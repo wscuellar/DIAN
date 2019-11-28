@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="Gosocket.Dian.Web.Services.WcfDianCustomerServices" CodeBehind="WcfDianCustomerServices.svc.cs" %>

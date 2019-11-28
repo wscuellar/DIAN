@@ -1,0 +1,173 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Domain.Common
+@{
+    if (Model.ContributorTypeId == (int)ContributorType.Biller)
+    {
+        ViewBag.Title = "Editar facturador electrónico";
+    }
+    else if (Model.ContributorTypeId == (int)ContributorType.Provider)
+    {
+        ViewBag.Title = "Editar proveedor tecnológico";
+    }
+    else
+    {
+        ViewBag.Title = "Editar adquiriente";
+    }
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("Edit", "Contributor", FormMethod.Post, new { id = "edit-contributor-form" }))
+                        {
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("View", "Contributor", new { id = Model.Id })" class="btn btn-default">Cancelar</a>
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="edit-contributorFile-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mySmallModalLabel">Editar fichero </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("UpdateContributorFile", "Contributor", FormMethod.Post, new { id = "edit-contributorFile-form" }))
+            {
+                @Html.Hidden("contributorFileId")
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Comentarios", new { @class = "control-label" })
+                                @Html.TextArea("comments", new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div id="providers" class="col-sm-6 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Estado", new { @class = "control-label" })
+                                @Html.DropDownList("statusId", new SelectList(Model.FileStatuses, "Id", "Name"), new { @class = "form-control selectpicker" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-default btn-gosocket btn-modal">Guardar</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/contributor/contributor.js?1.0.0"></script>
+
+    <script>
+        $(document).ready(function ($) {
+
+            disableFields();
+            @if (Model.OperationModeId == null)
+            {
+                Model.OperationModeId = 0;
+            }
+            if (@Model.OperationModeId === @((int)OperationMode.Own))
+                $('.software').css('display', '');
+            if (@Model.OperationModeId === @((int)OperationMode.Provider))
+                $('#providers').css('display', '');
+
+            $('#OperationModeId').change(function () {
+                if ($(this).val() === '@((int)OperationMode.Provider)')
+                    $('#providers').css('display', '');
+                else
+                    $('#providers').css('display', 'none');
+
+                if ($(this).val() === '@((int)OperationMode.Own)')
+                    $('.software').css('display', '');
+                else
+                    $('.software').css('display', 'none');
+            });
+            @{
+                string isProvider = "";
+                if (User.ContributorTypeId() == (int)ContributorType.Provider) { isProvider = "True"; } else { isProvider = "False"; }
+            }
+
+            $('.btn-save').click(function () {
+                if ('@isProvider' === 'True') {
+                        bootbox.dialog({
+                        title: "Advertencia",
+                        message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está usted seguro?</strong></h4>Al realizar esta acción deberá iniciar sesión nuevamente.</div></div>",
+                        buttons: {
+                            del: {
+                                label: "Aceptar",
+                                className: "btn-gosocket",
+                                callback: function () {
+                                        var form = $('#edit-contributor-form');
+                                        if (form.valid()) {
+                                            showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
+                                            form.submit();
+                                        }
+                                    }
+                                },
+                        }
+                        });
+                    }
+                    else {
+                        var form = $('#edit-contributor-form');
+                        if (form.valid()) {
+                            showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
+                            form.submit();
+                        }
+                    }
+                });
+        });
+
+        function cleanFields() {
+            $('#Name').val('');
+            $('#BusinessName').val('');
+            $('#Email').val('');
+        }
+        function changeStatus(button) {
+            var comments = button.attr("data-comments");
+            var statusIndex = button.attr("data-statusIndex");
+            var id = button.attr("data-id");
+            $("#comments").val(comments);
+            $("#statusId").val(statusIndex).change();
+            $("#contributorFileId").val(id);
+            $('#edit-contributorFile-modal').modal('show');
+        }
+        function disableFields() {
+            $('#Code').attr('readonly', true);
+            $('#Name').attr('readonly', true);
+            $('#BusinessName').attr('readonly', true);
+            //$('#Email').attr('readonly', true);
+        }
+        var formModal = $('#edit-contributorFile-form');
+        $('.btn-modal').click(function () {
+            formModal.submit();
+        });
+
+    </script>
+}

@@ -1,0 +1,77 @@
+﻿@model Gosocket.Dian.Web.Models.DocValidatorModel
+
+@{
+    ViewBag.Title = "Detalles del documento";
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+
+    <style>
+        .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+            width: 135px !important;
+        }
+
+        
+    </style>
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+
+        <div class="tab-base">
+            <!-- Navs Tabs -->
+
+            <ul class="nav nav-tabs">
+                <li class="active"><a>@Model.Document.DocumentTypeName</a></li>
+                @foreach (var item in Model.Document.References)
+                {
+                    <li><a href="@Url.Action("Details", "Document", new { trackId = item.DocumentKey })">@item.DocumenTypeName</a></li>
+                }
+                @foreach (var t in Model.Document.DocumentTags)
+                {
+                    <li><a href="@Url.Action("Details", "Document", new { trackId = t.Value })">@t.Description</a></li>
+                }
+            </ul>
+
+            <!--Navs Content -->
+            <div class="tab-content">
+                <div class="panel-body padding-top-20">
+                    @Html.Partial("_ViewerPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('.document-row').click('onClick', function () {
+                if (!$(this).hasClass('not-redirect')) {
+                    var id = $(this).context.getAttribute('data-id');
+                    var partitionKey = $(this).context.getAttribute('data-partitionKey');
+                    window.location.href = "/Document/Details?trackId=" + id + "&partitionKey=" + partitionKey;
+                }
+                else
+                    $(this).removeClass('not-redirect')
+            });
+        });
+
+        function changeTab(id) {
+            window.location.href = "/Document/Details?trackId=" + id;
+        }
+    </script>
+
+}

@@ -1,0 +1,57 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control" } };}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("Configuration", "Contributor", FormMethod.Post, new { id = "configuration-contributor-form" }))
+                        {
+                            @Html.HiddenFor(m => m.Id)
+                            @Html.HiddenFor(m => m.Code)
+                            @Html.HiddenFor(m => m.Name)
+                            @Html.HiddenFor(m => m.BusinessName)
+                            <div class="panel-body padding-20 padding-bottom-10">
+                                <div class="row">
+                                    <div class="col-sm-3 padding-xs-0">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.ExchangeEmail, new { @class = "control-label" })
+                                            @Html.TextBoxFor(m => m.ExchangeEmail, defaultHtmlAttr)
+                                            @Html.ValidationMessageFor(m => m.ExchangeEmail, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel-footer text-right">
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $('.btn-save').click(function () {
+            var form = $('#configuration-contributor-form');
+            if (form.valid()) {
+                showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+                form.submit();
+            }
+        });
+    </script>
+}

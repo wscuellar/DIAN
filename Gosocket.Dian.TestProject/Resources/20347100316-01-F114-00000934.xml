@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ext:UBLExtensions>
+    <ext:UBLExtension>
+      <ext:ExtensionContent>
+        <sac:AdditionalInformation>
+          <sac:AdditionalMonetaryTotal>
+            <cbc:ID>1001</cbc:ID>
+            <cbc:PayableAmount currencyID="PEN">109.32</cbc:PayableAmount>
+          </sac:AdditionalMonetaryTotal>
+          <sac:AdditionalMonetaryTotal>
+            <cbc:ID>1002</cbc:ID>
+            <cbc:PayableAmount currencyID="PEN">0.00</cbc:PayableAmount>
+          </sac:AdditionalMonetaryTotal>
+          <sac:AdditionalMonetaryTotal>
+            <cbc:ID>1003</cbc:ID>
+            <cbc:PayableAmount currencyID="PEN">0.00</cbc:PayableAmount>
+          </sac:AdditionalMonetaryTotal>
+          <sac:AdditionalMonetaryTotal>
+            <cbc:ID>1004</cbc:ID>
+            <cbc:PayableAmount currencyID="PEN">0.00</cbc:PayableAmount>
+          </sac:AdditionalMonetaryTotal>
+          <sac:AdditionalProperty>
+            <cbc:ID>1000</cbc:ID>
+            <cbc:Value>Recibimos la suma de  CIENTO VEINTE Y NUEVE con 00/100 Soles</cbc:Value>
+          </sac:AdditionalProperty>
+        </sac:AdditionalInformation>
+      </ext:ExtensionContent>
+    </ext:UBLExtension>
+  <ext:UBLExtension><ext:ExtensionContent><Signature Id="SignatureSP" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>dhHSHY3mqJe39ZSuDtOdUcAAhB4=</DigestValue></Reference></SignedInfo><SignatureValue>nRQRdZbCJzKxMx91Y9EUB9jGUJwmEDuLIoXCARHPj0MM5KoQ5Po1eX+y7oa36TF5dkc1z66o9CBasgJDVqyEJ6m6I8Bg9YtrppbNXWVqBIZzgzJNShUKBDUZKMOhk+tApSpGxeq7Uh7mHbR76dlHKCY1KpDxBfKWjRYBtItTnjcvm+8Y01esLlhDwPcgixdYU4tP1Bui+G6679cACuD4iBpGDex2UoVAvHl7jELxQjWfKzS7Uj/Q71ypO+1DjK6vcTYM4/yODIPAnpfW+xEsapq4QahezdqG1xyPQEt82rE/roRnfr8t15Apw1MN5O+JJ03VtiG7VvYpazV6dAnhrg==</SignatureValue><KeyInfo><X509Data><X509SubjectName>C=PE, CN=MARIA ELENA ALARCON VASQUEZ, G=MARIA ELENA, SN=ALARCON VASQUEZ, T=DIRECTORA DE FINANZAS, OU=20347100316, OU=FINANZAS, O=ADIDAS PERU SAC, OID.1.3.6.1.4.1.17326.30.4=DNI, OID.1.3.6.1.4.1.17326.30.3=20347100316, OID.1.3.6.1.4.1.17326.30.2=RUC, SERIALNUMBER=000725962, S=LIMA-LIMA, L=MIRAFLORES, Description=Qualified Certificate: RACER-PFVP-SW-KPSC, E=maria.elena.alarcon@adidas-group.com</X509SubjectName><X509Certificate>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</X509Certificate></X509Data></KeyInfo></Signature></ext:ExtensionContent></ext:UBLExtension></ext:UBLExtensions>
+  <cbc:UBLVersionID>2.0</cbc:UBLVersionID>
+  <cbc:CustomizationID>1.0</cbc:CustomizationID>
+  <cbc:ID>F114-934</cbc:ID>
+  <cbc:IssueDate>2017-10-15</cbc:IssueDate>
+  <cbc:InvoiceTypeCode>01</cbc:InvoiceTypeCode>
+  <cbc:DocumentCurrencyCode>PEN</cbc:DocumentCurrencyCode>
+  <cac:Signature>
+    <cbc:ID>IDSignCF</cbc:ID>
+    <cac:SignatoryParty>
+      <cac:PartyIdentification>
+        <cbc:ID>20347100316</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name>adidas Peru SAC</cbc:Name>
+      </cac:PartyName>
+    </cac:SignatoryParty>
+    <cac:DigitalSignatureAttachment>
+      <cac:ExternalReference>
+        <cbc:URI>#SignatureCF</cbc:URI>
+      </cac:ExternalReference>
+    </cac:DigitalSignatureAttachment>
+  </cac:Signature>
+  <cac:AccountingSupplierParty>
+    <cbc:CustomerAssignedAccountID>20347100316</cbc:CustomerAssignedAccountID>
+    <cbc:AdditionalAccountID>6</cbc:AdditionalAccountID>
+    <cac:Party>
+      <cac:PartyName>
+        <cbc:Name>adidas Peru SAC</cbc:Name>
+      </cac:PartyName>
+      <cac:PostalAddress>
+        <cbc:ID>150122</cbc:ID>
+        <cbc:StreetName>AV. 28 DE JULIO NRO. 1011INT. 1001 URB. SAN ANTONIO LIMA</cbc:StreetName>
+        <cbc:CityName>
+        </cbc:CityName>
+        <cac:Country>
+          <cbc:IdentificationCode>PE</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>adidas Peru SAC</cbc:RegistrationName>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:AccountingCustomerParty>
+    <cbc:CustomerAssignedAccountID>20601473471</cbc:CustomerAssignedAccountID>
+    <cbc:AdditionalAccountID>6</cbc:AdditionalAccountID>
+    <cac:Party>
+      <cac:PartyName>
+        <cbc:Name>KENZO Y CIA SAC</cbc:Name>
+      </cac:PartyName>
+      <cac:PostalAddress>
+        <cbc:ID>
+        </cbc:ID>
+        <cbc:StreetName>LIMA</cbc:StreetName>
+        <cbc:CityName>
+        </cbc:CityName>
+        <cac:Country>
+          <cbc:IdentificationCode>PE</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>KENZO Y CIA SAC</cbc:RegistrationName>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="PEN">19.68</cbc:TaxAmount>
+    <cac:TaxSubtotal>
+      <cbc:TaxAmount currencyID="PEN">19.68</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>1000</cbc:ID>
+          <cbc:Name>IGV</cbc:Name>
+          <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+  </cac:TaxTotal>
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="PEN">0.00</cbc:TaxAmount>
+    <cac:TaxSubtotal>
+      <cbc:TaxAmount currencyID="PEN">0.00</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>2000</cbc:ID>
+          <cbc:Name>ISC</cbc:Name>
+          <cbc:TaxTypeCode>EXC</cbc:TaxTypeCode>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+  </cac:TaxTotal>
+  <cac:LegalMonetaryTotal>
+    <cbc:PayableAmount currencyID="PEN">129.00</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  <cac:InvoiceLine>
+    <cbc:ID>1</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="NIU">1.00</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="PEN">109.32</cbc:LineExtensionAmount>
+    <cac:PricingReference>
+      <cac:AlternativeConditionPrice>
+        <cbc:PriceAmount currencyID="PEN">129.00</cbc:PriceAmount>
+        <cbc:PriceTypeCode>01</cbc:PriceTypeCode>
+      </cac:AlternativeConditionPrice>
+    </cac:PricingReference>
+    <cac:AllowanceCharge>
+      <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+      <cbc:Amount currencyID="PEN">0.00</cbc:Amount>
+    </cac:AllowanceCharge>
+    <cac:TaxTotal>
+      <cbc:TaxAmount currencyID="PEN">19.68</cbc:TaxAmount>
+      <cac:TaxSubtotal>
+        <cbc:TaxAmount currencyID="PEN">19.68</cbc:TaxAmount>
+        <cac:TaxCategory>
+          <cbc:TaxExemptionReasonCode>10</cbc:TaxExemptionReasonCode>
+          <cac:TaxScheme>
+            <cbc:ID>1000</cbc:ID>
+            <cbc:Name>IGV</cbc:Name>
+            <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+          </cac:TaxScheme>
+        </cac:TaxCategory>
+      </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <cac:Item>
+      <cbc:Description>CE9923 - LK LOGO FZ HD - S</cbc:Description>
+      <cac:SellersItemIdentification>
+        <cbc:ID>CE9923</cbc:ID>
+      </cac:SellersItemIdentification>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="PEN">109.32</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+  
+<Personalizados>
+    <DocPersonalizado dteID="T01934">
+      <campoString name="SIGEXT_InvoiceNumber" xmlns="">F114-934</campoString><campoString name="SIGEXT_ResponseID" xmlns="">75cdc221-64c6-4f28-8517-07995ac304f1</campoString><campoString name="SIGEXT_ResponseCode" xmlns="">0001</campoString><campoString name="SIGEXT_ResponseText" xmlns="">La Factura numero F114-934 ha sido aceptada</campoString><campoString name="SIGEXT_SunatProcessNumber" xmlns="">201701453196650</campoString><campoString name="SIGEXT_RucReceiver" xmlns=""></campoString><campoString name="SIGEXT_ErrorCode" xmlns=""></campoString><campoString name="SIGEXT_ErrorText" xmlns=""></campoString><campoString name="SIGEXT_SunatDate" xmlns="">2017.10.15</campoString><campoString name="SIGEXT_SunatTime" xmlns="">18:20:12</campoString><campoString name="SIGEXT_SendDate" xmlns="">2017.10.15</campoString><campoString name="SIGEXT_SendTime" xmlns="">00:00:00</campoString><campoString name="PDF417">20347100316|01|F114|934|19.68|129.00|2017-10-15|6|20601473471|dhHSHY3mqJe39ZSuDtOdUcAAhB4=|nRQRdZbCJzKxMx91Y9EUB9jGUJwmEDuLIoXCARHPj0MM5KoQ5Po1eX+y7oa36TF5dkc1z66o9CBasgJDVqyEJ6m6I8Bg9YtrppbNXWVqBIZzgzJNShUKBDUZKMOhk+tApSpGxeq7Uh7mHbR76dlHKCY1KpDxBfKWjRYBtItTnjcvm+8Y01esLlhDwPcgixdYU4tP1Bui+G6679cACuD4iBpGDex2UoVAvHl7jELxQjWfKzS7Uj/Q71ypO+1DjK6vcTYM4/yODIPAnpfW+xEsapq4QahezdqG1xyPQEt82rE/roRnfr8t15Apw1MN5O+JJ03VtiG7VvYpazV6dAnhrg==|</campoString>
+      <campoString name="DigestValue">dhHSHY3mqJe39ZSuDtOdUcAAhB4=</campoString>
+      <campoString name="CodTienda">PE114</campoString>
+      <campoString name="NomTienda">BCS Larcomar</campoString>
+      <campoString name="DirTienda">Malec¢n De La Reserva 610 C.C. Larcomar. Tienda L-105</campoString>
+      <campoString name="Tipo">01</campoString>
+      <campoString name="Serie">F114</campoString>
+      <campoString name="Numero">00000934</campoString>
+      <campoString name="Mail">0</campoString>
+      <campoString name="SYSEMI">PV</campoString>
+      <campoString name="FormatoTienda">BCS</campoString>
+      <campoString name="Vendedor">254 - BUGARIN</campoString>
+      <campoString name="TransRBO">TPE114010000121974</campoString>
+      <campoString name="FormaPago1">Visa</campoString>
+      <campoNumero name="Monto1001">109.32</campoNumero>
+      <campoNumero name="Monto1002">0.00</campoNumero>
+      <campoNumero name="Monto1003">0.00</campoNumero>
+      <campoNumero name="Monto1004">0.00</campoNumero>
+      <campoNumero name="Monto2005">0.00</campoNumero>
+      <campoNumero name="SumIGV">19.68</campoNumero>
+      <campoNumero name="SumISC">0.00</campoNumero>
+      <campoNumero name="TotalVenta">129.00</campoNumero>
+      <campoNumero name="MontoPago1">129.00</campoNumero>
+    </DocPersonalizado>
+  </Personalizados></Invoice>

@@ -1,0 +1,68 @@
+﻿@using Microsoft.Owin.Security
+@using System.Configuration
+@using Gosocket.Dian.Web.Models
+@model LoginTwoFactorViewModel
+@{
+    ViewBag.Title = "Acceder";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<!-- LOGIN FORM -->
+<!--===================================================-->
+<div class="cls-content">
+    <div class="cls-content-sm panel">
+        <div class="panel-body">
+            <a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
+           
+            <div class="form-group" style="margin-top: 15px;">
+                <div class="input-group">
+                    <input id="search-cufe" required name="cufe" data-mailcheckfield=".email-suggestion" autofocus id="NitEnterprise" type="text" ng-model="model.username" class="form-control" placeholder="CUFE o UUID" maxlength="100">
+                    <span class="input-group-btn">
+                        <a class="btn btn-default" onclick="filterSearch();"><i class="fa fa-search" style="color:green;"></i></a>
+                    </span>
+                </div>
+                <div class="pad-top" name="rp">
+                    @if (ViewBag.ListErrors != null && ViewBag.ListErrors.Count > 0)
+                    {
+                        foreach (var item in ViewBag.ListErrors)
+                        {
+                            <div class="row" ng-show="model.errorMessage" style="margin-top: -10px; margin-bottom: 10px;">
+                                <div class="col-md-12 col-sm-12">
+                                    <code>@item</code>
+                                </div>
+                            </div>
+
+                        }
+
+                    }
+                </div>
+                <div class="pad-top" name="rp">
+                    <a href="@Url.Action("Login","AccountTwoFactor")" class="btn-link mar-hor" style="color: black;">Ingresar como usuario</a>
+                </div>
+            </div>
+
+            </div>
+    </div>
+
+</div>
+
+
+@section scripts
+{
+    <script type="text/javascript">
+
+        function filterSearch() {
+            var cufe = $('#search-cufe').val();
+            if (cufe != null) {
+                var redirectUrl = "../Document/FindDocument";
+                var form = $('<form action="' + redirectUrl + '" method="post">' +
+                    '<input type="hidden" name="trackId" value="' + cufe + '" />' +
+                    '</form>');
+                $('body').append(form);
+                $(form).submit();
+            }
+        }
+
+    </script>
+
+}
+<!--===================================================-->

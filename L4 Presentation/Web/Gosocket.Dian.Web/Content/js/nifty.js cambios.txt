@@ -1,0 +1,32 @@
+Sobre cada cambio hay un comentario:
+// *** GOSOCKET ***
+
+NIFTY LANGUAGE SELECTOR v1.1 (Comentada)
+
+NIFTY NAVIGATION v1.3.1
+
+Comentada la funcion bindSmallNav (line 739)
+
+funcion updateNav (line 974) 
+comentado
+/*bindSmallNav();*/
+
+function updateSize
+modificada (line 951)
+if (screenCat != currentScreen) {
+            screenCat = currentScreen;
+            nifty.screenSize = currentScreen;
+            if ((nifty.screenSize == 'md' || nifty.screenSize == 'lg') && !nifty.container.hasClass('mainnav-lg')) {
+                nifty.container.removeClass('mainnav-out mainnav-xs mainnav-sm mainnav-md').addClass('mainnav-lg');
+            }
+            if (nifty.screenSize == 'sm' || nifty.screenSize == 'xs') {
+                nifty.container.removeClass('mainnav-out mainnav-sm mainnav-md mainnav-lg').addClass('mainnav-xs');
+            }
+            /*if (nifty.screenSize == 'sm' && nifty.container.hasClass('mainnav-lg')) {
+                $.niftyNav('collapse');
+            } else if (nifty.screenSize == "xs" && nifty.container.hasClass('mainnav-lg')) {
+                nifty.container.removeClass('mainnav-sm mainnav-out mainnav-lg').addClass('mainnav-sm');
+            }*/
+        }
+
+

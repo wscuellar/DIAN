@@ -1,0 +1,304 @@
+﻿@{
+    ViewBag.Title = "Ver Documento";
+}
+
+@section css
+{
+    <style>
+        
+    </style>
+    <link href="~/Content/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <!--Nav Tabs-->
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a data-="tab" href="">Factura Electrónica</a>
+                </li>
+            </ul>
+
+            <!--Tabs Content-->
+            <div class="tab-content">
+                <div id="tab-document" class="tab-pane fade active in">
+                    <div class="row">
+                        <div class="col-sm-7">
+                            <!--Sender Information-->
+                            <div class="media">
+                                <div class="media-left">
+                                    <div class="img-sm bg-gray-light" id="default-1" style="display: none;">
+                                        <h2 class="mar-no text-center padding-top-5">Caracol Televisión S.A</h2>
+                                    </div>
+                                    <img id="img-1"
+                                         src="~/Content/img/DHL_logo.png"
+                                         alt="LOGO"
+                                         style="max-width: 120px; max-height: 40px;">
+                                </div>
+                                <div class="media-body">
+                                    <div class="text-bold">DHL Express Colombia Ltda.</div>
+                                    <small class="text-muted">contacto@email.com</small>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="hr-sm visible-xs">
+                        <div class="col-sm-5 clearfix">
+                            <!--Details Information-->
+                            <div class="pull-right text-right">
+                                <p class="mar-no">
+                                    <small class="text-muted">Recibido en Gosocket: 29 agosto, 2018</small>
+                                </p>
+                                <a href="#" id="to-attachment">
+                                    <strong>Adjuntos (1) </strong>
+                                    <i class="fa fa-paperclip fa-lg fa-fw"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Message-->
+                    <!--===================================================-->
+                    <div class="mar-top pad-no bg-white" id="html-gdoc">
+
+                        <div style="display: none;" id="viewer-company-options">
+
+
+                        </div>
+
+                        <div class="fab-shadow"></div>
+                        <div>
+                            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                            <style>
+                                
+                            </style>
+
+
+                            <div>
+                                <div class="row render-row">
+                                    <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
+                                        <img class="img-responsive" style="max-height: 130px;" src="~/Content/img/DHL_logo.png">
+                                    </div>
+                                    <div class="col-md-5" style="padding-top: 7px; padding-left: 0">
+                                        <p>
+                                            <span class="emisor-name">DHL Express Colombia Ltda.</span>
+                                            <br>
+                                            <span class="datos-contacto">Datos de contacto</span>
+                                            <br>
+                                            Dirección: CARRERA 85 D No. 46A-38<br>
+                                            Municipio: Bogota<br>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4" style="padding-top: 7px; padding-left: 0;">
+                                        <p>
+                                            <span class="tipo-doc">FACTURA ELECTRÓNICA</span>
+                                            <br>
+                                            ID: PRUE983100124<br>
+
+                                            NIT emisor: 860502609<br>
+                                            NIT receptor: 8909169882
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row render-row">
+                                    <div class="col-md-6" style="padding: 0">
+                                        <p>
+                                            <span class="datos-receptor">DATOS DEL RECEPTOR</span>
+                                            <br>
+                                            Nombre: AVERY DENNISON RETAIL INFORMATION SERVICES CO<br>
+                                            Dirección: LOMBIA S.A.SCRA 50 F # 7 SUR 31<br>
+                                            Municipio: <br>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6" style="padding-left: 0">
+                                        <p>
+                                            Fecha emisión: 31-5-2018<br>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row render-row">
+                                    <div class="span12">
+                                        <p>
+                                            DETALLES
+                                        </p>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="text-align: center;">Nombre</th>
+                                                        <th style="text-align: center;">Unidad</th>
+                                                        <th style="text-align: right;">Cantidad</th>
+                                                        <th style="text-align: right;">Precio</th>
+                                                        <th style="text-align: right;">Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="text-align: center;">Envios Nacionales e Internacionales</td>
+                                                        <td style="text-align: center;"></td>
+                                                        <td style="text-align: right;">6,00</td>
+                                                        <td style="text-align: right;">3.582.372,00</td>
+                                                        <td style="text-align: right;">3.582.372,00</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row render-row">
+                                    <div class="col-md-7" style="padding-left: 0">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <p>REFERENCIAS DEL DOCUMENTO</p>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered align-middle">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align: center;">Tipo</th>
+                                                                <th style="text-align: center;">Número</th>
+                                                                <th style="text-align: center;">Fecha</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5" style="padding-right: 0">
+                                        <p style="text-align: right;font-weight: bold;">
+                                            TOTALES E IMPUESTOS<br>
+                                        </p>
+                                        <p style="text-align: right;font-weight: bold;">
+                                            Monto Neto: 3.582.372,00<br>
+                                            IVA: 0,00<br>
+                                            Descuento: 0,00<br>
+                                            Monto Total: 3.582.372,00<br>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row render-row">
+                                    <p class="col-md-5" id="imagecode">
+                                    </p>
+                                </div>
+                                <div class="row render-row bg-gray-light">
+                                    <div class="col-md-12" style="text-align: center; padding: 0;">
+                                        <p>
+                                            ESTO ES LA VISTA PREVIA DEL XML ALMACENADO. SI DESEA VER LA REPRESENTACIÓN GRÁFICA DEL DOCUMENTO
+                                            SEGÚN LO ESTIPULADO EN LA LEGISLACIÓN LOCAL DE FACTURACIÓN ELECTRÓNICA HAGA CLIC EN LA OPCIÓN DE "Descargar PDF".
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                    <!--===================================================-->
+                    <!--End Message-->
+                    <!-- Attach Files-->
+                    <!--===================================================-->
+                    <div class="pad-ver" id="attachments-container">
+                        <div class="row mar-no" style="border-bottom: 2px solid #348441;">
+                            <div class="col-sm-6 pad-no">
+                                <h4 class="margin-top-10"><i class="fa fa-paperclip fa-fw"></i> Adjuntos <span>(1)</span></h4>
+                            </div>
+                            <div class="col-sm-6 pad-no">
+                                <a href="#" class="btn btn-default btn-hover-gosocket pull-right"><i class="fa fa-plus"></i>&nbsp;&nbsp;Agregar adjunto</a>
+                            </div>
+                        </div>
+                        <ul class="mail-attach-list list-ov">
+                            <li class="clearfix">
+                                <!--Download button-->
+                                <div class="mail-attach-btn">
+                                    <a href="#" class="btn btn-default btn-hover-gosocket add-tooltip" title="Descargar Adjunto" data-html="true" data-original-title="Descargar adjunto"><i class="fa fa-download"></i></a>
+                                    <a href="#" class="btn btn-default btn-hover-gosocket add-tooltip"
+                                       title="Editar adjunto" data-html="true" data-original-title="Editar adjunto">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a href="#" class="btn-attach-delete btn btn-default btn-hover-gosocket add-tooltip"
+                                       title="Eliminar adjunto" data-html="true" data-original-title="Eliminar adjunto"
+                                       data-id="1">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </div>
+
+                                <!--File information-->
+                                <div class="mail-attach-file">
+                                    <div class="media-body">
+                                        <div class="text-bold">
+                                            <a href="#">11002980005140</a>
+                                        </div>
+                                        <small class="text-muted">71 - RECHAZADO</small>&nbsp;&nbsp;&nbsp;&nbsp;<small class="text-muted">Fecha: 30/08/2018</small>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--===================================================-->
+                    <!-- End Attach Files-->
+                    <!-- Events -->
+                    <div class="pad-ver" >
+                        <div class="row mar-no" style="border-bottom: 2px solid #348441;">
+                            <div class="col-sm-6 pad-no">
+                                <h4 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i> Tracking de Documento</h4>
+                            </div>
+                        </div>
+                        <table class="table table-vcenter margin-bottom-0">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>27/8/2018 10:11:14</td>
+                                    <td><label class="label label-success">Exitoso</label></td>
+                                </tr>
+                                <tr>
+                                    <td>27/8/2018 10:10:50</td>
+                                    <td><label class="label label-warning">Firma Validada</label></td>
+                                </tr>
+                                <tr>
+                                    <td>27/8/2018 10:10:02</td>
+                                    <td><label class="label label-warning">Esquema Validado</label></td>
+                                </tr>
+                                <tr>
+                                    <td>27/8/2018 10:09:05</td>
+                                    <td><label class="label label-default">Recibido</label></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--===================================================-->
+                    <!--===================================================-->
+                </div>
+                <div id="tab-comments" class="tab-pane fade">
+                </div>
+                <!-- #endregion -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script src="~/Content/plugins/bootstrap-tagsinput/bootstrap-tagsinput.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+        });
+        var downloadAttach = $("#download-attach");
+        downloadAttach.show().click(function (e) {
+            e.preventDefault();
+            document.location.href = "@Url.Action("DownloadAttachments", "Document")";
+        });
+        $.niftyAside('show');
+    </script>
+}
+

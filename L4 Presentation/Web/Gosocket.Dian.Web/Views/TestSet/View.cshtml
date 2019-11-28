@@ -1,0 +1,96 @@
+﻿@model Gosocket.Dian.Web.Models.TestSetViewModel
+@using Gosocket.Dian.Web.Common
+@using Gosocket.Dian.Domain.Common
+@{
+    ViewBag.Title = "Set de pruebas";
+}
+@section css{
+    <style>
+        .fa-caret-down {
+            display: none;
+        }
+    </style>
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            @if (!User.IsInAnyRole("Administrador", "Super") && !string.IsNullOrEmpty(Model.TestSetId))
+            {
+                if (Model.Status == (int)TestSetStatus.InProcess)
+                {
+                    <div class="row padding-25 padding-bottom-0">
+                        <div class="alert custom-alert-success col-sm-12">
+                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                            Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong style='font-size: 14px; font-weight: bold;'>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.InProcess)</strong>.<br />
+                            Usted debe proporcionar el identificador del set de pruebas (TestSetId) <strong style="font-size: 14px; font-weight: bold;">@Model.TestSetId</strong> en el web services para el envío de su set de pruebas.
+                        </div>
+                    </div>
+                }
+                if (Model.Status == (int)TestSetStatus.Accepted)
+                {
+                    <div class="row padding-25 padding-bottom-0">
+                        <div class="alert custom-alert-success col-sm-12">
+                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                            Su empresa ha superado satisfactoriamente las pruebas de validación de su set de pruebas.
+                        </div>
+                    </div>
+                }
+                if (Model.Status == (int)TestSetStatus.Rejected)
+                {
+                    <div class="row padding-25 padding-bottom-0">
+                        <div class="alert custom-alert-danger col-sm-12">
+                            <h4><i class="fa fa-exclamation-circle" aria-hidden"true"=""></i> Importante!</h4>
+                            Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong style='font-size: 14px; font-weight: bold;'>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.Rejected)</strong>.
+                            Usted debe reiniciar el proceso para poder poder enviar nuevos documentos a su set de pruebas con indentificador <strong style="font-size: 14px; font-weight: bold;">@Model.TestSetId</strong>
+                        </div>
+                    </div>
+                }
+            }
+
+            <div class="panel-body padding-top-0">
+
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @Html.Partial("_form")
+                        <div class="panel-footer text-right">
+                            @if (User.IsInAnyRole("Administrador", "Super"))
+                            {
+                                <a href="@Url.Action("List", "TestSet")" class="btn btn-default">Volver</a>
+                                <a href="@Url.Action("Edit", "TestSet", new { operationModeId = Model.OperationModeId })" class="btn btn-default btn-hover-gosocket">Editar</a>
+                            }
+                            else if (User.ContributorTypeId() == (int)ContributorType.Biller)
+                            {
+                                <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = ViewBag.ContributorId })" class="btn btn-default">Volver</a>
+                                <a href="@Url.Action("Tracking", "TestSet", new { contributorCode = ViewBag.ContributorCode, softwareId = ViewBag.SoftwareId, contributorTypeId = User.ContributorTypeId() })" class="btn btn-default btn-hover-gosocket">Detalles</a>
+                            }
+                            else if (User.ContributorTypeId() == (int)ContributorType.Provider)
+                            {
+                                <a href="@Url.Action("Check", "Contributor")" class="btn btn-default">Volver</a>
+                                <a href="@Url.Action("Tracking", "TestSet", new { contributorCode = ViewBag.ContributorCode, softwareId = ViewBag.SoftwareId, contributorTypeId = User.ContributorTypeId() })" class="btn btn-default btn-hover-gosocket">Detalles</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function ($) {
+            $('.fields').attr('readonly', true);
+
+            $('#OperationModeId').attr('disabled', 'disabled');
+        });
+
+    </script>
+}

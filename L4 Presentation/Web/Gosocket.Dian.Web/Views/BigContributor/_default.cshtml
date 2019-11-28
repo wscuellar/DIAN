@@ -1,0 +1,64 @@
+﻿
+@model Gosocket.Dian.Web.Models.RequestAuthorizationBigContributorViewModel
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control" } };}
+@{var defaultHtmlReadOnlyAttr = new Dictionary<string, object> { { "class", "form-control" }, { "readonly", "readonly" } };}
+
+<div class="row">
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.ContributorCode, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ContributorCode, defaultHtmlReadOnlyAttr)
+        </div>
+    </div>
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.ContributorName, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ContributorName, defaultHtmlReadOnlyAttr)
+        </div>
+    </div>
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.StatusDescription, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.StatusDescription, defaultHtmlReadOnlyAttr)
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Justification, new { @class = "control-label" })
+            @Html.TextAreaFor(m => m.Justification, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.Justification, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.MinimumInvoices, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.MinimumInvoices, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.MinimumInvoices, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-6 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.MaximumInvoices, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.MaximumInvoices, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.MaximumInvoices, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+@if (User.IsInRole("Administrador"))
+{
+    <div class="row">
+        <div class="col-sm-12 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Observations, new { @class = "control-label" })
+                @Html.TextAreaFor(m => m.Observations, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.Observations, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+}
+
+

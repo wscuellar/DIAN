@@ -1,0 +1,69 @@
+/* Higher than 1200 (desktop devices)
+====================================================================== */
+@media (min-width: 1400px) {
+#crush { width:1126px; margin:0 auto; padding-top:20px; padding-bottom:20px; }
+#logo { width:100%; height:auto; float:left; text-align:center }
+.logoimg { width:auto; height:auto; }
+#txt { width:100%; margin-top:20px; text-align:left; font-size:5.000em; }
+}
+
+/* Higher than 960 (desktop devices)
+====================================================================== */
+@media only screen and (min-width: 980px) and (max-width: 1199px){
+#crush { width:850px; margin:0 auto; padding-top:20px; padding-bottom:20px; }
+#logo { width:100%; height:auto; float:left; text-align:center }
+.logoimg { width:auto; height:auto; }
+#txt { width:100%; margin-top:20px; text-align:center }
+.txt01 { vertical-align:central;  font-size:6.250em; }
+.txt02 { vertical-align:central; font-size:2.500em; }
+.txt03 { vertical-align:central; font-size:2.500em; }
+.footimg { width:850px; height:auto; vertical-align:central; margin-top:20px }
+}
+
+/* Tablet Portrait (devices and browsers)
+====================================================================== */
+@media only screen and (min-width: 768px) and (max-width: 979px) {
+#crush { width:690px; margin:0 auto; padding-top:20px; padding-bottom:20px; }
+#logo { width:100%; height:auto; float:left; text-align:center }
+
+#txt { width:100%; margin-top:20px; text-align:center }
+.txt01 { font-size:6.250em; }
+.txt02 { font-size:2.500em; }
+.txt03 { font-size:2.500em; }
+.footimg { width:690px; height:auto; vertical-align:central; margin-top:20px }
+}
+
+/* All Mobile Sizes (devices and browser)
+====================================================================== */
+@media only screen and (max-width: 767px) {
+#crush { width:660px; margin:0 auto; padding-top:20px; padding-bottom:20px; }
+#logo { width:100%; height:auto; float:left; text-align:center }
+.logoimg { width:280px; height:auto; }
+#txt { width:100%; margin-top:20px; text-align:center }
+.txt01 { font-size:4.375em; }
+.txt02 { font-size:2.188em; line-height:30px; }
+.txt03 { font-size:1.65em; padding-top:4px }
+.footimg { width:660px; height:auto; vertical-align:central; margin-top:20px }
+}
+
+/* Mobile Landscape Size to Tablet Portrait (devices and browsers)
+====================================================================== */
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+#crush { width:400px; margin:0 auto; padding-top:20px; padding-bottom:20px; }
+#logo { width:100%; height:auto; float:left; text-align:center }
+.logoimg { width:220px; height:auto; }
+.footimg { width:400px; height:auto; vertical-align:central; margin-top:20px }
+}
+
+/* Mobile Portrait Size to Mobile Landscape Size (devices and browsers)
+=================================================================== */
+@media only screen and (max-width: 479px) {
+#crush { width:400px; margin:0 auto; vertical-align:middle; padding-top:20px; padding-bottom:20px; }
+#logo { width:100%; height:auto; float:left; text-align:center }
+.logoimg { width:190px; height:auto; }
+#txt { width:100%; margin-top:20px; text-align:center }
+.txt01 { font-size:3.438em; }
+.txt02 { font-size:1.625em; line-height:24px; padding:0 40px;}
+.txt03 { font-size:1.4em; padding-top:4px }
+.footimg { width:400px; height:auto; vertical-align:central; margin-top:20px }
+}

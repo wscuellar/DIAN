@@ -1,0 +1,58 @@
+﻿@model Gosocket.Dian.Web.Models.SoftwareViewModel
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control software-props" } };}
+
+<div class="row">
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Pin, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Pin, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.Pin, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Name, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.ContributorCode, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ContributorCode, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.ContributorCode, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.SoftwareUser, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.SoftwareUser, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.SoftwareUser, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.SoftwarePassword, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.SoftwarePassword, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.SoftwarePassword, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Url, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Url, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.Url, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.StatusName, new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.AcceptanceStatusSoftwareId, new SelectList(Model.Statuses, "Id", "Name",Model.AcceptanceStatusSoftwareId), new { @class = "form-control selectpicker", @id = "acceptanceStatusSoftware" })
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,32 @@
+﻿@model Gosocket.Dian.Web.Models.SoftwareTableViewModel
+
+<div class="table-responsive">
+
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Proveedor</th>
+                <th>Software</th>
+                <th>Código del Software</th>
+                <th class="text-center">Prefijo Asociado</th>
+                <th class="text-center">Fecha Asociación</th>
+                <th class="text-center"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.AssociatedRanges.OrderBy(a => a.AssociationDate))
+            {
+                <tr class=''>
+                    <td class="largeText iffyTip"><a>@r.SoftwareOwner</a></td>
+                    <td class="largeText iffyTip"><a>@r.SoftwareName</a></td>
+                    <td class="largeText iffyTip"><a>@r.SoftwareId</a></td>
+                    <td class="text-center smallText iffyTip"><a>@r.Serie</a></td>
+                    <td class="text-center smallText iffyTip"><a>@r.AssociationDate</a></td>
+                    <td class="text-center">
+                        <a href="javascript:void(0)" class="text-center" data-pk="@r.PartitionKey" data-rk="@r.RowKey" onclick="removeRangeAssociationAlert(this)"> <i class="fa fa-trash add-tooltip" data-original-title="Eliminar asociación"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

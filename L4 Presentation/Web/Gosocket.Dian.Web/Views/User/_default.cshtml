@@ -1,0 +1,32 @@
+﻿@model Gosocket.Dian.Web.Models.UserViewModel
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control user-props" } };}
+
+<div class="row">
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Code, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.IdentificationType, new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.IdentificationType, new SelectList(Model.IdentificationTypes, "Id", "Description", Model.IdentificationType), new { @class = "form-control selectpicker" })
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Name, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>

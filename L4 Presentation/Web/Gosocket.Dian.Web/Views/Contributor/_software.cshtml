@@ -1,0 +1,35 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+
+<div class="form-inline padding-bottom-10 padding-top-10 software" style="display:none;">
+    <div class="row margin-horizontal-0">
+        <div class="col-sm-12 table-toolbar-left padding-left-0  padding-bottom-0">
+            <h3 class="panel-title padding-0">Datos de software</h3>
+        </div>
+    </div>
+    <hr class="margin-0" />
+</div>
+
+<div class="row software" style="display:none;">
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Software.Name, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Software.Name, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Software.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Software.Pin, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Software.Pin, new { @class = "form-control" })
+        </div>
+    </div>
+
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Software.Url, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Software.Url, new { @class = "form-control", @disabled = "disabled" })
+            @Html.ValidationMessageFor(m => m.Software.Url, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>

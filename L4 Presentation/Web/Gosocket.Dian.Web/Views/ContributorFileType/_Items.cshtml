@@ -1,0 +1,33 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorFileTypeTableViewModel
+@using Gosocket.Dian.Web.Utils
+<div class="table-responsive">
+
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Obligatorio</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var fileType in Model.ContributorFileTypes)
+            {
+                <tr class='clickable-row' data-href="@Url.Action("View","ContributorFileType", new { id = fileType.Id })">
+                    <td class="text-nowrap"><a>@fileType.Name</a></td>
+                    <td class="text-nowrap">
+                        <a>
+                            @if (fileType.Mandatory)
+                            {
+                                @:Sí
+                            }
+                            else
+                            {
+                                @:No
+                            }
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

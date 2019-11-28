@@ -1,0 +1,23 @@
+﻿@using Gosocket.Dian.Infrastructure
+<div class="bhoechie-tab-content active">
+    <center>
+        <a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
+        @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Prod")
+        {
+        <div class="alert alert-primary" role="alert" style="margin-top: 20px;">
+            Se ha enviado la ruta de acceso al correo @ViewBag.UserEmail registrado en el RUT de la persona natural que se autenticó en el sistema.
+            <br />
+            El acceso estará disponible por 60 minutos.
+        </div>
+        }
+
+        @if (ConfigurationManager.GetValue("Environment") == "Dev" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test")
+        {
+            <div class="alert alert-success" role="alert" style="margin-top: 20px;">
+                <span>Acceso directo para ambiente de pruebas</span><br />
+                <a href="@ViewBag.Url">Clic para entrar</a>
+            </div>
+        }
+
+    </center>
+</div>

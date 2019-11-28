@@ -1,0 +1,317 @@
+﻿@using Gosocket.Dian.Web.Utils;
+@model Gosocket.Dian.Web.Models.ListSoftwareViewModel
+
+@{
+    ViewBag.Title = "Administrar Software";
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+
+    <style>
+        .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+            width: 135px !important;
+        }
+
+        .bootstrap-select {
+            margin-bottom: 0;
+        }
+
+            .bootstrap-select .dropdown-menu > .active > a,
+            .bootstrap-select .dropdown-menu > .active > a:focus,
+            .bootstrap-select .dropdown-menu > .active > a:hover {
+                background-color: #348441;
+            }
+
+        .company-logo {
+            max-width: 64px;
+            max-height: 32px;
+        }
+
+        .modal-header:after {
+            border-bottom: 2px solid #348441;
+        }
+
+        .tab-content .panel {
+            -webkit-box-shadow: none !important;
+            -ms-box-shadow: none !important;
+            box-shadow: none !important;
+        }
+
+        .bootstrap-filestyle {
+            margin-bottom: 5px;
+        }
+
+        .divider {
+            border-top: 1px solid #29b570;
+            display: block;
+            line-height: 1px;
+            margin: 15px 0;
+            position: relative;
+            text-align: center;
+        }
+
+            .divider .divider-title {
+                background: #fff;
+                font-size: 12px;
+                letter-spacing: 1px;
+                padding: 0 20px;
+                text-transform: uppercase;
+                color: #29b570;
+            }
+
+        .select2-container--default {
+            display: inline-table !important;
+        }
+
+            .select2-container--default .select2-selection--single {
+                height: 31px !important;
+                line-height: 1.4 !important;
+            }
+
+            .select2-container--default .select2-selection {
+                border-radius: 0px !important;
+                background-color: #fafafa !important;
+            }
+    </style>
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <!--Tabs Content-->
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">@ViewBag.Title</h3>
+                        </div>
+
+                        <div class="panel-body padding-top-20">
+                            @if (User.IsInRole("Administrador"))
+                            {
+                                <div class="pad-btm form-inline padding-bottom-0">
+                                    <div class="row margin-horizontal-0">
+                                        <div class="col-md-10 table-toolbar-left padding-left-0">
+                                            <a href="@Url.Action("AddSoftware", "Software")" class="btn btn-default btn-default btn-hover-gosocket btn-labeled fa fa-plus margin-right-10">Registrar Software</a>
+                                            @*<a href="#" class="btn btn-default btn-default btn-hover-gosocket btn-labeled fa fa-edit margin-right-10">Rangos Prueba</a>*@
+                                            <div class="input-group">
+                                                <span class="typeahead-spinner"><i class="fa fa-lg fa-spin fa-spinner"></i></span>
+                                                <span class="twitter-typeahead" style="position: relative; display: inline-block;">
+                                                    <input class="tt-hint" type="text" autocomplete="off" spellcheck="off" disabled="" style="position: absolute; top: 0px; left: 0px; border-color: transparent; box-shadow: none; background: none 0% 0% / auto repeat scroll padding-box border-box rgb(255, 255, 255);">
+                                                    <input id="input-searchPin" class="form-control tt-query" type="text" value="@Model.Pin" placeholder="Identificador o PIN" autocomplete="off" spellcheck="false" dir="auto" style="position: relative; vertical-align: top; background-color: transparent;">
+                                                    <span style="position: absolute; left: -9999px;visibility: hidden; white-space: nowrap;  font-size: 12px; font-style: normal; font-variant: normal; font-weight: 400;word-spacing: 0px; letter-spacing: 0px; text-indent: 0px; text-rendering: auto; text-transform: none;"></span>
+                                                    <span class="tt-dropdown-menu" style="position: absolute; top: 100%; left: 0px; z-index: 100; display: none;"></span>
+                                                </span>
+                                                <span class="input-group-btn">
+                                                    <button id="button-search" class="btn btn-default" type="button" onclick="filterSearch(1)"><i class="fa fa-search"></i></button>
+                                                </span>
+                                            </div>
+
+                                            @*filter status*@
+                                            <select class="selectpicker" id="search-status" data-href="" style="width:100px" onchange="filterSearch(1)">
+                                                <option value="-1">Todos</option>
+                                                @foreach (var item in DataUtils.GetAcceptanceStatusesSoftware())
+                                                {
+                                                    var text_color = "text-yellow";
+                                                    switch (item.Id)
+                                                    {
+                                                        case 1:
+                                                            text_color = "text-yellow";
+                                                            break;
+                                                        case 2:
+                                                            text_color = "text-gosocket";
+                                                            break;
+                                                        case 3:
+                                                            text_color = "text-green";
+                                                            break;
+                                                        case 4:
+                                                            text_color = "text-warning";
+                                                            break;
+                                                        default:
+                                                            text_color = "text-red";
+                                                            break;
+                                                    }
+                                                    if (Model.Status == item.Id)
+                                                    {
+                                                        <option value="@item.Id" data-icon="fa fa-circle @text_color" selected>&nbsp;@item.Name</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Id" data-icon="fa fa-circle @text_color">&nbsp;@item.Name</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <select class="select2" id="select-providers" style="width: 300px;">
+                                                <option value="">Todos</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-2 table-toolbar-right padding-right-0">
+                                            <!--Pager buttons-->
+                                            <span class="text-muted">
+                                                <strong>
+                                                    @(((Model.Page - 1) * 30) + 1)
+                                                    -
+                                                    @(((Model.Page - 1) * 30) + 30)
+                                                </strong>
+                                            </span>
+                                            <div class="btn-group btn-group margin-left-5">
+                                                <a class="btn btn-default paginate-btn leftPaging" onclick="filterSearch(@Model.Page-1)">
+                                                    <span class="fa fa-chevron-left"></span>
+                                                </a>
+                                                <a class="btn btn-default paginate-btn rightPaging" onclick="filterSearch(@Model.Page+1)">
+                                                    <span class="fa fa-chevron-right"></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="table-responsive">
+
+                                <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Identificador</th>
+                                            <th>Proveedor</th>
+                                            <th>Pin</th>
+                                            <th>Nombre</th>
+                                            <th>Estado</th>
+                                            <th>Fecha</th>
+                                            <th>Usuario</th>
+                                            <th>Contraseña</th>
+                                            <th>Url</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Softwares)
+                                        {
+                                            var text_color = "text-yellow";
+                                            switch (item.Status)
+                                            {
+                                                case 1:
+                                                    text_color = "text-yellow";
+                                                    break;
+                                                case 2:
+                                                    text_color = "text-gosocket";
+                                                    break;
+                                                case 3:
+                                                    text_color = "text-green";
+                                                    break;
+                                                case 4:
+                                                    text_color = "text-warning";
+                                                    break;
+                                                default:
+                                                    text_color = "text-red";
+                                                    break;
+                                            }
+                                            <tr class='clickable-row' data-href="@Url.Action("EditSoftware","Software", new { softwareid = new Guid(item.Id) })">
+                                                <td class="text-nowrap"><a>@item.Id</a></td>
+                                                <td class="text-nowrap"><a>@item.ProviderName</a></td>
+                                                <td class="text-nowrap"><a>@item.Pin</a></td>
+                                                <td class="text-nowrap"><a>@item.Name</a></td>
+                                                <td class="text-nowrap">
+                                                    <a><i class="fa fa-circle @text_color"></i>&nbsp;@item.StatusName</a>
+                                                </td>
+                                                <td class="text-nowrap">
+                                                    @if (item.Date.HasValue)
+                                                    {
+                                                        <a>@item.Date.Value.ToString("dd-MM-yyyy")</a>
+                                                    }
+                                                </td>
+                                                <td class="text-nowrap"><a>@item.SoftwareUser</a></td>
+                                                <td class="text-nowrap"><a>@item.SoftwarePassword</a></td>
+                                                <td class="text-nowrap"><a>@item.Url</a></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <hr class="margin-top-0">
+                            @if (User.IsInRole("Administrador"))
+                            {
+                                <div class="pull-right">
+                                    <!--Pager buttons-->
+                                    <span class="text-muted">
+                                        <strong>
+                                            @(((Model.Page - 1) * 30) + 1)
+                                            -
+                                            @(((Model.Page - 1) * 30) + 30)
+                                        </strong>
+                                    </span>
+                                    <div class="btn-group btn-group margin-left-5">
+                                        <a class="btn btn-default paginate-btn leftPaging" onclick="filterSearch(@Model.Page-1)">
+                                            <span class="fa fa-chevron-left"></span>
+                                        </a>
+                                        <a class="btn btn-default paginate-btn rightPaging" onclick="filterSearch(@Model.Page+1)">
+                                            <span class="fa fa-chevron-right"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                            </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+
+    <script>
+        $(document).ready(function ($) {
+            if (@Model.Page== 1) $('.leftPaging').hide();
+            if ('@Model.IsNextPage.ToString()' == 'False') $('.rightPaging').hide();
+            $.ajax({
+                url: "@Url.Action("GetProviders", "Provider")",
+                method: "POST",
+                error: function (a, b, c) {
+                },
+                success: function (data) {
+                    var providerId = '@Model.ProviderId';
+                    //Load select items
+                    $.each(data, function (i, p) {
+                        var newOption = '<option value="' + p.Id + '">' + p.Name + '</option>';
+                        if (p.Id == providerId) {
+                            newOption = '<option selected value="' + p.Id + '">' + p.Name + '</option>';
+                        }
+                        $('#select-providers').append(newOption);
+                    });
+                    $('#select-providers').trigger('change');
+                    $('#select-providers').change(filterSearch);
+                }
+            });
+        });
+
+        function filterSearch(pageNumber) {
+            var pin = $('#input-searchPin').val();
+            var status = $('#search-status').val();
+            var providerId = $('#select-providers').val();
+            console.log("pin:" + pin);
+            var redirectUrl = "../Software/Search";
+            var form = $('<form action="' + redirectUrl + '" method="post">' +
+                '<input type="hidden" name="Page" value="' + pageNumber + '" />' +
+                '<input type="hidden" name="Pin" value="' + pin + '" />' +
+                '<input type="hidden" name="Status" value="' + status + '" />' +
+                '<input type="hidden" name="ProviderId" value="' + providerId + '" />' +
+                '</form>');
+            $('body').append(form);
+            $(form).submit();
+        }
+    </script>
+
+}

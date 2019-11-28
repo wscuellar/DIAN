@@ -1,0 +1,181 @@
+﻿@model Gosocket.Dian.Web.Models.TestSetSummaryViewModel
+
+@{
+    ViewBag.Title = "Detalle de set de pruebas";
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+
+    <style>
+        .bootstrap-select {
+            margin-bottom: 0;
+        }
+
+            .bootstrap-select .dropdown-menu > .active > a,
+            .bootstrap-select .dropdown-menu > .active > a:focus,
+            .bootstrap-select .dropdown-menu > .active > a:hover {
+                background-color: #348441;
+            }
+
+        .company-logo {
+            max-width: 64px;
+            max-height: 32px;
+        }
+
+        .modal-header:after {
+            border-bottom: 2px solid #348441;
+        }
+
+        .tab-content .panel {
+            -webkit-box-shadow: none !important;
+            -ms-box-shadow: none !important;
+            box-shadow: none !important;
+        }
+
+        .bootstrap-filestyle {
+            margin-bottom: 5px;
+        }
+
+        .divider {
+            border-top: 1px solid #29b570;
+            display: block;
+            line-height: 1px;
+            margin: 15px 0;
+            position: relative;
+            text-align: center;
+        }
+
+            .divider .divider-title {
+                background: #fff;
+                font-size: 12px;
+                letter-spacing: 1px;
+                padding: 0 20px;
+                text-transform: uppercase;
+                color: #29b570;
+            }
+
+        .select2-container--default {
+            display: inherit !important;
+        }
+    </style>
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <!--Tabs Content-->
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">@ViewBag.Title - @Model.OperationModeName</h3>
+                        </div>
+
+                        <div class="panel-body padding-top-20">
+                            <div class="pad-btm form-inline padding-bottom-0">
+                                <div class="row margin-horizontal-0">
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="panel panel-bordered-default padding-0">
+                                        <div class="panel-body padding-0">
+                                            <div class="col-lg-12">
+                                                <div class="col-sm-6 col-md-3">
+                                                    <h4 class="text-center margin-bottom-0">Documentos enviados<br>@Model.TestSets.Count()</h4>
+                                                    <div id="documents-sentreceived-chart" style="height: 200px;"></div>
+                                                </div>
+                                                <div class="col-sm-6 col-md-3">
+                                                    <h4 class="text-center margin-bottom-0">@*Fallos en reglas mandatorias<br>@Model.TestSetsWithRulesMandatoryUnsuccessfully*@</h4>
+                                                    <div id="documents-mandatory-chart" style="height: 200px;"></div>
+                                                </div>
+                                                <div class="col-sm-6 col-md-6" style="top: 40px;">
+                                                    <!--Widget footer-->
+                                                    <ul class="list-unstyled text-center clearfix" style="margin-bottom: 0px;">
+                                                        <li class="col-xs-6">
+
+                                                            <p class="text-2x mar-no">Total de Documentos Necesarios</p>
+                                                            <p class="text-2x">@Model.DocumentsTotal</p>
+
+                                                        </li>
+                                                        <li class="col-xs-6">
+                                                            <p class="text-2x mar-no">Total de Documentos Obligatorios</p>
+                                                            @*<p class="text-2x">@Model.DocumentsTotalOk</p>*@
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (Model.TestSets.Count > 0)
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Número documento</th>
+                                                <th>NIT receptor</th>
+                                                <th>Total de reglas</th>
+                                                <th>Total de reglas satisfactorias</th>
+                                                <th>Total de reglas insatisfactorias</th>
+                                                <th>Total de reglas mandatorias insatifactorias</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var s in Model.TestSets)
+                                            {
+                                                <tr class='clickable-row' data-href="#">
+                                                    <td class="text-nowrap"><a>@s.DocumentNumber</a></td>
+                                                    <td class="text-nowrap"><a>@s.ReceiverCode</a></td>
+                                                    <td class="text-nowrap"><a>@s.TotalRules</a></td>
+                                                    <td class="text-nowrap"><a>@s.TotalRulesSuccessfully</a></td>
+                                                    <td class="text-nowrap"><a>@s.TotalRulesUnsuccessfully</a></td>
+                                                    <td class="text-nowrap"><a>@s.TotalMandatoryRulesUnsuccessfully</a></td>
+                                                    <td>
+                                                        <a class="btn btn-small btn-default btn-hover-gosocket " onclick="copyTextToClipboard('@s.TrackId');" style="padding: 12px 16px; cursor: pointer; "><i class="fa fa-files-o"></i> Copiar TrackId</a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+
+                            <div class="pull-right">
+                                @*<a href="@Url.Action("TestSetList", "Contributor", new { contributorId = Model.ContributorId})" class="btn btn-default">Volver</a>*@
+                                <a href="@Url.Action("ConfigureOperationModes", "Contributor",new { id = Model.ContributorId})" class="btn btn-default">Volver</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+
+
+    <script src="~/Content/plugins/morris-js/morris.min.js"></script>
+    <script src="~/Content/plugins/morris-js/raphael-js/raphael.min.js"></script>
+    <script src="~/Scripts/languages.min.js"></script>
+    <script src="~/Scripts/numeral.min.js"></script>
+    <script src="~/Content/plugins/raty/jquery.raty.js"></script>
+
+    
+}

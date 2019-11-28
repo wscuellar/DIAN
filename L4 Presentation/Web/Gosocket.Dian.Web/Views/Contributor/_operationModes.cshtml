@@ -1,0 +1,45 @@
+﻿@* Show  only for production environment*@
+@model Gosocket.Dian.Web.Models.ContributorViewModel
+@using Gosocket.Dian.Infrastructure
+<div class="panel-heading">
+    <h3 class="panel-title padding-0">Listado de modos de operación asociados</h3>
+    <hr class="margin-0" />
+</div>
+
+<div class="table-responsive padding-top-15">
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Modo de operación</th>
+                <th class="text-center">Registro</th>
+                <th>Software</th>
+                <th>Id</th>
+                <th>Pin</th>
+                <th>URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contributorOperation in Model.ContributorOperations)
+            {
+                <tr data-index-contributorOperations="@contributorOperation.Id">
+                    <td><a>@contributorOperation.OperationMode.Name</a></td>
+                    <td class="text-center">
+                        <a>@contributorOperation.Timestamp.ToString("dd-MM-yyyy")</a>
+                    </td>
+                    <td>
+                        <a>@contributorOperation.Software.Name</a>
+                    </td>
+                    <td>
+                        <a>@contributorOperation.Software.Id</a>
+                    </td>
+                    <td>
+                        <a>@contributorOperation.Software.Pin</a>
+                    </td>
+                    <td>
+                        <a>@ConfigurationManager.GetValue("WebServiceUrl")</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

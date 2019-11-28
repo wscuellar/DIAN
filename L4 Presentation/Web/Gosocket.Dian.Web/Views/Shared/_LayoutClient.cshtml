@@ -1,0 +1,366 @@
+﻿@using Gosocket.Dian.Web.Utils
+@using Gosocket.Dian.Web.Code;
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DIAN | @ViewBag.Title</title>
+
+    <meta name="description" content="dian">
+    <meta name="keywords" content="dian" />
+    <meta name="author" content="Gosocket Corp SpA">
+    <link rel="shortcut icon" href="~/Content/img/favicon_dian.ico">
+    <link rel="manifest" href="/manifest.json">
+    <!--STYLESHEET-->
+    <!--=================================================-->
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+    <!--Bootstrap Stylesheet [ REQUIRED ]-->
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet">
+    <!--Nifty Stylesheet [ REQUIRED ]-->
+    <link href="~/Content/css/nifty.min.css" rel="stylesheet">
+    <!--Font Awesome [ OPTIONAL ]-->
+    <link href="~/Content/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!--Flag Icons [ OPTIONAL ]-->
+    <link href="~/Content/plugins/flag-icon-css/flag-icon.min.css" rel="stylesheet">
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <!--Chosen [ OPTIONAL ]-->
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+    <!--Select2 [ OPTIONAL ]-->
+    <link href="~/Content/plugins/select2/select2.min.css" rel="stylesheet">
+    <link href="~/Content/css/gosocket/typeahead.css" rel="stylesheet" />
+    <link href="~/Content/css/daterangepicker.min.css" rel="stylesheet" />
+    <!--DatePicker [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-datepicker/bootstrap-datepicker.css" rel="stylesheet">
+    <!--Gosocket Stylesheet [ REQUIRED ]-->
+    <link href="~/Content/css/gosocket/gosocket.css?v=3.0" rel="stylesheet">
+    <link href="~/Scripts/font-awesome-animation.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    @RenderSection("css", required: false)
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div id="container" class="effect mainnav-lg navbar-fixed">
+        <!--NAVBAR-->
+        <!--===================================================-->
+        <header id="navbar">
+
+            <div id="navbar-container" class="boxed">
+                <!--Brand logo & name-->
+                <!--================================-->
+                <div class="navbar-header">
+                    <a href="/" class="navbar-brand">
+                        <img src="~/Content/img/LogoDian.png" alt="Gosocket" class="brand-icon gologo-xs">
+                        @*<img src="~/Content/img/logoNoSlogan.png" alt="Gosocket" class="brand-icon gologo-lg">*@
+                    </a>
+                </div>
+                <!--================================-->
+                <!--End brand logo & name-->
+                <!--Navbar Dropdown-->
+                <!--================================-->
+                <div class="navbar-content clearfix">
+                    <ul class="nav navbar-top-links pull-left">
+                        <li>
+                            <i class="fa fa-navicon fa-lg"></i>
+                        </li>
+                        <li class="dropdown-litopsearch dropdown">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                <i class="fa fa-search fa-lg"></i>
+                            </a>
+                            <!--litopsearch dropdown menu-->
+                            <div class="dropdown-menu dropdown-menu-lg">
+                                <div class="input-group mar-btm searchtop">
+                                    <span class="typeahead-spinner"><i class="fa fa-lg fa-spin fa-spinner"></i></span>
+                                    <input id="input-search-dropdown" class="form-control" type="text" data-provide="typeahead" placeholder="Buscar">
+                                    <span class="input-group-btn">
+                                        <button id="button-search-dropdown" class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul id="right-nav" class="nav navbar-top-links pull-right">
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--User dropdown-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <li id="dropdown-user" class="dropdown">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                <div class="username"></div>
+                            </a>
+                        </li>
+
+                        <li id="dropdown-user" class="dropdown">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
+                                <span class="pull-right">
+                                    <img class="img-circle img-user media-object" src="~/Content/img/av3.png" alt="UserName">
+                                </span>
+                                <div class="username">@User.Identity.Name</div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-md dropdown-menu-right panel-default">
+
+                                <!-- User dropdown menu -->
+                                <ul class="head-list">
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa fa-cog fa-fw fa-lg"></i> Configurar
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!-- Dropdown footer -->
+                                <div class="pad-all text-right">
+                                    @using Microsoft.AspNet.Identity
+                                    @if (Request.IsAuthenticated)
+                                    {
+                                        using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <!-- item-->
+                                            <a href="javascript:document.getElementById('logoutForm').submit()" class="btn btn-primary">
+                                                <i class="fa fa-sign-out fa-fw"></i> Salir
+                                            </a>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </li>
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--End user dropdown-->
+                        <!--Mega dropdown-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--End mega dropdown-->
+                        <!--Notification dropdown-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--End Chat button-->
+                    </ul>
+                </div>
+                <!--================================-->
+                <!--End Navbar Dropdown-->
+            </div>
+        </header>
+        <!--===================================================-->
+        <!--END NAVBAR-->
+        <div class="boxed">
+            <!--CONTENT CONTAINER-->
+            <!--===================================================-->
+            <div id="content-container">
+
+                <div id="page-alert">
+                </div>
+                @RenderBody()
+            </div>
+            <!--===================================================-->
+            <!--END CONTENT CONTAINER-->
+
+            <nav id="mainnav-container">
+                <div id="mainnav">
+                    <!--Menu-->
+                    <!--================================-->
+                    <div id="mainnav-menu-wrap">
+                        <div class="nano has-scrollbar">
+                            <div class="nano-content" tabindex="0">
+                                <ul class="list-group" id="mainnav-menu">
+                                    <li id="company-header" class="list-header">DIAN</li>
+                                    <!--Country selector-->
+                                    <li id="li-country-selector">
+                                        <form id="nav-current-company-form" action="#" method="GET" data-change-msg="mssg">
+                                            <select name="accountId" style="width: 200px;"></select>
+                                            <input type="hidden" name="countryId" value="" />
+                                            <input type="hidden" name="returnUrl" value="@Request.RawUrl" />
+                                        </form>
+                                    </li>
+                                    <!--Category name-->
+                                    <li class="list-header">MENÚ PRINCIPAL</li>
+                                    <li id="@Navigation.NavigationEnum.Dashboard">
+                                        <a href="@Url.Action("Client", "Dashboard" )">
+                                            <i class="fa fa-dashboard"></i>
+                                            <span class="menu-title">
+                                                Dashboard
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a id="@Navigation.NavigationEnum.DocumentIndex" class="parent-link" href="#">
+                                            <i class="fa fa-inbox"></i>
+                                            <span class="menu-title">
+                                                Documentos
+                                            </span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <!--Submenu-->
+                                        <ul class="collapse">
+                                            <li id="@Navigation.NavigationEnum.DocumentSent"><a href="@Url.Action("Sent", "Document" )">Enviados</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a id="@Navigation.NavigationEnum.ClientIndex" class="parent-link" href="#">
+                                            <i class="fa fa-users"></i>
+                                            <span class="menu-title">
+                                                Participante
+                                            </span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <!--Submenu-->
+                                        <ul class="collapse">
+                                            <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("ProviderStatus", "HFE" )">Facturador</a></li>
+                                            
+                                        </ul>
+                                    </li>
+                                    
+                                    <li class="list-divider"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!--================================-->
+                    <!--End menu-->
+                </div>
+            </nav>
+            <!--ASIDE-->
+            <!--===================================================-->
+            <aside id="aside-container">
+                <div id="aside">
+                    <div class="nano">
+                        <div class="nano-content">
+                            <!--Nav tabs-->
+                            <!--================================-->
+                            @if (ViewBag.HasActions != null && ViewBag.HasActions)
+                            {
+                                <ul class="nav nav-tabs nav-justified">
+                                    <li style="display: none" id="li-aside-actions">
+                                        <a href="#tab-aside-actions" data-toggle="tab" class="padding-bottom-0" style="display: none;">
+
+                                        </a>
+                                    </li>
+                                </ul>
+                            }
+                            <!--================================-->
+                            <!--End nav tabs-->
+                            <!-- Tabs Content -->
+                            <!--================================-->
+                            <div class="tab-content">
+                                <!--First tab (Actions)-->
+                                <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                                @if (ViewBag.HasActions != null && ViewBag.HasActions)
+                                {
+                                    <div class="tab-pane" id="tab-aside-actions">
+                                        <hr class="mar-no" />
+                                        <div class="pad-all">
+                                            <p class="text-lg mar-no aside-normal-text text-semibold">Acciones</p>
+                                            @*<button id="download-xml-viewer" data-docid="b04b38f1-f7f6-48e1-8b7d-82465aca7a14" class="btn btn-block btn-default btn-hover-gosocket margin-top-15"><i class="fa fa-download"></i>&nbsp;&nbsp;Descargar XML</button>*@
+
+                                            <button id="download-pdf" class="btn btn-block btn-default btn-hover-gosocket margin-top-15"><i class="fa fa-download"></i>&nbsp;&nbsp;Descargar PDF</button>
+
+                                        </div>
+                                        <hr class="mar-no" />
+                                    </div>
+                                }
+                                <!--End second tab (Chat)-->
+                                <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            <!--===================================================-->
+            <!--END ASIDE-->
+        </div>
+        <!-- SCROLL TOP BUTTON -->
+        <!--===================================================-->
+        <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+        <!--===================================================-->
+        <!-- Support phone -->
+        <a id="support-tel" href="tel:600 600 0060" style="display: none; position: fixed;bottom: -210px;right: 10px;background-color: #696969;z-index: 4000;padding: 10px 10px 8px 10px;color: #ffffff;width: 210px;text-align: center;">Soporte <i class="fa fa-phone" aria-hidden="true"></i> : 600 600 0060</a>
+        <a id="support-tel-pe" href="tel:0 801 10880" style="display: none; position: fixed;bottom: -210px;right: 10px;background-color: #696969;z-index: 4000;padding: 10px 10px 8px 10px;color: #ffffff;width: 210px;text-align: center;">Soporte <i class="fa fa-phone" aria-hidden="true"></i> : 0 801 10880</a>
+        <!-- END Support phone -->
+    </div>
+    <!--===================================================-->
+    <!-- END OF CONTAINER -->
+    <!--JAVASCRIPT-->
+    <!--=================================================-->
+    <!--jQuery [ REQUIRED ]-->
+
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <!--BootstrapJS [ RECOMMENDED ]-->
+    <script src="~/Content/js/bootstrap.min.js"></script>
+    <!--Nifty Admin [ RECOMMENDED ]-->
+    <script src="~/Content/js/nifty.js"></script>
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <!--Select2 [ OPTIONAL ]-->
+    <script src="~/Content/plugins/select2/select2.min.js"></script>
+    <script src="~/Content/plugins/select2/i18n/es.js"></script>
+    <!--Chosen [ OPTIONAL ]-->
+    <script src="~/Content/plugins/chosen/chosen.jquery.js"></script>
+    <!--Handlebars [ REQUIRED ]-->
+    <script src="~/Content/plugins/handlebars/handlebars.js"></script>
+    <!--Mail -->
+    <script src="~/Content/js/demo/mail.js"></script>
+    @*<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>*@
+    <script type="text/javascript" src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script src="~/Content/js/daterangepicker.min.js"></script>
+
+    <script src="~/Content/plugins/switchery/switchery.min.js"></script>
+
+    <!--Gosocket Js [ REQUIRED ]-->
+    <script src="~/Content/js/gosocket/gosocket.js?1.6.10"></script>
+    <script src="~/Content/js/gosocket/typeahead.js"></script>
+    <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
+
+    <script>
+        $(function () {
+            @if (ViewBag.CurrentPage != null) {
+                var currentPage = (Navigation.NavigationEnum)ViewBag.CurrentPage;
+                if (currentPage != Navigation.NavigationEnum.Undefined) {
+                    <text>
+                        var selectedLi = $("#@currentPage");
+                            if (selectedLi.length > 0) {
+                                if (selectedLi.parent().attr("id") === "mainnav-menu") {
+                            selectedLi.addClass("active active-link");
+                        } else {
+                            selectedLi.addClass("active-link");
+                        var parentUl = selectedLi.parent("ul");
+                        parentUl.addClass("in");
+                        var parentLi = parentUl.parent("li");
+                                    if (parentLi.parent().attr("id") === "mainnav-menu") {
+                            parentLi.addClass("active").children("a").addClass("parent-active");
+                        } else {
+                            parentUl = parentLi.parent("ul");
+                        parentUl.addClass("in");
+                        parentUl.parent("li").addClass("active").children("a").addClass("parent-active");
+                    }
+                }
+            }
+                        </text>
+                }
+            }
+        });
+        function changeCurrentClient() {
+            var redirectUrl = "../LegalRepresentative/ChangeCurrentClient";
+            var client = $('#select-client').val();
+            var form = $('<form action="' + redirectUrl + '" method="post">' +
+                '<input type="hidden" name="ClientId" value="' + client + '" />' +
+                '<input type="hidden" name="RedirectUrl" value="@Request.Url.AbsoluteUri" />' +
+                '</form>');
+            $('body').append(form);
+            $(form).submit();
+        }
+    </script>
+
+    @RenderSection("scripts", required: false)
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".clickable-row").click(function () {
+                window.location = $(this).data("href");
+            });
+        });
+    </script>
+</body>
+</html>

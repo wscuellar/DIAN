@@ -1,0 +1,29 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+@using Gosocket.Dian.Infrastructure
+@{
+    ViewBag.Title = "Modos de operación - ambiente productivo";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            
+
+            <div class="panel-body padding-top-20">
+                <div class="pad-btm padding-bottom-0">
+
+                    <div class="alert custom-alert-primary margin-bottom-5">
+                        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                        Estimado contribuyente, la url de recepción de facturas para el ambiente de operación es <strong>@ConfigurationManager.GetValue("WebServiceUrl")</strong><br />
+                    </div>
+
+                </div>
+
+                <div class="row margin-horizontal-0 margin-vertical-0">
+                    @Html.Partial("_operationModes")
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

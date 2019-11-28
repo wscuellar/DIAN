@@ -1,0 +1,63 @@
+﻿@using Gosocket.Dian.Domain.Common
+@using Gosocket.Dian.Web.Common;
+
+@model Gosocket.Dian.Web.Models.ContributorViewModel
+
+<div class="row">
+    <div class="col-sm-6 padding-xs-0" id="div-files-upload">
+        @if (Model.ContributorFiles != null && Model.ContributorFiles.Count > 0)
+        {
+            foreach (var f in Model.ContributorFiles)
+            {
+                <div class="form-group">
+                    <label class="control-label">@f.ContributorFileType.Name</label>
+                    <div class="input-group">
+                        @{
+                            switch (f.ContributorFileStatus.Id)
+                            {
+                                case 0:
+                                    <span class="input-group-addon"><a class="fa fa-clock-o add-tooltip" style="color:#f1aa40" data-html="true" data-placement="left" data-original-title="Pendiente de carga"></a></span>
+                                    break;
+                                case 1:
+                                    <span class="input-group-addon"><a class="fa fa-eye add-tooltip" style="color:#f1aa40" data-html="true" data-placement="left" data-original-title="Cargado y en revisión"></a></span>
+                                    break;
+                                case 2:
+                                    <span class="input-group-addon"><a class="fa fa-thumbs-up add-tooltip" style="color:#348441" data-html="true" data-placement="left" data-original-title="Aprobado"></a></span>
+                                    break;
+                                case 3:
+                                    <span class="input-group-addon"><a class="fa fa-thumbs-down add-tooltip" style="color:#de3633" data-html="true" data-placement="left" data-original-title="@f.Comments"></a></span>
+                                    break;
+                                default:
+                                    <span class="input-group-addon"><a class="fa fa-exclamation-triangle add-tooltip" style="color:#f1aa40" data-html="true" data-placement="left" data-original-title="@f.Comments"></a></span>
+                                    break;
+                            }
+                        }
+                        <input class="form-control" type="text" value="@f.FileName" readonly="readonly">
+                        <span class="input-group-btn">
+                            @{
+                                if (User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == (int)ContributorType.AuthorizedProvider)
+                                {
+                                    if (f.ContributorFileStatus.Id != 1 && f.ContributorFileStatus.Id != 2)
+                                    {
+                                        <a href="@Url.Action("UploadFile", "Contributor",new { id = Model.Id, code = Model.Code, fileId = f.Id, fileTypeId = f.ContributorFileType.Id, fileTypeName = f.ContributorFileType.Name})" class="btn btn-default btn-hover-gosocket btn-labeled fa fa-upload">Subir</a>
+                                    }
+                                }
+                                else if (User.IsInAnyRole("Administrador", "Super"))
+                                {
+                                    if (f.ContributorFileStatus.Id != 0 && f.ContributorFileStatus.Id != 2)
+                                    {
+                                        <a class="btn btn-default btn-hover-gosocket btn-labeled fa fa-pencil-square-o" onclick="changeFileStatus('@f.Id','@f.FileName')">Estado</a>
+                                    }
+                                    else if (f.ContributorFileStatus.Id == 0)
+                                    {
+                                        <a class="btn btn-default btn-labeled fa fa-info-circle">Pendiente de Carga</a>
+                                    }
+                                }
+                            }
+                        </span>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

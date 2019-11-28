@@ -1,0 +1,226 @@
+﻿
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+@section css
+{
+    <link href="~/Content/plugins/morris-js/morris.min.css" rel="stylesheet">
+
+    <style>
+        .panel-bordered-default:hover {
+            border: 1px solid #FF6800;
+        }
+
+        .panel-alert {
+            padding-bottom: 10px;
+        }
+
+        .star {
+            width: 35px !important;
+            height: 35px !important;
+            display: inline-block;
+            background-size: cover;
+        }
+
+        .staron {
+            background-image: url('../../Content/img/staron.png');
+        }
+
+        .staroff {
+            background-image: url('../../Content/img/staroff.png');
+        }
+    </style>
+}
+
+<div class="panel">
+    <div class="panel-heading">
+        <h3 class="panel-title">@ViewBag.Title</h3>
+    </div>
+
+    <div class="panel-body">
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="panel panel-bordered-default padding-0">
+                    <div class="panel-body padding-0">
+                        <div class="col-lg-12">
+                            <div class="col-sm-6 col-md-3">
+                                <h4 class="text-center margin-bottom-0">Documentos<br>51</h4>
+                                <div id="documents-chart" style="height: 200px;"></div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <h4 class="text-center margin-bottom-0">Emitidos<br>31</h4>
+                                <div id="sent-chart" style="height: 200px;"></div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <h4 class="text-center margin-bottom-0">Recibidos<br>19</h4>
+                                <div id="received-chart" style="height: 200px;"></div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <h4 class="text-center margin-bottom-0">Proveedores<br>2</h4>
+                                <div id="provider-chart" style="height: 200px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-sm-6 col-md-6 col-lg-4">
+                <div class="panel panel-bordered-default panel-colorful">
+                    <div class="panel-body padding-5" style="min-height: 282px;">
+                        <h4 class="margin-vertical-25 text-center" style="font-size: 20px;">
+                            Documentos Recibidos Hoy:
+                        </h4>
+                        <p class="text-center">
+                            <a href="#" style="margin-left: 30px;" class="margin-left-5">
+                                <i class="fa fa-file-text-o" style="font-size: 70px;"></i>
+                                <span id="count-docs-received-today" class="badge badge-header badge-danger" style="position: relative;top: -49px;right: 20px;font-size: 13px;padding: 5px; display: none;">
+                                    <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i>
+                                </span>
+                            </a>
+                        </p>
+                        <p class="text-center margin-top-30">
+                            <a href="@Url.Action("Received", "Document")" class="btn btn-default btn-lg btn-hover-gosocket" style="padding: 10px 50px;">Clic aquí</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-md-6 col-lg-4">
+                <!--Large weather widget-->
+                <!--===================================================-->
+                <div class="panel  panel-bordered-default  panel-colorful text-center">
+                    <div class="panel-body  padding-0">
+                       
+                        <!--Widget footer-->
+                        <ul class="list-unstyled text-center clearfix" style="margin-bottom: 0px;">
+                            <li class="col-xs-6">
+
+                                <p class="text-2x mar-no">Emitidos</p>
+                                <p class="text-2x">31</p>
+
+                            </li>
+                            <li class="col-xs-6">
+                                <p class="text-2x mar-no">Recibidos</p>
+                                <p class="text-2x">19</p>
+                            </li>
+                        </ul>
+                        <hr style="margin-top: 11px; margin-bottom: 11px;">
+
+                        <!--Widget footer-->
+                        <ul class="list-unstyled text-center clearfix">
+
+                            <li class="col-xs-6">
+                                <p class="text-2x mar-no">Clientes</p>
+                                <p class="text-2x">11</p>
+                            </li>
+                            <li class="col-xs-6">
+                                <p class="text-2x mar-no">Proveedores</p>
+                                <p class="text-2x">2</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!--===================================================-->
+                <!--End Large weather widget-->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script src="~/Content/plugins/morris-js/morris.min.js"></script>
+    <script src="~/Content/plugins/morris-js/raphael-js/raphael.min.js"></script>
+    <script src="~/Scripts/languages.min.js"></script>
+    <script src="~/Scripts/numeral.min.js"></script>
+    <script src="~/Content/plugins/raty/jquery.raty.js"></script>
+    <script>
+
+        $(document)
+            .ready(function() {
+                
+                Morris.Donut({
+                    element: 'documents-chart',
+                    data: [
+                        { label: "Rechazado", value: 3 },
+                        { label: "Observaciones", value: 4 },
+                        { label: "Pendiente", value: 5 },
+                        { label: "Exitoso", value: 39 }
+                    ],
+                    colors: [
+                        '#f76549',
+                        '#f4df60',
+                        '#579ddb',
+                        '#348441'
+                    ],
+                    resize: true
+                });
+                Morris.Donut({
+                    element: 'sent-chart',
+                    data: [
+                        { label: "Exitosos", value: 29 },
+                        { label: "Rechazado", value: 2 }
+                    ],
+                    colors: [
+                        '#348441',
+                        '#f76549'
+                    ],
+                    resize: true
+                });
+                Morris.Donut({
+                    element: 'received-chart',
+                    data: [
+                        { label: "Exitosos", value: 18 },
+                        { label: "Rechazado", value: 1 }
+                    ],
+                    colors: [
+                        '#348441',
+                        '#f76549'
+                    ],
+                    resize: true
+                });
+                Morris.Donut({
+                    element: 'provider-chart',
+                    data: [
+                        { label: "Autorizados", value: 2 },
+                        { label: "No Autorizados", value: 0 }
+                    ],
+                    colors: [
+                        '#348441',
+                        '#f76549'
+                    ],
+                    resize: true
+                });
+                
+                var ratyDefaults = {
+                    targetKeep: true,
+                    starType: "div",
+                    starOff: "star staroff",
+                    starOn: "star staron",
+                    number: 5,
+                    readOnly: true,
+                    noRatedMsg: "Intermedio"
+                };
+                var initRating = function ($this) {
+                    var options = $.extend(true, {}, ratyDefaults, $this.data());
+
+                    if (options.hints) {
+                        options.hints = options.hints.split(",");
+                    }
+
+                    $this.raty(options);
+                }
+                $('.rating').each(function () {
+                    initRating($(this));
+                });
+            });
+    </script>
+
+}

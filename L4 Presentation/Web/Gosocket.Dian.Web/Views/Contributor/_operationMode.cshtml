@@ -1,0 +1,14 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+
+@if(Model.ContributorTypeId == 1)
+{
+<div class="row">
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.OperationModeId, new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.OperationModeId, new SelectList(Model.GetOperationModes(), "Id", "Name", Model.OperationModeId), new { @class = "form-control selectpicker" })
+        </div>
+    </div>
+</div>
+}
+

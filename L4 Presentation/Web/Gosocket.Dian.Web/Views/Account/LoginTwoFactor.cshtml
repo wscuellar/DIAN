@@ -1,0 +1,85 @@
+﻿@using Microsoft.Owin.Security
+@using Gosocket.Dian.Web.Models
+@model LoginTwoFactorViewModel
+@{
+    ViewBag.Title = "Acceder";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<!-- LOGIN FORM -->
+<!--===================================================-->
+<div class="cls-content">
+    <div class="cls-content-sm panel">
+        <div class="panel-body">
+            <a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
+            <form method="post" action="@Url.Action("Login","AccountTwoFactor")" style="margin-top: 20px;" id="fms">
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-envelope"></i>
+                        </div>
+                        <input required name="NitEnterprise" data-mailcheckfield=".email-suggestion" autofocus id="NitEnterprise" type="text" ng-model="model.username" class="form-control" placeholder="NIT Empresa" maxlength="100">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-asterisk"></i>
+                        </div>
+                        <input required id="NitEnterprise" name="NitEnterprise" type="text" class="form-control" placeholder="NIT Representante Legal" ng-model="model.password" maxlength="100" autocomplete="off">
+                    </div>
+                </div>
+                @if (ViewData.ModelState.Values.Count > 0)
+                {
+                    foreach (var item in ViewData.ModelState.Values)
+                    {
+                        if (item.Errors.Count > 0)
+                        {
+                            <div class="row" ng-show="model.errorMessage" style="margin-top: -10px; margin-bottom: 10px;">
+                                <div class="col-md-12 col-sm-12">
+                                    <code>@item.Errors[0].ErrorMessage</code>
+                                </div>
+                            </div>
+                        }
+
+                    }
+
+                }
+
+                @if (ViewBag.ListErrors.Count > 0)
+                {
+                    foreach (var item in ViewBag.ListErrors)
+                    {
+                        <div class="row" ng-show="model.errorMessage" style="margin-top: -10px; margin-bottom: 10px;">
+                            <div class="col-md-12 col-sm-12">
+                                <code>@item</code>
+                            </div>
+                        </div>
+
+                    }
+
+                }
+                @*<div class="g-recaptcha" data-sitekey="6LdLLHMUAAAAAHNiDYNGeT-y2vIhsenl2hU9Kiy1"></div>*@
+
+                <button class="btn btn-gosocket btn-lg btn-block" ng-disabled="form.$invalid" style="margin-top: 40px;" id="sbmbtn">
+                    <i class=""></i> Entrar
+                </button>
+
+                <div class="pad-top" name="rp">
+                    <a href="@Url.Action("CertificateLogin","AccountTwoFactor")" class="btn-link mar-rgt" style="color: black;">Ingresar con Certificado</a>
+                    <a href="@Url.Action("Register","Account")" class="btn-link mar-lft" style="color: black;">Regístrate</a>
+                </div>
+            </form>
+            <!--<div class="mar-btm"><em>- Entrar con otras cuentas -</em></div>
+            <ul class="list-inline">
+                <li ng-repeat="provider in model.externalProviders">
+                    <a class="btn btn-primary btn-lg btn-block" href="{{provider.href}}">Entrar con {{provider.text}}</a>
+                </li>
+            </ul>-->
+        </div>
+    </div>
+
+</div>
+
+
+<!--===================================================-->

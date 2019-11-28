@@ -1,0 +1,212 @@
+﻿@using Gosocket.Dian.Web.Utils;
+@model Gosocket.Dian.Web.Models.SearchProviderModel
+
+@{
+    ViewBag.Title = "Proveedores Autorizados";
+    Layout = "~/Views/Shared/_LayoutPublicInfo.cshtml";
+}
+
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+
+    <style>
+        .bootstrap-select {
+            margin-bottom: 0;
+        }
+
+            .bootstrap-select .dropdown-menu > .active > a,
+            .bootstrap-select .dropdown-menu > .active > a:focus,
+            .bootstrap-select .dropdown-menu > .active > a:hover {
+                background-color: #348441;
+            }
+
+        .company-logo {
+            max-width: 64px;
+            max-height: 32px;
+        }
+
+        .modal-header:after {
+            border-bottom: 2px solid #348441;
+        }
+
+        .tab-content .panel {
+            -webkit-box-shadow: none !important;
+            -ms-box-shadow: none !important;
+            box-shadow: none !important;
+        }
+
+        .bootstrap-filestyle {
+            margin-bottom: 5px;
+        }
+
+        .divider {
+            border-top: 1px solid #29b570;
+            display: block;
+            line-height: 1px;
+            margin: 15px 0;
+            position: relative;
+            text-align: center;
+        }
+
+            .divider .divider-title {
+                background: #fff;
+                font-size: 12px;
+                letter-spacing: 1px;
+                padding: 0 20px;
+                text-transform: uppercase;
+                color: #29b570;
+            }
+
+        .select2-container--default {
+            display: inherit !important;
+        }
+    </style>
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <!--Tabs Content-->
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <div class="panel-control">
+                                
+                            </div>
+                            <h3 class="panel-title">@ViewBag.Title</h3>
+                        </div>
+
+                        <div class="panel-body padding-top-20">
+                            <div class="pad-btm form-inline padding-bottom-0">
+                                <div class="row margin-horizontal-0">
+                                    <div class="col-md-10 table-toolbar-left padding-left-0">
+                                        <div class="input-group">
+                                            <span class="typeahead-spinner"><i class="fa fa-lg fa-spin fa-spinner"></i></span>
+                                            <span class="twitter-typeahead" style="position: relative; display: inline-block;"><input class="tt-hint" type="text" autocomplete="off" spellcheck="off" disabled="" style="position: absolute; top: 0px; left: 0px; border-color: transparent; box-shadow: none; background: none 0% 0% / auto repeat scroll padding-box border-box rgb(255, 255, 255);"><input id="search-nit" name="Nit" value="@Model.Nit" class="form-control tt-query" type="text" placeholder="NIT" autocomplete="off" spellcheck="false" dir="auto" style="position: relative; vertical-align: top; background-color: transparent;"><span style="position: absolute; left: -9999px; visibility: hidden; white-space: nowrap;  font-size: 12px; font-style: normal; font-variant: normal; font-weight: 400; word-spacing: 0px; letter-spacing: 0px; text-indent: 0px; text-rendering: auto; text-transform: none;"></span><span class="tt-dropdown-menu" style="position: absolute; top: 100%; left: 0px; z-index: 100; display: none;"></span></span>
+                                            <span class="input-group-btn">
+                                                <a class="btn btn-default" onclick="filterSearch()"><i class="fa fa-search"></i></a>
+                                            </span>
+
+                                        </div>
+                                        <div class="btn-group">
+                                            <button id="buttonExport" onclick="location.href='@Url.Action("ExportCSV","PublicInfo",new { nit = Model.Nit, providerType = 3 })';" class="btn btn-default "  aria-expanded="false" >
+                                                <i class="fa fa-download"></i>
+                                                <a>Descargar CSV</a>
+                                            </button>
+                                            
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-2 table-toolbar-right padding-right-0">
+                                        <!--Pager buttons-->
+                                        <span class="text-muted">
+                                            <strong>
+                                                @(((Model.Page - 1) * 30) + 1)
+                                                -
+                                                @(((Model.Page - 1) * 30) + 30)
+                                            </strong>
+                                        </span>
+                                        <div class="btn-group btn-group margin-left-5">
+                                            <a class="btn btn-default paginate-btn leftPaging" onclick="filterSearch(@Model.Page-1)">
+                                                <span class="fa fa-chevron-left"></span>
+                                            </a>
+                                            <a class="btn btn-default paginate-btn rightPaging" onclick="filterSearch(@Model.Page+1)">
+                                                <span class="fa fa-chevron-right"></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+
+                                <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                    <thead>
+                                        <tr>
+                                            <th>NIT</th>
+                                            <th>Nombre Comercial</th>
+                                            <th>Razón Social</th>
+                                            <th>Fecha de Inicio</th>
+                                            <th>Fecha de Fin</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var provider in Model.Providers)
+                                        {
+                                        <tr>
+                                            <td class="text-nowrap"><a>@provider.Nit</a></td>
+                                            <td class="text-nowrap"><a>@provider.Name</a></td>
+                                            <td class="text-nowrap"><a>@provider.RazonSocial</a></td>
+                                            <td class="text-nowrap"><a>@provider.StartDate</a></td>
+                                            <td class="text-nowrap"><a>@provider.EndDate</a></td>
+                                        </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <hr class="margin-top-0">
+                            <div class="pull-right">
+                                <!--Pager buttons-->
+                                <span class="text-muted">
+                                    <strong>
+                                        @(((Model.Page - 1) * 30) + 1)
+                                        -
+                                        @(((Model.Page - 1) * 30) + 30)
+                                    </strong>
+                                </span>
+                                <div class="btn-group btn-group margin-left-5">
+                                    <a class="btn btn-default paginate-btn leftPaging" onclick="filterSearch(@Model.Page-1)">
+                                        <span class="fa fa-chevron-left"></span>
+                                    </a>
+                                    <a class="btn btn-default paginate-btn rightPaging" onclick="filterSearch(@Model.Page+1)">
+                                        <span class="fa fa-chevron-right"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+
+    <script>
+        $(document).ready(function ($) {
+            if (@Model.Page== 1) $('.leftPaging').hide();
+            if ('@Model.IsNextPage.ToString()' == 'False') $('.rightPaging').hide();
+            if ('@Model.Providers.Count' == '0') $('#buttonExport').prop("disabled", "disabled");;
+
+        });
+        function filterSearch(pageNumber) {
+            var nit = $('#search-nit').val();
+            var status = $('#search-status').val();
+            var redirectUrl = "../PublicInfo/SearchProvider";
+            var form = $('<form action="' + redirectUrl + '" method="post">' +
+                '<input type="hidden" name="Page" value="' + pageNumber + '" />' +
+                '<input type="hidden" name="Nit" value="' + nit + '" />' +
+                '</form>');
+            $('body').append(form);
+            $(form).submit();
+        }
+    </script>
+
+}

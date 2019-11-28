@@ -1,0 +1,19 @@
+﻿@model Gosocket.Dian.Web.Models.UserViewModel
+
+@Html.HiddenFor(x => x.Id)
+
+@{var index = 0;}
+@if (Model != null && Model.Contributors != null && Model.Contributors.Count > 0)
+{
+    foreach (var f in Model.Contributors.OrderByDescending(f => f.Id).ToList())
+    {
+        <input name="Contributors[@index].Id" type="hidden" value="@f.Id" />
+        <input name="Contributors[@index].IsNew" type="hidden" value="false" />
+        index++;
+    }
+    <input id="lastIndexContributor" type="hidden" value="@index" />
+}
+
+<div class="panel-body padding-20 padding-bottom-10">
+    @Html.Partial("_default")
+</div>

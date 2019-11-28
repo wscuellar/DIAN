@@ -1,0 +1,38 @@
+﻿@model Gosocket.Dian.Web.Models.ContingencyViewModel
+@Html.HiddenFor(m => m.PartitionKey)
+@Html.HiddenFor(m => m.RowKey)
+@Html.HiddenFor(m => m.Active)
+@Html.HiddenFor(m => m.CreatedBy)
+@Html.HiddenFor(m => m.CreatedDate)
+@Html.HiddenFor(m => m.Deleted)
+@Html.HiddenFor(m => m.DeletedBy)
+@Html.HiddenFor(m => m.DeletedDate)
+<div class="panel-body padding-20 padding-bottom-10">
+    @{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control user-props" } };}
+
+    <div class="row">
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.StartDateString, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.StartDateString, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.StartDateString, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.EndDateString, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.EndDateString, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.EndDateString, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-sm-6 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Reason, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Reason, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Reason, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+</div>
+

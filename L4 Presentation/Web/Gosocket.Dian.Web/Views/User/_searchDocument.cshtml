@@ -1,0 +1,32 @@
+﻿@using Gosocket.Dian.Web.Models
+@model UserLoginViewModel
+@{
+    var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", Html.DisplayNameFor(model => model.DocumentKey) }, { "autofocus", "" }, { "autocomplete", "off" } };
+}
+<div class="bhoechie-tab-content active">
+    <center>
+        <a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
+        <form id="search-document-form" method="post" action="@Url.Action("SearchDocument","User")" style="margin-top: 20px;">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(x => x.RecaptchaToken, new { @class = "RecaptchaToken" })
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-search"></i>
+                    </div>
+                    @Html.TextBoxFor(m => m.DocumentKey, defaultHtmlAttr)
+                </div>
+                @Html.ValidationMessageFor(m => m.DocumentKey, "", new { @class = "text-danger text-left" })
+            </div>
+
+            <button class="btn btn-gosocket btn-lg btn-block search-document margin-top-10" >
+                <i class=""></i> Buscar
+            </button>
+        </form>
+    </center>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}

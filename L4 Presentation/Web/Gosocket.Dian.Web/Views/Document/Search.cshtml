@@ -1,0 +1,48 @@
+﻿@using Gosocket.Dian.Web.Models
+@model SearchViewModel
+@{
+    /**/
+
+    ViewBag.Title = "Buscar documento";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+@{
+    var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.DocumentKey) }, { "autofocus", "" } };
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#button-search').click(function () {
+                $(this).attr('disabled', 'disabled');
+                $('#search-form').submit();
+            });
+        });
+    </script>
+}
+
+<div class="cls-content">
+    <div class="cls-content-sm panel">
+        <div class="panel-body">
+            <a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
+
+            <form id="search-form" action="@Url.Action("Search", "Document")" method="post">
+                <div class="form-group" style="margin-top: 15px;">
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.DocumentKey, defaultHtmlAttr)
+                        <span class="input-group-btn">
+                            <a id="button-search" class="btn btn-default"><i class="fa fa-search" style="color:green;"></i></a>
+                        </span>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DocumentKey, "", new { @class = "text-danger text-left" })
+                    <div class="pad-top" name="rp">
+                        <a href="@Url.Action("Login","User")" class="btn-link mar-hor" style="color: black;">Ingresar como usuario</a>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>

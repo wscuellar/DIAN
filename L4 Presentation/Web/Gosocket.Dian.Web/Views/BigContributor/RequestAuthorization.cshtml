@@ -1,0 +1,127 @@
+﻿@model Gosocket.Dian.Web.Models.RequestAuthorizationBigContributorViewModel
+@using Gosocket.Dian.Domain.Common
+
+@{
+    ViewBag.Title = "Solicitar Autorización Envío Documentos por Lote - Modo Asíncrono";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+
+                    @if (Model.AuthorizationRequestAlreadyExist && Model.StatusCode == (int)BigContributorAuthorizationStatus.Pending)
+                    {
+                        <div class="alert custom-alert-primary margin-bottom-5">
+                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                            Estimado contribuyente, su estado de solicitud se encuentra pendiente de autorización.<br />
+                        </div>
+                    }
+
+                    @if (Model.AuthorizationRequestAlreadyExist && Model.StatusCode == (int)BigContributorAuthorizationStatus.Authorized)
+                    {
+                        <div class="alert custom-alert-success margin-bottom-5">
+                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                            Estimado contribuyente, su estado de solicitud se encuentra autorizado.<br />
+                        </div>
+                    }
+
+                    @if (Model.AuthorizationRequestAlreadyExist && Model.StatusCode == (int)BigContributorAuthorizationStatus.Rejected)
+                    {
+                        <div class="alert custom-alert-danger margin-bottom-5">
+                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                            Estimado contribuyente, su estado de solicitud se encuentra rechazado.<br />
+                            Observación: <strong>@Model.Observations</strong>
+                        </div>
+                    }
+
+                        <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                            @using (Html.BeginForm("RequestAuthorization", "BigContributor", FormMethod.Post, new { id = "request-authorization-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Partial("_form")
+                                <div class="panel-footer text-right">
+                                    <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Enviar</button>
+                                </div>
+                            }
+                        </div>
+                </div>
+
+                @if (Model.Trackings.Any())
+                {
+                    @Html.Partial("_requestAuthorizationTrackings")
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        var form = $('#request-authorization-form');
+
+        $(document).ready(function ($) {
+
+            if (@Model.StatusCode == @((int)BigContributorAuthorizationStatus.Pending) || @Model.StatusCode == @((int)BigContributorAuthorizationStatus.Authorized)) {
+                $('.btn-save').attr('disabled', 'disabled');
+            }
+
+            if ('@Model.AuthorizationRequestAlreadyExist' === 'True' && @Model.StatusCode != @((int)BigContributorAuthorizationStatus.Rejected)) {
+                disableFields();
+            }
+
+            $('.btn-save').click(function () {
+                
+                if (form.valid()) {
+                    bootbox.dialog({
+                        title: "Advertencia",
+                        message: "<div class='media'><div class='media-body'>" +
+                            "<h4 class='text-thin'><strong>¿Está seguro de solicitar autorización?</strong></h4></div></div>",
+                        buttons: {
+                            del: {
+                                label: "Aceptar",
+                                className: "btn-gosocket",
+                                callback: function () {
+                                    sendRequest()
+                                }
+                            },
+                        }
+                    });
+                }
+            });
+        });
+
+        $(document).on('mouseenter', ".iffyTip", function () {
+            var $this = $(this);
+            if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+                $this.tooltip({
+                    title: $this.text(),
+                    placement: "top",
+                    container: "body"
+                });
+                $this.tooltip('show');
+            }
+        });
+
+        function disableFields() {
+            $('#Justification').attr('readonly', true);
+            $('#MinimumInvoices').attr('readonly', true);
+            $('#MaximumInvoices').attr('readonly', true);
+        }
+        function sendRequest() {
+            $('#StatusCode').val(@((int)BigContributorAuthorizationStatus.Pending));
+            showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+            form.submit();
+        }
+
+    </script>
+}

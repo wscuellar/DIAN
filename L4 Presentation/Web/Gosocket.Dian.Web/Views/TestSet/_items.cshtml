@@ -1,0 +1,62 @@
+﻿@model Gosocket.Dian.Web.Models.TestSetTableViewModel
+
+
+<div class="table-responsive">
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        @if (Model.TestSets.Count == 0)
+        {
+            <tr style="background-color: transparent !important;">
+                <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
+                    <div class="alert panel-footer-grey">
+                        Ningún set de pruebas disponible para mostrar.
+                    </div>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <thead>
+                <tr>
+                    <th>Modo de operación</th>
+                    <th>Descripción</th>
+                    <th>Documentos</th>
+                    <th>Facturas electrónicas</th>
+                    <th>Notas de crédito</th>
+                    <th>Notas de débito</th>
+                    <th>Estado</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Término</th>
+                    <th>Creado por</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var set in Model.TestSets)
+                {
+
+                    <tr class='clickable-row' data-href="@Url.Action("Edit","TestSet",new { operationModeId = set.OperationModeId})">
+                        <td class="text-nowrap"><a>@set.OperationModeName</a></td>
+                        <td class="text-nowrap"><a>@set.Description</a></td>
+                        <td class="text-nowrap"><a>@set.TotalDocumentRequired</a></td>
+                        <td class="text-nowrap"><a>@set.InvoicesTotalRequired</a></td>
+                        <td class="text-nowrap"><a>@set.TotalCreditNotesRequired</a></td>
+                        <td class="text-nowrap"><a>@set.TotalDebitNotesRequired</a></td>
+                        <td class="text-nowrap">
+                            @{
+                                var text_color = set.Active ? "text-gosocket" : "text-red";
+                                var text_status = set.Active ? "Activo" : "Inactivo";
+                                <a><i class="fa fa-circle @text_color"></i>&nbsp;@text_status</a>
+                            }
+                        </td>
+                        <td class="text-nowrap">
+                            <a>@set.StartDate.ToString("dd-MM-yyyy")</a>
+                        </td>
+                        <td class="text-nowrap">
+                            <a>@set.EndDate.ToString("dd-MM-yyyy")</a>
+                        </td>
+                        <td class="text-nowrap"><a>@set.CreatedBy</a></td>
+                    </tr>
+                }
+            </tbody>
+        }
+    </table>
+</div>

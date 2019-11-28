@@ -1,0 +1,126 @@
+﻿
+@model Gosocket.Dian.Web.Models.RequestAuthorizationBigContributorViewModel
+@using Gosocket.Dian.Domain.Common
+
+@{
+    ViewBag.Title = "Procesar Solicitud de Autorización de Envío Documentos por Lote - Modo Asíncrono";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("ProcessAuthorizationRequest", "BigContributor", FormMethod.Post, new { id = "process-authorization-request-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-right">
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-authorize">Autorizar</button>
+                                <button type="button" class="btn btn-default btn-reject">rechazar</button>
+                                <a href="@Url.Action("ReviewRequests", "BigContributor")" class="btn btn-default">Volver</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (Model.Trackings.Any())
+                {
+                    @Html.Partial("_requestAuthorizationTrackings")
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        var form = $('#process-authorization-request-form');
+
+        $(document).ready(function ($) {
+
+            if (@Model.StatusCode == @((int)BigContributorAuthorizationStatus.Rejected)) {
+                $('.btn-reject').attr('disabled', 'disabled');
+                $('#Observations').attr('readonly', true);
+            }
+
+            if (@Model.StatusCode == @((int)BigContributorAuthorizationStatus.Authorized)) {
+                $('.btn-authorize').attr('disabled', 'disabled');
+                //$('#Observations').attr('readonly', true);
+            }
+
+            disableFields();
+
+            $('.btn-authorize').click(function () {
+                if (@Model.StatusCode === @((int)BigContributorAuthorizationStatus.Rejected)) {
+                    $('#Observations').val('');
+                }
+                $('#StatusCode').val(@((int)BigContributorAuthorizationStatus.Authorized));
+                if (form.valid()) {
+                    showConfirmation('autorizar');
+                }
+            });
+
+            $('.btn-reject').click(function () {
+                if (@Model.StatusCode === @((int)BigContributorAuthorizationStatus.Authorized) && '@Model.Observations.Contains("Autorizado")' === 'True') {
+                    $('#Observations').val('');
+                }
+                $('#StatusCode').val(@((int)BigContributorAuthorizationStatus.Rejected));
+                if (form.valid()) {
+                    showConfirmation('rechazar');
+                }
+            });
+        });
+
+        $(document).on('mouseenter', ".iffyTip", function () {
+            var $this = $(this);
+            if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+                $this.tooltip({
+                    title: $this.text(),
+                    placement: "top",
+                    container: "body"
+                });
+                $this.tooltip('show');
+            }
+        });
+
+        function disableFields() {
+            $('#Justification').attr('readonly', true);
+            $('#MinimumInvoices').attr('readonly', true);
+            $('#MaximumInvoices').attr('readonly', true);
+        }
+
+        function showConfirmation(action) {
+            bootbox.dialog({
+                title: "Advertencia",
+                message: "<div class='media'><div class='media-body'>" +
+                    "<h4 class='text-thin'>¿Está seguro de <strong>" + action + "</strong> la solicitud?</h4></div></div>",
+                buttons: {
+                    del: {
+                        label: "Aceptar",
+                        className: "btn-gosocket",
+                        callback: function () {
+                            sendResponse()
+                        }
+                    },
+                }
+            });
+        }
+
+        function sendResponse() {
+            showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+            form.submit();
+        }
+
+    </script>
+}

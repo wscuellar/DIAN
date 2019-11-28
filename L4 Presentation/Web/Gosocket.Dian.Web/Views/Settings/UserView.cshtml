@@ -1,0 +1,40 @@
+﻿@model Gosocket.Dian.Web.Models.UserViewModel
+
+@{
+    ViewBag.Title = "Usuario";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div id="panel-body" data-target="#panel-body" data-toggle="panel-overlay" class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @Html.Partial("_userForm")
+                        <div class="panel-footer text-right">
+                            <a href="@Url.Action("Users", "Settings")" class="btn btn-default">Volver</a>
+                            @*<a href="@Url.Action("Edit", "User", new { id = Model.Id })" class="btn btn-default btn-hover-gosocket">Editar</a>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function ($) {
+            $('.user-props').attr('readonly', true);
+            $('#Email').attr('readonly', true);
+            $('#Name').attr('readonly', true);
+        });
+
+    </script>
+}
+

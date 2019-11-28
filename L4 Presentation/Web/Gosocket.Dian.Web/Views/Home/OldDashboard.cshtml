@@ -1,0 +1,292 @@
+﻿@model Gosocket.Dian.Web.Models.DocumentStatsViewModel
+@using Gosocket.Dian.Web.Common
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    @if (User.IsInAnyRole("Administrador", "Super"))
+                    {
+                        <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dia margin-bottom-0  ">
+                            <div class="panel-body padding-0 padding-bottom-0">
+                                <div class="row">
+                                    <div id="global-stats-chart" class="col-sm-4 padding-xs-0" style="height:320px; margin: 0 auto"></div>
+                                    <div id="global-monthly-stats-chart" class="col-sm-8 padding-xs-0" style="height:320px; margin: 0 auto"></div>
+                                    <table id="datatable-monthly-chart" style="display:none">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Totales</th>
+                                                <th>Aceptados</th>
+                                                <th>Con notificaciones</th>
+                                                <th>Rechazados</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                           
+                                            @foreach (var item in Model.GlobalMonthlyTotals)
+                                            {
+                                                <tr>
+                                                    <th>@item.Item1.ToString("MMM-yyy")</th>
+                                                    <td>@item.Item2</td>
+                                                    <td>@item.Item3</td>
+                                                    <td>@item.Item4</td>
+                                                    <td>@item.Item5</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row padding-top-30">
+                                    <div id="global-daily-stats-chart" class="col-sm-12 padding-xs-0" style="height:320px; margin: 0 auto"></div>
+                                    <table id="datatable-daily-chart" style="display:none">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Totales</th>
+                                                <th>Aceptados</th>
+                                                <th>Con notificaciones</th>
+                                                <th>Rechazados</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model.GlobalDailyTotals)
+                                            {
+                                                <tr>
+                                                    <th>@item.Item1.ToString("dd-MM-yyyy")</th>
+                                                    <td>@item.Item2</td>
+                                                    <td>@item.Item3</td>
+                                                    <td>@item.Item4</td>
+                                                    <td>@item.Item5</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ContributorTestSetMessageInfo))
+                    {
+                        @Html.Raw(Model.ContributorTestSetMessageInfo)
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+    <script>
+        $(document).ready(function ($) {
+            Highcharts.setOptions({
+                lang:
+                {
+                    months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                }
+            });
+            @if (User.IsInAnyRole("Administrador", "Super"))
+            {
+                <Text>
+            loadGlobalPie();
+                    //loadGlobalStats();
+                    loadGlobalMonthlyStats();
+                    loadGlobalDailyStats();
+                </Text>
+            }
+        });
+
+        function loadGlobalPie() {
+            Highcharts.chart('global-stats-chart', {
+                credits: {
+                    enabled: false
+                },
+                navigation: {
+                    buttonOptions: {
+                        enabled: false
+                    }
+                },
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Resumen general de documentos recibidos'
+                },
+                tooltip: {
+                    pointFormat: '<b>{point.name}</b>:{point.y}'
+                },
+                colors: ['#0778D7','#348441', '#D7B707', '#DC2D08'],
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>:{point.y}',
+                            style: {
+                                color: ['#0778D7','#348441', '#D7B707', '#DC2D08']
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    data: [{
+                            name: 'Total',
+                        y: @Model.GlobalTotal
+                    },{
+                            name: 'Aceptados',
+                        y: @Model.GlobalTotalAccepted
+                    }, {
+                            name: 'Con notificaciones',
+                        y: @Model.GlobalTotalNotification
+                    }, {
+                            name: 'Rechazados',
+                        y: @Model.GlobalTotalRejected
+                    }],
+                    showInLegend: true
+                }]
+            });
+        }
+
+        function loadGlobalStats() {
+            Highcharts.chart('global-stats-chart', {
+                credits: {
+                    enabled: false
+                },
+                navigation: {
+                    buttonOptions: {
+                        enabled: false
+                    }
+                },
+                title: {
+                    text: 'Resumen general de documentos recibidos'
+                },
+                subtitle: {
+                    text: 'Hasta hoy ' + '@DateTime.UtcNow.Date.ToString("dd-MM-yyyy")'
+                },
+                xAxis: {
+                    categories: ['Total', 'Aceptados', 'Con notificaciones', 'Rechazados']
+                },
+                yAxis: {
+                    allowDecimals: false,
+                    title: {
+                        text: 'Totales'
+                    }
+                },
+                colors: ['#0778D7', '#348441', '#D7B707', '#DC2D08'],
+                tooltip: {
+                    headerFormat: '<span style="color: {point.color}">\u25CF</span> {point.key}: ',
+                    pointFormat: '<b>{point.y}</b>',
+                },
+                series: [{
+                    type: 'column',
+                    colorByPoint: true,
+                    data: [@Model.GlobalTotal, @Model.GlobalTotalAccepted, @Model.GlobalTotalNotification, @Model.GlobalTotalRejected],
+                    showInLegend: true
+                }]
+            });
+        }
+
+        function loadGlobalMonthlyStats() {
+            Highcharts.chart('global-monthly-stats-chart', {
+                credits: {
+                    enabled: false
+                },
+                navigation: {
+                    buttonOptions: {
+                        enabled: false
+                    }
+                },
+                data: {
+                    table: 'datatable-monthly-chart'
+                },
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Resumen de documentos recibidos mensualmente'
+                },
+                subtitle: {
+                    text: 'Últimos cuatro meses'
+                },
+                xAxis: {
+                    dateTimeLabelFormats: {
+                        month: '%B %Y'
+                    }
+                },
+                yAxis: {
+                    allowDecimals: false,
+                    title: {
+                        text: ''
+                    }
+                },
+                colors: ['#0778D7', '#348441', '#D7B707', '#DC2D08'],
+            });
+        }
+
+        function loadGlobalDailyStats() {
+            Highcharts.chart('global-daily-stats-chart', {
+                credits: {
+                    enabled: false
+                },
+                navigation: {
+                    buttonOptions: {
+                        enabled: false
+                    }
+                },
+                data: {
+                    table: 'datatable-daily-chart'
+                },
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Resumen de documentos recibidos diariamente'
+                },
+                subtitle: {
+                    text: 'Últimos treinta días'
+                },
+                xAxis: {
+                    dateTimeLabelFormats: {
+                        day: '%e %b %Y'
+                    }
+                },
+                yAxis: {
+                    allowDecimals: false,
+                    title: {
+                        text: ''
+                    }
+                },
+                tooltip: {
+                    dateTimeLabelFormats: {
+                        day: "%A, %e %b del %Y"
+                    }
+                },
+                colors: ['#0778D7', '#348441', '#D7B707', '#DC2D08'],
+            });
+        }
+
+    </script>
+}

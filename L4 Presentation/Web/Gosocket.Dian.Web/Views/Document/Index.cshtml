@@ -1,0 +1,323 @@
+﻿@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Domain.Common
+@model Gosocket.Dian.Web.Models.SearchDocumentViewModel
+
+@{
+    ViewBag.Title = "Consultar documentos";
+    var view = ViewBag.ViewType;
+
+    var columnSize = 5;
+    if (view == "Index" || view == "Provider")
+    {
+        columnSize = 3;
+    }
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <!--Tabs Content-->
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">@ViewBag.Title</h3>
+                        </div>
+
+                        <div class="panel-body padding-top-20">
+                            <div class="pad-btm padding-bottom-0">
+                                <div class="row margin-horizontal-0">
+                                    @{ string action = ViewBag.ViewType; }
+                                    @using (Html.BeginForm(action, "Document", FormMethod.Post, new { id = "documents-form" }))
+                                    {
+                                        <input id="page" name="Page" type="hidden" value="@Model.Page" />
+                                        <input id="startDate" name="StartDate" type="hidden" value="@Model.StartDate" />
+                                        <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />
+
+                                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                            <div class="col-md-12 padding-horizontal-0">
+                                                <div id="document-list" class="panel panel-bordered-dian">
+
+                                                    <div class="panel-body padding-20 padding-bottom-0">
+                                                        <div class="row">
+                                                            <div class="col-sm-@columnSize padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.DocumentKey, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.DocumentKey, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.DocumentKey) } })
+                                                                </div>
+                                                            </div>
+
+                                                            @if (ViewBag.ViewType != "Sent")
+                                                            {
+                                                                <div class="col-sm-2 padding-xs-0">
+                                                                    <div class="form-group">
+                                                                        @Html.LabelFor(m => m.SenderCode, new { @class = "control-label" })
+                                                                        @Html.TextBoxFor(m => m.SenderCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SenderCode) } })
+                                                                    </div>
+                                                                </div>
+                                                            }
+
+                                                            @if (ViewBag.ViewType != "Received")
+                                                            {
+                                                                <div class="col-sm-2 padding-xs-0">
+                                                                    <div class="form-group">
+                                                                        @Html.LabelFor(m => m.ReceiverCode, new { @class = "control-label" })
+                                                                        @Html.TextBoxFor(m => m.ReceiverCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.ReceiverCode) } })
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    <label class="control-label">Rango de fechas</label>
+                                                                    <div class="form-group">
+                                                                        <div class="btn btn-default col-sm-12" id="dashboard-report-range">
+                                                                            <i class="icon-calendar"></i>&nbsp;
+                                                                            <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                                                            <i class="fa fa-angle-down"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-2" padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.Statuses, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.Status, new SelectList(Model.Statuses, "Code", "Name", Model.Status), new { @class = "form-control selectpicker" })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.DocumentTypeId, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.DocumentTypeId, new SelectList(Model.DocumentTypes, "Code", "Name", Model.DocumentTypeId), new { @class = "form-control selectpicker" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-2 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.ReferencesType, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.ReferencesType, new SelectList(Model.DocumentTypes.Where(d => new List<string> { "00", "07", "08" }.Contains(d.Code)), "Code", "Name", Model.ReferencesType), new { @class = "form-control selectpicker" })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="panel-footer-grey text-right">
+                                                        <button class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Buscar</button>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row margin-horizontal-0">
+                                            <div class="col-md-9 table-toolbar-left padding-left-0">
+                                            </div>
+                                            <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+                                                @if (Model.Documents.Any())
+                                                {
+                                                    <span class="text-muted">
+                                                        <strong>@(Model.Page * Model.MaxItemCount + 1)-@(Model.MaxItemCount > Model.Documents.Count ? (Model.Page) * Model.MaxItemCount + Model.Documents.Count : (Model.Page + 1) * Model.MaxItemCount)</strong>
+                                                    </span>
+                                                    <div class="btn-group btn-group margin-left-5">
+                                                        <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                                                            <span class="fa fa-chevron-left"></span>
+                                                        </a>
+                                                        <a class="btn btn-default paginate-btn next-page" @(Model.Documents.Count < Model.MaxItemCount ? "disabled=\"disabled\"" : "")>
+                                                            <span class="fa fa-chevron-right"></span>
+                                                        </a>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+
+                            @Html.Partial("_documents");
+
+                            <div class="pull-right table-pagination">
+                                @if (Model.Documents.Any())
+                                {
+                                    <span class="text-muted">
+                                        <strong>@(Model.Page * Model.MaxItemCount + 1)-@(Model.MaxItemCount > Model.Documents.Count ? (Model.Page) * Model.MaxItemCount + Model.Documents.Count : (Model.Page + 1) * Model.MaxItemCount)</strong>
+                                    </span>
+                                    <div class="btn-group btn-group margin-left-5">
+                                        <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                                            <span class="fa fa-chevron-left"></span>
+                                        </a>
+                                        <a class="btn btn-default paginate-btn next-page" @(Model.Documents.Count < Model.MaxItemCount ? "disabled=\"disabled\"" : "")>
+                                            <span class="fa fa-chevron-right"></span>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+
+    <script>
+        var startDate;
+        var endDate;
+
+        $(document).ready(function () {
+            $('input.check').on('change', function () {
+                $('input.check').not(this).prop('checked', false).parent().removeClass('active');
+            });
+
+            $('.document-row').click('onClick', function () {
+                if (!$(this).hasClass('not-redirect')) {
+                    var id = $(this).context.getAttribute('data-id');
+                    var partitionKey = $(this).context.getAttribute('data-partitionKey');
+                    window.location.href = "/Document/Details?trackId=" + id + "&partitionKey=" + partitionKey;
+                }
+                else
+                    $(this).removeClass('not-redirect')
+            });
+
+            $('.download-files').click('onClick', function () {
+                downloadFiles(this);
+            });
+
+            $('.btn-search').click(function () {
+                $('#page').val(0);
+                $(this).attr('disabled', 'disabled');
+                $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
+                $('.table-pagination').css('display', 'none');
+                $('.table-responsive').css('display', 'none');
+                $('#documents-form').submit();
+            });
+
+            // Pagination
+            $('.next-page').click(function () {
+                $('#page').val(@Model.Page + 1);
+                $('#documents-form').submit();
+            });
+
+            $('.prev-page').click(function () {
+                $('#page').val(@Model.Page - 1);
+                $('#documents-form').submit();
+            });
+            // Pagination
+
+        });
+
+        startDate = moment("@Model.StartDate.ToString("yyyy-MM-dd")");
+        endDate = moment("@Model.EndDate.ToString("yyyy-MM-dd")");
+
+        startDate.locale('es');
+        endDate.locale('es');
+
+        $('#dashboard-report-range').daterangepicker({
+            "buttonClasses": "btn btn-block btn-default",
+            "startDate": startDate,
+            "endDate": endDate,
+            "applyClass": "btn-hover-gosocket",
+            "cancelClass": "btn-hover-gosocket",
+            "ranges": {
+                'Últimos 7 Días': [moment().subtract('days', 6), moment()],
+                'Mes actual': [moment().startOf('month'), moment().endOf('month')],
+                'Mes Anterior': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+                'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
+            },
+            "locale": {
+                "format": "DD-MM-YY",
+                "separator": " - ",
+                "applyLabel": "Aceptar",
+                "cancelLabel": "Cancelar",
+                "fromLabel": "Desde",
+                "toLabel": "Hasta",
+                "customRangeLabel": "Rango de Fechas",
+                "daysOfWeek": [
+                    "Do",
+                    "Lu",
+                    "Ma",
+                    "Mi",
+                    "Ju",
+                    "Vi",
+                    "Sa"
+                ],
+                "monthNames": [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre"
+                ],
+                "firstDay": 1
+            },
+            opens: ('left'),
+        }, function (start, end, label) {
+            $('#dashboard-report-range span').html(capitalizeMonth(start.format('DD-MMMM-YYYY')) + ' al ' + capitalizeMonth(end.format('DD-MMMM-YYYY')));
+            startDate = start;
+            endDate = end;
+            $('#startDate').val(startDate.format('MM/DD/YYYY'));
+            $('#endDate').val(endDate.format('MM/DD/YYYY'));
+        });
+        $('#dashboard-report-range span').html(capitalizeMonth(startDate.format('DD-MMMM-YYYY')) + ' al ' + capitalizeMonth(endDate.format('DD-MMMM-YYYY')));
+        $('#dashboard-report-range').show();
+
+        function capitalizeMonth(date) {
+            return date.substring(0,3) + date.charAt(3).toUpperCase() + date.slice(4);
+        }
+
+        function downloadFiles(span) {
+            $(span).parent().parent().addClass('not-redirect');
+            var id = span.id;
+            if ($(span).hasClass("fa-download")) {
+                $(span).removeClass("fa-download");
+                $(span).addClass("fa-spinner");
+                setTimeout(function () {
+                    $("#" + id).removeClass("fa-spinner");
+                    $("#" + id).addClass("fa-download");
+                }, 5000);
+                window.location.href = "/Document/DownloadZipFiles?trackId=" + id;
+
+            }
+        }
+
+        $(document).on('mouseenter', ".iffyTip", function () {
+            var $this = $(this);
+            if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+                $this.tooltip({
+                    title: $this.text(),
+                    placement: "top"
+                });
+                $this.tooltip('show');
+            }
+        });
+        $('.hideText').css('width', $('.hideText').parent().width());
+
+    </script>
+
+}
+

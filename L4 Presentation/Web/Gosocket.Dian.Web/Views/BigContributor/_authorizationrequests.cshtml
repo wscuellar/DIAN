@@ -1,0 +1,47 @@
+﻿@model Gosocket.Dian.Web.Models.RequestAuthorizationBigContributorTableViewModel
+@using Gosocket.Dian.Domain.Common
+
+<div class="table-responsive">
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>NIT Facturador</th>
+                <th>Nombre Facturador</th>
+                <th>Estado Solicitud</th>
+                <th class="text-center">Fecha Solicitud</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Requests)
+            {
+                var processRequestUrl = Url.Action("ProcessAuthorizationRequest", "BigContributor", new { contributorCode = r.ContributorCode });
+
+                var label = "";
+                switch (r.StatusCode)
+                {
+                    case (int)BigContributorAuthorizationStatus.Pending:
+                        label = "custom-label-warning";
+                        break;
+                    case (int)BigContributorAuthorizationStatus.Authorized:
+                        label = "custom-label-success";
+                        break;
+                    case (int)BigContributorAuthorizationStatus.Rejected:
+                        label = "custom-label-danger";
+                        break;
+                    default:
+                        label = "custom-label-primary";
+                        break;
+                }
+
+                <tr class='clickable-row' data-href="@processRequestUrl">
+                    <td class=""><a>@r.ContributorCode</a></td>
+                    <td class="largeText iffyTip"><a>@r.ContributorName</a></td>
+                    <td class="text-left smallText">
+                        <span class="label label-table @label iffyTip">@r.StatusDescription</span>
+                    </td>
+                    <td class="text-center"><a>@r.RequestDate.ToString("dd-MM-yyyy")</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

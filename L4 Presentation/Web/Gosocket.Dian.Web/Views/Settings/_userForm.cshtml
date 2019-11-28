@@ -1,0 +1,27 @@
+﻿@model Gosocket.Dian.Web.Models.UserViewModel
+@Html.HiddenFor(x => x.Id)
+
+<div class="panel-body padding-20 padding-bottom-10">
+    @{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control user-props" } };}
+
+    <div class="row">
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Name, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+    </div>
+</div>
+

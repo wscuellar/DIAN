@@ -1,0 +1,125 @@
+﻿@model List<Gosocket.Dian.Web.Models.SearchDocumentViewModel>
+
+@{
+    ViewBag.Title = "Documentos Recibidos";
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <!--Tabs Content-->
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">@ViewBag.Title</h3>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+
+    <script>
+        function showTracking() {
+            $('#tracking-modal').modal("show");
+        }
+        $(document).ready(function ($) {
+
+            $(".document-row").click(function () {
+                window.location = "../Document/Viewer?nav=14";
+            });
+
+            $('#ByEmisionDate').on('change', function (e) {
+                
+            });
+
+            $(".paginate-btn").click(function (e) {
+                
+            });
+
+            $('#doctype-select').on('change', function (e) {
+                
+            });
+        });
+
+        var startDate = moment().subtract('month', 1);
+        var endDate = moment();
+
+        $('#dashboard-report-range').daterangepicker({
+            "buttonClasses": "btn btn-block btn-default",
+            "startDate": startDate,
+            "endDate": endDate,
+            "applyClass": "btn-hover-gosocket",
+            "cancelClass": "btn-hover-gosocket",
+            "ranges": {
+                'Últimos 7 Días': [moment().subtract('days', 6), moment()],
+                'Mes actual': [moment().startOf('month'), moment().endOf('month')],
+                'Mes Anterior': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+                'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
+            },
+            "locale": {
+                "format": "DD/MM/YY",
+                "separator": " - ",
+                "applyLabel": "Aceptar",
+                "cancelLabel": "Cancelar",
+                "fromLabel": "Desde",
+                "toLabel": "Hasta",
+                "customRangeLabel": "Rango de Fechas",
+                "daysOfWeek": [
+                    "Do",
+                    "Lu",
+                    "Ma",
+                    "Mi",
+                    "Ju",
+                    "Vi",
+                    "Sa"
+                ],
+                "monthNames": [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre"
+                ],
+                "firstDay": 1
+            },
+            opens: ('left'),
+        }, function (start, end, label) {
+            $('#dashboard-report-range span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+            window.location.href = '/Inbox/SearchSent?FromDate=' + start.format('D/MM/YYYY') + '&ToDate=' + end.format('D/MM/YYYY') + '';
+        });
+
+        $('#dashboard-report-range span').html(startDate.format('DD/MM/YYYY') + ' - ' + endDate.format('DD/MM/YYYY'));
+        $('#dashboard-report-range').show();
+    </script>
+
+}

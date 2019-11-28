@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<fe:Invoice xmlns:fe="http://www.dian.gov.co/contratos/facturaelectronica/v1" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:clm54217="urn:un:unece:uncefact:codelist:specification:54217:2001" xmlns:clm66411="urn:un:unece:uncefact:codelist:specification:66411:2001" xmlns:clmIANAMIMEMediaType="urn:un:unece:uncefact:codelist:specification:IANAMIMEMediaType:2003" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:sts="http://www.dian.gov.co/contratos/facturaelectronica/v1/Structures" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.dian.gov.co/contratos/facturaelectronica/v1 ../xsd/DIAN_UBL.xsd urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2 ../../ubl2/common/UnqualifiedDataTypeSchemaModule-2.0.xsd urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2 ../../ubl2/common/UBL-QualifiedDatatypes-2.0.xsd"> 
+  <ext:UBLExtensions>
+    <ext:UBLExtension>
+      <ext:ExtensionContent>
+        <sts:DianExtensions>
+          <sts:InvoiceControl>
+            <sts:InvoiceAuthorization>9000000032421248</sts:InvoiceAuthorization>
+            <sts:AuthorizationPeriod>
+              <cbc:StartDate>2017-12-13</cbc:StartDate>
+              <cbc:EndDate>2019-06-13</cbc:EndDate>
+            </sts:AuthorizationPeriod>
+            <sts:AuthorizedInvoices>
+              <sts:Prefix>PRUE</sts:Prefix>
+              <sts:From>983100000</sts:From>
+              <sts:To>983200000</sts:To>
+            </sts:AuthorizedInvoices>
+          </sts:InvoiceControl>
+          <sts:InvoiceSource>
+            <cbc:IdentificationCode listAgencyID="6" listAgencyName="United Nations Economic Commission for Europe" listSchemeURI="urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.0">CO</cbc:IdentificationCode>
+          </sts:InvoiceSource>
+          <sts:SoftwareProvider>
+            <sts:ProviderID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Direccion de Impuestos y Aduanas Nacionales)">860502609</sts:ProviderID>
+            <sts:SoftwareID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Direccion de Impuestos y Aduanas Nacionales)">9f926c2e-b2f3-4ce7-8e30-00999252ee07</sts:SoftwareID>
+          </sts:SoftwareProvider>
+          <sts:SoftwareSecurityCode schemeAgencyID="195" schemeAgencyName="CO, DIAN (Direccion de Impuestos y Aduanas Nacionales)">75b9ca45b5196795cee68e1c5ecf164d8e00efdbbc8e06699e398e2e66821c00da5364d83f4ae8499a808d3731d274de</sts:SoftwareSecurityCode>
+        </sts:DianExtensions>
+      </ext:ExtensionContent>
+    </ext:UBLExtension>
+  <ext:UBLExtension><ext:ExtensionContent><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="xmldsig-ebfc3095-ea77-4079-8e5e-436b3a03e7d5">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" />
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256" />
+<ds:Reference Id="xmldsig-ebfc3095-ea77-4079-8e5e-436b3a03e7d5-ref0" URI="">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" />
+<ds:DigestValue>8mVmfohzoXaiEOuACyo1nVc1LbCjqSzeqRmqm3tvWUU=</ds:DigestValue>
+</ds:Reference>
+<ds:Reference Id="xmldsig-ebfc3095-ea77-4079-8e5e-436b3a03e7d5-ref1" URI="#KeyInfo">
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" />
+<ds:DigestValue>JoBz9uEpTcwAcgMwXKUJtDWP9vVkLnBaYPpZr8VPCoM=</ds:DigestValue>
+</ds:Reference>
+<ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#xmldsig-ebfc3095-ea77-4079-8e5e-436b3a03e7d5-signedprops">
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" />
+<ds:DigestValue>I5oVVzneyNZZDP2eQbcGQzeuV7RT0H6hyaZc2SY+YmY=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue Id="xmldsig-ebfc3095-ea77-4079-8e5e-436b3a03e7d5-sigvalue">
+Z28HGdsp4PkMMuQtoz0xlf8EvqgrN7g2V1mK4N5M5V6+6XwBvz+mYknV/PEB9IhUnYiVAc2WOJtC
+0rRo98paln59pQd5muL/7Qx3B1eu2MECGPttjg3DJ31fI7DYeLkwAUNHOA/vvdHFgknOYq9nhazt
+6vfcgUy+4eef/YWrWzCW5lRMn7+XfnzHS79AqCtx0EwvVnpvBqJh3nWhwlO31zFfURjI2wOa2E1Z
+ijKq7NJDiX8ZX/ZkFSljAvukCep3CQPhmxZDkkZYRRe4yITrjzkhe3lQ6sM3q2iS/36dIW4dYHE8
+EAToqM/e/Fhu70/UCXo22CE3udW9cRZuOpWI1w==
+</ds:SignatureValue>
+<ds:KeyInfo Id="KeyInfo">
+<ds:X509Data>
+<ds:X509Certificate>
+MIIJXjCCB0agAwIBAgIIMR3l6gsAawwwDQYJKoZIhvcNAQELBQAwggFgMTkwNwYDVQQNDDBHU0Ug
+U3Vib3JkaW5hdGUgQ2VydGlmaWNhdGUgMDAxIENvbG9tYmlhIEhXLUtVU1UxFjAUBgNVBAMMDUdT
+RSBTVUIwMDFfQ08xEzARBgNVBAUTCjkwMDIwNDI3MjgxGDAWBgkqhkiG9w0BCQEWCWNhQGdzZS5j
+bzE0MDIGA1UECgwrR0VTVElPTiBERSBTRUdVUklEQUQgRUxFQ1RST05JQ0EgUy5BLiAtIEdTRTEg
+MB4GA1UEDAwXU3Vib3JkaW5hdGUgQ2VydGlmaWNhdGUxOzA5BgNVBAsMMkludGVybmV0IENlcnRp
+ZmljYXRpb24gQXV0aG9yaXR5IGh0dHA6Ly93d3cuZ3NlLmNvMSIwIAYDVQQJDBlodHRwOi8vd3d3
+LmdzZS5jby9hZGRyZXNzMRYwFAYDVQQHDA1CT0dPVMOBLCBELkMuMQswCQYDVQQGEwJDTzAeFw0x
+NzA4MTgxNjM0NDlaFw0xODA5MDIxNjQ0NDlaMIIB7TELMAkGA1UEBhMCQ08xKTAnBgkqhkiG9w0B
+CQEWGmx1Y2lvLnF1aWphbm9AZ29zb2NrZXQubmV0MRAwDgYDVQQEDAdRVUlKQU5PMRQwEgYDVQQH
+DAtCT0dPVEEgRC5DLjEPMA0GA1UECAwGQk9HT1RBMRMwEQYDVQQFEwo5MDA1MDg5MDg5MRMwEQYD
+VQQqDApMVUNJTyBKT1NFMTMwMQYDVQQKDCpTSUdOQVRVUkUgU09VVEggQ09OU1VMVElORyBDT0xP
+TUJJQSBTLkEuUy4xMzAxBgNVBAMMKlNJR05BVFVSRSBTT1VUSCBDT05TVUxUSU5HIENPTE9NQklB
+IFMuQS5TLjEYMBYGA1UEDAwPQ09VTlRSWSBNQU5BR0VSMUcwRQYDVQQNDD5DRVJUSUZJQ0FETyBE
+RSBGQUNUVVJBIEVMRUNUUk9OSUNBIC0gRU1JVElETyBQT1IgR1NFIFNVQjAwMV9DTzEgMB4GA1UE
+CQwXQVYgQ0FSUkVSQTQ1IE5PLiAxMDMtNDAxFTATBg0rBgEEAYHzIAICAQICDAJDRTEvMC0GDSsG
+AQQBgfMgAgIBAgQMHENBTUFSQSBERSBDT01FUkNJTyBERSBCT0dPVEExGTAXBg0rBgEEAYHzIAIC
+AQILDAY0MzYzMTQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCv7cN3sfvC6eb93UUU
+fFUVQLdhu9xdEvIAhb6rKiItwAq9QyVDVULwInwyfjct2QeINN5kAZjuDkDybjXw+jWIT9PvFU4s
+XFYc6Khs/Go67uaO+fm58cA+kb8tjdZ3SOhS/dkGE8B0F2wRQKNlNcLDi9WR+4TMIYeLHtnl3f5A
+eG9VbAovbDtvIJKrd/CCVYxzJTLueF4eFRohRFviJKfyDrvRaW/JMFl/7KFITDyJnwi/mUAcR0dk
+P+NeZmvhuOGanRgk+bXA7huujH68lMb+6gdiR9dFYZyCiWphCb1sFHZeocuVvk5uq+9N/RS/fxLU
+jJ3okg+XLPqfYgalxMFHAgMBAAGjggKJMIIChTAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwID
++DApBgNVHSUEIjAgBggrBgEFBQcDAgYIKwYBBQUHAwQGCisGAQQBgjcKAwQwHQYDVR0OBBYEFAfQ
+yIRbXcWZ3kSINDaX4WQQ+/MOMG0GCCsGAQUFBwEBBGEwXzAeBggrBgEFBQcwAYYSaHR0cDovL29j
+c3AuZ3NlLmNvMD0GCCsGAQUFBzAChjFodHRwOi8vY2VydHMuZ3NlLmNvL3N1Yi9jcnRfZ3NlX3N1
+YjAwMWNvX3NoYTIuY3J0MB8GA1UdIwQYMBaAFI5KA16j/QmnY7Vk7nVGemzdvkVJMHgGA1UdHwRx
+MG8wNaAzoDGGL2h0dHA6Ly9jcmwuZ3NlLmNvL3N1Yi9jcmxfZ3NlX3N1YjAwMWNvX3NoYTIuY3Js
+MDagNKAyhjBodHRwOi8vY3JsMS5nc2UuY28vc3ViL2NybF9nc2Vfc3ViMDAxY29fc2hhMi5jcmww
+FgYDVR0SBA8wDYELaW5mb0Bnc2UuY28wgbMGA1UdIASBqzCBqDCBpQYNKwYBBAGB8yACAgMLAjCB
+kzA5BggrBgEFBQcCARYtaHR0cDovL2Nwcy5nc2UuY28vc3ViL2Nwc19zdWIwMDFjb19hY19nc2Uu
+cGRmMFYGCCsGAQUFBwICMEoaSFRlcm1zIG9mIHVzZSBhdCBDUFMgQ0EgR1NFIGh0dHA6Ly9jcHMu
+Z3NlLmNvL3N1Yi9jcHNfc3ViMDAxY29fY2FfZ3NlLnBkZjBDBggrBgEFBQcBAwQ3MDUwCAYGBACO
+RgEBMAgGBgQAjkYBATAVBgYEAI5GAQIwCxMDRVVSAgEAAgEAMAgGBgQAjkYBBDANBgkqhkiG9w0B
+AQsFAAOCAgEASVVx9nS5MxCnDB2M5Con0SJanQnui3lwDIINpngoNVydUNdMOpqdMC81rFrMDEH+
+elDt9Ut8mFPEWvMNGP2PURBbpVhe+jt3b8TPYkg3b5HBuSjwXU9RxXgyPw0rcUMYrVvct0N4boie
+s/eyUkpxmacdOIygH5bkVIr+8X96+AscbQoUgTFo7SlIAiT2mfmYsUCUs+avyrJxYdCyVUHVFIzX
+mofUPL6qPN5PxAlT0Z48Sm+p6dS9rhppZDmz2Bmb6ir8kVPwqB0LwejjvTuvIDWYLiKxqxxUdlGk
+CzBgdl3Krj9mvqjhx9h3XTesJ+Vypyq5Wbty9td3EzfiFoeJBKRHUphmhFyGv+djsD8USXa8STtx
+3obfUh8VUOghphMkMvnzWCwY2vITsvc2DlIjMTMV5KeBLCLHzIeB9RgeW0jYdN6PPSYh6+aLXIun
+FZ5zp+sZpcM8aTSlOq83ZPEAxz4clPs7NvfHoIcAMWiF4GpBvSqXxvM7UECIAj4Py0Zqii+QTLHr
+cnX4l9O4z33Iy9hWnFNeBcMTxcfECMfb7TEUuLKdA8OEx/iG+a095DsovowntV4qZioV0oy+2ytB
+xt5hIoIYaj4J9aSnl1vNccGjLbdQ399vNEbyUvGwdhZXwyowLZBJgmtHgjM6WQHTqY3dumQL0ln+
+ZXC30qwnvzg=
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+<ds:Object><xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:xades141="http://uri.etsi.org/01903/v1.4.1#" Target="#xmldsig-ebfc3095-ea77-4079-8e5e-436b3a03e7d5"><xades:SignedProperties Id="xmldsig-ebfc3095-ea77-4079-8e5e-436b3a03e7d5-signedprops"><xades:SignedSignatureProperties><xades:SigningTime>2018-08-23T15:52:07.809+00:00</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" /><ds:DigestValue>xSGj+iKtTubHAHv9Fsbi7LUH9RwmSU9W5jHoqWg0i1c=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>C=CO,L=BOGOTÁ\, D.C.,STREET=http://www.gse.co/address,OU=Internet Certification Authority http://www.gse.co,2.5.4.12=#0c175375626f7264696e617465204365727469666963617465,O=GESTION DE SEGURIDAD ELECTRONICA S.A. - GSE,1.2.840.113549.1.9.1=#16096361406773652e636f,2.5.4.5=#130a39303032303432373238,CN=GSE SUB001_CO,2.5.4.13=#0c30475345205375626f7264696e6174652043657274696669636174652030303120436f6c6f6d6269612048572d4b555355</ds:X509IssuerName><ds:X509SerialNumber>3539237675552762636</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" /><ds:DigestValue>pznjmDOeR15rpA1yHFwviUTB68SV5ZdprBUnIkwICXM=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>C=CO,L=BOGOTÁ\, D.C.,STREET=http://www.gse.co/address,OU=Internet Certification Authority http://www.gse.co,2.5.4.5=#130a39303032303432373238,O=GESTION DE SEGURIDAD ELECTRONICA S.A. - GSE,CN=Global Certification Authority Root GSE,1.2.840.113549.1.9.1=#16096361406773652e636f</ds:X509IssuerName><ds:X509SerialNumber>1</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" /><ds:DigestValue>HZ9QMgtuIDkb6XQVGEZpQ9ikGpYNKYcqvpcTMkuHp8k=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>C=CO,L=BOGOTÁ\, D.C.,STREET=http://www.gse.co/address,OU=Internet Certification Authority http://www.gse.co,2.5.4.5=#130a39303032303432373238,O=GESTION DE SEGURIDAD ELECTRONICA S.A. - GSE,CN=Global Certification Authority Root GSE,1.2.840.113549.1.9.1=#16096361406773652e636f</ds:X509IssuerName><ds:X509SerialNumber>0</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate><xades:SignaturePolicyIdentifier><xades:SignaturePolicyId><xades:SigPolicyId><xades:Identifier>https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf</xades:Identifier></xades:SigPolicyId><xades:SigPolicyHash><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" /><ds:DigestValue>dMoMvtcG5aIzgYo0tIsSQeVJBDnUnfSOfBpxXrmor0Y=</ds:DigestValue></xades:SigPolicyHash></xades:SignaturePolicyId></xades:SignaturePolicyIdentifier><xades:SignerRole><xades:ClaimedRoles><xades:ClaimedRole>third party</xades:ClaimedRole></xades:ClaimedRoles></xades:SignerRole></xades:SignedSignatureProperties></xades:SignedProperties></xades:QualifyingProperties></ds:Object>
+</ds:Signature></ext:ExtensionContent></ext:UBLExtension></ext:UBLExtensions>
+  <cbc:UBLVersionID>UBL 2.0</cbc:UBLVersionID>
+  <cbc:ProfileID>DIAN 1.0</cbc:ProfileID>
+  <cbc:ID>PRUE983100124</cbc:ID>
+  <cbc:UUID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Direccion de Impuestos y Aduanas Nacionales)">ae8aa55948c226e3e9c952d6bf21d52f94cb7cf3</cbc:UUID>
+  <cbc:IssueDate>2018-05-31</cbc:IssueDate>
+  <cbc:IssueTime>00:00:00</cbc:IssueTime>
+  <cbc:InvoiceTypeCode listAgencyID="195" listAgencyName="CO, DIAN (Direccion de Impuestos y Aduanas Nacionales)" listSchemeURI="http://www.dian.gov.co/contratos/facturaelectronica/v1/InvoiceType">1</cbc:InvoiceTypeCode>
+  <cbc:Note>NumFac: PRUE983100124
+FecFac: 20180531000000
+NitFac: 860502609
+DocAdq: 8909169882
+ValFac: 3582372.00
+ValIva: 0.00
+ValOtroIm: 
+ValFacIm: 3582372.00
+CUFE: ae8aa55948c226e3e9c952d6bf21d52f94cb7cf3 </cbc:Note>
+  <cbc:DocumentCurrencyCode>COP</cbc:DocumentCurrencyCode>
+  <fe:AccountingSupplierParty>
+    <cbc:AdditionalAccountID>1</cbc:AdditionalAccountID>
+    <fe:Party>
+      <cac:PartyIdentification>
+        <cbc:ID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Direccion de Impuestos y Aduanas Nacionales)" schemeID="31">860502609</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name>DHL Express Colombia Ltda.</cbc:Name>
+      </cac:PartyName>
+      <fe:PhysicalLocation>
+        <fe:Address>
+          <cbc:Department>Bogota</cbc:Department>
+          <cbc:CitySubdivisionName>BOGOTA</cbc:CitySubdivisionName>
+          <cbc:CityName />
+          <cac:AddressLine>
+            <cbc:Line>CARRERA 85 D No. 46A-38</cbc:Line>
+          </cac:AddressLine>
+          <cac:Country>
+            <cbc:IdentificationCode>CO</cbc:IdentificationCode>
+          </cac:Country>
+        </fe:Address>
+      </fe:PhysicalLocation>
+      <fe:PartyTaxScheme>
+        <cbc:TaxLevelCode>3</cbc:TaxLevelCode>
+        <cac:TaxScheme />
+      </fe:PartyTaxScheme>
+      <fe:PartyLegalEntity>
+        <cbc:RegistrationName>DHL Express Colombia Ltda.</cbc:RegistrationName>
+      </fe:PartyLegalEntity>
+      <cac:Contact>
+        <cbc:ElectronicMail />
+      </cac:Contact>
+    </fe:Party>
+  </fe:AccountingSupplierParty>
+  <fe:AccountingCustomerParty>
+    <cbc:AdditionalAccountID>1</cbc:AdditionalAccountID>
+    <fe:Party>
+      <cac:PartyIdentification>
+        <cbc:ID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Direccion de Impuestos y Aduanas Nacionales)" schemeID="31">8909169882</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name>AVERY DENNISON RETAIL INFORMATION SERVICES CO</cbc:Name>
+      </cac:PartyName>
+      <fe:PhysicalLocation>
+        <fe:Address>
+          <cbc:Department />
+          <cbc:CitySubdivisionName>MEDELLIN</cbc:CitySubdivisionName>
+          <cbc:CityName>MEDELLIN</cbc:CityName>
+          <cac:AddressLine>
+            <cbc:Line>LOMBIA S.A.SCRA 50 F # 7 SUR 31</cbc:Line>
+          </cac:AddressLine>
+          <cac:Country>
+            <cbc:IdentificationCode>CO</cbc:IdentificationCode>
+          </cac:Country>
+        </fe:Address>
+      </fe:PhysicalLocation>
+      <fe:PartyTaxScheme>
+        <cbc:TaxLevelCode>2</cbc:TaxLevelCode>
+        <cac:TaxScheme />
+      </fe:PartyTaxScheme>
+      <fe:PartyLegalEntity>
+        <cbc:RegistrationName>AVERY DENNISON RETAIL INFORMATION SERVICES CO</cbc:RegistrationName>
+      </fe:PartyLegalEntity>
+      <cac:Contact>
+        <cbc:ElectronicMail />
+      </cac:Contact>
+    </fe:Party>
+  </fe:AccountingCustomerParty>
+  <fe:Delivery>
+    <cbc:ID />
+    <fe:DeliveryLocation>
+      <cbc:ID />
+      <cbc:Description>LOMBIA S.A.SCRA 50 F # 7 SUR 31</cbc:Description>
+      <cbc:CountrySubentity>MEDELLIN</cbc:CountrySubentity>
+      <fe:Address>
+        <cbc:CityName />
+        <cbc:CountrySubentity>MEDELLIN</cbc:CountrySubentity>
+        <cac:AddressLine>
+          <cbc:Line>LOMBIA S.A.SCRA 50 F # 7 SUR 31</cbc:Line>
+        </cac:AddressLine>
+        <cac:Country>
+          <cbc:Name>Colombia</cbc:Name>
+        </cac:Country>
+      </fe:Address>
+    </fe:DeliveryLocation>
+  </fe:Delivery>
+  <fe:TaxTotal>
+    <cbc:TaxAmount currencyID="COP">0.00</cbc:TaxAmount>
+    <cbc:TaxEvidenceIndicator>false</cbc:TaxEvidenceIndicator>
+    <fe:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="COP">3582372.00</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="COP">0.00</cbc:TaxAmount>
+      <cbc:Percent>19.00</cbc:Percent>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>01</cbc:ID>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </fe:TaxSubtotal>
+  </fe:TaxTotal>
+  <fe:TaxTotal>
+    <cbc:TaxAmount currencyID="COP">0.00</cbc:TaxAmount>
+    <cbc:TaxEvidenceIndicator>false</cbc:TaxEvidenceIndicator>
+    <fe:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="COP">0.00</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="COP">0.00</cbc:TaxAmount>
+      <cbc:Percent>19.00</cbc:Percent>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>02</cbc:ID>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </fe:TaxSubtotal>
+  </fe:TaxTotal>
+  <fe:TaxTotal>
+    <cbc:TaxAmount currencyID="COP">0.00</cbc:TaxAmount>
+    <cbc:TaxEvidenceIndicator>false</cbc:TaxEvidenceIndicator>
+    <fe:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="COP">0.00</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="COP">0.00</cbc:TaxAmount>
+      <cbc:Percent>19.00</cbc:Percent>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>03</cbc:ID>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </fe:TaxSubtotal>
+  </fe:TaxTotal>
+  <fe:LegalMonetaryTotal>
+    <cbc:LineExtensionAmount currencyID="COP">3582372.00</cbc:LineExtensionAmount>
+    <cbc:TaxExclusiveAmount currencyID="COP">0.00</cbc:TaxExclusiveAmount>
+    <cbc:PayableAmount currencyID="COP">3582372.00</cbc:PayableAmount>
+  </fe:LegalMonetaryTotal>
+  <fe:InvoiceLine>
+    <cbc:ID>1</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="NIU">6.00</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="COP">3582372.00</cbc:LineExtensionAmount>
+    <fe:Item>
+      <cbc:Description>Envios Nacionales e Internacionales</cbc:Description>
+      <cbc:Name>ES</cbc:Name>
+    </fe:Item>
+    <fe:Price>
+      <cbc:PriceAmount currencyID="COP">3582372.00</cbc:PriceAmount>
+    </fe:Price>
+  </fe:InvoiceLine>
+  
+<Personalizados>
+    <DocPersonalizado dteID="T01983100124">
+      <campoString name="SIGEXT_InvoiceNumber">PRUE-983100124</campoString><campoString name="SIGEXT_ResponseID">e4fcc315-0cfe-4490-b705-2cbd9c484d5a</campoString><campoString name="SIGEXT_ResponseCode">200</campoString><campoString name="SIGEXT_ResponseText">Ejemplar recibido exitosamente pasará a verificación.</campoString><campoString name="SIGEXT_SunatProcessNumber"></campoString><campoString name="SIGEXT_RucReceiver"></campoString><campoString name="SIGEXT_ErrorCode"></campoString><campoString name="SIGEXT_ErrorText"></campoString><campoString name="SIGEXT_dianDate">2018.08.23</campoString><campoString name="SIGEXT_SunatTime">15:52:09</campoString><campoString name="SIGEXT_SendDate">2018.08.23</campoString><campoString name="SIGEXT_SendTime">15:52:08</campoString><campoString name="QRCode">NumFac: PRUE983100124
+FecFac: 20180531000000
+NitFac: 860502609
+DocAdq: 8909169882
+ValFac: 3582372.00
+ValIva: 0.00
+ValOtroIm: 
+ValFacIm: 3582372.00
+CUFE: </campoString>
+      <campoString name="SERIE">PRUE</campoString>
+      <campoString name="FOLIO">983100124</campoString>
+      <campoString name="Info2">DHL EXPRESS COLOMBIA LTDA. ES AUTORETENEDOR, SEGUN RESOLUCION No. 1730 DE NOVIEMBRE DE 1990.||DHL EXPRESS COLOMBIA LTDA. ES GRAN CONTRIBUYENTE, SEGUN RESOLUCION No. 76 DE DICIEMBRE 01 DE 2016.||DHL EXPRESS COLOMBIA LTDA. ES AGENTE RETENEDOR DE IVA, SEGUN RESOLUCION No. 11076 DE DICIEMBRE 14 DE 2001.||DHL EXPRESS COLOMBIA LTDA. ESTA EXCLUIDO DE IMPUESTO A LAS VENTAS, SEGUN NUMERAL 2, ARTICULO 476 E.T.</campoString>
+      <campoString name="Info1">DHL EXPRESS COLOMBIA LTDA. ES AUTORETENEDOR, SEGUN RESOLUCION No. 1730 DE NOVIEMBRE DE 1990.||DHL EXPRESS COLOMBIA LTDA. ES GRAN CONTRIBUYENTE, SEGUN RESOLUCION No. 76 DE DICIEMBRE 01 DE 2016.||DHL EXPRESS COLOMBIA LTDA. ES AGENTE RETENEDOR DE IVA, SEGUN RESOLUCION No. 11076 DE DICIEMBRE 14 DE 2001.||DHL EXPRESS COLOMBIA LTDA. ESTA EXCLUIDO DE IMPUESTO A LAS VENTAS, SEGUN NUMERAL 2, ARTICULO 476 E.T.</campoString>
+      <campoString name="NotaInteres">. PAGOS A TRAVES DE NUESTRA PAGINA WEB www.dhl.com.co||. TRANSFERENCIA ELECTRONICA A NUESTRA CUENTA CORRIENTE No. 401603527 CONVENIO 4958 DEL BANCO BBVA||. CHEQUE A NOMBRE DE DHL EXPRESS COLOMBIA LTDA., CON CRUCE RESTRICTIVO AL PRIMER BENEFICIARIO||. PAGOS A TRAVES DE LA TARJETA DE CREDITO - (CONSULTE SU ASESOR DE CUENTA)||||. ESTIMADO CLIENTE: LE RECORDAMOS QUE ESTA FACTURA TIENE UN VENCIMIENTO DE QUINCE (15) DIAS FECHA DE FACTURA</campoString>
+      <campoString name="CodigoPos">0.0.0.0</campoString>
+      <campoString name="Mail">XIOMARA.BEDOYA@AVERYDENNISON.COM;JULIANA.GIRALDO@AVERYDENNISON.COM;CRISTINA.HOYOS@AVERYDENNISON.COM;ANA.MONTOYA@AVERYDENNISON.COM;ALFREDO.LOBO@AVERYDENNISON.COM;</campoString>
+      <campoString name="NombreRec">AVERY DENNISON RETAIL INFORMATION SERVICES CO</campoString>
+      <campoString name="Ser">PRUE</campoString>
+      <campoString name="Dian0">RESOLUCION DIAN No.</campoString>
+      <campoString name="Dian1">9000000032421248 DEL 2017-12-13 AL 2017-12-13</campoString>
+      <campoString name="Dian2">DEL No. PRUE983100000 AL No. PRUE983200000</campoString>
+      <campoString name="Dian3">FACTURACION ELECTRONICA</campoString>
+      <campoString name="Folio">983100124</campoString>
+      <campoString name="NoCuenta">969211303</campoString>
+      <campoString name="Enviar">PDF</campoString>
+      <campoString name="Telefono">4447434</campoString>
+      <campoString name="Tipo">1</campoString>
+      <campoString name="Local">Local</campoString>
+      <campoNumero name="Cant1">0.00</campoNumero>
+      <campoNumero name="Cant2">1.00</campoNumero>
+      <campoNumero name="Cant3">0.00</campoNumero>
+      <campoNumero name="Cant4">0.00</campoNumero>
+      <campoNumero name="Cant5">0.00</campoNumero>
+      <campoNumero name="USD1">0.00</campoNumero>
+      <campoNumero name="USD2">2833.35</campoNumero>
+      <campoNumero name="USD3">0.00</campoNumero>
+      <campoNumero name="USD4">0.00</campoNumero>
+      <campoNumero name="USD5">0.00</campoNumero>
+      <campoNumero name="USD6">76.50</campoNumero>
+      <campoNumero name="USD7">43.68</campoNumero>
+      <campoNumero name="USD8">0.00</campoNumero>
+      <campoNumero name="USD9">0.00</campoNumero>
+      <campoNumero name="USD10">0.00</campoNumero>
+      <campoNumero name="USD11">0.00</campoNumero>
+      <campoNumero name="USD12">0.00</campoNumero>
+      <campoNumero name="COP1">0.00</campoNumero>
+      <campoNumero name="COP2">8097289.00</campoNumero>
+      <campoNumero name="COP3">0.00</campoNumero>
+      <campoNumero name="COP4">0.00</campoNumero>
+      <campoNumero name="COP5">0.00</campoNumero>
+      <campoNumero name="COP6">218626.00</campoNumero>
+      <campoNumero name="COP7">124831.00</campoNumero>
+      <campoNumero name="COP8">0.00</campoNumero>
+      <campoNumero name="COP9">0.00</campoNumero>
+      <campoNumero name="COP10">0.00</campoNumero>
+      <campoNumero name="COP11">0.00</campoNumero>
+      <campoNumero name="COP12">0.00</campoNumero>
+      <campoNumero name="USD13">-1700.01</campoNumero>
+      <campoNumero name="COP13">-485.00</campoNumero>
+      <campoNumero name="TOTALUSD">1253.52</campoNumero>
+      <campoNumero name="TRM">2857.85</campoNumero>
+      <campoNumero name="TOTALCOP">3582372.00</campoNumero>
+      <campoFecha name="FechaVenc">2018-06-15</campoFecha>
+      <ImpresionDetalle>
+          <PersonNroLinDet>1</PersonNroLinDet>
+          <DetPersonAFN_01>2739888093</DetPersonAFN_01>
+          <DetPersonAFN_02>2018.04.25</DetPersonAFN_02>
+          <DetPersonAFN_03>SO#23727948 DN#109480714</DetPersonAFN_03>
+          <DetPersonAFN_04>HKG</DetPersonAFN_04>
+          <DetPersonAFN_05>MDE</DetPersonAFN_05>
+          <DetPersonAFN_06>P</DetPersonAFN_06>
+          <DetPersonAFN_07>6</DetPersonAFN_07>
+          <DetPersonAFN_08>103.50</DetPersonAFN_08>
+          <DetPersonAFN_09>PAXAR (CHINA) LIMITED</DetPersonAFN_09>
+          <DetPersonAFN_10>WAN JI</DetPersonAFN_10>
+          <DetPersonAFN_11>GATE B, NO. 7 CHUN YING</DetPersonAFN_11>
+          <DetPersonAFN_13>HONG KONG</DetPersonAFN_13>
+          <DetPersonAFN_14>HONG KONG</DetPersonAFN_14>
+          <DetPersonAFN_17>JULIANA MAR!A GIRALDO V</DetPersonAFN_17>
+          <DetPersonAFN_18>JULIANA MAR!A GIRALDO V</DetPersonAFN_18>
+          <DetPersonAFN_19>NIT 890.916.988-2CARRERA 5</DetPersonAFN_19>
+          <DetPersonAFN_21>MEDELLIN</DetPersonAFN_21>
+          <DetPersonAFN_22>COLOMBIA</DetPersonAFN_22>
+          <DetPersonAFN_23>050010</DetPersonAFN_23>
+          <DetPersonAFN_25>FUEL SURCHARGE</DetPersonAFN_25>
+          <DetPersonAFN_26>FLETE INBOUND</DetPersonAFN_26>
+          <DetPersonAFN_27>SHIPMENT INSURANCE</DetPersonAFN_27>
+          <DetPersonAFN_28>CUSTOMER REBATE (FLETE).</DetPersonAFN_28>
+          <DetPersonAFN_33>76.50</DetPersonAFN_33>
+          <DetPersonAFN_34>2,833.35</DetPersonAFN_34>
+          <DetPersonAFN_35>43.68</DetPersonAFN_35>
+          <DetPersonAFN_36>-1,700.01</DetPersonAFN_36>
+          <DetPersonAFN_40>3,582,372</DetPersonAFN_40>
+          <DetPersonAFN_41>1,253.52</DetPersonAFN_41>
+          <DetPersonNUD_01>218626.00</DetPersonNUD_01>
+          <DetPersonNUD_02>8097289.00</DetPersonNUD_02>
+          <DetPersonNUD_03>124831.00</DetPersonNUD_03>
+          <DetPersonNUD_04>-4858374.00</DetPersonNUD_04>
+        </ImpresionDetalle>
+    </DocPersonalizado>
+  </Personalizados></fe:Invoice>

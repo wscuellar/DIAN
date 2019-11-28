@@ -1,0 +1,34 @@
+﻿@model Gosocket.Dian.Web.Models.SoftwareTableViewModel
+<div class="table-responsive">
+
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Pin</th>
+                <th>Nombre</th>
+                <th class="text-center">Fecha</th>
+                <th>Estado</th>
+                <th>Nit proveedor</th>
+                <th>Url</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model.Softwares)
+            {
+            <tr class='clickable-row' data-href="@Url.Action("View","Software", new { id = s.Id })">
+                <td class="text-nowrap"><a>@s.Pin</a></td>
+                <td class="text-nowrap"><a>@s.Name</a></td>
+                <td class="text-nowrap text-center">
+                    @if (s.Date.HasValue)
+                    {
+                        <a>@s.Date.Value.ToString("dd-MM-yyyy")</a>
+                    }
+                </td>
+                <td class="text-nowrap"><a>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription((Gosocket.Dian.Domain.Common.SoftwareStatus)s.AcceptanceStatusSoftwareId)</a></td>
+                <td class="text-nowrap"><a>@s.ContributorCode</a></td>
+                <td class="text-nowrap"><a>@s.Url</a></td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

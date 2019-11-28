@@ -1,0 +1,9 @@
+﻿@model Gosocket.Dian.Web.Models.RequestAuthorizationBigContributorViewModel
+
+@Html.HiddenFor(m => m.RequestDate)
+@Html.HiddenFor(m => m.StatusCode)
+@Html.HiddenFor(m => m.AuthorizationRequestAlreadyExist)
+
+<div class="panel-body padding-20 padding-bottom-10">
+    @Html.Partial("_default")
+</div>

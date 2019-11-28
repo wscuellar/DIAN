@@ -1,0 +1,42 @@
+﻿@using Microsoft.Owin.Security
+@using Gosocket.Dian.Web.Models
+@model LoginTwoFactorViewModel
+@{
+    ViewBag.Title = "Acceder";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<!-- LOGIN FORM -->
+<!--===================================================-->
+<div class="cls-content">
+    <div class="cls-content-sm panel">
+        <div class="panel-body">
+            <a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-warning" role="alert" style="margin-top: 20px;">
+                    <i class="fa fa-warning fa-2x"></i>
+                    @ViewBag.ErrorMessage
+                </div>
+                <a class="btn btn-gosocket btn-lg btn-block" style="margin-top: 40px;" href="@Url.Action("Login","AccountTwoFactor")">
+                    <i class=""></i> Volver a Intentarlo
+                </a>
+            }
+            else
+            {
+                <div class="alert alert-success" role="alert" style="margin-top: 20px;">
+                    <i class="fa fa-info-circle fa-2x"></i>
+                    Se ha enviado un email a su correo registrado en el sistema con la URL de acceso, por favor acceder mediante este.
+                </div>
+
+                <div class="alert alert-warning" role="alert" style="margin-top: 20px;">
+                    <i class="fa fa-info-circle fa-2x"></i>
+                    <a >Acceso para ambiente pruebas</a><br />
+                    <a href="@ViewBag.Url">Clic para entrar</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<!--===================================================-->

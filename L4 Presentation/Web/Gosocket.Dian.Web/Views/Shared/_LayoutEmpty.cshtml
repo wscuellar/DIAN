@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DIAN | @ViewBag.Title</title>
+
+    <meta name="description" content="dian">
+    <meta name="keywords" content="dian" />
+    <meta name="author" content="Gosocket Corp SpA">
+    <link rel="shortcut icon" href="~/Content/img/favicon_dian.ico">
+    @*<link rel="manifest" href="/manifest.json">*@
+    <!--STYLESHEET-->
+    <!--=================================================-->
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+    <!--Bootstrap Stylesheet [ REQUIRED ]-->
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet">
+    <!--Nifty Stylesheet [ REQUIRED ]-->
+    <link href="~/Content/css/nifty.min.css" rel="stylesheet">
+    <!--Font Awesome [ OPTIONAL ]-->
+    <link href="~/Content/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!--Flag Icons [ OPTIONAL ]-->
+    <link href="~/Content/plugins/flag-icon-css/flag-icon.min.css" rel="stylesheet">
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <!--Chosen [ OPTIONAL ]-->
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+    <!--Select2 [ OPTIONAL ]-->
+    <link href="~/Content/plugins/select2/select2.min.css" rel="stylesheet">
+    <link href="~/Content/css/gosocket/typeahead.css" rel="stylesheet" />
+    <link href="~/Content/css/daterangepicker.min.css" rel="stylesheet" />
+    <!--DatePicker [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-datepicker/bootstrap-datepicker.css" rel="stylesheet">
+    <!--Gosocket Stylesheet [ REQUIRED ]-->
+    <link href="~/Content/css/gosocket/gosocket.css?v=2.9" rel="stylesheet">
+    <link href="~/Scripts/font-awesome-animation.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    @RenderSection("css", required: false)
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div id="container" class="effect mainnav-lg navbar-fixed">
+        <div class="boxed">
+            <!--CONTENT CONTAINER-->
+            <!--===================================================-->
+            <div id="content-container" style="padding-left: 0px!important;padding-top: 0px!important;">
+
+                <div id="page-alert">
+                </div>
+                @RenderBody()
+            </div>
+            <!--===================================================-->
+            <!--END CONTENT CONTAINER-->
+        </div>
+    </div>
+    <!--===================================================-->
+    <!-- END OF CONTAINER -->
+    <!--JAVASCRIPT-->
+    <!--=================================================-->
+    <!--jQuery [ REQUIRED ]-->
+
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <!--BootstrapJS [ RECOMMENDED ]-->
+    <script src="~/Content/js/bootstrap.min.js"></script>
+    <!--Nifty Admin [ RECOMMENDED ]-->
+    <script src="~/Content/js/nifty.js"></script>
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <!--Select2 [ OPTIONAL ]-->
+    <script src="~/Content/plugins/select2/select2.min.js"></script>
+    <script src="~/Content/plugins/select2/i18n/es.js"></script>
+    <!--Chosen [ OPTIONAL ]-->
+    <script src="~/Content/plugins/chosen/chosen.jquery.js"></script>
+    <!--Handlebars [ REQUIRED ]-->
+    <script src="~/Content/plugins/handlebars/handlebars.js"></script>
+    <!--Mail -->
+    <script src="~/Content/js/demo/mail.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="~/Content/js/daterangepicker.min.js"></script>
+
+    <script src="~/Content/plugins/switchery/switchery.min.js"></script>
+
+    <!--Gosocket Js [ REQUIRED ]-->
+    <script src="~/Content/js/gosocket/gosocket.js?1.6.10"></script>
+    <script src="~/Content/js/gosocket/typeahead.js"></script>
+    <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
+
+    @RenderSection("scripts", required: false)
+
+    <script type="text/javascript">
+
+        window.onload = function () {
+            document.addEventListener("contextmenu", function (e) {
+                e.preventDefault();
+            }, false);
+            document.addEventListener("keydown", function (e) {
+                //document.onkeydown = function(e) {
+                // "I" key
+                if (e.ctrlKey && e.shiftKey && e.keyCode == 73) {
+                    disabledEvent(e);
+                }
+                // Mac chrome
+                if (e.altKey && e.metaKey && e.keyCode == 73) {
+                    disabledEvent(e);
+                }
+                // Mac firefox
+                if (e.altKey && e.metaKey && e.keyCode == 75) {
+                    disabledEvent(e);
+                }
+                // Mac safari
+                if (e.altKey && e.metaKey && e.keyCode == 67) {
+                    disabledEvent(e);
+                }
+                // "J" key
+                if (e.ctrlKey && e.shiftKey && e.keyCode == 74) {
+                    disabledEvent(e);
+                }
+                // "S" key + macOS
+                if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+                    disabledEvent(e);
+                }
+                // "U" key
+                if (e.ctrlKey && e.keyCode == 85) {
+                    disabledEvent(e);
+                }
+                // "F12" key
+                if (event.keyCode == 123) {
+                    disabledEvent(e);
+                }
+            }, false);
+            function disabledEvent(e) {
+                if (e.stopPropagation) {
+                    e.stopPropagation();
+                } else if (window.event) {
+                    window.event.cancelBubble = true;
+                }
+                e.preventDefault();
+                return false;
+            }
+        };
+
+    </script>
+
+</body>
+</html>

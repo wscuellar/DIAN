@@ -1,0 +1,131 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+@using Gosocket.Dian.Domain.Common
+
+@{
+    if (Model.ContributorTypeId == (int)ContributorType.Biller)
+    {
+        ViewBag.Title = "Agregar facturador electrónico";
+    }
+    else if (Model.ContributorTypeId == (int)ContributorType.Provider)
+    {
+        ViewBag.Title = "Agregar proveedor tecnológico";
+    }
+    else
+    {
+        ViewBag.Title = "Agregar adquiriente";
+    }
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("Add", "Contributor", FormMethod.Post, new { id = "add-contributor-form" }))
+                        {
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("List", "Contributor", new { type = Model.ContributorTypeId })" class="btn btn-default">Volver</a>
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+<script>
+        $(document).ready(function ($) {
+
+            if (@Model.ContributorTypeId === @((int)ContributorType.Biller) || @Model.ContributorTypeId === @((int)ContributorType.Provider)) {
+
+                disableFields();
+
+                $('#Code').focusout(function () {
+                    showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
+                    cleanFields();
+                    var code = $(this).val();
+                    $.ajax({
+                        url: "@Url.Action("Get","Contributor")",
+                        method: "Get",
+                        data: { code: code },
+                        error: function (a, b, c) {
+                        },
+                        success: function (data) {
+                            if (data.success) {
+                                if (@Model.ContributorTypeId === @((int)ContributorType.Biller) && data.contributorTypeId === null || (@Model.ContributorTypeId === @ContributorType.Provider && (data.contributorTypeId === null || data.contributorTypeId === @((int)ContributorType.Zero) || data.contributorTypeId === @((int)ContributorType.Biller)))) {
+                                    $('#Name').val(data.name);
+                                    $('#BusinessName').val(data.businessName);
+                                    $('#Email').val(data.email);
+                                }
+                                else {
+                                    var message = '';
+                                    if (@Model.ContributorTypeId === @((int)ContributorType.Biller) && data.contributorTypeId === @((int)ContributorType.Biller))
+                                        message = 'Empresa con NIT ' + code + ' actualmente se encuentra como facturador electrónico.';
+                                    if (@Model.ContributorTypeId === @((int)ContributorType.Biller) && data.contributorTypeId === @((int)ContributorType.Provider))
+                                        message = 'Empresa con NIT ' + code + ' actualmente se encuentra como proveedor tecnológico.';
+                                    if (@Model.ContributorTypeId === @((int)ContributorType.Provider) && data.contributorTypeId === @((int)ContributorType.Provider))
+                                        message = 'Empresa con NIT ' + code + ' actualmente se encuentra como proveedor tecnológico.';
+                                    var title = 'Error en la validaciónd el NIT ingresado.'
+                                    showNotification('danger', 'fa fa-bolt fa-2x', '#panel-form', title, message);
+                                }
+
+                            } else {
+                                showNotification('danger', 'fa fa-bolt fa-2x', '#panel-form', 'Error en la validaciónd el NIT ingresado.', data.message);
+                            }
+                            hideLoading('#panel-form');
+                        }
+                    });
+                });
+            }
+
+
+            if (@Model.ContributorTypeId === @((int)ContributorType.Biller)) {
+                $('#OperationModeId').change(function () {
+                    if ($(this).val() === '@((int)OperationMode.Provider)')
+                        $('#providers').css('display', '');
+                    else
+                        $('#providers').css('display', 'none');
+
+                    if ($(this).val() === '@((int)OperationMode.Own)')
+                        $('.software').css('display', '');
+                    else 
+                        $('.software').css('display', 'none');
+                        
+                });
+            }
+
+            $('.btn-save').click(function () {
+                var form = $('#add-contributor-form');
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+                    form.submit();
+                }
+            });
+        });
+
+        function cleanFields() {
+            $('#Name').val('');
+            $('#BusinessName').val('');
+            $('#Email').val('');
+        }
+
+        function disableFields() {
+            $('#Name').attr('readonly', true);
+            $('#BusinessName').attr('readonly', true);
+            $('#Email').attr('readonly', true);
+        }
+
+</script>
+}

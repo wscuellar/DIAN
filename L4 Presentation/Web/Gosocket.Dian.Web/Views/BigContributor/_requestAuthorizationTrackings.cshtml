@@ -1,0 +1,50 @@
+﻿@model Gosocket.Dian.Web.Models.RequestAuthorizationBigContributorViewModel
+
+<div class="panel-heading">
+    <h3 class="panel-title padding-0">Seguimiento de la Solicitud</h3>
+    <hr class="margin-0" />
+</div>
+
+<div class="table-responsive padding-top-15">
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th class="text-center">Fecha</th>
+                <th>Usuario</th>
+                <th class="text-left">Acción</th>
+                <th>Descripción</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model.Trackings)
+            {
+                var label = "";
+                switch (t.Action)
+                {
+                    case "Modifica":
+                        label = "custom-label-warning";
+                        break;
+                    case "Autoriza":
+                        label = "custom-label-success";
+                        break;
+                    case "Rechaza":
+                        label = "custom-label-danger";
+                        break;
+                    default:
+                        label = "custom-label-primary";
+                        break;
+                }
+                <tr class=''>
+                    <td class="text-center"><a>@t.Date.ToString("dd-MM-yyyy")</a></td>
+                    <td class="largeText iffyTip"><a>@t.User</a></td>
+                    <td class="text-left smallText" style="width: 100px !important;">
+                        <span class="label label-table @label iffyTip">@t.Action</span>
+                    </td>
+                    <td class="largeText iffyTip"><a>@t.Description</a></td>
+                    <td class="largeText iffyTip"><a>@t.Observations</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

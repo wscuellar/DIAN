@@ -1,0 +1,31 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+
+@Html.AntiForgeryToken()
+@Html.HiddenFor(m => m.Id)
+@Html.HiddenFor(m => m.ContributorTypeId)
+@Html.HiddenFor(m => m.Software.Id)
+@Html.HiddenFor(m => m.Software.AcceptanceStatusSoftwareId)
+@Html.HiddenFor(m => m.EndDate)
+@Html.HiddenFor(m => m.StartDate)
+
+@{var index = 0;}
+@if (Model != null && Model.ContributorFiles != null && Model.ContributorFiles.Count > 0)
+{
+    foreach (var f in Model.ContributorFiles.OrderByDescending(f => f.ContributorFileType.Id).ToList())
+    {
+        <input name="ContributorFiles[@index].Id" type="hidden" value="@f.Id" />
+        <input name="ContributorFiles[@index].ContributorFileStatus.Id" type="hidden" value="@f.ContributorFileStatus.Id" />
+        <input name="ContributorFiles[@index].ContributorFileType.Id" type="hidden" value="@f.ContributorFileType.Id" />
+        <input name="ContributorFiles[@index].FileName" type="hidden" value="@f.FileName" />
+        <input name="ContributorFiles[@index].IsNew" type="hidden" value="false" />
+        index++;
+    }
+    <input id="lastIndexContributorFile" type="hidden" value="@index" />
+}
+
+<div class="panel-body padding-20 padding-bottom-10">
+    @Html.Partial("_default")
+    @Html.Partial("_billerObligation")
+    @Html.Partial("_provider")
+    @Html.Partial("_software")
+</div>

@@ -1,0 +1,55 @@
+﻿@model Gosocket.Dian.Web.Models.UserViewModel
+@using Gosocket.Dian.Web.Utils
+
+<div class="panel-heading">
+    <h3 class="panel-title padding-0">Listado de empresas asociadas</h3>
+    <hr class="margin-0" />
+</div>
+
+@if (Model.CanEdit)
+{
+    <div class="form-inline padding-bottom-10 padding-top-10">
+        <div class="row margin-horizontal-0">
+            <div class="col-sm-12 table-toolbar-left padding-left-0">
+                @Html.TextBoxFor(m => m.ContributorCode, new { @class = "form-control" })
+                <button id="add-contributor" class="btn btn-default"><i class="fa fa-plus"></i> Agregar</button>
+            </div>
+        </div>
+        <hr class="margin-0" />
+    </div>
+}
+
+<div class="table-responsive padding-top-15">
+    <table id="table-contributors" class="table-contributor table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>NIT</th>
+                <th>Nombre Comercial</th>
+                <th>Razón Social</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{var index = 0;}
+
+            @foreach (var contributor in Model.Contributors)
+            {
+                var textClass = DataUtils.GetProviderStatusStyle(contributor.AcceptanceStatusId);
+                <tr data-code="@contributor.Code" class='clickable-row' data-href="@Url.Action("View","Contributor", new { id = contributor.Id })">
+                    <td class="text-nowrap"><a>@contributor.Code</a></td>
+                    <td class="text-nowrap"><a>@contributor.Name</a></td>
+                    <td class="text-nowrap"><a>@contributor.BusinessName</a></td>
+                    <td class="">
+                        @if (Model.CanEdit)
+                        {
+                            <a href="javascript:void(0)" class="text-center" data-index-contributor="@index" onclick="removeLine(this)"> <i class="fa fa-trash"></i></a>
+                        }
+                    </td>
+                </tr>
+                index++;
+            }
+        </tbody>
+    </table>
+    <input id="lastIndexContributor" type="hidden" value="@index" />
+
+</div>

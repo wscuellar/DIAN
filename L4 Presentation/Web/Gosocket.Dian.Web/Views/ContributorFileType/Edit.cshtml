@@ -1,0 +1,69 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorFileTypeViewModel
+@using Gosocket.Dian.Web.Models
+
+@{
+    ViewBag.Title = "Editar tipo de fichero";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("Edit", "ContributorFileType", FormMethod.Post, new { id = "edit-contributorFileType-form" }))
+                        {
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("View", "ContributorFileType", new { id = Model.Id })" class="btn btn-default">Cancelar</a>
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function ($) {
+
+            var form = $('#edit-contributorFileType-form');
+
+            $("#label-check").click(function () {
+                var check = $("#label-check");
+                if (!check.hasClass("active")) {
+                    check.addClass("active");
+                    $("#Mandatory").val(true);
+                } else {
+                    check.removeClass("active");
+                    $("#Mandatory").val(false);
+                }
+            });
+
+            $('.btn-save').click(function () {
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
+                    form.submit();
+                }
+            });
+
+            if('@Model.Mandatory' === 'True'){
+                $("#label-check").addClass('active');
+            }
+
+        });
+
+
+
+    </script>
+}

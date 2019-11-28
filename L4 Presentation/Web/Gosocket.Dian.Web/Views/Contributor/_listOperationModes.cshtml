@@ -1,0 +1,83 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+@using Gosocket.Dian.Web.Utils
+@using Gosocket.Dian.Infrastructure
+<div class="panel-heading">
+    <h3 class="panel-title padding-0">Listado de modos de operación asociados</h3>
+    <hr class="margin-0" />
+</div>
+
+<div class="table-responsive padding-top-15">
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Modo de operación</th>
+                <th class="text-center">Registro</th>
+                <th>Estado</th>
+                <th>Software</th>
+                <th>Id</th>
+                <th>Pin</th>
+                <th>URL</th>
+                <th class="text-center">Rangos de prueba</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contributorOperation in Model.ContributorOperations)
+            {
+                <tr data-index-contributorOperations="@contributorOperation.Id">
+                    <td><a>@contributorOperation.OperationMode.Name</a></td>
+                    <td class="text-center">
+                        <a>@contributorOperation.Timestamp.ToString("dd-MM-yyyy")</a>
+                    </td>
+                    <td>
+                        <a>@contributorOperation.Status</a>
+                    </td>
+                    <td>
+                        @if (contributorOperation.Software != null)
+                        {
+                            <a>@contributorOperation.Software.Name</a>
+                        }
+                        else
+                        {
+                            <a>@ConfigurationManager.GetValue("DianBillerName")</a>
+                        }
+                    </td>
+                    <td>
+                        @if (contributorOperation.Software != null)
+                        {
+                            <a>@contributorOperation.Software.Id</a>
+                        }
+                        else
+                        {
+                            <a>@ConfigurationManager.GetValue("BillerSoftwareId")</a>
+                        }
+                    </td>
+                    <td>
+                        @if (contributorOperation.Software != null)
+                        {
+                            <a>@contributorOperation.Software.Pin</a>
+                        }
+                        else
+                        {
+                            <a>@ConfigurationManager.GetValue("BillerSoftwarePin")</a>
+                        }
+                    </td>
+                    <td>
+                        <a>@ConfigurationManager.GetValue("WebServiceUrl")</a>
+                    </td>
+                    <td class="text-center">
+                        <a href="@Url.Action("ListTests", "NumberRange", new { contributorId = Model.Id, operationModeId = contributorOperation.OperationModeId })" class="text-center" data-index-contributorOperations="@contributorOperation.Id" data-index-operationModeId="@contributorOperation.OperationModeId" onclick="redirectToTestNumberRange(this);"> <i class="fa fa-list add-tooltip" data-original-title="Rangos de numeración de pruebas"></i></a>
+                    </td>
+                    <td class="text-center">
+                        @{var softwareId = contributorOperation.SoftwareId != null ? contributorOperation.SoftwareId.ToString() : ConfigurationManager.GetValue("BillerSoftwareId");}
+                        @if (contributorOperation.StatusId != 1)
+                        {
+                            <a href="javascript:void(0)" class="text-center" data-index-contributorOperations="@contributorOperation.Id" onclick="removeLine(this)"> <i class="fa fa-trash add-tooltip" data-original-title="Eliminar modo de operación"></i></a>
+                        }
+                        <a href="@Url.Action("View", "TestSet", new { operationModeId = contributorOperation.OperationModeId, contributorId = Model.Id, contributorCode = Model.Code, softwareId = @softwareId})" class="text-center"> <i class="fa fa-tasks  add-tooltip" data-original-title="Detalles de set de pruebas"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

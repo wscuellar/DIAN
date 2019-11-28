@@ -1,0 +1,40 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+
+@if (Model.ContributorTypeId == 1)
+{
+    <div class="form-inline padding-bottom-10 padding-top-10 biller" style="display:none;">
+        <div class="row margin-horizontal-0">
+            <div class="col-sm-12 table-toolbar-left padding-left-0  padding-bottom-0">
+                <h3 class="panel-title padding-0">Datos de empresa </h3>
+            </div>
+        </div>
+        <hr class="margin-0" />
+    </div>
+    <div class="row">
+        <div id="providers" class="col-sm-4 padding-xs-0" style="display:none;">
+            <div class="form-group">
+                @Html.LabelFor(m => m.ProviderId, new { @class = "control-label" })
+                @Html.DropDownListFor(m => m.ProviderId, new SelectList(Model.Providers, "Id", "Name", Model.ProviderId), new { @class = "form-control selectpicker" })
+            </div>
+        </div>
+        <div id="softwares" class="col-sm-4 padding-xs-0" style="display:none;">
+            <div class="form-group">
+                @Html.LabelFor(m => m.SoftwareId, new { @class = "control-label" })
+                @Html.DropDownList("SoftwareId", Enumerable.Empty<SelectListItem>(), new { @class = "form-control selectpicker" })
+            </div>
+        </div>
+        <div id="providerFree" class="col-sm-4 padding-xs-0" style="display:none;">
+            <div class="form-group">
+                @Html.LabelFor(m => m.ProviderId, new { @class = "control-label" })
+                @Html.TextBox("ProviderIdFree", "UAE-Dian", new { @class = "form-control", @disabled = "disabled" })
+            </div>
+        </div>
+        <div id="softwareFree" class="col-sm-4 padding-xs-0" style="display:none;">
+            <div class="form-group">
+                @Html.LabelFor(m => m.SoftwareId, new { @class = "control-label" })
+                @Html.TextBox("Software_SoftwareIdFree", "UAE-Dian", new { @class = "form-control", @disabled = "disabled" })
+            </div>
+        </div>
+    </div>
+}
+

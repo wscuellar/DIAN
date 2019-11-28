@@ -1,0 +1,26 @@
+﻿@model Gosocket.Dian.Web.Models.UserTableViewModel
+@using Gosocket.Dian.Web.Utils
+<div class="table-responsive">
+
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                @*<th>Código</th>*@
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Roles</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Users)
+            {
+            <tr>
+                @*<td class="text-nowrap"><a>@user.Code</a></td>*@
+                <td class="text-nowrap"><a>@user.Name</a></td>
+                <td class="text-nowrap"><a>@user.Email</a></td>
+                <td class="text-nowrap"><a>@user.Roles</a></td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

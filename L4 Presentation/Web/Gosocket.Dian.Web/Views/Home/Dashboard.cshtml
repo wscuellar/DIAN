@@ -1,0 +1,449 @@
+﻿@model Gosocket.Dian.Web.Models.DocumentStatsViewModel
+@using Gosocket.Dian.Web.Common
+@using Gosocket.Dian.Domain.Common
+@using Gosocket.Dian.Infrastructure
+
+@{
+    ViewBag.Title = "Tablero";
+}
+
+<div id="page-content" data-target="#page-content" data-toggle="panel-overlay" class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body" padding-top-20">
+                <div class="row margin-horizontal-0">
+                    @if (User.IsInAnyRole("Administrador", "Super"))
+                    {
+                        <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dia margin-bottom-0  ">
+                            <div class="panel-body padding-0 padding-bottom-0">
+                                <div class="row">
+                                    <div id="contributor-stats-chart" class="col-sm-4 padding-xs-0" style="height:320px; margin: 0 auto"></div>
+                                    <div id="global-stats-chart" class="col-sm-4 padding-xs-0" style="height:320px; margin: 0 auto"></div>
+                                    <div id="global-monthly-stats-chart" class="col-sm-4 padding-xs-0" style="height:320px; margin: 0 auto"></div>
+
+                                </div>
+                                <div class="row padding-top-30">
+                                    <div id="global-daily-stats-chart" class="col-sm-12 padding-xs-0" style="height:320px; margin: 0 auto"></div>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ContributorTestSetMessageInfo))
+                    {
+                        @Html.Raw(Model.ContributorTestSetMessageInfo)
+                    }
+
+                    @if (!User.IsInAnyRole("Administrador", "Super"))
+                    {
+                        <div class="col-md-6 col-lg-3">
+                            <div class="panel panel-mint panel-colorful">
+                                <div class="panel-body text-center">
+                                    <p class="text-uppercase mar-btm text-sm">Documentos emitidos</p>
+                                    <i class="fa fa-arrow-circle-right fa-5x"></i>
+                                    <hr>
+                                    <p id="total-documents-emitted" class="h2 text-thin">
+                                        <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i>
+                                    </p>
+                                    <small><span class="text-semibold"><i class="fa fa-calendar fa-fw"></i></span> Documentos emitidos en los últimos 30 días.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="panel panel-info panel-colorful">
+                                <div class="panel-body text-center">
+                                    <p class="text-uppercase mar-btm text-sm">Documentos recibidos</p>
+                                    <i class="fa fa-arrow-circle-left fa-5x"></i>
+                                    <hr>
+                                    <p id="total-documents-received" class="h2 text-thin"><i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i></p>
+                                    <small><span class="text-semibold"><i class="fa fa-calendar fa-fw"></i></span> Documentos recibidos en los últimos 30 días.</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+    <script>
+
+        $(document).ready(function ($) {
+
+            if ('@User.IsInAnyRole("Administrador", "Super")' === 'False') {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetEmittedAndreceivedTotal", "Home")',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.success) {
+                            $("#total-documents-emitted").html(data.emitted);
+                            $("#total-documents-received").html(data.received)
+                        }
+                    },
+                    error: function () {}
+                });
+            }
+
+            if ('@ConfigurationManager.GetValue("Environment")' == 'Test' || '@ConfigurationManager.GetValue("Environment")' == 'Hab') {
+                if ('@User.IsInAnyRole("Administrador", "Super")' === 'False' && @Model.ContributorAcceptanceStatusId === @((int)ContributorStatus.Enabled) && '@Model.ContributorProductionDate' === '') {
+
+                    showRegisterProductionDateModal();
+
+                    $('#productionDate').datepicker({
+                        format: 'dd-mm-yyyy',
+                        language: 'es',
+                        todayBtn: 'linked',
+                        autoclose: true,
+                        todayHighlight: true,
+                        startDate: '@Model.ContributorHabilitationDate.Value.ToString("dd-MM-yyyy")',
+                        endDate: '@Model.ContributorHabilitationDate.Value.AddYears(1).ToString("dd-MM-yyyy")'
+                    });
+                }
+            }
+
+
+            Highcharts.setOptions({
+                lang:
+                {
+                    months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                }
+            });
+
+            @if (User.IsInAnyRole("Administrador", "Super"))
+            {
+                <Text>
+                //Global Stat Chart
+                Highcharts.chart('global-stats-chart', {
+                    credits: {
+                        enabled: false
+                    },
+                    navigation: {
+                        buttonOptions: {
+                            enabled: false
+                        }
+                    },
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: 'Resumen general de documentos recibidos'
+                    },
+                     subtitle: {
+                         text: 'Existen un total de : ' + '<span style="font-weight: bold">@Model.GlobalTotal</span>' +' documentos'
+                     },
+                    tooltip: {
+                        pointFormat: '<b>{point.name}</b>:{point.y}'
+                    },
+                    colors: ['#348441', '#D7B707', '#DC2D08'],
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>:{point.y}',
+                                style: {
+                                    color: ['#348441', '#D7B707', '#DC2D08']
+                                }
+                            }
+                        }
+                    },
+                    series: [{
+                        data: [{
+                                name: 'Aceptados',
+                            y: @Model.GlobalTotalAccepted,
+                        }, {
+                                name: 'Con notificaciones',
+                            y: @Model.GlobalTotalNotification,
+                        }, {
+                                name: 'Rechazados',
+                            y: @Model.GlobalTotalRejected,
+                        }],
+                        showInLegend: true
+                    }]
+                });
+
+            //Contributor Stats Chart
+             Highcharts.chart('contributor-stats-chart', {
+                credits: {
+                    enabled: false
+                },
+                navigation: {
+                    buttonOptions: {
+                        enabled: false
+                    }
+                },
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Resumen general de contribuyentes por estado'
+                 },
+                 subtitle: {
+                     text: 'Existen un total de : ' + '<span style="font-weight: bold"> @Model.TotalContributors </span>'+' contribuyentes'
+                 },
+                tooltip: {
+                    pointFormat: '<b>{point.name}</b>:{point.y}'
+                },
+                 colors: ['#D7B707', '#0778D7', '#348441'],
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>:{point.y}',
+                            style: {
+                                color: ['#D7B707', '#0778D7', '#348441']
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    data: [{
+                            name: 'Pendientes',
+                        y: @Model.PendingContributors,
+                    }, {
+                            name: 'Registrados',
+                        y: @Model.RegisteredContributors,
+                    }, {
+                            name: 'Habilitados',
+                        y: @Model.EnabledContributors,
+                    }],
+                    showInLegend: true
+                }]
+            });
+
+            //Global Monthly Stats Chart
+             Highcharts.chart('global-monthly-stats-chart', {
+                credits: {
+                   enabled: false
+                },
+                navigation: {
+                   buttonOptions: {
+                        enabled: false
+                    }
+                },
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Resumen de documentos recibidos mensualmente'
+                },
+                subtitle: {
+                    text: 'En los últimos cuatro meses existen un total de '  + '<span style="font-weight: bold">@Model.JsonMonthSumAll</span>'+' documento.'
+                },
+                xAxis: {
+                    categories:@Html.Raw(@Model.JsonMonthDate),
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: ''
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                }, colors: ['#0778D7', '#348441', '#D7B707', '#DC2D08'],
+
+                series: [{
+                    name: 'Total',
+                    data: @Model.JsonMonthAll,
+
+                }, {
+                    name: 'Aceptados',
+                    data: @Model.JsonMonthAccepted,
+
+                }, {
+                    name: 'Con notificaciones',
+                    data: @Model.JsonMonthNotification,
+
+                }, {
+                    name: 'Rechazados',
+                    data: @Model.JsonMonthRejected,
+
+                }]
+            });
+
+            //Global Daily Stats Chart
+             Highcharts.chart('global-daily-stats-chart', {
+                credits: {
+                   enabled: false
+                },
+                navigation: {
+                   buttonOptions: {
+                        enabled: false
+                    }
+                },
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Resumen de documentos recibidos diariamente'
+                },
+                subtitle: {
+                    text: 'En los últimos catorce dias existen un total de ' +'<span style="font-weight: bold">@Model.JsonSumAll</span>'+' recibidos'
+                },
+                xAxis: {
+                    categories:@Html.Raw(@Model.JsonDate),
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: ''
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        //borderWidth: 0
+                    }
+                }, colors: ['#0778D7', '#348441', '#D7B707', '#DC2D08'],
+                series: [{
+                    name: 'Total',
+                    data: @Model.JsonAll,
+                }, {
+                    name: 'Aceptados',
+                    data: @Model.JsonAccepted,
+                }, {
+                    name: 'Con notificaciones',
+                    data: @Model.JsonNotification,
+
+                }, {
+                    name: 'Rechazados',
+                    data: @Model.JsonRejected,
+                }]
+            });
+
+                </Text>
+            }
+        });
+
+        function showRegisterProductionDateModal() {
+            bootbox.dialog({
+                title: "Registrar fecha de inicio salida a producción",
+                message: "<div class='row'>" +
+                            "<div class= 'col-md-12'>" +
+                                "<form class= 'form-horizontal' >" +
+                                    "<div class='form-group'>" +
+                                        "<label class='col-md-4 control-label' for='name'>Habilitación</label>" +
+                                        "<div class='col-md-4'>" +
+                                            "<input id='habilitationDate' name='habilitationDate' type='text' value='@Model.ContributorHabilitationDate.Value.ToString("dd-MM-yyyy")' class='form-control input-md' readonly>" +
+                                                "<span class='help-block'><small>Fecha de habilitación</small></span>" +
+                                        "</div>" +
+                                    "</div>" +
+                                    "<div class='form-group'>" +
+                                        "<label class='col-md-4 control-label' for='name'>Producción</label>" +
+                                        "<div class='col-md-4'>" +
+                                            "<input id='productionDate' name='productionDate' type='text' value='@DateTime.UtcNow.ToString("dd-MM-yyyy")' class='form-control input-md'>" +
+                                            "<span class='help-block'><small>Fecha inicio real producción</small></span>" +
+                                        "</div>" +
+                                    "</div>" +
+                                "</form>" +
+                            "</div>" +
+                        "</div> ",
+                buttons: {
+                    del: {
+                        label: "Aceptar",
+                        className: "btn-gosocket",
+                        callback: function () {
+                            showConfirmSetProductionDate();
+                        }
+                    },
+                }
+            });
+        }
+
+        function showConfirmSetProductionDate() {
+            var habilitationDate = $("#habilitationDate").val();
+            var productionDate = $("#productionDate").val();
+            bootbox.dialog({
+                message: "<div class='media'><div class='media-body'>" +
+                    "<h4 class='text-thin'><strong>Responsabilidad “52-Facturador Electrónico” en el RUT será actualizada con la fecha registrada.</strong></h4>" +
+                    "Esta fecha no se puede modificar posteriormente, ya que con esta fecha se realiza la actualización de la responsabilidad “52-Facturador Electrónico” en el RUT.<br>" +
+                    "</div></div>",
+                title: "Advertencia",
+                buttons: {
+                    del: {
+                        label: "Aceptar",
+                        className: "btn-gosocket",
+                        callback: function () {
+                            setProductionDate(habilitationDate, productionDate);
+                        }
+                    },
+                }
+            });
+        }
+
+        function setProductionDate(habilitationDate, productionDate) {
+            showLoading('#page-content', 'Actualizando', 'Procesando datos, por favor espere.');
+            $.ajax({
+            url: "@Url.Action("SetHabilitationAndProductionDates", "Contributor")",
+            method: "Post",
+                data: {
+                    habilitationDate: habilitationDate,
+                    productionDate: productionDate
+                },
+                error: function (a, b, c) {},
+                success: function (data) {
+                    if (data.success) {
+                        showPageNotification('success', data.message);
+                    } else {
+                        showPageNotification('danger', data.message);
+                    }
+                    hideLoading('#page-content');
+                }
+            });
+        }
+
+    </script>
+}

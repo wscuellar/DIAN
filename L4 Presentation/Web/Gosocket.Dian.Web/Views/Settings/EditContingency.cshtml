@@ -1,0 +1,55 @@
+﻿
+@model Gosocket.Dian.Web.Models.ContingencyViewModel
+
+@{
+    ViewBag.Title = "Agregar Nueva Contingencia";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("EditContingency", "Settings", FormMethod.Post, new { id = "add-contingency-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Partial("_contingencyForm")
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("Contingencies", "Settings")" class="btn btn-default">Volver</a>
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function ($) {
+
+            $('#StartDateString').mask("99-99-9999 99:99", { placeholder: "dd-mm-yyyy hh:mm" });
+            $('#EndDateString').mask("99-99-9999 99:99", { placeholder: "dd-mm-yyyy hh:mm" });
+
+            $('.btn-save').click(function () {
+                var form = $('#add-contingency-form');
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+                    form.submit();
+                }
+            });
+        });
+
+    </script>
+}
+

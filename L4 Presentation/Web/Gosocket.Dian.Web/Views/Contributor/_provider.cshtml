@@ -1,0 +1,96 @@
+﻿@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Domain.Common
+@model Gosocket.Dian.Web.Models.ContributorViewModel
+
+
+@if ((Model.ContributorTypeId == (int)ContributorType.Provider || Model.ContributorTypeId == (int)ContributorType.AuthorizedProvider))
+{
+    <div id="row-provider" class="row padding-top-10">
+        @if (Model.ContributorFiles != null && Model.ContributorFiles.Count > 0)
+        {
+            <div class="col-sm-6 padding-xs-0">
+                <div class="form-group">
+                    <div class="table-responsive">
+                        <table id="table-contributor-files" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">Archivo</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{var index = 0;}
+                                @foreach (var f in Model.ContributorFiles.OrderByDescending(f => f.ContributorFileType.Id).ToList())
+                                {
+                                    <tr data-id="@f.ContributorFileType.Id">
+                                        <td class="text-left">@f.ContributorFileType.Name</td>
+                                        <td class="text-center"><span class="label label-warning">@f.ContributorFileStatus.Name</span></td>
+                                        <td class="">
+                                            @if (f.ContributorFileStatus.Id != 0)
+                                            {
+                                                <span class="fa fa fa-download add-tooltip download-contributor-files" data-original-title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>
+                                            }
+                                            @if (f.ContributorFileStatus.Id != 0 && Model.CanEdit)
+                                            {
+                                                <a href="javascript:void(0)" class="text-center add-tooltip" data-comments="@f.Comments" data-original-title="Editar fichero" data-statusIndex="@f.ContributorFileStatus.Id" data-id="@f.Id" onclick="changeStatus($(this))"> <i class="fa fa-edit"></i></a>
+                                            }
+                                            @if (!f.ContributorFileType.Mandatory && Model.CanEdit)
+                                            {
+                                                <a href="javascript:void(0)" class="text-center add-tooltip" data-index-contributor-file="@index" data-original-title="Eliminar fichero" onclick="removeLine(this)"> <i class="fa fa-trash"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                    index++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.ContributorFileTypes != null && Model.ContributorFileTypes.Count > 0)
+        {
+            <div class="col-sm-6 padding-xs-0">
+                <div class="form-group">
+                    <div class="form-group">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Archivo</th>
+                                        <th class="text-right"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var f in Model.ContributorFileTypes)
+                                    {
+                                        <tr>
+                                            <td>@f.Name</td>
+                                            <td class="text-right"><button type="button" data-id="@f.Id" data-name="@f.Name" class="btn btn-sm btn-default btn-hover-gosocket add-contributor-file">Agregar</button></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+}
+
+@if (User.IsInAnyRole("Administrador", "Super") && Model.AcceptanceStatuses != null && Model.AcceptanceStatuses.Count > 0)
+{
+    <div class="row">
+        <div class="col-sm-6 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.AcceptanceStatusId, new { @class = "control-label" })
+                @Html.DropDownListFor(m => m.AcceptanceStatusId, new SelectList(Model.AcceptanceStatuses, "Id", "Name", Model.AcceptanceStatusId), new { @class = "form-control selectpicker" })
+            </div>
+        </div>
+    </div>
+}
+

@@ -1,0 +1,177 @@
+﻿.tool-img {
+    max-width: 64px;
+}
+
+.tab-base .tab-content {
+    -webkit-box-shadow: none;
+    -ms-box-shadow: none;
+    box-shadow: none;
+}
+
+.tab-base > .nav-tabs {
+    background-color: #ebeef0;
+}
+
+.bootstrap-select {
+    margin-bottom: 0;
+}
+
+    .bootstrap-select .dropdown-menu > .active > a,
+    .bootstrap-select .dropdown-menu > .active > a:focus,
+    .bootstrap-select .dropdown-menu > .active > a:hover {
+        background-color: #348441;
+    }
+
+.company-logo {
+    max-width: 64px;
+    max-height: 32px;
+}
+
+.modal-header:after {
+    border-bottom: 2px solid #348441;
+}
+
+.bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+    width: 150px;
+}
+
+.tab-content .panel {
+    -webkit-box-shadow: none !important;
+    -ms-box-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.bootstrap-filestyle {
+    margin-bottom: 5px;
+}
+
+.divider {
+    border-top: 1px solid #29b570;
+    display: block;
+    line-height: 1px;
+    margin: 15px 0;
+    position: relative;
+    text-align: center;
+}
+
+    .divider .divider-title {
+        background: #fff;
+        font-size: 12px;
+        letter-spacing: 1px;
+        padding: 0 20px;
+        text-transform: uppercase;
+        color: #29b570;
+    }
+
+.iffyTip {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.smallText {
+    max-width: 150px;
+}
+
+.largeText {
+    max-width: 300px;
+}
+
+.hideText2 {
+    max-width: 150px;
+}
+
+.tab-content > .tab-pane {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.select-finance .fa-check-circle {
+    box-shadow: none !important;
+}
+
+.bootstrap-tagsinput {
+    margin-bottom: 0 !important;
+}
+
+.select2-container--default {
+    display: inline-table !important;
+}
+
+    .select2-container--default .select2-selection--single {
+        height: 31px !important;
+        line-height: 1.4 !important;
+    }
+
+    .select2-container--default .select2-selection {
+        border-radius: 0px !important;
+        background-color: #fafafa !important;
+    }
+
+.slice {
+    position: relative;
+    float: left;
+    width: 14em;
+    height: 6em;
+    margin: .5em;
+    padding: 2em;
+    text-align: center;
+    margin: 0 auto;
+}
+
+    .slice > div {
+        margin: 1em auto;
+    }
+
+        .slice > div:nth-child(2) {
+            font-family: cursive;
+            position: absolute;
+            bottom: 0;
+            left: 3em;
+            color: #ff6800;
+        }
+
+.emisor-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000000;
+    line-height: 28px;
+}
+
+.tipo-doc {
+    font-size: 18px;
+    font-weight: normal;
+    color: #000000;
+}
+
+.render-row {
+    border: 1px solid lightgray;
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 15px;
+    margin: 0 !important;
+}
+
+    .render-row:first-of-type {
+        margin-top: 10px;
+    }
+
+    .render-row:not(:first-of-type) {
+        border-top: none;
+    }
+
+    .render-row p {
+        line-height: 20px;
+    }
+
+.datos-contacto {
+    font-size: 18px;
+}
+
+.datos-receptor {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.select2-container--default {
+    display: inherit !important;
+}

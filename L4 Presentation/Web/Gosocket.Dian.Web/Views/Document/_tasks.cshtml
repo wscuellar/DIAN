@@ -1,0 +1,116 @@
+﻿@using Gosocket.Dian.Domain.Common
+@using Gosocket.Dian.Web.Common;
+@model Gosocket.Dian.Web.Models.ExportDocumentTableViewModel
+
+<div class="table-responsive padding-bottom-15">
+    <table colspan="12" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Rango</th>
+                @if (!User.IsInAnyRole("Administrador", "Super"))
+                {
+                    <th>Grupo</th>
+                }
+                <th>Tipo</th>
+                <th class="text-right">Total</th>
+                <th class="text-center">Estado</th>
+                <th class="text-right">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Tasks.Any())
+            {
+                <tr style="background-color: transparent !important;">
+                    <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
+                        <div class="alert panel-footer-grey">
+                            Ninguna tarea de exportación disponible para mostrar.
+                        </div>
+                    </td>
+                </tr>
+            }
+            @foreach (var t in Model.Tasks.OrderByDescending(t => t.Date))
+            {
+                var iconTypeClass = "";
+                switch (t.Type)
+                {
+                    case 0:
+                        iconTypeClass = "file-excel-o";
+                        break;
+                    case 1:
+                        iconTypeClass = "file-pdf-o";
+                        break;
+                    case 2:
+                        iconTypeClass = "file-code-o";
+                        break;
+                    default:
+                        break;
+                }
+
+                var statusIcon = "";
+                var textClass = "gosocket";
+                switch (t.Status)
+                {
+                    case 0:
+                        statusIcon = "circle-o-notch fa-spin";
+                        textClass = "primary";
+                        break;
+                    case 1:
+                        statusIcon = "check";
+                        break;
+                    case 2:
+                        statusIcon = "remove";
+                        break;
+                    case 3:
+                        statusIcon = "ban";
+                        textClass = "danger";
+                        break;
+                    default:
+                        statusIcon = "circle-o-notch fa-spin";
+                        textClass = "primary";
+                        break;
+                }
+                <tr>
+                    <td>@t.Date.ToString("dd-MM-yyyy")</td>
+                    <td>@t.User</td>
+                    <td>@t.FilterDate</td>
+                    @if (!User.IsInAnyRole("Administrador", "Super"))
+                    {
+                        <td>@t.FilterGroup</td>
+                    }
+                    <td><i class="fa fa-@iconTypeClass"></i> @t.TypeDescription</td>
+                    <td class="text-right">@t.TotalResult</td>
+                    <td class="text-center">
+                        <i class="fa fa-@statusIcon fa-lg text-@textClass add-tooltip"
+                           title="@t.StatusDescription" data-html="true" data-original-title="@t.StatusDescription"></i>
+                    </td>
+                    <td class="text-right">
+                        @if (t.Status == (int)ExportStatus.InProcess)
+                        {
+                            <a class="btn btn-default btn-hover-gosocket add-tooltip" href="#"
+                               title="Cancelar" data-html="true" data-original-title="Cancelar">
+                                <i class="fa fa-remove"></i>
+                            </a>
+                        }
+                        @if (t.Status == (int)ExportStatus.OK)
+                        {
+                            <a class="btn btn-default btn-hover-gosocket add-tooltip" href="@Url.Action("DownloadExportedZipFile", new { pk = t.PartitionKey, rk = t.RowKey })"
+                               title="Descargar" data-html="true" data-original-title="Descargar">
+                                <i class="fa fa-download"></i>
+                            </a>
+                        }
+                        @if (t.Status == (int)ExportStatus.Cancelled || t.Status == (int)ExportStatus.Error)
+                        {
+                            <a class="btn btn-default btn-hover-gosocket add-tooltip" href="#"
+                               title="Eliminar" data-html="true" data-original-title="Eliminar">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+</div>

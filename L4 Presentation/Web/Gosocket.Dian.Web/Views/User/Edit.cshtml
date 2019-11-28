@@ -1,0 +1,140 @@
+﻿@model Gosocket.Dian.Web.Models.UserViewModel
+@using Gosocket.Dian.Web.Models
+
+@{
+    ViewBag.Title = "Editar representante legal";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("Edit", "User", FormMethod.Post, new { id = "edit-user-form" }))
+                        {
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("View", "User", new { id = Model.Id })" class="btn btn-default">Cancelar</a>
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @Html.Partial("_contributors")
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function ($) {
+
+            $('#Code').attr('readonly', true);
+
+            var indexContributor = parseInt($('#lastIndexContributor').val());
+
+            $('#add-contributor').click(function () {
+                var exist = false;
+                showLoading('#panel-form', 'Agregando', 'Procesando datos, por favor espere.');
+                var code = $('#ContributorCode').val();
+
+                $("#table-contributors").find("tbody > tr").each(function () {
+                    var val = $(this).attr('data-code');
+                    if (val === code) {
+                        exist = true;
+                    }
+                });
+
+                if (exist) {
+                    showNotification('info', 'fa fa-check fa-2x', 'floating', 'Aviso.', 'Empresa ya se encuentra asociada al usuario');
+                    $('#ContributorCode').val('');
+                    hideLoading('#panel-body');
+                    return;
+                }
+
+                $.ajax({
+                    url: "@Url.Action("AddContributor", "User")",
+                    method: "Get",
+                    data: { id: '@Model.Id', code: code },
+                    error: function (a, b, c) {
+                    },
+                    success: function (data) {
+                            if (data.success) {
+                                var line = "<tr data-code='" + code + "'>";
+                                line += "<input name='Contributors[" + indexContributor + "].Id' type='hidden' value='" + data.id + "'/>";
+                                line += "<input name='Contributors[" + indexContributor + "].IsNew' type='hidden' value='true'/>";
+                                line += '<td class="text-nowrap"><a>' + data.code + '</a></td>';
+                                line += '<td class="text-nowrap"><a>' + data.name + '</a></td>';
+                                line += '<td class="text-nowrap"><a>' + data.businessName + '</a></td>';
+                                line += "<td class=''><a href='javascript:void(0)' class='text-center new' data-index-contributor='" + indexContributor + "' onclick='removeLine(this)'> <i class='fa fa-trash'></i></a></td></tr>";
+                                $('#table-contributors > tbody').append(line);
+                            } else {
+                                showNotification('danger', 'fa fa-bolt fa-2x', '#panel-form', 'Error en la validaciónd el NIT ingresado.', data.message);
+                            }
+                            hideLoading('#panel-form');
+                            $('#ContributorCode').val('');
+                        }
+                });
+            });
+        });
+
+        $('.btn-save').click(function () {
+            var form = $('#edit-user-form');
+            if (form.valid()) {
+                showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
+                form.submit();
+            }
+        });
+
+        function removeLine(button) {
+
+            var code = $(button).parent().parent().attr("data-code")
+
+            bootbox.dialog({
+                    message: "Está seguro que desea eliminar la relación con la empresa?",
+                    title: "Advertencia",
+                    buttons: {
+                        del: {
+                            label: "Aceptar",
+                            className: "btn-gosocket",
+                            callback: function () {
+                                removeLineAjax(code);
+                            }
+                        },
+                    }
+                });
+            
+        }
+
+        function removeLineAjax(code) {
+            showLoading('#panel-form', 'Eliminando', 'Procesando datos, por favor espere.');
+            $.ajax({
+            url: "@Url.Action("RemoveContributor", "User")",
+            method: "Get",
+            data: { id: '@Model.Id', code: code },
+            error: function (a, b, c) {
+            },
+            success: function (data) {
+                if (data.success) {
+                    $("[data-code*='" + data.code + "']").remove();
+                    } else {
+                        showNotification('danger', 'fa fa-bolt fa-2x', '#panel-form', 'Error al eliminar el contribuyente.', data.message);
+                    }
+                    hideLoading('#panel-form');
+                }
+            });
+        }
+
+    </script>
+}

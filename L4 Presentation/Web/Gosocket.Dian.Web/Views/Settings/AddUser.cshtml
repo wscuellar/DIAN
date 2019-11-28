@@ -1,0 +1,48 @@
+﻿@model Gosocket.Dian.Web.Models.UserViewModel
+
+@{
+    ViewBag.Title = "Agregar usuario";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("AddUser", "Settings", FormMethod.Post, new { id = "add-user-form" }))
+                        {
+                            @Html.Partial("_userForm")
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("Users", "Settings")" class="btn btn-default">Volver</a>
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function ($) {
+            $('.btn-save').click(function () {
+                var form = $('#add-user-form');
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+                    form.submit();
+                }
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,95 @@
+﻿@using Gosocket.Dian.Web.Models
+@model RegisterViewModel
+@{
+    ViewBag.Title = "Regístrate";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<!-- LOGIN FORM -->
+<!--===================================================-->
+<div class="cls-content">
+    <div class="cls-content-sm panel">
+        <div class="panel-body">
+            <a href=""><img alt="Dian" src="~/Content/img/LogoDian.png" width="180" class=""></a>
+            
+            <form method="post" action="@Url.Action("Register","Account")">
+                @Html.AntiForgeryToken()
+
+                <div class="form-group" style="margin-top:20px;">
+
+                    <div class="input-group" style="margin-top: 10px;">
+                        <div class="input-group-addon">
+                            <i class="fa fa-envelope"></i>
+                        </div>
+                        <input autofocus="" required name="Email" id="email" type="email" class="form-control" placeholder="Correo electrónico" value="" maxlength="100">
+                    </div>
+                    <div class="input-group" style="margin-top: 10px;">
+                        <div class="input-group-addon">
+                            <i class="fa fa-asterisk"></i>
+                        </div>
+                        <input type="password" class="form-control" placeholder="Contraseña" required name="Password">
+
+                    </div>
+                    <div class="input-group" style="margin-top: 10px;">
+                        <div class="input-group-addon">
+                            <i class="fa fa-asterisk"></i>
+                        </div>
+                        <input type="password" class="form-control" placeholder="Confirme contraseña" required name="ConfirmPassword" id="password2">
+                        <input type="hidden" value="@ViewBag.Id" name="Id">
+                    </div>
+                    <div class="input-group" style="margin-top: 10px;">
+                        <select class="selectpicker" id="Role" name="Role">
+                            <option value="1">&nbsp;Facturador Electrónico</option>
+                            <option value="2">&nbsp;Proveedor Tecnológico</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="margin-top: 10px;">
+                        <select class="selectpicker" id="documentType" name="DocumentType">
+                            <option value="1">&nbsp;Tarjeta de identidad</option>
+                            <option value="2">&nbsp;Pasaporte</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="margin-top: 10px;">
+                        <div class="input-group-addon">
+                            <i class="fa fa-id-card-o"></i>
+                        </div>
+                        <input autofocus="" required name="DocumentNumber" id="documentNumber" type="text" class="form-control" placeholder="Número de documento" value="" maxlength="100">
+                    </div>
+
+
+                    @if (ViewData.ModelState.Values.Count > 0)
+                    {
+                        foreach (var item in ViewData.ModelState.Values)
+                        {
+                            if (item.Errors.Count > 0)
+                            {
+                                <div class="row" ng-show="model.errorMessage" style="margin-top: 10px; margin-bottom: 10px;">
+                                    <div class="col-md-12 col-sm-12">
+                                        <code>@item.Errors[0].ErrorMessage</code>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+
+                <button class="btn btn-gosocket btn-lg btn-block" type="submit">
+                    <i class=""></i> Registrarse
+                </button>
+                <div class="pad-top" name="rp">
+                    <a href="@Url.Action("RecoveryPassword","Account")" class="btn-link mar-rgt" style="color: black;">Olvidó su contraseña</a>
+                    <a href="@Url.Action("Login","Account")" class="btn-link mar-lft" style="color: black;">Entrar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+<!--===================================================-->
+
+
+
+@section scripts
+{
+
+}

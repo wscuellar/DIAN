@@ -1,0 +1,115 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+@using Gosocket.Dian.Web.Common
+@{
+    if (User.IsInAnyRole("Administrador", "Super"))
+    {
+        ViewBag.Title = "Configurar sets de pruebas";
+    }
+    else
+    {
+        ViewBag.Title = "Listado sets de pruebas";
+    }
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+
+    <style>
+    </style>
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <!--Tabs Content-->
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">@ViewBag.Title - @Model.Name</h3>
+                        </div>
+
+                        <div class="panel-body padding-top-20">
+                            @if (User.IsInAnyRole("Administrador", "Super"))
+                            {
+                                <div class="pad-btm form-inline padding-bottom-0">
+                                    <div class="row margin-horizontal-0">
+                                        <div class="col-md-10 table-toolbar-left padding-left-0">
+                                            <a href="@Url.Action("AddTestSet", "Contributor", new { contributorId = Model.Id})" class="btn btn-default btn-default btn-hover-gosocket btn-labeled fa fa-plus margin-right-10">Agregar Set de Pruebas</a>
+                                        </div>
+
+                                        <div class="col-md-2 table-toolbar-right padding-right-0">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="table-responsive">
+                                <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                    @if (Model.ContributorTestSets.Count == 0)
+                                    {
+                                        <tr style="background-color: transparent !important;">
+                                            <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
+                                                <div class="alert panel-footer-grey">
+                                                    Ningún set de pruebas disponible para mostrar.
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <thead>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Descripción</th>
+                                                <th>Categoría Validador</th>
+                                                <th>Tipo Documento</th>
+                                                <th>Total Documentos</th>
+                                                <th>Total Documentos OK</th>
+                                                <th>Estado</th>
+                                                <th>Fecha Inicio</th>
+                                                <th>Fecha Término</th>
+                                                <th>Creado por</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var s in Model.ContributorTestSets)
+                                            {
+                                                <tr class='clickable-row' data-href="@Url.Action("TestSetTracking","Contributor", new { contributorId = Model.Id, contributorCode = s.SenderCode, testSetId = s.TestSetId , category = s.Category , documentType = s.DocumentTypeCode   })">
+                                                    <td class="text-nowrap"><a>@s.SenderName</a></td>
+                                                    <td class="text-nowrap"><a>@s.Description</a></td>
+                                                    <td class="text-nowrap"><a>@s.Category</a></td>
+                                                    <td class="text-nowrap"><a>@s.DocumentTypeCode</a></td>
+                                                    <td class="text-nowrap"><a>@s.DocumentsTotal</a></td>
+                                                    <td class="text-nowrap"><a>@s.DocumentsTotalOk</a></td>
+                                                    <td class="text-nowrap">
+                                                        @{
+                                                            var text_color = s.Active ? "text-gosocket" : "text-red";
+                                                            var text_status = s.Active ? "Activo" : "Inactivo";
+                                                            <a><i class="fa fa-circle @text_color"></i>&nbsp;@text_status</a>
+                                                        }
+                                                    </td>
+                                                    <td class="text-nowrap">
+                                                        <a>@s.StartDate.ToString("dd-MM-yyyy")</a>
+                                                    </td>
+                                                    <td class="text-nowrap">
+                                                        <a>@s.EndDate.ToString("dd-MM-yyyy")</a>
+                                                    </td>
+                                                    <td class="text-nowrap"><a>@s.CreatedBy</a></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

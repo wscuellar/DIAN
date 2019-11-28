@@ -1,0 +1,76 @@
+﻿@model Gosocket.Dian.Web.Models.SearchDocumentViewModel
+
+<div class="table-responsive">
+    @if (Model.Documents.Count == 0)
+    {
+        <div class="alert panel-footer-grey text-center">
+            Ningún documento disponible para mostrar.
+        </div>
+    }
+    else {
+        <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+            <thead>
+                <tr>
+                    <th style="width: 50px;"></th>
+                    <th>Fecha</th>
+                    <th class="text-center">Prefijo</th>
+                    <th>Nº documento</th>
+                    <th>Tipo documento</th>
+                    <th>NIT emisor</th>
+                    <th>Emisor</th>
+                    <th>NIT Receptor</th>
+                    <th>Receptor</th>
+                    <th>Estado</th>
+                    <th class="text-right">Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var document in Model.Documents)
+                {
+                    var status = "success";
+                    var isDisabled = "";
+                    if (document.Status == 10)
+                    {
+                        status = "primary";
+                    }
+                    if (document.Status == 2)
+                    {
+                        status = "danger";
+                        isDisabled = "disabled";
+                    }
+                    <tr data-id="@document.Id" data-partitionKey="@document.PartitionKey" class="document-row">
+                        <td>
+                            <span class="fa fa fa-circle text-@status add-tooltip" data-original-title="@document.StatusName"></span>
+                            @if (true)
+                            {
+                                <span class="fa fa fa-download add-tooltip download-files" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                            }
+                            else
+                            {
+                                <span class="fa fa fa-close add-tooltip" data-original-title="Descarga desahabilitada"></span>
+                            }
+                        </td>
+                        <td class="text-nowrap"><a>@document.EmissionDate.ToString("dd-MM-yyyy")</a></td>
+                        <td class="text-center text-nowrap">@document.Serie</td>
+                        <td class="text-nowrap"><a>@document.Number</a></td>
+                        <td>
+                            <div class="iffyTip hideText2">@document.DocumentTypeName</div>
+                        </td>
+                        <td class="text-nowrap"><a>@document.SenderCode</a></td>
+                        <td>
+                            <div class="iffyTip hideText2">@document.SenderName</div>
+
+                        </td>
+                        <td class="text-nowrap"><a>@document.ReceiverCode</a></td>
+                        <td class="text-nowrap"><a>@document.ReceiverName</a></td>
+                        <td class="text-nowrap"><a>@document.StatusName</a></td>
+                        <td class="text-right text-nowrap">
+                            <a>@document.TotalAmount.ToString("C0")</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

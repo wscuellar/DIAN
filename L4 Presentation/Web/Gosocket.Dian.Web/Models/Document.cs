@@ -1,0 +1,178 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace Gosocket.Dian.Web.Models
+{
+    public class SearchDocumentViewModel
+    {
+        public SearchDocumentViewModel()
+        {
+            MaxItemCount = 15;
+            IsNextPage = false;
+            Page = 0;
+            StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); ;
+            EndDate = DateTime.Now;
+            Status = 0;
+            DocumentTypeId = "00";
+            ReferencesType = "00";
+            Documents = new List<DocumentViewModel>();
+            DocumentTypes = DocumentTypeModel.List();
+            Statuses = DocumentStatusViewModel.List();
+        }
+
+        [Display(Name = "CUFE")]
+        public string DocumentKey { get; set; }
+        [Display(Name = "NIT emisor")]
+        public string SenderCode { get; set; }
+        [Display(Name = "NIT receptor")]
+        public string ReceiverCode { get; set; }
+        public int Page { get; set; }
+        public bool IsNextPage { get; set; }
+        public int MaxItemCount { get; set; }
+        public List<DocumentViewModel> Documents { get; set; }
+        public List<DocumentTypeModel> DocumentTypes { get; set; }
+        [Display(Name = "Estado")]
+        public List<DocumentStatusViewModel> Statuses { get; set; }
+        public int Status { get; set; }
+        [Display(Name = "Tipo de documento")]
+        public string DocumentTypeId { get; set; }
+        [Display(Name = "Tipo de referencia")]
+        public string ReferencesType { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+    }
+
+    public class DocumentViewModel
+    {
+        public DocumentViewModel()
+        {
+            DocumentTags = new List<DocumentTagViewModel>();
+            Events = new List<EventViewModel>();
+            References = new List<ReferenceViewModel>();
+            TaxesDetail = new TaxesDetailViewModel();
+        }
+        public string Id { get; set; }
+
+        public string PartitionKey { get; set; }
+        public List<DocumentTagViewModel> DocumentTags { get; set; }
+        public List<EventViewModel> Events { get; set; }
+        public List<ReferenceViewModel> References { get; set; }
+
+        public TaxesDetailViewModel TaxesDetail { get; set; }
+
+        public DateTime EmissionDate { get; set; }
+        public string DocumentTypeId { get; set; }
+
+        public string DocumentTypeName { get; set; }
+
+        public string Number { get; set; }
+        public string Serie { get; set; }
+        public string SerieAndNumber { get; set; }
+        
+
+        public string SenderCode { get; set; }
+        public string SenderName { get; set; }
+        public string ReceiverCode { get; set; }
+        public string ReceiverName { get; set; }
+        public string TechProviderCode { get; set; }
+        public string TechProviderName { get; set; }
+        public DateTime GenerationDate { get; set; }
+        public DateTime ReceptionDate { get; set; }
+        public int Status { get; set; }
+        public string StatusName { get; set; }
+        public double Amount { get; set; }
+        public double TaxAmountIva5Percent { get; set; }
+        public double TaxAmountIva19Percent { get; set; }
+        public double TaxAmountIva { get; set; }
+        public double TaxAmountIca { get; set; }
+        public double TaxAmountIpc { get; set; }
+        public double TotalAmount { get; set; }
+    }
+
+    public class DocumentTagViewModel
+    {
+        public string Code { get; set; }
+        public string Description { get; set; }
+        public string Value { get; set; }
+        public DateTime TimeStamp { get; set; }
+    }
+
+    public class DocumentTypeModel
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+
+        public static List<DocumentTypeModel> List()
+        {
+            return new List<DocumentTypeModel>
+            {
+                new DocumentTypeModel{Code = "00", Name = "Todos..." },
+                new DocumentTypeModel{Code = "01", Name = "Factura electrónica" },
+                new DocumentTypeModel{Code = "02", Name = "Factura de exportación electrónica" },
+                new DocumentTypeModel{Code = "03", Name = "Factura de contingencia electrónica" },
+                new DocumentTypeModel{Code = "04", Name = "Factura de contingencia electrónica DIAN" },
+                new DocumentTypeModel{Code = "07", Name = "Nota de crédito electrónica" },
+                new DocumentTypeModel{Code = "08", Name = "Nota de débito electrónica" }
+            };
+        }
+    }
+
+    public class EventViewModel
+    {
+        public DateTime Date { get; set; }
+        public int DateNumber { get; set; }
+        public DateTime TimeStamp { get; set; }
+        public string Code { get; set; }
+        public string Description { get; set; }
+        public string SenderCode { get; set; }
+        public string SenderName { get; set; }
+        public string ReceiverCode { get; set; }
+        public string ReceiverName { get; set; }
+    }
+
+    public class ReferenceViewModel
+    {
+        public string DocumentTypeId { get; set; }
+        public string DocumenTypeName { get; set; }
+        public DateTime Date { get; set; }
+        public int DateNumber { get; set; }
+        public DateTime TimeStamp { get; set; }
+        public string DocumentKey { get; set; }
+        public string Description { get; set; }
+        public string SenderCode { get; set; }
+        public string SenderName { get; set; }
+        public string ReceiverCode { get; set; }
+        public string ReceiverName { get; set; }
+
+        //Especifica si se muestra en la lista de documentos
+        //      referenciados por el presente documento
+        public bool ShowAsReference { get; set; }
+    }
+    public class TaxesDetailViewModel
+    {
+        public double TaxAmountIva5Percent { get; set; }
+        public double TaxAmountIva14Percent { get; set; }
+        public double TaxAmountIva16Percent { get; set; }
+        public double TaxAmountIva19Percent { get; set; }
+        public double TaxAmountIva { get; set; }
+        public double TaxAmountIca { get; set; }
+        public double TaxAmountIpc { get; set; }
+    }
+    public class DocumentStatusViewModel
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+
+        public static List<DocumentStatusViewModel> List()
+        {
+            return new List<DocumentStatusViewModel>
+            {
+                new DocumentStatusViewModel {Code = "0", Name = "Todos..." },
+                new DocumentStatusViewModel{ Code = "1", Name = "Aprobado"},
+                new DocumentStatusViewModel{ Code = "10", Name = "Aprobado con notificación"}
+            };
+        }
+    }
+
+}

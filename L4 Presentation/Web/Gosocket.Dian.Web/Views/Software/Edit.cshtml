@@ -1,0 +1,80 @@
+﻿@model Gosocket.Dian.Web.Models.SoftwareViewModel
+@using Gosocket.Dian.Web.Models
+
+@{
+    ViewBag.Title = "Editar software";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("Edit", "Software", FormMethod.Post, new { id = "edit-software-form" }))
+                        {
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("View", "Software", new { id = Model.Id })" class="btn btn-default">Cancelar</a>
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function ($) {
+            $('.btn-save').click(function () {
+                var form = $('#edit-software-form');
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
+                    form.submit();
+                }
+            });
+
+            $('#ContributorCode').focusout(function () {
+                    showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
+                    var code = $(this).val();
+                    $.ajax({
+                        url: "@Url.Action("Get","Contributor")",
+                        method: "Get",
+                        data: { code: code },
+                        error: function (a, b, c) {
+                        },
+                        success: function (data) {
+                            if (data.success && data.contributorTypeId !== null) {
+                                $('.btn-save').removeAttr("disabled");
+                                showNotification('info', 'fa fa-bolt fa-2x', '#panel-form', 'NIT registrado en los registros de la dian.');
+
+                            } else {
+                                if (data.contributorTypeId === null) {
+                                    showNotification('danger', 'fa fa-bolt fa-2x', '#panel-form', 'Debe seleccionar un contribuyente.', data.message);
+                                } else {
+                                    showNotification('danger', 'fa fa-bolt fa-2x', '#panel-form', 'Error en la validaciónd el NIT ingresado.', data.message);
+                                }
+                                $('.btn-save').attr("disabled", true);
+                            }
+                            hideLoading('#panel-form');
+                        }
+                });
+            });
+            $('#Pin').attr('readonly', true);
+
+        });
+
+    </script>
+}

@@ -1,0 +1,23 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorFileTypeViewModel
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control contributorFileType-props" } };}
+
+<div class="row">
+    <div class="col-sm-4 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Name, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="col-sm-2 padding-xs-0">
+        <div class="form-block">
+            <div class="form-block" style="padding-top: 16px;">
+                <label id="label-check" class="form-checkbox form-icon btn btn-gosocket form-text textEllipsis add-tooltip" data-toggle="tooltip" data-original-title="@Html.DisplayNameFor(model => model.Mandatory)">
+                    @Html.DisplayNameFor(model => model.Mandatory)
+                    @Html.HiddenFor(model => model.Mandatory)
+                </label>
+            </div>
+        </div>
+    </div>
+</div>

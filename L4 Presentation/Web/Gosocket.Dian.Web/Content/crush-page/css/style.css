@@ -1,0 +1,12 @@
+body { margin:auto; padding:0; background:url(../img/crush-bg.png) no-repeat top center; background-size:100% auto; }
+#content { height:100%; width:100%; }
+#crush { width:1126px; margin:0 auto; padding-top:20px; padding-bottom:20px; text-align:center }
+#head { width:100%; height:auto; float:left }
+#logo { width:auto; height:auto; float:left }
+.logoimg { width: 10% !important; height:auto; }
+#txt { width:auto; float:right; margin-left:20px; margin-top:64px; text-align:left }
+.txt01 { font-family:'Gotham Bold';  letter-spacing:-0.1em; width:auto; height:auto; color:#231f20; }
+.txt02 { font-family:'Gotham Thin';  letter-spacing:-0.075em; width:auto; height:auto; color:#348441; }
+.txt03 { font-family:'Gotham Bold';  letter-spacing:-0.075em; width:auto; height:auto; color:#231f20; }
+#foot { width:auto; height:auto; }
+.footimg { width:auto; height:auto; }

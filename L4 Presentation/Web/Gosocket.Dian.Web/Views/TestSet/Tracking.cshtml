@@ -1,0 +1,149 @@
+﻿@model Gosocket.Dian.Web.Models.TestSetResultViewModel
+@using Gosocket.Dian.Domain.Common
+@{
+    ViewBag.Title = "Detalle de set de pruebas";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title - @Model.OperationModeName</h3>
+            </div>
+
+            @if (Model.Status == (int)TestSetStatus.InProcess)
+            {
+                <div class="row padding-25 padding-bottom-0">
+                    <div class="alert custom-alert-success col-sm-12">
+                        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                        Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong style='font-size: 14px; font-weight: bold;'>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.InProcess)</strong>.<br />
+                        Usted debe proporcionar el identificador del set de pruebas (TestSetId) <strong style="font-size: 14px; font-weight: bold;">@Model.Id</strong> en el web services para el envío de su set de pruebas.
+                    </div>
+                </div>
+            }
+            @if (Model.Status == (int)TestSetStatus.Accepted)
+            {
+                <div class="row padding-25 padding-bottom-0">
+                    <div class="alert custom-alert-success col-sm-12">
+                        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                        Su empresa ha superado satisfactoriamente las pruebas de validación de su set de pruebas.
+                    </div>
+                </div>
+            }
+            @if (Model.Status == (int)TestSetStatus.Rejected)
+            {
+                <div class="row padding-25 padding-bottom-0">
+                    <div class="alert custom-alert-danger col-sm-12">
+                        <h4><i class="fa fa-exclamation-circle" aria-hidden"true"=""></i> Importante!</h4>
+                        Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong style='font-size: 14px; font-weight: bold;'>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.Rejected)</strong>.<br />
+                        Usted debe reiniciar el proceso para poder poder enviar nuevos documentos a su set de pruebas con indentificador <strong style="font-size: 14px; font-weight: bold;">@Model.Id</strong>
+                    </div>
+                </div>
+            }
+
+            <div class="panel-body padding-top-0">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        <div class="panel-body padding-0 padding-bottom-0">
+                            <div class="row">
+                                <div id="chart" style="height:320px; margin: 0 auto"></div>
+
+                            </div>
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("View", "TestSet", new {operationModeId = Model.OperationModeId, contributorId = Model.ContributorId, contributorCode = Model.ContributorCode, softwareId = Model.SoftwareId })" class="btn btn-default">Volver</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+    <script>
+        $(document).ready(function ($) {
+            LoadData();
+        });
+
+
+
+            function LoadData() {
+            Highcharts.chart('chart', {
+                chart: {
+                    type: 'column'
+                },
+                credits: {
+                    enabled: false
+                },
+                navigation: {
+                    buttonOptions: {
+                        enabled: false
+                    }
+                },
+                title: {
+                    text: 'Resumen documentos recibidos y aceptados para el set de pruebas'
+                },
+                xAxis: {
+                    categories: [
+                        'Documentos',
+                        'Facturas',
+                        'Nota de crédito',
+                        'Nota de débito'
+                    ],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Totales'
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                }, colors: ['#0778D7', '#D7B707', '#FF8000', '#348441', '#DC2D08'],
+                series: [{
+                    name: 'Requeridos',
+                    data: [@Model.TotalDocumentRequired,@Model.InvoicesTotalRequired,@Model.TotalCreditNotesRequired,@Model.TotalDebitNotesRequired]
+
+                }, {
+                        name: 'Min. requerido aceptado',
+                    data: [@Model.TotalDocumentAcceptedRequired, @Model.TotalInvoicesAcceptedRequired, @Model.TotalCreditNotesAcceptedRequired,@Model.TotalDebitNotesAcceptedRequired]
+
+                }, {
+                        name: 'Recibidos',
+                    data: [@Model.TotalDocumentSent, @Model.InvoicesTotalSent,@Model.TotalCreditNotesSent,@Model.TotalDebitNotesSent]
+
+                }, {
+                        name: 'Aceptados',
+                    data: [@Model.TotalDocumentAccepted,@Model.TotalInvoicesAccepted,@Model.TotalCreditNotesAccepted,@Model.TotalDebitNotesAccepted]
+
+                }, {
+                        name: 'Rechazados',
+                    data: [@Model.TotalDocumentsRejected, @Model.TotalInvoicesRejected,@Model.TotalCreditNotesRejected,@Model.TotalDebitNotesRejected]
+
+                }]
+            });
+            }
+
+
+    </script>
+
+}

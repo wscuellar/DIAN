@@ -1,0 +1,50 @@
+﻿@model Gosocket.Dian.Web.Models.SoftwareViewModel
+
+@{
+
+    ViewBag.Title = "Agregar software";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-default margin-bottom-0">
+                        @using (Html.BeginForm("Add", "Software", FormMethod.Post, new { id = "add-software-form" }))
+                        {
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("List", "Software")" class="btn btn-default">Volver</a>
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function ($) {
+
+            $('.btn-save').click(function () {
+                var form = $('#add-software-form');
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+                    form.submit();
+                }
+            });
+        });
+
+    </script>
+}

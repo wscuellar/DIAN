@@ -1,0 +1,343 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Domain.Common
+@using Gosocket.Dian.Web.Models
+@using Gosocket.Dian.Infrastructure
+@{
+    ViewBag.Title = "Configurar modos de operación";
+}
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+
+    <style>
+    </style>
+}
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("AddContributorOperations", "Contributor", FormMethod.Post, new { id = "add-operation-mode-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(m => m.Id)
+                            @Html.HiddenFor(m => m.Code)
+                            @Html.HiddenFor(m => m.ContributorTypeId)
+
+                            <div class="panel-body padding-20 padding-bottom-10">
+                                <div class="row">
+                                    <div class="col-sm-4 padding-xs-0">
+                                        <div class="form-group">
+                                            @Html.Label("Seleccione el modo de operación", new { @class = "control-label" })
+                                            @Html.DropDownListFor(m => m.OperationModeId, new SelectList(Model.OperationModes, "Id", "Name", Model.OperationModeId), new { @class = "form-control selectpicker" })
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 padding-xs-0">
+                                        <div class="form-group">
+                                            @if (ConfigurationManager.GetValue("Environment") == "Hab")
+                                            {
+                                                @Html.Label("Url de recepción de facturas en habilitación", new { @class = "control-label" })
+                                            }
+                                            @if (ConfigurationManager.GetValue("Environment") == "Test")
+                                            {
+                                                @Html.Label("Url de recepción de facturas en piloto", new { @class = "control-label" })
+                                            }
+                                            @if (ConfigurationManager.GetValue("Environment") == "Prod")
+                                            {
+                                                @Html.Label("Url de recepción de facturas", new { @class = "control-label" })
+                                            }
+                                            @Html.TextBoxFor(m => m.Software.Url, new { @class = "form-control", @disabled = "disabled" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-inline padding-bottom-10 padding-top-10 biller" style="display:none;">
+                                    <div class="row margin-horizontal-0">
+                                        <div class="col-sm-12 table-toolbar-left padding-left-0  padding-bottom-0">
+                                            <h3 class="panel-title padding-0">Datos de empresa y software </h3>
+                                        </div>
+                                    </div>
+                                    <hr class="margin-0" />
+                                </div>
+                                <div class="row">
+                                    <div id="providers" class="col-sm-3 padding-xs-0" style="display:none;">
+                                        <div class="form-group">
+                                            @Html.Label("Nombre empresa proveedora", new { @class = "control-label" })
+                                            @Html.DropDownListFor(m => m.ProviderId, new SelectList(Model.Providers.OrderBy(p => p.Name), "Id", "Name", Model.ProviderId), new { @class = "form-control selectpicker" })
+                                        </div>
+                                    </div>
+                                    <div id="softwares" class="col-sm-3 padding-xs-0" style="display:none;">
+                                        <div class="form-group">
+                                            @Html.Label("Nombre del software", new { @class = "control-label" })
+                                            @Html.DropDownList("SoftwareId", Enumerable.Empty<SelectListItem>(), new { @class = "form-control selectpicker" })
+                                        </div>
+                                    </div>
+                                    <div id="providerFree" class="col-sm-3 padding-xs-0" style="display:none;">
+                                        <div class="form-group">
+                                            @Html.Label("Nombre empresa proveedora", new { @class = "control-label" })
+                                            @Html.TextBox("ProviderIdFree", "UAE-Dian", new { @class = "form-control", @disabled = "disabled" })
+                                        </div>
+                                    </div>
+                                    <div id="softwareFree" class="col-sm-3 padding-xs-0" style="display:none;">
+                                        <div class="form-group">
+                                            @Html.Label("Nombre del software", new { @class = "control-label" })
+                                            @Html.TextBoxFor(m => m.Software.Name, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div id="pinsoftware" class="col-sm-3 padding-xs-0">
+                                        <div class="form-group">
+                                            @Html.Label("Pin del SW", new { @class = "control-label" })
+                                            @Html.TextBoxFor(m => m.Software.Pin, new { @class = "form-control", @maxlength = "5" })
+                                            @Html.ValidationMessageFor(m => m.Software.Pin, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div id="idsoftware" class="col-sm-3 padding-xs-0">
+                                        <div class="form-group">
+                                            @Html.HiddenFor(x => x.Software.Id)
+                                            @Html.Label("ID del SW", new { @class = "control-label" })
+                                            @Html.TextBoxFor(m => m.Software.Id, new { @class = "form-control", @disabled = "disabled" })
+                                            @Html.ValidationMessageFor(m => m.Software.Id, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                </div>
+                                @if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Pending)
+                                {
+                                    <div class="alert custom-alert-danger fade in">
+                                        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                                        No puede agregar modo de operación si se encuentra pendiente de registro.
+                                    </div>
+                                }
+                            </div>
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("View", "Contributor", new { id = Model.Id })" class="btn btn-default">Volver</a>
+                                @if (User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Pending && !Model.ContributorOperations.Any(c => (c.StatusId == (int)TestSetStatus.InProcess || c.StatusId == (int)TestSetStatus.Rejected) && !c.Deleted))
+                                {
+                                    <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Adicionar</button>
+                                }
+                            </div>
+                        }
+
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.TestSetResultRejected.PartitionKey))
+                    {
+                        @*@Html.AntiForgeryToken()*@
+                        <div class="row padding-10 padding-bottom-0">
+                            <div class="alert custom-alert-danger col-sm-12 margin-bottom-0">
+                                <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                                Usted se encuentra en el proceso de pruebas de validación, su set de pruebas se encuentra <strong style='font-size: 14px; font-weight: bold;'>Rechazado</strong>
+                                <br />
+                                <button type="button" class="btn custom-btn-danger btn-reset">Reiniciar</button>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="row margin-horizontal-0 margin-vertical-0">
+                    @Html.Partial("_listOperationModes")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/contributor/contributor.js?1.0.0"></script>
+
+    <script>
+        var jsonProviders;
+        $(document).ready(function ($) {
+            if ('@TempData["ErrorMessage"]' != '') {
+                showNotification('warning', 'fa fa-check fa-2x', 'floating', 'Aviso.', '@TempData["ErrorMessage"]');
+            }
+
+            jsonProviders = @Html.Raw(Json.Encode(Model.Providers));
+
+            loadSoftwares($('#ProviderId').val());
+            $('.row.software').css('display', '');
+            $('.biller').css('display', '');
+            $('#providers').css('display', 'none');
+            $('#providerFree').css('display', '');
+            $("#softwares").css('display', 'none');
+            $("#softwareFree").css('display', '');
+            $('#Software_Name').attr('disabled', true);
+            $('#Software_Pin').attr('disabled', true);
+            $("#Software_Name").val("UAE-Dian");
+            $('#idsoftware').css('display', 'none');
+            $('#pinsoftware').css('display', 'none');
+
+            $('#ProviderId').change(function () {
+                showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
+                loadSoftwares($(this).val());
+            });
+            $('#OperationModeId').change(function () {
+                if ($(this).val() === '@((int)OperationMode.Provider)') {
+                    $('#providers').css('display', '');
+                    $('#providerFree').css('display', 'none');
+                    $("#softwares").css('display', '');
+                    $("#softwareFree").css('display', 'none');
+                    $('#Software_Name').attr('disabled', true);
+                    $('#Software_Pin').attr('disabled', true);
+                    $('#ProviderId').attr('disabled', false);
+                    $('#SoftwareId').attr('disabled', false);
+                    $("#SoftwareId").selectpicker('refresh');
+                    $("#ProviderId").selectpicker('refresh');
+                    $('#idsoftware').css('display', 'none');
+                    $('#pinsoftware').css('display', 'none');
+                }
+                else if ($(this).val() === '@((int)OperationMode.Free)') {
+                    $('#providers').css('display', 'none');
+                    $('#providerFree').css('display', '');
+                    $("#softwares").css('display', 'none');
+                    $("#softwareFree").css('display', '');
+                    $("#Software_Name").val("@ConfigurationManager.GetValue("DianBillerName")");
+                    $("#Software_Pin").val("");
+                    $("#ProviderIdFree").val("@ConfigurationManager.GetValue("DianBillerName")");
+                    $('#Software_Name').attr('disabled', true);
+                    $('#Software_Pin').attr('disabled', true);
+                    $('#idsoftware').css('display', 'none');
+                    $('#pinsoftware').css('display', 'none');
+                }
+                else {
+                    $('#Software_Name').attr('disabled', false);
+                    $('#Software_Name').val('');
+                    $('#Software_Pin').attr('disabled', false);
+                    $('#providers').css('display', 'none');
+                    $('#providerFree').css('display', '');
+                    $("#softwares").css('display', 'none');
+                    $("#softwareFree").css('display', '');
+                    $("#Software_SoftwareIdFree").val("");
+                    $("#ProviderIdFree").val("@Model.Name");
+                    $('#idsoftware').css('display', '');
+                    $('#pinsoftware').css('display', '');
+                }
+            });
+
+
+            $('.btn-reset').click(function () {
+                bootbox.dialog({
+                    title: "Advertencia",
+                    message: "<div class='media'><div class='media-body'>" +
+                        "<h4 class='text-thin'><strong>Está seguro que desea reiniciar el set de pruebas?</strong></h4>" +
+                        "Al realizar esta acción deberá enviar otro set de pruebas con documentos diferentes.<br>" +
+                        "Todas las estadísticas de la certificación anterior serán reiniciadas." +
+                        "</div></div>",
+                    buttons: {
+                        del: {
+                            label: "Aceptar",
+                            className: "btn-gosocket",
+                            callback: function () {
+                                resetTestSet()
+                            }
+                        },
+                    }
+                });
+            });
+
+            function resetTestSet() {
+                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                //var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
+                $.ajax({
+                    url: "@Url.Action("ResetTestSetResult", "TestSet")",
+                    method: "Post",
+                    data: {
+                        //__RequestVerificationToken: __RequestVerificationToken,
+                        pk: '@Model.TestSetResultRejected.PartitionKey',
+                        rk: '@Model.TestSetResultRejected.RowKey'
+                    },
+                    error: function (a, b, c) {
+                        hideLoading('#panel-form');
+                        showNotification('danger', 'fa fa-bolt fa-2x', 'floating', '', b + ': ' + c);
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+
+            $('.btn-save').click(function () {
+                var form = $('#add-operation-mode-form');
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
+                    form.submit();
+                }
+            });
+        });
+
+        function loadSoftwares(contributorId) {
+            var dropdown = $("#SoftwareId");
+            dropdown.find('option').remove()
+            provider = jQuery.grep(jsonProviders, function (obj) {
+                return obj.Id === parseInt(contributorId);
+            });
+
+            if (provider.length > 0) {
+                var softwares = provider[0].Softwares;
+                $.each(softwares, function () {
+                    dropdown.append($("<option />").val(this.Id).text(this.Name));
+                });
+                dropdown.selectpicker('refresh');
+            }
+
+            hideLoading('#panel-form');
+        }
+
+        function removeLine(button) {
+            var id = $(button).attr("data-index-contributorOperations")
+            bootbox.dialog({
+                message: "Está seguro que desea eliminar el modo de operación?",
+                title: "Advertencia",
+                buttons: {
+                    del: {
+                        label: "Aceptar",
+                        className: "btn-gosocket",
+                        callback: function () {
+                            removeLineAjax(id);
+                        }
+                    },
+                }
+            });
+        }
+
+
+        function removeLineAjax(id) {
+            showLoading('#panel-form', 'Eliminando', 'Procesando, por favor espere.');
+            var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
+            $.ajax({
+            url: "@Url.Action("RemoveContributorOperation", "Contributor")",
+            method: "Post",
+                data: {
+                    __RequestVerificationToken: __RequestVerificationToken,
+                    id: id
+                },
+            error: function (a, b, c) {
+            },
+            success: function (data) {
+                if (data.success) {
+                    $("[data-index-contributorOperations*='" + data.id + "']").remove();
+                    } else {
+                        showNotification('danger', 'fa fa-bolt fa-2x', '#panel-form', 'Error al eliminar el modo de operación.', data.message);
+                    }
+                hideLoading('#panel-form');
+                location.reload();
+                }
+            });
+        }
+
+    </script>
+}

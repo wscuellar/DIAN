@@ -1,0 +1,186 @@
+﻿@using Gosocket.Dian.Web.Utils;
+@model Gosocket.Dian.Web.Models.SoftwareViewModel
+
+@{
+    ViewBag.Title = "Registrar Software";
+}
+
+<div class="panel">
+    <div class="panel-heading">
+        <h3 class="panel-title">@ViewBag.Title</h3>
+    </div>
+
+    <div class="panel-body padding-top-20">
+        <div class="row margin-horizontal-0">
+            <div class="panel panel-bordered-default margin-bottom-0">
+                @using (Html.BeginForm("AddSoftwareConfirmed", "Software", FormMethod.Post))
+                {
+
+                    <div class="panel-body padding-20 padding-bottom-10" id="software-form">
+                        <div class="row">
+                            <div class="col-sm-6 padding-xs-0">
+                                @{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control" } };}
+
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.ContributorId, new { @class = "control-label" })
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.ContributorId, new { @class = "form-control" })
+                                        <span class="input-group-btn">
+                                            <button id="provider-search-btn" class="btn btn-default btn-hover-gosocket btn-labeled fa fa-search" type="button" onclick="validateSoftware()">Buscar</button>
+                                            <a class="btn btn-default btn-labeled fa fa-close btn-hover-warning" onclick="clearSoftwareForm()">Limpiar</a>
+                                        </span>
+                                        @Html.ValidationMessageFor(m => m.ContributorId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Pin, new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.Pin, defaultHtmlAttr)
+                                    @Html.ValidationMessageFor(m => m.Pin, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.Name, defaultHtmlAttr)
+                                    @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Date, new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.Date, new { @class = "form-control datepicker" })
+                                    @Html.ValidationMessageFor(m => m.Date, "", new { @class = "text-danger" })
+                                </div>
+
+
+                            </div>
+                            <div class="col-sm-6 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.SoftwarePassword, new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.SoftwarePassword, defaultHtmlAttr)
+                                    @Html.ValidationMessageFor(m => m.SoftwarePassword, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Url, new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.Url, defaultHtmlAttr)
+                                    @Html.ValidationMessageFor(m => m.Url, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.SoftwareUser, new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.SoftwareUser, defaultHtmlAttr)
+                                    @Html.ValidationMessageFor(m => m.SoftwareUser, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Estado Aprobación</label>
+                                    <select class="selectpicker" id="Status" name="Status">
+                                        @foreach (var item in DataUtils.GetAcceptanceStatusesSoftware())
+                                        {
+                                            var text_color = "text-yellow";
+                                            switch (item.Id)
+                                            {
+                                                case 1:
+                                                    text_color = "text-yellow";
+                                                    break;
+                                                case 2:
+                                                    text_color = "text-gosocket";
+                                                    break;
+                                                case 3:
+                                                    text_color = "text-green";
+                                                    break;
+                                                case 4:
+                                                    text_color = "text-warning";
+                                                    break;
+                                                default:
+                                                    text_color = "text-red";
+                                                    break;
+                                            }
+                                            <option value="@item.Id" data-icon="fa fa-circle @text_color">&nbsp;@item.Name</option>
+                                        }
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer text-right">
+                        <a href="@Url.Action("Search", "Software")" class="btn btn-default btn-hover-gosocket">Cancelar</a>
+                        &nbsp;&nbsp;&nbsp;
+                        <button class="btn btn-default btn-hover-gosocket" type="submit" id="btn-guardar" disabled>Guardar</button>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <text>
+            $.niftyNoty({
+                type: "danger",
+                container: 'page',
+                message: "@ViewBag.ErrorMessage",
+                timer: 5000
+            });
+            </text>
+        }
+
+        function validateSoftware() {
+            $.ajax({
+                url: "../Provider/GetProvider",
+                method: "POST",
+                data: { nit: $("#ProviderId").val() },
+                error: function (a, b, c) {
+                },
+                success: function (data) {
+                    console.log(data);
+                    if (data.Success) {
+                        var provider = data.Provider;
+                        $("#software-form input").addClass("valid");
+                        $.niftyNoty({
+                            type: "info",
+                            container: 'page',
+                            message: "Proveedor encontrado en el sistema.",
+                            timer: 5000
+                        });
+                        $("#btn-guardar").removeAttr("disabled");
+
+                    } else {
+                        $("#software-form input").removeClass("valid");
+                        $.niftyNoty({
+                            type: "danger",
+                            container: 'page',
+                            message: "Proveedor no encontrado en el sistema.",
+                            timer: 5000
+                        });
+                        $("#btn-guardar").attr("disabled", "disabled");
+
+                    }
+                }
+            });
+        };
+        function clearProviderForm() {
+            $("#ProviderId").val("");
+            $("#Pin").val("");
+            $("#Name").val("");
+            $("#SoftwareDate ").val("");
+            $("#SoftwarePassword").val("");
+            $("#Url").val("");
+            $("#Environment").val("");
+            $("#SoftwareUser").val("");
+            $("#btn-guardar").attr("disabled", "disabled");
+            $("#software-form input").removeClass("valid");
+        }
+        $(document).ready(function ($) {
+            $('.datepicker').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                minYear: 1901
+            });
+        });
+    </script>
+}

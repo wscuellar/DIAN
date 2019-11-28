@@ -1,0 +1,213 @@
+﻿@model Gosocket.Dian.Web.Models.DocValidatorModel
+
+@{
+    ViewBag.Title = "Ver Documento";
+    var status = "success";
+    if (Model.Document.Status == 10)
+    {
+        status = "primary";
+    }
+    if (Model.Document.Status == 2)
+    {
+        status = "danger";
+    }
+}
+
+@section css
+{
+    <style>
+    </style>
+    <link href="~/Content/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
+}
+
+
+<!--Message-->
+<!--===================================================-->
+<div class="mar-top pad-no bg-white" id="html-gdoc">
+
+    <div style="display: none;" id="viewer-company-options">
+
+
+    </div>
+
+    <div class="fab-shadow"></div>
+    <div>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style>
+        </style>
+
+
+        <div>
+            <div class="row render-row">
+                <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
+                    <img class="img-responsive" style="max-height: 130px;" src="~/Content/img/LogoDian.png">
+                </div>
+                <div class="col-md-5" style="padding-top: 7px; padding-left: 0">
+                </div>
+                <div class="col-md-4" style="padding-top: 7px; padding-left: 0;">
+                    <p style="text-align: right;">
+                        <span class="tipo-doc">@Model.Document.DocumentTypeName</span>
+                        <br>
+                        Folio: @Model.Document.Number<br>
+                        Fecha emisión: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br>
+                    </p>
+                </div>
+            </div>
+            <div class="row render-row">
+                <div class="col-md-4" style="padding: 0">
+                    <p>
+                        <span class="datos-receptor">DATOS DEL EMISOR</span>
+                        <br>
+                        NIT: @Model.Document.SenderCode<br>
+                        Nombre: @Model.Document.SenderName<br>
+                    </p>
+                </div>
+                <div class="col-md-4" style="padding: 0">
+                    <p>
+                        <span class="datos-receptor">DATOS DEL RECEPTOR</span>
+                        <br>
+                        NIT: @Model.Document.ReceiverCode<br>
+                        Nombre: @Model.Document.ReceiverName<br>
+                    </p>
+                </div>
+                @if (Model.Document.Status != 2)
+                {
+                    <div class="col-md-4" style="padding-right: 0">
+                        <p style="text-align: right;font-weight: bold;">
+                            TOTALES E IMPUESTOS<br>
+                        </p>
+                        <p style="text-align: right;font-weight: bold;">
+                            @*IVA 5%: @Model.Document.TaxesDetail.TaxAmountIva5Percent.ToString("C0")<br>
+                            IVA 19%: @Model.Document.TaxesDetail.TaxAmountIva19Percent.ToString("C0")<br>*@
+                            IVA: @Model.Document.TaxAmountIva.ToString("C0")<br>
+                            Total: @Model.Document.TotalAmount.ToString("C0")<br>
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mar-no" style="border-bottom: 2px solid #348441;">
+    <div class="col-sm-6 pad-no">
+        <h4 class="margin-top-10">Validaciones del documento</h4>
+    </div>
+</div>
+@if (Model.Validations != null && Model.Validations.Count() == 0)
+{
+    <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i>  Todas las validaciones han sido satisfactorias.</h5>
+}
+else
+{
+    <div class="table-responsive">
+
+        <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Validations)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>
+                            <label class="label label-primary">@item.Status</label>
+                            <span class="fa fa fa-info-circle add-tooltip" data-original-title="@item.ErrorMessage"></span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+<br />
+<br />
+<div class="row mar-no" style="border-bottom: 2px solid #348441;">
+    <div class="col-sm-6 pad-no">
+        <h4 class="margin-top-10">Eventos del documento</h4>
+    </div>
+</div>
+@if (Model.Document.Events.Count() == 0)
+{
+    <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i>  No existen eventos para el documento.</h5>
+}
+else
+{
+    <div class="table-responsive">
+
+        <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Descripción</th>
+                    <th>Fecha</th>
+                    <th>Nit Emisor</th>
+                    <th>Emisor</th>
+                    <th>Nit Receptor</th>
+                    <th>Receptor</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Document.Events)
+                {
+                    <tr>
+                        <td>@item.Code</td>
+                        <td>@item.Description</td>
+                        <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                        <td>@item.SenderCode</td>
+                        <td>@item.SenderName</td>
+                        <td>@item.ReceiverCode</td>
+                        <td>@item.ReceiverName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+<br />
+<br />
+@if (Model.Document.References.Where(x => x.ShowAsReference).Count() > 0)
+{
+    <div class="row mar-no" style="border-bottom: 2px solid #348441;">
+        <div class="col-sm-6 pad-no">
+            <h4 class="margin-top-10">Referencias del documento</h4>
+        </div>
+    </div>
+    <div class="table-responsive">
+
+        <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+            <thead>
+                <tr>
+                    <th>Tipo de documento</th>
+                    <th>Fecha</th>
+                    <th>Descripción</th>
+                    <th>Nit Emisor</th>
+                    <th>Emisor</th>
+                    <th>Nit Receptor</th>
+                    <th>Receptor</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Document.References)
+                {
+                    <tr data-id="@item.DocumentKey" data-partitionKey="@item.DateNumber" class="document-row">
+                        <td>@item.DocumenTypeName</td>
+                        <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                        <td>@item.Description</td>
+                        <td>@item.SenderCode</td>
+                        <td>@item.SenderName</td>
+                        <td>@item.ReceiverCode</td>
+                        <td>@item.ReceiverName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+

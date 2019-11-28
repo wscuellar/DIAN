@@ -1,0 +1,48 @@
+﻿@model Gosocket.Dian.Web.Models.SoftwareViewModel
+@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Domain.Common
+
+@{
+    ViewBag.Title = "Software";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div id="panel-body" data-target="#panel-body" data-toggle="panel-overlay" class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @Html.Partial("_form")
+                        <div class="panel-footer text-right">
+                            @if (User.ContributorTypeId() == (int)ContributorType.Biller)
+                            {
+                                <a href="@Url.Action("TestSetList", "Contributor", new { contributorId = User.ContributorId() })" class="btn btn-default">Set de Pruebas</a>
+                            }
+                            <a href="@Url.Action("List", "Software")" class="btn btn-default">Volver</a>
+                            @if (User.IsInAnyRole("Administrador", "Super"))
+                            {
+                                <a href="@Url.Action("Edit", "Software", new { id = Model.Id })" class="btn btn-default btn-hover-gosocket">Editar</a>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function ($) {
+            $('.software-props').attr('readonly', true);
+            $('#acceptanceStatusSoftware').attr('disabled', true);
+        });
+
+    </script>
+}

@@ -1,0 +1,62 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+@using Gosocket.Dian.Web.Common;
+
+<div class="panel software" style="display:none;">
+    <div class="form-inline padding-bottom-10 padding-top-10">
+        <div class="row margin-horizontal-0">
+            <div class="col-sm-12 table-toolbar-left padding-left-0  padding-bottom-0">
+                <h3 class="panel-title padding-0">Software</h3>
+            </div>
+        </div>
+        <hr class="margin-0" />
+    </div>
+
+    <div class="panel-body padding-0">
+        <div class="row margin-horizontal-0">
+            <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                @using (Html.BeginForm("AddFromWizard", "Software", FormMethod.Post, new { id = "add-software-form" }))
+                {
+                    <div class="panel-body padding-20 padding-bottom-10">
+                        <div class="row">
+                            <div class="col-sm-3 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Software.Name, new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.Software.Name, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Software.Name, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Software.SoftwareUser, new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.Software.SoftwareUser, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Software.SoftwareUser, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Software.SoftwarePassword, new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.Software.SoftwarePassword, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Software.SoftwarePassword, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Software.Url, new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.Software.Url, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Software.Url, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer text-right">
+                        <a href="@Url.Action("TestSetList", "Contributor", new { contributorId = User.ContributorId() })" class="btn btn-default">Set de Pruebas</a>
+                        <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

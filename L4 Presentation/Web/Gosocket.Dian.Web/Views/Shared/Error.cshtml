@@ -1,0 +1,52 @@
+﻿@model HandleErrorInfo
+@{
+    Layout = "~/Views/Shared/_LayoutEmpty.cshtml";
+}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="~/Content/crush-page/css/style.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/crush-page/css/style-responsive.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/crush-page/css/fonts.css" rel="stylesheet" type="text/css" />
+    <title>Gosocket - The Companies Network</title>
+    <link rel="shortcut icon" href="~/Content/img/LogoDian.png" />
+    <!-- start: Mobile Specific -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <!-- end: Mobile Specific -->
+    @if (HttpContext.Current.Session["RequestId"] == null || string.IsNullOrEmpty(HttpContext.Current.Session["RequestId"].ToString()))
+    {
+        <script language="javascript" type="text/javascript">window.location = "https://www2.gosocket.net";</script>
+    }
+</head>
+@if (HttpContext.Current.Session["RequestId"] == null)
+{
+
+}
+else
+{
+    <body>
+        <div id="content">
+            <div id="crush">
+                <div id="head">
+                    <div id="logo">
+                        @*<a href="#"><img src="~/Content/img/LogoDian.png" alt="Gosocket - The Companies Network" class="logoimg" /></a>*@
+                    </div>
+                    <div id="txt">
+                        <div class="txt01" style="text-align: center;">¡Lo Sentimos!</div>
+                        <div style="clear: both"></div>
+                        <div class="txt02" style="text-align: center;">No se pudo procesar la solicitud.</div>
+                        <div style="clear: both"></div>
+                        <div class="txt03" style="text-align: center;">Por favor inténtelo mas tarde...</div>
+                        <div style="font-size: 20px; text-align: center;" class="txt03">Id:@HttpContext.Current.Session["RequestId"]</div>
+                    </div>
+                    <div style="clear: both"></div>
+                    <div id="foot">
+                        <img src="~/Content/crush-page/img/city-img.png" alt="Dian" class="footimg" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+}
+</html>
