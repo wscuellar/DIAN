@@ -34,8 +34,8 @@ namespace Gosocket.Dian.Functions.Global.Export
                 #region Filter documents
                 string ct = null;
                 var resultDocuments = new List<GlobalDataDocument>();
-                
-                var result = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(ct, task.StartDate, task.EndDate, 0, "00", task.SenderCode, task.ReceiverCode, null, 10000, null, "00");
+
+                var result = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(ct, task.StartDate, task.EndDate, 0, "00", task.SenderCode, null, task.ReceiverCode, null, 10000, null, "00");
                 if (result != null && result.Item3.Any())
                     resultDocuments.AddRange(result.Item3);
                 #endregion
@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Functions.Global.Export
                     TotalIPC = d.TaxAmountIpc,
                     TotalAmount = d.TotalAmount,
                     Status = d.ValidationResultInfo.StatusName
-                }); 
+                });
                 #endregion
 
                 #region Generate excel file

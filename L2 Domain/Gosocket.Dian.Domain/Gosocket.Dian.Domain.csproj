@@ -144,6 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\EnumHelper.cs" />
+    <Compile Include="Cosmos\ComosDbFilterRequest.cs" />
     <Compile Include="Cosmos\GlobalDataDocument.cs" />
     <Compile Include="Domain\ResponseApplicationResponse.cs" />
     <Compile Include="Domain\ResponseAssignResponsability.cs" />

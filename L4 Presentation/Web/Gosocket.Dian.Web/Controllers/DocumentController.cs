@@ -33,6 +33,7 @@ namespace Gosocket.Dian.Web.Controllers
         readonly GlobalDocumentService globalDocumentService = new GlobalDocumentService();
         private readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
+        private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
 
         private List<DocValidatorTrackingModel> GetValidatedRules(string trackId)
@@ -88,18 +89,20 @@ namespace Gosocket.Dian.Web.Controllers
 
             var document = new DocumentViewModel
             {
+                DocumentKey = globalDataDocument.DocumentKey,
                 Amount = globalDataDocument.FreeAmount,
                 DocumentTypeId = globalDataDocument.DocumentTypeId,
                 DocumentTypeName = globalDataDocument.DocumentTypeName,
                 GenerationDate = globalDataDocument.GenerationTimeStamp,
                 Id = globalDataDocument.DocumentKey,
                 EmissionDate = globalDataDocument.EmissionDate,
-                Number = globalDataDocument.Number,
+                Number = Services.Utils.StringUtil.TextAfter(globalDataDocument.SerieAndNumber, globalDataDocument.Serie),
                 TechProviderName = globalDataDocument?.TechProviderInfo?.TechProviderName,
                 TechProviderCode = globalDataDocument?.TechProviderInfo?.TechProviderCode,
                 ReceiverName = globalDataDocument.ReceiverName,
                 ReceiverCode = globalDataDocument.ReceiverCode,
                 ReceptionDate = globalDataDocument.ReceptionTimeStamp,
+                Serie = globalDataDocument.Serie,
                 SenderName = globalDataDocument.SenderName,
                 SenderCode = globalDataDocument.SenderCode,
                 Status = globalDataDocument.ValidationResultInfo.Status,
@@ -289,18 +292,20 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.Document = new DocumentViewModel
             {
+                DocumentKey = globalDataDocument.DocumentKey,
                 Amount = globalDataDocument.FreeAmount,
                 DocumentTypeId = globalDataDocument.DocumentTypeId,
                 DocumentTypeName = globalDataDocument.DocumentTypeName,
                 GenerationDate = globalDataDocument.GenerationTimeStamp,
                 Id = globalDataDocument.DocumentKey,
                 EmissionDate = globalDataDocument.EmissionDate,
-                Number = globalDataDocument.Number,
+                Number = Services.Utils.StringUtil.TextAfter(globalDataDocument.SerieAndNumber, globalDataDocument.Serie),
                 TechProviderName = globalDataDocument?.TechProviderInfo?.TechProviderName,
                 TechProviderCode = globalDataDocument?.TechProviderInfo?.TechProviderCode,
                 ReceiverName = globalDataDocument.ReceiverName,
                 ReceiverCode = globalDataDocument.ReceiverCode,
                 ReceptionDate = globalDataDocument.ReceptionTimeStamp,
+                Serie = globalDataDocument.Serie,
                 SenderName = globalDataDocument.SenderName,
                 SenderCode = globalDataDocument.SenderCode,
                 Status = globalDataDocument.ValidationResultInfo.Status,
@@ -360,13 +365,15 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult Search()
         {
-            return View();
+            return RedirectToAction(nameof(UserController.SearchDocument), "User");
         }
 
         [HttpPost]
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult Search(SearchViewModel model)
         {
+            return RedirectToAction(nameof(UserController.SearchDocument), "User");
+
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -393,14 +400,15 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult SearchQR(string documentKey)
         {
+            documentKey = documentKey.ToLower();
             var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
-            if (globalDocValidatorDocumentMeta == null)
-                return RedirectToAction(nameof(SearchInvalidQR));
+            if (globalDocValidatorDocumentMeta == null) return RedirectToAction(nameof(SearchInvalidQR));
 
-            var identifier = $"{globalDocValidatorDocumentMeta.SenderCode}{globalDocValidatorDocumentMeta.DocumentTypeId}{globalDocValidatorDocumentMeta.SerieAndNumber}".EncryptSHA256();
+            var identifier = globalDocValidatorDocumentMeta.Identifier;
             var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
-            if (globalDocValidatorDocument == null)
-                return RedirectToAction(nameof(SearchInvalidQR));
+            if (globalDocValidatorDocument == null) return RedirectToAction(nameof(SearchInvalidQR));
+
+            if (globalDocValidatorDocument.DocumentKey != documentKey) return RedirectToAction(nameof(SearchInvalidQR));
 
             var partitionKey = $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocument.DocumentKey.Substring(0, 2)}";
 
@@ -498,17 +506,20 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns></returns>
         private async Task<ActionResult> GetDocuments(SearchDocumentViewModel model, int filterType)
         {
-            string continuationToken = (string)Session["Continuation_Token_" + model.Page];
-
             SetView(filterType);
 
+            string continuationToken = (string)Session["Continuation_Token_" + model.Page];
+            if (string.IsNullOrEmpty(continuationToken)) continuationToken = "";
+
             List<string> pks = null;
+            model.DocumentKey = model.DocumentKey?.ToLower();
             if (!string.IsNullOrEmpty(model.DocumentKey))
             {
                 var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
                 var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
-                if (globalDocValidatorDocument == null)
-                    return View("Index", model);
+                if (globalDocValidatorDocument == null) return View("Index", model);
+
+                if (globalDocValidatorDocument.DocumentKey != model.DocumentKey) return View("Index", model);
 
                 pks = new List<string> { $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{model.DocumentKey.Substring(0, 2)}" };
             }
@@ -518,16 +529,16 @@ namespace Gosocket.Dian.Web.Controllers
             switch (filterType)
             {
                 case 1:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.ReceiverCode, null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, model.ReceiverCode, null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
                     break;
                 case 2:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, User.ContributorCode(), model.ReceiverCode, null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, User.ContributorCode(), model.SerieAndNumber, model.ReceiverCode, null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
                     break;
                 case 3:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, User.ContributorCode(), null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, User.ContributorCode(), null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
                     break;
                 case 4:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.ReceiverCode, User.ContributorCode(), model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, model.ReceiverCode, User.ContributorCode(), model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
                     break;
                 default:
                     break;
@@ -562,7 +573,6 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             model.IsNextPage = result.Item1;
-            string test = "Continuation_Token_" + (model.Page + 1);
             this.Session["Continuation_Token_" + (model.Page + 1)] = result.Item2;
 
             return View("Index", model);

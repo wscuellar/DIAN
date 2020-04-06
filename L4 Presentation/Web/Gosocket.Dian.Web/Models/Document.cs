@@ -27,6 +27,8 @@ namespace Gosocket.Dian.Web.Models
         public string SenderCode { get; set; }
         [Display(Name = "NIT receptor")]
         public string ReceiverCode { get; set; }
+        [Display(Name = "Prefijo y folio")]
+        public string SerieAndNumber { get; set; }
         public int Page { get; set; }
         public bool IsNextPage { get; set; }
         public int MaxItemCount { get; set; }
@@ -62,6 +64,7 @@ namespace Gosocket.Dian.Web.Models
         public TaxesDetailViewModel TaxesDetail { get; set; }
 
         public DateTime EmissionDate { get; set; }
+        public string DocumentKey { get; set; }
         public string DocumentTypeId { get; set; }
 
         public string DocumentTypeName { get; set; }
@@ -69,7 +72,7 @@ namespace Gosocket.Dian.Web.Models
         public string Number { get; set; }
         public string Serie { get; set; }
         public string SerieAndNumber { get; set; }
-        
+
 
         public string SenderCode { get; set; }
         public string SenderName { get; set; }

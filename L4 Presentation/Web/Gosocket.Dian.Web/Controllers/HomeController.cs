@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.Cosmos;
 using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Web.Common;
@@ -183,18 +184,37 @@ namespace Gosocket.Dian.Web.Controllers
             try
             {
                 var utcNow = DateTime.UtcNow;
-                var result = await CosmosDBService.Instance(utcNow).ReadDocumentsAsync("", utcNow.AddDays(-30), utcNow, 0, "00", contributorCode, null, null, 1000, null, "00");
-                totalDocumentsEmitted = result.Item3.Count();
-                result = await CosmosDBService.Instance(utcNow).ReadDocumentsAsync("", utcNow.AddDays(-30), utcNow, 0, "00", null, contributorCode, null, 1000, null, "00");
-                totalDocumentsReceived = result.Item3.Count();
+                var emmited = new List<GlobalDataDocument>();
+                bool hasMoreResults = true;
+                var ct = "";
+                do
+                {
+                    var result = await CosmosDBService.Instance(utcNow).ReadDocumentsAsync(ct, utcNow.AddDays(-30), utcNow, 0, "00", contributorCode, null, null, null, 1000, null, "00");
+                    hasMoreResults = result.Item1;
+                    ct = result.Item2;
+                    emmited.AddRange(result.Item3);
+                } while (hasMoreResults && emmited.Count() < 10000);
+                totalDocumentsEmitted = emmited.Count();
+
+                var received = new List<GlobalDataDocument>();
+                hasMoreResults = true;
+                ct = "";
+                do
+                {
+                    var result = await CosmosDBService.Instance(utcNow).ReadDocumentsAsync(ct, utcNow.AddDays(-30), utcNow, 0, "00", null, null, contributorCode, null, 1000, null, "00");
+                    hasMoreResults = result.Item1;
+                    ct = result.Item2;
+                    received.AddRange(result.Item3);
+                } while (hasMoreResults && received.Count() < 10000);
+                totalDocumentsReceived = received.Count();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new
                 {
                     success = false,
-                    emitted = totalDocumentsEmitted,
-                    received = totalDocumentsReceived
+                    emitted = totalDocumentsEmitted == 10000 ? $"+ { totalDocumentsEmitted}" : $"{totalDocumentsEmitted}",
+                    received = totalDocumentsReceived == 10000 ? $"+ { totalDocumentsReceived}" : $"{totalDocumentsReceived}",
                 }, JsonRequestBehavior.AllowGet);
             }
 

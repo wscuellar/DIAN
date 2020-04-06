@@ -39,7 +39,7 @@ namespace Gosocket.Dian.Functions.Global.Export
                 var resultForEmitted = new Tuple<bool, string, List<GlobalDataDocument>>(false, null, null);
                 if (new string[] { "0", "1" }.Contains(task.FilterGroupCode))
                 {
-                    resultForEmitted = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(continuationToken, task.StartDate, task.EndDate, 0, "00", task.SenderCode, task.ReceiverCode, null, 10000, null, "00");
+                    resultForEmitted = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(continuationToken, task.StartDate, task.EndDate, 0, "00", task.SenderCode, null, task.ReceiverCode, null, 10000, null, "00");
                     var emitted = resultForEmitted.Item3.Select(d => new DocumentExported
                     {
                         DocumentTypeName = d.DocumentTypeName,
@@ -65,7 +65,7 @@ namespace Gosocket.Dian.Functions.Global.Export
                 var resultForReceived = new Tuple<bool, string, List<GlobalDataDocument>>(false, null, null);
                 if (new string[] { "0", "2" }.Contains(task.FilterGroupCode))
                 {
-                    resultForReceived = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(continuationToken, task.StartDate, task.EndDate, 0, "00", null, task.SenderCode, null, 10000, null, "00");
+                    resultForReceived = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(continuationToken, task.StartDate, task.EndDate, 0, "00", null, null, task.SenderCode, null, 10000, null, "00");
                     var received = resultForReceived.Item3.Select(d => new DocumentExported
                     {
                         DocumentTypeName = d.DocumentTypeName,
@@ -87,7 +87,7 @@ namespace Gosocket.Dian.Functions.Global.Export
 
                     });
                     exported.AddRange(received);
-                } 
+                }
                 #endregion
 
                 #region Generate excel file
@@ -135,7 +135,7 @@ namespace Gosocket.Dian.Functions.Global.Export
                 var update = globalTaskTableMabager.InsertOrUpdate(task);
 
                 if (!upload || !update)
-                    throw new Exception(); 
+                    throw new Exception();
                 #endregion
 
                 #region Only debug

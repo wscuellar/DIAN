@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Infrastructure;
+using LinqKit;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
@@ -7,6 +8,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application.Cosmos
@@ -249,8 +252,134 @@ namespace Gosocket.Dian.Application.Cosmos
             return result.FirstOrDefault();
         }
 
+        public Tuple<bool, string, List<GlobalDataDocument>> ReadFilterDocuments(ComosDbFilterRequest filter)
+        {
+            var collectionName = GetCollectionName(filter.EFrom);
+            var collectionLink = collections[collectionName].SelfLink;
+
+            List<string> partitionKeys = new List<string>();
+            partitionKeys = GeneratePartitionKeys(filter.EFrom, filter.ETo);
+
+            if (string.IsNullOrEmpty(filter.ContinuationToken))
+            {
+                filter.ContinuationToken = null;
+            }
+
+            var options = new FeedOptions()
+            {
+                MaxItemCount = filter.ResultMaxItemCount,
+                EnableCrossPartitionQuery = true,
+                RequestContinuation = filter.ContinuationToken,
+            };
+
+            var predicate = PredicateBuilder.New<GlobalDataDocument>();
+
+            //PartitionKey
+            if (partitionKeys.Any())
+            {
+                predicate = predicate.And(p => partitionKeys.Contains(p.PartitionKey));
+            }
+
+            if (filter.EFrom != new DateTime(DateTime.UtcNow.Year, 1, 1) && filter.ETo.Date != new DateTime(DateTime.UtcNow.Year, 12, 31))
+            {
+                //int fromNumber = int.Parse(filter.EFrom.ToString("yyyyMMdd"));
+                //int toNumber = int.Parse(filter.ETo.ToString("yyyyMMdd"));
+                filter.ETo = new DateTime(filter.ETo.Year, filter.ETo.Month, filter.ETo.Day).AddDays(1).AddMilliseconds(-1); //para que sea hasta el ultimo milisegundo de ese dia
+                //predicate = predicate.And(p => p.EmissionDateNumber >= fromNumber && p.EmissionDateNumber <= toNumber);
+                predicate = predicate.And(p => p.ReceptionTimeStamp >= (filter.EFrom) && p.ReceptionTimeStamp <= (filter.ETo));
+            }
+
+            IQueryable<GlobalDataDocument> query = null;
+            query = client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options).Where(predicate);
+
+            string ct = "";
+            var resultDocs = new List<GlobalDataDocument>();
+            while (query.AsDocumentQuery().HasMoreResults)
+            {
+                var result = query.AsDocumentQuery().ExecuteNextAsync<GlobalDataDocument>().Result;
+                resultDocs.AddRange(SaveRest(result.GetEnumerator()));
+                ct = result.ResponseContinuation;
+            }
+
+            return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, ct, resultDocs.ToList());
+        }
+
+        public Tuple<long, long, List<GlobalDataDocument>> CountFilterDocuments(ComosDbFilterRequest filter)
+        {
+            var collectionName = GetCollectionName(filter.RFrom);
+            var collectionLink = collections[collectionName].SelfLink;
+
+            var options = new FeedOptions()
+            {
+                MaxItemCount = -1,
+                EnableCrossPartitionQuery = true,
+                RequestContinuation = null
+            };
+
+            var partitionKeys = GeneratePartitionKeys(filter.RFrom, filter.RTo);
+
+            var predicate = PredicateBuilder.New<GlobalDataDocument>();
+
+            //Sender
+            if (!string.IsNullOrEmpty(filter.SenderCode))
+                predicate = predicate.And(p => p.SenderCode == filter.SenderCode.ToUpper());
+
+            //Receiver
+            if (!string.IsNullOrEmpty(filter.ReceiverCode))
+                predicate = predicate.And(p => p.ReceiverCode == filter.ReceiverCode.ToUpper());
+
+            //DocumentType
+            if (!string.IsNullOrEmpty(filter.DocumentTypeId))
+                predicate = predicate.And(p => p.DocumentTypeId == filter.DocumentTypeId);
+
+            //PartitionKey
+            //if (partitionKeys.Any())
+            //    predicate = predicate.And(p => partitionKeys.Contains(p.PartitionKey));
+
+
+            //Reception date
+            if (filter.RFrom != new DateTime() && filter.RTo != new DateTime())
+            {
+                filter.RTo = new DateTime(filter.RTo.Year, filter.RTo.Month, filter.RTo.Day).AddDays(1).AddMilliseconds(-1);//para que sea hasta el ultimo milisegundo de ese di
+                predicate = predicate.And(p => p.ReceptionTimeStamp >= filter.RFrom && p.ReceptionTimeStamp <= filter.RTo);
+            }
+
+            //Emission date
+            //if (filter.EFrom != new DateTime() && filter.ETo != new DateTime())
+            //{
+            //    filter.ETo = new DateTime(filter.ETo.Year, filter.ETo.Month, filter.ETo.Day).AddDays(1).AddMilliseconds(-1);//para que sea hasta el ultimo milisegundo de ese di
+            //    predicate = predicate.And(p => p.EmissionDate >= filter.EFrom && p.EmissionDate <= filter.ETo);
+            //}
+
+            //Status
+            if (filter.Status.HasValue)
+                predicate = predicate.And(p => p.ValidationResultInfo.Status == filter.Status.Value);
+
+            var result = client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options).Count(predicate);
+
+            double total = 0;
+            var count = result;
+            if (filter.ReturnTotals)
+                total = client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options).Where(predicate).Sum(d => d.TotalAmount);
+
+            var list = client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options).Where(predicate).ToList();
+
+            return Tuple.Create((long)count, (long)total, list);
+        }
+
+        private List<T> SaveRest<T>(IEnumerator<T> e)
+        {
+            var list = new List<T>();
+            while (e.MoveNext())
+            {
+                list.Add(e.Current);
+            }
+            return list;
+
+        }
+
         public async Task<Tuple<bool, string, List<GlobalDataDocument>>> ReadDocumentsAsync(string continuationToken, DateTime? from, DateTime? to,
-        int status, string documentTypeId, string senderCode, string receiverCode, string providerCode, int maxItemCount, string documentKey, string referenceType, List<string> pks = null)
+    int status, string documentTypeId, string senderCode, string serieAndNumber, string receiverCode, string providerCode, int maxItemCount, string documentKey, string referenceType, List<string> pks = null)
         {
 
             if (!from.HasValue || !to.HasValue)
@@ -311,6 +440,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 && (documentTypeId == "00" || e.DocumentTypeId == documentTypeId || e.DocumentTypeId == documentTypeOption1 || e.DocumentTypeId == documentTypeOption2)
                 && (referenceType == "00" || e.References.Any(r => r.DocumentTypeId == referenceType) || e.References.Any(r => r.DocumentTypeId == referenceTypeOption1) || e.References.Any(r => r.DocumentTypeId == referenceTypeOption2))
                 && (senderCode == null || e.SenderCode == senderCode)
+                && (serieAndNumber == null || e.SerieAndNumber == serieAndNumber)
                 && (receiverCode == null || e.ReceiverCode == receiverCode)
                 && (providerCode == null || e.TechProviderInfo.TechProviderCode == providerCode)
                 ).OrderByDescending(e => e.Timestamp).AsDocumentQuery();
@@ -348,26 +478,47 @@ namespace Gosocket.Dian.Application.Cosmos
         {
             try
             {
+                //
                 var collectionName = GetCollectionName(documentTagMessage.Date);
                 if (!collections.ContainsKey(collectionName))
                     Instance(documentTagMessage.Date);
 
+                // table manager instance
+                var tableManager = new TableManager("GlobalDocValidatorDocumentMeta");
+
+                //
                 var documentTag = Mapper<DocumentTagMessage, DocumentTag>(documentTagMessage);
 
+                //
                 string discriminator = documentTagMessage.DocumentKey.Substring(0, 2);
+
+                //
                 var partitionKey = $"co|{documentTagMessage.Date.Day.ToString().PadLeft(2, '0')}|{discriminator}";
 
-                var document = await ReadDocumentAsync(documentTagMessage.DocumentKey, partitionKey, documentTagMessage.Date);
+                //
+                var meta = tableManager.Find<GlobalDocValidatorDocumentMeta>(documentTagMessage.DocumentKey, documentTagMessage.DocumentKey);
+
+                // id en cosmos
+                var id = ToGuid($"{meta.SenderCode}{meta.DocumentTypeId}{meta.SerieAndNumber}").ToString();
+
+                // get cosmos document
+                var document = await GetAsync(id, partitionKey, meta.EmissionDate);
+
+                //
                 if (document == null) return;
-                    //throw new Exception("Document not found " + documentTag.Value);
-                
+
+                //
                 if (document.DocumentTags != null && document.DocumentTags.Any(x => x.Code == documentTag.Code && x.Value == documentTag.Value))
                     return;
 
+                //
                 if (document.DocumentTags == null)
                     document.DocumentTags = new List<DocumentTag>();
 
+                //
                 document.DocumentTags.Add(documentTag);
+
+                //
                 await client.UpsertDocumentAsync(collections[collectionName].SelfLink, document);
             }
             catch (Exception ex)
@@ -432,6 +583,17 @@ namespace Gosocket.Dian.Application.Cosmos
             return m;
         }
         #endregion
+
+        private static Guid ToGuid(string code)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] inputBytes = Encoding.ASCII.GetBytes(code);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                return new Guid(hashBytes);
+            }
+        }
     }
 
     #region Models

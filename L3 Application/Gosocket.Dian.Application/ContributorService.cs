@@ -101,9 +101,10 @@ namespace Gosocket.Dian.Application
             }
         }
 
-        public List<Contributor> GetContributorsByAcceptanceStatusesId(int[] statuses)
+        public List<Contributor> GetContributorsByAcceptanceStatusesId(int[] statuses, string connectionString = null)
         {
-            using (var context = new SqlDBContext())
+            var ctx = string.IsNullOrEmpty(connectionString) ? new SqlDBContext() : new SqlDBContext(connectionString);
+            using (var context = ctx)
             {
                 return context.Contributors.Where(x => statuses.Contains(x.AcceptanceStatusId)).ToList();
             }
@@ -124,6 +125,14 @@ namespace Gosocket.Dian.Application
                 return context.Contributors.Include("ContributorType").Include("OperationMode").Include("Provider").Include("Clients")
                     .Include("AcceptanceStatus").Include("Softwares").Include("Softwares.AcceptanceStatusSoftware").Include("ContributorFiles")
                     .Include("ContributorFiles.ContributorFileStatus").Include("ContributorFiles.ContributorFileType").FirstOrDefault(x => x.Id == id);
+            }
+        }
+
+        public Contributor GetContributorFiles(int id)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.Contributors.Include("ContributorFiles").Include("ContributorFiles.ContributorFileStatus").FirstOrDefault(x => x.Id == id);
             }
         }
 
@@ -266,7 +275,7 @@ namespace Gosocket.Dian.Application
                 {
                     var contributorInstance = context.Contributors.FirstOrDefault(c => c.Code == contributor.Code);
                     contributorInstance.AcceptanceStatusId = (int)Domain.Common.ContributorStatus.Enabled;
-                    contributorInstance.HabilitationDate = DateTime.UtcNow;
+                    contributorInstance.HabilitationDate = contributorInstance.HabilitationDate ?? DateTime.UtcNow;
                     context.SaveChanges();
                 }
                 catch (Exception ex)
