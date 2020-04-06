@@ -88,7 +88,7 @@ namespace Gosocket.Dian.Web.Services
                         if (!string.IsNullOrEmpty(previusResult))
                         {
                             DianResponse response = JsonConvert.DeserializeObject<DianResponse>(previusResult);
-                            if(response.XmlBase64Bytes == null)
+                            if (!response.IsValid || response.XmlBase64Bytes == null)
                                 response = customerDianPa.GetStatus(trackId.ToLower());
                             Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetStatus(p) " + DateTime.UtcNow.Subtract(start).TotalSeconds);
                             customerDianPa = null;
@@ -308,40 +308,39 @@ namespace Gosocket.Dian.Web.Services
                 var email = GetAuthEmail();
 
                 if (string.IsNullOrEmpty(authCode))
-                    return new DianResponse { StatusCode = "90", StatusDescription = "NIT de la empresa no informado en el certificado." };
+                    return new DianResponse { StatusCode = "89", StatusDescription = "NIT de la empresa no informado en el certificado." };
 
                 if (contentFile == null)
                 {
                     Log($"{authCode} {email} SendBillSync", (int)InsightsLogType.Error, "Archivo no enviado.");
-                    return new DianResponse { StatusCode = "90", StatusDescription = "Archivo no enviado." };
+                    return new DianResponse { StatusCode = "89", StatusDescription = "Archivo no enviado." };
                 }
 
                 var mimeType = GetMimeFromBytes(contentFile);
                 if (mimeType != zipMimeType)
                 {
                     Log($"{authCode} {email} SendBillSync", (int)InsightsLogType.Error, $"MIMEType del archivo inválido ({mimeType}).");
-                    return new DianResponse { StatusCode = "90", StatusDescription = $"MIMEType del archivo inválido ({mimeType})." };
+                    return new DianResponse { StatusCode = "89", StatusDescription = $"MIMEType del archivo inválido ({mimeType})." };
                 }
 
                 if (!contentFile.ZipContainsXmlFiles())
                 {
                     Log($"{authCode} {email} SendBillSync", (int)InsightsLogType.Error, $"Archivo ZIP no contiene XML's.");
-                    return new DianResponse { StatusCode = "90", StatusDescription = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML valido." };
+                    return new DianResponse { StatusCode = "89", StatusDescription = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML válido." };
                 }
 
                 DianPAServices customerDianPa = new DianPAServices();
                 {
-                    //var start = DateTime.UtcNow;
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
                     var result = customerDianPa.UploadDocumentSync(fileName, contentFile, authCode);
 
                     var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
-                    if (!exist && result.IsValid)
+                    if (!exist && result.IsValid && result.XmlBase64Bytes != null)
                         fileManager.Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
 
                     customerDianPa = null;
-                    //var globalEnd = DateTime.UtcNow.Subtract(start).TotalSeconds;
+
                     stopwatch.Stop();
                     double ms = stopwatch.ElapsedMilliseconds;
                     double seconds = ms / 1000;
@@ -352,6 +351,14 @@ namespace Gosocket.Dian.Web.Services
                         var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "SendBillSync" };
                         tableManagerGlobalLogger.InsertOrUpdate(logger);
                     }
+
+                    //Logged if response do not have AR
+                    if (result?.XmlBase64Bytes == null)
+                    {
+                        var logger = new GlobalLogger($"RESPONSEWITHOUTAR-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = "Response without AR", Action = "SendBillSync" };
+                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                    }
+
                     return result;
                 }
             }
@@ -374,44 +381,47 @@ namespace Gosocket.Dian.Web.Services
         {
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = "Método no disponible." };
+                return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
 
-                if (string.IsNullOrEmpty(authCode))
-                {
-                    var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = "NIT de la empresa no informado en el certificado." };
-                    return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
-                }
+                //var authCode = GetAuthCode();
+                //var email = GetAuthEmail();
 
-                if (contentFile == null)
-                {
-                    Log(fileName, (int)InsightsLogType.Error, "Archivo no enviado.");
-                    var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = "Archivo no enviado." };
-                    return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
-                }
+                //if (string.IsNullOrEmpty(authCode))
+                //{
+                //    var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = "NIT de la empresa no informado en el certificado." };
+                //    return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
+                //}
 
-                var mimeType = GetMimeFromBytes(contentFile);
-                if (mimeType != zipMimeType)
-                {
-                    Log($"{authCode} {email} SendBillAttachmentAsync", (int)InsightsLogType.Error, $"MIMEType del archivo inválido ({mimeType}).");
-                    var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = $"MIMEType del archivo inválido ({mimeType})." };
-                    return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
-                }
+                //if (contentFile == null)
+                //{
+                //    Log(fileName, (int)InsightsLogType.Error, "Archivo no enviado.");
+                //    var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = "Archivo no enviado." };
+                //    return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
+                //}
 
-                if (!contentFile.ZipContainsXmlFiles())
-                {
-                    Log($"{authCode} {email} SendBillAttachmentAsync", (int)InsightsLogType.Error, $"Archivo ZIP no contiene XML's.");
-                    var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML valido." };
-                    return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
-                }
+                //var mimeType = GetMimeFromBytes(contentFile);
+                //if (mimeType != zipMimeType)
+                //{
+                //    Log($"{authCode} {email} SendBillAttachmentAsync", (int)InsightsLogType.Error, $"MIMEType del archivo inválido ({mimeType}).");
+                //    var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = $"MIMEType del archivo inválido ({mimeType})." };
+                //    return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
+                //}
 
-                DianPAServices customerDianPa = new DianPAServices();
-                {
-                    Log($"{authCode} {email}", (int)InsightsLogType.Info, "SendBillAttachmentAsync");
-                    var result = customerDianPa.UploadDocumentAttachmentAsync(fileName, contentFile, authCode);
-                    customerDianPa = null;
-                    return result;
-                }
+                //if (!contentFile.ZipContainsXmlFiles())
+                //{
+                //    Log($"{authCode} {email} SendBillAttachmentAsync", (int)InsightsLogType.Error, $"Archivo ZIP no contiene XML's.");
+                //    var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML valido." };
+                //    return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
+                //}
+
+                //DianPAServices customerDianPa = new DianPAServices();
+                //{
+                //    Log($"{authCode} {email}", (int)InsightsLogType.Info, "SendBillAttachmentAsync");
+                //    var result = customerDianPa.UploadDocumentAttachmentAsync(fileName, contentFile, authCode);
+                //    customerDianPa = null;
+                //    return result;
+                //}
             }
             catch (Exception ex)
             {
@@ -438,7 +448,7 @@ namespace Gosocket.Dian.Web.Services
                 if (contentFile == null)
                 {
                     Log($"{authCode} {email} SendEventUpdateStatus", (int)InsightsLogType.Error, "Archivo no enviado.");
-                    var eventResponse = new EventResponse { Code = "90", Message = "Archivo no enviado." };
+                    var eventResponse = new EventResponse { Code = "89", Message = "Archivo no enviado." };
                     var events = new List<EventResponse> { eventResponse };
                     return events;
                 }
@@ -447,7 +457,7 @@ namespace Gosocket.Dian.Web.Services
                 if (mimeType != zipMimeType)
                 {
                     Log($"{authCode} {email} SendEventUpdateStatus", (int)InsightsLogType.Error, $"MIMEType del archivo inválido ({mimeType}).");
-                    var eventResponse = new EventResponse { Code = "90", Message = $"MIMEType del archivo inválido ({mimeType})." };
+                    var eventResponse = new EventResponse { Code = "89", Message = $"MIMEType del archivo inválido ({mimeType})." };
                     var events = new List<EventResponse> { eventResponse };
                     return events;
                 }
@@ -455,7 +465,7 @@ namespace Gosocket.Dian.Web.Services
                 if (!contentFile.ZipContainsXmlFiles())
                 {
                     Log($"{authCode} {email} SendEventUpdateStatus", (int)InsightsLogType.Error, $"Archivo ZIP no contiene XML's.");
-                    var eventResponse = new EventResponse { Code = "90", Message = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML valido.." };
+                    var eventResponse = new EventResponse { Code = "89", Message = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML valido.." };
                     var events = new List<EventResponse> { eventResponse };
                     return events;
                 }
@@ -492,7 +502,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 var authCode = GetAuthCode();
                 if (string.IsNullOrEmpty(authCode))
-                    return new NumberRangeResponseList { OperationCode = "90", OperationDescription = "NIT de la empresa no informado en el certificado." };
+                    return new NumberRangeResponseList { OperationCode = "89", OperationDescription = "NIT de la empresa no informado en el certificado." };
 
                 DianPAServices customerDianPa = new DianPAServices();
                 {
@@ -564,19 +574,19 @@ namespace Gosocket.Dian.Web.Services
                 catch
                 {
                     Log($"{authCode} {email}, trackId: '{trackId}' GetStatusZip", (int)InsightsLogType.Error, "Formato trackId inválido.");
-                    responses.Add(new DianResponse { StatusCode = "90", StatusDescription = $"Formato trackId inválido." });
+                    responses.Add(new DianResponse { StatusCode = "89", StatusDescription = $"Formato trackId inválido." });
                 }
             }
 
             if (string.IsNullOrEmpty(trackId))
             {
                 Log($"{authCode} {email} GetStatus", (int)InsightsLogType.Error, $"TrackId es nulo o vacío.");
-                responses.Add(new DianResponse { StatusCode = "90", StatusDescription = "TrackId es nulo o vacío." });
+                responses.Add(new DianResponse { StatusCode = "89", StatusDescription = "TrackId es nulo o vacío." });
             }
             else if (trackId.Length < 20)
             {
                 Log($"{authCode} {email}, trackId: '{trackId}'", (int)InsightsLogType.Error, $"TrackId inválido (Length).");
-                responses.Add(new DianResponse { StatusCode = "90", StatusDescription = "TrackId inválido (Length)." });
+                responses.Add(new DianResponse { StatusCode = "89", StatusDescription = "TrackId inválido (Length)." });
             }
 
             return responses;

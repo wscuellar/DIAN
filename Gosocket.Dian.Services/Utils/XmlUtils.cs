@@ -1,22 +1,19 @@
-﻿using Gosocket.Dian.Domain.Domain;
+﻿using eFacturacionColombia_V2.Firma;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace Gosocket.Dian.Services.Utils
 {
     public class XmlUtil
     {
+        private const string CategoryContainerName = "dian";
         private static readonly XNamespace ns = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
         private static readonly XNamespace ext = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2";
         private static readonly XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
@@ -24,6 +21,133 @@ namespace Gosocket.Dian.Services.Utils
         private static readonly XNamespace ds = "http://www.w3.org/2000/09/xmldsig#";
         private static readonly XNamespace sts = "dian:gov:co:facturaelectronica:Structures-2-1";
 
+        private static object obj = new object();
+
+        private static readonly FileManager fileManager = new FileManager();
+        private static readonly FirmaElectronica signer = new FirmaElectronica();
+
+        public static byte[] GenerateApplicationResponseBytes(string trackId, GlobalDocValidatorDocumentMeta documentMeta, List<GlobalDocValidatorTracking> validations)
+        {
+            var responseBytes = new byte[] { };
+
+            var docTypeCode = documentMeta.DocumentTypeId;
+
+            var messageIdNode = SerieNumberMessageFromDocType(documentMeta);
+            var series = messageIdNode.Item1;
+            var number = messageIdNode.Item2;
+            var messDocType = messageIdNode.Item3;
+
+            var errors = new List<GlobalDocValidatorTracking>();
+            var notifications = new List<GlobalDocValidatorTracking>();
+
+            errors = validations.Where(r => r.Mandatory && !r.IsValid).ToList();
+            notifications = validations.Where(r => r.IsNotification).ToList();
+
+            bool mandatoryInvalid = false;
+            bool priorityInvalid = false;
+
+            if (errors.Count > 0)
+                mandatoryInvalid = true;
+            if (!mandatoryInvalid && notifications.Count > 0)
+                priorityInvalid = true;
+
+            XElement root = BuildRootNode(documentMeta);
+            root.Add(BuildSenderNode(documentMeta));
+            root.Add(BuildReceiverNode(documentMeta));
+
+            XElement docResponse = new XElement("DocumentResponse");
+
+            List<XElement> notesListObservations = new List<XElement>();
+            List<XElement> notesListErrors = new List<XElement>();
+
+            int lineId = 1;
+
+            #region CONSTRUYENDO NODO APROBADO SIN OBSERVACIONES
+            if (!mandatoryInvalid && !priorityInvalid)
+            {
+                docResponse = BuildDocumentResponseNode(lineId, documentMeta, false, false);
+                var firstLineResponse = BuildResponseLineResponse(lineId, 0);
+                docResponse.Add(firstLineResponse);
+
+                lineId++;
+
+                var lineResponse = BuildResponseNode(lineId, string.Empty, string.Empty, false, false, documentMeta);
+                docResponse.Add(lineResponse);
+                root.Add(docResponse);
+            }
+            #endregion
+
+            if (!mandatoryInvalid && priorityInvalid)
+            {
+                List<string> obsMessageList = new List<string>();
+
+                #region CONSTRUYENDO NODO CON OBSERVACIONES
+                docResponse = BuildDocumentResponseNode(lineId, documentMeta, true, false);
+                var lineResponse = BuildResponseLineResponse(lineId, 0);
+                docResponse.Add(lineResponse);
+
+                foreach (var i in notifications)
+                {
+                    lineId++;
+                    obsMessageList.Add($"Regla: {i.ErrorCode}, Notificación: {i.ErrorMessage}");
+                    notesListObservations.Add(BuildResponseNode(lineId, i.ErrorCode, i.ErrorMessage, true, false, documentMeta));
+                }
+                #endregion
+
+                docResponse.Add(notesListObservations);
+                root.Add(docResponse);
+            }
+
+            if (mandatoryInvalid)
+            {
+                docResponse = BuildDocumentResponseNode(lineId, documentMeta, false, true);
+                var lineResponse = BuildResponseLineResponse(lineId, 0);
+                docResponse.Add(lineResponse);
+
+                List<string> errorsList = new List<string>();
+                List<string> errorsMessageList = new List<string>();
+                foreach (var ruleItem in errors)
+                {
+                    lineId++;
+
+                    errorsList.Add(ruleItem.ErrorCode);
+                    errorsMessageList.Add($"Regla: {ruleItem.ErrorCode}, Rechazo: {ruleItem.ErrorMessage}");
+
+                    #region CONSTRUYENDO NODO CON ERRORES
+
+                    notesListErrors.Add(BuildResponseNode(lineId, ruleItem.ErrorCode, ruleItem.ErrorMessage, false, true, documentMeta));
+
+                    #endregion
+                }
+
+                docResponse.Add(notesListErrors);
+                root.Add(docResponse);
+            }
+
+            var xml = FormatterXml(root);
+            responseBytes = Encoding.UTF8.GetBytes(xml);
+
+            var responseToSign = Encoding.UTF8.GetString(responseBytes);
+
+            signer.Certificate2 = GetCertificate();
+            var date = DateTime.UtcNow.AddHours(-5);
+            responseBytes = signer.FirmarEvento(responseToSign, date);
+
+            if (responseBytes == null) return null;
+
+            if (!mandatoryInvalid)
+            {
+                var folder = "Success";
+                var container = $"{CategoryContainerName}";
+                var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
+                var numberFolder = string.IsNullOrEmpty(number) ? trackId : number;
+                var accountCode = string.IsNullOrEmpty(documentMeta.SenderCode) ? "SenderCode" : documentMeta.SenderCode;
+                var fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{folder}/{documentMeta.SenderCode}/{docTypeCode}/{serieFolder}/{number}/{trackId}.xml";
+                fileManager.Upload(container, fileName, responseBytes);
+            }
+
+            return responseBytes;
+        }
         public static Tuple<string, string, string> SerieNumberMessageFromDocType(GlobalDocValidatorDocumentMeta processResultEntity)
         {
             if (processResultEntity == null) return null;
@@ -38,11 +162,11 @@ namespace Gosocket.Dian.Services.Utils
         public static XElement BuildDianExtensionsNode()
         {
             return new XElement(sts + "DianExtensions",
-                    new XElement(sts + "InvoiceSource",                        
+                    new XElement(sts + "InvoiceSource",
                         new XElement(cbc + "IdentificationCode", "CO",
                             new XAttribute("listAgencyID", "6"),
                             new XAttribute("listAgencyName", "United Nations Economic Commission for Europe"),
-                            new XAttribute("listSchemeUri", "urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.1"))),
+                            new XAttribute("listSchemeURI", "urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.1"))),
                         new XElement(sts + "SoftwareProvider",
                             new XElement(sts + "ProviderID", "800197268",
                                 new XAttribute("schemeID", "4"),
@@ -70,9 +194,11 @@ namespace Gosocket.Dian.Services.Utils
             var number = messageIdNode.Item2;
 
             var uuId = $"{processResultEntity.UblVersion}{processResultEntity.DocumentTypeId}{processResultEntity.SenderCode}{processResultEntity.ReceiverCode}{processResultEntity.Serie}{processResultEntity.Number}";
+            var profileExecutionId = "1";
+            if (ConfigurationManager.GetValue("Environment") != "Prod") profileExecutionId = "2";
 
-            var cufe = DianServicesUtils.CreateCufeId(uuId);
-
+            var cufe = CreateCufeId(uuId);
+            var issueDate = DateTime.UtcNow;
             return new XElement(ns + "ApplicationResponse",
                 new XAttribute(XNamespace.Xmlns + "cac",
                     "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"),
@@ -83,24 +209,16 @@ namespace Gosocket.Dian.Services.Utils
                 new XAttribute(XNamespace.Xmlns + "sts", "dian:gov:co:facturaelectronica:Structures-2-1"),
                 new XAttribute(XNamespace.Xmlns + "ds", "http://www.w3.org/2000/09/xmldsig#"),
                 new XElement(ext + "UBLExtensions",
-                    new XElement(ext + "UBLExtension", new XElement(ext + "ExtensionContent", BuildDianExtensionsNode()))),
+                    new XElement(ext + "UBLExtension", new XElement(ext + "ExtensionContent", BuildDianExtensionsNode())),
+                    new XElement(ext + "UBLExtension", new XElement(ext + "ExtensionContent", string.Empty))),
                 new XElement(cbc + "UBLVersionID", "UBL 2.1"), new XElement(cbc + "CustomizationID", "1"),
                 new XElement(cbc + "ProfileID", "DIAN 2.1"),
-                new XElement(cbc + "ProfileExecutionID", "2"),
+                new XElement(cbc + "ProfileExecutionID", profileExecutionId),
                 new XElement(cbc + "ID", $"{GetRandomInt()}"),
                 new XElement(cbc + "UUID", cufe,
-                    new XAttribute("schemeName", "CUFE-SHA384")),
-                new XElement(cbc + "IssueDate", DateTime.UtcNow.ToString("yyyy-MM-dd")),
-                new XElement(cbc + "IssueTime", $"{DateTime.UtcNow.ToString("hh:mm:ss")}-05:00")
-                //new XElement(cac + "Signature",
-                //    new XElement(cbc + "ID", "214124"),
-                //    new XElement(cac + "SignatoryParty",
-                //        new XElement(cac + "PartyName",
-                //        new XElement(cbc + "Name", "SOUTH CONSULTING SIGNATURE COLOMBIA S.A."))),
-                //    new XElement(cac + "DigitalSignatureAttachment",
-                //        new XElement(cac + "ExternalReference",
-                //        new XElement(cbc + "URI", "#signatureKG"))))
-                        );
+                    new XAttribute("schemeName", "CUDE-SHA384")),
+                new XElement(cbc + "IssueDate", issueDate.AddHours(-5).ToString("yyyy-MM-dd")),
+                new XElement(cbc + "IssueTime", $"{issueDate.AddHours(-5).ToString("HH:mm:ss")}-05:00"));
         }
 
         public static XElement BuildSenderNode(GlobalDocValidatorDocumentMeta processResultEntity)
@@ -134,13 +252,12 @@ namespace Gosocket.Dian.Services.Utils
             return new XElement(cac + "DocumentResponse",
                 BuildResponseDianEventDescriptionNode(withErrors),
                 BuildDocumentReferenceNode(processResultEntity));
-            //BuildIssuerParty());
         }
 
         public static XElement BuildResponseDianEventDescriptionNode(bool withErrors)
         {
             var responseCode = withErrors ? "04" : "02";
-            var responseDescription = withErrors ? "Uso no autorizado por la DIAN" : "Uso autorizado por la DIAN";
+            var responseDescription = withErrors ? "Documento rechazado por la DIAN" : "Documento validado por la DIAN";
 
             return new XElement(cac + "Response",
                         new XElement(cbc + "ResponseCode", $"{responseCode}"),
@@ -187,8 +304,8 @@ namespace Gosocket.Dian.Services.Utils
             return new XElement(cac + "LineResponse",
                    BuildResponseReferenceLineId(line),
                         new XElement(cac + "Response",
-                            new XElement(cbc + "ResponseCode", withErrors ? code : "0"),
-                            new XElement(cbc + "Description", withErrors ? message : approvedMessage)));
+                            new XElement(cbc + "ResponseCode", withErrors || withObservations ? code : "0"),
+                            new XElement(cbc + "Description", withErrors || withObservations ? message : approvedMessage)));
         }
 
         public static XElement BuildStatusNode(string code, string message)
@@ -223,7 +340,7 @@ namespace Gosocket.Dian.Services.Utils
              new XElement(cac + "TaxScheme",
                 new XElement(cbc + "ID", "01"),
                 new XElement(cbc + "Name", "IVA"))),
-                new XElement(cbc + "PartyLegalEntity",
+                new XElement(cac + "PartyLegalEntity",
                 new XElement(cbc + "RegistrationName", "Nombre"))));
         }
 
@@ -232,112 +349,26 @@ namespace Gosocket.Dian.Services.Utils
             return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" + root.ToString(SaveOptions.None);
         }
 
-        public static Tuple<byte[], byte[]> GetEmbeddedXElementFromAttachment(byte[] attachment)
+        public static string CreateCufeId(string joinedCombination)
         {
-            var ubl = new byte[] { }; 
-            var response = new byte[] { };
+            StringBuilder Sb = new StringBuilder();
 
-            try
+            using (var hash = SHA384.Create())
             {
-                var xmlDocument = new XmlDocument();
-                xmlDocument.LoadXml(Encoding.UTF8.GetString(attachment));
+                Encoding enc = Encoding.UTF8;
+                Byte[] result = hash.ComputeHash(enc.GetBytes(joinedCombination));
 
-                var xmlReader = new XmlTextReader(new MemoryStream(attachment));
-
-                var document = new XPathDocument(xmlReader);
-                var navigator = document.CreateNavigator();
-
-                var binaryStringUbl = navigator.SelectSingleNode("//*[local-name()='AttachedDocument']/*[local-name()='DocumentoFiscalElectronico']").InnerXml;
-                binaryStringUbl = ReplaceTagsFromCdata(binaryStringUbl);
-                ubl = Encoding.UTF8.GetBytes(binaryStringUbl);
-
-                var binaryStringResponse = navigator.SelectSingleNode("//*[local-name()='AttachedDocument']/*[local-name()='Attachment']").InnerXml;
-                binaryStringResponse = ReplaceTagsFromCdata(binaryStringResponse);
-                response = Encoding.UTF8.GetBytes(binaryStringResponse);
-            }
-            catch (Exception)
-            {
-
-            }
-                return new Tuple<byte[], byte[]>(ubl, response);            
+                foreach (Byte b in result)
+                    Sb.Append(b.ToString("x2"));
             }
 
-        public static bool ValidateIfAttachmentSameDocumentKey(Tuple<byte[], byte[]> attachmentElements, string fileName, ref List<XmlParamsResponseTrackId> trackIdList)
-        {
-            bool isSame = false;
-
-            if (attachmentElements.Item1.Count() > 0 && attachmentElements.Item2.Count() > 0)
-            {
-                try
-                {
-                    var ublReplaced = ReplaceTagsFromCdata(Encoding.UTF8.GetString(attachmentElements.Item1));
-
-                    var navigatorUbl = XDocument.Parse(ublReplaced).CreateNavigator();
-                    
-                    var documentKeyUbl = navigatorUbl.SelectSingleNode("//*[local-name()='Invoice']/*[local-name()='UUID']|//*[local-name()='CreditNote']/*[local-name()='UUID']|//*[local-name()='DebitNote']/*[local-name()='UUID']").InnerXml;
-
-                    var responseReplaced = ReplaceTagsFromCdata(Encoding.UTF8.GetString(attachmentElements.Item2));
-
-                    var navigatorResponse = XDocument.Parse(responseReplaced).CreateNavigator();
-
-                    var documentKeyResponse = navigatorResponse.SelectSingleNode("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']").InnerXml;
-
-                    if (documentKeyUbl == documentKeyResponse)
-                        isSame = true;
-                    else
-                    {
-                        trackIdList.Add(new XmlParamsResponseTrackId
-                        {
-                            XmlFileName = fileName,
-                            ProcessedMessage = $"El UUID del DE {documentKeyUbl} no coincide con el UUID del APR {documentKeyResponse}"
-                        });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    trackIdList.Add(new XmlParamsResponseTrackId
-                    {
-                        XmlFileName = fileName,
-                        ProcessedMessage = $"Error validando el nodo CUFE del DE y/o APR"
-                    });
-                }
-            }
-
-            return isSame;
-        }
-
-        public static string ReplaceTagsFromCdata(string xml)
-        {
-            var xmlSplittedStart = Regex.Replace(xml, "&lt;", "<");
-            return Regex.Replace(xmlSplittedStart, "&gt;", ">");
+            return Sb.ToString();
         }
 
         public static int GetRandomInt()
         {
             Random rnd = new Random();
             return rnd.Next(1, 100000000);
-        }
-
-        public static async Task<byte[]> GetApplicationResponseIfExist(GlobalDocValidatorDocumentMeta documentMeta)
-        {
-            byte[] responseBytes = null;
-            var fileManager = new FileManager();
-
-            byte[] xmlBytes = null;
-
-            var processDate = documentMeta.Timestamp;
-
-            var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
-
-            var isValidFolder = "Success";
-
-            var container = "dian";
-            var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
-
-            xmlBytes = await fileManager.GetBytesAsync(container, fileName);
-            if (xmlBytes != null) responseBytes = xmlBytes;
-
-            return responseBytes;
         }
 
         public static bool ApplicationResponseExist(GlobalDocValidatorDocumentMeta documentMeta)
@@ -359,88 +390,61 @@ namespace Gosocket.Dian.Services.Utils
             return exist;
         }
 
-        //public static XElement BuildNodeWithoutObservations(GlobalOseProcessResult processResultEntity)
-        //{
-        //    var series = processResultEntity.SerieNumber.Split('-')[0];
-        //    var number = processResultEntity.SerieNumber.Split('-')[1];
-        //    return new XElement(cac + "DocumentResponse",
-        //            new XElement(cac + "Response",
-        //                new XElement(cbc + "ResponseCode", "0",
-        //                    new XAttribute("listAgencyName", "PE:SUNAT"),
-        //                    new XElement(cbc + "Description", $"La fatura número {series}-{number}, ha sido aceptada."))),
-        //            new XElement(cac + "DocumentReference",
-        //                new XElement(cbc + "ID", $"{series}-{number}"),
-        //                new XElement(cbc + "IssueDate", processResultEntity.EmisionDate.ToString("yy-MM-dd")),
-        //                new XElement(cbc + "IssueTime", processResultEntity.EmisionDate.ToString("hh:mm:ss")),
-        //                new XElement(cbc + "DocumentTypeCode", processResultEntity.DocumentType),
-        //                new XElement(cac + "Attachment",
-        //                    new XElement(cac + "ExternalReference",
-        //                        new XElement(cbc + "DocumentHash", "")))),
-        //            new XElement(cac + "IssuerParty",
-        //                new XElement(cac + "PartyLegalEntity",
-        //                    new XElement(cbc + "CompanyID", processResultEntity.SenderCode,
-        //                        new XAttribute("schemeID", "")))),
-        //            new XElement(cac + "RecipientParty",
-        //                new XElement(cac + "PartyLegalEntity",
-        //                    new XElement(cbc + "CompanyID", processResultEntity.ReceiverCode,
-        //                        new XAttribute("schemeID", "")))));
-        //}
+        public static byte[] GetApplicationResponseIfExist(GlobalDocValidatorDocumentMeta documentMeta)
+        {
+            byte[] responseBytes = null;
+            var fileManager = new FileManager();
 
-        //public static XElement BuildNodeWithObservations(GlobalOseProcessResult processResultEntity, string code, string message)
-        //{
-        //    var series = processResultEntity.SerieNumber.Split('-')[0];
-        //    var number = processResultEntity.SerieNumber.Split('-')[1];
-        //    return new XElement(cac + "DocumentResponse",
-        //                new XElement(cac + "Response",
-        //                    new XElement(cbc + "ResponseCode", "0",
-        //                        new XAttribute("listAgencyName", "PE:SUNAT"),
-        //                        new XElement(cbc + "Description", $"La fatura número {series}-{number}, ha sido aceptada.")),
-        //                    new XElement(cac + "Status",
-        //                        new XElement(cbc + "StatusReasonCode", $"{code}",
-        //                            new XAttribute("listURI", "urn:pe:gob:sunat:cpe:see:gem:codigos:codigoretorno")),
-        //                        new XElement(cbc + "StatusReason", $"{code}-{message}"))),
-        //                new XElement(cac + "DocumentReference",
-        //                    new XElement(cbc + "ID", $"{series}-{number}"),
-        //                    new XElement(cbc + "IssueDate", processResultEntity.EmisionDate.ToString("yy-MM-dd")),
-        //                    new XElement(cbc + "IssueTime", processResultEntity.EmisionDate.ToString("hh:mm:ss")),
-        //                    new XElement(cbc + "DocumentTypeCode", processResultEntity.DocumentType),
-        //                    new XElement(cac + "Attachment",
-        //                        new XElement(cac + "ExternalReference",
-        //                            new XElement(cbc + "DocumentHash", "")))),
-        //                new XElement(cac + "IssuerParty",
-        //                    new XElement(cac + "PartyLegalEntity",
-        //                        new XElement(cbc + "CompanyID", processResultEntity.SenderCode,
-        //                            new XAttribute("schemeID", "")))),
-        //                new XElement(cac + "RecipientParty",
-        //                    new XElement(cac + "PartyLegalEntity",
-        //                        new XElement(cbc + "CompanyID", processResultEntity.ReceiverCode,
-        //                            new XAttribute("schemeID", "")))));
-        //}
+            byte[] xmlBytes = null;
 
-        //public static XElement BuildNodeWithErrors(GlobalOseProcessResult processResultEntity, string code, string message)
-        //{
-        //    var series = processResultEntity.SerieNumber.Split('-')[0];
-        //    var number = processResultEntity.SerieNumber.Split('-')[1];
-        //    return new XElement(cac + "DocumentResponse",
-        //                new XElement(cac + "Response",
-        //                    new XElement(cbc + "ResponseCode", code,
-        //                        new XElement(cbc + "Description", $"{message}."))),
-        //                new XElement(cac + "DocumentReference",
-        //                    new XElement(cbc + "ID", $"{series}-{number}"),
-        //                    new XElement(cbc + "IssueDate", processResultEntity.EmisionDate.ToString("yy-MM-dd")),
-        //                    new XElement(cbc + "IssueTime", processResultEntity.EmisionDate.ToString("hh:mm:ss")),
-        //                    new XElement(cbc + "DocumentTypeCode", processResultEntity.DocumentType),
-        //                    new XElement(cac + "Attachment",
-        //                        new XElement(cac + "ExternalReference",
-        //                            new XElement(cbc + "DocumentHash", "")))),
-        //                new XElement(cac + "IssuerParty",
-        //                    new XElement(cac + "PartyLegalEntity",
-        //                        new XElement(cbc + "CompanyID", processResultEntity.SenderCode,
-        //                            new XAttribute("schemeID", "")))),
-        //                new XElement(cac + "RecipientParty",
-        //                    new XElement(cac + "PartyLegalEntity",
-        //                        new XElement(cbc + "CompanyID", processResultEntity.ReceiverCode,
-        //                            new XAttribute("schemeID", "")))));
-        //}
+            var processDate = documentMeta.Timestamp;
+
+            var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
+
+            var isValidFolder = "Success";
+
+            var container = CategoryContainerName;
+            var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
+
+            xmlBytes = fileManager.GetBytes(container, fileName);
+            if (xmlBytes == null)
+            {
+                fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
+                xmlBytes = fileManager.GetBytes("dian", fileName);
+            }
+            if (xmlBytes != null) responseBytes = xmlBytes;
+            fileManager = null;
+            return responseBytes;
+        }
+
+        public static X509Certificate2 GetCertificate()
+        {
+            var certificate = GetCertificateByThumbprint();
+            if (certificate == null) return null;
+
+            return certificate;
+        }
+
+        private static X509Certificate2 GetCertificateByThumbprint()
+        {
+            var thumbprint = ConfigurationManager.GetValue("CertificateThumbprint"); //"BF6B7AE700D03E317C8792D93C4C3DD488C1A002";
+            lock (obj)
+            {
+                var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+                store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+                var certificateCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+                store.Close();
+
+                foreach (var certificate in certificateCollection)
+                {
+                    if (certificate.Thumbprint == thumbprint)
+                    {
+                        using (certificate.GetRSAPrivateKey()) { }
+                        return certificate;
+                    }
+                }
+                throw new CryptographicException($"No certificate found with thumbprint: {thumbprint}");
+            }
+        }
     }
 }

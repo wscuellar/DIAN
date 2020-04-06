@@ -74,8 +74,6 @@ namespace Gosocket.Dian.Services.Utils.Helpers
 
         private static async Task<HttpResponseMessage> ConsumeApiWithHeaderAsync<T>(string url, T requestObj, Dictionary<string, string> headers)
         {
-            //if (!httpClients.ContainsKey(ToGuid(url)))
-            //{
             using (var client = new HttpClient())
             {
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
@@ -87,28 +85,10 @@ namespace Gosocket.Dian.Services.Utils.Helpers
 
                 return await client.PostAsync(url, byteContent);
             }
-            //}
-            //else
-            //{
-            //    var client = httpClients[ToGuid(url)];
-            //    client.DefaultRequestHeaders.Connection.Add("Keep-Alive");
-
-            //    var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
-            //    var byteContent = new ByteArrayContent(buffer);
-            //    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            //    if (headers != null)
-            //        foreach (var header in headers)
-            //            client.DefaultRequestHeaders.Add(header.Key, header.Value);
-
-            //    return await client.PostAsync(url, byteContent);
-            //}
-
         }
 
         private static HttpResponseMessage ConsumeApiWithHeader<T>(string url, T requestObj, Dictionary<string, string> headers)
         {
-            //if (!httpClients.ContainsKey(ToGuid(url)))
-            //{
             using (var client = new HttpClient())
             {
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
@@ -120,22 +100,6 @@ namespace Gosocket.Dian.Services.Utils.Helpers
 
                 return client.PostAsync(url, byteContent).Result;
             }
-            //}
-            //else
-            //{
-            //    var client = httpClients[ToGuid(url)];
-            //    client.DefaultRequestHeaders.Connection.Add("Keep-Alive");
-
-            //    var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
-            //    var byteContent = new ByteArrayContent(buffer);
-            //    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            //    if (headers != null)
-            //        foreach (var header in headers)
-            //            client.DefaultRequestHeaders.Add(header.Key, header.Value);
-
-            //    return client.PostAsync(url, byteContent).Result;
-            //}
-
         }
 
         public static async Task<T> ExecuteRequestAsync<T>(string url, dynamic requestObj)

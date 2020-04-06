@@ -720,9 +720,9 @@ namespace Gosocket.Dian.Services.Utils
                     }
             }
 
-            string[] noteCodes = { "7", "8" };
+            //string[] noteCodes = { "7", "8" };
 
-            if (string.IsNullOrEmpty(documentKey) && !noteCodes.Contains(docTypeCode))
+            if (string.IsNullOrEmpty(documentKey))
             {
                 stringBuilder.AppendLine($"{codeMessage}D06-(R) CUFE del UBL no puede estar vacío.");
                 errors.Add(stringBuilder.ToString());
@@ -730,7 +730,7 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
 
-            if (string.IsNullOrEmpty(documentParsed.Number))
+            if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
             {
                 stringBuilder.AppendLine($"{codeMessage}D05-(R) El ID del Documento no puede estar vacío.");
                 errors.Add(stringBuilder.ToString());
@@ -761,11 +761,11 @@ namespace Gosocket.Dian.Services.Utils
             }
             else
             {
-                if (string.IsNullOrEmpty(documentKey) && noteCodes.Contains(docTypeCode))
-                {
-                    var documentKeyData = $"{docTypeCode}{senderCode}{documentParsed.Number}";
-                    documentParsed.DocumentKey = CreateCufeId(documentKeyData);
-                }
+                //if (string.IsNullOrEmpty(documentKey) && noteCodes.Contains(docTypeCode))
+                //{
+                //    var documentKeyData = $"{docTypeCode}{senderCode}{documentParsed.Number}";
+                //    documentParsed.DocumentKey = CreateCufeId(documentKeyData);
+                //}
             }
 
             return isValid;

@@ -9,7 +9,6 @@ using Microsoft.Azure.EventGrid.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +24,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
         private TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
+        private TableManager TableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
 
         private TableManager TableManagerGlobalBatchFileMapper = new TableManager("GlobalBatchFileMapper");
         private TableManager TableManagerGlobalBatchFileRuntime = new TableManager("GlobalBatchFileRuntime");
@@ -33,14 +33,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
 
         private TableManager TableManagerGlobalNumberRange = new TableManager("GlobalNumberRange");
-        private TableManager TableManagerDianOfeControl = new TableManager("DianOfeControl");
+        //private TableManager TableManagerDianOfeControl = new TableManager("DianOfeControl");
         private TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
 
         private FileManager fileManager = new FileManager();
-
-        private int _ublVersion = 20;
 
         private readonly string blobContainer = "global";
         private readonly string blobContainerFolder = "batchValidator";
@@ -124,153 +122,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="fileName"></param>
         /// <param name="contentFile"></param>
         /// <param name="authCode"></param>
-        /// <param name="testSetId"></param>
-        /// <returns></returns>
-        public UploadDocumentResponse UploadMultipleDocumentAsync(string fileName, byte[] contentFile, string authCode = null, string testSetId = null)
-        {
-            UploadDocumentResponse responseMessages = new UploadDocumentResponse();
-            List<XmlParamsResponseTrackId> trackIdList = new List<XmlParamsResponseTrackId>();
-
-            var contentFileList = contentFile.ExtractMultipleZip();
-
-            //Validar si tiene problemas el Zip enviado
-            if (DianServicesUtils.ValidateIfZipHasFlagsErrors(fileName, contentFileList, trackIdList, ref responseMessages)) return responseMessages;
-
-            //TrackId para el zip
-            var zipKey = Guid.NewGuid().ToString();
-
-            trackIdList.AddRange(contentFileList.Where(c => c.HasError).Select(x => new XmlParamsResponseTrackId
-            {
-                XmlFileName = x.XmlFileName,
-                ProcessedMessage = x.XmlErrorMessage,
-            }));
-
-            var requestObjects = contentFileList.Where(c => !c.HasError).Select(x => DianServicesUtils.CreateRequestObject(Convert.ToBase64String(x.XmlBytes), x.XmlFileName));
-
-            //Llamar a function para traer los valores de los Xpath
-            var multipleResponsesXpathDataValue = ApiHelpers.ExecuteRequest<List<ResponseXpathDataValue>>(ConfigurationManager.GetValue("GetMultipleXpathDataValuesUrl"), requestObjects);
-
-            //Validar si respuesta de la function viene con errores
-            trackIdList.AddRange(multipleResponsesXpathDataValue.Where(c => (!c.Success) && (c == null)).Select(x => new XmlParamsResponseTrackId
-            {
-                XmlFileName = x.XpathsValues["FileName"],
-                ProcessedMessage = x.Message
-            }));
-            multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(c => c.Success).ToList();
-
-            //Validar que nits emisores sea único
-            var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues["SenderCodeXpath"]).Distinct();
-            if (nits.Count() > 1)
-            {
-                trackIdList.Add(new XmlParamsResponseTrackId
-                {
-                    Success = false,
-                    ProcessedMessage = "Lote de documentos contenidos en el archivo zip deben pertenecer todos a un mismo emisor."
-                });
-                responseMessages.ErrorMessageList = trackIdList;
-                return responseMessages;
-            }
-
-            //Validar grandes contribuyentes
-            if (string.IsNullOrEmpty(testSetId))
-            {
-                var nitBigContributor = multipleResponsesXpathDataValue.FirstOrDefault().XpathsValues["SenderCodeXpath"];
-                var bigContributorRequestAuthorization = TableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(nitBigContributor, nitBigContributor);
-                if (bigContributorRequestAuthorization?.StatusCode != (int)BigContributorAuthorizationStatus.Authorized)
-                {
-                    trackIdList.Add(new XmlParamsResponseTrackId
-                    {
-                        Success = false,
-                        ProcessedMessage = $"Empresa emisora con NIT {nitBigContributor} no se encuentra autorizada para enviar documentos por los lotes.",
-                        SenderCode = nitBigContributor
-                    });
-                    responseMessages.ErrorMessageList = trackIdList;
-                    return responseMessages;
-                }
-            }
-
-            //Validar campos mandatorios basicos para el trabajo del WS
-            var xpathValuesValidationResult = DianServicesUtils.ValidateXpathValues(multipleResponsesXpathDataValue);
-            trackIdList.AddRange(xpathValuesValidationResult.Where(v => !v.Success));
-
-            multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(c => xpathValuesValidationResult.Where(v => v.Success).Select(v => v.DocumentKey).Contains(c.XpathsValues["DocumentKeyXpath"])).ToList();
-
-            foreach (var responseXpathValues in multipleResponsesXpathDataValue)
-            {
-                if (!string.IsNullOrEmpty(responseXpathValues.XpathsValues["SeriesXpath"]) && responseXpathValues.XpathsValues["NumberXpath"].Length > responseXpathValues.XpathsValues["SeriesXpath"].Length)
-                    responseXpathValues.XpathsValues["NumberXpath"] = responseXpathValues.XpathsValues["NumberXpath"].Substring(responseXpathValues.XpathsValues["SeriesXpath"].Length, responseXpathValues.XpathsValues["NumberXpath"].Length - responseXpathValues.XpathsValues["SeriesXpath"].Length);
-
-                responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues["SeriesXpath"]}{responseXpathValues.XpathsValues["NumberXpath"]}";
-            }
-
-            ////Validar que el SenderCode coincide con las empresas permitidas
-            var result = DianServicesUtils.ValidateIfIsAllowedToSend(multipleResponsesXpathDataValue, authCode, testSetId);
-            if (result.Count > 0)
-            {
-                trackIdList.AddRange(result);
-                responseMessages.ErrorMessageList = trackIdList;
-                return responseMessages;
-            }
-
-            if (multipleResponsesXpathDataValue.Count > 0)
-            {
-                //Crear los request Objects para upload
-                List<RequestObject> uploadRequest = new List<RequestObject>();
-                uploadRequest.AddRange(multipleResponsesXpathDataValue.Select(
-                    c => new RequestObject
-                    {
-                        Category = DianServicesUtils.GetEnumDescription((DianServicesUtils.Category)int.Parse(DianServicesUtils.StractUblVersion(c.XpathsValues["UblVersionXpath"]))),
-                        XmlBase64 = c.XpathsValues["XmlBase64"],
-                        FileName = c.XpathsValues["FileName"],
-                        DocumentTypeId = c.XpathsValues["DocumentTypeXpath"],
-                        TrackId = c.XpathsValues["DocumentKeyXpath"],
-                        ZipKey = zipKey,
-                        TestSetId = testSetId,
-                        SoftwareId = c.XpathsValues["SoftwareIdXpath"]
-                    }
-                ));
-
-                // upload multiple xml's
-                var responseUploadMultipleXml = ApiHelpers.ExecuteRequest<List<ResponseUploadMultipleXml>>(ConfigurationManager.GetValue("UploadMultipleXmlUrl"), uploadRequest);
-                var uploadFailed = responseUploadMultipleXml.Where(m => !m.Success && multipleResponsesXpathDataValue.Select(d => d.XpathsValues["DocumentKeyXpath"]).Contains(m.DocumentKey));
-                trackIdList.AddRange(uploadFailed.Select(x => new XmlParamsResponseTrackId
-                {
-                    DocumentKey = x.DocumentKey,
-                    XmlFileName = x.FileName,
-                    ProcessedMessage = x.Message
-
-                }));
-
-                multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(x => !uploadFailed.Select(e => e.DocumentKey).Contains(x.XpathsValues["DocumentKeyXpath"])).ToList();
-
-                if (multipleResponsesXpathDataValue.Count > 0)
-                {
-                    List<EventGridEvent> eventsList = multipleResponsesXpathDataValue.Select(x => new EventGridEvent
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        EventType = "Validate.Document.Event",
-                        Data = JsonConvert.SerializeObject(new Dictionary<string, string> { { "trackId", x.XpathsValues["DocumentKeyXpath"] } }),
-                        EventTime = DateTime.UtcNow,
-                        Subject = $"|DT:{x.XpathsValues["DocumentTypeXpath"]}|",
-                        DataVersion = "2.0"
-                    }).ToList();
-
-                    EventGridManager.Instance().SendMessagesToEventGrid(eventsList);
-                    responseMessages.ZipKey = zipKey;
-                }
-            }
-
-            responseMessages.ErrorMessageList = trackIdList.Any() ? trackIdList : null;
-
-            return responseMessages;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="contentFile"></param>
-        /// <param name="authCode"></param>
         /// <returns></returns>
         public DianResponse UploadDocumentSync(string fileName, byte[] contentFile, string authCode = null)
         {
@@ -284,6 +135,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             start = DateTime.UtcNow;
             DianResponse dianResponse = new DianResponse
             {
+                IsValid = false,
                 XmlFileName = contentFileList.First().XmlFileName,
                 ErrorMessage = new List<string>()
             };
@@ -293,7 +145,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var countZeroMess = "Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML valido.";
                 var countOverOneMess = "Encontrados mas de un XML descomprimiendo el archivo ZIP: Se debe enviar solo un fichero XML.";
 
-                dianResponse.StatusCode = "90";
+                dianResponse.StatusCode = "89";
                 dianResponse.StatusMessage = contentFileList.Any(f => f.MaxQuantityAllowedFailed) ? countOverOneMess : countZeroMess;
                 dianResponse.XmlFileName = fileName;
                 return dianResponse;
@@ -307,7 +159,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 if (contentFileList.Count > 1)
                     dianResponse.StatusMessage = "El método síncrono solo puede recibir un documento.";
 
-                dianResponse.StatusCode = "90";
+                dianResponse.StatusCode = "89";
                 return dianResponse;
             }
             var zone1 = new GlobalLogger("", "Zone 1") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
@@ -319,45 +171,38 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var zone2 = new GlobalLogger("", "Zone 2") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
             // ZONE 2
 
+
+            // Parser
             start = DateTime.UtcNow;
-            var requestObj = DianServicesUtils.CreateGetXpathRequestObject(xmlBase64);
-            var responseXpathValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), requestObj);
-            var xpath = new GlobalLogger("", "2 Xpath") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
+            var xmlBytes = contentFileList.First().XmlBytes;
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
+            DocumentParsed.SetValues(ref documentParsed);
+            var parser = new GlobalLogger("", "Parser") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
+            // Parser
 
             // ZONE 3
             start = DateTime.UtcNow;
-            if (!responseXpathValues.Success)
-            {
-                dianResponse.StatusDescription = $"{responseXpathValues.Message}";
-                dianResponse.StatusCode = "90";
-                return dianResponse;
-            }
-
             //Validar campos mandatorios basicos para el trabajo del WS
-            if (!DianServicesUtils.ValidateXpathValuesSync(responseXpathValues, ref dianResponse))
-                return dianResponse;
+            if (!DianServicesUtils.ValidateParserValuesSync(documentParsed, ref dianResponse)) return dianResponse;
 
-            if (!string.IsNullOrEmpty(responseXpathValues.XpathsValues["SeriesXpath"]) && responseXpathValues.XpathsValues["NumberXpath"].Length > responseXpathValues.XpathsValues["SeriesXpath"].Length)
-                responseXpathValues.XpathsValues["NumberXpath"] = responseXpathValues.XpathsValues["NumberXpath"].Substring(responseXpathValues.XpathsValues["SeriesXpath"].Length, responseXpathValues.XpathsValues["NumberXpath"].Length - responseXpathValues.XpathsValues["SeriesXpath"].Length);
-
-            responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues["SeriesXpath"]}{responseXpathValues.XpathsValues["NumberXpath"]}";
-
-            var senderCode = responseXpathValues.XpathsValues["SenderCodeXpath"];
-            var docTypeCode = responseXpathValues.XpathsValues["DocumentTypeXpath"];
-            if (string.IsNullOrEmpty(docTypeCode))
-                docTypeCode = responseXpathValues.XpathsValues["DocumentTypeId"];
-            var serie = $"{responseXpathValues.XpathsValues["SeriesXpath"]}";
-            var number = $"{responseXpathValues.XpathsValues["NumberXpath"]}";
-            var trackId = responseXpathValues.XpathsValues["DocumentKeyXpath"].ToLower();
+            var senderCode = documentParsed.SenderCode;
+            var docTypeCode = documentParsed.DocumentTypeId;
+            var serieAndNumber = documentParsed.SerieAndNumber;
+            var trackId = documentParsed.DocumentKey.ToLower();
             var zone3 = new GlobalLogger("", "Zone 3") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
             // ZONE 3
 
+            // Auth
             start = DateTime.UtcNow;
             var authEntity = GetAuthorization(senderCode, authCode);
             if (authEntity == null)
             {
                 dianResponse.XmlFileName = $"{fileName}";
-                dianResponse.StatusCode = "90";
+                dianResponse.StatusCode = "89";
                 dianResponse.StatusDescription = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
                 var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
                 if (globalEnd >= 10)
@@ -368,15 +213,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 return dianResponse;
             }
             var auth = new GlobalLogger("", "3 Auth") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
+            // Auth
 
-            // Check document duplicity
+            // Duplicity
             start = DateTime.UtcNow;
-            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serie, number);
-            var duplicity = new GlobalLogger(trackId, "Duplicity") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
+            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serieAndNumber, trackId);
             if (response != null) return response;
+            var duplicity = new GlobalLogger(trackId, "Duplicity") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
+            // Duplicity
 
             unzip.PartitionKey = trackId;
-            xpath.PartitionKey = trackId;
+            parser.PartitionKey = trackId;
             auth.PartitionKey = trackId;
             zone1.PartitionKey = trackId;
             zone2.PartitionKey = trackId;
@@ -399,7 +246,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (!uploadXmlResponse.Success)
             {
                 dianResponse.XmlFileName = $"{fileName}";
-                dianResponse.StatusCode = "90";
+                dianResponse.StatusCode = "89";
                 dianResponse.StatusDescription = uploadXmlResponse.Message;
                 var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
                 if (globalEnd >= 10)
@@ -441,20 +288,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 GlobalDocValidatorDocumentMeta documentMeta = null;
                 List<Task> arrayTasks = new List<Task>();
 
-                Task firstLocalRun = Task.Run(() =>
-                {
-                    var applicationResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
-                    dianResponse.XmlBase64Bytes = !applicationResponse.Success ? null : applicationResponse.Content;
-                });
                 Task secondLocalRun = Task.Run(() =>
                 {
                     documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-                    var prefix = !string.IsNullOrEmpty(serie) ? serie : string.Empty;
-                    message = (string.IsNullOrEmpty(prefix)) ? $"La {documentMeta.DocumentTypeName} {number}, ha sido autorizada." : $"La {documentMeta.DocumentTypeName} {prefix}-{number}, ha sido autorizada.";
-                    existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
+                    //var prefix = !string.IsNullOrEmpty(serie) ? serie : string.Empty;
+                    message = $"La {documentMeta.DocumentTypeName} {serieAndNumber}, ha sido autorizada."; // (string.IsNullOrEmpty(prefix)) ? $"La {documentMeta.DocumentTypeName} {serieAndNumber}, ha sido autorizada." : $"La {documentMeta.DocumentTypeName} {prefix}-{number}, ha sido autorizada.";
+                    existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
                 });
 
-                var errors = validations.Where(r => r.Mandatory && !r.IsValid).ToList();
+                var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
                 var notifications = validations.Where(r => r.IsNotification).ToList();
 
                 if (!errors.Any() && !notifications.Any())
@@ -480,14 +322,16 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     foreach (var n in notifications)
                         notificationList.Add($"Regla: {n.ErrorCode}, Notificación: {n.ErrorMessage}");
 
-                    dianResponse.IsValid = errors.Any() ? dianResponse.IsValid : true;
-                    dianResponse.StatusMessage = errors.Any() ? dianResponse.StatusMessage : message;
+                    dianResponse.IsValid = errors.Any() ? false : true;
+                    dianResponse.StatusMessage = errors.Any() ? "Documento con errores en campos mandatorios." : message;
                     dianResponse.ErrorMessage.AddRange(notificationList);
                 }
 
-                arrayTasks.Add(firstLocalRun);
                 arrayTasks.Add(secondLocalRun);
                 Task.WhenAll(arrayTasks).Wait();
+
+                var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
+                dianResponse.XmlBase64Bytes = applicationResponse ?? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations);
 
                 dianResponse.XmlDocumentKey = trackId;
 
@@ -512,7 +356,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 arrayTasks = new List<Task>
                 {
                     TableManagerGlobalLogger.InsertOrUpdateAsync(unzip),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(xpath),
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(parser),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(auth),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(duplicity),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(upload),
@@ -523,7 +367,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone3),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(mapper),
                 };
-                if (validatorDocument != null && !existDocument)
+                if (dianResponse.IsValid && !existDocument)
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
 
                 Task.WhenAll(arrayTasks);
@@ -539,124 +383,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="contentFile"></param>
-        /// <param name="authCode"></param>
-        /// <param name="email"></param>
-        /// <returns></returns>
-        public UploadDocumentResponse UploadDocumentAttachmentAsync(string fileName, byte[] contentFile, string authCode = null, string email = null)
-        {
-            var startDate = DateTime.Now;
-
-            UploadDocumentResponse responseMessages = new UploadDocumentResponse();
-
-            List<XmlParamsResponseTrackId> trackIdList = new List<XmlParamsResponseTrackId>();
-
-            var contentFileList = contentFile.ExtractMultipleZip();
-
-            //Validar si tiene problemas el Zip enviado
-            if (DianServicesUtils.ValidateIfZipHasFlagsErrors(fileName, contentFileList, trackIdList, ref responseMessages))
-                return responseMessages;
-
-            var zipKey = Guid.NewGuid().ToString();
-
-            Parallel.ForEach(contentFileList, new ParallelOptions { MaxDegreeOfParallelism = 1 }, contentXmlFile =>
-            {
-                XmlParamsResponseTrackId respTrackId = new XmlParamsResponseTrackId();
-
-                //Validar si algun xml contenido del zip enviado contiene error
-                if (DianServicesUtils.ValidateIfZipParamHasError(contentXmlFile.XmlFileName, contentXmlFile, ref trackIdList))
-                    return;
-
-                var tupleEmbeddedElements = XmlUtil.GetEmbeddedXElementFromAttachment(contentXmlFile.XmlBytes);
-
-                if (!DianServicesUtils.ValidateIfEmbeddedAttachmentHasItems(tupleEmbeddedElements, contentXmlFile.XmlFileName, ref trackIdList))
-                    return;
-
-                if (!XmlUtil.ValidateIfAttachmentSameDocumentKey(tupleEmbeddedElements, contentXmlFile.XmlFileName, ref trackIdList))
-                    return;
-
-                var xmlBase64 = Convert.ToBase64String(tupleEmbeddedElements.Item1);
-
-                var requestObj = DianServicesUtils.CreateRequestObject(xmlBase64);
-
-                //ResponseXpathDataValue responseXpathValues = DianServicesUtils.GetXpathDataValues(requestObj);
-                ResponseXpathDataValue responseXpathValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), requestObj);
-
-                //Validar si respuesta de la function viene con errores
-                if (!DianServicesUtils.ValidateXpathValuesResponse(responseXpathValues, contentXmlFile.XmlFileName, ref trackIdList))
-                    return;
-
-                //Validar campos mandatorios basicos para el trabajo del WS
-                if (!DianServicesUtils.ValidateXpathValues(responseXpathValues, contentXmlFile.XmlFileName, ref trackIdList))
-                    return;
-
-                var senderCode = responseXpathValues.XpathsValues["SenderCodeXpath"];
-                var docKey = responseXpathValues.XpathsValues["DocumentKeyXpath"];
-
-                if (senderCode.Contains('|'))
-                    senderCode = senderCode.Split('|').Last();
-
-                //Validar que el SenderCode coincide con las empresas permitidas de un PA
-                if (!DianServicesUtils.ValidateIfIsAllowedToSend(contentXmlFile.XmlFileName, senderCode, authCode, email, ref trackIdList))
-                    return;
-
-                if (!string.IsNullOrEmpty(responseXpathValues.XpathsValues["SeriesXpath"]))
-                    responseXpathValues.XpathsValues["NumberXpath"] = responseXpathValues.XpathsValues["NumberXpath"].Substring(responseXpathValues.XpathsValues["SeriesXpath"].Length, responseXpathValues.XpathsValues["NumberXpath"].Length - responseXpathValues.XpathsValues["SeriesXpath"].Length);
-
-                responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues["SeriesXpath"]}{responseXpathValues.XpathsValues["NumberXpath"]}";
-
-                _ublVersion = int.Parse(DianServicesUtils.StractUblVersion(responseXpathValues.XpathsValues["UblVersionXpath"]));
-
-                var receiverCode = responseXpathValues.XpathsValues["ReceiverCodeXpath"];
-                var docTypeCode = responseXpathValues.XpathsValues["DocumentTypeXpath"];
-                if (string.IsNullOrEmpty(docTypeCode))
-                    docTypeCode = responseXpathValues.XpathsValues["DocumentTypeId"];
-
-                var trackId = responseXpathValues.XpathsValues["DocumentKeyXpath"];
-
-                var identifier = StringUtil.EncryptSHA256($"{senderCode}{docTypeCode}{responseXpathValues.XpathsValues["SeriesAndNumberXpath"]}");
-                ////Validar si documento fue insertado anteriormente con mismo CUFE
-                var documentEntity = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
-                //Validar si documento fue insertado anteriormente con mismo CUFE
-                if (DianServicesUtils.ValidateIfDocumentSentAlready(documentEntity, contentXmlFile.XmlFileName, ref trackIdList))
-                    return;
-
-                var category = DianServicesUtils.GetEnumDescription((DianServicesUtils.Category)_ublVersion);
-
-                var sendRequestObj = new { category, xmlBase64, fileName = contentXmlFile.XmlFileName, documentTypeId = docTypeCode, trackId, zipKey };
-
-                // Inserta en DianFileMapper
-                DianServicesUtils.UploadXml(contentXmlFile.XmlFileName, trackId, sendRequestObj);
-
-                var requestObjTrackId = new { trackId };
-
-                // send to validate document async
-                var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("ValidateDocumentAsyncUrl"), requestObjTrackId);
-                var result = response.Content.ReadAsStringAsync().Result;
-
-                DianServicesUtils.ValidateResultValidatorFunction(trackId, result, contentXmlFile.XmlFileName, respTrackId, ref trackIdList);
-
-                var processTime = (DateTime.Now - startDate).TotalSeconds;
-
-                DianServicesUtils.EventRuleNotification(processTime, int.Parse(docTypeCode), _ublVersion.ToString(), 1, senderCode, false, true);
-            });
-
-            responseMessages.ZipKey = zipKey;
-            responseMessages.ErrorMessageList = trackIdList.Any() ? trackIdList : null;
-
-            return responseMessages;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <returns></returns>
         public ExchangeEmailResponse GetExchangeEmails(string authCode)
         {
-            var contributor = TableManagerGlobalContributor.Find<GlobalContributor>(authCode, authCode);
+            var contributor = GetGlobalContributor(authCode);
             if (contributor == null)
-                return new ExchangeEmailResponse { StatusCode = "90", Success = false, Message = $"NIT {authCode} no autorizado para consultar correos de recepción de facturas.", CsvBase64Bytes = null };
+                return new ExchangeEmailResponse { StatusCode = "89", Success = false, Message = $"NIT {authCode} no autorizado para consultar correos de recepción de facturas.", CsvBase64Bytes = null };
 
             var bytes = fileManager.GetBytes("dian", $"exchange/emails.csv");
             var response = new ExchangeEmailResponse { StatusCode = "0", Success = true, CsvBase64Bytes = bytes };
@@ -740,30 +472,35 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var validations = new List<GlobalDocValidatorTracking>();
                     List<Task> arrayTasks = new List<Task>();
 
-                    Task firstLocalRun = Task.Run(() =>
-                    {
-                        var applicationResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
-                        response.XmlBase64Bytes = !applicationResponse.Success ? null : applicationResponse.Content;
-                        if (!applicationResponse.Success)
-                            Debug.WriteLine(applicationResponse.Message);
-                    });
+                    //Task firstLocalRun = Task.Run(() =>
+                    //{
+                    //    var applicationResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
+                    //    response.XmlBase64Bytes = !applicationResponse.Success ? null : applicationResponse.Content;
+                    //    if (!applicationResponse.Success)
+                    //        Debug.WriteLine(applicationResponse.Message);
+                    //});
+
                     Task secondLocalRun = Task.Run(() =>
                     {
                         documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
                         if (!string.IsNullOrEmpty(documentMeta.Identifier))
-                            existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
+                            existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
                         applicationResponseExist = XmlUtil.ApplicationResponseExist(documentMeta);
                     });
 
                     Task fourLocalRun = Task.Run(() =>
                     {
-                        validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
+                        validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
+                        //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
                     });
 
-                    arrayTasks.Add(firstLocalRun);
+                    //arrayTasks.Add(firstLocalRun);
                     arrayTasks.Add(secondLocalRun);
                     arrayTasks.Add(fourLocalRun);
                     Task.WhenAll(arrayTasks).Wait();
+
+                    var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
+                    response.XmlBase64Bytes = applicationResponse ?? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations);
 
                     response.XmlDocumentKey = trackId;
                     response.XmlFileName = documentMeta.FileName;
@@ -921,7 +658,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 var eventResponse = new EventResponse()
                 {
-                    Code = "90",
+                    Code = "89",
                     Message = contentFileList.Any(f => f.MaxQuantityAllowedFailed) ? countOverOneMess : countZeroMess
                 };
                 eventsResponse.Add(eventResponse);
@@ -934,31 +671,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 var xmlBase64 = Convert.ToBase64String(contentBytes);
 
-                var requestObj = new Dictionary<string, string>
-                {
-                    { "XmlBase64", xmlBase64},
-                    { "CUDEXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='UUID']" },
-                    { "DocumentKeyXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']" },
-                    { "ResponseCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" }
-                };
+                var xmlParser = new XmlParser(contentBytes);
+                if (!xmlParser.Parser())
+                    throw new Exception(xmlParser.ParserError);
 
-                ResponseXpathDataValue responseXpathValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), requestObj);
+                var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
 
-                if (responseXpathValues == null || !responseXpathValues.Success)
-                {
-                    var eventResponse = new EventResponse()
-                    {
-                        Code = "Error",
-                        Message = "ApplicationResponse con errores"
-                    };
-
-                    eventsResponse.Add(eventResponse);
-                    continue;
-                }
-
-                var appResponseKey = responseXpathValues.XpathsValues["CUDEXpath"];
-                var documentKey = responseXpathValues.XpathsValues["DocumentKeyXpath"];
-                var responseCode = responseXpathValues.XpathsValues["ResponseCodeXpath"];
+                var appResponseKey = documentParsed.Cude;
+                var documentKey = documentParsed.DocumentKey.ToLower();
+                var responseCode = documentParsed.ResponseCode;
 
                 var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
 
@@ -1045,7 +766,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             return eventsResponse;
         }
-
 
         /// <summary>
         /// 
@@ -1141,57 +861,74 @@ namespace Gosocket.Dian.Services.ServicesGroup
         public EventResponse GetXmlByDocumentKey(string trackId, string authCode)
         {
             var eventResponse = new EventResponse();
+            //authCode = "9005089089";
 
-            var downloadXmlRequest = new { trackId };
-            var responseDownloadXml = ApiHelpers.ExecuteRequest<ResponseDownloadXml>(ConfigurationManager.GetValue("DownloadXmlUrl"), downloadXmlRequest);
-
-            if (!responseDownloadXml.Success)
+            var documentKey = trackId.ToLower();
+            var globalDocValidatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
+            if (globalDocValidatorDocumentMeta == null)
             {
-                eventResponse.Code = "205";
-                eventResponse.Message = responseDownloadXml.Message;
+                eventResponse.Code = "404";
+                eventResponse.Message = $"Xml con CUFE: '{documentKey}' no encontrado.";
                 return eventResponse;
             }
-            else
+
+            var identifier = globalDocValidatorDocumentMeta.Identifier;
+            var globalDocValidatorDocument = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
+            if (globalDocValidatorDocument == null)
             {
-                var getXpathDataValuesRequest = new Dictionary<string, string>
-                {
-                    { "XmlBase64", responseDownloadXml.XmlBase64},
-                    { "SenderCodeXpath", "//*[local-name()='AccountingSupplierParty']/*[local-name()='Party']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']|/*[local-name()='Invoice']/*[local-name()='AccountingSupplierParty']/*[local-name()='Party']/*[local-name()='PartyIdentification']/*[local-name()='ID']" },
-                    { "ReceiverCodeXpath", "//*[local-name()='AccountingCustomerParty']/*[local-name()='Party']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']|/*[local-name()='Invoice']/*[local-name()='AccountingCustomerParty']/*[local-name()='Party']/*[local-name()='PartyIdentification']/*[local-name()='ID']" }
-                };
+                eventResponse.Code = "404";
+                eventResponse.Message = $"Xml con CUFE: '{documentKey}' no encontrado.";
+                return eventResponse;
+            }
 
-                var responseXpathValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), getXpathDataValuesRequest);
-                if (responseXpathValues == null || !responseXpathValues.Success)
-                {
-                    eventResponse.Code = "206";
-                    eventResponse.Message = "Xml con errores en los campos número documento emisor o número documento receptor";
-                    return eventResponse;
-                }
+            if (globalDocValidatorDocument.DocumentKey != documentKey)
+            {
+                eventResponse.Code = "404";
+                eventResponse.Message = $"Xml con CUFE: '{documentKey}' no encontrado.";
+                return eventResponse;
+            }
 
-                var senderCode = responseXpathValues.XpathsValues["SenderCodeXpath"].Split('|').FirstOrDefault();
-                var receiverCode = responseXpathValues.XpathsValues["ReceiverCodeXpath"].Split('|').FirstOrDefault();
+            var xmlBytes = GetXmlFromStorage(documentKey);
+            if (xmlBytes == null)
+            {
+                eventResponse.Code = "404";
+                eventResponse.Message = $"Xml con CUFE: '{documentKey}' no encontrado.";
+                return eventResponse;
+            }
 
-                if (!authCode.Contains(senderCode) && !authCode.Contains(receiverCode))
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+            {
+                eventResponse.Code = "206";
+                eventResponse.Message = "Xml con errores en los campos número documento emisor o número documento receptor";
+                return eventResponse;
+            }
+
+            var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
+
+            var senderCode = documentParsed.SenderCode;
+            var receiverCode = documentParsed.ReceiverCode;
+
+            if (!authCode.Contains(senderCode) && !authCode.Contains(receiverCode))
+            {
+                // pt con emisor
+                var authEntity = GetAuthorization(senderCode, authCode);
+                if (authEntity == null)
                 {
-                    // pt con emisor
-                    var authEntity = GetAuthorization(senderCode, authCode);
+                    // pt con receptor
+                    authEntity = GetAuthorization(receiverCode, authCode);
                     if (authEntity == null)
                     {
-                        // pt con receptor
-                        authEntity = GetAuthorization(senderCode, receiverCode);
-                        if (authEntity == null)
-                        {
-                            eventResponse.Code = "401";
-                            eventResponse.Message = $"NIT: {authCode} del certificado no autorizado para consultar xmls de emisor con NIT: {senderCode} y receptor con NIT: {receiverCode}";
-                            return eventResponse;
-                        }
+                        eventResponse.Code = "401";
+                        eventResponse.Message = $"NIT: {authCode} del certificado no autorizado para consultar xmls de emisor con NIT: {senderCode} y receptor con NIT: {receiverCode}";
+                        return eventResponse;
                     }
                 }
             }
 
             eventResponse.Code = "100";
             eventResponse.Message = $"Accion completada OK";
-            eventResponse.XmlBytesBase64 = responseDownloadXml.XmlBase64;
+            eventResponse.XmlBytesBase64 = Convert.ToBase64String(xmlBytes);
 
             return eventResponse;
         }
@@ -1205,12 +942,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="serie"></param>
         /// <param name="number"></param>
         /// <returns></returns>
-        private DianResponse CheckDocumentDuplicity(string senderCode, string documentType, string serie, string number)
+        private DianResponse CheckDocumentDuplicity(string senderCode, string documentType, string serieAndNumber, string trackId)
         {
             var response = new DianResponse(); ;
             // identifier
             if (new string[] { "01", "02", "04" }.Contains(documentType)) documentType = "01";
-            var identifier = StringUtil.GenerateIdentifierSHA256($"{senderCode}{documentType}{serie}{number}");
+            var identifier = StringUtil.GenerateIdentifierSHA256($"{senderCode}{documentType}{serieAndNumber}");
             var document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
             if (document != null)
             {
@@ -1219,15 +956,40 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     $"Regla: 90, Rechazo: Documento procesado anteriormente."
                 };
                 response.IsValid = false;
+                response.StatusCode = "99";
                 response.StatusMessage = "Documento con errores en campos mandatorios.";
                 response.StatusDescription = "Validación contiene errores en campos mandatorios.";
                 response.ErrorMessage = new List<string>();
                 response.ErrorMessage.AddRange(failedList);
                 var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(document.DocumentKey, document.DocumentKey);
-                var xmlBytes = GetApplicationResponseIfExist(documentMeta);
+                var xmlBytes = XmlUtil.GetApplicationResponseIfExist(documentMeta);
                 response.XmlBase64Bytes = xmlBytes;
                 response.XmlDocumentKey = document.DocumentKey;
                 return response;
+            }
+
+            // double check
+            var meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (meta != null)
+            {
+                document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
+                if (document != null)
+                {
+                    var failedList = new List<string>
+                {
+                    $"Regla: 90, Rechazo: Documento con CUFE '{document.DocumentKey}' procesado anteriormente."
+                };
+                    response.IsValid = false;
+                    response.StatusCode = "99";
+                    response.StatusMessage = "Documento con errores en campos mandatorios.";
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                    response.ErrorMessage = new List<string>();
+                    response.ErrorMessage.AddRange(failedList);
+                    var xmlBytes = XmlUtil.GetApplicationResponseIfExist(meta);
+                    response.XmlBase64Bytes = xmlBytes;
+                    response.XmlDocumentKey = document.DocumentKey;
+                    return response;
+                }
             }
 
             return null;
@@ -1236,89 +998,46 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="documentMeta"></param>
-        /// <returns></returns>
-        public byte[] GetApplicationResponseIfExist(GlobalDocValidatorDocumentMeta documentMeta)
-        {
-            if (documentMeta == null) return null;
-            var processDate = documentMeta.Timestamp;
-            var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
-            var isValidFolder = "Success";
-            var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
-            var xmlBytes = fileManager.GetBytes("dian", fileName);
-            if (xmlBytes == null)
-            {
-                fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
-                xmlBytes = fileManager.GetBytes("dian", fileName);
-            }
-            if (xmlBytes == null)
-            {
-                var applicationResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId = documentMeta.PartitionKey });
-                xmlBytes = !applicationResponse.Success ? null : applicationResponse.Content;
-            }
-            return xmlBytes;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="senderCode"></param>
+        /// <param name="code"></param>
         /// <param name="authCode"></param>
         /// <returns></returns>
-        private GlobalAuthorization GetAuthorization(string senderCode, string authCode)
+        private GlobalAuthorization GetAuthorization(string code, string authCode)
         {
-
-            //if(!string.IsNullOrEmpty(senderCode) && !string.IsNullOrEmpty(authCode))
-            //{
-
-            //}
 
             var authorization = new GlobalAuthorization();
             var trimAuthCode = authCode?.Trim();
-            var cacheItemKey = $"auth-{trimAuthCode}";
-            //var cacheItem = InstanceCache.AuthorizationsInstanceCache.GetCacheItem(cacheItemKey);
-            //if (cacheItem == null)
-            {
-                var newAuthCode = trimAuthCode?.Substring(0, trimAuthCode.Length - 1);
-                authorization = TableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, senderCode);
-                if (authorization == null)
-                    authorization = TableManagerGlobalAuthorization.Find<GlobalAuthorization>(newAuthCode, senderCode);
-                if (authorization == null) return null;
-                //CacheItemPolicy policy = new CacheItemPolicy
-                //{
-                //    AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1)
-                //};
-                //InstanceCache.AuthorizationsInstanceCache.Set(new CacheItem($"auth-{authorization.PartitionKey}", authorization), policy);
-            }
-            //else
-            //    authorization = (GlobalAuthorization)cacheItem.Value;
+            var newAuthCode = trimAuthCode?.Substring(0, trimAuthCode.Length - 1);
+            authorization = TableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
+            if (authorization == null) authorization = TableManagerGlobalAuthorization.Find<GlobalAuthorization>(newAuthCode, code);
+            if (authorization == null) return null;
 
             return authorization;
         }
-        #endregion
-    }
+        private GlobalContributor GetGlobalContributor(string authCode)
+        {
+            var globalContributor = new GlobalContributor();
+            var trimAuthCode = authCode?.Trim();
+            var newAuthCode = trimAuthCode?.Substring(0, trimAuthCode.Length - 1);
+            globalContributor = TableManagerGlobalContributor.Find<GlobalContributor>(trimAuthCode, trimAuthCode);
+            if (globalContributor == null) globalContributor = TableManagerGlobalContributor.Find<GlobalContributor>(newAuthCode, newAuthCode);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class RequestObject
-    {
-        [JsonProperty(PropertyName = "category")]
-        public string Category { get; set; }
-        [JsonProperty(PropertyName = "xmlBase64")]
-        public string XmlBase64 { get; set; }
-        [JsonProperty(PropertyName = "fileName")]
-        public string FileName { get; set; }
-        [JsonProperty(PropertyName = "documentTypeId")]
-        public string DocumentTypeId { get; set; }
-        [JsonProperty(PropertyName = "trackId")]
-        public string TrackId { get; set; }
-        [JsonProperty(PropertyName = "zipKey")]
-        public string ZipKey { get; set; }
-        [JsonProperty(PropertyName = "isEvent")]
-        public bool? IsEvent { get; set; }
-        public string SoftwareId { get; set; }
-        [JsonProperty(PropertyName = "testSetId")]
-        public string TestSetId { get; set; }
+            return globalContributor;
+        }
+        public static byte[] GetXmlFromStorage(string trackId)
+        {
+            var tableManager = new TableManager("GlobalDocValidatorRuntime");
+            var documentStatusValidation = tableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
+            if (documentStatusValidation == null)
+                return null;
+
+            var fileManager = new FileManager();
+            var container = $"global";
+            var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
+            var xmlBytes = fileManager.GetBytes(container, fileName);
+
+            tableManager = null;
+            return xmlBytes;
+        }
+        #endregion
     }
 }

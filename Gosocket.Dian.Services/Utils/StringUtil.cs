@@ -126,5 +126,12 @@ namespace Gosocket.Dian.Services.Utils
             return builder.ToString();
         }
 
+        public static string TextAfter(string value, string search)
+        {
+            search = search ?? "";
+            //var length = search != null ? search.Length : 0;
+            return value.Substring(value.IndexOf(search) + search.Length);
+        }
+
     }
 }
