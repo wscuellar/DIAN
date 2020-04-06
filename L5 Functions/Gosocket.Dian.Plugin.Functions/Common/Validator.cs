@@ -142,7 +142,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Cufe validation
-        public ValidateListResponse ValidateCufe(ResponseXpathDataValue responseXpathDataValue, string trackId)
+        public ValidateListResponse ValidateCufe(CufeModel cufeModel, string trackId)
         {
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
@@ -151,7 +151,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string key = string.Empty;
             var errorCode = "FAD06";
             var prop = "CUFE";
-            string[] codesWithCUDE = { "03", "91", "92" };
+            string[] codesWithCUDE = { "03", "91", "92", "96" };
             if (codesWithCUDE.Contains(documentMeta.DocumentTypeId))
                 prop = "CUDE";
             if (documentMeta.DocumentTypeId == "91")
@@ -166,7 +166,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 key = ConfigurationManager.GetValue("TestHabTechnicalKey");
             else
             {
-                var softwareId = responseXpathDataValue.XpathsValues["SoftwareIdXpath"];
+                var softwareId = cufeModel.SoftwareId;
                 if (softwareId == billerSoftwareId)
                     key = billerSoftwarePin;
                 else
@@ -190,30 +190,38 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = $"Valor del {prop} no está calculado correctamente." };
 
-            var number = responseXpathDataValue.XpathsValues["NumberXpath"];
-            var emissionDate = responseXpathDataValue.XpathsValues["EmissionDateXpath"];
-            var emissionHour = responseXpathDataValue.XpathsValues["HourEmissionXpath"];
-            var amount = responseXpathDataValue.XpathsValues["AmountXpath"];
+            var number = cufeModel.SerieAndNumber;
+            var emissionDate = cufeModel.EmissionDate;
+            var emissionHour = cufeModel.HourEmission;
+            var amount = cufeModel.Amount?.Trim();
             if (string.IsNullOrEmpty(amount)) amount = "0.00"; else amount = TruncateDecimal(decimal.Parse(amount), 2).ToString("F2");
             var taxCode1 = "01";
             var taxCode2 = "04";
             var taxCode3 = "03";
-            var taxAmount1 = responseXpathDataValue.XpathsValues["TaxAmount1Xpath"];
-            taxAmount1 = taxAmount1.Split('|')[0];
-            var taxAmount2 = responseXpathDataValue.XpathsValues["TaxAmount2Xpath"];
-            var taxAmount3 = responseXpathDataValue.XpathsValues["TaxAmount3Xpath"];
+            var taxAmount1 = cufeModel.TaxAmount1?.Trim();
+            taxAmount1 = taxAmount1?.Split('|')[0];
+            var taxAmount2 = cufeModel.TaxAmount2?.Trim();
+            var taxAmount3 = cufeModel.TaxAmount3?.Trim();
 
             if (string.IsNullOrEmpty(taxAmount1)) taxAmount1 = "0.00"; else taxAmount1 = TruncateDecimal(decimal.Parse(taxAmount1), 2).ToString("F2");
             if (string.IsNullOrEmpty(taxAmount2)) taxAmount2 = "0.00"; else taxAmount2 = TruncateDecimal(decimal.Parse(taxAmount2), 2).ToString("F2");
             if (string.IsNullOrEmpty(taxAmount3)) taxAmount3 = "0.00"; else taxAmount3 = TruncateDecimal(decimal.Parse(taxAmount3), 2).ToString("F2");
-            var amountToPay = responseXpathDataValue.XpathsValues["AmountToPayXpath"];
+            var amountToPay = cufeModel.TotalAmount?.Trim();
             if (string.IsNullOrEmpty(amountToPay)) amountToPay = "0.00"; else amountToPay = TruncateDecimal(decimal.Parse(amountToPay), 2).ToString("F2");
-            var senderCode = responseXpathDataValue.XpathsValues["SenderCodeXpath"];
-            var receiverCode = responseXpathDataValue.XpathsValues["ReceiverCodeXpath"];
-            var environmentType = responseXpathDataValue.XpathsValues["EnvironmentTypeXpath"];
+            var senderCode = cufeModel.SenderCode;
+            var receiverCode = cufeModel.ReceiverCode;
+            var environmentType = cufeModel.EnvironmentType;
 
             var data = $"{number}{emissionDate}{emissionHour}{amount}{taxCode1}{taxAmount1}{taxCode2}{taxAmount2}{taxCode3}{taxAmount3}{amountToPay}{senderCode}{receiverCode}{key}{environmentType}";
-            var documentKey = responseXpathDataValue.XpathsValues["DocumentKeyXpath"];
+            var documentKey = cufeModel.DocumentKey;
+
+            // Only for AR
+            if (cufeModel.DocumentTypeId == "96")
+            {
+                data = $"{cufeModel.SerieAndNumber}{cufeModel.EmissionDate}{cufeModel.HourEmission}{cufeModel.SenderCode}{cufeModel.ReceiverCode}{cufeModel.ResponseCode}{cufeModel.ReferenceId}{cufeModel.ReferenceTypeCode}{key}";
+                documentKey = cufeModel.Cude;
+            }
+
             var hash = data.EncryptSHA384();
 
             if (documentKey.ToLower() == hash)
@@ -250,7 +258,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region NIT validations
-        public List<ValidateListResponse> ValidateNit(ResponseXpathDataValue responseXpathDataValue, string trackId)
+        public List<ValidateListResponse> ValidateNit(NitModel nitModel, string trackId)
         {
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
@@ -258,38 +266,38 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
-            var senderCode = responseXpathDataValue.XpathsValues["SenderCodeXpath"];
-            var senderCodeDigit = responseXpathDataValue.XpathsValues["SenderCodeDigitXpath"];
+            var senderCode = nitModel.SenderCode;
+            var senderCodeDigit = nitModel.SenderCodeDigit;
 
-            var senderCodeProvider = responseXpathDataValue.XpathsValues["SenderCodeProviderXpath"];
-            var senderCodeProviderDigit = responseXpathDataValue.XpathsValues["SenderCodeProviderDigitXpath"];
+            var senderCodeProvider = nitModel.ProviderCode;
+            var senderCodeProviderDigit = nitModel.ProviderCodeDigit;
 
-            var receiverCode = responseXpathDataValue.XpathsValues["ReceiverCodeXpath"];
-            var receiverCodeSchemeNameValue = responseXpathDataValue.XpathsValues["ReceiverCodeSchemeNameValueXpath"];
+            var receiverCode = nitModel.ReceiverCode;
+            var receiverCodeSchemeNameValue = nitModel.ReceiverCodeSchemaValue;
             if (receiverCodeSchemeNameValue == "31")
             {
                 string receiverDvErrorCode = "FAK24";
                 if (documentMeta.DocumentTypeId == "91") receiverDvErrorCode = "CAK24";
                 else if (documentMeta.DocumentTypeId == "92") receiverDvErrorCode = "DAK24";
 
-                var receiverCodeDigit = responseXpathDataValue.XpathsValues["ReceiverCodeDigitXpath"];
+                var receiverCodeDigit = nitModel.ReceiverCodeDigit;
                 if (string.IsNullOrEmpty(receiverCodeDigit) || receiverCodeDigit == "undefined") receiverCodeDigit = "11";
                 if (ValidateDigitCode(receiverCode, int.Parse(receiverCodeDigit)))
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = "(R) DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
 
-            var receiver2Code = responseXpathDataValue.XpathsValues["ReceiverCode2Xpath"];
+            var receiver2Code = nitModel.ReceiverCode2;
             if (receiverCode != receiver2Code)
             {
-                var receiver2CodeSchemeNameValue = responseXpathDataValue.XpathsValues["ReceiverCode2SchemeNameValueXpath"];
+                var receiver2CodeSchemeNameValue = nitModel.ReceiverCode2SchemaValue;
                 if (receiver2CodeSchemeNameValue == "31")
                 {
                     string receiver2DvErrorCode = "FAK47";
                     if (documentMeta.DocumentTypeId == "91") receiver2DvErrorCode = "CAK47";
                     else if (documentMeta.DocumentTypeId == "92") receiver2DvErrorCode = "DAK47";
 
-                    var receiver2CodeDigit = responseXpathDataValue.XpathsValues["ReceiverCode2DigitXpath"];
+                    var receiver2CodeDigit = nitModel.ReceiverCode2Digit;
                     if (string.IsNullOrEmpty(receiver2CodeDigit) || receiver2CodeDigit == "undefined") receiver2CodeDigit = "11";
                     if (ValidateDigitCode(receiver2Code, int.Parse(receiver2CodeDigit)))
                         responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -297,18 +305,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            var softwareProviderCode = responseXpathDataValue.XpathsValues["SoftwareProviderCodeXpath"];
-            var softwareProviderCodeDigit = responseXpathDataValue.XpathsValues["SoftwareProviderCodeDigitXpath"];
-
-            // Participante (consorcio)
-            var sheldHolderCode = responseXpathDataValue.XpathsValues["SheldHolderCodeXpath"].Split('|');
-            var sheldHolderSchemaNameValues = responseXpathDataValue.XpathsValues["SheldHolderSchemaNameValueXpath"].Split('|');
-            var sheldHolderCodeDigit = responseXpathDataValue.XpathsValues["SheldHolderCodeDigitXpath"].Split('|');
-
-            // Principal (mandante)
-            var agentPartyCode = responseXpathDataValue.XpathsValues["AgentPartyCodeXpath"].Split('|');
-            var agentPartySchemaNameValues = responseXpathDataValue.XpathsValues["AgentPartySchemaNameValueXpath"].Split('|');
-            var agentPartyCodeDigit = responseXpathDataValue.XpathsValues["AgentPartyCodeDigitXpath"].Split('|');
+            var softwareProviderCode = nitModel.SoftwareProviderCode;
+            var softwareProviderCodeDigit = nitModel.SoftwareProviderCodeDigit;
 
             // Sender
             var sender = GetContributorInstanceCache(senderCode);
@@ -398,141 +396,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProvider?.Code} Prestrador de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
 
-            var position = 0;
-            var validDv = false;
-            string sheldHolderDvErrorCode = "FAJ60";
-            if (documentMeta.DocumentTypeId == "91") sheldHolderDvErrorCode = "CAJ60";
-            else if (documentMeta.DocumentTypeId == "92") sheldHolderDvErrorCode = "DAJ60";
-
-            //string sheldHolderErrorCode = "FAJ57";
-            //if (documentMeta.DocumentTypeId == "91") sheldHolderErrorCode = "CAJ57";
-            //else if (documentMeta.DocumentTypeId == "92") sheldHolderErrorCode = "DAJ57";
-            foreach (var shell in sheldHolderCode)
-            {
-                if (!string.IsNullOrEmpty(shell))
-                {
-                    var inBound = InBounds(position, sheldHolderSchemaNameValues);
-                    if (!inBound) continue;
-                    var schemaNameValue = sheldHolderSchemaNameValues[position];
-
-                    if (schemaNameValue == "31")
-                    {
-                        inBound = InBounds(position, sheldHolderCodeDigit);
-                        if (!inBound) continue;
-                        var dv = sheldHolderCodeDigit[position];
-                        var shellHolder = GetContributorInstanceCache(shell);
-                        if (string.IsNullOrEmpty(dv) || dv == "undefined")
-                        {
-                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sheldHolderDvErrorCode, ErrorMessage = "(N) DV del NIT del participante de consorcio no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                            validDv = false;
-                            break;
-                        }
-                        if (ValidateDigitCode(shell, int.Parse(dv)))
-                            validDv = true;
-                        else
-                        {
-                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sheldHolderDvErrorCode, ErrorMessage = "(N) DV del NIT del participante de consorcio no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                            validDv = false;
-                            break;
-                        }
-                    }
-                    position += 1;
-
-                    //if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
-                    //{
-                    //    if (shellHolder != null)
-                    //        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sheldHolderErrorCode, ErrorMessage = $"{shell} del participante de consorcio válido.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    //    else
-                    //    {
-                    //        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sheldHolderErrorCode, ErrorMessage = $"{shell} del participante de consorcio no válido.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    //        break;
-                    //    }
-                    //}
-                    //else if (ConfigurationManager.GetValue("Environment") == "Prod")
-                    //{
-                    //    if (shellHolder?.StatusId == (int)ContributorStatus.Enabled)
-                    //        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sheldHolderErrorCode, ErrorMessage = $"{shell} del participante de consorcio válido.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    //    else
-                    //    {
-                    //        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sheldHolderErrorCode, ErrorMessage = $"{shell} del participante de consorcio no válido.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    //        break;
-                    //    }
-                    //}
-                }
-            }
-            if (validDv)
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sheldHolderDvErrorCode, ErrorMessage = "(N) DV del NIT del participante de consorcio está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
-            position = 0;
-            validDv = false;
-            string agentPartyDvErrorCode = "FBA07";
-            if (documentMeta.DocumentTypeId == "91") agentPartyDvErrorCode = "CBA07";
-            else if (documentMeta.DocumentTypeId == "92") agentPartyDvErrorCode = "DBA07";
-
-            //string agentPartyErrorCode = "FBA07";
-            //if (documentMeta.DocumentTypeId == "91") agentPartyErrorCode = "CBA07";
-            //else if (documentMeta.DocumentTypeId == "92") agentPartyErrorCode = "DBA07";
-            foreach (var agent in agentPartyCode)
-            {
-                if (!string.IsNullOrEmpty(agent))
-                {
-                    var inBound = InBounds(position, agentPartySchemaNameValues);
-                    if (!inBound) continue;
-                    var schemaNameValue = agentPartySchemaNameValues[position];
-
-                    if (schemaNameValue == "31")
-                    {
-                        inBound = InBounds(position, agentPartyCodeDigit);
-                        if (!inBound) continue;
-                        var dv = agentPartyCodeDigit[position];
-
-                        var agentParty = GetContributorInstanceCache(agent);
-
-                        if (string.IsNullOrEmpty(dv) || dv == "undefined")
-                        {
-                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = agentPartyDvErrorCode, ErrorMessage = "(R) DV del NIT del mandante mal calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                            validDv = false;
-                            break;
-                        }
-                        if (ValidateDigitCode(agent, int.Parse(dv)))
-                            validDv = true;
-                        else
-                        {
-                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = agentPartyDvErrorCode, ErrorMessage = "(R) DV del NIT del mandante mal calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                            validDv = false;
-                            break;
-                        }
-                    }
-                    position += 1;
-
-                    //if (schemaNameValue == "31")
-                    //{
-                    //    if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
-                    //    {
-                    //        if (agentParty != null)
-                    //            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = agentPartyErrorCode, ErrorMessage = $"{agent} NIT del mandante registrado en la DIAN.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    //        else
-                    //        {
-                    //            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = agentPartyErrorCode, ErrorMessage = $"{agent} NIT del mandante no esta registrado en la DIAN.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    //            break;
-                    //        }
-                    //    }
-                    //    else if (ConfigurationManager.GetValue("Environment") == "Prod")
-                    //    {
-                    //        if (agentParty?.StatusId == (int)ContributorStatus.Enabled)
-                    //            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = agentPartyErrorCode, ErrorMessage = $"{agent} NIT del mandante registrado en la DIAN.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    //        else
-                    //        {
-                    //            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = agentPartyErrorCode, ErrorMessage = $"{agent} NIT del mandante no esta registrado en la DIAN.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    //            break;
-                    //        }
-                    //    }
-                    //}
-                }
-            }
-            if (validDv)
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = agentPartyDvErrorCode, ErrorMessage = "(R) DV del NIT del mandante correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
@@ -574,16 +437,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Number range validation
-        public List<ValidateListResponse> ValidateNumberingRange(ResponseXpathDataValue responseXpathDataValue, string trackId)
+        public List<ValidateListResponse> ValidateNumberingRange(NumberRangeModel numberRangeModel, string trackId)
         {
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
-            var invoiceAuthorization = responseXpathDataValue.XpathsValues["InvoiceAuthorizationXpath"];
-            var softwareId = responseXpathDataValue.XpathsValues["SoftwareIdXpath"];
-            var senderCode = responseXpathDataValue.XpathsValues["SenderCodeXpath"];
+            var invoiceAuthorization = numberRangeModel.InvoiceAuthorization; //responseXpathDataValue.XpathsValues["InvoiceAuthorizationXpath"];
+            var softwareId = numberRangeModel.SoftwareId; //responseXpathDataValue.XpathsValues["SoftwareIdXpath"];
+            var senderCode = numberRangeModel.SenderCode;  //responseXpathDataValue.XpathsValues["SenderCodeXpath"];
 
             GlobalTestSetResult testSetResult = null;
             List<GlobalTestSetResult> testSetResults = null;
@@ -638,16 +501,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //
-            var startDateXpathValue = responseXpathDataValue.XpathsValues["StartDateXpath"];
-            int.TryParse(DateTime.Parse(startDateXpathValue).ToString("yyyyMMdd"), out int fromDateNumber);
+            DateTime.TryParse(numberRangeModel.StartDate, out DateTime _startDate);
+            int.TryParse(_startDate.ToString("yyyyMMdd"), out int fromDateNumber);
             if (range.ValidDateNumberFrom == fromDateNumber)
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
                 responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado no corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             //
-            var endDateXpathValue = responseXpathDataValue.XpathsValues["EndDateXpath"];
-            int.TryParse(DateTime.Parse(endDateXpathValue).ToString("yyyyMMdd"), out int toDateNumber);
+            DateTime.TryParse(numberRangeModel.EndDate, out DateTime endDate);
+            int.TryParse(endDate.ToString("yyyyMMdd"), out int toDateNumber);
             if (range.ValidDateNumberTo == toDateNumber)
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB08b", ErrorMessage = "Fecha final del rango de numeración informado corresponde a la fecha final de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
@@ -656,21 +519,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //
             //if (!string.IsNullOrEmpty(range.Serie))
             //{
-            if (range.Serie == responseXpathDataValue.XpathsValues["PrefixXpath"])
+            if (range.Serie == numberRangeModel.Serie) //responseXpathDataValue.XpathsValues["PrefixXpath"])
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAB10b", ErrorMessage = "El prefijo corresponde al prefijo autorizado en la resolución.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
                 responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAB10b", ErrorMessage = "El prefijo debe corresponder al prefijo autorizado en la resolución.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             //}
 
             //
-            long.TryParse(responseXpathDataValue.XpathsValues["StartNumberXpath"], out long fromNumber);
+            //long.TryParse(responseXpathDataValue.XpathsValues["StartNumberXpath"], out long fromNumber);
+            long.TryParse(numberRangeModel.StartNumber, out long fromNumber);
             if (range.FromNumber == fromNumber)
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB11b", ErrorMessage = "Valor inicial del rango de numeración informado corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
                 responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB11b", ErrorMessage = "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             //
-            long.TryParse(responseXpathDataValue.XpathsValues["EndNumberXpath"], out long endNumber);
+            //long.TryParse(responseXpathDataValue.XpathsValues["EndNumberXpath"], out long endNumber);
+            long.TryParse(numberRangeModel.EndNumber, out long endNumber);
             if (range.ToNumber == endNumber)
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB12b", ErrorMessage = "Valor final del rango de numeración informado corresponde a un valor final de los rangos vigentes para el contribuyente emisor.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
@@ -754,7 +619,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Software validation
-        public ValidateListResponse ValidateSoftware(ResponseXpathDataValue responseXpathDataValue, string trackId)
+        public ValidateListResponse ValidateSoftware(SoftwareModel softwareModel, string trackId)
         {
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
@@ -766,13 +631,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId == "92")
                 response.ErrorCode = "DAB27b";
 
-            var number = responseXpathDataValue.XpathsValues["NumberXpath"];
-            var softwareId = responseXpathDataValue.XpathsValues["SoftwareIdXpath"];
-            var SoftwareSecurityCode = responseXpathDataValue.XpathsValues["SoftwareSecurityCodeXpath"];
-
-            //var number = softwareModel.SerieAndNumber;
-            //var softwareId = softwareModel.SoftwareId;
-            //var SoftwareSecurityCode = softwareModel.SoftwareSecurityCode;
+            var number = softwareModel.SerieAndNumber;
+            var softwareId = softwareModel.SoftwareId;
+            var SoftwareSecurityCode = softwareModel.SoftwareSecurityCode;
 
             var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
@@ -820,7 +681,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Tax level code validation
-        public List<ValidateListResponse> ValidateTaxLevelCodes(ResponseXpathDataValue responseXpathDataValue)
+        public List<ValidateListResponse> ValidateTaxLevelCodes(Dictionary<string, string> dictionary)
         {
             DateTime startDate = DateTime.UtcNow;
             var responses = new List<ValidateListResponse>();
@@ -828,9 +689,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var typeListInstance = GetTypeListInstanceCache();
             var typeListvalues = typeListInstance.Value.Split(';');
 
+            //Get xpath values
+            var xpathValues = GetXpathValues(dictionary);
+
             //Sender tax level code validation
             var isValid = true;
-            var senderTaxLevelCodes = responseXpathDataValue.XpathsValues["SenderTaxLevelCodeXpath"].Split(';');
+            var senderTaxLevelCodes = xpathValues["SenderTaxLevelCodes"].Split(';');
             foreach (var code in senderTaxLevelCodes)
                 if (!typeListvalues.Contains(code))
                 {
@@ -842,10 +706,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAJ26", ErrorMessage = "Responsabilidad informada por emisor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             //receiver tax level code validation
-
             isValid = true;
-            var additionalAccountId = responseXpathDataValue.XpathsValues["AdditionalAccountIDXpath"];
-            var receiverTaxLevelCodes = responseXpathDataValue.XpathsValues["ReceiverTaxLevelCodeXpath"].Split(';');
+            var additionalAccountId = xpathValues["AdditionalAccountIds"];
+            var receiverTaxLevelCodes = xpathValues["ReceiverTaxLevelCodes"].Split(';');
             foreach (var code in receiverTaxLevelCodes)
                 if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
                 {
@@ -858,7 +721,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //delivery tax level code validation
             isValid = true;
-            var deliveryTaxLevelCodes = responseXpathDataValue.XpathsValues["DeliveryTaxLevelCodeXpath"].Split(';');
+            var deliveryTaxLevelCodes = xpathValues["DeliveryTaxLevelCodes"].Split(';');
             foreach (var code in deliveryTaxLevelCodes)
                 if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
                 {
@@ -870,7 +733,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAM37", ErrorMessage = "Responsabilidad informada para transportista válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             isValid = true;
-            var sheldHolderTaxLevelCodeItems = responseXpathDataValue.XpathsValues["SheldHolderTaxLevelCodeXpath"].Split('|');
+            var sheldHolderTaxLevelCodeItems = xpathValues["SheldHolderTaxLevelCodes"].Split('|');
             foreach (var item in sheldHolderTaxLevelCodeItems)
                 if (!string.IsNullOrEmpty(item))
                 {
@@ -1032,34 +895,66 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "ZD05", ErrorMessage = "Cadena de confianza del certificado digital correcta.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
         }
+        private Dictionary<string, string> GetXpathValues(Dictionary<string, string> dictionary)
+        {
+            var newDictionary = new Dictionary<string, string>();
+            foreach (var item in dictionary)
+            {
+                try
+                {
+                    if (_xmlDocument.SelectNodes(item.Value, _ns).Count == 1)
+                        newDictionary[item.Key] = _xmlDocument.SelectSingleNode(item.Value, _ns)?.InnerText;
+                    else
+                    {
+                        var values = string.Empty;
+                        var nodes = _xmlDocument.SelectNodes(item.Value, _ns);
+                        foreach (XmlNode node in nodes)
+                        {
+                            if (string.IsNullOrEmpty(values))
+                                values = node.InnerText;
+                            else
+                                values = $"{values}|{node.InnerText}";
+                        }
+                        newDictionary[item.Key] = values;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    newDictionary[item.Key] = ex.Message;
+                }
+            }
+            return newDictionary;
+        }
         private static decimal TruncateDecimal(decimal value, int preision)
         {
             decimal step = (decimal)Math.Pow(10, preision);
             decimal tmp = Math.Truncate(step * value);
             return tmp / step;
         }
-        private bool ValidateDigitCode(string code, int digit)
+        public bool ValidateDigitCode(string code, int digit)
         {
-            int[] cousins = new int[] { 0, 3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71 };
-            int dv, actualCousin, _totalOperacion = 0, residue, totalDigits = code.Length;
-
-            for (int i = 0; i < totalDigits; i++)
+            try
             {
-                actualCousin = int.Parse(code.Substring(i, 1));
-                _totalOperacion += actualCousin * cousins[totalDigits - i];
+                int[] cousins = new int[] { 0, 3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71 };
+                int dv, actualCousin, _totalOperacion = 0, residue, totalDigits = code.Length;
+
+                for (int i = 0; i < totalDigits; i++)
+                {
+                    actualCousin = int.Parse(code.Substring(i, 1));
+                    _totalOperacion += actualCousin * cousins[totalDigits - i];
+                }
+                residue = _totalOperacion % 11;
+                if (residue > 1)
+                    dv = 11 - residue;
+                else
+                    dv = residue;
+
+                return dv == digit;
             }
-            residue = _totalOperacion % 11;
-            if (residue > 1)
-                dv = 11 - residue;
-            else
-                dv = residue;
-
-            return dv == digit;
-        }
-
-        private bool InBounds(int index, string[] array)
-        {
-            return (index >= 0) && (index < array.Length);
+            catch
+            {
+                return false;
+            }
         }
         #endregion
     }
