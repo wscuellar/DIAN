@@ -23,9 +23,31 @@
                                 @{var index = 0;}
                                 @foreach (var f in Model.ContributorFiles.OrderByDescending(f => f.ContributorFileType.Id).ToList())
                                 {
+                                    var label = "";
+                                    switch (f.ContributorFileStatus.Id)
+                                    {
+                                        case 0:
+                                            label = "custom-label-warning";
+                                            break;
+                                        case 1:
+                                            label = "custom-label-primary";
+                                            break;
+                                        case 2:
+                                            label = "custom-label-success";
+                                            break;
+                                        case 3:
+                                            label = "custom-label-danger";
+                                            break;
+                                        case 4:
+                                            label = "custom-label-primary";
+                                            break;
+                                        default:
+                                            label = "custom-label-warning";
+                                            break;
+                                    };
                                     <tr data-id="@f.ContributorFileType.Id">
                                         <td class="text-left">@f.ContributorFileType.Name</td>
-                                        <td class="text-center"><span class="label label-warning">@f.ContributorFileStatus.Name</span></td>
+                                        <td class="text-center"><span class="label label-table @label">@f.ContributorFileStatus.Name</span></td>
                                         <td class="">
                                             @if (f.ContributorFileStatus.Id != 0)
                                             {

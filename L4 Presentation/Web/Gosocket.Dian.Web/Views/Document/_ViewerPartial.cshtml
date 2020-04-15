@@ -43,11 +43,16 @@
                     <img class="img-responsive" style="max-height: 130px;" src="~/Content/img/LogoDian.png">
                 </div>
                 <div class="col-md-5" style="padding-top: 7px; padding-left: 0">
+                    CUFE: @Model.Document.DocumentKey<br>
                 </div>
                 <div class="col-md-4" style="padding-top: 7px; padding-left: 0;">
                     <p style="text-align: right;">
                         <span class="tipo-doc">@Model.Document.DocumentTypeName</span>
                         <br>
+                        @if (!string.IsNullOrEmpty(Model.Document.Serie))
+                        {
+                            @Html.Raw($"Serie: {Model.Document.Serie}<br>");
+                        }
                         Folio: @Model.Document.Number<br>
                         Fecha emisión: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br>
                     </p>
@@ -78,7 +83,7 @@
                         </p>
                         <p style="text-align: right;font-weight: bold;">
                             @*IVA 5%: @Model.Document.TaxesDetail.TaxAmountIva5Percent.ToString("C0")<br>
-                            IVA 19%: @Model.Document.TaxesDetail.TaxAmountIva19Percent.ToString("C0")<br>*@
+                                IVA 19%: @Model.Document.TaxesDetail.TaxAmountIva19Percent.ToString("C0")<br>*@
                             IVA: @Model.Document.TaxAmountIva.ToString("C0")<br>
                             Total: @Model.Document.TotalAmount.ToString("C0")<br>
                         </p>
@@ -96,7 +101,7 @@
 </div>
 @if (Model.Validations != null && Model.Validations.Count() == 0)
 {
-    <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i>  Todas las validaciones han sido satisfactorias.</h5>
+    <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i>  Documento validado por la DIAN.</h5>
 }
 else
 {

@@ -53,13 +53,8 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Proveedor")]
         public string ContributorName { get; set; }
 
-        //public int ContributorId { get; set; }
-
         [Display(Name = "NIT de proveedor")]
         public string ContributorCode { get; set; }
-
-        //[Display(Name = "Proveedor")]
-        //public string ContributorName { get; set; }
 
         [Required(ErrorMessage = "El Pin es requerido.")]
         [RegularExpression(@"\d{5}",ErrorMessage = "Debe ser numérico y tener 5 dígitos.")]
@@ -70,7 +65,6 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Nombre")]
         public string Name { get; set; }
 
-        //[Required(ErrorMessage = "La fecha es requerida.")]
         [Display(Name = "Fecha")]
         public DateTime? Date { get; set; }
 

@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Utils;
 using Gosocket.Dian.Infrastructure;
@@ -55,6 +56,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
         private readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
+        private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
 
         private IdentificationTypeService identificationTypeService = new IdentificationTypeService();
         private ContributorService contributorService = new ContributorService();
@@ -366,6 +368,12 @@ namespace Gosocket.Dian.Web.Controllers
             if (!ModelState.IsValid)
                 return View("CertificateLogin", model);
 
+            if (!model.CompanyCode.EncryptSHA256().Equals(model.HashCode))
+            {
+                ModelState.AddModelError($"CertificateLoginFailed", "NIT de empresa no corresponde al NIT informado en el certificado.");
+                return View("CertificateLogin", model);
+            }
+
             var user = userService.GetByCodeAndIdentificationTyte(model.UserCode, model.IdentificationType);
             if (user == null)
             {
@@ -404,7 +412,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Token = Guid.NewGuid().ToString(), Status = true };
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Certificate.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
                 dianAuthTableManager.InsertOrUpdate(auth);
             }
             else
@@ -415,6 +423,7 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.UserId = user.Id;
                     auth.Email = user.Email;
                     auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.Certificate.GetDescription();
                     auth.Token = Guid.NewGuid().ToString();
                     auth.Status = true;
                     dianAuthTableManager.InsertOrUpdate(auth);
@@ -466,7 +475,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("CompanyLogin", model);
             }
 
-            if (contributor.StatusRut == (int)Domain.Common.StatusRut.Cancelled)
+            if (contributor.StatusRut == (int)StatusRut.Cancelled)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Contribuyente tiene RUT en estado cancelado.");
                 return View("CompanyLogin", model);
@@ -481,7 +490,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Token = Guid.NewGuid().ToString(), Status = true };
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Company.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
                 dianAuthTableManager.InsertOrUpdate(auth);
             }
             else
@@ -492,6 +501,7 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.UserId = user.Id;
                     auth.Email = user.Email;
                     auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.Company.GetDescription();
                     auth.Token = Guid.NewGuid().ToString();
                     auth.Status = true;
                     dianAuthTableManager.InsertOrUpdate(auth);
@@ -563,32 +573,32 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("PersonLogin", model);
             }
 
-            var contributor = user.Contributors.FirstOrDefault(c => c.PersonType == (int)Domain.Common.PersonType.Natural && c.Name.ToLower() == user.Name.ToLower());
+            var contributor = user.Contributors.FirstOrDefault(c => c.PersonType == (int)PersonType.Natural && c.Name.ToLower() == user.Name.ToLower());
             if (contributor == null)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "Persona natural sin permisos asociados.");
                 return View("PersonLogin", model);
             }
 
-            if (contributor.StatusRut == (int)Domain.Common.StatusRut.Cancelled)
+            if (contributor.StatusRut == (int)StatusRut.Cancelled)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "Contribuyente tiene RUT en estado cancelado.");
                 return View("PersonLogin", model);
             }
 
-            if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)Domain.Common.ContributorStatus.Enabled)
+            if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "Usted no se ecuentra habilitado.");
                 return View("PersonLogin", model);
             }
 
             var pk = $"{model.IdentificationType}|{model.PersonCode}";
-            var rk = $"{user.Contributors.FirstOrDefault(c => c.PersonType == (int)Domain.Common.PersonType.Natural && c.Name.ToLower() == user.Name.ToLower())?.Code}";
+            var rk = $"{user.Contributors.FirstOrDefault(c => c.PersonType == (int)PersonType.Natural && c.Name.ToLower() == user.Name.ToLower())?.Code}";
 
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Token = Guid.NewGuid().ToString(), Status = true };
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Person.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
                 dianAuthTableManager.InsertOrUpdate(auth);
             }
             else
@@ -599,6 +609,7 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.UserId = user.Id;
                     auth.Email = user.Email;
                     auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.Person.GetDescription();
                     auth.Token = Guid.NewGuid().ToString();
                     auth.Status = true;
                     dianAuthTableManager.InsertOrUpdate(auth);
@@ -672,8 +683,8 @@ namespace Gosocket.Dian.Web.Controllers
                 if (user == null)
                 {
                     dianAuthTableManager.Delete(auth);
-                    ModelState.AddModelError($"PersonLoginFailed", "Persona natural no se encuentra registrada.");
-                    return View("PersonLogin", model);
+                    ModelState.AddModelError($"{auth.Type}LoginFailed", "Persona natural no se encuentra registrada.");
+                    return View($"{auth?.Type}Login", model);
                 }
 
                 user.ContributorCode = rk;
@@ -681,9 +692,8 @@ namespace Gosocket.Dian.Web.Controllers
                 return RedirectToAction(nameof(HomeController.Dashboard), "Home");
             }
 
-            var currentTab = "company";
-            ModelState.AddModelError($"{currentTab.Capitalize()}LoginFailed", "Token expirado, por favor intente nuevamente.");
-            return View("Login", model);
+            ModelState.AddModelError($"{auth?.Type}LoginFailed", "Token expirado, por favor intente nuevamente.");
+            return View($"{auth?.Type}Login", model);
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -723,6 +733,7 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         //certValidator.Validate(X509);
                         model.CompanyCode = ExtractNitFromCertificate(parts);
+                        model.HashCode = model.CompanyCode.EncryptSHA256();
                         if (string.IsNullOrEmpty(model.CompanyCode))
                         {
                             ModelState.AddModelError($"CompanyCode", "No se encontró el NIT de la empresa en el certificado.");
@@ -842,7 +853,8 @@ namespace Gosocket.Dian.Web.Controllers
             if (!ModelState.IsValid)
                 return View("SearchDocument", model);
 
-            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
+            var documentKey = model.DocumentKey.ToLower();
+            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
             if (globalDocValidatorDocumentMeta == null)
             {
                 ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
@@ -852,6 +864,12 @@ namespace Gosocket.Dian.Web.Controllers
             var identifier = globalDocValidatorDocumentMeta.Identifier;
             var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
             if (globalDocValidatorDocument == null)
+            {
+                ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
+                return View("SearchDocument", model);
+            }
+
+            if (globalDocValidatorDocument.DocumentKey != documentKey)
             {
                 ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
                 return View("SearchDocument", model);
@@ -932,6 +950,14 @@ namespace Gosocket.Dian.Web.Controllers
             var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
             return Redirect(redirectUrl);
         }
+
+        public RedirectResult RedirectToBiller2()
+        {
+            var auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
+            var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl2") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
+            return Redirect(redirectUrl);
+        }
+
         private IAuthenticationManager AuthenticationManager
         {
             get

@@ -14,6 +14,7 @@ namespace Gosocket.Dian.Domain.Entity
         public int ContributorId { get; set; }
         public string UserId { get; set; }
         public string Token { get; set; }
+        public string Type { get; set; }
         public bool Status { get; set; }
     }
 }

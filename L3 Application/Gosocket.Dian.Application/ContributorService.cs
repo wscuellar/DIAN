@@ -39,6 +39,11 @@ namespace Gosocket.Dian.Application
             return query.ToList();
         }
 
+        public List<Contributor> GetContributors(int type, int page, int length)
+        {
+            var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == type).OrderBy(c => c.AcceptanceStatusId).Skip(page * length).Take(length);
+            return query.ToList();
+        }
 
         public List<Contributor> GetContributors(string code, int status, int page, int length, int? contributorType)
         {

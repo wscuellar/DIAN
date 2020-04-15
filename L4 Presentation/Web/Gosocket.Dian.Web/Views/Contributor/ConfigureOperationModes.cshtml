@@ -90,6 +90,7 @@
                                         <div class="form-group">
                                             @Html.Label("Nombre del software", new { @class = "control-label" })
                                             @Html.TextBoxFor(m => m.Software.Name, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.Software.Name, "", new { @class = "text-danger" })
                                         </div>
                                     </div>
                                     <div id="pinsoftware" class="col-sm-3 padding-xs-0">
@@ -183,6 +184,7 @@
                 showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
                 loadSoftwares($(this).val());
             });
+
             $('#OperationModeId').change(function () {
                 if ($(this).val() === '@((int)OperationMode.Provider)') {
                     $('#providers').css('display', '');
@@ -212,20 +214,13 @@
                     $('#pinsoftware').css('display', 'none');
                 }
                 else {
-                    $('#Software_Name').attr('disabled', false);
-                    $('#Software_Name').val('');
-                    $('#Software_Pin').attr('disabled', false);
-                    $('#providers').css('display', 'none');
-                    $('#providerFree').css('display', '');
-                    $("#softwares").css('display', 'none');
-                    $("#softwareFree").css('display', '');
-                    $("#Software_SoftwareIdFree").val("");
-                    $("#ProviderIdFree").val("@Model.Name");
-                    $('#idsoftware').css('display', '');
-                    $('#pinsoftware').css('display', '');
+                    ShowOwnSoftwareOperation();
                 }
             });
 
+            if ($('#OperationModeId').val() === '@((int)OperationMode.Own)') {
+                ShowOwnSoftwareOperation();
+            }
 
             $('.btn-reset').click(function () {
                 bootbox.dialog({
@@ -279,6 +274,20 @@
             });
         });
 
+        function ShowOwnSoftwareOperation() {
+            $('#Software_Name').attr('disabled', false);
+            $('#Software_Name').val('');
+            $('#Software_Pin').attr('disabled', false);
+            $('#providers').css('display', 'none');
+            $('#providerFree').css('display', '');
+            $("#softwares").css('display', 'none');
+            $("#softwareFree").css('display', '');
+            $("#Software_SoftwareIdFree").val("");
+            $("#ProviderIdFree").val("@Model.Name");
+            $('#idsoftware').css('display', '');
+            $('#pinsoftware').css('display', '');
+        }
+
         function loadSoftwares(contributorId) {
             var dropdown = $("#SoftwareId");
             dropdown.find('option').remove()
@@ -313,7 +322,6 @@
                 }
             });
         }
-
 
         function removeLineAjax(id) {
             showLoading('#panel-form', 'Eliminando', 'Procesando, por favor espere.');

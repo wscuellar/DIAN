@@ -34,7 +34,7 @@ div.bhoechie-tab-menu {
 
             div.bhoechie-tab-menu div.list-group > a .glyphicon,
             div.bhoechie-tab-menu div.list-group > a .fa {
-                color: #00852F;
+                color: #3875A0;
             }
 
             div.bhoechie-tab-menu div.list-group > a:first-child {
@@ -50,8 +50,8 @@ div.bhoechie-tab-menu {
             div.bhoechie-tab-menu div.list-group > a.active,
             div.bhoechie-tab-menu div.list-group > a.active .glyphicon,
             div.bhoechie-tab-menu div.list-group > a.active .fa {
-                background-color: #00852F;
-                background-image: #00852F;
+                background-color: #3875A0;
+                background-image: #3875A0;
                 color: #ffffff;
             }
 
@@ -64,7 +64,7 @@ div.bhoechie-tab-menu {
                     border-left: 0;
                     border-bottom: 13px solid transparent;
                     border-top: 13px solid transparent;
-                    border-left: 10px solid #00852F;
+                    border-left: 10px solid #3875A0;
                 }
 
 div.bhoechie-tab-content {
@@ -81,8 +81,8 @@ div.bhoechie-tab div.bhoechie-tab-content:not(.active) {
 }
 
 .btn-gosocket, .btn-gosocket:hover, .btn-gosocket:focus {
-    background-color: #00852F;
-    border-color: #00852F;
+    background-color: #3875A0;
+    border-color: #3875A0;
     color: #ffffff;
 }
 
@@ -106,7 +106,7 @@ div.bhoechie-tab div.bhoechie-tab-content:not(.active) {
 }
 
 .alert-success {
-    background-color: #348441;
+    background-color: #3875A0;
     border-color: transparent;
     color: #fff;
 }

@@ -133,8 +133,8 @@
     @Scripts.Render("~/bundles/jqueryval")
     <script>
         $(document).ready(function () {
-
             var form = $('#softwares-form');
+
             $("#Pin").focus();
             $("#Pin").on("change paste keyup", function () {
                 if ($(this).val() != "") {
@@ -145,13 +145,20 @@
                     $('#ContributorId').removeAttr('disabled')
                     $('#ContributorId').selectpicker('refresh');
                 }
-
             });
-
 
             if (@Model.Softwares.Count == 0) {
                 $('.table-responsive').css('display', 'none');
             }
+
+            $('#Pin').keyup(function (event) {
+                event.preventDefault();
+                if (event.which === 13)
+                    if (form.valid()) {
+                        $('#Page').val(0);
+                        form.submit();
+                    }
+            });
 
             $('.btn-search').click(function () {
                 if (form.valid()) {
