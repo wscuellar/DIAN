@@ -9,6 +9,7 @@ using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -59,12 +60,14 @@ namespace Gosocket.Dian.Web.Controllers
             model.AssociatedRanges = ranges.Where(r => r.State == (long)NumberRangeState.Authorized && r.Active && !string.IsNullOrEmpty(r.SoftwareId)).Select(r => new NumberRangeViewModel
             {
                 AssociationDate = r.AssociationDate.HasValue ? r.AssociationDate.Value.ToString("dd-MM-yyyy") : null,
+                ExpirationDate = DateTime.ParseExact(r.ValidDateNumberTo.ToString(), "yyyyMMdd", CultureInfo.InvariantCulture).ToString("dd-MM-yyyy"),
                 PartitionKey = r.PartitionKey,
                 RowKey = r.RowKey,
                 Serie = $"{r.Serie ?? "Sin prefijo"} - {r.ResolutionNumber} ({r.FromNumber} - {r.ToNumber})",
                 SoftwareId = r.SoftwareId,
                 SoftwareName = r.SoftwareName,
-                SoftwareOwner = r.SoftwareOwnerName
+                SoftwareOwner = r.SoftwareOwnerName,
+                ValidDateNumberTo = r.ValidDateNumberTo.ToString(),
             }).ToList();
 
             return View(model);

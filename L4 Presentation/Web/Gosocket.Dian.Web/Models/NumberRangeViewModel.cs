@@ -34,6 +34,7 @@ namespace Gosocket.Dian.Web.Models
         public string Serie { get; set; }
         public string ResolutionNumber { get; set; }
         public string AssociationDate { get; set; }
+        public string ExpirationDate { get; set; }
         public DateTime ResolutionDate { get; set; }
         public string ValidDateNumberFrom { get; set; }
         public string ValidDateNumberTo { get; set; }
