@@ -21,13 +21,23 @@
                 var expireDateLabel = "custom-label-success";
                 var diff = DateTime.ParseExact(r.ExpirationDate, "dd-MM-yyyy", CultureInfo.InvariantCulture).Subtract(DateTime.UtcNow).Days;
                 var expireDateTooltipTitle = $"Expira en {diff} días";
+
                 if (diff == 1)
                 {
                     expireDateTooltipTitle = $"Expira en un {diff} día";
                 }
+                if (diff == 0)
+                {
+                    expireDateTooltipTitle = $"Expira hoy";
+                }
                 if (31 >= diff)
                 {
                     expireDateLabel = "custom-label-warning";
+                }
+                if (0 > diff)
+                {
+                    expireDateLabel = "custom-label-danger";
+                    expireDateTooltipTitle = "Expirado";
                 }
                 <tr class=''>
                     <td class="largeText iffyTip"><a>@r.SoftwareOwner</a></td>
