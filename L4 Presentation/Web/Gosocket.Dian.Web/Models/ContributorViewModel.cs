@@ -71,6 +71,9 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Fecha término autorización")]
         public DateTime? EndDate { get; set; }
 
+        [Display(Name = "Fecha de inicio producción")]
+        public string ProductionDate { get; set; }
+
         public int? ContributorFileTypeId { get; set; }
 
         [Display(Name = "Modo de operación")]

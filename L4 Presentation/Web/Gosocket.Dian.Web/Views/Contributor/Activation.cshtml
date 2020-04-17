@@ -1,0 +1,127 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+@using Gosocket.Dian.Web.Common
+@using Gosocket.Dian.Domain.Common;
+@using Gosocket.Dian.Infrastructure
+@{
+    var env = ConfigurationManager.GetValue("Environment");
+    ViewBag.Title = "Activar contribuyente";
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+
+    <style>
+    </style>
+}
+
+
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control" } };}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="pad-btm padding-bottom-0">
+                    <div class="row margin-horizontal-0">
+                        @using (Html.BeginForm("Activation", "Contributor", FormMethod.Post, new { id = "activation-form" }))
+                        {
+                            <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                <div class="col-md-12 padding-horizontal-0">
+                                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
+
+                                        <div class="panel-body padding-20 padding-bottom-0">
+                                            <div class="row">
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.Code, new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.Code, defaultHtmlAttr)
+                                                        @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.AcceptanceStatusName, new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.AcceptanceStatusName, new { @class = "form-control", @disabled = "disabled" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-footer-grey text-right">
+                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Buscar</button>
+                                            @if (Model.AcceptanceStatusId == (int)ContributorStatus.Registered && Model.ContributorTestSetResults.Any(t => t.Status == (int)TestSetStatus.Accepted))
+                                            {
+                                                <button type="button" class="btn btn-default btn-hover-gosocket btn-activate"><i class="fa fa-check"></i>&nbsp;&nbsp;Activar</button>
+                                            }
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local") && User.IsInRole("Administrador") || User.IsInRole("Super"))
+                {
+                    if (Model.ContributorTestSetResults != null && Model.ContributorTestSetResults.Any())
+                    {
+                        <div class="row margin-horizontal-0 margin-vertical-30">
+                            @Html.Partial("_testSetResults")
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+
+            var form = $('#activation-form');
+            $("#Code").focus();
+
+            @*if (@Model.Contributors.Count == 0) {
+                $('.table-responsive').css('display', 'none');
+            }*@
+
+            $('.btn-search').click(function () {
+                $('#page').val(0);
+                showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
+                $(this).attr('disabled', 'disabled');
+                $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
+                $('.table-pagination').css('display', 'none');
+                $('.table-responsive').css('display', 'none');
+                form.submit();
+            });
+
+            // Pagination
+        });
+        $(document).on('mouseenter', ".iffyTip", function () {
+            var $this = $(this);
+            if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+                $this.tooltip({
+                    title: $this.text(),
+                    placement: "bottom",
+                    container: "body"
+                });
+                $this.tooltip('show');
+            }
+        });
+    </script>
+}
+

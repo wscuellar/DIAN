@@ -1,4 +1,5 @@
 ﻿@model Gosocket.Dian.Web.Models.SoftwareTableViewModel
+@using System.Globalization
 
 <div class="table-responsive">
 
@@ -10,18 +11,43 @@
                 <th>Código del Software</th>
                 <th class="text-center">Prefijo Asociado</th>
                 <th class="text-center">Fecha Asociación</th>
+                <th class="text-center">Fecha Expiración</th>
                 <th class="text-center"></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var r in Model.AssociatedRanges.OrderBy(a => a.AssociationDate))
             {
+                var expireDateLabel = "custom-label-success";
+                var diff = DateTime.ParseExact(r.ExpirationDate, "dd-MM-yyyy", CultureInfo.InvariantCulture).Subtract(DateTime.UtcNow).Days;
+                var expireDateTooltipTitle = $"Expira en {diff} días";
+
+                if (diff == 1)
+                {
+                    expireDateTooltipTitle = $"Expira en un {diff} día";
+                }
+                if (diff == 0)
+                {
+                    expireDateTooltipTitle = $"Expira hoy";
+                }
+                if (31 >= diff)
+                {
+                    expireDateLabel = "custom-label-warning";
+                }
+                if (0 > diff)
+                {
+                    expireDateLabel = "custom-label-danger";
+                    expireDateTooltipTitle = "Expirado";
+                }
                 <tr class=''>
                     <td class="largeText iffyTip"><a>@r.SoftwareOwner</a></td>
                     <td class="largeText iffyTip"><a>@r.SoftwareName</a></td>
                     <td class="largeText iffyTip"><a>@r.SoftwareId</a></td>
                     <td class="text-center smallText iffyTip"><a>@r.Serie</a></td>
                     <td class="text-center smallText iffyTip"><a>@r.AssociationDate</a></td>
+                    <td class="text-center">
+                        <a class="label label-table @expireDateLabel add-tooltip" data-placement="top" data-original-title="@expireDateTooltipTitle">@r.ExpirationDate</a>
+                    </td>
                     <td class="text-center">
                         <a href="javascript:void(0)" class="text-center" data-pk="@r.PartitionKey" data-rk="@r.RowKey" onclick="removeRangeAssociationAlert(this)"> <i class="fa fa-trash add-tooltip" data-original-title="Eliminar asociación"></i></a>
                     </td>

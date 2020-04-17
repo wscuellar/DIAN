@@ -529,6 +529,7 @@
     <Content Include="Content\img\edelpa.png" />
     <Content Include="Content\img\favicon.ico" />
     <Content Include="Content\img\favicon_dian.ico" />
+    <Content Include="Content\img\favicon_dian_old.ico" />
     <Content Include="Content\img\flags\france.png" />
     <Content Include="Content\img\flags\germany.png" />
     <Content Include="Content\img\flags\italy.png" />
@@ -540,6 +541,7 @@
     <Content Include="Content\img\loader.gif" />
     <Content Include="Content\img\logo.png" />
     <Content Include="Content\img\LogoDian.png" />
+    <Content Include="Content\img\LogoDian_Old.png" />
     <Content Include="Content\img\logoejemplogadget.png" />
     <Content Include="Content\img\logoNoSlogan.png" />
     <Content Include="Content\img\logo_slogan.png" />
@@ -2121,7 +2123,6 @@
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-hab-staging - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-prod-staging - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-staging - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\font-awesome-animation.min.css" />
     <Content Include="Scripts\globalize.0.1.3\cultures\globalize.culture.af-ZA.js" />
@@ -2647,6 +2648,7 @@
     <Content Include="Views\Document\_tasks.cshtml" />
     <Content Include="Views\Contributor\_testSetResults.cshtml" />
     <Content Include="Views\Contributor\Configuration.cshtml" />
+    <Content Include="Views\Contributor\Activation.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2681,7 +2683,9 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>

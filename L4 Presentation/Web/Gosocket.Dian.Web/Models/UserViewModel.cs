@@ -72,6 +72,8 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "NIT Empresa")]
         public string CompanyCode { get; set; }
 
+        public string HashCode { get; set; }
+
         [DataType(DataType.Text)]
         [Display(Name = "Ingrese CUFE o UUID")]
         [Required(ErrorMessage = "CUFE o UUID es requerido.")]

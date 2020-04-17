@@ -20,7 +20,7 @@
                     <div class="row margin-horizontal-0">
                         @using (Html.BeginForm("ReviewRequests", "BigContributor", FormMethod.Post, new { id = "review-requests-form" }))
                         {
-                            <input id="page" name="Page" type="hidden" value="@Model.Page" />
+                            @Html.HiddenFor(m => m.Page)
                             <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                 <div class="col-md-12 padding-horizontal-0">
                                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
@@ -112,9 +112,18 @@
                 $('.table-responsive').css('display', 'none');
             }
 
+            $('#ContributorCode').keyup(function (event) {
+                event.preventDefault();
+                if (event.which === 13)
+                    if (form.valid()) {
+                        $('#Page').val(0);
+                        form.submit();
+                    }
+            });
+
             $('.btn-search').click(function () {
                 if (form.valid()) {
-                    $('#page').val(0);
+                    $('#Page').val(0);
                     showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
                     $(this).attr('disabled', 'disabled');
                     $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
@@ -126,12 +135,12 @@
 
             // Pagination
             $('.next-page').click(function () {
-                $('#page').val(@Model.Page + 1);
+                $('#Page').val(@Model.Page + 1);
                 form.submit();
             });
 
             $('.prev-page').click(function () {
-                $('#page').val(@Model.Page - 1);
+                $('#Page').val(@Model.Page - 1);
                 form.submit();
             });
             // Pagination

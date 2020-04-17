@@ -37,7 +37,7 @@
                                     @{ string action = ViewBag.ViewType; }
                                     @using (Html.BeginForm(action, "Document", FormMethod.Post, new { id = "documents-form" }))
                                     {
-                                        <input id="page" name="Page" type="hidden" value="@Model.Page" />
+                                        @Html.HiddenFor(m => m.Page)
                                         <input id="startDate" name="StartDate" type="hidden" value="@Model.StartDate" />
                                         <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />
 
@@ -51,6 +51,13 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.DocumentKey, new { @class = "control-label" })
                                                                     @Html.TextBoxFor(m => m.DocumentKey, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.DocumentKey) } })
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-2 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.SerieAndNumber, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.SerieAndNumber, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SerieAndNumber) } })
                                                                 </div>
                                                             </div>
 
@@ -85,12 +92,7 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-sm-2" padding-xs-0">
-                                                                <div class="form-group">
-                                                                    @Html.LabelFor(m => m.Statuses, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.Status, new SelectList(Model.Statuses, "Code", "Name", Model.Status), new { @class = "form-control selectpicker" })
-                                                                </div>
-                                                            </div>
+
                                                         </div>
 
                                                         <div class="row">
@@ -98,6 +100,12 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.DocumentTypeId, new { @class = "control-label" })
                                                                     @Html.DropDownListFor(m => m.DocumentTypeId, new SelectList(Model.DocumentTypes, "Code", "Name", Model.DocumentTypeId), new { @class = "form-control selectpicker" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-2" padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.Statuses, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.Status, new SelectList(Model.Statuses, "Code", "Name", Model.Status), new { @class = "form-control selectpicker" })
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-2 padding-xs-0">
@@ -117,26 +125,6 @@
                                             </div>
                                         </div>
 
-                                        <div class="row margin-horizontal-0">
-                                            <div class="col-md-9 table-toolbar-left padding-left-0">
-                                            </div>
-                                            <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
-                                                @if (Model.Documents.Any())
-                                                {
-                                                    <span class="text-muted">
-                                                        <strong>@(Model.Page * Model.MaxItemCount + 1)-@(Model.MaxItemCount > Model.Documents.Count ? (Model.Page) * Model.MaxItemCount + Model.Documents.Count : (Model.Page + 1) * Model.MaxItemCount)</strong>
-                                                    </span>
-                                                    <div class="btn-group btn-group margin-left-5">
-                                                        <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
-                                                            <span class="fa fa-chevron-left"></span>
-                                                        </a>
-                                                        <a class="btn btn-default paginate-btn next-page" @(Model.Documents.Count < Model.MaxItemCount ? "disabled=\"disabled\"" : "")>
-                                                            <span class="fa fa-chevron-right"></span>
-                                                        </a>
-                                                    </div>
-                                                }
-                                            </div>
-                                        </div>
                                     }
 
                                 </div>
@@ -144,24 +132,7 @@
 
                             @Html.Partial("_documents");
 
-                            <div class="pull-right table-pagination">
-                                @if (Model.Documents.Any())
-                                {
-                                    <span class="text-muted">
-                                        <strong>@(Model.Page * Model.MaxItemCount + 1)-@(Model.MaxItemCount > Model.Documents.Count ? (Model.Page) * Model.MaxItemCount + Model.Documents.Count : (Model.Page + 1) * Model.MaxItemCount)</strong>
-                                    </span>
-                                    <div class="btn-group btn-group margin-left-5">
-                                        <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
-                                            <span class="fa fa-chevron-left"></span>
-                                        </a>
-                                        <a class="btn btn-default paginate-btn next-page" @(Model.Documents.Count < Model.MaxItemCount ? "disabled=\"disabled\"" : "")>
-                                            <span class="fa fa-chevron-right"></span>
-                                        </a>
-                                    </div>
-                                }
-                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -202,7 +173,7 @@
             });
 
             $('.btn-search').click(function () {
-                $('#page').val(0);
+                $('#Page').val(0);
                 $(this).attr('disabled', 'disabled');
                 $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
                 $('.table-pagination').css('display', 'none');
@@ -212,12 +183,12 @@
 
             // Pagination
             $('.next-page').click(function () {
-                $('#page').val(@Model.Page + 1);
+                $('#Page').val(@Model.Page + 1);
                 $('#documents-form').submit();
             });
 
             $('.prev-page').click(function () {
-                $('#page').val(@Model.Page - 1);
+                $('#Page').val(@Model.Page - 1);
                 $('#documents-form').submit();
             });
             // Pagination

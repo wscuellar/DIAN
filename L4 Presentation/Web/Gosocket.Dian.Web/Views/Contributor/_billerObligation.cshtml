@@ -1,7 +1,9 @@
 ﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
 @using Gosocket.Dian.Domain.Common
+@using Gosocket.Dian.Infrastructure
 @{
     var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control" }, { "readonly", "readonly" } };
+    var env = ConfigurationManager.GetValue("Environment");
     var readOnlyHtmlAttr = new Dictionary<string, object> { { "class", "form-control" }, { "readonly", "readonly" } };
     if (Model.AcceptanceStatusId == (int)ContributorStatus.Pending)
     {
@@ -29,6 +31,16 @@
             @Html.ValidationMessageFor(m => m.ExchangeEmail, "", new { @class = "text-danger" })
         </div>
     </div>
+    @if (Model.AcceptanceStatusId == (int)ContributorStatus.Enabled && (env == "Hab" || env == "Test"))
+    {
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.ProductionDate, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.ProductionDate, readOnlyHtmlAttr)
+            </div>
+        </div>
+    }
+
 </div>
 <div class="row">
     <div class="alert custom-alert-primary" role="alert">

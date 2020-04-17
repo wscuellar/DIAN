@@ -64,6 +64,42 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
+        [CustomRoleAuthorization(CustomRoles = "Super")]
+        public ActionResult Activation()
+        {
+            var model = new ContributorViewModel { ContributorTestSetResults = new List<TestSetResultViewModel>() };
+            return View(model);
+        }
+
+        [HttpPost]
+        [CustomRoleAuthorization(CustomRoles = "Super")]
+        public ActionResult Activation(ContributorViewModel model)
+        {
+            Contributor contributor = contributorService.GetByCode(model.Code);
+            if (contributor == null) return View(model);
+            model.AcceptanceStatusId = contributor.AcceptanceStatusId;
+            model.AcceptanceStatusName = Domain.Common.EnumHelper.GetEnumDescription((ContributorStatus)contributor.AcceptanceStatusId);
+            var testSetResults = tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(contributor.Code);
+            model.ContributorTestSetResults = testSetResults.Where(t => !t.Deleted).Select(t => new TestSetResultViewModel
+            {
+                Id = t.Id,
+                OperationModeName = t.OperationModeName,
+                SoftwareId = t.SoftwareId,
+                Status = t.Status,
+                StatusDescription = Domain.Common.EnumHelper.GetEnumDescription((TestSetStatus)t.Status),
+                TotalInvoicesAcceptedRequired = t.TotalInvoicesAcceptedRequired,
+                TotalInvoicesAccepted = t.TotalInvoicesAccepted,
+                TotalInvoicesRejected = t.TotalInvoicesRejected,
+                TotalCreditNotesAcceptedRequired = t.TotalCreditNotesAcceptedRequired,
+                TotalCreditNotesAccepted = t.TotalCreditNotesAccepted,
+                TotalCreditNotesRejected = t.TotalCreditNotesRejected,
+                TotalDebitNotesAcceptedRequired = t.TotalDebitNotesAcceptedRequired,
+                TotalDebitNotesAccepted = t.TotalDebitNotesAccepted,
+                TotalDebitNotesRejected = t.TotalDebitNotesRejected
+            }).ToList();
+            return View(model);
+        }
+
         [NonAction]
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult Add(string type)
@@ -475,8 +511,8 @@ namespace Gosocket.Dian.Web.Controllers
             var contributors = new List<Contributor>();
             if (User.ContributorTypeId() == (int)Domain.Common.ContributorType.Provider || User.ContributorTypeId() == (int)Domain.Common.ContributorType.AuthorizedProvider)
             {
-                //contributors = contributorService.Get(int.Parse(User.ContributorId().ToString())).Clients.ToList();
-                contributors = contributorOperationsService.GetContributorOperations(int.Parse(User.ContributorId().ToString()), null).Select(c => new Contributor
+                var operations = contributorOperationsService.GetContributorOperations(int.Parse(User.ContributorId().ToString()), null);
+                contributors = operations.Where(o => !o.Deleted).Select(c => new Contributor
                 {
                     Id = c.Contributor.Id,
                     Code = c.Contributor.Code,
@@ -491,10 +527,12 @@ namespace Gosocket.Dian.Web.Controllers
             }
             else
             {
-                if (contributorType == (int)Domain.Common.ContributorType.Biller)
-                    contributors = contributorService.GetBillerContributors(model.Page, model.Length);
-                if (contributorType == (int)Domain.Common.ContributorType.Provider)
-                    contributors = contributorService.GetProviderContributors(model.Page, model.Length);
+                //if (contributorType == (int)Domain.Common.ContributorType.Biller)
+                //    contributors = contributorService.GetBillerContributors(model.Page, model.Length);
+                //if (contributorType == (int)Domain.Common.ContributorType.Provider)
+                //    contributors = contributorService.GetProviderContributors(model.Page, model.Length);
+                if (contributorType == (int)Domain.Common.ContributorType.Biller || contributorType == (int)Domain.Common.ContributorType.Provider)
+                    contributors = contributorService.GetContributors(contributorType, model.Page, model.Length);
                 else if (contributorType == -1)
                     contributors = contributorService.GetParticipantContributors(model.Page, model.Length);
             }
@@ -529,7 +567,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (User.ContributorTypeId() == (int)Domain.Common.ContributorType.Provider || User.ContributorTypeId() == (int)Domain.Common.ContributorType.AuthorizedProvider)
             {
-                contributors = contributorOperationsService.GetContributorOperations(int.Parse(User.ContributorId().ToString()), model.Code).Select(c => new Contributor
+                var operations = contributorOperationsService.GetContributorOperations(int.Parse(User.ContributorId().ToString()), model.Code);
+                contributors = operations.Where(o => !o.Deleted).Select(c => new Contributor
                 {
                     Id = c.Contributor.Id,
                     Code = c.Contributor.Code,
@@ -546,10 +585,12 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 if (string.IsNullOrEmpty(model.Code))
                 {
-                    if (contributorType == (int)Domain.Common.ContributorType.Biller)
-                        contributors = contributorService.GetBillerContributors(model.Page, model.Length);
-                    if (contributorType == (int)Domain.Common.ContributorType.Provider)
-                        contributors = contributorService.GetProviderContributors(model.Page, model.Length);
+                    //if (contributorType == (int)Domain.Common.ContributorType.Biller)
+                    //    contributors = contributorService.GetBillerContributors(model.Page, model.Length);
+                    //if (contributorType == (int)Domain.Common.ContributorType.Provider)
+                    //    contributors = contributorService.GetProviderContributors(model.Page, model.Length);
+                    if (contributorType == (int)Domain.Common.ContributorType.Biller || contributorType == (int)Domain.Common.ContributorType.Provider)
+                        contributors = contributorService.GetContributors(contributorType, model.Page, model.Length);
                     else if (contributorType == -1)
                         contributors = contributorService.GetParticipantContributors(model.Page, model.Length);
                 }
@@ -611,7 +652,6 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public ActionResult Register(ContributorViewModel model)
         {
             if (ConfigurationManager.GetValue("Environment") == "Prod")
@@ -644,9 +684,12 @@ namespace Gosocket.Dian.Web.Controllers
                 tableManagerGlobalExchangeEmail.InsertOrUpdate(globalExchangeEmail);
 
                 // insert in production.
-                var globalStorageConnectionStringProduction = ConfigurationManager.GetValue("GlobalStorageProduction");
-                var tableManagerExchangeEmailProdcution = new TableManager("GlobalExchangeEmail", globalStorageConnectionStringProduction);
-                tableManagerExchangeEmailProdcution.InsertOrUpdate(globalExchangeEmail);
+                if (ConfigurationManager.GetValue("Environment") == "Hab")
+                {
+                    var globalStorageConnectionStringProduction = ConfigurationManager.GetValue("GlobalStorageProduction");
+                    var tableManagerExchangeEmailProdcution = new TableManager("GlobalExchangeEmail", globalStorageConnectionStringProduction);
+                    tableManagerExchangeEmailProdcution.InsertOrUpdate(globalExchangeEmail);
+                }
             }
 
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
@@ -659,6 +702,14 @@ namespace Gosocket.Dian.Web.Controllers
                 return RedirectToAction(nameof(UserController.Unauthorized));
 
             Contributor contributor = contributorOperationsService.GetContributor(User.ContributorId());
+
+            if (contributor.ContributorTypeId == (int)Domain.Common.ContributorType.Provider)
+            {
+                var c = contributorService.GetContributorFiles(User.ContributorId());
+                if (c.ContributorFiles.Any(f => f.ContributorFileStatus.Id != (int)Domain.Common.ContributorFileStatus.Approved))
+                    return RedirectToAction(nameof(Wizard));
+            }
+
             ContributorViewModel model = new ContributorViewModel { Id = contributor.Id, ContributorTypeId = contributor.ContributorTypeId.Value, Name = contributor.Name, Code = contributor.Code };
             model.ContributorTypeId = contributor.ContributorTypeId.Value;
             model.Software = new SoftwareViewModel { Url = ConfigurationManager.GetValue("WebServiceUrl"), Id = Guid.NewGuid() };
@@ -935,7 +986,6 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public ActionResult AddContributorOperations(ContributorViewModel model)
         {
             if (ConfigurationManager.GetValue("Environment") == "Prod")
@@ -943,6 +993,13 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (User.ContributorId() != model.Id)
                 return RedirectToAction(nameof(UserController.Unauthorized), "User");
+
+            if (model.ContributorTypeId == (int)Domain.Common.ContributorType.Provider)
+            {
+                var c = contributorService.GetContributorFiles(model.Id);
+                if (c.ContributorFiles.Any(f => f.ContributorFileStatus.Id != (int)Domain.Common.ContributorFileStatus.Approved))
+                    return RedirectToAction(nameof(Wizard));
+            }
 
             var contributorCode = User.ContributorCode();
             var testSetResults = tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(contributorCode);
@@ -1435,6 +1492,7 @@ namespace Gosocket.Dian.Web.Controllers
                 BusinessName = contributor.BusinessName,
                 Email = contributor.Email,
                 ExchangeEmail = contributor.ExchangeEmail,
+                ProductionDate = contributor.ProductionDate.HasValue ? contributor.ProductionDate.Value.ToString("dd-MM-yyyy") : "Sin registrar",
                 PrincipalActivityCode = contributor.PrincipalActivityCode,
                 ContributorTypeId = contributor.ContributorTypeId != null ? contributor.ContributorTypeId.Value : 0,
                 OperationModeId = contributor.OperationModeId != null ? contributor.OperationModeId.Value : 0,
@@ -1504,7 +1562,7 @@ namespace Gosocket.Dian.Web.Controllers
                 TotalInvoicesRejected = t.TotalInvoicesRejected,
                 TotalCreditNotesAcceptedRequired = t.TotalCreditNotesAcceptedRequired,
                 TotalCreditNotesAccepted = t.TotalCreditNotesAccepted,
-                TotalCreditNotesRequired = t.TotalCreditNotesRequired,
+                TotalCreditNotesRejected = t.TotalCreditNotesRejected,
                 TotalDebitNotesAcceptedRequired = t.TotalDebitNotesAcceptedRequired,
                 TotalDebitNotesAccepted = t.TotalDebitNotesAccepted,
                 TotalDebitNotesRejected = t.TotalDebitNotesRejected
@@ -1713,6 +1771,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
         private void SetView(string type)
         {
+            ViewBag.Type = type;
             switch (type)
             {
                 case "1":
@@ -1726,6 +1785,7 @@ namespace Gosocket.Dian.Web.Controllers
                     break;
                 default:
                     ViewBag.CurrentPage = Navigation.NavigationEnum.Client;
+                    ViewBag.Type = 0;
                     break;
             }
         }

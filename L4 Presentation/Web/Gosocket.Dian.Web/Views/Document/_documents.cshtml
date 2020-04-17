@@ -1,6 +1,27 @@
 ﻿
 @model Gosocket.Dian.Web.Models.SearchDocumentViewModel
 
+<div class="row margin-horizontal-0 padding-top-35">
+    <div class="col-md-9 table-toolbar-left padding-left-0">
+    </div>
+    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+        @if (Model.Documents.Any())
+        {
+            <span class="text-muted">
+                <strong>@(Model.Page * Model.MaxItemCount + 1)-@(Model.MaxItemCount > Model.Documents.Count ? (Model.Page) * Model.MaxItemCount + Model.Documents.Count : (Model.Page + 1) * Model.MaxItemCount)</strong>
+            </span>
+            <div class="btn-group btn-group margin-left-5">
+                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                    <span class="fa fa-chevron-left"></span>
+                </a>
+                <a class="btn btn-default paginate-btn next-page" @(Model.Documents.Count < Model.MaxItemCount ? "disabled=\"disabled\"" : "")>
+                    <span class="fa fa-chevron-right"></span>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
 <div class="table-responsive padding-bottom-15">
     <table colspan="12" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         <thead>
@@ -83,4 +104,25 @@
             }
         </tbody>
     </table>
+</div>
+
+<div class="row margin-horizontal-0 padding-top-0">
+    <div class="col-md-9 table-toolbar-left padding-left-0">
+    </div>
+    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+        @if (Model.Documents.Any())
+        {
+            <span class="text-muted">
+                <strong>@(Model.Page * Model.MaxItemCount + 1)-@(Model.MaxItemCount > Model.Documents.Count ? (Model.Page) * Model.MaxItemCount + Model.Documents.Count : (Model.Page + 1) * Model.MaxItemCount)</strong>
+            </span>
+            <div class="btn-group btn-group margin-left-5">
+                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                    <span class="fa fa-chevron-left"></span>
+                </a>
+                <a class="btn btn-default paginate-btn next-page" @(Model.Documents.Count < Model.MaxItemCount ? "disabled=\"disabled\"" : "")>
+                    <span class="fa fa-chevron-right"></span>
+                </a>
+            </div>
+        }
+    </div>
 </div>

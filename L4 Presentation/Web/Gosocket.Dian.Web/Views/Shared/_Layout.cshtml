@@ -40,7 +40,7 @@
     @*<link href="~/Content/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker-standalone.min.css" rel="stylesheet">*@
     <!--Gosocket Stylesheet [ REQUIRED ]-->
 
-    <link href="~/Content/css/gosocket/gosocket.css?v=3.2.1" rel="stylesheet">
+    <link href="~/Content/css/gosocket/gosocket.css?v=3.2.3" rel="stylesheet">
     <link href="~/Content/css/gosocket/gosocket-specific.css" rel="stylesheet">
     <link href="~/Scripts/font-awesome-animation.min.css" rel="stylesheet" />
     <link href="~/Content/plugins/switchery/switchery.min.css" rel="stylesheet" />
@@ -414,6 +414,17 @@
                                                 </span>
                                             </a>
                                         </li>
+                                        if (ConfigurationManager.GetValue("Environment") == "Test")
+                                        {
+                                            <li id="@Navigation.NavigationEnum.Invoice">
+                                                <a href="@Url.Action("RedirectToBiller2", "User")" target="_blank">
+                                                    <i class="fa fa-dollar"></i>
+                                                    <span class="menu-title">
+                                                        Facturador Gratuito 2
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        }
                                     }
 
                                     @if (User.IsInAnyRole("Administrador", "Super"))
