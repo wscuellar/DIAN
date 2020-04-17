@@ -415,6 +415,18 @@
                                             </a>
                                         </li>
                                     }
+
+                                    @if (User.IsInAnyRole("Administrador", "Super"))
+                                    {
+                                        <li id="@Navigation.NavigationEnum.Invoice">
+                                            <a href="@Url.Action("RedirectToBiller", "User")" target="_blank">
+                                                <i class="fa fa-dollar"></i>
+                                                <span class="menu-title">
+                                                    Facturador Gratuito
+                                                </span>
+                                            </a>
+                                        </li>
+                                    }
                                     <!--Rol Facturador-->
                                     <li class="list-divider"></li>
                                 </ul>
