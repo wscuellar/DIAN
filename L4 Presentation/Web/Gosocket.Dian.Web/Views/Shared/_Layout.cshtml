@@ -414,7 +414,7 @@
                                                 </span>
                                             </a>
                                         </li>
-                                        if (ConfigurationManager.GetValue("Environment") == "Test")
+                                        @*if (ConfigurationManager.GetValue("Environment") == "Test")
                                         {
                                             <li id="@Navigation.NavigationEnum.Invoice">
                                                 <a href="@Url.Action("RedirectToBiller2", "User")" target="_blank">
@@ -424,7 +424,7 @@
                                                     </span>
                                                 </a>
                                             </li>
-                                        }
+                                        }*@
                                     }
 
                                     @if (User.IsInAnyRole("Administrador", "Super"))
