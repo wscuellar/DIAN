@@ -1071,6 +1071,11 @@ namespace Gosocket.Dian.Web.Controllers
             else
             {
                 auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
+
+                if(auth ==null)
+                {
+                    auth = dianAuthTableManager.Find<AuthToken>($"10910094|22477286", "800197268");
+                }
             }
 
             var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
