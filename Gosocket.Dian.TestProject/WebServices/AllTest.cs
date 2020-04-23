@@ -10,6 +10,26 @@ namespace Gosocket.Dian.TestProject.WebServices
         private readonly DianPAServices service = new DianPAServices();
 
         [TestMethod]
+        public void TestSuccessGetExchangeEmails()
+        {
+            var authCode = "9005089089";
+            var response = service.GetExchangeEmails(authCode);
+            Assert.IsTrue(response.Success);
+            Assert.AreEqual(response.StatusCode, "0");
+            Assert.IsNotNull(response.CsvBase64Bytes);
+        }
+
+        [TestMethod]
+        public void TestFailGetExchangeEmails()
+        {
+            var authCode = "90050890111";
+            var response = service.GetExchangeEmails(authCode);
+            Assert.IsFalse(response.Success);
+            Assert.AreEqual(response.StatusCode, "89");
+            Assert.IsNull(response.CsvBase64Bytes);
+        }
+
+        [TestMethod]
         public void TestNotificationGetStatus()
         {
             var trackId = "1d168afc3b628bfdbdfee5e3c5013df1475b3f666f90f5c40dcbccbb82d004b86be1000b7e8741f2d78c0333fc34a235";
@@ -69,6 +89,37 @@ namespace Gosocket.Dian.TestProject.WebServices
             Assert.AreEqual(response.StatusCode, "66");
             Assert.AreEqual(response.StatusDescription, "TrackId no existe en los registros de la DIAN.");
             Assert.IsTrue(response.XmlBase64Bytes == null);
+        }
+
+        [TestMethod]
+        public void TestSuccessGetXmlByDocumentKey()
+        {
+            var authCode = "900508908";
+            var trackId = "e761520babc21a65d073b71ef0bde46ca1d149eb243eb6d32abb8f8e8495de58552e52ae8ccf398fad52fee673a5c077";
+            var response = service.GetXmlByDocumentKey(trackId, authCode);
+            Assert.AreEqual(response.Code, "100");
+            Assert.AreEqual(response.Message, "Accion completada OK");
+            Assert.IsTrue(response.XmlBytesBase64 != null);
+        }
+
+        [TestMethod]
+        public void TestNotFoundXmlGetXmlByDocumentKey()
+        {
+            var authCode = "900508908";
+            var trackId = "e761520babc21a65d073b71ef0bde46ca1d149eb243eb6d32abb8f8e8495de58552e52ae8ccf398fad52fee673a5c07";
+            var response = service.GetXmlByDocumentKey(trackId, authCode);
+            Assert.AreEqual(response.Code, "404");
+            Assert.IsTrue(response.XmlBytesBase64 == null);
+        }
+
+        [TestMethod]
+        public void TestNotAuthorizedGetXmlByDocumentKey()
+        {
+            var authCode = "900508908";
+            var trackId = "3c2d78f97d024f5e803e6ad3eb491bb6ac7c79922b819304028f44d9cf3de98a3bc68aa357eb8e82b8b733c874cf5bfc";
+            var response = service.GetXmlByDocumentKey(trackId, authCode);
+            Assert.AreEqual(response.Code, "401");
+            Assert.IsTrue(response.XmlBytesBase64 == null);
         }
     }
 }

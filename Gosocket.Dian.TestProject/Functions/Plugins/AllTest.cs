@@ -120,5 +120,13 @@ namespace Gosocket.Dian.TestProject.Fucntions.Plugins
         #endregion
 
         #endregion
+
+        [TestMethod]
+        public void TestSuccessValidateDigitCodes()
+        {
+            var validator = new Validator();
+            var isValid = validator.ValidateDigitCode("1832", 6);
+            Assert.IsTrue(isValid);
+        }
     }
 }
