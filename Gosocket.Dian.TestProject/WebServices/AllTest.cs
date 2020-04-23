@@ -38,7 +38,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             Assert.IsTrue(response.ErrorMessage.Any());
             Assert.AreEqual(response.StatusCode, "00");
             Assert.AreEqual(response.StatusDescription, "Procesado Correctamente.");
-            Assert.IsTrue(response.XmlBase64Bytes != null);
+            Assert.IsNotNull(response.XmlBase64Bytes);
         }
 
         [TestMethod]
@@ -49,7 +49,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             Assert.IsTrue(response.IsValid);
             Assert.AreEqual(response.StatusCode, "00");
             Assert.AreEqual(response.StatusDescription, "Procesado Correctamente.");
-            Assert.IsTrue(response.XmlBase64Bytes != null);
+            Assert.IsNotNull(response.XmlBase64Bytes);
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             Assert.IsTrue(response.IsValid);
             Assert.AreEqual(response.StatusCode, "00");
             Assert.AreEqual(response.StatusDescription, "Procesado Correctamente.");
-            Assert.IsTrue(response.XmlBase64Bytes != null);
+            Assert.IsNotNull(response.XmlBase64Bytes);
             //if (response.XmlBase64Bytes == null)
             //    Assert.IsTrue(response.XmlBase64Bytes != null);
             //if (response.ZipBase64Bytes == null)
@@ -88,7 +88,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             Assert.IsFalse(response.IsValid);
             Assert.AreEqual(response.StatusCode, "66");
             Assert.AreEqual(response.StatusDescription, "TrackId no existe en los registros de la DIAN.");
-            Assert.IsTrue(response.XmlBase64Bytes == null);
+            Assert.IsNull(response.XmlBase64Bytes);
         }
 
         [TestMethod]
@@ -99,7 +99,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             var response = service.GetXmlByDocumentKey(trackId, authCode);
             Assert.AreEqual(response.Code, "100");
             Assert.AreEqual(response.Message, "Accion completada OK");
-            Assert.IsTrue(response.XmlBytesBase64 != null);
+            Assert.IsNotNull(response.XmlBytesBase64);
         }
 
         [TestMethod]
@@ -109,7 +109,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             var trackId = "e761520babc21a65d073b71ef0bde46ca1d149eb243eb6d32abb8f8e8495de58552e52ae8ccf398fad52fee673a5c07";
             var response = service.GetXmlByDocumentKey(trackId, authCode);
             Assert.AreEqual(response.Code, "404");
-            Assert.IsTrue(response.XmlBytesBase64 == null);
+            Assert.IsNull(response.XmlBytesBase64);
         }
 
         [TestMethod]
@@ -119,7 +119,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             var trackId = "3c2d78f97d024f5e803e6ad3eb491bb6ac7c79922b819304028f44d9cf3de98a3bc68aa357eb8e82b8b733c874cf5bfc";
             var response = service.GetXmlByDocumentKey(trackId, authCode);
             Assert.AreEqual(response.Code, "401");
-            Assert.IsTrue(response.XmlBytesBase64 == null);
+            Assert.IsNull(response.XmlBytesBase64);
         }
     }
 }

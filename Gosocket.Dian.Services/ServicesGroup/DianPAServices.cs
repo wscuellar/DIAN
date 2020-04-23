@@ -191,6 +191,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var senderCode = documentParsed.SenderCode;
             var docTypeCode = documentParsed.DocumentTypeId;
+            var serie = documentParsed.Serie;
             var serieAndNumber = documentParsed.SerieAndNumber;
             var trackId = documentParsed.DocumentKey.ToLower();
             var zone3 = new GlobalLogger("", "Zone 3") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
@@ -217,7 +218,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // Duplicity
             start = DateTime.UtcNow;
-            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serieAndNumber, trackId);
+            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serie, serieAndNumber, trackId);
             if (response != null) return response;
             var duplicity = new GlobalLogger(trackId, "Duplicity") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
             // Duplicity
@@ -942,57 +943,74 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="serie"></param>
         /// <param name="number"></param>
         /// <returns></returns>
-        private DianResponse CheckDocumentDuplicity(string senderCode, string documentType, string serieAndNumber, string trackId)
+        private DianResponse CheckDocumentDuplicity(string senderCode, string documentType, string serie, string serieAndNumber, string trackId)
         {
-            var response = new DianResponse(); ;
+            var response = new DianResponse() { ErrorMessage = new List<string>() };
             // identifier
             if (new string[] { "01", "02", "04" }.Contains(documentType)) documentType = "01";
             var identifier = StringUtil.GenerateIdentifierSHA256($"{senderCode}{documentType}{serieAndNumber}");
             var document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
+
+            // first check
+            CheckDocument(ref response, document);
+
+            // Check if response has errors
+            if (response.ErrorMessage.Any()) return response;
+
+            var number = StringUtil.TextAfter(serieAndNumber, serie).TrimStart('0');
+            identifier = StringUtil.GenerateIdentifierSHA256($"{senderCode}{documentType}{serie}{number}");
+            document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
+
+            // second check
+            CheckDocument(ref response, document);
+
+            // Check if response has errors
+            if (response.ErrorMessage.Any()) return response;
+
+            // third check
+            var meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (meta != null)
+            {
+                document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
+
+                CheckDocument(ref response, document, meta);
+
+                // Check if response has errors
+                if (response.ErrorMessage.Any()) return response;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="document"></param>
+        /// <param name="meta"></param>
+        /// <returns></returns>
+        private DianResponse CheckDocument(ref DianResponse response, GlobalDocValidatorDocument document, GlobalDocValidatorDocumentMeta meta = null)
+        {
             if (document != null)
             {
+                if (meta == null)
+                    meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(document.DocumentKey, document.DocumentKey);
+
                 var failedList = new List<string>
                 {
-                    $"Regla: 90, Rechazo: Documento procesado anteriormente."
+                    $"Regla: 90, Rechazo: Documento con CUFE '{document.DocumentKey}' procesado anteriormente."
                 };
                 response.IsValid = false;
                 response.StatusCode = "99";
                 response.StatusMessage = "Documento con errores en campos mandatorios.";
                 response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                response.ErrorMessage = new List<string>();
                 response.ErrorMessage.AddRange(failedList);
-                var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(document.DocumentKey, document.DocumentKey);
-                var xmlBytes = XmlUtil.GetApplicationResponseIfExist(documentMeta);
+                var xmlBytes = XmlUtil.GetApplicationResponseIfExist(meta);
                 response.XmlBase64Bytes = xmlBytes;
                 response.XmlDocumentKey = document.DocumentKey;
-                return response;
             }
 
-            // double check
-            var meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (meta != null)
-            {
-                document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
-                if (document != null)
-                {
-                    var failedList = new List<string>
-                {
-                    $"Regla: 90, Rechazo: Documento con CUFE '{document.DocumentKey}' procesado anteriormente."
-                };
-                    response.IsValid = false;
-                    response.StatusCode = "99";
-                    response.StatusMessage = "Documento con errores en campos mandatorios.";
-                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                    response.ErrorMessage = new List<string>();
-                    response.ErrorMessage.AddRange(failedList);
-                    var xmlBytes = XmlUtil.GetApplicationResponseIfExist(meta);
-                    response.XmlBase64Bytes = xmlBytes;
-                    response.XmlDocumentKey = document.DocumentKey;
-                    return response;
-                }
-            }
-
-            return null;
+            return response;
         }
 
         /// <summary>
