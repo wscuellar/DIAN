@@ -2122,7 +2122,15 @@
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-certificate-test - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-hab-staging - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-prod-staging - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - ReadOnly - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - ReadOnly - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-ekostaging - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-ekostaging - ReadOnly - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-ekostaging - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-staging - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-staging - ReadOnly - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-staging - Web Deploy.pubxml" />

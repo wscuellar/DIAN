@@ -688,10 +688,9 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 user.ContributorCode = rk;
-                if (rk != "800197268")
-                {
-                    await SignInManager.SignInAsync(user, true, false);
-                }
+
+                await SignInManager.SignInAsync(user, true, false);
+
                 return RedirectToAction(nameof(HomeController.Dashboard), "Home");
             }
 
@@ -889,8 +888,6 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> Login(UserLoginViewModel model, string returnUrl)
         {
 
-            TempData["Admin"] = model.Email;
-
             ClearUnnecessariesModelStateErrorsForLogin();
 
             var recaptchaValidation = IsValidCaptcha(model.RecaptchaToken);
@@ -909,11 +906,7 @@ namespace Gosocket.Dian.Web.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    model.UserCode = "22477286";
-                    model.CompanyCode = "800197268";
-                    model.IdentificationType = 10910094;
-
-                    return await RedirecToNewTokenAdmin(model);
+                    return RedirectToAction(nameof(HomeController.Dashboard), "Home");
                 case SignInStatus.LockedOut:
                     ModelState.AddModelError($"AdminLoginFailed", "Usuario bloqueado.");
                     return View("Login", model);
@@ -930,112 +923,6 @@ namespace Gosocket.Dian.Web.Controllers
 
         }
 
-        private async Task<ActionResult> RedirecToNewTokenAdmin(UserLoginViewModel model)
-        {
-            model.IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel
-            {
-                Id = x.Id,
-                Description = x.Description
-            }).ToList();
-
-            ClearUnnecessariesModelStateErrorsForAuthentication(false);
-
-            var recaptchaValidation = IsValidCaptcha(model.RecaptchaToken);
-            if (!recaptchaValidation.Item1)
-            {
-                ModelState.AddModelError($"CompanyLoginFailed", recaptchaValidation.Item2);
-                return View("Login", model);
-            }
-            if (!ModelState.IsValid)
-                return View("Login", model);
-
-            var pk = $"{model.IdentificationType}|{model.UserCode}";
-            var rk = $"{model.CompanyCode}";
-
-            var user = userService.GetByCodeAndIdentificationTyte(model.UserCode, model.IdentificationType);
-            if (user == null)
-            {
-                ModelState.AddModelError($"CompanyLoginFailed", "Número de documento y tipo de identificación no coinciden.");
-                return View("Login", model);
-            }
-
-            var contributor = user.Contributors.FirstOrDefault(c => c.Code == model.CompanyCode);
-            if (contributor == null)
-            {
-                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no asociada a representante legal.");
-                return View("Login", model);
-            }
-
-            if (contributor.StatusRut == (int)StatusRut.Cancelled)
-            {
-                ModelState.AddModelError($"CompanyLoginFailed", "Contribuyente tiene RUT en estado cancelado.");
-                return View("Login", model);
-            }
-
-            if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)Domain.Common.ContributorStatus.Enabled)
-            {
-                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no se encuentra habilitada.");
-                return View("Login", model);
-            }
-
-            var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
-
-            if (auth == null)
-            {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Company.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
-                dianAuthTableManager.InsertOrUpdate(auth);
-            }
-            else
-            {
-                TimeSpan timeSpan = DateTime.UtcNow.Subtract(auth.Timestamp.DateTime);
-                if (timeSpan.TotalMinutes > 60 || string.IsNullOrEmpty(auth.Token))
-                {
-                    auth.UserId = user.Id;
-                    auth.Email = user.Email;
-                    auth.ContributorId = contributor.Id;
-                    auth.Type = AuthType.Company.GetDescription();
-                    auth.Token = Guid.NewGuid().ToString();
-                    auth.Status = true;
-                    dianAuthTableManager.InsertOrUpdate(auth);
-                }
-            }
-            var accessUrl = ConfigurationManager.GetValue("UserAuthTokenUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
-            if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Prod")
-            {
-                try
-                {
-                    auth.Email = user.Email;
-                    var emailSenderResponse = await EmailUtil.SendEmailAsync(auth, accessUrl);
-                    if (emailSenderResponse.ErrorType != ErrorTypes.NoError)
-                    {
-                        ModelState.AddModelError($"CompanyLoginFailed", "Autenticación correcta, su solicitud está siendo procesada.");
-                        return View("Login", model);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var requestId = Guid.NewGuid();
-                    var logger = new GlobalLogger(requestId.ToString(), requestId.ToString())
-                    {
-                        Action = "SendEmailAsync",
-                        Controller = "User",
-                        Message = ex.Message,
-                        RouteData = "",
-                        StackTrace = ex.StackTrace
-                    };
-                    var tableManager = new TableManager("GlobalLogger");
-                    tableManager.InsertOrUpdate(logger);
-                    ModelState.AddModelError($"CompanyLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
-                    return View("Login", model);
-                }
-            }
-
-            ViewBag.UserEmail = HideUserEmailParts(auth.Email);
-            ViewBag.Url = accessUrl;
-            ViewBag.currentTab = "confirmed";
-            return View("LoginConfirmed", model);
-
-        }
 
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult LogOut()
@@ -1063,25 +950,45 @@ namespace Gosocket.Dian.Web.Controllers
         public RedirectResult RedirectToBiller()
         {
             var auth = new AuthToken();
-            if (TempData["Admin"] != null)
-            {
-                auth = dianAuthTableManager.Find<AuthToken>($"10910094|22477286", "800197268");
-                TempData["Admin"] = null;
-            }
-            else
+            if (!User.IsInAnyRole("Administrador", "Super"))
             {
                 auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
-
-                if(auth ==null)
+            }else
+            {
+                var user = userService.GetByEmail(User.Identity.Name);
+                auth = dianAuthTableManager.Find<AuthToken>(ConfigurationManager.GetValue("PartitionKeyDian"), ConfigurationManager.GetValue("RowKeyDian"));
+                if (auth == null)
                 {
-                    auth = dianAuthTableManager.Find<AuthToken>($"10910094|22477286", "800197268");
+                    auth = new AuthToken(ConfigurationManager.GetValue("PartitionKeyDian"), ConfigurationManager.GetValue("RowKeyDian")) {
+                        PartitionKey = ConfigurationManager.GetValue("RowKeyDian"), 
+                        RowKey= ConfigurationManager.GetValue("RowKeyDian"), 
+                        Email =user.Email, 
+                        Token = Guid.NewGuid().ToString(), 
+                        UserId =user.Id,
+                        Status = true 
+                    };
+                    dianAuthTableManager.InsertOrUpdate(auth);
+                }
+                else
+                {
+                    TimeSpan timeSpan = DateTime.UtcNow.Subtract(auth.Timestamp.DateTime);
+                    if (timeSpan.TotalMinutes > 20 || string.IsNullOrEmpty(auth.Token))
+                    {
+                        auth.PartitionKey = ConfigurationManager.GetValue("PartitionKeyDian");
+                        auth.RowKey = ConfigurationManager.GetValue("RowKeyDian");
+                        auth.Email = user.Email;
+                        auth.Token = Guid.NewGuid().ToString();
+                        auth.UserId = user.Id;
+                        auth.Status = true;
+                        dianAuthTableManager.InsertOrUpdate(auth);
+                    }
                 }
             }
 
             var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
             return Redirect(redirectUrl);
         }
-
+       
         public RedirectResult RedirectToBiller2()
         {
             var auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
