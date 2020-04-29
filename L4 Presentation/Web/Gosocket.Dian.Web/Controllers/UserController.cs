@@ -956,11 +956,11 @@ namespace Gosocket.Dian.Web.Controllers
             }else
             {
                 var user = userService.GetByEmail(User.Identity.Name);
-                auth = dianAuthTableManager.Find<AuthToken>(ConfigurationManager.GetValue("PartitionKeyDian"), ConfigurationManager.GetValue("RowKeyDian"));
+                auth = dianAuthTableManager.Find<AuthToken>(user.Id, ConfigurationManager.GetValue("RowKeyDian"));
                 if (auth == null)
                 {
-                    auth = new AuthToken(ConfigurationManager.GetValue("PartitionKeyDian"), ConfigurationManager.GetValue("RowKeyDian")) {
-                        PartitionKey = ConfigurationManager.GetValue("RowKeyDian"), 
+                    auth = new AuthToken(user.Id, ConfigurationManager.GetValue("RowKeyDian")) {
+                        PartitionKey = user.Id, 
                         RowKey= ConfigurationManager.GetValue("RowKeyDian"), 
                         Email =user.Email, 
                         Token = Guid.NewGuid().ToString(), 
@@ -974,7 +974,7 @@ namespace Gosocket.Dian.Web.Controllers
                     TimeSpan timeSpan = DateTime.UtcNow.Subtract(auth.Timestamp.DateTime);
                     if (timeSpan.TotalMinutes > 20 || string.IsNullOrEmpty(auth.Token))
                     {
-                        auth.PartitionKey = ConfigurationManager.GetValue("PartitionKeyDian");
+                        auth.PartitionKey = user.Id;
                         auth.RowKey = ConfigurationManager.GetValue("RowKeyDian");
                         auth.Email = user.Email;
                         auth.Token = Guid.NewGuid().ToString();
