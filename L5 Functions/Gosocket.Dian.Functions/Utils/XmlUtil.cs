@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -22,11 +23,12 @@ namespace Gosocket.Dian.Functions.Utils
         private static readonly XNamespace ds = "http://www.w3.org/2000/09/xmldsig#";
         private static readonly XNamespace sts = "dian:gov:co:facturaelectronica:Structures-2-1";
 
+        private static object obj = new object();
+
         private static readonly FileManager fileManager = new FileManager();
         private static readonly FirmaElectronica signer = new FirmaElectronica();
-        private static readonly DocumentSigner documentSigner = new DocumentSigner();
 
-        public static byte[] GenerateApplicationResponseBytes(long nsu, string trackId, GlobalDocValidatorDocumentMeta documentMeta, List<GlobalDocValidatorTracking> validations)
+        public static byte[] GenerateApplicationResponseBytes(string trackId, GlobalDocValidatorDocumentMeta documentMeta, List<GlobalDocValidatorTracking> validations)
         {
             var responseBytes = new byte[] { };
 
@@ -66,7 +68,7 @@ namespace Gosocket.Dian.Functions.Utils
             if (!mandatoryInvalid && !priorityInvalid)
             {
                 docResponse = BuildDocumentResponseNode(lineId, documentMeta, false, false);
-                var firstLineResponse = BuildResponseLineResponse(lineId, nsu);
+                var firstLineResponse = BuildResponseLineResponse(lineId, 0);
                 docResponse.Add(firstLineResponse);
 
                 lineId++;
@@ -83,7 +85,7 @@ namespace Gosocket.Dian.Functions.Utils
 
                 #region CONSTRUYENDO NODO CON OBSERVACIONES
                 docResponse = BuildDocumentResponseNode(lineId, documentMeta, true, false);
-                var lineResponse = BuildResponseLineResponse(lineId, nsu);
+                var lineResponse = BuildResponseLineResponse(lineId, 0);
                 docResponse.Add(lineResponse);
 
                 foreach (var i in notifications)
@@ -101,7 +103,7 @@ namespace Gosocket.Dian.Functions.Utils
             if (mandatoryInvalid)
             {
                 docResponse = BuildDocumentResponseNode(lineId, documentMeta, false, true);
-                var lineResponse = BuildResponseLineResponse(lineId, nsu);
+                var lineResponse = BuildResponseLineResponse(lineId, 0);
                 docResponse.Add(lineResponse);
 
                 List<string> errorsList = new List<string>();
@@ -129,14 +131,15 @@ namespace Gosocket.Dian.Functions.Utils
 
             var responseToSign = Encoding.UTF8.GetString(responseBytes);
 
-            signer.Certificate2 = documentSigner._certificate;
-            responseBytes = signer.FirmarEvento(responseToSign, DateTime.UtcNow);
+            signer.Certificate2 = GetCertificate();
+            var date = DateTime.UtcNow.AddHours(-5);
+            responseBytes = signer.FirmarEvento(responseToSign, date);
 
             if (responseBytes == null) return null;
 
             if (!mandatoryInvalid)
             {
-                var folder = "Success"; //mandatoryInvalid ? "Error" : "Success";
+                var folder = "Success";
                 var container = $"{CategoryContainerName}";
                 var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
                 var numberFolder = string.IsNullOrEmpty(number) ? trackId : number;
@@ -193,9 +196,11 @@ namespace Gosocket.Dian.Functions.Utils
             var number = messageIdNode.Item2;
 
             var uuId = $"{processResultEntity.UblVersion}{processResultEntity.DocumentTypeId}{processResultEntity.SenderCode}{processResultEntity.ReceiverCode}{processResultEntity.Serie}{processResultEntity.Number}";
+            var profileExecutionId = "1";
+            if (ConfigurationManager.GetValue("Environment") != "Prod") profileExecutionId = "2";
 
             var cufe = CreateCufeId(uuId);
-
+            var issueDate = DateTime.UtcNow;
             return new XElement(ns + "ApplicationResponse",
                 new XAttribute(XNamespace.Xmlns + "cac",
                     "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"),
@@ -210,12 +215,12 @@ namespace Gosocket.Dian.Functions.Utils
                     new XElement(ext + "UBLExtension", new XElement(ext + "ExtensionContent", string.Empty))),
                 new XElement(cbc + "UBLVersionID", "UBL 2.1"), new XElement(cbc + "CustomizationID", "1"),
                 new XElement(cbc + "ProfileID", "DIAN 2.1"),
-                new XElement(cbc + "ProfileExecutionID", "2"),
+                new XElement(cbc + "ProfileExecutionID", profileExecutionId),
                 new XElement(cbc + "ID", $"{GetRandomInt()}"),
                 new XElement(cbc + "UUID", cufe,
-                    new XAttribute("schemeName", "CUFE-SHA384")),
-                new XElement(cbc + "IssueDate", DateTime.UtcNow.ToString("yyyy-MM-dd")),
-                new XElement(cbc + "IssueTime", $"{DateTime.UtcNow.AddHours(-5).ToString("hh:mm:ss")}-05:00"));
+                    new XAttribute("schemeName", "CUDE-SHA384")),
+                new XElement(cbc + "IssueDate", issueDate.AddHours(-5).ToString("yyyy-MM-dd")),
+                new XElement(cbc + "IssueTime", $"{issueDate.AddHours(-5).ToString("HH:mm:ss")}-05:00"));
         }
 
         public static XElement BuildSenderNode(GlobalDocValidatorDocumentMeta processResultEntity)
@@ -254,7 +259,7 @@ namespace Gosocket.Dian.Functions.Utils
         public static XElement BuildResponseDianEventDescriptionNode(bool withErrors)
         {
             var responseCode = withErrors ? "04" : "02";
-            var responseDescription = withErrors ? "Uso no autorizado por la DIAN" : "Uso autorizado por la DIAN";
+            var responseDescription = withErrors ? "Documento rechazado por la DIAN" : "Documento validado por la DIAN";
 
             return new XElement(cac + "Response",
                         new XElement(cbc + "ResponseCode", $"{responseCode}"),
@@ -368,6 +373,25 @@ namespace Gosocket.Dian.Functions.Utils
             return rnd.Next(1, 100000000);
         }
 
+        public static bool ApplicationResponseExist(GlobalDocValidatorDocumentMeta documentMeta)
+        {
+            var fileManager = new FileManager();
+            var processDate = documentMeta.Timestamp;
+            var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
+            var isValidFolder = "Success";
+
+            var container = "dian";
+            var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
+            var exist = fileManager.Exists(container, fileName);
+            //var xmlBytes = fileManager.GetBytes(container, fileName);
+            if (!exist)
+            {
+                fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
+                exist = fileManager.Exists(container, fileName);
+            }
+            return exist;
+        }
+
         public static async Task<byte[]> GetApplicationResponseIfExist(GlobalDocValidatorDocumentMeta documentMeta)
         {
             byte[] responseBytes = null;
@@ -388,22 +412,41 @@ namespace Gosocket.Dian.Functions.Utils
             if (xmlBytes == null)
             {
                 fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
-                xmlBytes = fileManager.GetBytes("dian", fileName);
+                xmlBytes = await fileManager.GetBytesAsync("dian", fileName);
             }
             if (xmlBytes != null) responseBytes = xmlBytes;
+            fileManager = null;
             return responseBytes;
         }
 
-        public static byte[] SendResponseToSign(string xml)
+        public static X509Certificate2 GetCertificate()
         {
-            byte[] responseSigned = new byte[] { };
+            var certificate = GetCertificateByThumbprint();
+            if (certificate == null) return null;
 
-            var docSigner = new DocumentSigner();
-            var cdrSigned = docSigner.SignXml(xml);
+            return certificate;
+        }
 
-            responseSigned = string.IsNullOrEmpty(cdrSigned) ? null : Encoding.UTF8.GetBytes(cdrSigned);
+        private static X509Certificate2 GetCertificateByThumbprint()
+        {
+            var thumbprint = ConfigurationManager.GetValue("CertificateThumbprint"); //"BF6B7AE700D03E317C8792D93C4C3DD488C1A002";
+            lock (obj)
+            {
+                var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+                store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+                var certificateCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+                store.Close();
 
-            return responseSigned;
+                foreach (var certificate in certificateCollection)
+                {
+                    if (certificate.Thumbprint == thumbprint)
+                    {
+                        using (certificate.GetRSAPrivateKey()) { }
+                        return certificate;
+                    }
+                }
+                throw new CryptographicException($"No certificate found with thumbprint: {thumbprint}");
+            }
         }
     }
 }

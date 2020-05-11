@@ -21,7 +21,6 @@ namespace Gosocket.Dian.Functions.Global
         private static readonly TableManager tableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
         private static readonly TableManager tableManagerDocumentTracking = new TableManager("GlobalDocValidatorTracking");
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
-        //private static readonly TableManager tableManagerDianNsuControl = new TableManager("DianNsuControl");
 
         [FunctionName("GetApplicationResponse")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -50,7 +49,6 @@ namespace Gosocket.Dian.Functions.Global
                 var validations = new List<GlobalDocValidatorTracking>();
                 Task firstLocalRun = Task.Run(() =>
                 {
-                    //var start = DateTime.UtcNow;
                     Stopwatch stopwatch1 = new Stopwatch();
                     stopwatch1.Start();
                     validations = tableManagerDocumentTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
@@ -65,14 +63,11 @@ namespace Gosocket.Dian.Functions.Global
 
                 GlobalDocValidatorDocumentMeta documentMetaEntity = null;
                 GlobalDocValidatorDocument docValidatorEntity = null;
-                //DianNsuControl nsuSender = null;
                 Task secondLocalRun = Task.Run(() =>
                 {
-                    //var start = DateTime.UtcNow;
                     Stopwatch stopwatch2 = new Stopwatch();
                     stopwatch2.Start();
                     documentMetaEntity = tableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-                    //nsuSender = tableManagerDianNsuControl.Find<DianNsuControl>("DianNsu", documentMetaEntity.DocumentKey);
                     var identifier = documentMetaEntity.Identifier;
                     docValidatorEntity = tableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
                     stopwatch2.Stop();
@@ -108,7 +103,7 @@ namespace Gosocket.Dian.Functions.Global
                     //var start = DateTime.UtcNow;
                     Stopwatch stopwatch4 = new Stopwatch();
                     stopwatch4.Start();
-                    xmlBytes = XmlUtil.GenerateApplicationResponseBytes(nsu, trackId, documentMetaEntity, validations);
+                    xmlBytes = XmlUtil.GenerateApplicationResponseBytes(trackId, documentMetaEntity, validations);
                     stopwatch4.Stop();
                     double ms4 = stopwatch4.ElapsedMilliseconds;
                     double seconds4 = ms4 / 1000;
