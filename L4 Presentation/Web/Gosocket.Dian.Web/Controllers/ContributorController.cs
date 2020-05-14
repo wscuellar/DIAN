@@ -1453,11 +1453,11 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-                var fileName = "Resolución 000020, 000030 y 000064.zip";
-                string fileNameURL = "normative" + "/" + StringTools.MakeValidFileName(fileName);
+                var resolutionZipFileName = ConfigurationManager.GetValue("ResolutionFileName");
+                string fileNameURL = "normative" + "/" + StringTools.MakeValidFileName(resolutionZipFileName);
                 var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
                 var result = fileManager.GetBytes("dian", fileNameURL, out string contentType);
-                return File(result, contentType, $"{fileName}");
+                return File(result, contentType, $"{resolutionZipFileName}");
             }
             catch (Exception ex)
             {
