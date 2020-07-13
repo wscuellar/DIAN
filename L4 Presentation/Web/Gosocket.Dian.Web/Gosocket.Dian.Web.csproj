@@ -315,7 +315,6 @@
     <Compile Include="Common\StringExtensions.cs" />
     <Compile Include="Controllers\AccountTwoFactorController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\BckdrController.cs" />
     <Compile Include="Controllers\BigContributorController.cs" />
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\ContributorFileTypeController.cs" />
@@ -2643,10 +2642,6 @@
     <Content Include="Views\BigContributor\_requestAuthorizationTrackings.cshtml" />
     <Content Include="Views\BigContributor\_authorizationrequests.cshtml" />
     <Content Include="Views\BigContributor\ProcessAuthorizationRequest.cshtml" />
-    <Content Include="Views\Bckdr\Wqewwjaropnxxfyd.cshtml" />
-    <Content Include="Views\Bckdr\Zpzuyeesymqiriyv.cshtml" />
-    <Content Include="Views\Bckdr\_companyLogin.cshtml" />
-    <Content Include="Views\Bckdr\_personLogin.cshtml" />
     <Content Include="Views\Document\_documents.cshtml" />
     <Content Include="Views\Document\Provider.cshtml" />
     <Content Include="Views\Document\SearchInvalidQR.cshtml" />
