@@ -688,7 +688,9 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 user.ContributorCode = rk;
+
                 await SignInManager.SignInAsync(user, true, false);
+
                 return RedirectToAction(nameof(HomeController.Dashboard), "Home");
             }
 
@@ -905,7 +907,6 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 case SignInStatus.Success:
                     return RedirectToAction(nameof(HomeController.Dashboard), "Home");
-                //return RedirectToLocal(returnUrl, model.Email);
                 case SignInStatus.LockedOut:
                     ModelState.AddModelError($"AdminLoginFailed", "Usuario bloqueado.");
                     return View("Login", model);
@@ -921,6 +922,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
         }
+
 
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult LogOut()
@@ -944,13 +946,49 @@ namespace Gosocket.Dian.Web.Controllers
             return RedirectToAction(nameof(UserController.Login), "User");
         }
 
+        [HttpGet]
         public RedirectResult RedirectToBiller()
         {
-            var auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
+            var auth = new AuthToken();
+            if (!User.IsInAnyRole("Administrador", "Super"))
+            {
+                auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
+            }else
+            {
+                var user = userService.GetByEmail(User.Identity.Name);
+                auth = dianAuthTableManager.Find<AuthToken>(user.Id, ConfigurationManager.GetValue("RowKeyDian"));
+                if (auth == null)
+                {
+                    auth = new AuthToken(user.Id, ConfigurationManager.GetValue("RowKeyDian")) {
+                        PartitionKey = user.Id, 
+                        RowKey= ConfigurationManager.GetValue("RowKeyDian"), 
+                        Email =user.Email, 
+                        Token = Guid.NewGuid().ToString(), 
+                        UserId =user.Id,
+                        Status = true 
+                    };
+                    dianAuthTableManager.InsertOrUpdate(auth);
+                }
+                else
+                {
+                    TimeSpan timeSpan = DateTime.UtcNow.Subtract(auth.Timestamp.DateTime);
+                    if (timeSpan.TotalMinutes > 20 || string.IsNullOrEmpty(auth.Token))
+                    {
+                        auth.PartitionKey = user.Id;
+                        auth.RowKey = ConfigurationManager.GetValue("RowKeyDian");
+                        auth.Email = user.Email;
+                        auth.Token = Guid.NewGuid().ToString();
+                        auth.UserId = user.Id;
+                        auth.Status = true;
+                        dianAuthTableManager.InsertOrUpdate(auth);
+                    }
+                }
+            }
+
             var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
             return Redirect(redirectUrl);
         }
-
+       
         public RedirectResult RedirectToBiller2()
         {
             var auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
@@ -1081,6 +1119,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Redirect(returnUrl);
             var user = UserManager.FindByName(userName);
             return RedirectToAction(nameof(HomeController.Dashboard), "Home");
+
         }
         private string ExtractNitFromCertificate(Dictionary<string, string> dictionary)
         {

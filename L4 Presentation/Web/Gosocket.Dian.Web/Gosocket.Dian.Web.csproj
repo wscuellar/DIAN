@@ -315,7 +315,6 @@
     <Compile Include="Common\StringExtensions.cs" />
     <Compile Include="Controllers\AccountTwoFactorController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\BckdrController.cs" />
     <Compile Include="Controllers\BigContributorController.cs" />
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\ContributorFileTypeController.cs" />
@@ -2122,7 +2121,18 @@
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-certificate-test - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-hab-staging - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-prod-staging - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - ReadOnly - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - ReadOnly - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-ekostaging - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-ekostaging - ReadOnly - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-ekostaging - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-staging - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-staging - ReadOnly - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-staging - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\font-awesome-animation.min.css" />
     <Content Include="Scripts\globalize.0.1.3\cultures\globalize.culture.af-ZA.js" />
@@ -2632,10 +2642,6 @@
     <Content Include="Views\BigContributor\_requestAuthorizationTrackings.cshtml" />
     <Content Include="Views\BigContributor\_authorizationrequests.cshtml" />
     <Content Include="Views\BigContributor\ProcessAuthorizationRequest.cshtml" />
-    <Content Include="Views\Bckdr\Wqewwjaropnxxfyd.cshtml" />
-    <Content Include="Views\Bckdr\Zpzuyeesymqiriyv.cshtml" />
-    <Content Include="Views\Bckdr\_companyLogin.cshtml" />
-    <Content Include="Views\Bckdr\_personLogin.cshtml" />
     <Content Include="Views\Document\_documents.cshtml" />
     <Content Include="Views\Document\Provider.cshtml" />
     <Content Include="Views\Document\SearchInvalidQR.cshtml" />
