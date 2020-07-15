@@ -716,7 +716,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     xmlBase64,
                     fileName = contentItem.XmlFileName,
                     isEvent = true,
-                    trackId = Guid.NewGuid().ToString(),
+                    trackId = appResponseKey,
                 };
 
                 var responseUpload = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadRequest);
