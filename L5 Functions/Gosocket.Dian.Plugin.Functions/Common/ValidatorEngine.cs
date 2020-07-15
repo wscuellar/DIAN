@@ -1,14 +1,10 @@
 ﻿using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
-using Gosocket.Dian.Plugin.Functions.Cache;
-//using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Plugin.Functions.Models;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
-using Org.BouncyCastle.X509;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Caching;
 using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
@@ -16,10 +12,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
     public class ValidatorEngine
     {
         #region Global properties
-        static readonly string container = "dian";
-        //static readonly string crtsFolder = "certificates/crts";
-
-        static readonly string crlsFolder = "certificates/crls";
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
         #endregion
 
@@ -39,7 +31,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Validator instance
             var validator = new Validator(xmlBytes);
             validateResponses.Add(validator.ValidateContingency());
-
 
             return validateResponses;
         }
@@ -132,13 +123,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //
             validateResponses.AddRange(validator.ValidateSignXades());
 
-            // Get all crt certificates
-            //var crts = await CertificateManager.Instance.GetRootCertificates(container, crtsFolder);
-
             // Get all crls
-            var crls = GetCrlstanceCache();
+            var crls = Application.Managers.CertificateManager.Instance.GetCrls();
 
-            validateResponses.AddRange(validator.ValidateSign(crls));
+            // Get all crt certificates
+            var crts = Application.Managers.CertificateManager.Instance.GetRootCertificates();
+
+            validateResponses.AddRange(validator.ValidateSign(crts, crls));
 
             return validateResponses;
         }
@@ -189,26 +180,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     { "SheldHolderTaxLevelCodes", "/sig:Invoice/cac:Delivery/cac:DeliveryParty/cac:PartyTaxScheme/cbc:TaxLevelCode" }
             };
             return dictionary;
-
-
-        }
-        private X509Crl[] GetCrlstanceCache()
-        {
-            X509Crl[] crls = null;
-            var cacheItem = InstanceCache.CrlsInstanceCache.GetCacheItem("Crls");
-            if (cacheItem == null)
-            {
-                crls = Application.Managers.CertificateManager.Instance.GetCrls(container, crlsFolder);
-                CacheItemPolicy policy = new CacheItemPolicy
-                {
-                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(24)
-                };
-                InstanceCache.SoftwareInstanceCache.Set(new CacheItem("Crls", crls), policy);
-            }
-            else
-                crls = (X509Crl[])cacheItem.Value;
-
-            return crls;
         }
 
         public async Task<byte[]> GetXmlFromStorageAsync(string trackId)

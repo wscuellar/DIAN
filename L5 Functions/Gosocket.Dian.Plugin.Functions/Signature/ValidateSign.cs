@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -34,6 +35,19 @@ namespace Gosocket.Dian.Plugin.Functions.Signature
             try
             {
                 var validateResponses = await ValidatorEngine.Instance.StartSignValidationAsync(trackId);
+
+                // Only for test, need removed in the future.
+                try
+                {
+                    if (validateResponses.Any(_ => _.ErrorCode == "ZD05" && !_.IsValid))
+                    {
+                        var validation = validateResponses.FirstOrDefault(_ => _.ErrorCode == "ZD05" && !_.IsValid);
+                        var logger = new GlobalLogger("ZD05", trackId) { Action = "ValidateSign", Message = validation.ErrorMessage };
+                        await tableManagerGlobalLogger.InsertOrUpdateAsync(logger);
+                    }
+                }
+                catch { }
+
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)

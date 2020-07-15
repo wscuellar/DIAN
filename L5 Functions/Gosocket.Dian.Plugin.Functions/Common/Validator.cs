@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain.Common;
+﻿using Gosocket.Dian.Application.Common;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
@@ -6,14 +7,10 @@ using Gosocket.Dian.Plugin.Functions.Cache;
 using Gosocket.Dian.Plugin.Functions.Common.Encryption;
 using Gosocket.Dian.Plugin.Functions.Cryptography.Verify;
 using Gosocket.Dian.Plugin.Functions.Models;
-using Org.BouncyCastle.Pkix;
 using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Utilities.Collections;
 using Org.BouncyCastle.X509;
-using Org.BouncyCastle.X509.Store;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -31,9 +28,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
     public class Validator
     {
         #region Global properties
-        private const string CertificatesCollection = "Certificate/Collection";
-        private readonly HashSet _trustedRoots = new HashSet();
-        private readonly List<X509Certificate> _intermediates = new List<X509Certificate>();
         static readonly TableManager contributorTableManager = new TableManager("GlobalContributor");
         static readonly TableManager contingencyTableManager = new TableManager("GlobalContingency");
         static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
@@ -448,9 +442,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
-            var invoiceAuthorization = numberRangeModel.InvoiceAuthorization; //responseXpathDataValue.XpathsValues["InvoiceAuthorizationXpath"];
-            var softwareId = numberRangeModel.SoftwareId; //responseXpathDataValue.XpathsValues["SoftwareIdXpath"];
-            var senderCode = numberRangeModel.SenderCode;  //responseXpathDataValue.XpathsValues["SenderCodeXpath"];
+            var invoiceAuthorization = numberRangeModel.InvoiceAuthorization;
+            var softwareId = numberRangeModel.SoftwareId;
+            var senderCode = numberRangeModel.SenderCode;
 
             GlobalTestSetResult testSetResult = null;
             List<GlobalTestSetResult> testSetResults = null;
@@ -520,25 +514,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else
                 responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB08b", ErrorMessage = "Fecha final del rango de numeración informado no corresponde a la fecha final de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
-            //
-            //if (!string.IsNullOrEmpty(range.Serie))
-            //{
-            if (range.Serie == numberRangeModel.Serie) //responseXpathDataValue.XpathsValues["PrefixXpath"])
+            if (string.IsNullOrEmpty(range.Serie)) range.Serie = "";
+            if (range.Serie == numberRangeModel.Serie)
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAB10b", ErrorMessage = "El prefijo corresponde al prefijo autorizado en la resolución.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
                 responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAB10b", ErrorMessage = "El prefijo debe corresponder al prefijo autorizado en la resolución.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-            //}
 
-            //
-            //long.TryParse(responseXpathDataValue.XpathsValues["StartNumberXpath"], out long fromNumber);
             long.TryParse(numberRangeModel.StartNumber, out long fromNumber);
             if (range.FromNumber == fromNumber)
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB11b", ErrorMessage = "Valor inicial del rango de numeración informado corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
                 responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB11b", ErrorMessage = "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
-            //
-            //long.TryParse(responseXpathDataValue.XpathsValues["EndNumberXpath"], out long endNumber);
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
             if (range.ToNumber == endNumber)
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB12b", ErrorMessage = "Valor final del rango de numeración informado corresponde a un valor final de los rangos vigentes para el contribuyente emisor.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -553,37 +540,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Sinature validations
-        public IEnumerable<X509Crl> Crls { get; private set; }
-        private ValidateListResponse ValidateCrl(X509Certificate certificate)
-        {
-            DateTime startDate = DateTime.UtcNow;
-            if (Crls.Any(c => c.IsRevoked(certificate)))
-                return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "ZD04", ErrorMessage = "Certificado de la firma revocado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
-
-            return new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "ZD04", ErrorMessage = "Certificado de la firma se encuentra vigente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
-        }
-
-        public List<ValidateListResponse> ValidateSign(IEnumerable<X509Crl> crls)
-        {
-            DateTime startDate = DateTime.UtcNow;
-            var validateResponses = new List<ValidateListResponse>();
-
-            Crls = crls ?? throw new ArgumentNullException(nameof(crls));
-
-            var certificate = GetPrimaryCertificate();
-
-            if (certificate == null)
-            {
-                validateResponses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "ZD06", ErrorMessage = "Cadena de confianza del certificado digital no se pudo validar. [Missing X509Certificate node]", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                return validateResponses;
-            }
-
-            var errors = new List<string>();
-            validateResponses.Add(ValidateCrl(certificate));
-
-            return validateResponses;
-        }
-
         public List<ValidateListResponse> ValidateSign(IEnumerable<X509Certificate> chainCertificates, IEnumerable<X509Crl> crls)
         {
             DateTime startDate = DateTime.UtcNow;
@@ -592,9 +548,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (chainCertificates == null)
                 throw new ArgumentNullException(nameof(chainCertificates));
 
-            Crls = crls ?? throw new ArgumentNullException(nameof(crls));
-            LoadCertificates(chainCertificates);
-
             var certificate = GetPrimaryCertificate();
 
             if (certificate == null)
@@ -603,10 +556,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 return validateResponses;
             }
 
+            if (DateTime.Now < certificate.NotBefore)
+            {
+                validateResponses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "ZD07", ErrorMessage = $"Certificado aún no se encuentra vigente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                return validateResponses;
+            }
 
-            var errors = new List<string>();
-            validateResponses.Add(ValidateChainTrust(certificate));
-            validateResponses.Add(ValidateCrl(certificate));
+            if (DateTime.Now > certificate.NotAfter)
+            {
+                validateResponses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "ZD07", ErrorMessage = $"Certificado se encuentra expirado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                return validateResponses;
+            }
+
+            bool.TryParse(Environment.GetEnvironmentVariable("RejectUntrustedCertificate"), out bool rejectUntrustedCertificate);
+
+            if (certificate.IsTrusted(chainCertificates))
+                validateResponses.Add(new ValidateListResponse { IsValid = true, Mandatory = rejectUntrustedCertificate, ErrorCode = "ZD05", ErrorMessage = "Cadena de confianza del certificado digital correcta.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            else
+                validateResponses.Add(new ValidateListResponse { IsValid = false, Mandatory = rejectUntrustedCertificate, ErrorCode = "ZD05", ErrorMessage = $"Cadena de confianza del certificado digital es incorrecta, a partir del 8 de Agosto del 2020 esta notificación pasará a rechazo.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+            if (certificate.IsRevoked(crls))
+                validateResponses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "ZD04", ErrorMessage = "Certificado de la firma revocado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            else
+                validateResponses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "ZD04", ErrorMessage = "Certificado de la firma se encuentra vigente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
 
             return validateResponses;
         }
@@ -862,42 +835,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var primaryCertificate = new X509Certificate2(Convert.FromBase64String(x509CertificateString));
             return DotNetUtilities.FromX509Certificate(primaryCertificate);
-        }
-        private static bool IsSelfSigned(X509Certificate certificate)
-        {
-            return certificate.IssuerDN.Equivalent(certificate.SubjectDN);
-        }
-        private void LoadCertificates(IEnumerable<X509Certificate> chainCertificates)
-        {
-            foreach (var root in chainCertificates)
-            {
-                if (IsSelfSigned(root))
-                    _trustedRoots.Add(new TrustAnchor(root, null));
-                else
-                    _intermediates.Add(root);
-            }
-        }
-        private ValidateListResponse ValidateChainTrust(X509Certificate certificate)
-        {
-            DateTime startDate = DateTime.UtcNow;
-            try
-            {
-                var selector = new X509CertStoreSelector { Certificate = certificate };
-
-                var builderParams = new PkixBuilderParameters(_trustedRoots, selector) { IsRevocationEnabled = false };
-                builderParams.AddStore(X509StoreFactory.Create(CertificatesCollection, new X509CollectionStoreParameters(_intermediates)));
-                builderParams.AddStore(X509StoreFactory.Create(CertificatesCollection, new X509CollectionStoreParameters(new[] { certificate })));
-
-                var builder = new PkixCertPathBuilder();
-                var result = builder.Build(builderParams);
-            }
-            catch (PkixCertPathBuilderException e)
-            {
-                Debug.WriteLine(e.InnerException?.Message ?? e.Message);
-                return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "ZD05", ErrorMessage = $"Error en la cadena de certificación.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
-            }
-
-            return new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "ZD05", ErrorMessage = "Cadena de confianza del certificado digital correcta.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
         }
         private Dictionary<string, string> GetXpathValues(Dictionary<string, string> dictionary)
         {

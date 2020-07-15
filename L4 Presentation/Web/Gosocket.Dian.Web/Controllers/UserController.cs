@@ -730,23 +730,31 @@ namespace Gosocket.Dian.Web.Controllers
                     X509Certificate2 X509 = new X509Certificate2(Request.ClientCertificate.Certificate);
                     var parts = GetCertificateSubjectInfo(X509.Subject);
 
-                    var certValidator = new CertificateValidator();
+                    var certificateValidator = new CertificateValidator();
                     try
                     {
-                        //certValidator.Validate(X509);
                         model.CompanyCode = ExtractNitFromCertificate(parts);
                         model.HashCode = model.CompanyCode.EncryptSHA256();
+
                         if (string.IsNullOrEmpty(model.CompanyCode))
                         {
                             ModelState.AddModelError($"CompanyCode", "No se encontró el NIT de la empresa en el certificado.");
                             return View("CertificateLogin", model);
                         }
 
+                        certificateValidator.Validate(X509);
+
                         return View("CertificateLogin", model);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        ModelState.AddModelError($"CertificateLoginFailed", "Error al autenticarse con certificado digital.");
+                        var logger = new GlobalLogger("ZD05-WEB", model.CompanyCode) { Action = "CertificateLogin", Controller = "UserController", Message = ex.Message };
+                        var tableManager = new TableManager("GlobalLogger");
+                        tableManager.InsertOrUpdate(logger);
+
+                        ModelState.AddModelError($"CertificateLoginFailed", ex.Message);
+                        model.CompanyCode = "";
+                        model.HashCode = "xxxxxxxxxx".EncryptSHA256();
                         return View("CertificateLogin", model);
                     }
                 }

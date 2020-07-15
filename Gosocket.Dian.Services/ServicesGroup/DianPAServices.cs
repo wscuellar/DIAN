@@ -346,6 +346,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 }
                 else
                 {
+                    dianResponse.IsValid = false;
                     dianResponse.StatusCode = "99";
                     dianResponse.StatusDescription = "Validación contiene errores en campos mandatorios.";
                 }

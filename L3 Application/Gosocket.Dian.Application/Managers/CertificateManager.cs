@@ -1,13 +1,10 @@
-﻿using Gosocket.Dian.Application.Common;
-using Gosocket.Dian.Infrastructure;
+﻿using Gosocket.Dian.Infrastructure;
 using Org.BouncyCastle.X509;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Caching;
-using static Gosocket.Dian.Logger.Logger;
 
 namespace Gosocket.Dian.Application.Managers
 {
@@ -15,10 +12,11 @@ namespace Gosocket.Dian.Application.Managers
     {
         private static readonly object _lock = new object();
 
-        //private static readonly Lazy<ConnectionMultiplexer> _cacheConnection = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(ConfigurationManager.GetValue("GlobalRedis")));
+        private static readonly string container = $"dian";
+        private static readonly string crtFilesFolder = $"certificates/crts/";
+        private static readonly string crlFilesFolder = $"certificates/crls/";
 
         public static IDatabase cache;
-        //= (_cacheConnection.Value).GetDatabase();
 
         private static CertificateManager _instance = null;
 
@@ -37,35 +35,47 @@ namespace Gosocket.Dian.Application.Managers
 
         public static CertificateManager Instance => _instance ?? (_instance = new CertificateManager());
 
-        public X509Certificate[] GetRootCertificates(string container, string directory)
+        public X509Certificate[] GetRootCertificates()
         {
-            var lastUpdate = cache.GetOrSet("crtLastUpdate", () => DateTime.UtcNow);
+            X509Certificate[] certificates = null;
 
-            var data = (CacheData<X509Certificate[]>)MemoryCache.Default.Get("Crts");
-            if (data == null || data.LastUpdate < lastUpdate)
+            var data = InstanceCache.CertificatesInstanceCache.GetCacheItem("Crts");
+
+            if (data == null)
             {
-                var buffers = GetBytesFromStorage(container, directory);
+                var buffers = GetBytesFromStorage(container, crtFilesFolder);
                 var parser = new X509CertificateParser();
-                var certificates = buffers.Select(b => parser.ReadCertificate(b)).ToArray();
+                certificates = buffers.Select(b => parser.ReadCertificate(b)).ToArray();
 
-                data = new CacheData<X509Certificate[]>(lastUpdate, certificates);
-                MemoryCache.Default.Set("Crts", data, new CacheItemPolicy());
+                CacheItemPolicy policy = new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(24) };
+                InstanceCache.CertificatesInstanceCache.Set(new CacheItem("Crts", certificates), policy);
             }
-            return data.Data;
+            else
+                certificates = (X509Certificate[])data.Value;
+
+            return certificates;
         }
 
-        public X509Certificate[] OldGetRootCertificate(string container, string directory)
+        public X509Crl[] GetCrls()
         {
-            var buffers = cache.GetOrSet("crtBuffers", () => GetBytesFromStorage(container, directory));
-            var parser = new X509CertificateParser();
-            return buffers.Select(b => parser.ReadCertificate(b)).ToArray();
-        }
+            X509Crl[] crls = null;
 
-        public X509Crl[] GetCrls(string container, string directory)
-        {
-            var buffers = cache.GetOrSet("crlBuffers", () => GetBytesFromStorage(container, directory));
-            var parser = new X509CrlParser();
-            return buffers.Select(b => parser.ReadCrl(b)).ToArray();
+            var data = InstanceCache.CertificatesInstanceCache.GetCacheItem("Crls");
+
+            if (data == null)
+            {
+                var buffers = GetBytesFromStorage(container, crlFilesFolder);
+                var parser = new X509CrlParser();
+                crls = buffers.Select(b => parser.ReadCrl(b)).ToArray();
+
+                CacheItemPolicy policy = new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(24) };
+                InstanceCache.CertificatesInstanceCache.Set(new CacheItem("Crls", crls), policy);
+
+            }
+            else
+                crls = (X509Crl[])data.Value;
+
+            return crls;
         }
 
         public static IEnumerable<byte[]> GetBytesFromStorage(string container, string directory)
@@ -80,17 +90,10 @@ namespace Gosocket.Dian.Application.Managers
                     yield return bytes;
             }
         }
+    }
 
-        public class CacheData<T>
-        {
-            public CacheData(DateTime lastUpdate, T data)
-            {
-                LastUpdate = lastUpdate;
-                Data = data;
-            }
-            public DateTime LastUpdate { get; }
-
-            public T Data { get; }
-        }
+    public static class InstanceCache
+    {
+        public static MemoryCache CertificatesInstanceCache = MemoryCache.Default;
     }
 }
