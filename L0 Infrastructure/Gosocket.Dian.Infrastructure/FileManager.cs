@@ -78,7 +78,7 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public byte[] GetBytes(string container, string name,out string contentType)
+        public byte[] GetBytes(string container, string name, out string contentType)
         {
             try
             {
@@ -112,6 +112,25 @@ namespace Gosocket.Dian.Infrastructure
                 var blob = blobContainer.GetBlockBlobReference(name);
                 blob.DownloadToStream(target);
                 return target;
+            }
+            catch (StorageException)
+            {
+                return null;
+            }
+        }
+
+        public async Task<string> GetTextAsync(string container, string name)
+        {
+            try
+            {
+                var blobContainer = BlobClient.GetContainerReference(container);
+                var blob = blobContainer.GetBlockBlobReference(name);
+
+                using (var ms = new MemoryStream())
+                {
+                    await blob.DownloadToStreamAsync(ms);
+                    return Encoding.UTF8.GetString(ms.ToArray());
+                }
             }
             catch (StorageException)
             {

@@ -1,4 +1,5 @@
 {
+  //"functions": [ "DownloadECDFiles" ],
   "queues": {
     "batchSize": 16,
     "maxPollingInterval": 2000,

@@ -1,6 +1,5 @@
 ﻿using eFacturacionColombia_V2.Firma;
 using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Functions.Global.Cryptography.Signer;
 using Gosocket.Dian.Infrastructure;
 using System;
 using System.Collections.Generic;

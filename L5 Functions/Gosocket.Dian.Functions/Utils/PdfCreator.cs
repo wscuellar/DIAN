@@ -1,6 +1,6 @@
 ﻿using OpenHtmlToPdf;
 
-namespace Gosocket.Dian.Functions.Global.Utils
+namespace Gosocket.Dian.Functions.Utils
 {
     public class PdfCreator
     {

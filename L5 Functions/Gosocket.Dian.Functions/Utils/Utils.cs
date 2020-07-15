@@ -7,14 +7,13 @@ using QRCoder;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Dynamic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gosocket.Dian.Functions.Global.Utils
+namespace Gosocket.Dian.Functions.Utils
 {
     public class Utils
     {

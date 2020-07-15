@@ -5,18 +5,19 @@
     <Configurations>Debug;Release;Sandbox;Production;DianSandbox;DianProduction;Dev;Test</Configurations>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Global\Plugins\**" />
-    <EmbeddedResource Remove="Global\Plugins\**" />
-    <None Remove="Global\Plugins\**" />
+    <Compile Remove="AR\Plugins\**" />
+    <EmbeddedResource Remove="AR\Plugins\**" />
+    <None Remove="AR\Plugins\**" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Documents\RegisterDocumentData.cs" />
-    <Compile Remove="Global\Cosmos\InsertDocumentTest.cs" />
-    <Compile Remove="Global\RegisterDocumentStats.cs" />
-    <Compile Remove="Global\RegisterNsu.cs" />
-    <Compile Remove="Global\UpdateOfeControl.cs" />
-    <Compile Remove="Global\UpdateOfeControl_Old.cs" />
-    <Compile Remove="Global\UpdateOfeData.cs" />
+    <Compile Remove="Cosmos\InsertDocumentTest.cs" />
+    <Compile Remove="AR\RegisterDocumentStats.cs" />
+    <Compile Remove="AR\RegisterNsu.cs" />
+    <Compile Remove="AR\UpdateOfeControl.cs" />
+    <Compile Remove="AR\UpdateOfeControl_Old.cs" />
+    <Compile Remove="AR\UpdateOfeData.cs" />
+    <Compile Remove="ECD\DownloadCrtFIles.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.2.0" />

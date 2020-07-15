@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-namespace Gosocket.Dian.Functions.Global.Utils
+namespace Gosocket.Dian.Functions.Utils
 {
     public class HtmlGDoc
     {
@@ -49,7 +49,7 @@ namespace Gosocket.Dian.Functions.Global.Utils
             var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
             var htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_html.xslt");
 
-            
+
 
             TextReader streamReaderHtmlXslt = new StreamReader(new MemoryStream(htmlXsltBytes));
 
