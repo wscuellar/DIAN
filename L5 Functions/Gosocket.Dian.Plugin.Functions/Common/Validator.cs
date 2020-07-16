@@ -573,7 +573,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (certificate.IsTrusted(chainCertificates))
                 validateResponses.Add(new ValidateListResponse { IsValid = true, Mandatory = rejectUntrustedCertificate, ErrorCode = "ZD05", ErrorMessage = "Cadena de confianza del certificado digital correcta.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
-                validateResponses.Add(new ValidateListResponse { IsValid = false, Mandatory = rejectUntrustedCertificate, ErrorCode = "ZD05", ErrorMessage = $"Cadena de confianza del certificado digital es incorrecta, a partir del 8 de Agosto del 2020 esta notificación pasará a rechazo.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                validateResponses.Add(new ValidateListResponse { IsValid = false, Mandatory = rejectUntrustedCertificate, ErrorCode = "ZD05", ErrorMessage = ConfigurationManager.GetValue("UnTrustedCertificateMessage"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             if (certificate.IsRevoked(crls))
                 validateResponses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "ZD04", ErrorMessage = "Certificado de la firma revocado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
