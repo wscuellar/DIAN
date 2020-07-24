@@ -2116,14 +2116,9 @@
     <Content Include="Content\resources\Adjuntos_980005140.zip" />
     <Content Include="Content\plugins\jquery-cookie\jquery.cookie.js" />
     <Content Include="Content\plugins\bootstrap-datetimepicker\bootstrap-datetimepicker-standalone.min.css" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-certificate-hab - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-certificate-prod - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-certificate-test - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-hab-staging - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-prod-staging - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\catalog-gosocket-STAGING - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - ReadOnly - FTP.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - ReadOnly - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - Web Deploy.pubxml" />
