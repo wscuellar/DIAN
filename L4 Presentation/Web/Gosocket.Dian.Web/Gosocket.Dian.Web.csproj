@@ -360,6 +360,8 @@
     <Compile Include="Models\OperationModeViewModel.cs" />
     <Compile Include="Models\ProviderViewModel.cs" />
     <Compile Include="Models\RequestAuthorizationBigContributorViewModel.cs" />
+    <Compile Include="Models\Role\RoleModel.cs" />
+    <Compile Include="Models\Role\Roles.cs" />
     <Compile Include="Models\SearchViewModel.cs" />
     <Compile Include="Models\SoftwareViewModel.cs" />
     <Compile Include="Models\Document.cs" />

@@ -375,7 +375,7 @@
                                                 {
                                                     <li id="@Navigation.NavigationEnum.Contingencies"><a href="@Url.Action("Contingencies", "Settings")">Administrar Contingencias</a></li>
                                                 }
-                                                @if (User.IsInRole("Super"))
+                                                @if (User.IsInAnyRole("Administrador", "Super"))
                                                 {
                                                     <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("Users", "Settings")">Usuarios</a></li>
                                                 }
