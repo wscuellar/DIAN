@@ -321,6 +321,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
+    <Compile Include="Controllers\SupportController.cs" />
     <Compile Include="Controllers\TestSetController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ContributorController.cs" />
@@ -2652,6 +2653,11 @@
     <Content Include="Views\Contributor\_testSetResults.cshtml" />
     <Content Include="Views\Contributor\Configuration.cshtml" />
     <Content Include="Views\Contributor\Activation.cshtml" />
+    <Content Include="Views\Support\CompanyLogin.cshtml" />
+    <Content Include="Views\Support\PersonLogin.cshtml" />
+    <Content Include="Views\Support\_companyLogin.cshtml" />
+    <Content Include="Views\Support\_personLogin.cshtml" />
+    <Content Include="Views\Support\_adminCredentials.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
