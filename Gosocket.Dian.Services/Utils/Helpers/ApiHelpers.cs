@@ -12,7 +12,7 @@ namespace Gosocket.Dian.Services.Utils.Helpers
     public class ApiHelpers
     {
 
-        public static ConcurrentDictionary<Guid, HttpClient> httpClients = new ConcurrentDictionary<Guid, HttpClient>();
+        private static ConcurrentDictionary<Guid, HttpClient> httpClients = new ConcurrentDictionary<Guid, HttpClient>();
 
         private static async Task<HttpResponseMessage> ConsumeApiAsync<T>(string url, T requestObj)
         {

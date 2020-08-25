@@ -959,6 +959,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (response.ErrorMessage.Any()) return response;
 
             var number = StringUtil.TextAfter(serieAndNumber, serie).TrimStart('0');
+            if (string.IsNullOrEmpty(number))
+            {
+                var failedList = new List<string> { $"" };
+                response.IsValid = false;
+                response.StatusCode = "99";
+                response.StatusMessage = ".";
+                response.StatusDescription = ".";
+                response.ErrorMessage.AddRange(failedList);
+                return response;
+            }
+
             identifier = StringUtil.GenerateIdentifierSHA256($"{senderCode}{documentType}{serie}{number}");
             document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
 
@@ -973,9 +984,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (meta != null)
             {
                 document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
-
                 CheckDocument(ref response, document, meta);
-
                 // Check if response has errors
                 if (response.ErrorMessage.Any()) return response;
             }

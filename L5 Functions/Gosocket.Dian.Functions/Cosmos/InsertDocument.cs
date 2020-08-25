@@ -20,8 +20,11 @@ namespace Gosocket.Dian.Functions.Cosmos
         private static readonly TableManager tableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager tableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
 
+        // Set queue name
+        private const string queueName = "global-document-input%Slot%";
+
         [FunctionName("InsertDocument")]
-        public static async Task Run([QueueTrigger("global-document-input", Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 

@@ -5,7 +5,7 @@
     "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
     "BatchThreads": 1,
     "BillerSoftwareId": "fa326ca7-c1f8-40d3-a6fc-24d7c1040607",
-    "Slot": "-local",
+    "Slot": "-debug",
     //Test config
     "Environment": "Test",
     "CertificateThumbprint": "BF6B7AE700D03E317C8792D93C4C3DD488C1A002",
