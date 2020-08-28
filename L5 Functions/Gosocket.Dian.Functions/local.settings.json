@@ -22,6 +22,7 @@
     "BindingRedirects": "[ { \"ShortName\": \"System.Buffers\", \"RedirectToVersion\": \"4.0.3.0\", \"PublicKeyToken\": \"cc7b13ffcd2ddd51\" } ]",
     "GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
     "DownloadXmlUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/DownloadXml?code=RrnXFtVj0ZIgJVgoUppytMM8FJWBdQ2xrIMCEID7rMeEc/rtMOZbWQ==",
+    "GetCertificateApiUrl": "http://192.168.100.4:8080/certificate/get",
     "GetValidationsByTrackIdUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/GetValidationsByTrackId?code=g4PK7MUsrsoT4E0dviddgJ9qTTj9LSn4TEgT1jTYKiOGaNzYGdWKYw==",
     "GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/GetXpathDataValues?code=iISdBakj0QUhDcloBs7J1sQ4g8jWJdM3wGjXCAFNlxbrzyKovmyTBw==",
     "GetMultipleXpathDataValuesUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/GetMultipleXpathDataValues?code=GNX3tQiuXZ5Ok6cyGqzSjm/TcaO7jmVN7VMK8BmNsIeYr4q/jGQyHg==",

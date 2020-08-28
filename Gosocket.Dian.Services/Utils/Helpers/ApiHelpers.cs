@@ -113,7 +113,7 @@ namespace Gosocket.Dian.Services.Utils.Helpers
             }
             catch (Exception ex)
             {
-                throw new Exception($"result={result}____________request={JsonConvert.SerializeObject(requestObj)}____________{ex.Message}");
+                throw new Exception($"result={result}____________request={JsonConvert.SerializeObject(requestObj)}____________{ex.Message} {ex.InnerException?.Message}");
             }
         }
 
@@ -128,7 +128,7 @@ namespace Gosocket.Dian.Services.Utils.Helpers
             }
             catch (Exception ex)
             {
-                throw new Exception($"result={result}____________request={JsonConvert.SerializeObject(requestObj)}____________{ex.Message}");
+                throw new Exception($"result={result}____________request={JsonConvert.SerializeObject(requestObj)}____________{ex.Message} {ex.InnerException?.Message}");
             }
         }
 
