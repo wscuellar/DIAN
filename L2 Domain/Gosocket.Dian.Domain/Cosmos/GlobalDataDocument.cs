@@ -109,8 +109,8 @@ namespace Gosocket.Dian.Domain.Cosmos
     public class TechProvider
     {
         public string TechProviderCode { get; set; }
-        public string TechProviderName { get; set; }
-        public ulong? TechProviderNSUCode { get; set; }
+        //public string TechProviderName { get; set; }
+        //public ulong? TechProviderNSUCode { get; set; }
     }
     public class ValidationResult
     {

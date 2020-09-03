@@ -84,7 +84,7 @@ namespace Gosocket.Dian.Functions.Documents
                 TaxAmountIva = globalDocValidatordocumentMeta.TaxAmountIva,
                 TaxAmountIpc = globalDocValidatordocumentMeta.TaxAmountIpc,
                 TaxAmountIca = globalDocValidatordocumentMeta.TaxAmountIca,
-                SoftwareId = softwareId
+                SoftwareId = globalDocValidatordocumentMeta.SoftwareId
             };
 
             globalDataDocument.TaxesDetail = new TaxesDetail
@@ -102,9 +102,9 @@ namespace Gosocket.Dian.Functions.Documents
 
             globalDataDocument.TechProviderInfo = new TechProvider()
             {
-                TechProviderCode = globalDataDocument.SenderCode,
-                TechProviderName = globalDataDocument.SenderName,
-                TechProviderNSUCode = null
+                TechProviderCode = globalDocValidatordocumentMeta.TechProviderCode,
+                //TechProviderName = globalDataDocument.SenderName,
+                //TechProviderNSUCode = null
             };
 
             globalDataDocument.ValidationResultInfo = new ValidationResult()
