@@ -4,8 +4,10 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using CertificateResponse = Gosocket.Dian.Functions.Models.CertificateResponse;
 
@@ -25,7 +27,12 @@ namespace Gosocket.Dian.Functions.Hsm
 
             try
             {
-                var response = await ApiHelpers.ExecuteRequestAsync<CertificateResponse>(ConfigurationManager.GetValue("GetCertificateApiUrl"), new { name = data.Name });
+                var authToken = Encoding.ASCII.GetBytes($"hsmgoapi:hsmgoapi");
+                var header = new Dictionary<string, string>
+                {
+                    { "Authorization", $"Basic {Convert.ToBase64String(authToken)}" }
+                };
+                var response = await ApiHelpers.ExecuteRequestWithHeaderAsync<CertificateResponse>(ConfigurationManager.GetValue("GetCertificateApiUrl"), new { name = data.Name }, header);
                 return req.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception ex)
