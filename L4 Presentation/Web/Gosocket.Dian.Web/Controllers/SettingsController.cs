@@ -2,6 +2,7 @@
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Web.Filters;
 using Gosocket.Dian.Web.Models;
+using Gosocket.Dian.Web.Models.Role;
 using Gosocket.Dian.Web.Utils;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -157,7 +158,7 @@ namespace Gosocket.Dian.Web.Controllers
             return RedirectToAction(nameof(Contingencies)); ;
         }
 
-        [CustomRoleAuthorization(CustomRoles = "Super")]
+        [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult AddUser()
         {
             UserViewModel model = new UserViewModel { };
@@ -166,10 +167,24 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        [CustomRoleAuthorization(CustomRoles = "Super")]
+        [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public async Task<ActionResult> AddUser(UserViewModel model)
         {
-            var user = new ApplicationUser
+            var user = userService.GetByEmail(model.Email);
+
+            if (user != null && !UserManager.IsInRole(user.Id, Roles.Administrator))
+            {
+                await UserManager.AddToRoleAsync(user.Id, Roles.Administrator);
+                return RedirectToAction(nameof(Users));
+            }
+
+            if (user != null && UserManager.IsInRole(user.Id, Roles.Administrator))
+            {
+                ModelState.AddModelError("Email", "Usuario ya cuenta con el rol Administrador.");
+                return View(model);
+            }
+
+            user = new ApplicationUser
             {
                 Code = Guid.NewGuid().ToString().Substring(0, 6),
                 Name = model.Name,
@@ -178,11 +193,10 @@ namespace Gosocket.Dian.Web.Controllers
                 UserName = model.Email,
                 CreatedBy = User.Identity.Name
             };
+
             var result = await UserManager.CreateAsync(user);
-            if (result.Succeeded)
-                result = await UserManager.AddToRoleAsync(user.Id, "Administrador");
-            if (result.Succeeded)
-                return RedirectToAction(nameof(UserView), new { user.Id });
+            if (result.Succeeded) result = await UserManager.AddToRoleAsync(user.Id, Roles.Administrator);
+            if (result.Succeeded) return RedirectToAction(nameof(Users));
 
             foreach (var item in result.Errors)
                 ModelState.AddModelError(string.Empty, item);
@@ -194,18 +208,28 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        [CustomRoleAuthorization(CustomRoles = "Super")]
+        [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
+        public ActionResult UpdateUserRole(string id, string role, bool value)
+        {
+            var user = userService.Get(id);
+            if (value) UserManager.AddToRole(id, role);
+            else UserManager.RemoveFromRole(id, role);
+
+            return Json(new { ok = true }, JsonRequestBehavior.AllowGet);
+        }
+
+        [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult Users()
         {
             var model = new UserTableViewModel();
             var users = userService.GetUsersWithRoles(null, model.Page, model.Length);
-            model.Users = users.Select(u => new UserViewModel
+            model.Users = users.Where(_ => _.Id != User.Identity.GetUserId() && UserManager.IsInRole(_.Id, Roles.Administrator)).Select(u => new UserViewModel
             {
                 Id = u.Id,
                 Code = u.Code,
                 Name = u.Name,
                 Email = u.Email,
-                Roles = GetRoles(u)
+                IsAdmin = true,
             }).ToList();
 
             model.SearchFinished = true;
@@ -214,12 +238,12 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        [CustomRoleAuthorization(CustomRoles = "Super")]
+        [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult Users(UserTableViewModel model)
         {
             var users = new List<ApplicationUser>();
             if (string.IsNullOrEmpty(model.Email))
-                users = userService.GetUsersWithRoles(null, model.Page, model.Length);
+                users = userService.GetUsersWithRoles(null, model.Page, model.Length).Where(_ => UserManager.IsInRole(_.Id, Roles.Administrator)).ToList();
             else
             {
                 var user = userService.GetByEmail(model.Email);
@@ -227,20 +251,20 @@ namespace Gosocket.Dian.Web.Controllers
                     users.Add(user);
             }
 
-            model.Users = users.Select(u => new UserViewModel
+            model.Users = users.Where(_ => _.Id != User.Identity.GetUserId()).Select(u => new UserViewModel
             {
                 Id = u.Id,
                 Code = u.Code,
                 Name = u.Name,
                 Email = u.Email,
-                Roles = GetRoles(u)
+                IsAdmin = !string.IsNullOrEmpty(model.Email) ? UserManager.IsInRole(u.Id, Roles.Administrator) : true,
             }).ToList();
 
             model.SearchFinished = true;
             return View(model);
         }
 
-        [CustomRoleAuthorization(CustomRoles = "Super")]
+        [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult UserView(string id)
         {
             ApplicationUser applicationUser = UserManager.FindById(id);
@@ -367,19 +391,6 @@ namespace Gosocket.Dian.Web.Controllers
             //    ModelState.AddModelError("EndDateString", "Fecha final inválida.");
             //    isValid = false;
             //}
-        }
-        private string GetRoles(ApplicationUser user)
-        {
-            var roles = "";
-            foreach (var item in user.Roles)
-            {
-                var rol = userService.GetRolName(item.RoleId);
-                if (string.IsNullOrEmpty(roles))
-                    roles = rol;
-                else
-                    roles = $"{roles}|{rol}";
-            }
-            return roles;
         }
     }
 }

@@ -7,6 +7,7 @@ using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Filters;
 using Gosocket.Dian.Web.Models;
+using Gosocket.Dian.Web.Models.Role;
 using Gosocket.Dian.Web.Utils;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -892,7 +893,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpPost]
         [ExcludeFilter(typeof(Authorization))]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(UserLoginViewModel model, string returnUrl)
         {
 
@@ -914,11 +915,16 @@ namespace Gosocket.Dian.Web.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
+                    var user = userService.GetByEmail(model.Email);
+                    if (!UserManager.IsInRole(user.Id, Roles.Administrator))
+                    {
+                        ModelState.AddModelError($"AdminLoginFailed", "Usuario no cuenta con rol de Administrador.");
+                        return View("Login", model);
+                    }
                     return RedirectToAction(nameof(HomeController.Dashboard), "Home");
                 case SignInStatus.LockedOut:
                     ModelState.AddModelError($"AdminLoginFailed", "Usuario bloqueado.");
                     return View("Login", model);
-                //return View("Lockout");
                 case SignInStatus.RequiresVerification:
                     return RedirectToAction("SendCode", new { ReturnUrl = returnUrl });
                 case SignInStatus.Failure:
@@ -961,19 +967,21 @@ namespace Gosocket.Dian.Web.Controllers
             if (!User.IsInAnyRole("Administrador", "Super"))
             {
                 auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
-            }else
+            }
+            else
             {
                 var user = userService.GetByEmail(User.Identity.Name);
                 auth = dianAuthTableManager.Find<AuthToken>(user.Id, ConfigurationManager.GetValue("RowKeyDian"));
                 if (auth == null)
                 {
-                    auth = new AuthToken(user.Id, ConfigurationManager.GetValue("RowKeyDian")) {
-                        PartitionKey = user.Id, 
-                        RowKey= ConfigurationManager.GetValue("RowKeyDian"), 
-                        Email =user.Email, 
-                        Token = Guid.NewGuid().ToString(), 
-                        UserId =user.Id,
-                        Status = true 
+                    auth = new AuthToken(user.Id, ConfigurationManager.GetValue("RowKeyDian"))
+                    {
+                        PartitionKey = user.Id,
+                        RowKey = ConfigurationManager.GetValue("RowKeyDian"),
+                        Email = user.Email,
+                        Token = Guid.NewGuid().ToString(),
+                        UserId = user.Id,
+                        Status = true
                     };
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
@@ -996,7 +1004,7 @@ namespace Gosocket.Dian.Web.Controllers
             var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
             return Redirect(redirectUrl);
         }
-       
+
         public RedirectResult RedirectToBiller2()
         {
             var auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());

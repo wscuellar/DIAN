@@ -321,6 +321,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
+    <Compile Include="Controllers\SupportController.cs" />
     <Compile Include="Controllers\TestSetController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ContributorController.cs" />
@@ -360,6 +361,8 @@
     <Compile Include="Models\OperationModeViewModel.cs" />
     <Compile Include="Models\ProviderViewModel.cs" />
     <Compile Include="Models\RequestAuthorizationBigContributorViewModel.cs" />
+    <Compile Include="Models\Role\RoleModel.cs" />
+    <Compile Include="Models\Role\Roles.cs" />
     <Compile Include="Models\SearchViewModel.cs" />
     <Compile Include="Models\SoftwareViewModel.cs" />
     <Compile Include="Models\Document.cs" />
@@ -2116,14 +2119,9 @@
     <Content Include="Content\resources\Adjuntos_980005140.zip" />
     <Content Include="Content\plugins\jquery-cookie\jquery.cookie.js" />
     <Content Include="Content\plugins\bootstrap-datetimepicker\bootstrap-datetimepicker-standalone.min.css" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-certificate-hab - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-certificate-prod - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-certificate-test - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-hab-staging - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-prod-staging - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\catalog-gosocket-STAGING - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - ReadOnly - FTP.pubxml" />
-    <None Include="Properties\PublishProfiles\gtpa-web-prototype-test - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - ReadOnly - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\gtpa-web-prototype-test-eko-staging - Web Deploy.pubxml" />
@@ -2655,6 +2653,11 @@
     <Content Include="Views\Contributor\_testSetResults.cshtml" />
     <Content Include="Views\Contributor\Configuration.cshtml" />
     <Content Include="Views\Contributor\Activation.cshtml" />
+    <Content Include="Views\Support\CompanyLogin.cshtml" />
+    <Content Include="Views\Support\PersonLogin.cshtml" />
+    <Content Include="Views\Support\_companyLogin.cshtml" />
+    <Content Include="Views\Support\_personLogin.cshtml" />
+    <Content Include="Views\Support\_adminCredentials.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,0 +1,62 @@
+﻿@using Gosocket.Dian.Domain.Common
+@using Gosocket.Dian.Infrastructure
+@using Gosocket.Dian.Web.Models
+@model UserLoginViewModel
+@{
+    ViewBag.Title = "Acceder";
+    Layout = "~/Views/Shared/_LayoutNewLogin.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-8 col-xs-9 bhoechie-tab-container">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
+            <div class="list-group">
+                <!-- company -->
+                <a href="#" class="list-group-item text-center active">
+                    <h4 class="glyphicon glyphicon-briefcase"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Company)
+                </a>
+
+                <!-- person -->
+                <a href="@Url.Action("PersonLogin", "Support")" class="list-group-item text-center">
+                    <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Person)
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
+            <!-- company section -->
+            @Html.Partial("_companyLogin")
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script src="https://www.google.com/recaptcha/api.js?render=@ConfigurationManager.GetValue("Recaptcha")"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('.list-group-item').click(function () {
+                cleanFields();
+            });
+
+            var cleanFields = function () {
+                $('.field-validation-error').html('');
+                $('#DocumentKey').val('');
+                $('#PersonCode').val('');
+                $('#CompanyCode').val('');
+                $('#UserCode').val('');
+            };
+
+            grecaptcha.ready(function () {
+                grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
+                    $(".RecaptchaToken").val(token);
+                });
+            });
+        });
+
+    </script>
+}

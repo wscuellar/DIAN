@@ -111,6 +111,8 @@ namespace Gosocket.Dian.Web.Models
         {
             CanEdit = false;
             Contributors = new List<ContributorViewModel>();
+            IsAdmin = false;
+            IsSuper = false;
         }
 
         public string Id { get; set; }
@@ -141,6 +143,12 @@ namespace Gosocket.Dian.Web.Models
         [Required(ErrorMessage = "Seleccione tipo de identificación.")]
         [Display(Name = "Tipo de identificación")]
         public int IdentificationType { get; set; }
+
+        [Display(Name = "Administrador")]
+        public bool IsAdmin { get; set; }
+
+        [Display(Name = "Super")]
+        public bool IsSuper { get; set; }
 
         public List<IdentificationTypeListViewModel> IdentificationTypes { get; set; }
 
