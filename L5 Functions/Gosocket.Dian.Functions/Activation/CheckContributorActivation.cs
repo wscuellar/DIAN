@@ -8,6 +8,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Threading;
 
 namespace Gosocket.Dian.Functions.Activation
 {
@@ -35,7 +36,6 @@ namespace Gosocket.Dian.Functions.Activation
 
                     var utcNow = DateTime.UtcNow;
                     var lastHabilitationDateChecked = new ContributorPendingActivation("LastHabilitationDateChecked", "Prod") { LastHabilitationDateChecked = utcNow };
-                    globalContributorPendingActivationTableManager.InsertOrUpdate(lastHabilitationDateChecked);
 
                     var pendings = globalContributorPendingActivationTableManager.FindAll<ContributorPendingActivation>();
                     var codes = pendings.Where(p => p.CheckOnlyProd && p.PartitionKey != "LastHabilitationDateChecked").Select(p => p.Code).ToList();
@@ -117,12 +117,22 @@ namespace Gosocket.Dian.Functions.Activation
                         }
                     }
 
+                    //
+                    globalContributorPendingActivationTableManager.InsertOrUpdate(lastHabilitationDateChecked);
+
+                    Thread.Sleep(120000);
+
                     var queueManager = new QueueManager(queueName);
                     queueManager.Put(JsonConvert.SerializeObject(new { date = DateTime.UtcNow }));
                     log.Info("Verificación finalizada en produción.");
                 }
                 catch (Exception ex)
                 {
+                    Thread.Sleep(120000);
+
+                    var queueManager = new QueueManager(queueName);
+                    queueManager.Put(JsonConvert.SerializeObject(new { date = DateTime.UtcNow }));
+
                     log.Error($"Error al verificar activación de contribuyentes en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                     throw;
                 }
