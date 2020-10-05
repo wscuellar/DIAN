@@ -956,7 +956,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
             CheckDocument(ref response, document);
 
             // Check if response has errors
-            if (response.ErrorMessage.Any()) return response;
+            if (response.ErrorMessage.Any())
+            {
+                //
+                var validations = TableManagerGlobalNumberRange.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                if (validations.Any(v => !v.IsValid)) return null;
+
+                //
+                return response;
+            }
 
             var number = StringUtil.TextAfter(serieAndNumber, serie).TrimStart('0');
             if (string.IsNullOrEmpty(number))
@@ -977,7 +985,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
             CheckDocument(ref response, document);
 
             // Check if response has errors
-            if (response.ErrorMessage.Any()) return response;
+            if (response.ErrorMessage.Any())
+            {
+                //
+                var validations = TableManagerGlobalNumberRange.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                if (validations.Any(v => !v.IsValid)) return null;
+
+                //
+                return response;
+            }
 
             // third check
             var meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
@@ -986,7 +1002,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
                 CheckDocument(ref response, document, meta);
                 // Check if response has errors
-                if (response.ErrorMessage.Any()) return response;
+                if (response.ErrorMessage.Any())
+                {
+                    //
+                    var validations = TableManagerGlobalNumberRange.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                    if (validations.Any(v => !v.IsValid)) return null;
+
+                    //
+                    return response;
+                }
             }
 
             return null;
