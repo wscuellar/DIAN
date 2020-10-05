@@ -959,7 +959,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (response.ErrorMessage.Any())
             {
                 //
-                var validations = TableManagerGlobalNumberRange.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
                 if (validations.Any(v => !v.IsValid)) return null;
 
                 //
@@ -988,7 +988,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (response.ErrorMessage.Any())
             {
                 //
-                var validations = TableManagerGlobalNumberRange.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
                 if (validations.Any(v => !v.IsValid)) return null;
 
                 //
@@ -1005,7 +1005,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 if (response.ErrorMessage.Any())
                 {
                     //
-                    var validations = TableManagerGlobalNumberRange.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                    var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
                     if (validations.Any(v => !v.IsValid)) return null;
 
                     //
