@@ -960,7 +960,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             {
                 //
                 var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
-                if (validations.Any(v => !v.IsValid)) return null;
+                if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
 
                 //
                 return response;
@@ -989,7 +989,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             {
                 //
                 var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
-                if (validations.Any(v => !v.IsValid)) return null;
+                if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
 
                 //
                 return response;
@@ -1006,7 +1006,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     //
                     var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
-                    if (validations.Any(v => !v.IsValid)) return null;
+                    if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
 
                     //
                     return response;
