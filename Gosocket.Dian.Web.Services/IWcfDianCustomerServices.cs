@@ -87,7 +87,7 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         [OperationContract]
         [CustomOperation]
-        List<EventResponse> SendEventUpdateStatus(byte[] contentFile);
+        DianResponse SendEventUpdateStatus(byte[] contentFile);
 
         /// <summary>
         /// 

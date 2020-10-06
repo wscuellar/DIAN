@@ -688,6 +688,8 @@ namespace Gosocket.Dian.Services.Utils
             var docTypeCode = documentParsed.DocumentTypeId;
             var documentKey = documentParsed.DocumentKey;
             var senderCode = documentParsed.SenderCode;
+            var eventCode = documentParsed.ResponseCode;
+            var documentCude = documentParsed.Cude;
 
             switch (docTypeCode)
             {
@@ -713,6 +715,11 @@ namespace Gosocket.Dian.Services.Utils
                         codeMessage = "DA";
                         break;
                     }
+                case "96":
+                    {
+                        codeMessage = "AR";
+                        break;
+                    }
                 default:
                     {
                         codeMessage = "GEN";
@@ -721,6 +728,22 @@ namespace Gosocket.Dian.Services.Utils
             }
 
             //string[] noteCodes = { "7", "8" };
+
+            if (string.IsNullOrEmpty(eventCode))
+            {
+                stringBuilder.AppendLine($"{codeMessage}D06-(R) Código tipo de evento no puede estar vacío.");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
+
+            if (string.IsNullOrEmpty(documentCude))
+            {
+                stringBuilder.AppendLine($"{codeMessage}D06-(R) CUDE del UBL no puede estar vacío.");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
 
             if (string.IsNullOrEmpty(documentKey))
             {
