@@ -71,22 +71,22 @@
     <Setting Name="Param_Validate" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Validate</Value>
     </Setting>
-    <Setting Name="Msg_Error_FieldMandatori" Type="System.String" Scope="User">
+    <Setting Name="Msg_Error_FieldMandatori" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Documento con errores en campos mandatorios.</Value>
     </Setting>
-    <Setting Name="Code_00" Type="System.String" Scope="User">
+    <Setting Name="Code_00" Type="System.String" Scope="Application">
       <Value Profile="(Default)">00</Value>
     </Setting>
-    <Setting Name="Code_99" Type="System.String" Scope="User">
+    <Setting Name="Code_99" Type="System.String" Scope="Application">
       <Value Profile="(Default)">99</Value>
     </Setting>
-    <Setting Name="Msg_Procees_Sucessfull" Type="System.String" Scope="User">
+    <Setting Name="Msg_Procees_Sucessfull" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Procesado Correctamente.</Value>
     </Setting>
-    <Setting Name="Param_7AplicattionSendEvent" Type="System.String" Scope="User">
+    <Setting Name="Param_7AplicattionSendEvent" Type="System.String" Scope="Application">
       <Value Profile="(Default)">7 Aplication SendEventUpdateStatus</Value>
     </Setting>
-    <Setting Name="Param_LastZone" Type="System.String" Scope="User">
+    <Setting Name="Param_LastZone" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Last Zone</Value>
     </Setting>
   </Settings>

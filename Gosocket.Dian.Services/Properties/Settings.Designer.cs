@@ -13,7 +13,7 @@ namespace Gosocket.Dian.Services.Properties {
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+    public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
         
@@ -232,75 +232,57 @@ namespace Gosocket.Dian.Services.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Documento con errores en campos mandatorios.")]
         public string Msg_Error_FieldMandatori {
             get {
                 return ((string)(this["Msg_Error_FieldMandatori"]));
             }
-            set {
-                this["Msg_Error_FieldMandatori"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("00")]
         public string Code_00 {
             get {
                 return ((string)(this["Code_00"]));
             }
-            set {
-                this["Code_00"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("99")]
         public string Code_99 {
             get {
                 return ((string)(this["Code_99"]));
             }
-            set {
-                this["Code_99"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Procesado Correctamente.")]
         public string Msg_Procees_Sucessfull {
             get {
                 return ((string)(this["Msg_Procees_Sucessfull"]));
             }
-            set {
-                this["Msg_Procees_Sucessfull"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("7 Aplication SendEventUpdateStatus")]
         public string Param_7AplicattionSendEvent {
             get {
                 return ((string)(this["Param_7AplicattionSendEvent"]));
             }
-            set {
-                this["Param_7AplicattionSendEvent"] = value;
-            }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Last Zone")]
         public string Param_LastZone {
             get {
                 return ((string)(this["Param_LastZone"]));
-            }
-            set {
-                this["Param_LastZone"] = value;
             }
         }
     }
