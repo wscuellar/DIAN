@@ -607,6 +607,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 response.ErrorCode = "CAB27b";
             if (documentMeta.DocumentTypeId == "92")
                 response.ErrorCode = "DAB27b";
+            if (documentMeta.DocumentTypeId == "96")
+                response.ErrorCode = "AAB27";
 
             var number = softwareModel.SerieAndNumber;
             var softwareId = softwareModel.SoftwareId;
@@ -628,6 +630,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         response.ErrorCode = "CAB24b";
                     if (documentMeta.DocumentTypeId == "92")
                         response.ErrorCode = "DAB24b";
+                    if (documentMeta.DocumentTypeId == "96")
+                        response.ErrorCode = "AAB24";
                     response.ErrorMessage = "El identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este OFE.";
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
@@ -639,6 +643,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         response.ErrorCode = "CAB24c";
                     if (documentMeta.DocumentTypeId == "92")
                         response.ErrorCode = "DAB24c";
+                    if (documentMeta.DocumentTypeId == "96")
+                        response.ErrorCode = "AAB24";
                     response.ErrorMessage = "Identificador del software informado se encuentra inactivo.";
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
