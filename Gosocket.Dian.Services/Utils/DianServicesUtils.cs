@@ -717,7 +717,7 @@ namespace Gosocket.Dian.Services.Utils
                     }
                 case "96":
                     {
-                        codeMessage = "AR";
+                        codeMessage = "AA";
                         break;
                     }
                 default:
@@ -736,6 +736,14 @@ namespace Gosocket.Dian.Services.Utils
                 stringBuilder.Clear();
                 isValid = false;
             }
+            else if (Convert.ToInt32(eventCode) < 30 | Convert.ToInt32(eventCode) > 34)
+            {
+                stringBuilder.AppendLine($"{codeMessage}222 - Evento no Implementado.");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
+
 
             if (string.IsNullOrEmpty(documentCude))
             {
@@ -776,13 +784,7 @@ namespace Gosocket.Dian.Services.Utils
                 stringBuilder.Clear();
                 isValid = false;
             }
-            if (Convert.ToInt32(eventCode) < 30 | Convert.ToInt32(eventCode) > 34)
-            {
-                stringBuilder.AppendLine($"{codeMessage}222 - Evento no Implementado.");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
-            }
+          
             if (!isValid)
             {
 

@@ -764,27 +764,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (contentFileList.First().XmlFileName.Split(Properties.Settings.Default.Symbol_Slash).Count() > 1 && contentFileList.First().XmlFileName.Split(Properties.Settings.Default.Symbol_Slash).Last() != null)
                 contentFileList.First().XmlFileName = contentFileList.First().XmlFileName.Split(Properties.Settings.Default.Symbol_Slash).Last();
 
-            //Validación del software ID
-            var trackIdFunctionValidate = new { trackId, draft = Properties.Settings.Default.Param_False };
-            var validateSoftware = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>("http://localhost:7071/api/ValidateSoftware", trackIdFunctionValidate);
-            if (validateSoftware.Count == 0)
-            {
-                dianResponse.XmlFileName = contentFileList.First().XmlFileName;
-                dianResponse.StatusDescription = string.Empty;
-                dianResponse.StatusCode = Properties.Settings.Default.Code_66;
-                return dianResponse;
-            }
-            //
-            var validateCufe = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>("http://localhost:7071/api/ValidateCufe", trackIdFunctionValidate);
-            if (validateCufe.Count == 0)
-            {
-                dianResponse.XmlFileName = contentFileList.First().XmlFileName;
-                dianResponse.StatusDescription = string.Empty;
-                dianResponse.StatusCode = Properties.Settings.Default.Code_66;
-                return dianResponse;
-            }
-
-
             var trackIdMapperEntity = new GlobalOseTrackIdMapper(contentFileList[0].XmlFileName, trackId);
             TableManagerDianFileMapper.InsertOrUpdate(trackIdMapperEntity);
             var mapper = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone4Mapper) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -793,7 +772,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // upload xml
             start = DateTime.UtcNow;
             var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = docTypeCode, trackId = trackIdCude };
-            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_Zone4Mapper), uploadXmlRequest);
+            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
             if (!uploadXmlResponse.Success)
             {
                 dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
@@ -814,9 +793,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // send to validate document sync
             start = DateTime.UtcNow;
             trackId = trackIdCude;
-            var requestObjTrackId = new { trackId, draft = Properties.Settings.Default.Param_Validate6 };
+            var requestObjTrackId = new { trackId, draft = Properties.Settings.Default.Param_False };
             var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentUrl), requestObjTrackId);
-            var validate = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_False) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+            var validate = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Validate6) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // send to validate document sync
 
             if (validations.Count == 0)
