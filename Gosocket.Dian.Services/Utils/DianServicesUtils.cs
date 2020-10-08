@@ -729,29 +729,34 @@ namespace Gosocket.Dian.Services.Utils
 
             //string[] noteCodes = { "7", "8" };
 
-            if (string.IsNullOrEmpty(eventCode))
+
+            if(docTypeCode == "96")
             {
-                stringBuilder.AppendLine($"{codeMessage}D06-(R) Código tipo de evento no puede estar vacío.");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
-            }
-            else if (Convert.ToInt32(eventCode) < 30 | Convert.ToInt32(eventCode) > 34)
-            {
-                stringBuilder.AppendLine($"{codeMessage}222 - Evento no Implementado.");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
-            }
+                if (string.IsNullOrEmpty(eventCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}D06-(R) Código tipo de evento no puede estar vacío.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+                else if (Convert.ToInt32(eventCode) < 30 | Convert.ToInt32(eventCode) > 34)
+                {
+                    stringBuilder.AppendLine($"{codeMessage}222 - Evento no Implementado.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
 
 
-            if (string.IsNullOrEmpty(documentCude))
-            {
-                stringBuilder.AppendLine($"{codeMessage}D06-(R) CUDE del UBL no puede estar vacío.");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
+                if (string.IsNullOrEmpty(documentCude))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}D06-(R) CUDE del UBL no puede estar vacío.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
             }
+            
 
             if (string.IsNullOrEmpty(documentKey))
             {
