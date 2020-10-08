@@ -6,7 +6,7 @@
 pool:   
   name: 'agentpooldev02'  
 
-variables:
+variables: 
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
