@@ -285,5 +285,23 @@ namespace Gosocket.Dian.Services.Properties {
                 return ((string)(this["Param_LastZone"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public string Code_100 {
+            get {
+                return ((string)(this["Code_100"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ApplicationResponseProcessUrl")]
+        public string Param_ApplicationResponseProcessUrl {
+            get {
+                return ((string)(this["Param_ApplicationResponseProcessUrl"]));
+            }
+        }
     }
 }

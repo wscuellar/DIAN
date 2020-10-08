@@ -89,5 +89,11 @@
     <Setting Name="Param_LastZone" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Last Zone</Value>
     </Setting>
+    <Setting Name="Code_100" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="Param_ApplicationResponseProcessUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ApplicationResponseProcessUrl</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

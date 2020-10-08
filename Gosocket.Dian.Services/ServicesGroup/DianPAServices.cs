@@ -771,7 +771,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // upload xml
             start = DateTime.UtcNow;
-            var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = docTypeCode, trackId = trackIdCude };
+            var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = docTypeCode, trackId = trackIdCude, isEvent = true };
             var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
             if (!uploadXmlResponse.Success)
             {
@@ -874,6 +874,16 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.StatusMessage = message;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Procees_Sucessfull;
                     validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { DocumentKey = trackIdCude, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };
+
+                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode });
+                    if (processEventResponse.Code != Properties.Settings.Default.Code_100)
+                    {
+                        dianResponse.IsValid = false;
+                        dianResponse.XmlFileName = contentFileList.First().XmlFileName;
+                        dianResponse.StatusCode = processEventResponse.Code;
+                        dianResponse.StatusDescription = processEventResponse.Message;
+                        return dianResponse;
+                    }
                 }
                 else
                 {
@@ -905,9 +915,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 Task.WhenAll(arrayTasks);
 
-                var lastZone = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_LastZone) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+              
+
+               var lastZone = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_LastZone) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 TableManagerGlobalLogger.InsertOrUpdate(lastZone);
                 // LAST ZONE
+
+
+
 
                 return dianResponse;
             }
