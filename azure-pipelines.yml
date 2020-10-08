@@ -7,7 +7,7 @@ trigger:
 - dev-indra 
 
 pool:
-  vm-Image: 'agentpooldev02'
+  vm-Image: 'agentpooldev01'
 
 variables:
   solution: '**/*.sln'
