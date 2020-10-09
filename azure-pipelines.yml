@@ -21,12 +21,25 @@ steps:
     feedsToUse: 'config'
     nugetConfigPath: 'NuGet.Config'
 
+task: SonarQubePrepare@4
+  inputs:
+    SonarQube: 'SonarServerConnection'
+    scannerMode: 'MSBuild'
+    projectKey: 'EntregaFactura'
+    projectName: 'EntregaFactura'
+
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: SonarQubeAnalyze@4
+
+- task: SonarQubePublish@4
+  inputs:
+    pollingTimeoutSec: '300'
 
 - task: PublishBuildArtifacts@1
   inputs:
