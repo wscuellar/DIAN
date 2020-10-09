@@ -23,7 +23,7 @@ steps:
 
 - task: SonarQubePrepare@4
   inputs:
-    SonarQube: 'SonarServerConnection'
+    SonarQube: 'ServiceConnectionSonar'
     scannerMode: 'MSBuild'
     projectKey: 'EntregaFactura'
     projectName: 'EntregaFactura'
