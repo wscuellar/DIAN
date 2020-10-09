@@ -21,7 +21,7 @@ steps:
     feedsToUse: 'config'
     nugetConfigPath: 'NuGet.Config'
 
-task: SonarQubePrepare@4
+- task: SonarQubePrepare@4
   inputs:
     SonarQube: 'SonarServerConnection'
     scannerMode: 'MSBuild'
