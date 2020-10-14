@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Plugin.Functions.Common;
-using Gosocket.Dian.Plugin.Functions.Document;
 using Gosocket.Dian.Plugin.Functions.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 
-namespace Gosocket.Dian.Plugin.Functions.Event
+namespace Gosocket.Dian.Plugin.Functions.Series
 {
     public static class ValidateSerieAndNumber
     {
@@ -26,21 +23,27 @@ namespace Gosocket.Dian.Plugin.Functions.Event
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            var data = await req.Content.ReadAsAsync<ValidateDocumentDuplicity.RequestObject>();
+            var data = await req.Content.ReadAsAsync<RequestObject>();
 
             if (data == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Request body is empty");
 
             if (string.IsNullOrEmpty(data.TrackId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
+            if (string.IsNullOrEmpty(data.Number))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a Number in the request body");
+
             var trackId = data.TrackId;
+            var number = data.Number;
 
             if (trackId == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
+            if (number == null)
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a Number on the query string or in the request body");
 
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateSerieAndNumberAsync(trackId);
+                var validateResponses = ValidatorEngine.Instance.StartValidateSerieAndNumberAsync(trackId, number);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -67,6 +70,8 @@ namespace Gosocket.Dian.Plugin.Functions.Event
         {
             [JsonProperty(PropertyName = "trackId")]
             public string TrackId { get; set; }
+            [JsonProperty(PropertyName = "Number")]
+            public string Number { get; set; }
         }
     }
 }

@@ -26,27 +26,33 @@ namespace Gosocket.Dian.Plugin.Functions.Event
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            var data = await req.Content.ReadAsAsync<ValidateDocumentDuplicity.RequestObject>();
+            var data = await req.Content.ReadAsAsync<RequestObject>();
 
             if (data == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Request body is empty");
 
             if (string.IsNullOrEmpty(data.TrackId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
+            if (string.IsNullOrEmpty(data.EventCode))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a EventCode in the request body");
+
             var trackId = data.TrackId;
+            var eventCode = data.EventCode;
 
             if (trackId == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
+            if (eventCode == null)
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a eventCode on the query string or in the request body");
 
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateEmitionEventPrevAsync(trackId);
+                var validateResponses = ValidatorEngine.Instance.StartValidateEmitionEventPrevAsync(trackId,eventCode);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"DUPLICITYPLGNS-{DateTime.UtcNow:yyyyMMdd}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"DUPLICITYPLGNS-{DateTime.UtcNow:yyyyMMdd}-Evento {eventCode}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -67,6 +73,8 @@ namespace Gosocket.Dian.Plugin.Functions.Event
         {
             [JsonProperty(PropertyName = "trackId")]
             public string TrackId { get; set; }
+            [JsonProperty(PropertyName = "EventCode")]
+            public string EventCode { get; set; }
         }
     }
 }

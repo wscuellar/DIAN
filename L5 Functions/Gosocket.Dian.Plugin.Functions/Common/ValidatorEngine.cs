@@ -63,15 +63,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
-        public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(string trackId)
+        public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(string trackId, string eventCode)
         {
             var validator = new Validator();
-            return validator.ValidateEmitionEventPrev(trackId);
+            return validator.ValidateEmitionEventPrev(trackId,eventCode);
         }
-        public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId)
+        public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId, string number)
         {
             var validator = new Validator();
-            return validator.ValidateSerieAndNumber(trackId);
+            return validator.ValidateSerieAndNumber(trackId, number);
         }
         public async Task<List<ValidateListResponse>> StartNitValidationAsync(string trackId)
         {
