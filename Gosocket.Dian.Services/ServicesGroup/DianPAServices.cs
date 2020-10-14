@@ -956,9 +956,28 @@ namespace Gosocket.Dian.Services.ServicesGroup
             CheckDocument(ref response, document);
 
             // Check if response has errors
-            if (response.ErrorMessage.Any()) return response;
+            if (response.ErrorMessage.Any())
+            {
+                //
+                var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
+
+                //
+                return response;
+            }
 
             var number = StringUtil.TextAfter(serieAndNumber, serie).TrimStart('0');
+            if (string.IsNullOrEmpty(number))
+            {
+                var failedList = new List<string> { $"" };
+                response.IsValid = false;
+                response.StatusCode = "99";
+                response.StatusMessage = ".";
+                response.StatusDescription = ".";
+                response.ErrorMessage.AddRange(failedList);
+                return response;
+            }
+
             identifier = StringUtil.GenerateIdentifierSHA256($"{senderCode}{documentType}{serie}{number}");
             document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
 
@@ -966,18 +985,32 @@ namespace Gosocket.Dian.Services.ServicesGroup
             CheckDocument(ref response, document);
 
             // Check if response has errors
-            if (response.ErrorMessage.Any()) return response;
+            if (response.ErrorMessage.Any())
+            {
+                //
+                var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
+
+                //
+                return response;
+            }
 
             // third check
             var meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             if (meta != null)
             {
                 document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
-
                 CheckDocument(ref response, document, meta);
-
                 // Check if response has errors
-                if (response.ErrorMessage.Any()) return response;
+                if (response.ErrorMessage.Any())
+                {
+                    //
+                    var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                    if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
+
+                    //
+                    return response;
+                }
             }
 
             return null;

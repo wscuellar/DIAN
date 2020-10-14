@@ -223,13 +223,13 @@ namespace Gosocket.Dian.Web.Controllers
         {
             var model = new UserTableViewModel();
             var users = userService.GetUsersWithRoles(null, model.Page, model.Length);
-            model.Users = users.Where(_ => _.Id != User.Identity.GetUserId() && UserManager.IsInRole(_.Id, Roles.Administrator)).Select(u => new UserViewModel
+            model.Users = users.Select(u => new UserViewModel
             {
                 Id = u.Id,
                 Code = u.Code,
                 Name = u.Name,
                 Email = u.Email,
-                IsAdmin = true,
+                IsAdmin = UserManager.IsInRole(u.Id, Roles.Administrator),
             }).ToList();
 
             model.SearchFinished = true;
@@ -243,21 +243,20 @@ namespace Gosocket.Dian.Web.Controllers
         {
             var users = new List<ApplicationUser>();
             if (string.IsNullOrEmpty(model.Email))
-                users = userService.GetUsersWithRoles(null, model.Page, model.Length).Where(_ => UserManager.IsInRole(_.Id, Roles.Administrator)).ToList();
+                users = userService.GetUsersWithRoles(null, model.Page, model.Length).ToList();
             else
             {
                 var user = userService.GetByEmail(model.Email);
-                if (user != null)
-                    users.Add(user);
+                if (user != null) users.Add(user);
             }
 
-            model.Users = users.Where(_ => _.Id != User.Identity.GetUserId()).Select(u => new UserViewModel
+            model.Users = users.Select(u => new UserViewModel
             {
                 Id = u.Id,
                 Code = u.Code,
                 Name = u.Name,
                 Email = u.Email,
-                IsAdmin = !string.IsNullOrEmpty(model.Email) ? UserManager.IsInRole(u.Id, Roles.Administrator) : true,
+                IsAdmin = UserManager.IsInRole(u.Id, Roles.Administrator),
             }).ToList();
 
             model.SearchFinished = true;

@@ -22,6 +22,7 @@ namespace Gosocket.Dian.Domain.Cosmos
         public int EmissionDateNumber { get; set; }
         public DateTime GenerationTimeStamp { get; set; }
         public DateTime ReceptionTimeStamp { get; set; }
+        public DateTime? SigningTimeStamp { get; set; }
         public List<DocumentTag> DocumentTags { get; set; }
         public List<Event> Events { get; set; }
         public TaxesDetail TaxesDetail { get; set; }
@@ -108,8 +109,8 @@ namespace Gosocket.Dian.Domain.Cosmos
     public class TechProvider
     {
         public string TechProviderCode { get; set; }
-        public string TechProviderName { get; set; }
-        public ulong? TechProviderNSUCode { get; set; }
+        //public string TechProviderName { get; set; }
+        //public ulong? TechProviderNSUCode { get; set; }
     }
     public class ValidationResult
     {

@@ -97,6 +97,7 @@ namespace Gosocket.Dian.Infrastructure
 
                 // A pfx can contain a chain            
                 var cert = x509Collection.Cast<X509Certificate2>().Single(s => s.HasPrivateKey);
+                using (cert.GetRSAPrivateKey()) { }
                 var x509Bytes = cert.Export(X509ContentType.Pfx, password);
                 var base64X509 = Convert.ToBase64String(x509Bytes);
 
@@ -133,11 +134,11 @@ namespace Gosocket.Dian.Infrastructure
             catch (KeyVaultErrorException e)
             {
                 result.Success = false;
-                result.Error = e.Body.Error.InnerError.Code == "KeySizeNotSupported"
-                    ? "KeySizeNotSupported" + " " + e.Body.Error.InnerError.Message
+                result.Error = e.Body.Error.InnerError?.Code == "KeySizeNotSupported"
+                    ? "KeySizeNotSupported" + " " + e.Body.Error.InnerError?.Message
                     : e.Message;
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 result.Success = false;
                 result.Error = e.Message;
