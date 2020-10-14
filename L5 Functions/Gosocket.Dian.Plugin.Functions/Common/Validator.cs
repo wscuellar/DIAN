@@ -904,5 +904,129 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
         }
         #endregion
+
+        #region validation to emition to event
+
+        public List<ValidateListResponse> ValidateEmitionEventPrev(string trackId)
+        {
+            DateTime startDate = DateTime.UtcNow;
+
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            trackId = trackId.ToLower();
+            int conteoDocuimentoAcuse = 0;
+            int conteoDocuimentoReciboBien = 0;
+            int conteoDocuimentoRechazo = 0;
+            int conteoDocuimentoAceptacionExpresa = 0;
+            int conteoDocuimentoAceptacionTacita = 0;
+
+            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId);
+
+            foreach (var documentMetaEntie in documentMeta)
+            {
+                switch (documentMetaEntie.EventCode)
+                {
+                    case "030":
+                        conteoDocuimentoAcuse++;
+                        break;
+                    case "031":
+                        conteoDocuimentoRechazo++;
+                        break;
+                    case "032":
+                        conteoDocuimentoReciboBien++;
+                        break;
+                    case "033":
+                        conteoDocuimentoAceptacionExpresa++;
+                        break;
+                    case "034":
+                        conteoDocuimentoAceptacionTacita++;
+                        break;
+                }
+            }
+
+            if (conteoDocuimentoReciboBien > 0)
+            {
+                if (conteoDocuimentoAcuse == 0)
+                {
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "VEEP001", ErrorMessage = "Solo se pueda transmitir el evento de recibo del bien o prestación del servicio, después de haber transmitido el evento de acuse de recibo.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+            }
+
+            if (conteoDocuimentoRechazo > 0)
+            {
+                if (conteoDocuimentoAcuse == 0)
+                {
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "VEEP002", ErrorMessage = "Solo se pueda transmitir el evento de Rechazo de la factura de Venta después de haber transmitido el evento de acuse de recibo", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+            }
+
+            if (conteoDocuimentoAceptacionExpresa > 0 || conteoDocuimentoRechazo > 0)
+            {
+                if (conteoDocuimentoAceptacionTacita > 0)
+                {
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "VEEP003", ErrorMessage = "Cuando haya una aceptación expresa de la factura o un rechazo de la factura no puede existir una Aceptación Tacita de la factura", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                }
+            }
+
+            if (conteoDocuimentoAceptacionExpresa > 0)
+            {
+                if (conteoDocuimentoRechazo > 0)
+                {
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "VEEP004", ErrorMessage = "Cuando haya una aceptación expresa de la factura, no puede existir un Rechazo de la factura de Venta", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                }
+            }
+
+            if (conteoDocuimentoAceptacionTacita > 0)
+            {
+                if (conteoDocuimentoRechazo > 0)
+                {
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "VEEP005", ErrorMessage = "Cuando haya una aceptación tacita de la factura, no puede existir un Rechazo de la factura de Venta", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                }
+            }
+
+            if (conteoDocuimentoAcuse > 1 || conteoDocuimentoRechazo > 1 || conteoDocuimentoReciboBien > 1 ||
+                conteoDocuimentoAceptacionExpresa > 1 || conteoDocuimentoAceptacionTacita > 1)
+            {
+                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "VEEP006", ErrorMessage = "Solo se pueda transmitir un  evento de cada tipo para un CUFE - Es decir no se pueden repetir los eventos.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+            }
+
+            return responses;
+        }
+
+
+        #endregion
+        #region validation for CBC ID
+        public List<ValidateListResponse> ValidateSerieAndNumber(string trackId)
+        {
+            DateTime startDate = DateTime.UtcNow;
+
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            trackId = trackId.ToLower();
+          
+
+            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId);
+
+            foreach (var documentMetaEntie in documentMeta)
+            {
+                var serieAndNumber = documentMetaEntie.SerieAndNumber.Replace(documentMetaEntie.Serie,"");
+
+                foreach (var serie in documentMeta.Where(t=>t.DocumentKey!= documentMetaEntie.DocumentKey))
+                {
+                    var serieTable = serie.SerieAndNumber.Replace(serie.Serie,"");
+                    if (serieAndNumber == serieTable)
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "VSAN001", ErrorMessage = "Solo puede haber un unico ID por SerieAndNumber.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                    }
+                }
+            }
+            return responses;
+        }
+        #endregion
+
     }
 }
