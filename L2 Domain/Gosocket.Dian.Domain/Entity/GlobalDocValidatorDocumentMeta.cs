@@ -41,4 +41,5 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string TestSetId { get; set; }
     public string UblVersion { get; set; }
     public string ZipKey { get; set; }
+    public string EventCode { get; set; }
 }

@@ -412,7 +412,17 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.FirstOrDefault();
         }
+        public List<T> FindDocumentReferenced<T>(string documentReferencedKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
 
+            var prefixCondition = TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                QueryComparisons.Equal, documentReferencedKey);
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
         public List<T> FindByPartition<T>(string partitionKey, DateTime timeStampFrom, DateTime timeStampTo)
             where T : ITableEntity, new()
         {
