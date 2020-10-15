@@ -986,6 +986,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
+                        if (documentMeta.Where(t => t.EventCode == "032").ToList().Count == decimal.Zero)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "VEEP005",
+                                ErrorMessage =
+                                    "Cuando haya una aceptación tacita de la factura, tiene que existir el documento de acuse de recibo",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
                         break;
                     case "034":
                         if (documentMeta.Where(t => t.EventCode == "031").ToList().Count > decimal.Zero)
@@ -1000,7 +1012,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-
+                        else if (documentMeta.Where(t => t.EventCode == "032").ToList().Count == decimal.Zero)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "VEEP005",
+                                ErrorMessage =
+                                    "Cuando haya una aceptación tacita de la factura, tiene que existir el documento de acuse de recibo",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
                         break;
                 }
             }
