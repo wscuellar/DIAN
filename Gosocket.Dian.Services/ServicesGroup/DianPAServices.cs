@@ -1258,7 +1258,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateSerie(string trackId, string serieAndNumber)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, serieAndNumber });
+            var number = serieAndNumber;
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1268,9 +1269,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     StatusCode = validations[0].ErrorCode,
                     IsValid = validations[0].Mandatory
                 };
+                response.ErrorMessage = new List<string>();
                 foreach (var item in validations)
                 {
-                    response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                    response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorCode}");
                 }
             }
             return response;
@@ -1288,6 +1290,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     StatusCode = validations[0].ErrorCode,
                     IsValid = validations[0].Mandatory
                 };
+                response.ErrorMessage = new List<string>();
                 foreach (var item in validations)
                 {
                     response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
