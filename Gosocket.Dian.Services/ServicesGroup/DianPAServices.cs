@@ -1259,7 +1259,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidateSerie(string trackId, string serieAndNumber)
         {
             var number = serieAndNumber;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number });
+            var urlVar = ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie);
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(urlVar, new { trackId, number });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
