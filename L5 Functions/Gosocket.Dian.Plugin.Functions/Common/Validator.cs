@@ -917,7 +917,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             if (documentMeta.Where(t => t.EventCode == eventCode).ToList().Count > decimal.Zero)
             {
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "VEEP006", ErrorMessage = "Solo se pueda transmitir un  evento de cada tipo para un CUFE - Es decir no se pueden repetir los eventos.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse 
+                { 
+                    IsValid = true, 
+                    Mandatory = true, 
+                    ErrorCode = "89", 
+                    ErrorMessage = "Solo se pueda transmitir un  evento de cada tipo para un CUFE - Es decir no se pueden repetir los eventos.", 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
             else
             {
@@ -931,7 +937,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "VEEP001",
+                                ErrorCode = "89",
                                 ErrorMessage = "Solo se pueda transmitir el evento de recibo del bien o prestación del servicio, después de haber transmitido el evento de acuse de recibo.",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -942,7 +948,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "VEEP003",
+                                ErrorCode = "89",
                                 ErrorMessage = "Cuando haya un rechazo de la factura de la factura no puede existir una Aceptación Tacita de la factura",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -956,7 +962,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "VEEP002",
+                                ErrorCode = "89",
                                 ErrorMessage = "Solo se pueda transmitir el evento de Rechazo de la factura de Venta después de haber transmitido el evento de acuse de recibo",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -970,7 +976,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "VEEP003",
+                                ErrorCode = "89",
                                 ErrorMessage = "Cuando haya una aceptación expresa de la factura no puede existir una Aceptación Tacita de la factura",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -981,7 +987,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "VEEP004",
+                                ErrorCode = "89",
                                 ErrorMessage = "Cuando haya una aceptación expresa de la factura, no puede existir un Rechazo de la factura de Venta",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -992,7 +998,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "VEEP005",
+                                ErrorCode = "89",
                                 ErrorMessage =
                                     "Cuando haya una aceptación tacita de la factura, tiene que existir el documento de acuse de recibo",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1006,7 +1012,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "VEEP005",
+                                ErrorCode = "89",
                                 ErrorMessage =
                                     "Cuando haya una aceptación tacita de la factura, no puede existir un Rechazo de la factura de Venta",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1018,7 +1024,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "VEEP005",
+                                ErrorCode = "89",
                                 ErrorMessage =
                                     "Cuando haya una aceptación tacita de la factura, tiene que existir el documento de acuse de recibo",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1046,7 +1052,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId);
             if (documentMeta.Where(t => t.Number == number).ToList().Count > decimal.Zero)
             {
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "VSAN001", ErrorMessage = "Solo puede haber un unico ID por SerieAndNumber.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse {
+                    IsValid = true, 
+                    Mandatory = true, 
+                    ErrorCode = "89", 
+                    ErrorMessage = "Solo puede haber un unico ID por SerieAndNumber.", 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
 
 
