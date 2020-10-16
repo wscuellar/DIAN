@@ -771,10 +771,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE MAPPER
 
             // Validate serie
-            var serieResponse = ValidateSerie(trackId, serieAndNumber);
+            var serieResponse = ValidateSerie(trackId, serieAndNumber);            
             if (serieResponse.IsValid)
             {
-                dianResponse = serieResponse;
+                dianResponse = serieResponse;                               
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
                 return dianResponse;
             }
             var validateSerie = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -784,6 +787,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (eventCodeResponse.IsValid)
             {
                 dianResponse = eventCodeResponse;
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
                 return dianResponse;
             }
             var validateEventCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -1272,8 +1278,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.ErrorMessage = new List<string>();
                 foreach (var item in validations)
                 {
-                    response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorCode}");
-                }
+                    response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                }               
+                response.StatusDescription = "Validación contiene errores en campos mandatorios.";                
+
             }
             return response;
         }
@@ -1295,6 +1303,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
                 }
+                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
             }
             return response;
         }
