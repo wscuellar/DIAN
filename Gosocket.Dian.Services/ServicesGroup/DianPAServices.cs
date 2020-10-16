@@ -745,6 +745,18 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var auth = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Auth3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // Auth
 
+            // Validate serie
+            var serieResponse = ValidateSerie(trackId, serieAndNumber);
+            if (serieResponse.IsValid)
+            {
+                dianResponse = serieResponse;
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
+                return dianResponse;
+            }
+            var validateSerie = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+
 
             // Duplicity
             start = DateTime.UtcNow;
@@ -769,19 +781,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             TableManagerDianFileMapper.InsertOrUpdate(trackIdMapperEntity);
             var mapper = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone4Mapper) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE MAPPER
-
-            // Validate serie
-            var serieResponse = ValidateSerie(trackId, serieAndNumber);            
-            if (serieResponse.IsValid)
-            {
-                dianResponse = serieResponse;                               
-                dianResponse.XmlDocumentKey = trackIdCude;
-                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                dianResponse.IsValid = false;
-                return dianResponse;
-            }
-            var validateSerie = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-
+          
             // Validate EventCode
             var eventCodeResponse = ValidateEventCode(trackId, eventCode);
             if (eventCodeResponse.IsValid)

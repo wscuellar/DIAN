@@ -930,7 +930,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 switch (eventCode)
                 {
 
-                    case "031":
+                    case "031": //Rechazo de la FEV
                         if (documentMeta.Where(t => t.EventCode == "030").ToList().Count == decimal.Zero)
                         {
                             responses.Add(new ValidateListResponse
@@ -938,7 +938,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "89",
-                                ErrorMessage = "Solo se pueda transmitir el evento de recibo del bien o prestación del servicio, después de haber transmitido el evento de acuse de recibo.",
+                                ErrorMessage = "Solo se pueda transmitir el evento (031) Rechazo de la FEV," +
+                                " después de haber transmitido el evento (030) de acuse de recibo.",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -949,13 +950,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "89",
-                                ErrorMessage = "Cuando haya un rechazo de la factura de la factura no puede existir una Aceptación Tacita de la factura",
+                                ErrorMessage = "No se pueda transmitir el evento (031) Rechazo de la FEV, " +
+                                "Cuando ya existe un evento (034) Aceptación Tacita de la factura",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
 
                         }
                         break;
-                    case "032":
+                    case "032": //Recibo del bien o aceptacion de la prestacion del servicio
                         if (documentMeta.Where(t => t.EventCode == "030").ToList().Count == decimal.Zero)
                         {
                             responses.Add(new ValidateListResponse
@@ -963,13 +965,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "89",
-                                ErrorMessage = "Solo se pueda transmitir el evento de Rechazo de la factura de Venta después de haber transmitido el evento de acuse de recibo",
+                                ErrorMessage = "Solo se pueda transmitir el evento (032) recibo del bien o aceptacion de la prestacion del servicio," +
+                                " después de haber transmitido el evento (030) de acuse de recibo",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
 
                         break;
-                    case "033":
+                    case "033": //Aceptacion Expresa
                         if (documentMeta.Where(t => t.EventCode == "034").ToList().Count > decimal.Zero)
                         {
                             responses.Add(new ValidateListResponse
@@ -977,7 +980,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "89",
-                                ErrorMessage = "Cuando haya una aceptación expresa de la factura no puede existir una Aceptación Tacita de la factura",
+                                ErrorMessage = "No se pueda transmitir el evento (033) Aceptación expresa de la factura," +
+                                " Cuando ya existe un evento (034) Aceptación Tacita de la factura",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -988,7 +992,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "89",
-                                ErrorMessage = "Cuando haya una aceptación expresa de la factura, no puede existir un Rechazo de la factura de Venta",
+                                ErrorMessage = "No se pueda transmitir el evento (033) Aceptación expresa de la factura, " +
+                                " Cuando ya existe un evento (031) Rechazo de la factura de Venta",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -1000,12 +1005,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 Mandatory = true,
                                 ErrorCode = "89",
                                 ErrorMessage =
-                                    "Cuando haya una aceptación tacita de la factura, tiene que existir el documento de acuse de recibo",
+                                    "Solo se pueda transmitir el evento (033) Aceptacion Expresa de la factura," +
+                                " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
                         break;
-                    case "034":
+                    case "034": //Aceptacion Tácita
                         if (documentMeta.Where(t => t.EventCode == "031").ToList().Count > decimal.Zero)
                         {
                             responses.Add(new ValidateListResponse
@@ -1013,12 +1019,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "89",
-                                ErrorMessage =
-                                    "Cuando haya una aceptación tacita de la factura, no puede existir un Rechazo de la factura de Venta",
+                                ErrorMessage = "No se pueda transmitir el evento (034) Aceptación Tácita de la factura, " +
+                                " Cuando ya existe un evento (031) Rechazo de la factura de Venta",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-                        else if (documentMeta.Where(t => t.EventCode == "032").ToList().Count == decimal.Zero)
+                        
+                        if (documentMeta.Where(t => t.EventCode == "032").ToList().Count == decimal.Zero)
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -1026,7 +1033,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 Mandatory = true,
                                 ErrorCode = "89",
                                 ErrorMessage =
-                                    "Cuando haya una aceptación tacita de la factura, tiene que existir el documento de acuse de recibo",
+                                    "Solo se pueda transmitir el evento (034) Aceptacion Tácita de la factura," +
+                                " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
