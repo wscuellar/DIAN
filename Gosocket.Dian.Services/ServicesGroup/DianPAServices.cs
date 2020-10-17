@@ -796,7 +796,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // upload xml
             start = DateTime.UtcNow;
-            var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = docTypeCode, trackId = trackIdCude, isEvent = true, eventCode = documentParsed.ResponseCode };
+            trackId = trackIdCude;
+            bool isEvent = true;        
+            var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = docTypeCode, trackId, isEvent, eventCode };
             var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
             if (!uploadXmlResponse.Success)
             {
@@ -926,7 +928,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(unzip),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(parser),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(auth),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(duplicity),
+                    //TableManagerGlobalLogger.InsertOrUpdateAsync(duplicity),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(upload),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validate),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(application),
