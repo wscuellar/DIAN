@@ -35,35 +35,35 @@
     //"TestHabSoftwarePin": "12345"
 
     // Test
-    //"Environment": "Test",
-    //"AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
-    //"AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    "Environment": "Test",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    "BindingRedirects": "[ { \"ShortName\": \"Microsoft.WindowsAzure.ServiceRuntime\", \"RedirectToVersion\": \"2.7.0.0\", \"PublicKeyToken\": \"31bf3856ad364e35\" } ]",    
+    "GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    "GlobalRedis": "gtpa-validator-redis-test.redis.cache.windows.net:6380,password=ghckdGfPqQOec7xvz8IUaBF6yObX4gcCdIWOc2TMFWo=,ssl=True,abortConnect=False",
+    "DownloadXmlUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/DownloadXml?code=RrnXFtVj0ZIgJVgoUppytMM8FJWBdQ2xrIMCEID7rMeEc/rtMOZbWQ==",
+    "GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/GetXpathDataValues?code=iISdBakj0QUhDcloBs7J1sQ4g8jWJdM3wGjXCAFNlxbrzyKovmyTBw==",
+    "SignatureDigestValue": "dMoMvtcG5aIzgYo0tIsSQeVJBDnUnfSOfBpxXrmor0Y=@EQC0kiWPaAME6IsEZ7WuaTWJ97Zmf6hIO69rMCVURmQxBB9ebgLrjhL5BArQ0a0l@Zcjw1Z9nGQn2j6NyGx8kAaLbOfJGd/fJxRTCeirlqAg7zRG27piJkJOpflGu7XACpMj9hC6dVMcCyzqHxxPZeQ==",
+    "SqlConnection": "Server=tcp:gtpa-sql-server-test.database.windows.net,1433;Initial Catalog=gtpa-sql-test;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+    "BillerSoftwareId": "fa326ca7-c1f8-40d3-a6fc-24d7c1040607",
+    "BillerSoftwarePin": "20191",
+    "TestHabTechnicalKey": "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c",
+    "TestHabSoftwarePin": "20191"
+
+    // Dev
+    //"Environment": "Dev",
+    //"AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragedev;AccountKey=QM8DTuuHPnf/bktq3YVkx/U2rMSVEz0TAnjbYKw0rcO03yG9+bpo7JFOT67KnR8T0EBJPfJKrHLJAdg5hEGMrg==;EndpointSuffix=core.windows.net",
+    //"AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=gtpastoragedev;AccountKey=QM8DTuuHPnf/bktq3YVkx/U2rMSVEz0TAnjbYKw0rcO03yG9+bpo7JFOT67KnR8T0EBJPfJKrHLJAdg5hEGMrg==;EndpointSuffix=core.windows.net",
     //"BindingRedirects": "[ { \"ShortName\": \"Microsoft.WindowsAzure.ServiceRuntime\", \"RedirectToVersion\": \"2.7.0.0\", \"PublicKeyToken\": \"31bf3856ad364e35\" } ]",
     //"GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragedev;AccountKey=QM8DTuuHPnf/bktq3YVkx/U2rMSVEz0TAnjbYKw0rcO03yG9+bpo7JFOT67KnR8T0EBJPfJKrHLJAdg5hEGMrg==;EndpointSuffix=core.windows.net",
-    //"GlobalRedis": "gtpa-validator-redis-test.redis.cache.windows.net:6380,password=ghckdGfPqQOec7xvz8IUaBF6yObX4gcCdIWOc2TMFWo=,ssl=True,abortConnect=False",
-    //"DownloadXmlUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/DownloadXml?code=RrnXFtVj0ZIgJVgoUppytMM8FJWBdQ2xrIMCEID7rMeEc/rtMOZbWQ==",
-    //"GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/GetXpathDataValues?code=iISdBakj0QUhDcloBs7J1sQ4g8jWJdM3wGjXCAFNlxbrzyKovmyTBw==",
+    //"GlobalRedis": "gtpa-validator-redis-dev.redis.cache.windows.net:6380,password=GEom8h155WzAkCoAc+hVAK9tQmL5daXsoKeGoFt6Khw=,ssl=True,abortConnect=False",
+    //"DownloadXmlUrl": "https://gtpa-function-doc-validator-dev.azurewebsites.net/api/DownloadXml?code=VWneAkVSg8kMkseLCJ3PQ9y6Mca1OaVplpALD3DQpUxhYMGa7elgVg==",
+    //"GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-dev.azurewebsites.net/api/GetXpathDataValues?code=d5BEa8ywxsHX/dEn1JWcYQXiHNs2omDsMQGoUYSzfg8PbxkjYAibNg==",
     //"SignatureDigestValue": "dMoMvtcG5aIzgYo0tIsSQeVJBDnUnfSOfBpxXrmor0Y=@EQC0kiWPaAME6IsEZ7WuaTWJ97Zmf6hIO69rMCVURmQxBB9ebgLrjhL5BArQ0a0l@Zcjw1Z9nGQn2j6NyGx8kAaLbOfJGd/fJxRTCeirlqAg7zRG27piJkJOpflGu7XACpMj9hC6dVMcCyzqHxxPZeQ==",
-    //"SqlConnection": "Server=tcp:gtpa-sql-server-test.database.windows.net,1433;Initial Catalog=gtpa-sql-test;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+    //"SqlConnection": "Server=tcp:gtpa-sql-server-dev.database.windows.net,1433;Initial Catalog=gtpa-sql-dev;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
     ////"BillerSoftwareId": "fa326ca7-c1f8-40d3-a6fc-24d7c1040607",
     //"BillerSoftwarePin": "20191",
     //"TestHabTechnicalKey": "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c",
     //"TestHabSoftwarePin": "20191"
-
-    // Dev
-    "Environment": "Dev",
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragedev;AccountKey=QM8DTuuHPnf/bktq3YVkx/U2rMSVEz0TAnjbYKw0rcO03yG9+bpo7JFOT67KnR8T0EBJPfJKrHLJAdg5hEGMrg==;EndpointSuffix=core.windows.net",
-    "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=gtpastoragedev;AccountKey=QM8DTuuHPnf/bktq3YVkx/U2rMSVEz0TAnjbYKw0rcO03yG9+bpo7JFOT67KnR8T0EBJPfJKrHLJAdg5hEGMrg==;EndpointSuffix=core.windows.net",
-    "BindingRedirects": "[ { \"ShortName\": \"Microsoft.WindowsAzure.ServiceRuntime\", \"RedirectToVersion\": \"2.7.0.0\", \"PublicKeyToken\": \"31bf3856ad364e35\" } ]",
-    "GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragedev;AccountKey=QM8DTuuHPnf/bktq3YVkx/U2rMSVEz0TAnjbYKw0rcO03yG9+bpo7JFOT67KnR8T0EBJPfJKrHLJAdg5hEGMrg==;EndpointSuffix=core.windows.net",
-    "GlobalRedis": "gtpa-validator-redis-dev.redis.cache.windows.net:6380,password=GEom8h155WzAkCoAc+hVAK9tQmL5daXsoKeGoFt6Khw=,ssl=True,abortConnect=False",
-    "DownloadXmlUrl": "https://gtpa-function-doc-validator-dev.azurewebsites.net/api/DownloadXml?code=VWneAkVSg8kMkseLCJ3PQ9y6Mca1OaVplpALD3DQpUxhYMGa7elgVg==",
-    "GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-dev.azurewebsites.net/api/GetXpathDataValues?code=d5BEa8ywxsHX/dEn1JWcYQXiHNs2omDsMQGoUYSzfg8PbxkjYAibNg==",
-    "SignatureDigestValue": "dMoMvtcG5aIzgYo0tIsSQeVJBDnUnfSOfBpxXrmor0Y=@EQC0kiWPaAME6IsEZ7WuaTWJ97Zmf6hIO69rMCVURmQxBB9ebgLrjhL5BArQ0a0l@Zcjw1Z9nGQn2j6NyGx8kAaLbOfJGd/fJxRTCeirlqAg7zRG27piJkJOpflGu7XACpMj9hC6dVMcCyzqHxxPZeQ==",
-    "SqlConnection": "Server=tcp:gtpa-sql-server-dev.database.windows.net,1433;Initial Catalog=gtpa-sql-dev;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
-    //"BillerSoftwareId": "fa326ca7-c1f8-40d3-a6fc-24d7c1040607",
-    "BillerSoftwarePin": "20191",
-    "TestHabTechnicalKey": "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c",
-    "TestHabSoftwarePin": "20191"
   }
 }

@@ -745,19 +745,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var auth = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Auth3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // Auth
 
-            // Validate serie
-            var serieResponse = ValidateSerie(trackId, serieAndNumber);
-            if (serieResponse.IsValid)
-            {
-                dianResponse = serieResponse;
-                dianResponse.XmlDocumentKey = trackIdCude;
-                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                dianResponse.IsValid = false;
-                return dianResponse;
-            }
-            var validateSerie = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-
-
             // Duplicity
             start = DateTime.UtcNow;
             var response = CheckDocumentDuplicity(senderCode, docTypeCode, serie, serieAndNumber, trackIdCude);
@@ -781,19 +768,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             TableManagerDianFileMapper.InsertOrUpdate(trackIdMapperEntity);
             var mapper = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone4Mapper) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE MAPPER
-          
-            // Validate EventCode
-            var eventCodeResponse = ValidateEventCode(trackId, eventCode);
-            if (eventCodeResponse.IsValid)
-            {
-                dianResponse = eventCodeResponse;
-                dianResponse.XmlDocumentKey = trackIdCude;
-                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                dianResponse.IsValid = false;
-                return dianResponse;
-            }
-            var validateEventCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-
+                     
             // upload xml
             start = DateTime.UtcNow;
             trackId = trackIdCude;
@@ -858,8 +833,37 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
                 var notifications = validations.Where(r => r.IsNotification).ToList();
 
-                if (!errors.Any() && !notifications.Any())
+                if (existDocument)
                 {
+                    // Validate serie
+                    var serieResponse = ValidateSerie(trackId, serieAndNumber);
+                    if (serieResponse.IsValid)
+                    {
+                        dianResponse = serieResponse;
+                        dianResponse.XmlDocumentKey = trackIdCude;
+                        dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                        dianResponse.IsValid = false;
+                        return dianResponse;
+                    }
+
+                    // Validate EventCode
+                    var eventCodeResponse = ValidateEventCode(trackId, eventCode);
+                    if (eventCodeResponse.IsValid)
+                    {
+                        dianResponse = eventCodeResponse;
+                        dianResponse.XmlDocumentKey = trackIdCude;
+                        dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                        dianResponse.IsValid = false;
+                        return dianResponse;
+                    }
+
+                }
+
+                var validateSerie = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+                var validateEventCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+
+                if (!errors.Any() && !notifications.Any())
+                {                    
                     dianResponse.IsValid = true;
                     dianResponse.StatusMessage = message;
                 }
@@ -928,7 +932,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(unzip),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(parser),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(auth),
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(duplicity),
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(duplicity),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(upload),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validate),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(application),
