@@ -918,132 +918,134 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             foreach (var documentIdentifier in documentMeta)
             {
                 document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier);
-
-                if (documentMeta.Where(t => t.EventCode == eventCode && t.DocumentTypeId == "96" && t.Identifier == document?.PartitionKey).ToList().Count > decimal.Zero)
+                if (document != null)
                 {
-                    responses.Add(new ValidateListResponse
+                    if (documentMeta.Where(t => t.EventCode == eventCode && t.DocumentTypeId == "96" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                     {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "89",
-                        ErrorMessage = "Solo se pueda transmitir un evento de cada tipo para un CUFE - Es decir no se pueden repetir los eventos ApplicationResponse.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-                else
-                {
-                    switch (eventCode)
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "Solo se pueda transmitir un evento de cada tipo para un CUFE - Es decir no se pueden repetir los eventos ApplicationResponse.",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
                     {
+                        switch (eventCode)
+                        {
 
-                        case "031": //Rechazo de la FEV
-                            if (documentMeta.Where(t => t.EventCode == "030" && t.Identifier == document?.PartitionKey).ToList().Count == decimal.Zero)
-                            {
-                                responses.Add(new ValidateListResponse
+                            case "031": //Rechazo de la FEV
+                                if (documentMeta.Where(t => t.EventCode == "030" && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
                                 {
-                                    IsValid = true,
-                                    Mandatory = true,
-                                    ErrorCode = "89",
-                                    ErrorMessage = "Solo se pueda transmitir el evento (031) Rechazo de la FEV," +
-                                    " después de haber transmitido el evento (030) de acuse de recibo.",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                            else if (documentMeta.Where(t => t.EventCode == "034" && t.Identifier == document?.PartitionKey).ToList().Count > decimal.Zero)
-                            {
-                                responses.Add(new ValidateListResponse
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "Solo se pueda transmitir el evento (031) Rechazo de la FEV," +
+                                        " después de haber transmitido el evento (030) de acuse de recibo.",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else if (documentMeta.Where(t => t.EventCode == "034" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                                 {
-                                    IsValid = true,
-                                    Mandatory = true,
-                                    ErrorCode = "89",
-                                    ErrorMessage = "No se pueda transmitir el evento (031) Rechazo de la FEV, " +
-                                    "Cuando ya existe un evento (034) Aceptación Tacita de la factura",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "No se pueda transmitir el evento (031) Rechazo de la FEV, " +
+                                        "Cuando ya existe un evento (034) Aceptación Tacita de la factura",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
 
-                            }
-                            break;
-                        case "032": //Recibo del bien o aceptacion de la prestacion del servicio
-                            if (documentMeta.Where(t => t.EventCode == "030" && t.Identifier == document?.PartitionKey).ToList().Count == decimal.Zero)
-                            {
-                                responses.Add(new ValidateListResponse
+                                }
+                                break;
+                            case "032": //Recibo del bien o aceptacion de la prestacion del servicio
+                                if (documentMeta.Where(t => t.EventCode == "030" && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
                                 {
-                                    IsValid = true,
-                                    Mandatory = true,
-                                    ErrorCode = "89",
-                                    ErrorMessage = "Solo se pueda transmitir el evento (032) recibo del bien o aceptacion de la prestacion del servicio," +
-                                    " después de haber transmitido el evento (030) de acuse de recibo",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "Solo se pueda transmitir el evento (032) recibo del bien o aceptacion de la prestacion del servicio," +
+                                        " después de haber transmitido el evento (030) de acuse de recibo",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
 
-                            break;
-                        case "033": //Aceptacion Expresa
-                            if (documentMeta.Where(t => t.EventCode == "034" && t.Identifier == document?.PartitionKey).ToList().Count > decimal.Zero)
-                            {
-                                responses.Add(new ValidateListResponse
+                                break;
+                            case "033": //Aceptacion Expresa
+                                if (documentMeta.Where(t => t.EventCode == "034" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                                 {
-                                    IsValid = true,
-                                    Mandatory = true,
-                                    ErrorCode = "89",
-                                    ErrorMessage = "No se pueda transmitir el evento (033) Aceptación expresa de la factura," +
-                                    " Cuando ya existe un evento (034) Aceptación Tacita de la factura",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                            else if (documentMeta.Where(t => t.EventCode == "031" && t.Identifier == document?.PartitionKey).ToList().Count > decimal.Zero)
-                            {
-                                responses.Add(new ValidateListResponse
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "No se pueda transmitir el evento (033) Aceptación expresa de la factura," +
+                                        " Cuando ya existe un evento (034) Aceptación Tacita de la factura",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else if (documentMeta.Where(t => t.EventCode == "031" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                                 {
-                                    IsValid = true,
-                                    Mandatory = true,
-                                    ErrorCode = "89",
-                                    ErrorMessage = "No se pueda transmitir el evento (033) Aceptación expresa de la factura, " +
-                                    " Cuando ya existe un evento (031) Rechazo de la factura de Venta",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                            if (documentMeta.Where(t => t.EventCode == "032" && t.Identifier == document?.PartitionKey).ToList().Count == decimal.Zero)
-                            {
-                                responses.Add(new ValidateListResponse
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "No se pueda transmitir el evento (033) Aceptación expresa de la factura, " +
+                                        " Cuando ya existe un evento (031) Rechazo de la factura de Venta",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                if (documentMeta.Where(t => t.EventCode == "032" && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
                                 {
-                                    IsValid = true,
-                                    Mandatory = true,
-                                    ErrorCode = "89",
-                                    ErrorMessage =
-                                        "Solo se pueda transmitir el evento (033) Aceptacion Expresa de la factura," +
-                                    " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                            break;
-                        case "034": //Aceptacion Tácita
-                            if (documentMeta.Where(t => t.EventCode == "031" && t.Identifier == document?.PartitionKey).ToList().Count > decimal.Zero)
-                            {
-                                responses.Add(new ValidateListResponse
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage =
+                                            "Solo se pueda transmitir el evento (033) Aceptacion Expresa de la factura," +
+                                        " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                break;
+                            case "034": //Aceptacion Tácita
+                                if (documentMeta.Where(t => t.EventCode == "031" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                                 {
-                                    IsValid = true,
-                                    Mandatory = true,
-                                    ErrorCode = "89",
-                                    ErrorMessage = "No se pueda transmitir el evento (034) Aceptación Tácita de la factura, " +
-                                    " Cuando ya existe un evento (031) Rechazo de la factura de Venta",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "No se pueda transmitir el evento (034) Aceptación Tácita de la factura, " +
+                                        " Cuando ya existe un evento (031) Rechazo de la factura de Venta",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
 
-                            if (documentMeta.Where(t => t.EventCode == "032" && t.Identifier == document?.PartitionKey).ToList().Count == decimal.Zero)
-                            {
-                                responses.Add(new ValidateListResponse
+                                if (documentMeta.Where(t => t.EventCode == "032" && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
                                 {
-                                    IsValid = true,
-                                    Mandatory = true,
-                                    ErrorCode = "89",
-                                    ErrorMessage =
-                                        "Solo se pueda transmitir el evento (034) Aceptacion Tácita de la factura," +
-                                    " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                            break;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage =
+                                            "Solo se pueda transmitir el evento (034) Aceptacion Tácita de la factura," +
+                                        " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                break;
+                        }
                     }
                 }
 
