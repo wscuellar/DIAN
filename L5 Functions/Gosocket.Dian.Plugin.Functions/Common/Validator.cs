@@ -1068,18 +1068,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             foreach (var documentIdentifier in documentMeta)
             {
                 document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier?.Identifier, documentIdentifier?.Identifier);
-
-                if (documentMeta.Where(t => t.Number == number && t.DocumentTypeId == "96").ToList().Count > decimal.Zero && document != null)
+                if (document != null)
                 {
-                    responses.Add(new ValidateListResponse
+                   if (documentMeta.Where(t => t.Number == number
+                   && t.DocumentTypeId == "96"
+                   && t.Identifier == document.PartitionKey                   
+                   ).ToList().Count > decimal.Zero)
                     {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "89",
-                        ErrorMessage = "Solo puede haber un unico ID por SerieAndNumber.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = " El Identificador (" + number + ") ApplicationResponse ya existe para este CUFE",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                 }
+               
             }
 
             return responses;
