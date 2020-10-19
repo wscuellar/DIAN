@@ -95,5 +95,11 @@
     <Setting Name="Param_ApplicationResponseProcessUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ApplicationResponseProcessUrl</Value>
     </Setting>
+    <Setting Name="Param_ValidateSerie" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateSerie</Value>
+    </Setting>
+    <Setting Name="Param_ValidateEventCode" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateEventCode</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -506,7 +506,7 @@ namespace Gosocket.Dian.Web.Services
                 tableManagerGlobalLogger.InsertOrUpdate(exception);
 
                 return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", 
-                    XmlFileName = "SendEventUpdateStatus", IsValid = false };
+                    XmlFileName = "SendEventUpdateStatus", IsValid = false, StatusMessage = "Documento XML ApplicationResponse no cumple con el estandar definido, archivo invalido " };
             }
         }
 
