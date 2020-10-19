@@ -1003,7 +1003,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
-                                if (documentMeta.Where(t => t.EventCode == "032" && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
+                                if (documentMeta.Where(t => t.EventCode == documentIdentifier.EventCode && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
@@ -1031,7 +1031,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
 
-                                if (documentMeta.Where(t => t.EventCode == "032" && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
+                                if (documentMeta.Where(t => t.EventCode == documentIdentifier.EventCode && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
