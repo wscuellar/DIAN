@@ -101,6 +101,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
+        public async Task<List<ValidateListResponse>> StartValidateParty(string trackId)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateParty(nitModel, trackId));
+
+            return validateResponses;
+        }
+
         public async Task<List<ValidateListResponse>> StartNumberingRangeValidationAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();

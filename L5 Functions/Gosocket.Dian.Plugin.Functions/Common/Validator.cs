@@ -7,6 +7,7 @@ using Gosocket.Dian.Plugin.Functions.Cache;
 using Gosocket.Dian.Plugin.Functions.Common.Encryption;
 using Gosocket.Dian.Plugin.Functions.Cryptography.Verify;
 using Gosocket.Dian.Plugin.Functions.Models;
+using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 using System;
@@ -431,6 +432,128 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG06", ErrorMessage = "Fecha de emisión de la nota es anterior a la fecha de emisión de FE referenciada.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
 
             return new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = $"{digit}BG02", ErrorMessage = "Factura electrónica referenciada correctamente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
+        }
+        #endregion
+
+        #region Validate SenderCode and ReceiverCode
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, string trackId)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            trackId = trackId.ToLower();
+            var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            var senderCode = nitModel.SenderCode;
+            var senderCodeDigit = nitModel.SenderCodeDigit;
+
+            var senderCodeProvider = nitModel.ProviderCode;
+            var senderCodeProviderDigit = nitModel.ProviderCodeDigit;
+
+            var receiverCode = nitModel.ReceiverCode;
+            var receiverCodeSchemeNameValue = nitModel.ReceiverCodeSchemaValue;
+            var sender = GetContributorInstanceCache(senderCode);
+            GlobalContributor sender2 = null;
+            string senderDvErrorCode = "FAJ24";
+
+            switch (receiverCodeSchemeNameValue)
+            {
+                case "30":
+                    var receiver30Code = nitModel.ReceiverCode2;
+                    if (receiverCode != receiver30Code)
+                    {
+                        string receiver2DvErrorCode = "89";
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+
+                    if (senderCode != senderCodeProvider)
+                    {
+                        string sender2DvErrorCode = "89";
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                    break;
+                case "31":
+                    var receiver31Code = nitModel.ReceiverCode2;
+                    if (receiverCode != receiver31Code)
+                    {
+                        string receiver2DvErrorCode = "89";
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+
+                    if (senderCode != senderCodeProvider)
+                    {
+                        string sender2DvErrorCode = "89";
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                    break;
+                case "32":
+                    var receiver2Code = nitModel.ReceiverCode2;
+                    if (receiverCode != receiver2Code)
+                    {
+                        string receiver2DvErrorCode = "89";
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+
+                    if (senderCode != senderCodeProvider)
+                    {
+                        string sender2DvErrorCode = "89";
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                    break;
+                case "34":
+                    var receiver34Code = nitModel.ReceiverCode2;
+                    if (receiverCode != receiver34Code)
+                    {
+                        string receiver2DvErrorCode = "89";
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+
+                    if (senderCode != senderCodeProvider)
+                    {
+                        string sender2DvErrorCode = "89";
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                    break;
+
+            }
+            string senderErrorCode = "89";
+
+            string sender2ErrorCode = "89";
+
+            if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
+            {
+                if (sender != null)
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                if (!string.IsNullOrEmpty(senderCodeProvider) && senderCode != senderCodeProvider)
+                {
+                    if (sender2 != null)
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+            }
+            else if (ConfigurationManager.GetValue("Environment") == "Prod")
+            {
+                if (sender?.StatusId == (int)ContributorStatus.Enabled)
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                if (!string.IsNullOrEmpty(senderCodeProvider) && senderCode != senderCodeProvider)
+                {
+                    if (sender2?.StatusId == (int)ContributorStatus.Enabled)
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+            }
+
+            foreach (var r in responses)
+                r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+            return responses;
         }
         #endregion
 
