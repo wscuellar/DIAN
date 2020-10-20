@@ -49,7 +49,7 @@ namespace Gosocket.Dian.Plugin.Functions.Series
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"DUPLICITYPLGNS-{DateTime.UtcNow:yyyyMMdd}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATESERIEPLGNS-{DateTime.UtcNow:yyyyMMdd}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Plugin.Functions.Series
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "DUPLICITYPLGNS",
+                        ErrorCode = "VALIDATESERIEPLGNS",
                         ErrorMessage = $"No se pudo validar los eventos previos  del documento."
                     }
                 };

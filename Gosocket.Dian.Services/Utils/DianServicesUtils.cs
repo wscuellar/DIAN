@@ -732,7 +732,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if(docTypeCode == "96")
             {
-                if (string.IsNullOrEmpty(eventCode))
+                if (string.IsNullOrEmpty(eventCode.Trim()))
                 {
                     stringBuilder.AppendLine($"{codeMessage}D06-(R) Código tipo de evento no puede estar vacío.");
                     errors.Add(stringBuilder.ToString());
