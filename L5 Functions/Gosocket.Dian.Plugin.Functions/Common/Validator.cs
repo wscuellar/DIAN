@@ -20,6 +20,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
+using Gosocket.Dian.Infrastructure.Utils;
 using ContributorType = Gosocket.Dian.Domain.Common.ContributorType;
 using OperationMode = Gosocket.Dian.Domain.Common.OperationMode;
 using X509Certificate = Org.BouncyCastle.X509.X509Certificate;
@@ -1150,6 +1151,73 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
 
         #endregion
+
+        public List<ValidateListResponse> ValidateAcceptanceTacitaExpresa(string eventCode, string dateReceived, string dateEntrie)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            var businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dateReceived), Convert.ToDateTime(dateEntrie));
+           
+            switch (eventCode)
+            {
+                case "030":
+                    responses.Add(Convert.ToDateTime(dateEntrie) >= Convert.ToDateTime(dateReceived)
+                        ? new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "VATE01",
+                            ErrorMessage = "Ok",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        }
+                        : new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "VATE01",
+                            ErrorMessage =
+                                "la fecha debe ser mayor o igual al evento de la factura electrónica  referenciada con el CUFE",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    break;
+                case "033":
+                    responses.Add(businessDays >= 3
+                        ? new ValidateListResponse
+                        {
+                            IsValid = false, Mandatory = true, ErrorCode = "VATE01",
+                            ErrorMessage =
+                                "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento, se rechaza la transmisión de este evento 33",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        }
+                        : new ValidateListResponse
+                        {
+                            IsValid = true, Mandatory = true, ErrorCode = "VATE01", ErrorMessage = "Ok",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+
+                    break;
+                case "034":
+                    responses.Add(businessDays > 3
+                        ? new ValidateListResponse
+                        {
+                            IsValid = true, Mandatory = true, ErrorCode = "VATE02", ErrorMessage = "Ok",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        }
+                        : new ValidateListResponse
+                        {
+                            IsValid = false, Mandatory = true, ErrorCode = "VATE02",
+                            ErrorMessage =
+                                "La fecha de firma debe ser mayor a los tres días hábiles contados a partir de la fecha de la firma del evento transmitido 032",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    break;
+            }
+
+            return responses;
+        }
+
+       
+
         #region validation for CBC ID
         public List<ValidateListResponse> ValidateSerieAndNumber(string trackId, string number)
         {
