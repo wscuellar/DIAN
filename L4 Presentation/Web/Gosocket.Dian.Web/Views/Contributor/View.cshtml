@@ -59,7 +59,7 @@
                             {
                                 <a href="@Url.Action("Edit", "Contributor", new { id = Model.Id, type = Model.ContributorTypeId })" class="btn btn-default btn-hover-gosocket">Editar</a>
                             }
-                            @if (ConfigurationManager.GetValue("Environment") == "Prod")
+                            @if (ConfigurationManager.GetValue("Environment") == "Prod" && !User.IsInRole("Administrador"))
                             {
                                 <a href="@Url.Action("OperationModes", "Contributor", new { id = Model.Id})" class="btn btn-default">Modos de operación</a>
                             }
