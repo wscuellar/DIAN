@@ -101,7 +101,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-        public async Task<List<ValidateListResponse>> StartValidateParty(string trackId)
+        public async Task<List<ValidateListResponse>> StartValidateParty(string trackId, string senderParty, string receiverParty, string eventCode)
         {
             var validateResponses = new List<ValidateListResponse>();
 
@@ -113,7 +113,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateParty(nitModel, trackId));
+            validateResponses.AddRange(validator.ValidateParty(nitModel, trackId, senderParty, receiverParty, eventCode));
 
             return validateResponses;
         }
