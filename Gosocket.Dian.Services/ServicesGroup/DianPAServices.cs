@@ -728,6 +728,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
 
+            //Validate Sendercode and ReceiverCode
+            var sender_receiver_response = ValidateParty(trackId, senderCode, receiverCode, eventCode);
+            if (sender_receiver_response.IsValid)
+            {
+                dianResponse = sender_receiver_response;
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
+                return dianResponse;
+            }
+
             // Auth
             start = DateTime.UtcNow;
             var authEntity = GetAuthorization(senderCode, authCode);
@@ -1284,6 +1295,32 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
                 }               
                 response.StatusDescription = "Validación contiene errores en campos mandatorios.";                
+
+            }
+            return response;
+        }
+
+        private DianResponse ValidateParty(string trackId, string senderCode, string receiverCode, string eventCode)
+        {
+            var nSenderCode = senderCode;
+            var nReceiverCode = receiverCode;
+            var nEventCode = eventCode;
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, nSenderCode, nReceiverCode, nEventCode });
+            DianResponse response = new DianResponse();
+            if (validations.Count > 0)
+            {
+                response = new DianResponse()
+                {
+                    StatusMessage = validations[0].ErrorMessage,
+                    StatusCode = validations[0].ErrorCode,
+                    IsValid = validations[0].IsValid
+                };
+                response.ErrorMessage = new List<string>();
+                foreach (var item in validations)
+                {
+                    response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                }
+                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
 
             }
             return response;

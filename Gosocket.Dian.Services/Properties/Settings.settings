@@ -101,5 +101,8 @@
     <Setting Name="Param_ValidateEventCode" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ValidateEventCode</Value>
     </Setting>
+    <Setting Name="Param_ValidateParty" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateParty</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
