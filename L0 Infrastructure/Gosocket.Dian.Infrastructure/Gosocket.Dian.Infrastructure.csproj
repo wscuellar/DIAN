@@ -200,6 +200,7 @@
     <Compile Include="StorageTools.cs" />
     <Compile Include="StringTools.cs" />
     <Compile Include="TableManager.cs" />
+    <Compile Include="Utils\BusinessDaysHolidays.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\RestUtil.cs" />
     <Compile Include="Utils\ZipExtensions.cs" />

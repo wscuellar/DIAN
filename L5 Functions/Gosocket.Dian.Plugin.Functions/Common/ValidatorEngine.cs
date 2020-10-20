@@ -68,6 +68,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validator = new Validator();
             return validator.ValidateEmitionEventPrev(trackId,eventCode);
         }
+        public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+            var dateReceived = xmlParser.SigningTime;
+            var dateEntrie = signingTime;
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateAcceptanceTacitaExpresa(eventCode, dateReceived, dateEntrie));
+
+            return validateResponses;
+        }
         public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId, string number)
         {
             var validator = new Validator();

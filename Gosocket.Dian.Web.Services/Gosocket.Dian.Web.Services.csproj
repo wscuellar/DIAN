@@ -211,6 +211,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="libman.json" />
     <None Include="Properties\PublishProfiles\gtpa-dian-webservices-input-sbx - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\webservices-TEST- Web Deploy.pubxml" />
     <None Include="Properties\Settings.settings">
