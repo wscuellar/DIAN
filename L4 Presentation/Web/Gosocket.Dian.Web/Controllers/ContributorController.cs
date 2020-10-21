@@ -722,7 +722,7 @@ namespace Gosocket.Dian.Web.Controllers
             foreach (var item in contributorOperations)
             {
                 var testSet = GetTestSetResult(testSetResults, item, model);
-                if(testSet == null)
+                if (testSet == null)
                 {
                     item.Deleted = true;
                     contributorOperationsService.AddOrUpdate(item);
@@ -764,29 +764,6 @@ namespace Gosocket.Dian.Web.Controllers
                 });
             }
             model.ContributorOperations = contributorOperationsModel;
-
-            //model.ContributorOperations = contributorOperations.Select(x => new ContributorOperationsViewModel
-            //{
-            //    Id = x.Id,
-            //    OperationMode = x.OperationMode != null ? new OperationModeViewModel { Id = x.OperationModeId, Name = x.OperationMode.Name } : null,
-            //    OperationModeId = x.OperationModeId,
-            //    Provider = x.Provider != null ? new ContributorViewModel { Name = x.Contributor.Name, AcceptanceStatusName = x.Contributor.AcceptanceStatus.Name } : null,
-            //    ProviderId = x.ProviderId,
-            //    Deleted = x.Deleted,
-            //    Timestamp = x.Timestamp,
-            //    StatusId = GetTestSetResult(testSetResults, x, model).Status,
-            //    Status = Domain.Common.EnumHelper.GetEnumDescription((TestSetStatus)GetTestSetResult(testSetResults, x, model).Status),
-            //    Software = x.Software != null ? new SoftwareViewModel
-            //    {
-            //        Id = x.Software.Id,
-            //        Pin = x.Software.Pin,
-            //        Name = x.Software.Name,
-            //        Url = x.Software.Url,
-            //        AcceptanceStatusSoftwareId = x.Software.AcceptanceStatusSoftwareId,
-            //        StatusName = x.Software.AcceptanceStatusSoftware.Name
-            //    } : null,
-            //    SoftwareId = x.SoftwareId
-            //}).ToList();
 
             var providers = contributorService.GetContributorsByType((int)Domain.Common.ContributorType.Provider).Where(x => x.AcceptanceStatusId == (int)ContributorStatus.Enabled && x.Softwares.Count > 0);
             model.Providers = providers.Select(z => new ProviderViewModel
