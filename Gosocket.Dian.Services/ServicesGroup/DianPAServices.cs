@@ -730,7 +730,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             //Validate Sendercode and ReceiverCode
             var sender_receiver_response = ValidateParty(trackId, senderCode, receiverCode, eventCode);
-            if (sender_receiver_response.IsValid)
+            if (!sender_receiver_response.IsValid)
             {
                 dianResponse = sender_receiver_response;
                 dianResponse.XmlDocumentKey = trackIdCude;
@@ -963,6 +963,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(mapper),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validateSerie),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validateEventCode)
+                    //TableManagerGlobalLogger.InsertOrUpdateAsync(sender_receiver_response)
                 };
                 if (dianResponse.IsValid && !existDocument)
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
@@ -1315,10 +1316,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateParty(string trackId, string senderCode, string receiverCode, string eventCode)
         {
-            var nSenderCode = senderCode;
-            var nReceiverCode = receiverCode;
-            var nEventCode = eventCode;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, nSenderCode, nReceiverCode, nEventCode });
+            var SenderParty = senderCode;
+            var ReceiverParty = receiverCode;
+            var ResponseCode = eventCode;
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, SenderParty, ReceiverParty, ResponseCode });
+            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1329,11 +1331,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     IsValid = validations[0].IsValid
                 };
                 response.ErrorMessage = new List<string>();
-                foreach (var item in validations)
+                if (!response.IsValid)
                 {
-                    response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                    foreach (var item in validations)
+                    {
+                        response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                    }
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
                 }
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
 
             }
             return response;
@@ -1376,7 +1381,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     ErrorMessage = new List<string>()
                 };
                 response.ErrorMessage = new List<string>();
-                if (response.StatusMessage != "OK")
+                if (!response.IsValid)
                 {
                     foreach (var item in validations)
                     {

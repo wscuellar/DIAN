@@ -49,7 +49,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
 
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateParty(trackId, senderParty, receiverParty, eventCode);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateParty(trackId, senderParty, receiverParty, eventCode);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
