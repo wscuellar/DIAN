@@ -330,5 +330,15 @@ namespace Gosocket.Dian.Services.Properties {
                 return ((string)(this["Param_ValidationAcceptanceTacitaExpresa"]));
             }
         }
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidatePartyUrl")]
+        public string Param_ValidateParty
+        {
+            get
+            {
+                return ((string)(this["Param_ValidateParty"]));
+            }
+        }
     }
 }
