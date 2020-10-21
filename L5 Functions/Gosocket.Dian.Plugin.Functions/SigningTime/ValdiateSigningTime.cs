@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
@@ -14,13 +12,13 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 
-namespace Gosocket.Dian.Plugin.Functions.Event
+namespace Gosocket.Dian.Plugin.Functions.SigningTime
 {
-    public static class ValidationAcceptanceTacitaExpresa
+    public static class ValdiateSigningTime
     {
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
 
-        [FunctionName("ValidationAcceptanceTacitaExpresa")]
+        [FunctionName("ValdiateSigningTimeUrl")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");
@@ -55,7 +53,7 @@ namespace Gosocket.Dian.Plugin.Functions.Event
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"DUPLICITYPLGNS-{DateTime.UtcNow:yyyyMMdd}-Evento {signingTime}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALDIATESIGNINGTIMEPLGNS -{DateTime.UtcNow:yyyyMMdd}-Evento {signingTime}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -64,7 +62,7 @@ namespace Gosocket.Dian.Plugin.Functions.Event
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "DUPLICITYPLGNS",
+                        ErrorCode = "VALDIATESIGNINGTIMEPLGNS ",
                         ErrorMessage = $"No se pudo validar los eventos previos de aceptación tacita y expresa"
                     }
                 };
