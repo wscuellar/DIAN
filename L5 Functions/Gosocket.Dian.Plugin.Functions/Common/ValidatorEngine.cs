@@ -5,6 +5,7 @@ using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
@@ -13,6 +14,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
     {
         #region Global properties
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         #endregion
 
         public ValidatorEngine() { }
@@ -66,12 +68,27 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(string trackId, string eventCode)
         {
             var validator = new Validator();
-            return validator.ValidateEmitionEventPrev(trackId,eventCode);
+            return validator.ValidateEmitionEventPrev(trackId, eventCode);
         }
-        public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime)
+        public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
         {
             var validateResponses = new List<ValidateListResponse>();
-
+            if (eventCode == "033" || eventCode == "034")
+            {
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId, "032").FirstOrDefault();
+                if (documentMeta != null)
+                {
+                    trackId = documentMeta.PartitionKey;
+                }
+                else
+                {
+                    ValidateListResponse response = new ValidateListResponse();
+                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE {trackId}";
+                    response.IsValid = false;
+                    validateResponses.Add(response);
+                    return validateResponses;
+                }
+            }
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())

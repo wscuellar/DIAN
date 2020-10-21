@@ -807,7 +807,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Valida dia hábil aceptación Tacita o Expresa o acuse de recibo
             if (eventCode == "033" || eventCode == "034" || eventCode == "030")
             {
-                var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime);
+                var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime,docTypeCode);
                 if (!validationAcceptanceTacitaExpresa.IsValid)
                 {
                     dianResponse = validationAcceptanceTacitaExpresa;
@@ -1361,10 +1361,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidationAcceptanceTacitaExpresa(string trackId, string eventCode, string signingTime)
+        private DianResponse ValidationAcceptanceTacitaExpresa(string trackId, string eventCode, string signingTime, string documentTypeId)
         {
 
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidationAcceptanceTacitaExpresa), new { trackId, eventCode, signingTime });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidationAcceptanceTacitaExpresa), new { trackId, eventCode, signingTime, documentTypeId });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
