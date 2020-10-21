@@ -25,7 +25,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
             log.Info("C# HTTP trigger function processed a request.");
 
             // Get request body
-            var data = await req.Content.ReadAsAsync<RequestObject>();
+            var data = await req.Content.ReadAsAsync<RequestObjectParty>();
 
             if (data == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Request body is empty");
@@ -33,11 +33,23 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
             if (string.IsNullOrEmpty(data.TrackId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
 
+            if (string.IsNullOrEmpty(data.SenderParty))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a SenderParty in the request body");
+
+            if (string.IsNullOrEmpty(data.ReceiverParty))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ReceiverParty in the request body");
+
+            if (string.IsNullOrEmpty(data.ResponseCode))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ResponseCode in the request body");
+
             var trackId = data.TrackId;
+            var senderParty = data.SenderParty;
+            var receiverParty = data.ReceiverParty;
+            var eventCode = data.ResponseCode;
 
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateParty(trackId);
+                var validateResponses = ValidatorEngine.Instance.StartValidateParty(trackId, senderParty, receiverParty, eventCode);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -59,5 +71,17 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
             }
         }
+    }
+
+    public class RequestObjectParty
+    {
+        [JsonProperty(PropertyName = "trackId")]
+        public string TrackId { get; set; }
+        [JsonProperty(PropertyName = "SenderParty")]
+        public string SenderParty { get; set; }
+        [JsonProperty(PropertyName = "ReceiverParty")]
+        public string ReceiverParty { get; set; }
+        [JsonProperty(PropertyName = "ResponseCode")]
+        public string ResponseCode { get; set; }
     }
 }

@@ -306,7 +306,7 @@ namespace Gosocket.Dian.Services.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ValidateSerie")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidateSerieUrl")]
         public string Param_ValidateSerie {
             get {
                 return ((string)(this["Param_ValidateSerie"]));
@@ -315,7 +315,7 @@ namespace Gosocket.Dian.Services.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ValidateEventCode")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidateEmitionEventUrl")]
         public string Param_ValidateEventCode {
             get {
                 return ((string)(this["Param_ValidateEventCode"]));

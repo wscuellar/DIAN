@@ -437,7 +437,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, string trackId)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, string trackId, string senderParty, string receiverParty, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
@@ -446,110 +446,79 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             var senderCode = nitModel.SenderCode;
-            var senderCodeDigit = nitModel.SenderCodeDigit;
-
             var senderCodeProvider = nitModel.ProviderCode;
-            var senderCodeProviderDigit = nitModel.ProviderCodeDigit;
-
             var receiverCode = nitModel.ReceiverCode;
             var receiverCodeSchemeNameValue = nitModel.ReceiverCodeSchemaValue;
             var sender = GetContributorInstanceCache(senderCode);
             GlobalContributor sender2 = null;
-            string senderDvErrorCode = "FAJ24";
 
-            switch (receiverCodeSchemeNameValue)
+            switch (Convert.ToInt16(eventCode))
             {
-                case "30":
-                    var receiver30Code = nitModel.ReceiverCode2;
-                    if (receiverCode != receiver30Code)
-                    {
-                        string receiver2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    }
+                case 30:
+                    var statusReceiver = false;
+                    var statusSender = false;
 
-                    if (senderCode != senderCodeProvider)
+                    //Validacion Emisor Electronico
+                    if (receiverParty != senderCode && receiverParty != "800197268")
                     {
                         string sender2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    }
-                    break;
-                case "31":
-                    var receiver31Code = nitModel.ReceiverCode2;
-                    if (receiverCode != receiver31Code)
+                        //Validacion Emisor no Electronico
+                        if (receiverParty != senderCode)
+                        {
+                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        }else
+                        {
+                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN Adquiriente no Electronico", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        }
+                    } 
+                    //Validacion Adquiriente Electronico
+                    if (senderParty != receiverCode && senderParty != senderCode)
                     {
                         string receiver2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        //Validacion Adquiriente no Electronico
+                        if (senderParty != receiverCode)
+                        {
+                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquiriente/Deudor de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        }else
+                        {
+                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        }
                     }
+                    return responses;
 
-                    if (senderCode != senderCodeProvider)
-                    {
-                        string sender2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    }
-                    break;
-                case "32":
-                    var receiver2Code = nitModel.ReceiverCode2;
-                    if (receiverCode != receiver2Code)
-                    {
-                        string receiver2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    }
-
-                    if (senderCode != senderCodeProvider)
-                    {
-                        string sender2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    }
-                    break;
-                case "34":
-                    var receiver34Code = nitModel.ReceiverCode2;
-                    if (receiverCode != receiver34Code)
+                case 31:
+                case 32:
+                case 33:
+                    if (senderParty != receiverCode)
                     {
                         string receiver2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquiriente/Deudor de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        return responses;
                     }
 
-                    if (senderCode != senderCodeProvider)
+                    if (receiverParty != senderCode)
                     {
                         string sender2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        return responses;
+                    }
+                    break;
+                case 34:
+                    if (senderParty != senderCode)
+                    {
+                        string receiver2DvErrorCode = "89";
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                       
+                    }
+
+                    if (receiverParty != "800197268")
+                    {
+                        string sender2DvErrorCode = "89";
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        return responses;
                     }
                     break;
 
-            }
-            string senderErrorCode = "89";
-
-            string sender2ErrorCode = "89";
-
-            if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
-            {
-                if (sender != null)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                else
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
-                if (!string.IsNullOrEmpty(senderCodeProvider) && senderCode != senderCodeProvider)
-                {
-                    if (sender2 != null)
-                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    else
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                }
-            }
-            else if (ConfigurationManager.GetValue("Environment") == "Prod")
-            {
-                if (sender?.StatusId == (int)ContributorStatus.Enabled)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                else
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
-                if (!string.IsNullOrEmpty(senderCodeProvider) && senderCode != senderCodeProvider)
-                {
-                    if (sender2?.StatusId == (int)ContributorStatus.Enabled)
-                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    else
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                }
             }
 
             foreach (var r in responses)
