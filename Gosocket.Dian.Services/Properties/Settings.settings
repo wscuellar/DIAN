@@ -104,8 +104,8 @@
     <Setting Name="Param_ValidateParty" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ValidatePartyUrl</Value>
     </Setting>
-    <Setting Name="Param_ValidationAcceptanceTacitaExpresa" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidateEventAcceptanceTacitaExpresa</Value>
+    <Setting Name="Param_ValdiateSigningTime" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValdiateSigningTimeUrl</Value>
     </Setting>
   </Settings>
 </SettingsFile>

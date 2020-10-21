@@ -18,7 +18,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
     {
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
 
-        [FunctionName("ValdiateSigningTimeUrl")]
+        [FunctionName("ValdiateSigningTime")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");

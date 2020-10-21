@@ -1364,7 +1364,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidationAcceptanceTacitaExpresa(string trackId, string eventCode, string signingTime)
         {
 
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidationAcceptanceTacitaExpresa), new { trackId, eventCode, signingTime });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValdiateSigningTime), new { trackId, eventCode, signingTime });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

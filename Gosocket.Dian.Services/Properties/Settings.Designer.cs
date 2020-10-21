@@ -324,20 +324,19 @@ namespace Gosocket.Dian.Services.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ValidateEventAcceptanceTacitaExpresa")]
-        public string Param_ValidationAcceptanceTacitaExpresa {
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidatePartyUrl")]
+        public string Param_ValidateParty {
             get {
-                return ((string)(this["Param_ValidationAcceptanceTacitaExpresa"]));
+                return ((string)(this["Param_ValidateParty"]));
             }
         }
+        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ValidatePartyUrl")]
-        public string Param_ValidateParty
-        {
-            get
-            {
-                return ((string)(this["Param_ValidateParty"]));
+        [global::System.Configuration.DefaultSettingValueAttribute("ValdiateSigningTimeUrl")]
+        public string Param_ValdiateSigningTime {
+            get {
+                return ((string)(this["Param_ValdiateSigningTime"]));
             }
         }
     }
