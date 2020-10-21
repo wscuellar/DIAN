@@ -49,7 +49,7 @@ namespace Gosocket.Dian.Plugin.Functions.Event
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a signingTime on the query string or in the request body");
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidationAcceptanceTacitaExpresaAsync(trackId,  eventCode, signingTime);
+                var validateResponses = await ValidatorEngine.Instance.StartValidationAcceptanceTacitaExpresaAsync(trackId,  eventCode, signingTime);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)

@@ -792,14 +792,27 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                 dianResponse.IsValid = false;
                 return dianResponse;
-            }            
+            }
+            // Valida dia hábil aceptación Tacita o Expresa o acuse de recibo
+            if (eventCode == "033" || eventCode == "034" || eventCode == "030")
+            {
+                var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime);
+                if (!validationAcceptanceTacitaExpresa.IsValid)
+                {
+                    dianResponse = validationAcceptanceTacitaExpresa;
+                    dianResponse.XmlDocumentKey = trackIdCude;
+                    dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                    dianResponse.IsValid = false;
+                    return dianResponse;
+                }
+            }
             var validateEventCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
 
             // upload xml
             start = DateTime.UtcNow;
             trackId = trackIdCude;
-            bool isEvent = true;        
+            bool isEvent = true;
             var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = docTypeCode, trackId, isEvent, eventCode };
             var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
             if (!uploadXmlResponse.Success)
@@ -860,7 +873,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var notifications = validations.Where(r => r.IsNotification).ToList();
 
                 if (!errors.Any() && !notifications.Any())
-                {                    
+                {
                     dianResponse.IsValid = true;
                     dianResponse.StatusMessage = message;
                 }
@@ -1267,7 +1280,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateSerie(string trackId, string serieAndNumber)
         {
-            var number = serieAndNumber;         
+            var number = serieAndNumber;
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
@@ -1282,8 +1295,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 foreach (var item in validations)
                 {
                     response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
-                }               
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";                
+                }
+                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
 
             }
             return response;
@@ -1311,6 +1324,32 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
+        private DianResponse ValidationAcceptanceTacitaExpresa(string trackId, string eventCode, string signingTime)
+        {
+
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidationAcceptanceTacitaExpresa), new { trackId, eventCode, signingTime });
+            DianResponse response = new DianResponse();
+            if (validations.Count > 0)
+            {
+                response = new DianResponse
+                {
+                    StatusMessage = validations[0].ErrorMessage,
+                    StatusCode = validations[0].ErrorCode,
+                    IsValid = validations[0].IsValid,
+                    ErrorMessage = new List<string>()
+                };
+                response.ErrorMessage = new List<string>();
+                if (response.StatusMessage != "OK")
+                {
+                    foreach (var item in validations)
+                    {
+                        response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                    }
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                }
+            }
+            return response;
+        }
         #endregion
     }
 }
