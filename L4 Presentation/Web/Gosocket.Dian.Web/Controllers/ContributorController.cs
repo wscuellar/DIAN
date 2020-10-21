@@ -1235,6 +1235,27 @@ namespace Gosocket.Dian.Web.Controllers
             return json;
         }
 
+
+        [HttpPost]
+        [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
+        [ValidateAntiForgeryToken]
+        public JsonResult SyncToProduction(int id)
+        {
+            var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), new { contributorId = id });
+            if (!response.Success)
+                return Json(new
+                {
+                    success = false,
+                    message = response.Message
+                }, JsonRequestBehavior.AllowGet);
+
+            return Json(new
+            {
+                success = true,
+                message = response.Message
+            }, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpPost]
         [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
         public JsonResult SetHabilitationAndProductionDates(string habilitationDate, string productionDate)
