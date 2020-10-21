@@ -49,13 +49,13 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
 
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateParty(trackId, senderParty, receiverParty, eventCode);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateParty(trackId, senderParty, receiverParty, eventCode);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"NOTREFPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATEPARTYPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -64,7 +64,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "NOTREFPLGNS",
+                        ErrorCode = "VALIDATEPARTYPLGNS",
                         ErrorMessage = $"No se pudo validar referencia."
                     }
                 };

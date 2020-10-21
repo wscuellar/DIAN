@@ -154,6 +154,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCode = "CAD06";
             else if (documentMeta.DocumentTypeId == "92")
                 errorCode = "DAD06";
+            else if (documentMeta.DocumentTypeId == "96")
+                errorCode = "AAD06";
 
             var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
