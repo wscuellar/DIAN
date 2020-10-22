@@ -26,6 +26,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string Encoding { get; set; }
         public string ParserError { get; set; }
         public string SigningTime { get; set; }
+        public string CustomizationID { get; set; }
 
 
         public XmlParser()
@@ -70,7 +71,10 @@ namespace Gosocket.Dian.Services.Utils.Common
                     XmlDocument.XmlResolver = null;
                     XmlDocument.Load(sr);
                     var node = XmlDocument.GetElementsByTagName("xades:SigningTime")[0];
+                    var nodeCustomizationID = XmlDocument.GetElementsByTagName("cbc:CustomizationID")[0];
                     SigningTime = node?.InnerText;
+                    CustomizationID = nodeCustomizationID?.InnerText;
+
                 }
             }
         }
