@@ -267,11 +267,22 @@ namespace Gosocket.Dian.Services.Utils
         public static XElement BuildDocumentReferenceNode(GlobalDocValidatorDocumentMeta processResultEntity)
         {
             var ticketId = processResultEntity.DocumentKey;
-
-            return new XElement(cac + "DocumentReference",
-                        new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
-                        new XElement(cbc + "UUID", ticketId,
-                            new XAttribute("schemeName", "CUFE-SHA384")));
+            
+            if(processResultEntity.DocumentTypeId == "96")
+            {
+                return new XElement(cac + "DocumentReference",
+                      new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
+                      new XElement(cbc + "UUID", ticketId,
+                          new XAttribute("schemeName", "CUDE-SHA384")));
+            }
+            else
+            {
+                return new XElement(cac + "DocumentReference",
+                       new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
+                       new XElement(cbc + "UUID", ticketId,
+                           new XAttribute("schemeName", "CUFE-SHA384")));
+            }
+           
         }
 
         public static XElement BuildResponseLineResponse(int line, long nsu)
