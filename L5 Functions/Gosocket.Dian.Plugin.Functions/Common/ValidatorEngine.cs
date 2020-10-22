@@ -65,10 +65,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
-        public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(string trackId, string eventCode)
+        public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(string trackId, string eventCode, string documentTypeId)
         {
             var validator = new Validator();
-            return validator.ValidateEmitionEventPrev(trackId, eventCode);
+            return validator.ValidateEmitionEventPrev(trackId, eventCode,documentTypeId);
         }
         public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
         {
@@ -100,10 +100,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
-        public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId, string number)
+        public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId, string number, string documentTypeId)
         {
             var validator = new Validator();
-            return validator.ValidateSerieAndNumber(trackId, number);
+            return validator.ValidateSerieAndNumber(trackId, number, documentTypeId);
         }
         public async Task<List<ValidateListResponse>> StartNitValidationAsync(string trackId)
         {

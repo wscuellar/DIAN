@@ -759,7 +759,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Auth
 
             // Validate serie
-            var serieResponse = ValidateSerie(trackId, serieAndNumber);
+            var serieResponse = ValidateSerie(trackId, serieAndNumber, docTypeCode);
             if (serieResponse.IsValid)
             {
                 dianResponse = serieResponse;
@@ -795,7 +795,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE MAPPER
 
             // Validate EventCode
-            var eventCodeResponse = ValidateEventCode(trackId, eventCode);
+            var eventCodeResponse = ValidateEventCode(trackId, eventCode, docTypeCode);
             if (eventCodeResponse.IsValid)
             {
                 dianResponse = eventCodeResponse;
@@ -1290,10 +1290,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
         }
 
 
-        private DianResponse ValidateSerie(string trackId, string serieAndNumber)
+        private DianResponse ValidateSerie(string trackId, string serieAndNumber, string documentTypeId)
         {
             var number = serieAndNumber;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number, documentTypeId });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1344,9 +1344,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidateEventCode(string trackId, string eventCode)
+        private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

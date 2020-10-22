@@ -32,18 +32,22 @@ namespace Gosocket.Dian.Plugin.Functions.Series
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
             if (string.IsNullOrEmpty(data.Number))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a Number in the request body");
+            if (string.IsNullOrEmpty(data.DocumentTypeId))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId in the request body");
 
             var trackId = data.TrackId;
             var number = data.Number;
+            var documentTypeId = data.DocumentTypeId;
 
             if (trackId == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
             if (number == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a Number on the query string or in the request body");
-
+            if (documentTypeId == null)
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId on the query string or in the request body");
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateSerieAndNumberAsync(trackId, number);
+                var validateResponses = ValidatorEngine.Instance.StartValidateSerieAndNumberAsync(trackId, number, documentTypeId);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -72,6 +76,8 @@ namespace Gosocket.Dian.Plugin.Functions.Series
             public string TrackId { get; set; }
             [JsonProperty(PropertyName = "Number")]
             public string Number { get; set; }
+            [JsonProperty(PropertyName = "DocumentTypeId")]
+            public string DocumentTypeId { get; set; }
         }
     }
 }
