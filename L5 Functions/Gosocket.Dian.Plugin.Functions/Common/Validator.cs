@@ -439,20 +439,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, string trackId, string senderParty, string receiverParty, string eventCode)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, string trackId, string senderParty, string receiverParty, string eventCode, string customizationID)
         {
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
-            var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             var senderCode = nitModel.SenderCode;
-            var senderCodeProvider = nitModel.ProviderCode;
             var receiverCode = nitModel.ReceiverCode;
-            var receiverCodeSchemeNameValue = nitModel.ReceiverCodeSchemaValue;
-            var sender = GetContributorInstanceCache(senderCode);
-            GlobalContributor sender2 = null;
 
             switch (Convert.ToInt16(eventCode))
             {
@@ -461,30 +456,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var statusSender = false;
 
                     //Validacion Emisor Electronico
-                    if (receiverParty != senderCode && receiverParty != "800197268")
+                    if(customizationID.Equals("301") && receiverParty != senderCode)
                     {
                         string sender2DvErrorCode = "89";
-                        //Validacion Emisor no Electronico
-                        if (receiverParty != senderCode)
-                        {
-                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        }else
-                        {
-                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN Adquiriente no Electronico", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        }
+                        //Validacion Emisor Electronico
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     } 
                     //Validacion Adquiriente Electronico
-                    if (senderParty != receiverCode && senderParty != senderCode)
+                    if(customizationID.Equals("301") && senderParty != receiverCode)
+                    {
+                        string receiver2DvErrorCode = "89";
+                        //Validacion Adquiriente Electronico
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquiriente/Deudor de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                    if(customizationID.Equals("302") && senderParty != senderCode)
                     {
                         string receiver2DvErrorCode = "89";
                         //Validacion Adquiriente no Electronico
-                        if (senderParty != receiverCode)
-                        {
-                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquiriente/Deudor de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        }else
-                        {
-                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        }
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                    if (customizationID.Equals("302") && receiverParty != "800197268")
+                    {
+                        string receiver2DvErrorCode = "89";
+                        //Validacion Adquiriente no Electronico
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el NIT DIAN", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     }
                     return responses;
 

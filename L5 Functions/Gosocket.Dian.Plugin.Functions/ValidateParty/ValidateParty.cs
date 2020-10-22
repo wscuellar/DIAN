@@ -42,14 +42,18 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
             if (string.IsNullOrEmpty(data.ResponseCode))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ResponseCode in the request body");
 
+            if (string.IsNullOrEmpty(data.CustomizationID))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ResponseCode in the request body");
+
             var trackId = data.TrackId;
             var senderParty = data.SenderParty;
             var receiverParty = data.ReceiverParty;
             var eventCode = data.ResponseCode;
+            var customizationID = data.CustomizationID;
 
             try
             {
-                var validateResponses = await ValidatorEngine.Instance.StartValidateParty(trackId, senderParty, receiverParty, eventCode);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateParty(trackId, senderParty, receiverParty, eventCode, customizationID);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -83,5 +87,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
         public string ReceiverParty { get; set; }
         [JsonProperty(PropertyName = "ResponseCode")]
         public string ResponseCode { get; set; }
+        [JsonProperty(PropertyName = "CustomizationID")]
+        public string CustomizationID { get; set; }
     }
 }
