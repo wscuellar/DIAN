@@ -412,12 +412,18 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.FirstOrDefault();
         }
-        public List<T> FindDocumentReferenced<T>(string documentReferencedKey) where T : ITableEntity, new()
+        public List<T> FindDocumentReferenced<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
 
-            var prefixCondition = TableQuery.GenerateFilterCondition("DocumentReferencedKey",
-                QueryComparisons.Equal, documentReferencedKey);
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                    QueryComparisons.Equal,
+                    documentReferencedKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 

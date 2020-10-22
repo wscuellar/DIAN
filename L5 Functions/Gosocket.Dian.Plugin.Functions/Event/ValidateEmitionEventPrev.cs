@@ -35,18 +35,22 @@ namespace Gosocket.Dian.Plugin.Functions.Event
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
             if (string.IsNullOrEmpty(data.EventCode))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a EventCode in the request body");
-
+            if (string.IsNullOrEmpty(data.DocumentTypeId))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId in the request body");
             var trackId = data.TrackId;
+
             var eventCode = data.EventCode;
+            var documentTypeId = data.DocumentTypeId;
 
             if (trackId == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
             if (eventCode == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a eventCode on the query string or in the request body");
-
+            if (documentTypeId == null)
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId on the query string or in the request body");
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateEmitionEventPrevAsync(trackId,eventCode);
+                var validateResponses = ValidatorEngine.Instance.StartValidateEmitionEventPrevAsync(trackId,eventCode, documentTypeId);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -75,6 +79,8 @@ namespace Gosocket.Dian.Plugin.Functions.Event
             public string TrackId { get; set; }
             [JsonProperty(PropertyName = "EventCode")]
             public string EventCode { get; set; }
+            [JsonProperty(PropertyName = "DocumentTypeId")]
+            public string DocumentTypeId { get; set; }
         }
     }
 }

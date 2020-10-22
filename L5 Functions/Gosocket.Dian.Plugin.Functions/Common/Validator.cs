@@ -1002,20 +1002,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region validation to emition to event
 
-        public List<ValidateListResponse> ValidateEmitionEventPrev(string trackId, string eventCode)
+        public List<ValidateListResponse> ValidateEmitionEventPrev(string trackId, string eventCode, string documentTypeId)
         {
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId.ToLower());
+            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId);
 
             foreach (var documentIdentifier in documentMeta)
             {
                 document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier);
                 if (document != null)
                 {
-                    if (documentMeta.Where(t => t.EventCode == eventCode && t.DocumentTypeId == "96" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
+                    if (documentMeta.Where(t => t.EventCode == eventCode && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -1221,13 +1221,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
        
 
         #region validation for CBC ID
-        public List<ValidateListResponse> ValidateSerieAndNumber(string trackId, string number)
+        public List<ValidateListResponse> ValidateSerieAndNumber(string trackId, string number, string documentTypeId)
         {
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             trackId = trackId.ToLower();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId);           
+            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId, documentTypeId);           
 
             foreach (var documentIdentifier in documentMeta)
             {
@@ -1235,7 +1235,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (document != null)
                 {
                    if (documentMeta.Where(t => t.Number == number
-                   && t.DocumentTypeId == "96"
                    && t.Identifier == document.PartitionKey                   
                    ).ToList().Count > decimal.Zero)
                     {
