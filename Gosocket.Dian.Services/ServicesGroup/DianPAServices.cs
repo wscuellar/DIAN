@@ -1305,8 +1305,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidateSerie(string trackId, string serieAndNumber, string documentTypeId)
         {
             var number = serieAndNumber;
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number, documentTypeId });
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateSerieAndNumber", new { trackId, number, documentTypeId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number, documentTypeId });            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1333,10 +1332,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
         {
             var SenderParty = senderCode;
             var ReceiverParty = receiverCode;
-            var ResponseCode = eventCode;            
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, SenderParty, ReceiverParty, ResponseCode });
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateParty", new { trackId, SenderParty, ReceiverParty, ResponseCode });
-
+            var ResponseCode = eventCode;
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, SenderParty, ReceiverParty, ResponseCode });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1362,8 +1359,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId)
         {
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId });
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1389,8 +1385,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidationAcceptanceTacitaExpresa(string trackId, string eventCode, string signingTime, string documentTypeId)
         {
 
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValdiateSigningTime), new { trackId, eventCode, signingTime, documentTypeId });
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValdiateSigningTime", new { trackId, eventCode, signingTime, documentTypeId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValdiateSigningTime), new { trackId, eventCode, signingTime, documentTypeId });
+            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

@@ -448,7 +448,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var senderCode = nitModel.SenderCode;
             var receiverCode = nitModel.ReceiverCode;
-
+            string receiver2DvErrorCode = "89";
+            string sender2DvErrorCode = "89";
             switch (Convert.ToInt16(eventCode))
             {
                 case 30:                  
@@ -456,8 +457,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case 32:
                 case 33:
                     if (senderParty != receiverCode)
-                    {
-                        string receiver2DvErrorCode = "89";
+                    {                        
                         responses.Add(new ValidateListResponse
                         { 
                             IsValid = false, 
@@ -468,8 +468,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     else if (receiverParty != senderCode)
-                    {
-                        string sender2DvErrorCode = "89";
+                    {                        
                         responses.Add(new ValidateListResponse
                         { 
                             IsValid = false, 
@@ -485,7 +484,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "89",
+                            ErrorCode = "100",
                             ErrorMessage = "Evento senderParty / receiverParty referenciado correctamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -493,8 +492,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;                  
                 case 34:
                     if (senderParty != senderCode)
-                    {
-                        string receiver2DvErrorCode = "89";
+                    {             
                         responses.Add(new ValidateListResponse 
                         { 
                             IsValid = false, 
@@ -506,8 +504,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        
                     }
                     else if (receiverParty != "800197268")
-                    {
-                        string sender2DvErrorCode = "89";
+                    {                 
                         responses.Add(new ValidateListResponse 
                         { 
                             IsValid = false, 
@@ -523,7 +520,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "89",
+                            ErrorCode = "100",
                             ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1066,15 +1063,27 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+                                else if (documentMeta.Where(t => t.EventCode == "033" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "202",
+                                        ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
+                                        "ya existe un evento (033) Aceptación Expresaa",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
                                 else if (documentMeta.Where(t => t.EventCode == "034" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "89",
-                                        ErrorMessage = "No se pueda transmitir el evento (031) Rechazo de la FEV, " +
-                                        "Cuando ya existe un evento (034) Aceptación Tacita de la factura",
+                                        ErrorCode = "202",
+                                        ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
+                                        "ya existe un evento (034) Aceptación Tacita de la factura",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -1084,7 +1093,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = true,
                                         Mandatory = true,
-                                        ErrorCode = "89",
+                                        ErrorCode = "100",
                                         ErrorMessage = "Evento referenciado correctamente",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -1109,7 +1118,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = true,
                                         Mandatory = true,
-                                        ErrorCode = "89",
+                                        ErrorCode = "100",
                                         ErrorMessage = "Evento referenciado correctamente",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -1134,9 +1143,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "89",
-                                        ErrorMessage = "No se pueda transmitir el evento (033) Aceptación expresa de la factura, " +
-                                        " Cuando ya existe un evento (031) Rechazo de la factura de Venta",
+                                        ErrorCode = "203",
+                                        ErrorMessage = "No se puede aceptar un documento que ha sido rechazado previamente, " +
+                                        "ya existe un evento (031) Rechazo de la factura de Venta",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -1160,7 +1169,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = true,
                                         Mandatory = true,
-                                        ErrorCode = "89",
+                                        ErrorCode = "100",
                                         ErrorMessage = "Evento referenciado correctamente",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -1173,9 +1182,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "89",
-                                        ErrorMessage = "No se pueda transmitir el evento (034) Aceptación Tácita de la factura, " +
-                                        " Cuando ya existe un evento (031) Rechazo de la factura de Venta",
+                                        ErrorCode = "203",
+                                        ErrorMessage = "No se puede aceptar un documento que ha sido rechazado previamente, " +
+                                        "ya existe un evento (031) Rechazo de la factura de Venta",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -1185,7 +1194,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = true,
                                         Mandatory = true,
-                                        ErrorCode = "89",
+                                        ErrorCode = "100",
                                         ErrorMessage = "Evento referenciado correctamente",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -1210,7 +1219,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = true,
                                         Mandatory = true,
-                                        ErrorCode = "89",
+                                        ErrorCode = "100",
                                         ErrorMessage = "Evento referenciado correctamente",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -1242,7 +1251,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "VATE01",
+                            ErrorCode = "100",
                             ErrorMessage = "Ok",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
@@ -1250,7 +1259,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "VATE01",
+                            ErrorCode = "89",
                             ErrorMessage =
                                 "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1260,14 +1269,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(businessDays >= 3
                         ? new ValidateListResponse
                         {
-                            IsValid = false, Mandatory = true, ErrorCode = "VATE01",
-                            ErrorMessage =
-                                "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento, se rechaza la transmisión de este evento 33",
+                            IsValid = false, 
+                            Mandatory = true, 
+                            ErrorCode = "89",
+                            ErrorMessage = "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento, se rechaza la transmisión de este evento 33",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
                         : new ValidateListResponse
                         {
-                            IsValid = true, Mandatory = true, ErrorCode = "VATE01", ErrorMessage = "Ok",
+                            IsValid = true, 
+                            Mandatory = true, 
+                            ErrorCode = "100", 
+                            ErrorMessage = "Ok",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
 
@@ -1276,14 +1289,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(businessDays > 3
                         ? new ValidateListResponse
                         {
-                            IsValid = true, Mandatory = true, ErrorCode = "VATE02", ErrorMessage = "Ok",
+                            IsValid = true, 
+                            Mandatory = true, 
+                            ErrorCode = "100", 
+                            ErrorMessage = "Ok",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
                         : new ValidateListResponse
                         {
-                            IsValid = false, Mandatory = true, ErrorCode = "VATE02",
-                            ErrorMessage =
-                                "La fecha de firma debe ser mayor a los tres días hábiles contados a partir de la fecha de la firma del evento transmitido 032",
+                            IsValid = false, 
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "La fecha de firma debe ser mayor a los tres días hábiles contados a partir de la fecha de la firma del evento transmitido 032",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
@@ -1327,7 +1344,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "89",
+                            ErrorCode = "100",
                             ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1340,7 +1357,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 IsValid = true,
                 Mandatory = true,
-                ErrorCode = "89",
+                ErrorCode = "100",
                 ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
