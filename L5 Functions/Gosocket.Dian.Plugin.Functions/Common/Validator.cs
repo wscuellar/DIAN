@@ -281,6 +281,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 string receiverDvErrorCode = "FAK24";
                 if (documentMeta.DocumentTypeId == "91") receiverDvErrorCode = "CAK24";
                 else if (documentMeta.DocumentTypeId == "92") receiverDvErrorCode = "DAK24";
+                else if (documentMeta.DocumentTypeId == "96") receiverDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAK24;
 
                 var receiverCodeDigit = nitModel.ReceiverCodeDigit;
                 if (string.IsNullOrEmpty(receiverCodeDigit) || receiverCodeDigit == "undefined") receiverCodeDigit = "11";
@@ -298,6 +299,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     string receiver2DvErrorCode = "FAK47";
                     if (documentMeta.DocumentTypeId == "91") receiver2DvErrorCode = "CAK47";
                     else if (documentMeta.DocumentTypeId == "92") receiver2DvErrorCode = "DAK47";
+                    else if (documentMeta.DocumentTypeId == "96") receiver2DvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAK47;
 
                     var receiver2CodeDigit = nitModel.ReceiverCode2Digit;
                     if (string.IsNullOrEmpty(receiver2CodeDigit) || receiver2CodeDigit == "undefined") receiver2CodeDigit = "11";
@@ -315,6 +317,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderDvErrorCode = "FAJ24";
             if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
             else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
+            else if (documentMeta.DocumentTypeId == "96") senderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ24;
             if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
             if (ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -327,6 +330,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 string sender2DvErrorCode = "FAJ47";
                 if (documentMeta.DocumentTypeId == "91") sender2DvErrorCode = "CAJ47";
                 else if (documentMeta.DocumentTypeId == "92") sender2DvErrorCode = "DAJ47";
+                else if (documentMeta.DocumentTypeId == "96") sender2DvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ47;
                 sender2 = GetContributorInstanceCache(senderCodeProvider);
                 if (string.IsNullOrEmpty(senderCodeProviderDigit) || senderCodeProviderDigit == "undefined") senderCodeProviderDigit = "11";
                 if (ValidateDigitCode(senderCodeProvider, int.Parse(senderCodeProviderDigit)))
@@ -338,6 +342,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string softwareproviderDvErrorCode = "FAB22";
             if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
             else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
+            else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
             var softwareProvider = GetContributorInstanceCache(softwareProviderCode);
             if (string.IsNullOrEmpty(softwareProviderCodeDigit) || softwareProviderCodeDigit == "undefined") softwareProviderCodeDigit = "11";
             if (ValidateDigitCode(softwareProviderCode, int.Parse(softwareProviderCodeDigit)))
@@ -347,14 +352,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderErrorCode = "FAJ21";
             if (documentMeta.DocumentTypeId == "91") senderErrorCode = "CAJ21";
             else if (documentMeta.DocumentTypeId == "92") senderErrorCode = "DAJ21";
+            else if (documentMeta.DocumentTypeId == "96") senderErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ21;
 
             string sender2ErrorCode = "FAJ44";
             if (documentMeta.DocumentTypeId == "91") sender2ErrorCode = "CAJ44";
             else if (documentMeta.DocumentTypeId == "92") sender2ErrorCode = "DAJ44";
+            else if (documentMeta.DocumentTypeId == "96") sender2ErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ44;
 
             string softwareProviderErrorCode = "FAB19b";
             if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
             else if (documentMeta.DocumentTypeId == "92") softwareProviderErrorCode = "DAB19b";
+            else if (documentMeta.DocumentTypeId == "96") softwareProviderErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB19b;
 
             if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
             {
