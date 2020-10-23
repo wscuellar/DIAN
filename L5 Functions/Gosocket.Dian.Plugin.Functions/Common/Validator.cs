@@ -439,7 +439,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, string trackId, string senderParty, string receiverParty, string eventCode, string customizationID)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, string trackId, string senderParty, string receiverParty, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
@@ -451,72 +451,85 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             switch (Convert.ToInt16(eventCode))
             {
-                case 30:
-                    var statusReceiver = false;
-                    var statusSender = false;
-
-                    //Validacion Emisor Electronico
-                    if(customizationID.Equals("301") && receiverParty != senderCode)
-                    {
-                        string sender2DvErrorCode = "89";
-                        //Validacion Emisor Electronico
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    } 
-                    //Validacion Adquiriente Electronico
-                    if(customizationID.Equals("301") && senderParty != receiverCode)
-                    {
-                        string receiver2DvErrorCode = "89";
-                        //Validacion Adquiriente Electronico
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquiriente/Deudor de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    }
-                    if(customizationID.Equals("302") && senderParty != senderCode)
-                    {
-                        string receiver2DvErrorCode = "89";
-                        //Validacion Adquiriente no Electronico
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    }
-                    if (customizationID.Equals("302") && receiverParty != "800197268")
-                    {
-                        string receiver2DvErrorCode = "89";
-                        //Validacion Adquiriente no Electronico
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el NIT DIAN", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    }
-                    return responses;
-
+                case 30:                  
                 case 31:
                 case 32:
                 case 33:
                     if (senderParty != receiverCode)
                     {
                         string receiver2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquiriente/Deudor de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        return responses;
+                        responses.Add(new ValidateListResponse
+                        { 
+                            IsValid = false, 
+                            Mandatory = true,
+                            ErrorCode = receiver2DvErrorCode, 
+                            ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquiriente/Deudor de la factura informada",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds 
+                        });
                     }
-
-                    if (receiverParty != senderCode)
+                    else if (receiverParty != senderCode)
                     {
                         string sender2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        return responses;
+                        responses.Add(new ValidateListResponse
+                        { 
+                            IsValid = false, 
+                            Mandatory = true, 
+                            ErrorCode = sender2DvErrorCode, 
+                            ErrorMessage = "El receptor del documento transmitido no coincide con el Emisor/Facturador de la factura informada", 
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds 
+                        });
                     }
-                    break;
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "Evento senderParty / receiverParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    return responses;                  
                 case 34:
                     if (senderParty != senderCode)
                     {
                         string receiver2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        responses.Add(new ValidateListResponse 
+                        { 
+                            IsValid = false, 
+                            Mandatory = true, 
+                            ErrorCode = receiver2DvErrorCode, 
+                            ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada", 
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds 
+                        });
                        
                     }
-
-                    if (receiverParty != "800197268")
+                    else if (receiverParty != "800197268")
                     {
                         string sender2DvErrorCode = "89";
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        return responses;
+                        responses.Add(new ValidateListResponse 
+                        { 
+                            IsValid = false, 
+                            Mandatory = true, 
+                            ErrorCode = sender2DvErrorCode, 
+                            ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN", 
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds 
+                        });                      
                     }
-                    break;
-
-            }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    return responses;
+              }
 
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
@@ -1005,6 +1018,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId);
 
+            if(documentMeta.Count == 0)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = true,
+                    Mandatory = true,
+                    ErrorCode = "89",
+                    ErrorMessage = "Evento referenciado correctamente",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                return responses;
+            }
+
             foreach (var documentIdentifier in documentMeta)
             {
                 document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier);
@@ -1014,7 +1041,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         responses.Add(new ValidateListResponse
                         {
-                            IsValid = true,
+                            IsValid = false,
                             Mandatory = true,
                             ErrorCode = "89",
                             ErrorMessage = "Solo se pueda transmitir un evento de cada tipo para un CUFE - Es decir no se pueden repetir los eventos ApplicationResponse.",
@@ -1031,7 +1058,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
-                                        IsValid = true,
+                                        IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "89",
                                         ErrorMessage = "Solo se pueda transmitir el evento (031) Rechazo de la FEV," +
@@ -1043,14 +1070,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
-                                        IsValid = true,
+                                        IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "89",
                                         ErrorMessage = "No se pueda transmitir el evento (031) Rechazo de la FEV, " +
                                         "Cuando ya existe un evento (034) Aceptación Tacita de la factura",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
-
+                                }
+                                else
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
                                 }
                                 break;
                             case "032": //Recibo del bien o aceptacion de la prestacion del servicio
@@ -1058,7 +1095,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
-                                        IsValid = true,
+                                        IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "89",
                                         ErrorMessage = "Solo se pueda transmitir el evento (032) recibo del bien o aceptacion de la prestacion del servicio," +
@@ -1066,14 +1103,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
-
+                                else
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
                                 break;
                             case "033": //Aceptacion Expresa
                                 if (documentMeta.Where(t => t.EventCode == "034" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
-                                        IsValid = true,
+                                        IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "89",
                                         ErrorMessage = "No se pueda transmitir el evento (033) Aceptación expresa de la factura," +
@@ -1085,7 +1132,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
-                                        IsValid = true,
+                                        IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "89",
                                         ErrorMessage = "No se pueda transmitir el evento (033) Aceptación expresa de la factura, " +
@@ -1093,16 +1140,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+
                                 if (documentMeta.Where(t => t.EventCode == documentIdentifier.EventCode && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage =
+                                            "Solo se pueda transmitir el evento (033) Aceptacion Expresa de la factura," +
+                                        " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
                                         IsValid = true,
                                         Mandatory = true,
                                         ErrorCode = "89",
-                                        ErrorMessage =
-                                            "Solo se pueda transmitir el evento (033) Aceptacion Expresa de la factura," +
-                                        " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
+                                        ErrorMessage = "Evento referenciado correctamente",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -1112,11 +1171,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
-                                        IsValid = true,
+                                        IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "89",
                                         ErrorMessage = "No se pueda transmitir el evento (034) Aceptación Tácita de la factura, " +
                                         " Cuando ya existe un evento (031) Rechazo de la factura de Venta",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "Evento referenciado correctamente",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -1125,12 +1195,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
-                                        IsValid = true,
+                                        IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "89",
                                         ErrorMessage =
                                             "Solo se pueda transmitir el evento (034) Aceptacion Tácita de la factura," +
                                         " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "Evento referenciado correctamente",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -1140,8 +1221,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
             }
-
-
 
             return responses;
         }
@@ -1161,7 +1240,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(Convert.ToDateTime(dateEntrie) >= Convert.ToDateTime(dateReceived)
                         ? new ValidateListResponse
                         {
-                            IsValid = false,
+                            IsValid = true,
                             Mandatory = true,
                             ErrorCode = "VATE01",
                             ErrorMessage = "Ok",
@@ -1169,11 +1248,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                         : new ValidateListResponse
                         {
-                            IsValid = true,
+                            IsValid = false,
                             Mandatory = true,
                             ErrorCode = "VATE01",
                             ErrorMessage =
-                                "la fecha debe ser mayor o igual al evento de la factura electrónica  referenciada con el CUFE",
+                                "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
@@ -1222,29 +1301,49 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             trackId = trackId.ToLower();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId, documentTypeId);           
+            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId, documentTypeId);
 
             foreach (var documentIdentifier in documentMeta)
             {
                 document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier?.Identifier, documentIdentifier?.Identifier);
                 if (document != null)
                 {
-                   if (documentMeta.Where(t => t.Number == number
-                   && t.Identifier == document.PartitionKey                   
-                   ).ToList().Count > decimal.Zero)
+                    if (documentMeta.Where(t => t.Number == number
+                    && t.Identifier == document.PartitionKey
+                    ).ToList().Count > decimal.Zero)
                     {
                         responses.Add(new ValidateListResponse
                         {
-                            IsValid = true,
+                            IsValid = false,
                             Mandatory = true,
                             ErrorCode = "89",
                             ErrorMessage = " El Identificador (" + number + ") ApplicationResponse ya existe para este CUFE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    return responses;
                 }
-               
             }
+
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "89",
+                ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
 
             return responses;
         }
