@@ -1267,19 +1267,30 @@ namespace Gosocket.Dian.Web.Controllers
         [ValidateAntiForgeryToken]
         public JsonResult SyncToProduction(int id)
         {
-            var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), new { contributorId = id });
-            if (!response.Success)
+            try
+            {
+                var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), new { contributorId = id });
+                if (!response.Success)
+                    return Json(new
+                    {
+                        success = false,
+                        message = response.Message
+                    }, JsonRequestBehavior.AllowGet);
+
+                return Json(new
+                {
+                    success = true,
+                    message = response.Message
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
                 return Json(new
                 {
                     success = false,
-                    message = response.Message
+                    message = ex.InnerException?.Message ?? ex.Message
                 }, JsonRequestBehavior.AllowGet);
-
-            return Json(new
-            {
-                success = true,
-                message = response.Message
-            }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpPost]

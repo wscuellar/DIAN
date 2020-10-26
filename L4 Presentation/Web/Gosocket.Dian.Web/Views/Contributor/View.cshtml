@@ -195,7 +195,7 @@
                     showNotification('danger', 'fa fa-bolt fa-2x', 'floating', '', b + ': ' + c);
                 },
                 success: function (data) {
-                    hideLoading();
+                    hideLoading('#panel-form');
                     if (data.success)
                         showNotification('success', 'fa fa-check-circle fa-2x', 'floating', 'Aviso', data.message);
                     if (!data.success)
