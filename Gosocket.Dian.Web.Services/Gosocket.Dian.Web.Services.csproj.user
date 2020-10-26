@@ -3,7 +3,7 @@
   <PropertyGroup>
     <UseIISExpress>true</UseIISExpress>
     <LastActiveSolutionConfig>Release|Any CPU</LastActiveSolutionConfig>
-    <NameOfLastUsedPublishProfile>webservices-TEST- Web Deploy</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>gtpa-webservices-input-test - Web Deploy</NameOfLastUsedPublishProfile>
     <Use64BitIISExpress />
     <IISExpressSSLPort>44319</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />

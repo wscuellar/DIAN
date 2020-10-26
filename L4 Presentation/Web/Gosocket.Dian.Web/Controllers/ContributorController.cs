@@ -717,28 +717,54 @@ namespace Gosocket.Dian.Web.Controllers
             var testSetResults = tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(contributor.Code);
 
             var contributorOperations = contributor.ContributorOperations.Where(o => !o.Deleted);
-            model.ContributorOperations = contributorOperations.Select(x => new ContributorOperationsViewModel
+
+            var contributorOperationsModel = new List<ContributorOperationsViewModel>();
+            foreach (var item in contributorOperations)
             {
-                Id = x.Id,
-                OperationMode = x.OperationMode != null ? new OperationModeViewModel { Id = x.OperationModeId, Name = x.OperationMode.Name } : null,
-                OperationModeId = x.OperationModeId,
-                Provider = x.Provider != null ? new ContributorViewModel { Name = x.Contributor.Name, AcceptanceStatusName = x.Contributor.AcceptanceStatus.Name } : null,
-                ProviderId = x.ProviderId,
-                Deleted = x.Deleted,
-                Timestamp = x.Timestamp,
-                StatusId = GetTestSetResult(testSetResults, x, model).Status,
-                Status = Domain.Common.EnumHelper.GetEnumDescription((TestSetStatus)GetTestSetResult(testSetResults, x, model).Status),
-                Software = x.Software != null ? new SoftwareViewModel
+                var testSet = GetTestSetResult(testSetResults, item, model);
+                if (testSet == null)
                 {
-                    Id = x.Software.Id,
-                    Pin = x.Software.Pin,
-                    Name = x.Software.Name,
-                    Url = x.Software.Url,
-                    AcceptanceStatusSoftwareId = x.Software.AcceptanceStatusSoftwareId,
-                    StatusName = x.Software.AcceptanceStatusSoftware.Name
-                } : null,
-                SoftwareId = x.SoftwareId
-            }).ToList();
+                    item.Deleted = true;
+                    contributorOperationsService.AddOrUpdate(item);
+
+                    var softwareId = GetSoftwareIdByOperationType(item.SoftwareId, item.OperationModeId);
+                    var software = softwareService.Get(Guid.Parse(softwareId));
+
+                    if (software != null && item.OperationModeId == (int)Domain.Common.OperationMode.Own)
+                    {
+                        software.Deleted = true;
+                        software.Updated = DateTime.UtcNow;
+                        softwareService.AddOrUpdate(software);
+                    }
+
+                    continue;
+                }
+
+                contributorOperationsModel.Add(new ContributorOperationsViewModel
+                {
+                    Id = item.Id,
+                    OperationMode = item.OperationMode != null ? new OperationModeViewModel { Id = item.OperationModeId, Name = item.OperationMode.Name } : null,
+                    OperationModeId = item.OperationModeId,
+                    Provider = item.Provider != null ? new ContributorViewModel { Name = item.Contributor.Name, AcceptanceStatusName = item.Contributor.AcceptanceStatus.Name } : null,
+                    ProviderId = item.ProviderId,
+                    Deleted = item.Deleted,
+                    Timestamp = item.Timestamp,
+                    StatusId = testSet.Status,
+                    Status = Domain.Common.EnumHelper.GetEnumDescription((TestSetStatus)testSet.Status),
+                    Software = item.Software != null ? new SoftwareViewModel
+                    {
+                        Id = item.Software.Id,
+                        Pin = item.Software.Pin,
+                        Name = item.Software.Name,
+                        Url = item.Software.Url,
+                        AcceptanceStatusSoftwareId = item.Software.AcceptanceStatusSoftwareId,
+                        StatusName = item.Software.AcceptanceStatusSoftware.Name
+                    } : null,
+                    SoftwareId = item.SoftwareId
+                });
+            }
+            model.ContributorOperations = contributorOperationsModel;
+
             var providers = contributorService.GetContributorsByType((int)Domain.Common.ContributorType.Provider).Where(x => x.AcceptanceStatusId == (int)ContributorStatus.Enabled && x.Softwares.Count > 0);
             model.Providers = providers.Select(z => new ProviderViewModel
             {
@@ -1233,6 +1259,27 @@ namespace Gosocket.Dian.Web.Controllers
                 success = true
             }, JsonRequestBehavior.AllowGet);
             return json;
+        }
+
+
+        [HttpPost]
+        [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
+        [ValidateAntiForgeryToken]
+        public JsonResult SyncToProduction(int id)
+        {
+            var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), new { contributorId = id });
+            if (!response.Success)
+                return Json(new
+                {
+                    success = false,
+                    message = response.Message
+                }, JsonRequestBehavior.AllowGet);
+
+            return Json(new
+            {
+                success = true,
+                message = response.Message
+            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
