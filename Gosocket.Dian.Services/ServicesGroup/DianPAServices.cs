@@ -722,7 +722,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var eventCode = documentParsed.ResponseCode;
             var trackIdCude = documentParsed.Cude;
             var receiverCode = documentParsed.ReceiverCode;
-            var signingTime = xmlParser.SigningTime;            
+            var signingTime = xmlParser.SigningTime;
+            signingTime = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
 
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3

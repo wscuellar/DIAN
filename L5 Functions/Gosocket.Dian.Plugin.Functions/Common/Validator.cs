@@ -1339,23 +1339,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             trackId = trackId.ToLower();
             var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId, documentTypeId);
 
-            foreach (var documentIdentifier in documentMeta)
+            if(documentMeta.Count > 0)
             {
-                document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier?.Identifier, documentIdentifier?.Identifier);
-                if (document != null)
+                foreach (var documentIdentifier in documentMeta)
                 {
-                    if (documentMeta.Where(t => t.Number == number
-                    && t.Identifier == document.PartitionKey
-                    ).ToList().Count > decimal.Zero)
+                    document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier?.Identifier, documentIdentifier?.Identifier);
+                    if (document != null)
                     {
-                        responses.Add(new ValidateListResponse
+                        if (documentMeta.Where(t => t.Number == number
+                        && t.Identifier == document.PartitionKey
+                        ).ToList().Count > decimal.Zero)
                         {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = " El Identificador (" + number + ") ApplicationResponse ya existe para este CUFE",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "89",
+                                ErrorMessage = " El Identificador (" + number + ") ApplicationResponse ya existe para este CUFE",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
                     }
                     else
                     {
@@ -1367,20 +1381,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
-                    }       
-                }
-                else
-                {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                    }
                 }
             }
+            else
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = true,
+                    Mandatory = true,
+                    ErrorCode = "100",
+                    ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+           
             return responses;
         }
         #endregion
