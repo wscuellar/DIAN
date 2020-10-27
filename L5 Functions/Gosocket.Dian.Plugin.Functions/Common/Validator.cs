@@ -1029,7 +1029,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = true,
                     Mandatory = true,
-                    ErrorCode = "89",
+                    ErrorCode = "100",
                     ErrorMessage = "Evento referenciado correctamente",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1236,6 +1236,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
                 }
+                else
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = "Evento referenciado correctamente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
 
             }
 
@@ -1356,20 +1367,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
-                    }
-                    return responses;
+                    }       
+                }
+                else
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
                 }
             }
-
-            responses.Add(new ValidateListResponse
-            {
-                IsValid = true,
-                Mandatory = true,
-                ErrorCode = "100",
-                ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
-                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-            });
-
             return responses;
         }
         #endregion
