@@ -201,6 +201,7 @@
     <Compile Include="KeyVault\ExportCertificatResult.cs" />
     <Compile Include="KeyVault\HttpMessageHandler.cs" />
     <Compile Include="KeyVault\ImportCertificateResult.cs" />
+    <Compile Include="Sql\RadianContributor.cs" />
     <Compile Include="Sql\IdentificationType.cs" />
     <Compile Include="Sql\AcceptanceStatus.cs" />
     <Compile Include="Sql\AcceptanceStatusSoftware.cs" />

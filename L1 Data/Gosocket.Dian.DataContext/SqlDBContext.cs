@@ -118,6 +118,7 @@ namespace Gosocket.Dian.DataContext
         public DbSet<ContributorType> ContributorType { set; get; }
         public DbSet<ContributorOperations> ContributorOperations { set; get; }
         public DbSet<OperationMode> OperationModes { set; get; }
+        public DbSet<RadianContributor> RadianContributors { set; get; }
     }
 
     public class MigrateDBConfiguration : System.Data.Entity.Migrations.DbMigrationsConfiguration<SqlDBContext>
