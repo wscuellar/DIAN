@@ -5,6 +5,7 @@ using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -72,6 +73,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
         {
+            
+
             var validateResponses = new List<ValidateListResponse>();
             if (eventCode == "033" || eventCode == "034")
             {
@@ -93,8 +96,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
-            var dateReceived = xmlParser.SigningTime;
-            var dateEntrie = signingTime;
+            DateTime dateReceived = DateTime.ParseExact(xmlParser.SigningTime, "yyyyMMdd", CultureInfo.InvariantCulture);
+            DateTime dateEntrie = DateTime.ParseExact(signingTime, "yyyyMMdd", CultureInfo.InvariantCulture);
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateAcceptanceTacitaExpresa(eventCode, dateReceived, dateEntrie));
 

@@ -1237,7 +1237,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #endregion
 
-        public List<ValidateListResponse> ValidateAcceptanceTacitaExpresa(string eventCode, string dateReceived, string dateEntrie)
+        public List<ValidateListResponse> ValidateAcceptanceTacitaExpresa(string eventCode, DateTime dateReceived, DateTime dateEntrie)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
