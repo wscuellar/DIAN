@@ -3,10 +3,10 @@
 # Add steps that publish symbols, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
 
-pool:   
-  name: 'agentpooldev02'  
+pool:
+  name: 'agentpooldev02'
 
-variables: 
+variables:  
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
@@ -19,14 +19,14 @@ steps:
     command: 'restore'
     restoreSolution: '**/*.sln'
     feedsToUse: 'config'
-    nugetConfigPath: 'NuGet.config'
+    nugetConfigPath: 'NuGet.Config'
 
 - task: SonarQubePrepare@4
   inputs:
-    SonarQube: 'SonarServerConnection'
+    SonarQube: 'ServiceConnectionSonar'
     scannerMode: 'MSBuild'
-    projectKey: 'facturadorgratuito'
-    projectName: 'facturadorgratuito'
+    projectKey: 'EntregaFactura'
+    projectName: 'EntregaFactura'
 
 - task: VSBuild@1
   inputs:
@@ -40,6 +40,17 @@ steps:
 - task: SonarQubePublish@4
   inputs:
     pollingTimeoutSec: '300'
+
+# Publish code coverage results
+# Publish Cobertura or JaCoCo code coverage results from a build
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'JaCoCo' # Options: cobertura, jaCoCo
+    summaryFileLocation: 'Container'
+    #pathToSources: # Optional
+    #reportDirectory: # Optional
+    #additionalCodeCoverageFiles: # Optional
+    #failIfCoverageEmpty: false # Optional
 
 - task: PublishBuildArtifacts@1
   inputs:
