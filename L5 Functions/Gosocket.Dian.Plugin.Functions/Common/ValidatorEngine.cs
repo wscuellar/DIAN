@@ -72,9 +72,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validator.ValidateEmitionEventPrev(trackId, eventCode,documentTypeId);
         }
         public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
-        {
-            
-
+        {           
             var validateResponses = new List<ValidateListResponse>();
             if (eventCode == "033" || eventCode == "034")
             {

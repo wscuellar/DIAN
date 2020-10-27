@@ -1029,7 +1029,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = true,
                     Mandatory = true,
-                    ErrorCode = "89",
+                    ErrorCode = "100",
                     ErrorMessage = "Evento referenciado correctamente",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1235,6 +1235,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 break;
                         }
                     }
+                }
+                else
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = "Evento referenciado correctamente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
                 }
 
             }

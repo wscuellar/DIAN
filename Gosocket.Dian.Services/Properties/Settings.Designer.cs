@@ -333,10 +333,10 @@ namespace Gosocket.Dian.Services.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ValdiateSigningTimeUrl")]
-        public string Param_ValdiateSigningTime {
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidateSigningTimeUrl")]
+        public string Param_ValidateSigningTime {
             get {
-                return ((string)(this["Param_ValdiateSigningTime"]));
+                return ((string)(this["Param_ValidateSigningTime"]));
             }
         }
     }

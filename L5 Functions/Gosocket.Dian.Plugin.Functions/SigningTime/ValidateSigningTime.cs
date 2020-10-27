@@ -14,11 +14,11 @@ using Newtonsoft.Json;
 
 namespace Gosocket.Dian.Plugin.Functions.SigningTime
 {
-    public static class ValdiateSigningTime
+    public static class ValidateSigningTime
     {
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
 
-        [FunctionName("ValdiateSigningTime")]
+        [FunctionName("ValidateSigningTime")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");
@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALDIATESIGNINGTIMEPLGNS -{DateTime.UtcNow:yyyyMMdd}-Evento {documentTypeId}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATESIGNINGTIMEPLGNS -{DateTime.UtcNow:yyyyMMdd}-Evento {documentTypeId}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -67,7 +67,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "VALDIATESIGNINGTIMEPLGNS ",
+                        ErrorCode = "VALIDATESIGNINGTIMEPLGNS ",
                         ErrorMessage = $"No se pudo validar los eventos previos de aceptación tacita y expresa"
                     }
                 };

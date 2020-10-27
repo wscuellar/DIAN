@@ -819,7 +819,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     return dianResponse;
                 }
             }
-            var validateSinginTime = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValdiateSigningTime) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+            var validateSinginTime = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSigningTime) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
 
             // upload xml
@@ -1385,7 +1385,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidationAcceptanceTacitaExpresa(string trackId, string eventCode, string signingTime, string documentTypeId)
         {
 
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValdiateSigningTime), new { trackId, eventCode, signingTime, documentTypeId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId });
             
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
