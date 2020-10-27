@@ -20,8 +20,11 @@ namespace Gosocket.Dian.Functions.Documents
         private static readonly TableManager documentValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private static readonly TableManager documentReferenceTableManager = new TableManager("GlobalDocReference");
 
+        // Set queue name
+        private const string queueName = "global-check-document-validation-input%Slot%";
+
         [FunctionName("CheckDocumentValidations")]
-        public static async Task Run([QueueTrigger("global-check-document-validation-input", Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 
@@ -81,7 +84,7 @@ namespace Gosocket.Dian.Functions.Documents
                 TaxAmountIva = globalDocValidatordocumentMeta.TaxAmountIva,
                 TaxAmountIpc = globalDocValidatordocumentMeta.TaxAmountIpc,
                 TaxAmountIca = globalDocValidatordocumentMeta.TaxAmountIca,
-                SoftwareId = softwareId
+                SoftwareId = globalDocValidatordocumentMeta.SoftwareId
             };
 
             globalDataDocument.TaxesDetail = new TaxesDetail
@@ -99,9 +102,9 @@ namespace Gosocket.Dian.Functions.Documents
 
             globalDataDocument.TechProviderInfo = new TechProvider()
             {
-                TechProviderCode = globalDataDocument.SenderCode,
-                TechProviderName = globalDataDocument.SenderName,
-                TechProviderNSUCode = null
+                TechProviderCode = globalDocValidatordocumentMeta.TechProviderCode,
+                //TechProviderName = globalDataDocument.SenderName,
+                //TechProviderNSUCode = null
             };
 
             globalDataDocument.ValidationResultInfo = new ValidationResult()

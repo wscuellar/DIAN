@@ -23,8 +23,11 @@ namespace Gosocket.Dian.Functions.Export
         private static readonly FileManager fileManager = new FileManager();
         private static readonly TableManager globalTaskTableMabager = new TableManager("GlobalTask");
 
+        // Set queue name
+        private const string queueName = "global-export-documents-to-excel-admin-input%Slot%";
+
         [FunctionName("ExportDocumentsToExcelAdmin")]
-        public static async Task Run([QueueTrigger("global-export-documents-to-excel-admin-input", Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             var eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);

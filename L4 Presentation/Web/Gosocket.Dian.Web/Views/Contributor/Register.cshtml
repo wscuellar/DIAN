@@ -27,7 +27,7 @@
                                 @Html.Partial("_default")
                                 @Html.Partial("_billerObligation")
                             </div>
-                            if (Model.BillerType != "Indefinido" && Model.AcceptanceStatusId == (int)ContributorStatus.Pending)
+                            if (Model.AcceptanceStatusId == (int)ContributorStatus.Pending)
                             {
                                 <div class="panel-footer text-right">
                                     <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Registrar</button>

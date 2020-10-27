@@ -38,6 +38,7 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string DocumentReferencedKey { get; set; }
     public string InvoiceAuthorization { get; set; }
     public string SoftwareId { get; set; }
+    public string TechProviderCode { get; set; }
     public string TestSetId { get; set; }
     public string UblVersion { get; set; }
     public string ZipKey { get; set; }

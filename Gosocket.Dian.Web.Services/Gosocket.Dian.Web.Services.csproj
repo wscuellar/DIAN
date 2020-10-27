@@ -212,7 +212,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Properties\PublishProfiles\gtpa-dian-webservices-input-sbx - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\webservices-TEST- Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-webservices-input-test - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
