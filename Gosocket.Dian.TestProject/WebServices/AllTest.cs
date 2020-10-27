@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Services.ServicesGroup;
+﻿using System.IO;
+using Gosocket.Dian.Services.ServicesGroup;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
@@ -40,7 +41,28 @@ namespace Gosocket.Dian.TestProject.WebServices
             Assert.AreEqual(response.StatusDescription, "Procesado Correctamente.");
             Assert.IsNotNull(response.XmlBase64Bytes);
         }
+        [TestMethod]
+        public void SendEventUpdateStatus()
+        {
+            
+            StreamReader file =
+                new StreamReader(@"C:\Users\D_dav\Downloads\ApResponse-72280636-SETG990000102-030 - TEST-firmado-SHA256\ApResponse-72280636-SETG990000102-030 - TEST-firmado-SHA256.xml");
+            byte[] bytes;
+            using (var memstream = new MemoryStream())
+            {
+                file.BaseStream.CopyTo(memstream);
+                bytes = memstream.ToArray();
+            }
 
+            file.Close();
+            var response = service.SendEventUpdateStatus(bytes, "11111111");
+            Assert.IsTrue(response.IsValid);
+            Assert.IsTrue(response.ErrorMessage.Any());
+            Assert.AreEqual(response.StatusCode, "00");
+            Assert.AreEqual(response.StatusDescription, "Procesado Correctamente.");
+            Assert.IsNotNull(response.XmlBase64Bytes);
+        }
+        
         [TestMethod]
         public void TestSuccessGetStatus()
         {

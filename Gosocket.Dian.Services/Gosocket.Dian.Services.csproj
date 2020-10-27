@@ -60,10 +60,21 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InstanceCache.cs" />
+    <Compile Include="Models\ValidateListResponse.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="ServicesGroup\DianPAServices.cs" />
+    <Compile Include="ServicesGroup\LogicalARService.cs" />
     <Compile Include="Utils\BatchInsertionUtils.cs" />
     <Compile Include="Utils\Common\DianResponse.cs" />
     <Compile Include="Utils\Common\DocumentParsed.cs" />

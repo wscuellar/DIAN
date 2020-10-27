@@ -211,8 +211,13 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="libman.json" />
     <None Include="Properties\PublishProfiles\gtpa-dian-webservices-input-sbx - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\webservices-TEST- Web Deploy.pubxml" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -246,6 +251,11 @@
     <Compile Include="Filters\CustomErrorHandler.cs" />
     <Compile Include="Filters\MessageInspector.cs" />
     <Compile Include="Filters\CustomOperation.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Validator\CertificateClaimsAuthenticationManager.cs" />
     <Compile Include="Validator\CertificateValidator.cs" />
     <Compile Include="Validator\CustomClaimTypes.cs" />

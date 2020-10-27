@@ -5,6 +5,8 @@ using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
@@ -13,6 +15,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
     {
         #region Global properties
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         #endregion
 
         public ValidatorEngine() { }
@@ -63,7 +66,50 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
+        public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(string trackId, string eventCode, string documentTypeId)
+        {
+            var validator = new Validator();
+            return validator.ValidateEmitionEventPrev(trackId, eventCode,documentTypeId);
+        }
+        public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
+        {           
+            var validateResponses = new List<ValidateListResponse>();
+            if (eventCode == "033" || eventCode == "034")
+            {
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId, "032").FirstOrDefault();
+                if (documentMeta != null)
+                {
+                    trackId = documentMeta.PartitionKey;
+                }
+                else
+                {
+                    ValidateListResponse response = new ValidateListResponse();
+                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE {trackId}";
+                    response.IsValid = false;
+                    validateResponses.Add(response);
+                    return validateResponses;
+                }
+            }
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+        
+            //DateTime dateReceived = DateTime.ParseExact(xmlParser.SigningTime, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateAcceptanceTacitaExpresa(eventCode, xmlParser.SigningTime, dateEntrie));
 
+            return validateResponses;
+        }
+        public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId, string number, string documentTypeId)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateSerieAndNumber(trackId, number, documentTypeId));
+            return validateResponses;
+        }
         public async Task<List<ValidateListResponse>> StartNitValidationAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
@@ -88,6 +134,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Validator instance
             var validator = new Validator();
             validateResponses.Add(validator.ValidateNoteReference(trackId));
+
+            return validateResponses;
+        }
+
+        public async Task<List<ValidateListResponse>> StartValidateParty(string trackId, string senderParty, string receiverParty, string eventCode)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateParty(nitModel, trackId, senderParty, receiverParty, eventCode));
 
             return validateResponses;
         }

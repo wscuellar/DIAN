@@ -438,7 +438,7 @@ namespace Gosocket.Dian.Web.Services
         /// </summary>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        public List<EventResponse> SendEventUpdateStatus(byte[] contentFile)
+        public DianResponse SendEventUpdateStatus(byte[] contentFile)
         {
             try
             {
@@ -448,44 +448,65 @@ namespace Gosocket.Dian.Web.Services
                 if (contentFile == null)
                 {
                     Log($"{authCode} {email} SendEventUpdateStatus", (int)InsightsLogType.Error, "Archivo no enviado.");
-                    var eventResponse = new EventResponse { Code = "89", Message = "Archivo no enviado." };
-                    var events = new List<EventResponse> { eventResponse };
-                    return events;
+                    return new DianResponse { StatusCode = "89", StatusDescription = "Archivo no enviado." };
                 }
 
                 var mimeType = GetMimeFromBytes(contentFile);
                 if (mimeType != zipMimeType)
                 {
                     Log($"{authCode} {email} SendEventUpdateStatus", (int)InsightsLogType.Error, $"MIMEType del archivo inválido ({mimeType}).");
-                    var eventResponse = new EventResponse { Code = "89", Message = $"MIMEType del archivo inválido ({mimeType})." };
-                    var events = new List<EventResponse> { eventResponse };
-                    return events;
+                    return new DianResponse { StatusCode = "89", StatusDescription = $"MIMEType del archivo inválido ({mimeType})." };
                 }
 
                 if (!contentFile.ZipContainsXmlFiles())
-                {
+                {                
                     Log($"{authCode} {email} SendEventUpdateStatus", (int)InsightsLogType.Error, $"Archivo ZIP no contiene XML's.");
-                    var eventResponse = new EventResponse { Code = "89", Message = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML valido.." };
-                    var events = new List<EventResponse> { eventResponse };
-                    return events;
+                    return new DianResponse { StatusCode = "89", StatusDescription = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML válido." };
                 }
 
                 DianPAServices customerDianPa = new DianPAServices();
                 {
-                    Log($"{authCode} {email}", (int)InsightsLogType.Info, "SendEventUpdateStatus");
+                    Stopwatch stopwatch = new Stopwatch();
+                    stopwatch.Start();
                     var result = customerDianPa.SendEventUpdateStatus(contentFile, authCode);
+
+                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
+                    if (!exist && result.IsValid && result.XmlBase64Bytes != null)
+                        fileManager.Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+
                     customerDianPa = null;
+
+                    stopwatch.Stop();
+                    double ms = stopwatch.ElapsedMilliseconds;
+                    double seconds = ms / 1000;
+                    stopwatch = null;
+                    Log($"{authCode} {email}", (int)InsightsLogType.Info, "SendEventUpdateStatus " + seconds);
+                    if (seconds >= 10)
+                    {
+                        var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "SendEventUpdateStatus" };
+                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                    }
+
+                    //Logged if response do not have AR
+                    if (result?.XmlBase64Bytes == null)
+                    {
+                        var logger = new GlobalLogger($"RESPONSEWITHOUTAR-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = "Response without AR", Action = "SendEventUpdateStatus" };
+                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                    }
+
                     return result;
+
                 }
             }
             catch (Exception ex)
             {
                 Log("SendEventUpdateStatus", (int)InsightsLogType.Error, ex.Message);
-                var exception = new GlobalLogger($"SendEventUpdateStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"SendEventUpdateStatus", Message = ex.Message, StackTrace = ex.StackTrace };
+                var exception = new GlobalLogger($"SendEventUpdateStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) 
+                { Action = $"SendEventUpdateStatus", Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(exception);
-                var eventResponse = new EventResponse { Code = "500", Message = $"Ha ocurrido un error. Por favor inténtentelo de nuevo." };
-                var response = new List<EventResponse> { eventResponse };
-                return response;
+
+                return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", 
+                    XmlFileName = "SendEventUpdateStatus", IsValid = false, StatusMessage = "Documento XML ApplicationResponse" };
             }
         }
 
