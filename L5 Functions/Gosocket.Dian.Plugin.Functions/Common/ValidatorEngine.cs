@@ -103,8 +103,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId, string number, string documentTypeId)
         {
+            var validateResponses = new List<ValidateListResponse>();
+
             var validator = new Validator();
-            return validator.ValidateSerieAndNumber(trackId, number, documentTypeId);
+            validateResponses.AddRange(validator.ValidateSerieAndNumber(trackId, number, documentTypeId));
+            return validateResponses;
         }
         public async Task<List<ValidateListResponse>> StartNitValidationAsync(string trackId)
         {
