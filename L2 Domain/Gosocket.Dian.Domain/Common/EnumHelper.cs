@@ -128,6 +128,12 @@ namespace Gosocket.Dian.Domain.Common
         Provider = 2,
         [Description("Proveedor autorizado")]
         AuthorizedProvider = 3,
+        [Description("Proveedor Tecnológico")]
+        ProviderTech=4,
+        [Description("Sistema de Negociación")]
+        BussinesSystem=5,
+        [Description("Factor")]
+        Factor=6
     }
 
     public enum DocumentType

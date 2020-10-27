@@ -350,6 +350,11 @@
                                                 <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor")">Facturadores</a></li>
                                             }
                                             <!--Rol Proveedor-->
+                                            <!--  RADIAN -->
+                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                            {
+                                                <li id="@Navigation.NavigationEnum.RADIAN"><a href="@Url.Action("Index", "Radian")">RADIAN</a></li>
+                                            }
                                         </ul>
                                     </li>
                                     <!--Rol Administrador-->

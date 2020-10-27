@@ -51,7 +51,8 @@ namespace Gosocket.Dian.Web.Utils
             TestSet,
             UserView,
             StatisticsBI,
-            Users
+            Users,
+            RADIAN
         }
     }
 }
