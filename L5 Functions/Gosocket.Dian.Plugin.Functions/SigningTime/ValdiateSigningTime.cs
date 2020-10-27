@@ -60,7 +60,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"VALDIATESIGNINGTIMEPLGNS -{DateTime.UtcNow:yyyyMMdd}-Evento {documentTypeId}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
-
+                var error = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
                 var validateResponses = new List<ValidateListResponse>
                 {
                     new ValidateListResponse
@@ -68,7 +68,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "VALDIATESIGNINGTIMEPLGNS ",
-                        ErrorMessage = $"No se pudo validar los eventos previos de aceptación tacita y expresa"
+                        ErrorMessage = $"No se pudo validar los eventos previos de aceptación tacita y expresa, error: {error}"
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
