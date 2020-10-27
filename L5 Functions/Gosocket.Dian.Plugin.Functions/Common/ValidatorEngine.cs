@@ -95,10 +95,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
         
-            //DateTime dateReceived = DateTime.ParseExact(decha.ToString(CultureInfo.InvariantCulture), "yyyyMMdd", CultureInfo.InvariantCulture);
-            //DateTime dateEntrie = DateTime.ParseExact(signingTime, "yyyyMMdd", CultureInfo.InvariantCulture);
+            //DateTime dateReceived = DateTime.ParseExact(xmlParser.SigningTime, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateAcceptanceTacitaExpresa(eventCode, xmlParser.SigningTime, signingTime));
+            validateResponses.AddRange(validator.ValidateAcceptanceTacitaExpresa(eventCode, xmlParser.SigningTime, dateEntrie));
 
             return validateResponses;
         }
