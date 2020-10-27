@@ -52,7 +52,8 @@ namespace Gosocket.Dian.Web.Utils
             UserView,
             StatisticsBI,
             Users,
-            RADIAN
+            RADIAN,
+            RadianContributorFileType,
         }
     }
 }

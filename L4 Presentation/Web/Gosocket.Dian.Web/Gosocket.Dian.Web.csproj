@@ -321,6 +321,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\RadianController.cs" />
+    <Compile Include="Controllers\RadiantContributorFileTypeController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\SupportController.cs" />
     <Compile Include="Controllers\TestSetController.cs" />
@@ -2660,6 +2661,7 @@
     <Content Include="Views\Support\_personLogin.cshtml" />
     <Content Include="Views\Support\_adminCredentials.cshtml" />
     <Content Include="Views\Radian\Index.cshtml" />
+    <Content Include="Views\RadiantContributorFileType\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

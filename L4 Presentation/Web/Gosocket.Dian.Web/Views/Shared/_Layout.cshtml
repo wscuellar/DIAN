@@ -376,6 +376,11 @@
                                                     <li id="@Navigation.NavigationEnum.ContributorFileType"><a href="@Url.Action("List", "ContributorFileType")">Tipos de Ficheros</a></li>
                                                     <li id="@Navigation.NavigationEnum.TestSet"><a href="@Url.Action("List", "TestSet")">Set de Pruebas</a></li>
                                                 }
+                                                <!-- Tipos Ficheros Radian RADIAN -->
+                                                @if (User.IsInAnyRole("Administrator", "Super"))
+                                                                            {
+                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("Index", "RadianContributorFileType")">Tipos de Ficheros Radian</a></li>
+                                                }
                                                 @if (User.IsInAnyRole("Administrador", "Super"))
                                                 {
                                                     <li id="@Navigation.NavigationEnum.Contingencies"><a href="@Url.Action("Contingencies", "Settings")">Administrar Contingencias</a></li>
