@@ -67,7 +67,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "VALIDATESIGNINGTIMEPLGNS ",
+                        ErrorCode = ex.Message + "VALIDATESIGNINGTIMEPLGNS ",
                         ErrorMessage = $"No se pudo validar los eventos previos de aceptación tacita y expresa"
                     }
                 };
