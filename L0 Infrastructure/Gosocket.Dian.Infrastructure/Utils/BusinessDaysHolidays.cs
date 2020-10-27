@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,27 +11,28 @@ namespace Gosocket.Dian.Infrastructure.Utils
     public class BusinessDaysHolidays
     {
         //Lista de días festivos excluidos los fines de semana
-        //private static readonly DateTime[] bankHolidays=
-        //{ 
-        //    Convert.ToDateTime("1/01/2020"),
-        //    Convert.ToDateTime("6/01/2020"),
-        //    Convert.ToDateTime("23/03/2020"),
-        //    Convert.ToDateTime("9/04/2020"),
-        //    Convert.ToDateTime("10/04/2020"),
-        //    Convert.ToDateTime("1/05/2020"),
-        //    Convert.ToDateTime("25/05/2020"),
-        //    Convert.ToDateTime("15/06/2020"),
-        //    Convert.ToDateTime("22/06/2020"),
-        //    Convert.ToDateTime("29/06/2020"),
-        //    Convert.ToDateTime("20/07/2020"),
-        //    Convert.ToDateTime("7/08/2020"),
-        //    Convert.ToDateTime("17/08/2020"),
-        //    Convert.ToDateTime("12/10/2020"),
-        //    Convert.ToDateTime("2/11/2020"),
-        //    Convert.ToDateTime("16/11/2020"),
-        //    Convert.ToDateTime("8/12/2020"),
-        //    Convert.ToDateTime("25/12/2020")
-        //};
+        private static readonly DateTime[] bankHolidays=
+        {
+            DateTime.ParseExact("01/01/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("01/01/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("06/01/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("23/03/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("09/04/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("10/04/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("01/05/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("25/05/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("15/06/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("22/06/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("29/06/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("20/07/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("07/08/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("17/08/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("12/10/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("02/11/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("16/11/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("08/12/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("25/12/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+        };
         /// <summary>
         /// Calcula el número de días hábiles, teniendo en cuenta:
         /// - fines de semana (sábados y domingos)
@@ -75,12 +77,12 @@ namespace Gosocket.Dian.Infrastructure.Utils
             businessDays -= fullWeekCount + fullWeekCount;
 
             // restar el número de festivos durante el intervalo de tiempo
-            //foreach (DateTime bankHoliday in bankHolidays)
-            //{
-            //    DateTime bh = bankHoliday.Date;
-            //    if (firstDay <= bh && bh <= lastDay)
-            //        --businessDays;
-            //}
+            foreach (DateTime bankHoliday in bankHolidays)
+            {
+                DateTime bh = bankHoliday.Date;
+                if (firstDay <= bh && bh <= lastDay)
+                    --businessDays;
+            }
 
             return businessDays;
         }
