@@ -191,6 +191,7 @@
     <Compile Include="Managers\TestSetManager.cs" />
     <Compile Include="ContributorFileTypeService.cs" />
     <Compile Include="GlobalDocumentService.cs" />
+    <Compile Include="RadianContributorService.cs" />
     <Compile Include="SoftwareService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Managers\DocumentTypeManager.cs" />
