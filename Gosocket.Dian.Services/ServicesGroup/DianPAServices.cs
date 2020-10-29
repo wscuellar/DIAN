@@ -723,6 +723,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var trackIdCude = documentParsed.Cude;
             var receiverCode = documentParsed.ReceiverCode;
             var signingTime = xmlParser.SigningTime;
+            var customizationID = xmlParser.CustomizationID;
             //signingTime = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
 
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -835,7 +836,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 trackId,
                 isEvent,
                 eventCode,
-                signingTime
+                signingTime,
+                customizationID
             };
             var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
             if (!uploadXmlResponse.Success)
