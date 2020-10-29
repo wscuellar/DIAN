@@ -1286,6 +1286,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
+                case "031":
+                    responses.Add(Convert.ToDateTime(dateEntrie) >= Convert.ToDateTime(dateReceived)
+                        ? new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Ok",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        }
+                        : new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage =
+                                "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    break;
                 case "032":
                     responses.Add(businessDays >= 3
                         ? new ValidateListResponse
