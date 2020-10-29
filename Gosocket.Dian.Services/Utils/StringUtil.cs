@@ -128,9 +128,16 @@ namespace Gosocket.Dian.Services.Utils
 
         public static string TextAfter(string value, string search)
         {
-            search = search ?? "";
-            //var length = search != null ? search.Length : 0;
-            return value.Substring(value.IndexOf(search) + search.Length);
+            try
+            {
+                search = search ?? "";
+                //var length = search != null ? search.Length : 0;
+                return value.Substring(value.IndexOf(search) + search.Length);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
     }
