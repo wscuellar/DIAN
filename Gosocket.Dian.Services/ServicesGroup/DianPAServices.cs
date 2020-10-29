@@ -723,7 +723,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var trackIdCude = documentParsed.Cude;
             var receiverCode = documentParsed.ReceiverCode;
             var signingTime = xmlParser.SigningTime;
-            signingTime = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
+            //signingTime = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
 
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
@@ -810,7 +810,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Valida dia hábil aceptación Tacita o Expresa o acuse de recibo
             if (eventCode == "033" || eventCode == "034" || eventCode == "030")
             {
-                var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime,docTypeCode);
+                var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime, docTypeCode);
                 if (!validationAcceptanceTacitaExpresa.IsValid)
                 {
                     dianResponse = validationAcceptanceTacitaExpresa;

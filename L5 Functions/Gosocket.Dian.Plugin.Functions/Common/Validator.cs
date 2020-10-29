@@ -718,7 +718,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId == "92")
                 response.ErrorCode = "DAB27b";
             if (documentMeta.DocumentTypeId == "96")
-                response.ErrorCode = "AAB27";
+                response.ErrorCode = "AAB27b";
 
             var number = softwareModel.SerieAndNumber;
             var softwareId = softwareModel.SoftwareId;
@@ -741,7 +741,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (documentMeta.DocumentTypeId == "92")
                         response.ErrorCode = "DAB24b";
                     if (documentMeta.DocumentTypeId == "96")
-                        response.ErrorCode = "AAB24";
+                        response.ErrorCode = "AAB24b";
                     response.ErrorMessage = "El identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este OFE.";
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
@@ -754,7 +754,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (documentMeta.DocumentTypeId == "92")
                         response.ErrorCode = "DAB24c";
                     if (documentMeta.DocumentTypeId == "96")
-                        response.ErrorCode = "AAB24";
+                        response.ErrorCode = "AAB24c";
                     response.ErrorMessage = "Identificador del software informado se encuentra inactivo.";
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
@@ -1258,7 +1258,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #endregion
 
-        public List<ValidateListResponse> ValidateAcceptanceTacitaExpresa(string eventCode, string dateReceived, DateTime dateEntrie)
+        public List<ValidateListResponse> ValidateAcceptanceTacitaExpresa(string eventCode, string dateReceived, string dateEntrie)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -1287,23 +1287,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case "031":
-                    responses.Add(Convert.ToDateTime(dateEntrie) >= Convert.ToDateTime(dateReceived)
-                        ? new ValidateListResponse
+                    responses.Add(businessDays > 3
+                         ? new ValidateListResponse
+                        {
+                             IsValid = false,
+                             Mandatory = true,
+                             ErrorCode = "89",
+                             ErrorMessage =
+                                "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento, se rechaza la transmisión de este evento 31",
+                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                         }
+                        : new ValidateListResponse
                         {
                             IsValid = true,
                             Mandatory = true,
                             ErrorCode = "100",
                             ErrorMessage = "Ok",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        }
-                        : new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage =
-                                "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds                          
                         });
                     break;
                 case "032":

@@ -74,6 +74,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
         {           
             var validateResponses = new List<ValidateListResponse>();
+            //Valida exista AR Constacia de recibo para eventos Aceptacion Expresa - Tácita o Rechazo FE
             if (eventCode == "033" || eventCode == "034" || eventCode == "031")
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId, "032").FirstOrDefault();
@@ -81,22 +82,25 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     trackId = documentMeta.PartitionKey;
                 }
-                else
+                //Solo si es eventcode AR Aceptacion Expresa - Tácita
+                else if(eventCode != "031")
                 {
                     ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE {trackId}";
+                    response.ErrorMessage = $"No se encontró documento electrónico AR Constacia de recibo para el CUFE {trackId}";
                     response.IsValid = false;
                     validateResponses.Add(response);
                     return validateResponses;
                 }
             }
+            //Obtiene infromacion XML Invoice 
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
         
             //DateTime dateReceived = DateTime.ParseExact(xmlParser.SigningTime, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-            DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            //DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            string dateEntrie = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateAcceptanceTacitaExpresa(eventCode, xmlParser.SigningTime, dateEntrie));
 
