@@ -177,6 +177,7 @@
   <ItemGroup>
     <Compile Include="Common\CertificateExtensions.cs" />
     <Compile Include="Common\RedisExtensions.cs" />
+    <Compile Include="RadianContributorFileTypeService.cs" />
     <Compile Include="ContributorOperationsService.cs" />
     <Compile Include="ContributorService.cs" />
     <Compile Include="Cosmos\CosmosDBService.cs" />
@@ -186,6 +187,7 @@
     <Compile Include="logger\LoggerService.cs" />
     <Compile Include="Managers\CategoryManager.cs" />
     <Compile Include="Managers\CertificateManager.cs" />
+    <Compile Include="Managers\RadianTestSetManager.cs" />
     <Compile Include="Managers\RedisConnectorManager.cs" />
     <Compile Include="Managers\RuleManager.cs" />
     <Compile Include="Managers\TestSetManager.cs" />

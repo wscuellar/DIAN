@@ -11,10 +11,11 @@ namespace Gosocket.Dian.Functions.Cosmos
 {
     public static class RegisterDocumentTag
     {
-        //global-test-queue-input
-        //global-document-tag-input
+        // Set queue name
+        private const string queueName = "global-document-tag-input%Slot%";
+
         [FunctionName("RegisterDocumentTag")]
-        public static async Task Run([QueueTrigger("global-document-tag-input", Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 

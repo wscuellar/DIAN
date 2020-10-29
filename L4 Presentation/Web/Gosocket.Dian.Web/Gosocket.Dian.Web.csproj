@@ -317,10 +317,12 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BigContributorController.cs" />
     <Compile Include="Controllers\ContributorCategoryController.cs" />
+    <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
     <Compile Include="Controllers\ContributorFileTypeController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\RadianController.cs" />
+    <Compile Include="Controllers\RadianTestSetController.cs" />
     <Compile Include="Controllers\RadiantContributorFileTypeController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\SupportController.cs" />
@@ -347,6 +349,10 @@
     <Compile Include="Migrations\201810031323318_InitialCreate.Designer.cs">
       <DependentUpon>201810031323318_InitialCreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202010282054253_AddTableRadianContributor.cs" />
+    <Compile Include="Migrations\202010282054253_AddTableRadianContributor.Designer.cs">
+      <DependentUpon>202010282054253_AddTableRadianContributor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountTwoFactorViewModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -354,6 +360,7 @@
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\ContributorCategoryViewModel.cs" />
+    <Compile Include="Models\RadianContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorViewModel.cs" />
     <Compile Include="Models\DocumentStatsViewModel.cs" />
@@ -363,6 +370,10 @@
     <Compile Include="Models\NumberRangeViewModel.cs" />
     <Compile Include="Models\OperationModeViewModel.cs" />
     <Compile Include="Models\ProviderViewModel.cs" />
+    <Compile Include="Models\RadianTestSetResultViewModel.cs" />
+    <Compile Include="Models\RadianTestSetTableViewModel.cs" />
+    <Compile Include="Models\RadianTestSetTrackingViewModel.cs" />
+    <Compile Include="Models\RadianTestSetViewModel.cs" />
     <Compile Include="Models\RequestAuthorizationBigContributorViewModel.cs" />
     <Compile Include="Models\Role\RoleModel.cs" />
     <Compile Include="Models\Role\Roles.cs" />
@@ -501,6 +512,12 @@
     <Content Include="Content\images\LogoAnticipos.png" />
     <Content Include="Content\images\payment-design.jpg" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\Factor.svg" />
+    <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
+    <Content Include="Content\images\Svg\OperacionDirecta.svg" />
+    <Content Include="Content\images\Svg\SistemaNegociacion.svg" />
+    <Content Include="Content\images\Svg\ProveedorTecnologico.svg" />
+    <Content Include="Content\images\Svg\FacturadorElectronico.svg" />
     <Content Include="Content\images\thumb-200x100.jpg" />
     <Content Include="Content\images\thumb-200x100.png" />
     <Content Include="Content\img\aeb50edc3bccd9a6170a88d5e0f14909_xl.jpg" />
@@ -2664,6 +2681,8 @@
     <Content Include="Views\Radian\Index.cshtml" />
     <Content Include="Views\RadiantContributorFileType\Index.cshtml" />
     <Content Include="Views\Radian\ElectronicInvoiceView.cshtml" />
+    <Content Include="Views\RadianTestSet\Index.cshtml" />
+    <Content Include="Views\RadianTestSet\_items.cshtml" />
     <Content Include="Views\Radian\AdminRadianView.cshtml" />
     <Content Include="Views\Radian\_Items.cshtml" />
     <None Include="Web.Debug.config">
@@ -2690,6 +2709,7 @@
     <Folder Include="Content\js\NewFolder1\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
+    <Folder Include="Views\RadianSetTest\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -2727,6 +2747,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201810031323318_InitialCreate.resx">
       <DependentUpon>201810031323318_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010282054253_AddTableRadianContributor.resx">
+      <DependentUpon>202010282054253_AddTableRadianContributor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

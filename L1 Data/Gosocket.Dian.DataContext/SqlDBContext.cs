@@ -67,6 +67,14 @@ namespace Gosocket.Dian.DataContext
             .HasForeignKey<Guid>(s => s.ContributorFileId);
             #endregion
 
+            #region RadianContributorFileHistory
+            //ContributorFileHistory - ContributorFile one-to-many Provider as many Clients
+            modelBuilder.Entity<RadianContributorFileHistory>()
+            .HasRequired<RadianContributorFile>(s => s.RadianContributorFile)
+            .WithMany()
+            .HasForeignKey<Guid>(s => s.RadianContributorFileId);
+            #endregion
+
             #region Software Relations
             modelBuilder.Entity<Software>()
             .HasRequired<Contributor>(s => s.Contributor)
@@ -113,12 +121,24 @@ namespace Gosocket.Dian.DataContext
         public DbSet<ContributorFileStatus> ContributorFileStatuses { set; get; }
         //Files
 
+        ////Radian Files
+        public DbSet<RadianContributorFile> RadianContributorFiles { set; get; }
+        public DbSet<RadianContributorFileHistory> RadianContributorFileHistories { set; get; }
+        public DbSet<RadianContributorFileType> RadianContributorFileTypes { set; get; }
+        public DbSet<RadianContributorFileStatus> RadianContributorFileStatuses { set; get; }
+        //Radian Files
+
         public DbSet<Contributor> Contributors { set; get; }
         public DbSet<UserContributors> UserContributors { set; get; }
         public DbSet<ContributorType> ContributorType { set; get; }
         public DbSet<ContributorOperations> ContributorOperations { set; get; }
         public DbSet<OperationMode> OperationModes { set; get; }
+
+
         public DbSet<RadianContributor> RadianContributors { set; get; }
+        public DbSet<RadianContributorType> RadianContributorTypes { set; get; }
+        public DbSet<RadianOperationMode> RadianOperationModes { set; get; }
+
     }
 
     public class MigrateDBConfiguration : System.Data.Entity.Migrations.DbMigrationsConfiguration<SqlDBContext>

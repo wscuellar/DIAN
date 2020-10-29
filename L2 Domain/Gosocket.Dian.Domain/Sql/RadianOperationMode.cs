@@ -1,0 +1,21 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Gosocket.Dian.Domain
+{
+    
+    [System.ComponentModel.DataAnnotations.Schema.Table("RadianOperationMode")]
+    public class RadianOperationMode
+    {
+        [System.ComponentModel.DataAnnotations.Key]
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public virtual ICollection<RadianContributor> RadiantContributors { get; set; }
+    }
+
+}
