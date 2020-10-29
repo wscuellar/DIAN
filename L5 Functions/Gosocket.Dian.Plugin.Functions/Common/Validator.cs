@@ -24,6 +24,7 @@ using Gosocket.Dian.Infrastructure.Utils;
 using ContributorType = Gosocket.Dian.Domain.Common.ContributorType;
 using OperationMode = Gosocket.Dian.Domain.Common.OperationMode;
 using X509Certificate = Org.BouncyCastle.X509.X509Certificate;
+using Gosocket.Dian.Plugin.Functions.ValidateParty;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -447,10 +448,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, string trackId, string senderParty, string receiverParty, string eventCode)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty data)
         {
             DateTime startDate = DateTime.UtcNow;
-            trackId = trackId.ToLower();
+            trackId = data.TrackId.ToLower();
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
@@ -458,7 +459,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var receiverCode = nitModel.ReceiverCode;
             string receiver2DvErrorCode = "89";
             string sender2DvErrorCode = "89";
-            switch (Convert.ToInt16(eventCode))
+            switch (Convert.ToInt16(data.ResponseCode))
             {
                 case 30:                  
                 case 31:
@@ -1283,6 +1284,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
+                    break;
+                case "032":
+                    responses.Add(businessDays >= 3
+                        ? new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento, se rechaza la transmisión de este evento 33",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        }
+                        : new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Ok",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+
                     break;
                 case "033":
                     responses.Add(businessDays >= 3
