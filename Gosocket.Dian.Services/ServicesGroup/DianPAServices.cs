@@ -807,8 +807,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             var validateEventCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
-            // Valida dia hábil aceptación Tacita o Expresa o acuse de recibo
-            if (eventCode == "033" || eventCode == "034" || eventCode == "030")
+            // Valida fechas y dia habil SigningTime
+            if (eventCode == "033" || eventCode == "034" || eventCode == "030" || eventCode == "031")
             {
                 var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime, docTypeCode);
                 if (!validationAcceptanceTacitaExpresa.IsValid)
