@@ -26,8 +26,11 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
 
+        // Set queue name
+        private const string queueName = "global-test-set-tracking-input%Slot%";
+
         [FunctionName("UpdateTestSetResult")]
-        public static async Task Run([QueueTrigger("global-test-set-tracking-input", Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 

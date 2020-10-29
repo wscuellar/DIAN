@@ -41,6 +41,11 @@
                                 var hasOwnSoftwareEnabled = Model.ContributorOperations.Any(x => x.OperationModeId == (int)OperationMode.Own & x.Software?.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production);
                             }
 
+                            @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local") && Model.AcceptanceStatusId == (int)ContributorStatus.Enabled && !User.IsInRole("Administrador"))
+                            {
+                                <button type="button" data-id="@Model.Id" class="btn btn-default btn-sync-to-production">@ConfigurationManager.GetValue("SyncToProdGloss")</button>
+                            }
+
                             @if (ConfigurationManager.GetValue("Environment") != "Prod" && User.ContributorTypeId() == (int)ContributorType.Biller && hasOwnSoftwareEnabled && Model.AcceptanceStatusId == (int)ContributorStatus.Enabled)
                             {
                                 <button type="button" data-id="@Model.Id" class="btn btn-default btn-gosocket pull-left btn-set-to-provider">Operar como proveedor</button>
@@ -59,7 +64,7 @@
                             {
                                 <a href="@Url.Action("Edit", "Contributor", new { id = Model.Id, type = Model.ContributorTypeId })" class="btn btn-default btn-hover-gosocket">Editar</a>
                             }
-                            @if (ConfigurationManager.GetValue("Environment") == "Prod")
+                            @if (ConfigurationManager.GetValue("Environment") == "Prod" && !User.IsInRole("Administrador"))
                             {
                                 <a href="@Url.Action("OperationModes", "Contributor", new { id = Model.Id})" class="btn btn-default">Modos de operación</a>
                             }
@@ -121,9 +126,25 @@
                     }
                 });
             });
+
+            $('.btn-sync-to-production').click(function () {
+                bootbox.dialog({
+                    title: "Advertencia",
+                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea sincronizar contribuyente a producción?</strong></h4></div></div>",
+                    buttons: {
+                        del: {
+                            label: "Aceptar",
+                            className: "btn-gosocket",
+                            callback: function () {
+                                syncToProduction(@Model.Id)
+                            }
+                        },
+                    }
+                });
+            });
         });
 
-        function disableFields() {
+        disableFields = () => {
             $('#Code').attr('readonly', true);
             $('#Name').attr('readonly', true);
             $('#BusinessName').attr('readonly', true);
@@ -137,7 +158,7 @@
             $('#Software_Url').attr('readonly', true);
         }
 
-        function setToProvider(id) {
+        setToProvider = (id) => {
             showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
             var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
             $.ajax({
@@ -155,6 +176,30 @@
                     if (data.success) {
                         window.location.href = '@Url.Action("Login", "User")';
                     }
+                }
+            });
+        }
+
+        syncToProduction = (id) => {
+            showLoading('#panel-form', 'Configuración', 'Enviando a sincronizar datos, por favor espere.');
+            var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
+            $.ajax({
+                url: "@Url.Action("SyncToProduction", "Contributor")",
+                method: "Post",
+                data: {
+                    __RequestVerificationToken: __RequestVerificationToken,
+                    id: id
+                },
+                error: function (a, b, c) {
+                    hideLoading('#panel-form');
+                    showNotification('danger', 'fa fa-bolt fa-2x', 'floating', '', b + ': ' + c);
+                },
+                success: function (data) {
+                    hideLoading('#panel-form');
+                    if (data.success)
+                        showNotification('success', 'fa fa-check-circle fa-2x', 'floating', 'Aviso', data.message);
+                    if (!data.success)
+                        showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.message);
                 }
             });
         }
