@@ -317,6 +317,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BigContributorController.cs" />
     <Compile Include="Controllers\ContributorCategoryController.cs" />
+    <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
     <Compile Include="Controllers\ContributorFileTypeController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -353,6 +354,7 @@
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\ContributorCategoryViewModel.cs" />
+    <Compile Include="Models\RadianContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorViewModel.cs" />
     <Compile Include="Models\DocumentStatsViewModel.cs" />

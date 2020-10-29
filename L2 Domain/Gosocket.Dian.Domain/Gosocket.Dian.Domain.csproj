@@ -213,6 +213,10 @@
     <Compile Include="Sql\ContributorFiles\ContributorFileStatus.cs" />
     <Compile Include="Sql\ContributorFiles\ContributorFileType.cs" />
     <Compile Include="Sql\ContributorType.cs" />
+    <Compile Include="Sql\RadianContributorFiles\RadianContributorFile.cs" />
+    <Compile Include="Sql\RadianContributorFiles\RadianContributorFileHistory.cs" />
+    <Compile Include="Sql\RadianContributorFiles\RadianContributorFileStatus.cs" />
+    <Compile Include="Sql\RadianContributorFiles\RadianContributorFileType.cs" />
     <Compile Include="Sql\RadianOperationMode.cs" />
     <Compile Include="Sql\Software.cs" />
     <Compile Include="Sql\ContributorOperations.cs" />
