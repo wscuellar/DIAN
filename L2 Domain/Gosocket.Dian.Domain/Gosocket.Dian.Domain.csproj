@@ -201,6 +201,8 @@
     <Compile Include="KeyVault\ExportCertificatResult.cs" />
     <Compile Include="KeyVault\HttpMessageHandler.cs" />
     <Compile Include="KeyVault\ImportCertificateResult.cs" />
+    <Compile Include="Sql\OperationMode.cs" />
+    <Compile Include="Sql\RadianContributorType.cs" />
     <Compile Include="Sql\RadianContributor.cs" />
     <Compile Include="Sql\IdentificationType.cs" />
     <Compile Include="Sql\AcceptanceStatus.cs" />
@@ -211,7 +213,7 @@
     <Compile Include="Sql\ContributorFiles\ContributorFileStatus.cs" />
     <Compile Include="Sql\ContributorFiles\ContributorFileType.cs" />
     <Compile Include="Sql\ContributorType.cs" />
-    <Compile Include="Sql\OperationMode.cs" />
+    <Compile Include="Sql\RadianOperationMode.cs" />
     <Compile Include="Sql\Software.cs" />
     <Compile Include="Sql\ContributorOperations.cs" />
     <Compile Include="Sql\UserContributors.cs" />

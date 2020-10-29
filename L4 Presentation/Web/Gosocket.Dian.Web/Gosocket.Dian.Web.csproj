@@ -500,6 +500,12 @@
     <Content Include="Content\images\LogoAnticipos.png" />
     <Content Include="Content\images\payment-design.jpg" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\Factor.svg" />
+    <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
+    <Content Include="Content\images\Svg\OperacionDirecta.svg" />
+    <Content Include="Content\images\Svg\SistemaNegociacion.svg" />
+    <Content Include="Content\images\Svg\ProveedorTecnologico.svg" />
+    <Content Include="Content\images\Svg\FacturadorElectronico.svg" />
     <Content Include="Content\images\thumb-200x100.jpg" />
     <Content Include="Content\images\thumb-200x100.png" />
     <Content Include="Content\img\aeb50edc3bccd9a6170a88d5e0f14909_xl.jpg" />

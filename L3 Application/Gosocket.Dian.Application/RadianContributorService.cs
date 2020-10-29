@@ -32,7 +32,7 @@ namespace Gosocket.Dian.Application
         /// <returns></returns>
         public List<RadianContributor> GetRadianContributor(int page, int length,Expression<Func<RadianContributor, bool>> expression)
         {
-            var query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("ContributorType").Include("OperationMode");
+            var query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode");
             return query.ToList();
         }
 
@@ -48,7 +48,7 @@ namespace Gosocket.Dian.Application
                 var radianContributorInstance = context.RadianContributors.FirstOrDefault(c => c.Id == radianContributor.Id);
                 if (radianContributorInstance != null)
                 {
-                    radianContributorInstance.ContributorTypeId = radianContributor.ContributorTypeId;
+                    radianContributorInstance.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
                     context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
                 }
                 else
