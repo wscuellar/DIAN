@@ -1227,13 +1227,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (meta != null)
             {
                 document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
-<<<<<<< HEAD
 
                 CheckDocument(ref response, document, documentType, meta);
 
-=======
-                CheckDocument(ref response, document, meta);
->>>>>>> dev-dian
                 // Check if response has errors
                 if (response.ErrorMessage.Any())
                 {
