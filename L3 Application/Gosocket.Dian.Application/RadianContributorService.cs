@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -31,7 +32,7 @@ namespace Gosocket.Dian.Application
         /// <returns></returns>
         public List<RadianContributor> GetRadianContributor(int page, int length,Expression<Func<RadianContributor, bool>> expression)
         {
-            var query = sqlDBContext.RadianContributors.Where(expression);
+            var query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode");
             return query.ToList();
         }
 
@@ -47,7 +48,7 @@ namespace Gosocket.Dian.Application
                 var radianContributorInstance = context.RadianContributors.FirstOrDefault(c => c.Id == radianContributor.Id);
                 if (radianContributorInstance != null)
                 {
-                    radianContributorInstance.ContributorTypeId = radianContributor.ContributorTypeId;
+                    radianContributorInstance.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
                     context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
                 }
                 else
@@ -68,8 +69,11 @@ namespace Gosocket.Dian.Application
         public void RemoveRadianContributor(RadianContributor radianContributor)
         {
             RadianContributor rc = sqlDBContext.RadianContributors.FirstOrDefault(x => x.Id == radianContributor.Id);
-            sqlDBContext.RadianContributors.Remove(rc);
-            sqlDBContext.SaveChanges();
+            if(rc != null)
+            {
+                sqlDBContext.RadianContributors.Remove(rc);
+                sqlDBContext.SaveChanges();
+            }
         }
 
     }

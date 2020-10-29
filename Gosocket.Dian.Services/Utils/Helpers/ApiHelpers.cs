@@ -12,7 +12,7 @@ namespace Gosocket.Dian.Services.Utils.Helpers
     public class ApiHelpers
     {
 
-        public static ConcurrentDictionary<Guid, HttpClient> httpClients = new ConcurrentDictionary<Guid, HttpClient>();
+        private static ConcurrentDictionary<Guid, HttpClient> httpClients = new ConcurrentDictionary<Guid, HttpClient>();
 
         private static async Task<HttpResponseMessage> ConsumeApiAsync<T>(string url, T requestObj)
         {
@@ -74,15 +74,43 @@ namespace Gosocket.Dian.Services.Utils.Helpers
 
         private static async Task<HttpResponseMessage> ConsumeApiWithHeaderAsync<T>(string url, T requestObj, Dictionary<string, string> headers)
         {
-            using (var client = new HttpClient())
+            //using (var client = new HttpClient())
+            //{
+            //    var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+            //    var byteContent = new ByteArrayContent(buffer);
+            //    byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            //    if (headers != null)
+            //        foreach (var header in headers)
+            //            client.DefaultRequestHeaders.Add(header.Key, header.Value);
+
+            //    return await client.PostAsync(url, byteContent);
+            //}
+
+            if (!httpClients.ContainsKey(ToGuid(url)))
             {
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.Connection.Add("Keep-Alive");
+
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
                 if (headers != null)
                     foreach (var header in headers)
                         client.DefaultRequestHeaders.Add(header.Key, header.Value);
 
+                if (!httpClients.ContainsKey(ToGuid(url)))
+                    httpClients[ToGuid(url)] = client;
+
+                return await client.PostAsync(url, byteContent);
+            }
+            else
+            {
+                var client = httpClients[ToGuid(url)];
+
+                var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+                var byteContent = new ByteArrayContent(buffer);
+                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 return await client.PostAsync(url, byteContent);
             }
         }
@@ -113,7 +141,7 @@ namespace Gosocket.Dian.Services.Utils.Helpers
             }
             catch (Exception ex)
             {
-                throw new Exception($"result={result}____________request={JsonConvert.SerializeObject(requestObj)}____________{ex.Message}");
+                throw new Exception($"result={result}____________request={JsonConvert.SerializeObject(requestObj)}____________{ex.Message} {ex.InnerException?.Message}");
             }
         }
 
@@ -128,7 +156,7 @@ namespace Gosocket.Dian.Services.Utils.Helpers
             }
             catch (Exception ex)
             {
-                throw new Exception($"result={result}____________request={JsonConvert.SerializeObject(requestObj)}____________{ex.Message}");
+                throw new Exception($"result={result}____________request={JsonConvert.SerializeObject(requestObj)}____________{ex.Message} {ex.InnerException?.Message}");
             }
         }
 
@@ -136,7 +164,7 @@ namespace Gosocket.Dian.Services.Utils.Helpers
         {
             var response = await ConsumeApiWithHeaderAsync(url, requestObj, headers);
             var result = response.Content.ReadAsStringAsync().Result;
-            return JsonConvert.DeserializeObject<T>(result);
+            return (T)JsonConvert.DeserializeObject<T>(result);
         }
 
         public static T ExecuteRequestWithHeader<T>(string url, dynamic requestObj, Dictionary<string, string> headers)

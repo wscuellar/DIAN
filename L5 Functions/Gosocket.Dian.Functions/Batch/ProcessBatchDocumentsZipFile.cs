@@ -30,10 +30,11 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerGlobalBigContributorRequestAuthorization = new TableManager("GlobalBigContributorRequestAuthorization");
         private static readonly TableManager tableManagerGlobalTestSetResult = new TableManager("GlobalTestSetResult");
 
-        //global-process-batch-zip-input
-        //global-test-queue-input
+        // Set queue name
+        private const string queueName = "global-process-batch-zip-input%Slot%";
+
         [FunctionName("ProcessBatchDocumentsZipFile")]
-        public static async Task Run([QueueTrigger("global-process-batch-zip-input", Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             var testSetId = string.Empty;

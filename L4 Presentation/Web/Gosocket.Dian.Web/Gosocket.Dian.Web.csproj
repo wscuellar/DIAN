@@ -317,6 +317,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BigContributorController.cs" />
     <Compile Include="Controllers\ContributorCategoryController.cs" />
+    <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
     <Compile Include="Controllers\ContributorFileTypeController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -358,6 +359,7 @@
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\ContributorCategoryViewModel.cs" />
+    <Compile Include="Models\RadianContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorViewModel.cs" />
     <Compile Include="Models\DocumentStatsViewModel.cs" />
@@ -509,6 +511,12 @@
     <Content Include="Content\images\LogoAnticipos.png" />
     <Content Include="Content\images\payment-design.jpg" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\Factor.svg" />
+    <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
+    <Content Include="Content\images\Svg\OperacionDirecta.svg" />
+    <Content Include="Content\images\Svg\SistemaNegociacion.svg" />
+    <Content Include="Content\images\Svg\ProveedorTecnologico.svg" />
+    <Content Include="Content\images\Svg\FacturadorElectronico.svg" />
     <Content Include="Content\images\thumb-200x100.jpg" />
     <Content Include="Content\images\thumb-200x100.png" />
     <Content Include="Content\img\aeb50edc3bccd9a6170a88d5e0f14909_xl.jpg" />
@@ -2671,6 +2679,7 @@
     <Content Include="Views\Support\_adminCredentials.cshtml" />
     <Content Include="Views\Radian\Index.cshtml" />
     <Content Include="Views\RadiantContributorFileType\Index.cshtml" />
+    <Content Include="Views\Radian\ElectronicInvoiceView.cshtml" />
     <Content Include="Views\RadianTestSet\Index.cshtml" />
     <Content Include="Views\RadianTestSet\_items.cshtml" />
     <None Include="Web.Debug.config">
