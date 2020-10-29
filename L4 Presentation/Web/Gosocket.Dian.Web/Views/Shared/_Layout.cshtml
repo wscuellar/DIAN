@@ -353,13 +353,32 @@
                                             <!--  RADIAN -->
                                             @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
                                             {
-                                                <li id="@Navigation.NavigationEnum.RADIAN"><a href="@Url.Action("Index", "Radian")">RADIAN</a></li>
+                                                <li id="@Navigation.NavigationEnum.RADIAN">
+                                                    <a href="@Url.Action("Index", "Radian")">RADIAN</a>
+                                                </li>
                                             }
+
                                         </ul>
                                     </li>
                                     <!--Rol Administrador-->
                                     @if (User.IsInAnyRole("Administrador", "Super"))
                                     {
+                                        <!--  RADIAN -->
+                                        <li>
+                                            <a id="@Navigation.NavigationEnum.RADIAN" class="parent-link" href="#">
+                                                <i class="fa fa-check-square"></i>
+                                                <span class="menu-title">RADIAN</span>
+                                                <i class="arrow"></i>
+                                                <!-- Configuracion -->
+                                            </a>
+                                            <!-- SubMenu -->
+                                            <ul class="collapse">
+                                                <a href="#">Configuración</a>
+                                                <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas</a></li>
+                                            </ul>
+
+                                        </li>
+
                                         <li>
                                             <a id="@Navigation.NavigationEnum.ConfigurationIndex" class="parent-link" href="#">
 
@@ -378,7 +397,7 @@
                                                 }
                                                 <!-- Tipos Ficheros Radian RADIAN -->
                                                 @if (User.IsInAnyRole("Administrator", "Super"))
-                                                                            {
+                                                {
                                                     <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("Index", "RadianContributorFileType")">Tipos de Ficheros Radian</a></li>
                                                 }
                                                 @if (User.IsInAnyRole("Administrador", "Super"))
@@ -425,16 +444,16 @@
                                             </a>
                                         </li>
                                         @*if (ConfigurationManager.GetValue("Environment") == "Test")
-                                        {
-                                            <li id="@Navigation.NavigationEnum.Invoice">
-                                                <a href="@Url.Action("RedirectToBiller2", "User")" target="_blank">
-                                                    <i class="fa fa-dollar"></i>
-                                                    <span class="menu-title">
-                                                        Facturador Gratuito 2
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        }*@
+                                            {
+                                                <li id="@Navigation.NavigationEnum.Invoice">
+                                                    <a href="@Url.Action("RedirectToBiller2", "User")" target="_blank">
+                                                        <i class="fa fa-dollar"></i>
+                                                        <span class="menu-title">
+                                                            Facturador Gratuito 2
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            }*@
                                     }
 
                                     @if (User.IsInAnyRole("Administrador", "Super"))
