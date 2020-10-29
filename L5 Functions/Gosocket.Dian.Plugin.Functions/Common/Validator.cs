@@ -448,10 +448,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty data)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, string trackId, string senderParty, string receiverParty, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
-            trackId = data.TrackId.ToLower();
+            trackId = trackId.ToLower();
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
@@ -459,7 +459,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var receiverCode = nitModel.ReceiverCode;
             string receiver2DvErrorCode = "89";
             string sender2DvErrorCode = "89";
-            switch (Convert.ToInt16(data.ResponseCode))
+            switch (Convert.ToInt16(eventCode))
             {
                 case 30:                  
                 case 31:
