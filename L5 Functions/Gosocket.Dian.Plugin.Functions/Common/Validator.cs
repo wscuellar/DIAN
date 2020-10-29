@@ -500,6 +500,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     return responses;                  
                 case 34:
+                case 43:
                     if (senderParty != senderCode)
                     {             
                         responses.Add(new ValidateListResponse 
