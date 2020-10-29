@@ -2662,6 +2662,7 @@
     <Content Include="Views\Support\_adminCredentials.cshtml" />
     <Content Include="Views\Radian\Index.cshtml" />
     <Content Include="Views\RadiantContributorFileType\Index.cshtml" />
+    <Content Include="Views\Radian\ElectronicInvoiceView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

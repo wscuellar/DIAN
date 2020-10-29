@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -31,7 +32,7 @@ namespace Gosocket.Dian.Application
         /// <returns></returns>
         public List<RadianContributor> GetRadianContributor(int page, int length,Expression<Func<RadianContributor, bool>> expression)
         {
-            var query = sqlDBContext.RadianContributors.Where(expression);
+            var query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("ContributorType").Include("OperationMode");
             return query.ToList();
         }
 
@@ -68,8 +69,11 @@ namespace Gosocket.Dian.Application
         public void RemoveRadianContributor(RadianContributor radianContributor)
         {
             RadianContributor rc = sqlDBContext.RadianContributors.FirstOrDefault(x => x.Id == radianContributor.Id);
-            sqlDBContext.RadianContributors.Remove(rc);
-            sqlDBContext.SaveChanges();
+            if(rc != null)
+            {
+                sqlDBContext.RadianContributors.Remove(rc);
+                sqlDBContext.SaveChanges();
+            }
         }
 
     }

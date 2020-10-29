@@ -16,8 +16,9 @@ namespace Gosocket.Dian.Domain
         public Contributor Contributor { get; set; }
         public int ContributorTypeId { get; set; }
         public ContributorType ContributorType { get; set; }
-        public int OperationModelId { get; set; }
+        public int OperationModeId { get; set; }
         public OperationMode OperationMode { get; set; }
+        public string RadianState { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime Update { get; set; }
         public string CreatedBy { get; set; }

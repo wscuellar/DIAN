@@ -125,7 +125,7 @@ namespace Gosocket.Dian.DataContext
     {
         public MigrateDBConfiguration()
         {
-            AutomaticMigrationsEnabled = true;
+            AutomaticMigrationsEnabled = false;
         }
     }
     public class AzureDbConfiguration : DbConfiguration
