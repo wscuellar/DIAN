@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using System.Web.Mvc;
+using Gosocket.Dian.Web.Models;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -24,6 +25,12 @@ namespace Gosocket.Dian.Web.Controllers
         {
             return View();
             //return PartialView("ElectronicInvoiceView");
+        }
+
+        public ActionResult AdminRadianView()
+        {
+            var model = new AdminRadianViewModel();
+            return View(model);
         }
 
     }
