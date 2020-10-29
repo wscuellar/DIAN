@@ -74,7 +74,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
         {           
             var validateResponses = new List<ValidateListResponse>();
-            if (eventCode == "033" || eventCode == "034")
+            if (eventCode == "033" || eventCode == "034" || eventCode == "031")
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId, "032").FirstOrDefault();
                 if (documentMeta != null)
