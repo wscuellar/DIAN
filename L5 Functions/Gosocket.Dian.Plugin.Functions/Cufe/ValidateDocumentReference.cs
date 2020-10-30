@@ -76,8 +76,6 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
             public string TrackId { get; set; }
             [JsonProperty(PropertyName = "IdDocumentReference")]
             public string IdDocumentReference { get; set; }
-           
-
         }
     }
 }
