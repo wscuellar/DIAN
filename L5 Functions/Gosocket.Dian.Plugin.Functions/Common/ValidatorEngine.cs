@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Gosocket.Dian.Plugin.Functions.SigningTime;
+
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -76,11 +78,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validator = new Validator();
             return validator.ValidateDocumentReferencePrev(trackId, idDocumentReference);
         }
-        public async Task<List<ValidateListResponse>> StartValidateSigningTimeAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
+        public async Task<List<ValidateListResponse>> StartValidateSigningTimeAsync(ValidateSigningTime.RequestObject data)
         {           
             var validateResponses = new List<ValidateListResponse>();
             string code;
-            switch (eventCode)
+            switch (data.EventCode)
             {
                 case "044":
                     code = "043";
@@ -90,34 +92,34 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
             }
 
-            if (eventCode == "033" || eventCode == "034" || eventCode == "044")
+            if (data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044")
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId, code).FirstOrDefault();
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
                 if (documentMeta != null)
                 {
-                    trackId = documentMeta.PartitionKey;
+                    data.TrackId = documentMeta.PartitionKey;
                 }
                 //Solo si es eventcode AR Aceptacion Expresa - Tácita
-                else if(eventCode != "031")
+                else if(data.EventCode != "031")
                 {
                     ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE o CUFE {trackId}";
+                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE o CUFE {data.TrackId}";
                     response.IsValid = false;
                     validateResponses.Add(response);
                     return validateResponses;
                 }
             }
             
-            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
         
             //DateTime dateReceived = DateTime.ParseExact(xmlParser.SigningTime, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             //DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            string dateEntrie = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
+            string dateEntrie = Convert.ToDateTime(data.SigningTime).ToString("dd/MM/yyyy");
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSigningTime(eventCode, xmlParser.SigningTime, dateEntrie));
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser));
 
             return validateResponses;
         }

@@ -36,29 +36,18 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a SigningTime in the request body");
             if (string.IsNullOrEmpty(data.DocumentTypeId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId in the request body");
+            if (string.IsNullOrEmpty(data.CustomizationID))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a Customization in the request body");
 
-            var trackId = data.TrackId;
-            var eventCode = data.EventCode;
-            var signingTime = data.SigningTime;
-            var documentTypeId = data.DocumentTypeId;
-
-            if (trackId == null)
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
-            if (eventCode == null)
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a eventCode on the query string or in the request body");
-            if (signingTime == null)
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a signingTime on the query string or in the request body");
-            if (documentTypeId == null)
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId on the query string or in the request body");
             try
             {
-                var validateResponses = await ValidatorEngine.Instance.StartValidateSigningTimeAsync(trackId,  eventCode, signingTime, documentTypeId);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateSigningTimeAsync(data);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALIDATESIGNINGTIMEPLGNS -{DateTime.UtcNow:yyyyMMdd}-Evento {documentTypeId}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATESIGNINGTIMEPLGNS -{DateTime.UtcNow:yyyyMMdd}-Evento {data.DocumentTypeId}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
                 var error = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
                 var validateResponses = new List<ValidateListResponse>
@@ -85,6 +74,10 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
             public string SigningTime { get; set; }
             [JsonProperty(PropertyName = "DocumentTypeId")]
             public string DocumentTypeId { get; set; }
+            [JsonProperty(PropertyName = "customizationID")]
+            public string CustomizationID { get; set; }
+
+            
         }
     }
 }
