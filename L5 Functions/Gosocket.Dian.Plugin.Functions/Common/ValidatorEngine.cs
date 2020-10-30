@@ -71,12 +71,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validator = new Validator();
             return validator.ValidateEmitionEventPrev(trackId, eventCode,documentTypeId);
         }
+        public List<ValidateListResponse> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
+        {
+            var validator = new Validator();
+            return validator.ValidateDocumentReferencePrev(trackId, idDocumentReference);
+        }
         public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
         {           
             var validateResponses = new List<ValidateListResponse>();
-            if (eventCode == "033" || eventCode == "034")
+            string code;
+            switch (eventCode)
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId, "032").FirstOrDefault();
+                case "044":
+                    code = "043";
+                    break;
+                default:
+                    code = "032";
+                    break;
+            }
+
+            if (eventCode == "033" || eventCode == "034" || eventCode == "044")
+            {
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId, code).FirstOrDefault();
                 if (documentMeta != null)
                 {
                     trackId = documentMeta.PartitionKey;
@@ -84,12 +100,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 else
                 {
                     ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE {trackId}";
+                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE o CUFE {trackId}";
                     response.IsValid = false;
                     validateResponses.Add(response);
                     return validateResponses;
                 }
             }
+            
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())

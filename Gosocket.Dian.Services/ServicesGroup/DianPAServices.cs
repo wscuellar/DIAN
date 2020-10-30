@@ -724,9 +724,19 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var receiverCode = documentParsed.ReceiverCode;
             var signingTime = xmlParser.SigningTime;
             signingTime = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
-
+            var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
+            //Validation of the DocumentReference Section - Informed CUFE
+            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId);
+            if (!documentReferenceCufe.IsValid)
+            {
+                dianResponse = documentReferenceCufe;
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
+                return dianResponse;
+            }
 
             //Validate Sendercode and ReceiverCode
             var sender_receiver_response = ValidateParty(trackId, senderCode, receiverCode, eventCode);
@@ -810,7 +820,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Valida dia hábil aceptación Tacita o Expresa o acuse de recibo
             if (eventCode == "033" || eventCode == "034" || eventCode == "030")
             {
-                var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime,docTypeCode);
+                var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime, docTypeCode);
                 if (!validationAcceptanceTacitaExpresa.IsValid)
                 {
                     dianResponse = validationAcceptanceTacitaExpresa;
@@ -826,7 +836,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // upload xml
             start = DateTime.UtcNow;
             trackId = trackIdCude;
-            bool isEvent = true;            
+            bool isEvent = true;
             var uploadXmlRequest = new
             {
                 xmlBase64,
@@ -1306,7 +1316,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidateSerie(string trackId, string serieAndNumber, string documentTypeId)
         {
             var number = serieAndNumber;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number, documentTypeId });            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number, documentTypeId });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1378,7 +1388,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
                     }
                     response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                }                
+                }
             }
             return response;
         }
@@ -1387,7 +1397,34 @@ namespace Gosocket.Dian.Services.ServicesGroup
         {
 
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId });
-            
+
+            DianResponse response = new DianResponse();
+            if (validations.Count > 0)
+            {
+                response = new DianResponse
+                {
+                    StatusMessage = validations[0].ErrorMessage,
+                    StatusCode = validations[0].ErrorCode,
+                    IsValid = validations[0].IsValid,
+                    ErrorMessage = new List<string>()
+                };
+                response.ErrorMessage = new List<string>();
+                if (!response.IsValid)
+                {
+                    foreach (var item in validations)
+                    {
+                        response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                    }
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                }
+            }
+            return response;
+        }
+        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference)
+        {
+
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, IdDocumentReference = idDocumentReference });
+
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
