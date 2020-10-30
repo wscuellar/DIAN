@@ -82,7 +82,6 @@
 <div class="container ContainerBegin">
     <p class="TextSelected">Seleccione el modo de opreción en el Registro de Facturas Electronicas :</p>
     <div class="row">
-
         <div class="col-xs-6 col-md-6 d-flex container">
             <div class="card CardContainer">
                 <img class="imgSvg" src="~/Content/images/Svg/OperacionDirecta.svg" />
@@ -90,7 +89,9 @@
                     <h3 class="TittleCard">Operación Directa</h3>
                     <h4 class="TittleCard2">Software Propio</h4>
                 </div>
-                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar la trasmisión de eventos al RADIAN como Proveedor Tecnológico?" />
+                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar  la trasmisión de eventos en RADIAN como Facturador Electrónico?" />
+                <input type="hidden" class="ConfirmReject" value="El participante no cuenta con un software propio activo en el sistema" />
+                <input type="hidden" class="ConfirmUserExisting" value="El participante ya se encuentra registrado en RADIAN." />
             </div>
         </div>
 
@@ -102,7 +103,7 @@
                     <h3 class="TittleCard">Operación Indirecta</h3>
                     <p class="TittleCard2">A través de un aliado</p>
                 </div>
-                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar la trasmisión de eventos al RADIAN como Proveedor Tecnológico?" />
+                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?" />
             </div>
         </div>
     </div>
@@ -113,33 +114,57 @@
 {
     @Scripts.Render("~/bundles/jqueryval")
 
-    <script>
+<script>
 
         $('.CardContainer').click(function () {
-            var message = $(this).children(".ConfirmMessage").val();
+            var withSoft = '@ViewBag.WithSoft';
+            var existInRadian = '@ViewBag.ExistInRadian';
+            alert(existInRadian);
+            var findLabel = (withSoft == "True" && existInRadian == 'False') ?
+                ".ConfirmMessage" :
+                (existInRadian == 'False') ? ".ConfirmReject" : ".ConfirmUserExisting";
+            var message = $(this).children(findLabel).val()
+            var buttons = (withSoft == "True" && existInRadian == 'False') ? WithSoftwareExec() : WithOutSoftwareExec();
             if (message != undefined) {
-                showConfirmation(message);
+                showConfirmation(message, buttons);
             }
         });
 
-        function showConfirmation(confirmMessage) {
+        function showConfirmation(confirmMessage, buttons) {
             bootbox.dialog({
                 title: "Advertencia",
-                message: "<div class='media'><div class='media-body'>" +
-                    "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
-                buttons: {
-                    del: {
-                        label: "Aceptar",
-                        className: "btn-gosocket",
-                        callback: function () {
-                           // var url = $("#RedirectToElectronicInvoiceView").val();
-                           // window.location.href = url;
-                        }
-                    },
-                }
+                message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
+                buttons: buttons
             });
         }
 
-    </script>
+        function WithSoftwareExec() {
+            return {
+                del: {
+                    label: "Aceptar",
+                    className: "btn-gosocket",
+                    callback: function () {
+                        alert("tiene");
+                        // var url = $("#RedirectToElectronicInvoiceView").val();
+                        // window.location.href = url;
+                    }
+                },
+                del1: {
+                    label: "Cancelar",
+                    className: "btn-gosocket",
+                }
+            }
+        }
+
+        function WithOutSoftwareExec() {
+            return {
+                del: {
+                    label: "Aceptar",
+                    className: "btn-gosocket",
+                }
+            }
+        }
+
+</script>
 }
 
