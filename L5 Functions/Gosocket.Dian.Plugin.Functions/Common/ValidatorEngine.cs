@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Gosocket.Dian.Plugin.Functions.SigningTime;
+
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -72,38 +74,56 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validator = new Validator();
             return validator.ValidateEmitionEventPrev(trackId, eventCode,documentTypeId);
         }
-        public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
+        public List<ValidateListResponse> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
+        {
+            var validator = new Validator();
+            return validator.ValidateDocumentReferencePrev(trackId, idDocumentReference);
+        }
+        public async Task<List<ValidateListResponse>> StartValidateSigningTimeAsync(ValidateSigningTime.RequestObject data)
         {           
             var validateResponses = new List<ValidateListResponse>();
-            //Valida exista AR Constacia de recibo para eventos Aceptacion Expresa - Tácita o Rechazo FE
-            if (eventCode == "033" || eventCode == "034" || eventCode == "031")
+            DateTime startDate = DateTime.UtcNow;
+            string code;
+            switch (data.EventCode)
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId, "032").FirstOrDefault();
+                case "044":
+                    code = "043";
+                    break;
+                default:
+                    code = "032";
+                    break;
+            }
+
+            if (data.EventCode == "031" || data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044")
+            {
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
                 if (documentMeta != null)
                 {
-                    trackId = documentMeta.PartitionKey;
+                    data.TrackId = documentMeta.PartitionKey;
                 }
                 //Solo si es eventcode AR Aceptacion Expresa - Tácita
-                else if(eventCode != "031")
+                else if(data.EventCode != "031")
                 {
                     ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = $"No se encontró documento electrónico AR Constacia de recibo para el CUFE {trackId}";
+                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE/CUFE {data.TrackId}";
                     response.IsValid = false;
+                    response.ErrorCode = "89";
+                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     validateResponses.Add(response);
                     return validateResponses;
                 }
             }
-            //Obtiene infromacion XML Invoice 
-            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            
+            var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
         
             //DateTime dateReceived = DateTime.ParseExact(xmlParser.SigningTime, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             //DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            string dateEntrie = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
+            string dateEntrie = Convert.ToDateTime(data.SigningTime).ToString("dd/MM/yyyy");
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateAcceptanceTacitaExpresa(eventCode, xmlParser.SigningTime, dateEntrie));
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser));
 
             return validateResponses;
         }
