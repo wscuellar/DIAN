@@ -196,6 +196,7 @@
     <Compile Include="Entity\GlobalOseProcessResult.cs" />
     <Compile Include="Entity\GlobalOseTrackIdMapper.cs" />
     <Compile Include="Entity\GlobalTypeList.cs" />
+    <Compile Include="Entity\RadianTestSet.cs" />
     <Compile Include="KeyVault\BaseResult.cs" />
     <Compile Include="KeyVault\DeleteCertificateResult.cs" />
     <Compile Include="KeyVault\ExportCertificatResult.cs" />

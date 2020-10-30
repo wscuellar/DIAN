@@ -2,6 +2,7 @@
 using Gosocket.Dian.Web.Common;
 using System.Collections.Generic;
 using System.Web.Mvc;
+using Gosocket.Dian.Web.Models;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -28,6 +29,12 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.WithSoft =contributor != null && contributor.Softwares != null && contributor.Softwares.Count > 1;
             ViewBag.ExistInRadian = radianContributor != null && radianContributor.Count > 0;
             return View();
+        }
+
+        public ActionResult AdminRadianView()
+        {
+            var model = new AdminRadianViewModel();
+            return View(model);
         }
 
     }
