@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Plugin.Functions.Models;
+using Gosocket.Dian.Plugin.Functions.ValidateParty;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
@@ -142,11 +143,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-        public async Task<List<ValidateListResponse>> StartValidateParty(string trackId, string senderParty, string receiverParty, string eventCode)
+        public async Task<List<ValidateListResponse>> StartValidateParty(RequestObjectParty party)
         {
             var validateResponses = new List<ValidateListResponse>();
 
-            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlBytes = await GetXmlFromStorageAsync(party.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
@@ -154,7 +155,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateParty(nitModel, trackId, senderParty, receiverParty, eventCode));
+            validateResponses.AddRange(validator.ValidateParty(nitModel, party));
 
             return validateResponses;
         }

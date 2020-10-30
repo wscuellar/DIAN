@@ -730,7 +730,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE 3
 
             //Validate Sendercode and ReceiverCode
-            var sender_receiver_response = ValidateParty(trackId, senderCode, receiverCode, eventCode);
+            var sender_receiver_response = ValidateParty(trackId, senderCode, receiverCode, eventCode, customizationID);
             if (!sender_receiver_response.IsValid)
             {
                 dianResponse = sender_receiver_response;
@@ -1366,12 +1366,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidateParty(string trackId, string senderCode, string receiverCode, string eventCode)
+        private DianResponse ValidateParty(string trackId, string senderCode, string receiverCode, string eventCode, string customizationID)
         {
             var SenderParty = senderCode;
             var ReceiverParty = receiverCode;
             var ResponseCode = eventCode;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, SenderParty, ReceiverParty, ResponseCode });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, SenderParty, ReceiverParty, ResponseCode, customizationID });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

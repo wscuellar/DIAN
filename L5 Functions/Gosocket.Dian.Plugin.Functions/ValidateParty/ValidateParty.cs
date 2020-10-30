@@ -42,20 +42,18 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
             if (string.IsNullOrEmpty(data.ResponseCode))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ResponseCode in the request body");
 
-            var trackId = data.TrackId;
-            var senderParty = data.SenderParty;
-            var receiverParty = data.ReceiverParty;
-            var eventCode = data.ResponseCode;
+            if (string.IsNullOrEmpty(data.CustomizationID))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a CustomizationID in the request body");
 
             try
             {
-                var validateResponses = await ValidatorEngine.Instance.StartValidateParty(trackId, senderParty, receiverParty, eventCode);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateParty(data);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALIDATEPARTYPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATEPARTYPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -83,5 +81,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
         public string ReceiverParty { get; set; }
         [JsonProperty(PropertyName = "ResponseCode")]
         public string ResponseCode { get; set; }
+        [JsonProperty(PropertyName = "CustomizationID")]
+        public string CustomizationID { get; set; }
     }
 }

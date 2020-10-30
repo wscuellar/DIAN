@@ -448,10 +448,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, string trackId, string senderParty, string receiverParty, string eventCode)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party)
         {
             DateTime startDate = DateTime.UtcNow;
-            trackId = trackId.ToLower();
+            party.TrackId = party.TrackId.ToLower();
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
@@ -459,13 +459,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var receiverCode = nitModel.ReceiverCode;
             string receiver2DvErrorCode = "89";
             string sender2DvErrorCode = "89";
-            switch (Convert.ToInt16(eventCode))
+            switch (Convert.ToInt16(party.ResponseCode))
             {
                 case 30:                  
                 case 31:
                 case 32:
                 case 33:
-                    if (senderParty != receiverCode)
+                    if (party.SenderParty != receiverCode)
                     {                        
                         responses.Add(new ValidateListResponse
                         { 
@@ -476,7 +476,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds 
                         });
                     }
-                    else if (receiverParty != senderCode)
+                    else if (party.ReceiverParty != senderCode)
                     {                        
                         responses.Add(new ValidateListResponse
                         { 
@@ -501,7 +501,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;                  
                 case 34:
                 case 43:
-                    if (senderParty != senderCode)
+                    if (party.SenderParty != senderCode)
                     {             
                         responses.Add(new ValidateListResponse 
                         { 
@@ -513,7 +513,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                        
                     }
-                    else if (receiverParty != "800197268")
+                    else if (party.ReceiverParty != "800197268")
                     {                 
                         responses.Add(new ValidateListResponse 
                         { 
@@ -536,7 +536,73 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     return responses;
-              }
+                case 36:
+                    if (party.CustomizationID == "361" || party.CustomizationID == "362")
+                    {
+                        if (party.SenderParty != senderCode)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = receiver2DvErrorCode,
+                                ErrorMessage = "Emisor/Facturador Electrónico no coincide con la información de la factura  referenciada",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }else  if (party.CustomizationID == "363" || party.CustomizationID == "364")
+                    {
+                        //Tener encuenta la validacion puesto que se va a realizar como una funcion con el mandato
+                        if (party.SenderParty != nitModel.ProviderCode)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = receiver2DvErrorCode,
+                                ErrorMessage = "Información del Mandatario/Representante no se encuentra registrada en RADIAN",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    else if (party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = sender2DvErrorCode,
+                            ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    return responses;
+                case 37:
+                case 38:
+                case 39:
+                case 41:
+                    if (party.CustomizationID == "361" || party.CustomizationID == "362")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = receiver2DvErrorCode,
+                            ErrorMessage = "Ya existe un tipo de instrumento de limitación registrado en el sistema",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    } else if(party.CustomizationID == "363" || party.CustomizationID == "364") {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = receiver2DvErrorCode,
+                            ErrorMessage = "Ya existe un tipo de instrumento de limitación registrado en el sistema",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                        return responses;
+            }
 
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
@@ -1220,6 +1286,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ErrorMessage =
                                             "Solo se pueda transmitir el evento (034) Aceptacion Tácita de la factura," +
                                         " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                break;
+                            case "036":
+                                if(documentMeta.Where(t => t.EventCode == documentIdentifier.EventCode || t.EventCode == documentIdentifier.EventCode
+                                    || t.EventCode == documentIdentifier.EventCode || t.EventCode == documentIdentifier.EventCode).ToList().Count() > decimal.Zero)
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "Ya existe un tipo de instrumento de limitación registrado en el sistema",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
