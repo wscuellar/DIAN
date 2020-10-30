@@ -25,6 +25,8 @@ using ContributorType = Gosocket.Dian.Domain.Common.ContributorType;
 using OperationMode = Gosocket.Dian.Domain.Common.OperationMode;
 using X509Certificate = Org.BouncyCastle.X509.X509Certificate;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
+using Gosocket.Dian.Services.Utils.Common;
+using Gosocket.Dian.Plugin.Functions.SigningTime;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -1380,16 +1382,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #endregion
 
-        public List<ValidateListResponse> ValidateSigningTime(string eventCode, string dateReceived, string dateEntrie)
+        public List<ValidateListResponse> ValidateSigningTime(ValidateSigningTime.RequestObject data, XmlParser dataModel)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dateReceived), Convert.ToDateTime(dateEntrie));
+            var businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
 
-            switch (eventCode)
+            switch (data.EventCode)
             {
                 case "030":
-                    responses.Add(Convert.ToDateTime(dateEntrie) >= Convert.ToDateTime(dateReceived)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) >= Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -1489,7 +1491,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 //Validación de la existencia eventos previos Endoso en Garantía TASK 716
                 case "038":
-                    responses.Add(Convert.ToDateTime(dateEntrie) < Convert.ToDateTime(dateReceived)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -1507,6 +1509,73 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
+                case "044":
+                    DateTime signingTime = Convert.ToDateTime(data.SigningTime);
+                    if (dataModel.CustomizationID == "432" || dataModel.CustomizationID == "434") //que se mayor
+                    {
+                        DateTime dateMandato = Convert.ToDateTime(dataModel.SigningTime);
+                        if (signingTime >= dateMandato)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Ok",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "89",
+                                ErrorMessage = "La fecha Terminación del mandato es menor a la fecha de registro del Instrumento Mandato 043",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    else if (dataModel.CustomizationID == "431" || dataModel.CustomizationID == "433")  //que sea menor
+                    {
+                        DateTime endDateMandato = Convert.ToDateTime(dataModel.FieldValue("EndDate"));
+                        if (signingTime <= endDateMandato)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Ok",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "89",
+                                ErrorMessage = "La fecha Terminación del mandato es mayor a la fecha de registro del Instrumento Mandato 043",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "Error en el Instrumento Mandato 043",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
+
             }
 
             return responses;

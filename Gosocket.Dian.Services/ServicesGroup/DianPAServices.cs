@@ -826,9 +826,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var validateEventCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             // Valida fechas y dia habil SigningTime
-            if (eventCode == "033" || eventCode == "034" || eventCode == "030" || eventCode == "031")
+            if (eventCode == "033" || eventCode == "034" || eventCode == "030" || eventCode == "031" || eventCode == "044")
             {
-                var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime, docTypeCode);
+                var validationAcceptanceTacitaExpresa = ValidationSigningTime(trackId, eventCode, signingTime, docTypeCode, customizationID);
                 if (!validationAcceptanceTacitaExpresa.IsValid)
                 {
                     dianResponse = validationAcceptanceTacitaExpresa;
@@ -1437,10 +1437,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidationAcceptanceTacitaExpresa(string trackId, string eventCode, string signingTime, string documentTypeId)
+        private DianResponse ValidationSigningTime(string trackId, string eventCode, string signingTime, string documentTypeId, string customizationID)
         {
 
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId, customizationID });
 
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
