@@ -1567,7 +1567,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         responses.Add(new ValidateListResponse
                         {
-                            IsValid = true,
+                            IsValid = false,
                             Mandatory = true,
                             ErrorCode = "89",
                             ErrorMessage = "Error en el Instrumento Mandato 043",
