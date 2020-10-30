@@ -187,6 +187,7 @@
     <Compile Include="logger\LoggerService.cs" />
     <Compile Include="Managers\CategoryManager.cs" />
     <Compile Include="Managers\CertificateManager.cs" />
+    <Compile Include="Managers\RadianTestSetManager.cs" />
     <Compile Include="Managers\RedisConnectorManager.cs" />
     <Compile Include="Managers\RuleManager.cs" />
     <Compile Include="Managers\TestSetManager.cs" />

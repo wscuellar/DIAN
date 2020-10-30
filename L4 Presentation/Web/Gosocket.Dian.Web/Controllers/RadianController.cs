@@ -1,27 +1,40 @@
 ﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Web.Common;
+using System.Collections.Generic;
 using System.Web.Mvc;
+using Gosocket.Dian.Web.Models;
 
 namespace Gosocket.Dian.Web.Controllers
 {
     public class RadianController : Controller
     {
 
+
+        ContributorService ContributorService = new ContributorService();
         RadianContributorService radianContributorService = new RadianContributorService();
+
+
 
         // GET: Radian
         public ActionResult Index()
         {
-                //radianContributorService.AddOrUpdate(new Domain.RadianContributor() { ContributorId = 4486972, RadianState="Camilo", RadianContributorTypeId = 1, RadianOperationModeId = 1, Update = System.DateTime.Now, CreatedDate = System.DateTime.Now, CreatedBy = "Camilo" });
-            //var res = radianContributorService.GetRadianContributor(1, 3, t => t.RadianState == "Activo" ||  t.RadianState == "Camilo" );
-            ////VALUES(1, 4486972, 1, 1, 'ACTIVO', GETDATE(), GETDATE(), 'TEST')
-
-            //radianContributorService.RemoveRadianContributor(new Domain.RadianContributor() { Id = 2 });
-                return View();
+            return View();
         }
 
         public ActionResult ElectronicInvoiceView()
         {
+            string userCode = User.UserCode();
+            Domain.Contributor contributor = ContributorService.GetByCode(userCode);
+            List<Domain.RadianContributor> radianContributor =  radianContributorService.GetRadianContributor(1, 1, t => t.Contributor.Code == userCode);
+            ViewBag.WithSoft =contributor != null && contributor.Softwares != null && contributor.Softwares.Count > 1;
+            ViewBag.ExistInRadian = radianContributor != null && radianContributor.Count > 0;
             return View();
+        }
+
+        public ActionResult AdminRadianView()
+        {
+            var model = new AdminRadianViewModel();
+            return View(model);
         }
 
     }

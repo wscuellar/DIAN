@@ -54,6 +54,8 @@ namespace Gosocket.Dian.Web.Utils
             Users,
             RADIAN,
             RadianContributorFileType,
+            RadianSetPruebas,
+            AdminRadian
         }
     }
 }
