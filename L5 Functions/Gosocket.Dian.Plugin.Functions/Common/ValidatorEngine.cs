@@ -81,6 +81,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateSigningTimeAsync(ValidateSigningTime.RequestObject data)
         {           
             var validateResponses = new List<ValidateListResponse>();
+            DateTime startDate = DateTime.UtcNow;
             string code;
             switch (data.EventCode)
             {
@@ -92,7 +93,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
             }
 
-            if (data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044")
+            if (data.EventCode == "031" || data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044")
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
                 if (documentMeta != null)
@@ -103,8 +104,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 else if(data.EventCode != "031")
                 {
                     ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE o CUFE {data.TrackId}";
+                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE/CUFE {data.TrackId}";
                     response.IsValid = false;
+                    response.ErrorCode = "89";
+                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     validateResponses.Add(response);
                     return validateResponses;
                 }

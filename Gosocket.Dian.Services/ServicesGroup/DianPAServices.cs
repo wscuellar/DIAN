@@ -729,14 +729,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
-            //Validation of the DocumentReference Section - Informed CUFE and CUDE
-            string currenttrackId=trackId;
-            if (eventCode == "044"|| eventCode == "040")
-            {
-                currenttrackId = trackIdCude;
-            }
-
-            var documentReferenceCufe = ValidationDocumentReferenceCufe(currenttrackId, documentReferenceId);
+            //Validation of the DocumentReference Section - Informed CUFE and CUDE         
+            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId);
             if (!documentReferenceCufe.IsValid)
             {
                 dianResponse = documentReferenceCufe;

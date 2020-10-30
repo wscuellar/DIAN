@@ -73,10 +73,12 @@ namespace Gosocket.Dian.Services.Utils.Common
                     XmlDocument.Load(sr);
                     var node = XmlDocument.GetElementsByTagName("xades:SigningTime")[0];
                     var nodeCustomizationID = XmlDocument.GetElementsByTagName("cbc:CustomizationID")[0];
-                    var documentReferenceId = XmlDocument.GetElementsByTagName("cbc:ID")[0];
+                    var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";
+                    var documentReferenceId = XmlDocument.SelectSingleNode(documentReferenceIdValueXpath)?.InnerText;
+
                     SigningTime = node?.InnerText;
                     CustomizationID = nodeCustomizationID?.InnerText;
-                    DocumentReferenceId= documentReferenceId?.InnerText;
+                    DocumentReferenceId = documentReferenceId;
                 }
             }
         }
