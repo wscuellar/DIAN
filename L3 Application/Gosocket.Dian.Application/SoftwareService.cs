@@ -24,6 +24,7 @@ namespace Gosocket.Dian.Application
                 var softwareInstance = context.Softwares.FirstOrDefault(c => c.Id == software.Id);
                 if (softwareInstance != null)
                 {
+                    softwareInstance.Deleted = software.Deleted;
                     softwareInstance.Name = software.Name;
                     softwareInstance.ContributorId = software.ContributorId;
                     softwareInstance.SoftwareUser = software.SoftwareUser;

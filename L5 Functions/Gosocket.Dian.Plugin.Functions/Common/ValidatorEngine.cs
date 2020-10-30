@@ -76,7 +76,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validator = new Validator();
             return validator.ValidateDocumentReferencePrev(trackId, idDocumentReference);
         }
-        public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
+        public async Task<List<ValidateListResponse>> StartValidateSigningTimeAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
         {           
             var validateResponses = new List<ValidateListResponse>();
             string code;
@@ -97,7 +97,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     trackId = documentMeta.PartitionKey;
                 }
-                else
+                //Solo si es eventcode AR Aceptacion Expresa - Tácita
+                else if(eventCode != "031")
                 {
                     ValidateListResponse response = new ValidateListResponse();
                     response.ErrorMessage = $"No se encontró documento electrónico para el CUDE o CUFE {trackId}";
@@ -113,9 +114,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 throw new Exception(xmlParser.ParserError);
         
             //DateTime dateReceived = DateTime.ParseExact(xmlParser.SigningTime, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-            DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            //DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            string dateEntrie = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateAcceptanceTacitaExpresa(eventCode, xmlParser.SigningTime, dateEntrie));
+            validateResponses.AddRange(validator.ValidateSigningTime(eventCode, xmlParser.SigningTime, dateEntrie));
 
             return validateResponses;
         }

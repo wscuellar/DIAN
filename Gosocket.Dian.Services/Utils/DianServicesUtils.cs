@@ -734,7 +734,7 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (string.IsNullOrEmpty(eventCode.Trim()))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D06-(R) Código tipo de evento no puede estar vacío.");
+                    stringBuilder.AppendLine($"{codeMessage}H03-(R) Código tipo de evento no puede estar vacío.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;

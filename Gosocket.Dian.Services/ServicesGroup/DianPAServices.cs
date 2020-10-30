@@ -723,7 +723,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var trackIdCude = documentParsed.Cude;
             var receiverCode = documentParsed.ReceiverCode;
             var signingTime = xmlParser.SigningTime;
-            signingTime = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
+            var customizationID = xmlParser.CustomizationID;
+            //signingTime = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
+
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
@@ -817,8 +819,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             var validateEventCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
-            // Valida dia hábil aceptación Tacita o Expresa o acuse de recibo
-            if (eventCode == "033" || eventCode == "034" || eventCode == "030")
+            // Valida fechas y dia habil SigningTime
+            if (eventCode == "033" || eventCode == "034" || eventCode == "030" || eventCode == "031")
             {
                 var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime, docTypeCode);
                 if (!validationAcceptanceTacitaExpresa.IsValid)
@@ -845,7 +847,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 trackId,
                 isEvent,
                 eventCode,
-                signingTime
+                signingTime,
+                customizationID
             };
             var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
             if (!uploadXmlResponse.Success)
@@ -1193,9 +1196,28 @@ namespace Gosocket.Dian.Services.ServicesGroup
             CheckDocument(ref response, document, documentType);
 
             // Check if response has errors
-            if (response.ErrorMessage.Any()) return response;
+            if (response.ErrorMessage.Any())
+            {
+                //
+                var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
+
+                //
+                return response;
+            }
 
             var number = StringUtil.TextAfter(serieAndNumber, serie).TrimStart('0');
+            if (string.IsNullOrEmpty(number))
+            {
+                var failedList = new List<string> { $"" };
+                response.IsValid = false;
+                response.StatusCode = "99";
+                response.StatusMessage = ".";
+                response.StatusDescription = ".";
+                response.ErrorMessage.AddRange(failedList);
+                return response;
+            }
+
             identifier = StringUtil.GenerateIdentifierSHA256($"{senderCode}{documentType}{serie}{number}");
             document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
 
@@ -1203,7 +1225,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
             CheckDocument(ref response, document, documentType);
 
             // Check if response has errors
-            if (response.ErrorMessage.Any()) return response;
+            if (response.ErrorMessage.Any())
+            {
+                //
+                var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
+
+                //
+                return response;
+            }
 
             // third check
             var meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
@@ -1214,7 +1244,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 CheckDocument(ref response, document, documentType, meta);
 
                 // Check if response has errors
-                if (response.ErrorMessage.Any()) return response;
+                if (response.ErrorMessage.Any())
+                {
+                    //
+                    var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                    if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
+
+                    //
+                    return response;
+                }
             }
 
             return null;

@@ -23,18 +23,22 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
         private static readonly TableManager exchangeEmailTableManager = new TableManager("GlobalExchangeEmail");
 
+        // Set queue name
+        private const string queueName = "activate-contributor-input%Slot%";
+
         [FunctionName("ActivateContributor")]
-        public static void Run([QueueTrigger("activate-contributor-input", Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
                 Contributor contributor = null;
                 GlobalContributorActivation contributorActivation = null;
+                ActivateContributorRequestObject requestObject = null;
                 try
                 {
                     var eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
-                    var requestObject = JsonConvert.DeserializeObject<ActivateContributorRequestObject>(eventGridEvent.Data.ToString());
+                    requestObject = JsonConvert.DeserializeObject<ActivateContributorRequestObject>(eventGridEvent.Data.ToString());
 
                     contributor = contributorService.Get(requestObject.ContributorId);
 
@@ -50,7 +54,7 @@ namespace Gosocket.Dian.Functions.Activation
                             ContributorCode = contributor.Code,
                             ContributorTypeId = requestObject.ContributorTypeId,
                             OperationModeId = requestObject.OperationModeId,
-                            SentToActivateBy = "Fucntion",
+                            SentToActivateBy = "Function",
                             SoftwareId = requestObject.Software?.Id.ToString(),
                             SendDate = DateTime.UtcNow,
                             Message = "Contribuyente se activó en producción con éxito.",
@@ -136,6 +140,9 @@ namespace Gosocket.Dian.Functions.Activation
                 }
                 catch (Exception ex)
                 {
+                    if (contributorActivation == null)
+                        contributorActivation = new GlobalContributorActivation(requestObject.ContributorId.ToString(), Guid.NewGuid().ToString());
+
                     contributorActivation.Success = false;
                     contributorActivation.Message = "Error al activar contribuyente en producción.";
                     contributorActivation.Detail = ex.Message;

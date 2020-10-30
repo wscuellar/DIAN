@@ -63,8 +63,11 @@ namespace Gosocket.Dian.Functions.ECD
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(downloadUriBuilder.Uri);
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 Stream responseStream = response.GetResponseStream();
-                var crlBytes = Utils.Utils.ConvertStreamToBytes(responseStream);
-                fileManager.Upload(configuration.Container, configuration.FileName, crlBytes);
+                if(responseStream.Length > 0)
+                {
+                    var fileBytes = Utils.Utils.ConvertStreamToBytes(responseStream);
+                    fileManager.Upload(configuration.Container, configuration.FileName, fileBytes);
+                }
             }
             catch (Exception ex)
             {

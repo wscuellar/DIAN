@@ -52,7 +52,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId on the query string or in the request body");
             try
             {
-                var validateResponses = await ValidatorEngine.Instance.StartValidationAcceptanceTacitaExpresaAsync(trackId,  eventCode, signingTime, documentTypeId);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateSigningTimeAsync(trackId,  eventCode, signingTime, documentTypeId);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)

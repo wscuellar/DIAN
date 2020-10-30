@@ -21,12 +21,6 @@
     </div>
     <div class="col-sm-3 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.PrincipalActivityCode, new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.PrincipalActivityCode, defaultHtmlAttr)
-        </div>
-    </div>
-    <div class="col-sm-3 padding-xs-0">
-        <div class="form-group">
             @Html.LabelFor(m => m.ExchangeEmail, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.ExchangeEmail, readOnlyHtmlAttr)
             @Html.ValidationMessageFor(m => m.ExchangeEmail, "", new { @class = "text-danger" })
