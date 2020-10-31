@@ -27,6 +27,7 @@ using X509Certificate = Org.BouncyCastle.X509.X509Certificate;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
+using Gosocket.Dian.Plugin.Functions.Event;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -1135,13 +1136,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region validation to emition to event
 
-        public List<ValidateListResponse> ValidateEmitionEventPrev(string trackId, string eventCode, string documentTypeId)
+        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev)
         {
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId);
+            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
 
             if (documentMeta.Count == 0)
             {
@@ -1162,7 +1163,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier);
                 if (document != null)
                 {
-                    if (documentMeta.Where(t => t.EventCode == eventCode && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
+                    if (documentMeta.Where(t => t.EventCode == eventPrev.EventCode && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -1175,7 +1176,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else
                     {
-                        switch (eventCode)
+                        switch (eventPrev.EventCode)
                         {
 
                             case "031": //Rechazo de la FEV
@@ -1338,6 +1339,33 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ErrorMessage =
                                             "Solo se pueda transmitir el evento (034) Aceptacion Tácita de la factura," +
                                         " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                break;
+                            case "036":
+                                //Validacion de la Solicitud de Disponibilidad TAKS 723
+                                if (documentMeta
+                                    .Where(t => t.EventCode == "037" || t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                    .Count > decimal.Zero)
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "Ya existe un tipo de instrumento de limitación registrado en el sistema",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }

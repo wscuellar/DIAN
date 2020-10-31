@@ -37,26 +37,15 @@ namespace Gosocket.Dian.Plugin.Functions.Event
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a EventCode in the request body");
             if (string.IsNullOrEmpty(data.DocumentTypeId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId in the request body");
-            var trackId = data.TrackId;
-
-            var eventCode = data.EventCode;
-            var documentTypeId = data.DocumentTypeId;
-
-            if (trackId == null)
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
-            if (eventCode == null)
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a eventCode on the query string or in the request body");
-            if (documentTypeId == null)
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId on the query string or in the request body");
-            try
+         try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateEmitionEventPrevAsync(trackId,eventCode, documentTypeId);
+                var validateResponses = ValidatorEngine.Instance.StartValidateEmitionEventPrevAsync(data);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALIDATEEMITIONEVENTPLGNS-{DateTime.UtcNow:yyyyMMdd}-Evento {eventCode}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATEEMITIONEVENTPLGNS-{DateTime.UtcNow:yyyyMMdd}-Evento {data.EventCode}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
