@@ -1498,6 +1498,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             switch (data.EventCode)
             {
                 case "030":
+                //Validación de la Sección Signature - Fecha mayor o igual al endoso referenciado TASK 727
+                case "040":
                     responses.Add(Convert.ToDateTime(data.SigningTime) >= Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
