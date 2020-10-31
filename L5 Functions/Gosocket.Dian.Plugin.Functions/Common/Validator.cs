@@ -552,32 +552,45 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-                    }else  if (party.CustomizationID == "363" || party.CustomizationID == "364")
-                    {
-                        //Tener encuenta la validacion puesto que se va a realizar como una funcion con el mandato
-                        if (party.SenderParty != nitModel.ProviderCode)
+                        else if (party.ReceiverParty != "800197268")
                         {
                             responses.Add(new ValidateListResponse
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = receiver2DvErrorCode,
-                                ErrorMessage = "Información del Mandatario/Representante no se encuentra registrada en RADIAN",
+                                ErrorCode = sender2DvErrorCode,
+                                ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-                    }
-                    else if (party.ReceiverParty != "800197268")
-                    {
-                        responses.Add(new ValidateListResponse
+                        else
                         {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = sender2DvErrorCode,
-                            ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        //}else  if (party.CustomizationID == "363" || party.CustomizationID == "364")
+                        //{
+                        //    //Tener encuenta la validacion puesto que se va a realizar como una funcion con el mandato
+                        //    if (party.SenderParty != nitModel.ProviderCode)
+                        //    {
+                        //        responses.Add(new ValidateListResponse
+                        //        {
+                        //            IsValid = false,
+                        //            Mandatory = true,
+                        //            ErrorCode = receiver2DvErrorCode,
+                        //            ErrorMessage = "Información del Mandatario/Representante no se encuentra registrada en RADIAN",
+                        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        //        });
+                        //    }
+                        //}
                     }
+
                     return responses;
                 case 37:
                 case 38:
