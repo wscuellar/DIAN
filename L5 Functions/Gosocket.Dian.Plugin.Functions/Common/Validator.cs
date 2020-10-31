@@ -1485,6 +1485,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             switch (data.EventCode)
             {
                 case "030":
+                case "036":
                     responses.Add(Convert.ToDateTime(data.SigningTime) >= Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
@@ -1500,7 +1501,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             Mandatory = true,
                             ErrorCode = "89",
                             ErrorMessage =
-                                "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE",
+                                "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE/CUDE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;

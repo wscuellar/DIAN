@@ -89,20 +89,43 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case "044":
                     code = "043";
                     break;
+                case "036":
+                    code = "033";
+                    break;
                 default:
                     code = "032";
                     break;
             }
 
-            if (data.EventCode == "031" || data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044")
+            if (data.EventCode == "031" || data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044" || data.EventCode == "036")
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
                 if (documentMeta != null)
                 {
                     data.TrackId = documentMeta.PartitionKey;
                 }
+                // Validación de la Sección Signature - Fechas valida transmisión evento TASK 714
+                else if (data.EventCode == "036")
+                {
+                    code = "034";
+                    documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
+                    if (documentMeta != null)
+                    {
+                        data.TrackId = documentMeta.PartitionKey;
+                    }
+                    else
+                    {
+                        ValidateListResponse response = new ValidateListResponse();
+                        response.ErrorMessage = $"No se encuentran registros de Eventos de Aceptación Expresa - Tácita  prerrequisito para esta transmisión de Disponibilizacion";
+                        response.IsValid = false;
+                        response.ErrorCode = "89";
+                        response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                        validateResponses.Add(response);
+                        return validateResponses;
+                    }
+                }
                 //Solo si es eventcode AR Aceptacion Expresa - Tácita
-                else if(data.EventCode != "031")
+                else if (data.EventCode != "031")
                 {
                     ValidateListResponse response = new ValidateListResponse();
                     response.ErrorMessage = $"No se encontró documento electrónico para el CUDE/CUFE {data.TrackId}";
