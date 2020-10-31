@@ -618,6 +618,60 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                         return responses;
+                // Validación de la Sección SenderParty / ReceiverParty TASK 791
+                case 44:
+                    if (party.CustomizationID == "441")
+                    {
+                        if (party.SenderParty != senderCode)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = receiver2DvErrorCode,
+                                ErrorMessage = "Emisor/Facturador Electrónico no coincide con la información de la factura  referenciada",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        else if (party.ReceiverParty != "800197268")
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = sender2DvErrorCode,
+                                ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    //else if(party.CustomizationID == "442")
+                    //{
+                    //    //Tener encuenta la validacion puesto que se va a realizar como una funcion con el mandato
+                    //    if (party.SenderParty != nitModel.ProviderCode)
+                    //    {
+                    //        responses.Add(new ValidateListResponse
+                    //        {
+                    //            IsValid = false,
+                    //            Mandatory = true,
+                    //            ErrorCode = receiver2DvErrorCode,
+                    //            ErrorMessage = "Información del Mandatario/Representante no se encuentra registrada en RADIAN",
+                    //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //        });
+                    //    }
+                    //}
+                    return responses;
             }
 
             foreach (var r in responses)
