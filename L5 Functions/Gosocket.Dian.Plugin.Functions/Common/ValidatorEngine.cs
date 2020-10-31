@@ -10,7 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
-
+using Gosocket.Dian.Plugin.Functions.Event;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -69,10 +69,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
-        public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(string trackId, string eventCode, string documentTypeId)
+        public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(ValidateEmitionEventPrev.RequestObject eventPrev)
         {
             var validator = new Validator();
-            return validator.ValidateEmitionEventPrev(trackId, eventCode,documentTypeId);
+            return validator.ValidateEmitionEventPrev(eventPrev);
         }
         public List<ValidateListResponse> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
         {
