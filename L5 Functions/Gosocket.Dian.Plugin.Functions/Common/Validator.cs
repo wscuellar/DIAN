@@ -619,6 +619,43 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                         return responses;
                 // Validación de la Sección SenderParty / ReceiverParty TASK 791
+                case 40:
+                    if (party.SenderParty != senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = receiver2DvErrorCode,
+                            ErrorMessage = "El Endosante no coincide con el titular del evento",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+
+                    }
+                    else if (party.ReceiverParty != receiverCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = sender2DvErrorCode,
+                            ErrorMessage = "El Destinatario no coincide con el Endosatario",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    return responses;
+                // Validación de la Sección SenderParty / ReceiverParty TASK 791
                 case 44:
                     if (party.CustomizationID == "441")
                     {
