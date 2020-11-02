@@ -24,3 +24,36 @@
     });
 
 }));
+
+function showConfirmation(confirmMessage, buttons) {
+    bootbox.dialog({
+        title: "Advertencia",
+        message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
+        buttons: buttons
+    });
+}
+
+function ConfirmExec(operation) {
+    return {
+        del: {
+            label: "Aceptar",
+            className: "btn-gosocket",
+            callback: function () {
+                operation();
+            }
+        },
+        del1: {
+            label: "Cancelar",
+            className: "btn-gosocket",
+        }
+    }
+}
+
+function AlertExec() {
+    return {
+        del: {
+            label: "Aceptar",
+            className: "btn-gosocket",
+        }
+    }
+}

@@ -128,12 +128,6 @@ namespace Gosocket.Dian.Domain.Common
         Provider = 2,
         [Description("Proveedor autorizado")]
         AuthorizedProvider = 3,
-        [Description("Proveedor Tecnológico")]
-        ProviderTech=4,
-        [Description("Sistema de Negociación")]
-        BussinesSystem=5,
-        [Description("Factor")]
-        Factor=6
     }
 
     public enum DocumentType
@@ -320,4 +314,36 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Registro cancelado")]
         Cancelled = 12310324,
     }
+
+
+    public enum RadianContributorType
+    {
+        [Description("Cero")]
+        Zero = 0,
+        [Description("Facturador Electronico")]
+        ElectronicInvoice = 1,
+        [Description("Proveedor Tecnologico")]
+        TechnologyProvider = 2,
+        [Description("Sistema de Negociacion")]
+        TradingSystem = 3,
+        [Description("Factor")]
+        Factor = 3,
+    }
+
+    public enum RadianOperationMode
+    {
+        [Description("Operación Directa")]
+        Direct = 1,
+        [Description("Operación Indirecta")]
+        Indirect = 2,
+    }
+
+    public enum RadianState
+    {
+        [Description("Registrado")]
+        Registered = 1,
+        [Description("Cancelado")]
+        Cancel = 2,
+    }
+
 }

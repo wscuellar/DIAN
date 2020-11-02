@@ -4,7 +4,8 @@
 @{
     ViewBag.Title = "Modo de operación";
 }
-@Html.Hidden("RedirectToEnablingInvoiceDirect", Url.Action("EnablingInvoiceDirect", "Radian"));
+@Html.Hidden("RedirectToEnablingInvoiceDirect", Url.Action("Index", "RadianEnablingInvoiceDirect"));
+@Html.Hidden("RedirectToEnablingInvoiceIndirect", Url.Action("Index", "RadianEnablingInvoiceIndirect"));
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 
 
@@ -26,7 +27,7 @@
     <div class="row">
 
         <div class="col-xs-6 col-md-6 d-flex container">
-            <div class="card RadianCardContainer">
+            <div id="direct" class="card RadianCardContainer">
                 <img class="RadianimgSvg" src="~/Content/images/Svg/OperacionDirecta.svg" />
                 <div class="card-body">
                     <p class="RadianTittleCard">Operación Directa</p>
@@ -38,13 +39,14 @@
             </div>
         </div>
         <div class="col-xs-6 col-md-6">
-            <div class="card RadianCardContainer">
+            <div id="indirect" class="card RadianCardContainer">
                 <img class="RadianimgSvg" src="~/Content/images/Svg/OperacionIndirecta.svg" />
                 <div class="card-body">
                     <p class="RadianTittleCard">Operación Indirecta</p>
                     <p class="RadianTittleCard2">A través de un aliado</p>
                 </div>
                 <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?" />
+                <input type="hidden" class="ConfirmUserExisting" value="El participante ya se encuentra registrado en RADIAN." />
             </div>
         </div>
 
@@ -59,61 +61,44 @@
 
     <script>
 
-        function showConfirmation(confirmMessage, buttons) {
-            bootbox.dialog({
-                title: "Advertencia",
-                message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
-                buttons: buttons
-            });
-        }
-
-        function ConfirmExec(operation) {
-            return {
-                del: {
-                    label: "Aceptar",
-                    className: "btn-gosocket",
-                    callback: function () {
-                        operation();
-                    }
-                },
-                del1: {
-                    label: "Cancelar",
-                    className: "btn-gosocket",
-                }
-            }
-        }
-
-        function AlertExec() {
-            return {
-                del: {
-                    label: "Aceptar",
-                    className: "btn-gosocket",
-                }
-            }
-        }
-
+        var withSoft = '@ViewBag.WithSoft';
+        var existInRadian = '@ViewBag.ExistInRadian';
+        var contributorId = '@ViewBag.ContributorId';
 
         $('.RadianCardContainer').click(function () {
-            var withSoft = '@ViewBag.WithSoft';
-            var existInRadian = '@ViewBag.ExistInRadian';
-            var findLabel = GetLabelMessage(withSoft,existInRadian);
+            var direct = $(this).attr('id') == "direct";
+            var findLabel = direct ? GetDirectLabelMessage(withSoft, existInRadian) : GetIndirectLabelMessage(existInRadian);
             var message = $(this).children(findLabel).val()
             if (message != undefined) {
-                var buttons = (withSoft == "True" && existInRadian == 'False') ? ConfirmExec(EnablingInvoiceDirect) : AlertExec();
+                var buttons = {};
+                if (direct) {
+                    buttons = (withSoft == "True" && existInRadian == 'False') ? ConfirmExec(EnablingInvoiceDirect) : AlertExec();
+                }
+                else {
+                    buttons = (existInRadian == 'False') ? ConfirmExec(EnablingInvoiceIndirect) : AlertExec();
+                }
                 showConfirmation(message, buttons);
             }
         });
 
-        function GetLabelMessage(withSoft, existInRadian) {
+        function GetDirectLabelMessage(withSoft, existInRadian) {
             return (withSoft == "True" && existInRadian == 'False') ? ".ConfirmMessage" :  (existInRadian == 'False') ? ".ConfirmReject" : ".ConfirmUserExisting";
         }
 
+        function GetIndirectLabelMessage(existInRadian) {
+            return (existInRadian == 'False') ? ".ConfirmMessage" : ".ConfirmUserExisting";
+        }
+
     function EnablingInvoiceDirect() {
-        var contributorId = '@ViewBag.ContributorId';
         var url = $("#RedirectToEnablingInvoiceDirect").val() + "?ContributorId=" + contributorId;
         window.location.href = url;
     }
 
+    function EnablingInvoiceIndirect() {
+        var contributorId = '@ViewBag.ContributorId';
+        var url = $("#RedirectToEnablingInvoiceIndirect").val() + "?ContributorId=" + contributorId;
+        window.location.href = url;
+    }
 
     </script>
 }
