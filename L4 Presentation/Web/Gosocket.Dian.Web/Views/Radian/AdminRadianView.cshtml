@@ -32,6 +32,27 @@
                                                         @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
                                                     </div>
                                                 </div>
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.DateInterval, new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.DateInterval, defaultHtmlAttr)
+                                                        @Html.ValidationMessageFor(m => m.DateInterval, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.Type, new { @class = "control-label" })
+                                                        @Html.DropDownList("Tipo Participante", Model.RadianType, "", defaultHtmlAttr)
+                                                        @Html.ValidationMessageFor(m => m.Type, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.State, new { @class = "control-label" })
+                                                        @Html.DropDownList("Estado", Model.RadianType, "", defaultHtmlAttr)
+                                                        @Html.ValidationMessageFor(m => m.State, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
