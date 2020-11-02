@@ -820,18 +820,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var validateEventCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             // Valida fechas y dia habil SigningTime
-            if (eventCode == "033" || eventCode == "034" || eventCode == "030" || eventCode == "031" || eventCode == "044")
+        
+            var validationAcceptanceTacitaExpresa = ValidationSigningTime(trackId, eventCode, signingTime, docTypeCode, customizationID);
+            if (!validationAcceptanceTacitaExpresa.IsValid)
             {
-                var validationAcceptanceTacitaExpresa = ValidationSigningTime(trackId, eventCode, signingTime, docTypeCode, customizationID);
-                if (!validationAcceptanceTacitaExpresa.IsValid)
-                {
-                    dianResponse = validationAcceptanceTacitaExpresa;
-                    dianResponse.XmlDocumentKey = trackIdCude;
-                    dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                    dianResponse.IsValid = false;
-                    return dianResponse;
-                }
+                dianResponse = validationAcceptanceTacitaExpresa;
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
+                return dianResponse;
             }
+        
             var validateSinginTime = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSigningTime) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
 
