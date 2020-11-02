@@ -315,13 +315,17 @@
     <Compile Include="Common\StringExtensions.cs" />
     <Compile Include="Controllers\AccountTwoFactorController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BckdrController.cs" />
     <Compile Include="Controllers\BigContributorController.cs" />
     <Compile Include="Controllers\ContributorCategoryController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
     <Compile Include="Controllers\ContributorFileTypeController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\RadianController.cs" />
+    <Compile Include="Controllers\RadianEnablingInvoiceDirectController.cs" />
+    <Compile Include="Controllers\RadianEnablingInvoiceIndirectController.cs" />
     <Compile Include="Controllers\RadianTestSetController.cs" />
     <Compile Include="Controllers\RadiantContributorFileTypeController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
@@ -420,6 +424,7 @@
     <Content Include="Content\css\login.css" />
     <Content Include="Content\css\nifty.css" />
     <Content Include="Content\css\nifty.min.css" />
+    <Content Include="Content\css\Radian\RadianIndex.css" />
     <Content Include="Content\css\themes\type-a\theme-coffee.css" />
     <Content Include="Content\css\themes\type-a\theme-coffee.min.css" />
     <Content Include="Content\css\themes\type-a\theme-dark.css" />
@@ -631,6 +636,7 @@
     <Content Include="Content\js\nifty.js" />
     <Content Include="Content\js\nifty.js cambios.txt" />
     <Content Include="Content\js\nifty.min.js" />
+    <Content Include="Content\js\Radian\RadianIndex.js" />
     <Content Include="Content\js\user\user.js" />
     <Content Include="Content\plugins\animate-css\animate.css" />
     <Content Include="Content\plugins\animate-css\animate.min.css" />
@@ -2685,6 +2691,9 @@
     <Content Include="Views\RadianTestSet\_items.cshtml" />
     <Content Include="Views\Radian\AdminRadianView.cshtml" />
     <Content Include="Views\Radian\_Items.cshtml" />
+    <Content Include="Views\Radian\List.cshtml" />
+    <Content Include="Views\RadianEnablingInvoiceDirect\Index.cshtml" />
+    <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
