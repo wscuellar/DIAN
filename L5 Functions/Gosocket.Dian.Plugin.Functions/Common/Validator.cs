@@ -224,7 +224,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 fakeData = $"{cufeModel.SerieAndNumber}---{cufeModel.EmissionDate}---{cufeModel.HourEmission}---{cufeModel.SenderCode}---{cufeModel.ReceiverCode}---{cufeModel.ResponseCode}---{cufeModel.ReferenceId}---{cufeModel.ReferenceTypeCode}---{key}";
 
-                data = $"{cufeModel.SerieAndNumber}{cufeModel.EmissionDate}{cufeModel.HourEmission}{cufeModel.SenderCode}{cufeModel.ReceiverCode}{cufeModel.ResponseCode}{cufeModel.ReferenceId}{cufeModel.ReferenceTypeCode}{key}";
+                if(cufeModel.ResponseCode == "038")
+                {
+                    //Endoso en garantia en blanco
+                    data = $"{cufeModel.SerieAndNumber}{cufeModel.EmissionDate}{cufeModel.HourEmission}{cufeModel.ReceiverCode}{cufeModel.ResponseCode}{cufeModel.ResponseCodeListID}{cufeModel.ReferenceId}{cufeModel.ReferenceTypeCode}{key}";
+                }
+                else
+                {
+                    data = $"{cufeModel.SerieAndNumber}{cufeModel.EmissionDate}{cufeModel.HourEmission}{cufeModel.SenderCode}{cufeModel.ReceiverCode}{cufeModel.ResponseCode}{cufeModel.ReferenceId}{cufeModel.ReferenceTypeCode}{key}";
+                }  
                 documentKey = cufeModel.Cude;
             }
 
@@ -1203,7 +1211,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "100",
+                    ErrorCode = "89",
                     ErrorMessage = "CUFE no se encuentra registrado en el sistema DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1217,7 +1225,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "100",
+                    ErrorCode = "89",
                     ErrorMessage = "ID no se encuentra registrado en el sistema DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
