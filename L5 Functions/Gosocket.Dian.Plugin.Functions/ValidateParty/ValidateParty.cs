@@ -33,14 +33,19 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
             if (string.IsNullOrEmpty(data.TrackId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
 
-            if (string.IsNullOrEmpty(data.SenderParty))
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a SenderParty in the request body");
+            if (string.IsNullOrEmpty(data.ResponseCode))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ResponseCode in the request body");
+
+            //Valida eventos diferentes a Endoso en Garantia en blanco, dado que evento no informa el emisor documento AR
+            if(data.ResponseCode != "038")
+            {               
+                if (string.IsNullOrEmpty(data.SenderParty))
+                    return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a SenderParty in the request body");
+
+            }
 
             if (string.IsNullOrEmpty(data.ReceiverParty))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ReceiverParty in the request body");
-
-            if (string.IsNullOrEmpty(data.ResponseCode))
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ResponseCode in the request body");
 
             if (string.IsNullOrEmpty(data.CustomizationID))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a CustomizationID in the request body");

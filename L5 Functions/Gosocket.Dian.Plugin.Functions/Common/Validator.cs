@@ -511,6 +511,45 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     return responses;
                 case 34:
+                case 38: //Endoso en Garantia
+                    if (!string.IsNullOrEmpty(party.SenderParty.Trim())) // No informa SenderParty es un endoso en blanco entonces no valida emisor documento
+                    {
+                        if (party.SenderParty != senderCode)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = receiver2DvErrorCode,
+                                ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty referenciado correctamente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    return responses;
                 case 43:
                     if (party.SenderParty != senderCode)
                     {             
@@ -601,8 +640,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                     return responses;
-                case 37:
-                case 38:
+                case 37:  
                 case 39:
                 case 41:
                     if (party.CustomizationID == "361" || party.CustomizationID == "362")
