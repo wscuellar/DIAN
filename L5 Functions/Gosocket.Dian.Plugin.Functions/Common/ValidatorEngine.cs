@@ -71,6 +71,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(ValidateEmitionEventPrev.RequestObject eventPrev)
         {
+            //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
+            if (eventPrev.EventCode == "040")
+            {
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
+                if (documentMeta != null)
+                {
+                    //Obtiene el CUFE
+                    eventPrev.TrackId = documentMeta.DocumentReferencedKey;
+                }
+            }            
+
             var validator = new Validator();
             return validator.ValidateEmitionEventPrev(eventPrev);
         }
