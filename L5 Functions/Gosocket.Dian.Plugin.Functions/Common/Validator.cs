@@ -28,6 +28,7 @@ using Gosocket.Dian.Plugin.Functions.ValidateParty;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.Event;
+using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -1580,6 +1581,71 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #endregion
 
+        # region Validación de la Sección prerrequisitos Solicitud Disponibilizacion
+        public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, EventApproveCufeObjectParty data)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            GlobalDocValidatorDocument document = null;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId);
+
+            //Validación de la Sección prerrequisitos Solicitud Disponibilizacion Task 719
+            foreach (var documentIdentifier in documentMeta)
+            {
+                document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier);
+                if (document != null)
+                {
+                    if (documentMeta.Where(t => t.EventCode == "030" || t.EventCode == "032" || t.EventCode == "033" && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "Factura no cuenta con características para considerarse título valor",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else if (documentMeta.Where(t => t.EventCode == "030" || t.EventCode == "032" || t.EventCode == "034" && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "202",
+                            ErrorMessage = "Factura no cuenta con características para considerarse título valor",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                }
+                else
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = "Evento referenciado correctamente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+                return responses;
+        }
+        #endregion
+
         public List<ValidateListResponse> ValidateSigningTime(ValidateSigningTime.RequestObject data, XmlParser dataModel)
         {
             DateTime startDate = DateTime.UtcNow;
@@ -1800,8 +1866,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return responses;
         }
-
-
 
         #region validation for CBC ID
         public List<ValidateListResponse> ValidateSerieAndNumber(string trackId, string number, string documentTypeId)

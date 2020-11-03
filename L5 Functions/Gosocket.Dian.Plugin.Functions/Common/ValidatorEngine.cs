@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.Event;
+using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -199,6 +200,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateParty(nitModel, party));
+
+            return validateResponses;
+        }
+
+        public async Task<List<ValidateListResponse>> StartEventApproveCufe(EventApproveCufeObjectParty eventApproveCufe)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(eventApproveCufe.TrackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+
+            if(xmlParser.PaymentMeansID != "2")
+            {
+                ValidateListResponse response = new ValidateListResponse();
+                response.ErrorMessage = $"Tipo factura diferente a Credito.";
+                response.IsValid = false;
+                response.ErrorCode = "89";
+                response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                validateResponses.Add(response);
+                return validateResponses;
+            }
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.EventApproveCufe(nitModel, eventApproveCufe));
 
             return validateResponses;
         }
