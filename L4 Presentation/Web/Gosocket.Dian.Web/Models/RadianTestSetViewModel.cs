@@ -120,7 +120,7 @@ namespace Gosocket.Dian.Web.Models
 
         [Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Notificación pago parcial o total")]
-        public int PaymnetNotificationTotalAcceptedRequired { get; set; }
+        public int PaymentNotificationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Limitación de circulación")]

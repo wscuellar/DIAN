@@ -2682,6 +2682,9 @@
     <Content Include="Views\Radian\ElectronicInvoiceView.cshtml" />
     <Content Include="Views\RadianTestSet\Index.cshtml" />
     <Content Include="Views\RadianTestSet\_items.cshtml" />
+    <Content Include="Views\RadianTestSet\Add.cshtml" />
+    <Content Include="Views\RadianTestSet\_form.cshtml" />
+    <Content Include="Views\RadianTestSet\_default.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

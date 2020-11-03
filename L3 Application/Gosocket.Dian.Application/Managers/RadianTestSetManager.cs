@@ -38,16 +38,15 @@ namespace Gosocket.Dian.Application.Managers
 
                 return testSets;
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                //TODO: Crear o ubicar la clase que guarda logs de errores ¿Existe?
                 return new List<RadianTestSet>();
             }
         }
 
         public GlobalTestSet GetTestSet(string partitionKey, string rowKey)
         {
-            return testSetManager.Find<GlobalTestSet>(partitionKey, rowKey);
+            return testSetManager.Find<RadianTestSet>(partitionKey, rowKey);
         }
 
         //public IEnumerable<GlobalTestSetTracking> GetAllTestSetTracking(string partitionKey)
