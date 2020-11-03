@@ -326,8 +326,11 @@
     <Compile Include="Controllers\RadianController.cs" />
     <Compile Include="Controllers\RadianEnablingInvoiceDirectController.cs" />
     <Compile Include="Controllers\RadianEnablingInvoiceIndirectController.cs" />
+    <Compile Include="Controllers\RadianFactorController.cs" />
+    <Compile Include="Controllers\RadianTechnologyProviderController.cs" />
     <Compile Include="Controllers\RadianTestSetController.cs" />
     <Compile Include="Controllers\RadiantContributorFileTypeController.cs" />
+    <Compile Include="Controllers\RadianTradingSystemController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\SupportController.cs" />
     <Compile Include="Controllers\TestSetController.cs" />
@@ -2694,6 +2697,9 @@
     <Content Include="Views\Radian\List.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceDirect\Index.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
+    <Content Include="Views\RadianTradingSystem\Index.cshtml" />
+    <Content Include="Views\RadianFactor\Index.cshtml" />
+    <Content Include="Views\RadianTechnologyProvider\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
