@@ -1225,7 +1225,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "89",
+                    ErrorCode = "AAH07",
                     ErrorMessage = "CUFE/CUDE no se encuentra registrado en el sistema DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1239,7 +1239,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "89",
+                    ErrorCode = "AAH06",
                     ErrorMessage = "ID no se encuentra registrado en el sistema DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
