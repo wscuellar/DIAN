@@ -30,9 +30,13 @@ namespace Gosocket.Dian.Application
         /// <param name="length"></param>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public List<RadianContributor> GetRadianContributor(int page, int length,Expression<Func<RadianContributor, bool>> expression)
+        public List<RadianContributor> GetRadianContributor(Expression<Func<RadianContributor, bool>> expression, int page=0, int length=0)
         {
             var query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode");
+            if(page > 0 && length > 0)
+            {
+                query = query.Skip(page * length).Take(length);
+            }
             return query.ToList();
         }
 

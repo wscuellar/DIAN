@@ -46,7 +46,7 @@ namespace Gosocket.Dian.Application.Managers
 
         public GlobalTestSet GetTestSet(string partitionKey, string rowKey)
         {
-            return testSetManager.Find<RadianTestSet>(partitionKey, rowKey);
+            return testSetManager.Find<GlobalTestSet>(partitionKey, rowKey);
         }
 
         //public IEnumerable<GlobalTestSetTracking> GetAllTestSetTracking(string partitionKey)

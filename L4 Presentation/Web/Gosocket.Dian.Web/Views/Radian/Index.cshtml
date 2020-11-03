@@ -1,76 +1,12 @@
-﻿
-@using Gosocket.Dian.Web.Models
-@model LoginViewModel
+﻿@using Gosocket.Dian.Web.Models
 @{
     ViewBag.Title = "Habilitar Participantes";
 }
+@Html.Hidden("RedirectToTechnologyProviderView", Url.Action("Index", "RadianTechnologyProvider"));
+@Html.Hidden("RedirectToTradingSystemView", Url.Action("Index", "RadianTradingSystem"));
+@Html.Hidden("RedirectToFactorView", Url.Action("Index", "RadianFactor"));
+<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 
-@Html.Hidden("RedirectToElectronicInvoiceView", Url.Action("ElectronicInvoiceView", "Radian"));
-
-
-<style>
-
-    .ContainerBegin {
-        margin: 25px;
-        background: #FFFFFF;
-        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
-    }
-
-    .Centered {
-        text-align: center;
-    }
-
-    .CardContainer {
-        background: #F2F6FB;
-        border-radius: 10px;
-        width: 379px;
-        height: 188px;
-        background: #F2F6FB;
-        border-radius: 10px;
-        float: none;
-        margin: 20px auto;
-    }
-
-    .TittleCard {
-        font-family: Arial;
-        font-style: normal;
-        font-weight: bold;
-        font-size: 22px;
-        align-items: center;
-        text-align: center;
-        color: #2C323C;
-    }
-
-    .TittleCard2 {
-        /* Registro de Facturas Electrónicas */
-        font-family: Arial;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 12px;
-        line-height: 22px;
-        align-items: center;
-        text-align: center;
-        color: #2C323C;
-    }
-
-    .TextSelected {
-        /* Seleccione el tipo de participante: */
-        width: 292px;
-        height: 21px;
-        font-family: Arial;
-        font-style: normal;
-        font-weight: bold;
-        font-size: 18px;
-        line-height: 21px;
-        /* identical to box height */
-        color: #2C323C;
-        /*margin: 20px 0px 0px 5px;*/
-    }
-
-    .imgSvg {
-        margin: 0 148px;
-    }
-</style>
 
 <div style="text-align:left; margin-left:25px; ">
     <p style=" width: 174px; height: 34px; font-family: Arial; font-style: normal; font-weight: normal; font-size: 30px; line-height: 34px; color: #000000; ">
@@ -81,55 +17,68 @@
     </svg>
 </div>
 
-<div class="container ContainerBegin">
-    <p class="TextSelected">Seleccione el tipo de participante:</p>
+<div class="container RadianContainerBegin">
+    <p class="RadianTextSelected">Seleccione el tipo de participante:</p>
+    <svg width="1110" height="2" viewBox="0 0 1110 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 1C0 0.447715 0.447715 0 1 0H1109C1109.55 0 1110 0.447715 1110 1C1110 1.55228 1109.55 2 1109 2H1.00003C0.447741 2 0 1.55228 0 1Z" fill="#E9E8E8" />
+    </svg>
+
     <div class="row">
-        
+
         <div class="col-xs-6 col-md-6 d-flex container">
             <a href="@Url.Action("ElectronicInvoiceView", "Radian")">
-                <div class="card CardContainer">
-                    <img class="imgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
+                <div class="card RadianCardContainer"  id="1">
+                    <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
                     <div class="card-body">
-                        <h3 class="TittleCard">Facturador Electrónico</h3>
-                        <h4 class="TittleCard2">Registro de Facturas Electrónicas</h4>
+                        <p class="RadianTittleCard">Facturador Electrónico</p>
+                        <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
                     </div>
                 </div>
             </a>
-        </div>    
-        
-        
+        </div>
+
+
         <div class="col-xs-6 col-md-6">
-            <div class="card CardContainer">
-                <img class="imgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
+            <div class="card RadianCardContainer" action="RedirectToTechnologyProviderView" id="2">
+                <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
                 <div class="card-body">
-                    <h3 class="TittleCard">Proveedor Tecnológico</h3>
-                    <p class="TittleCard2">Registro de Facturas Electrónicas</p>
+                    <p class="RadianTittleCard">Proveedor Tecnológico</p>
+                    <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
                 </div>
                 <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar la trasmisión de eventos al RADIAN como Proveedor Tecnológico?" />
+                <input type="hidden" class="ConfirmReject" value="El participante no es un proveedor tecnológico habilitado." />
+                <input type="hidden" class="ConfirmRejectSoft" value="El participante no cuenta con un software propio activo en el sistema." />
+                <input type="hidden" class="ConfirmRejectUser" value="El participante ya se encuentra registrado en RADIAN como Proveedor Tecnologico." />
             </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-xs-6 col-md-6">
-            <div class="card CardContainer">
-                <img class="imgSvg" src="~/Content/images/Svg/SistemaNegociacion.svg" />
+            <div class="card RadianCardContainer" action="RedirectToTradingSystemView" id="3">
+                <img class="RadianimgSvg" src="~/Content/images/Svg/SistemaNegociacion.svg" />
                 <div class="card-body">
-                    <h3 class="TittleCard">Sistema de negociación</h3>
-                    <p class="TittleCard2">Registro de Facturas Electrónicas</p>
+                    <p class="RadianTittleCard">Sistema de negociación</p>
+                    <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
                 </div>
                 <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea operar como Sistema de Negociación?" />
+                <input type="hidden" class="ConfirmReject" value="El participante no esta habilitado." />
+                <input type="hidden" class="ConfirmRejectSoft" value="El participante no cuenta con un software propio activo en el sistema." />
+                <input type="hidden" class="ConfirmRejectUser" value="El participante ya se encuentra registrado en RADIAN como Sistema de Negociación Electrónica." />
             </div>
         </div>
 
         <div class="col-xs-6 col-md-6">
-            <div class="card CardContainer">
-                <img class="imgSvg" src="~/Content/images/Svg/Factor.svg" />
+            <div class="card RadianCardContainer" action="RedirectToFactorView" id="4">
+                <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
                 <div class="card-body">
-                    <h3 class="TittleCard">Factor</h3>
-                    <p class="TittleCard2">Registro de Facturas Electrónicas</p>
+                    <p class="RadianTittleCard">Factor</p>
+                    <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
                 </div>
-                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea operar como Factor?"/>
+                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea operar como Factor?" />
+                <input type="hidden" class="ConfirmReject" value="El participante no esta habilitado." />
+                <input type="hidden" class="ConfirmRejectSoft" value="El participante no cuenta con un software propio activo en el sistema." />
+                <input type="hidden" class="ConfirmRejectUser" value="El participante ya se encuentra registrado en RADIAN como Factor." />
             </div>
         </div>
 
@@ -140,45 +89,74 @@
 @section scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
     <script>
 
-        $('.CardContainer').click(function () {
-            var message = $(this).children(".ConfirmMessage").val();
-            if (message != undefined) {
-                showConfirmation(message);
-            }
+        var redirecTo = "";
+        var withSoft = '@ViewBag.WithSoft';
+        var existInRadian = '@ViewBag.ExistInRadian';
+        var contributorId = '@ViewBag.ContributorId';
+
+        $('.RadianCardContainer').click(function () {
+            var index = $(this).attr('id');
+            if (index > 1) {
+                redirecTo = $(this).attr('action');
+                var findLabel = Validation(redirecTo, index);
+                var message = $(this).children(findLabel).val()
+                if (message != undefined) {
+                    var buttons = findLabel == ".ConfirmMessage" ? ConfirmExec(redirect) : AlertExec();
+                    showConfirmation(message, buttons);
+                }
+            }            
         });
 
-        function showConfirmation(confirmMessage) {
-            bootbox.dialog({
-                title: "Advertencia",
-                message: "<div class='media'><div class='media-body'>" +
-                    "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
-                buttons: {
-                    del: {
-                        label: "Aceptar",
-                        className: "btn-gosocket",
-                        callback: function () {
-                            var url = $("#RedirectToElectronicInvoiceView").val();
-                            window.location.href = url;
-                        }
-                    },
-                }
-            });
+        function redirect() {
+            var url = $("#" + redirecTo).val() + "?ContributorId=" + contributorId;
+            window.location.href = url;
         }
 
-        function setProductionDate() {
-            //showLoading('#page-content', 'Actualizando', 'Procesando datos, por favor espere.');
-            $.ajax({
-            url: "@Url.Action("ElectronicInvoiceView", "Radian")",
-            method: "GET",
-                success: function (data) {
-                    alert("Gracias");
-                    //window.location.href = "/radian/ElectronicInvoiceView";
-                }
-            });
-       }
+        function Validation(redirectTo, index) {
+            var isActive = '@ViewBag.Active' == "True";
+            switch (redirecTo) {
+                case "RedirectToTechnologyProviderView":
+                    var isTecnologicProvider = '@ViewBag.ContributorTypeId' == "2";
+                    if (isTecnologicProvider && isActive && withSoft == "True" && !existInRadian.includes(index)) {
+                        return ".ConfirmMessage";
+                    }
+                    else {
+                        if (!isTecnologicProvider || !isActive) {
+                            return ".ConfirmReject";
+                        }
+                        if (withSoft == "False") {
+                            return ".ConfirmRejectSoft";
+                        }
+                        if (existInRadian.includes(index)) {
+                            return ".ConfirmRejectUser";
+                        }
+                    }
+                    break;
+                case "RedirectToTradingSystemView":
+                case "RedirectToFactorView":
+                    if (isActive && withSoft == "True" && !existInRadian.includes(index)) {
+                        return ".ConfirmMessage";
+                    }
+                    else {
+                        if (!isActive) {
+                            return ".ConfirmReject";
+                        }
+                        if (withSoft == "False") {
+                            return ".ConfirmRejectSoft";
+                        }
+                        if (existInRadian.includes(index)) {
+                            return ".ConfirmRejectUser";
+                        }
+                    }
+                    break;
+            }
+        }
+
 
     </script>
+
 }

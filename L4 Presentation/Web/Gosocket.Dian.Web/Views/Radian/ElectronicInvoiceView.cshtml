@@ -4,71 +4,10 @@
 @{
     ViewBag.Title = "Modo de operación";
 }
+@Html.Hidden("RedirectToEnablingInvoiceDirect", Url.Action("Index", "RadianEnablingInvoiceDirect"));
+@Html.Hidden("RedirectToEnablingInvoiceIndirect", Url.Action("Index", "RadianEnablingInvoiceIndirect"));
+<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 
-
-
-<style>
-
-    .ContainerBegin {
-        margin: 25px;
-        background: #FFFFFF;
-        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
-    }
-
-    .Centered {
-        text-align: center;
-    }
-
-    .CardContainer {
-        background: #F2F6FB;
-        border-radius: 10px;
-        width: 379px;
-        height: 188px;
-        background: #F2F6FB;
-        border-radius: 10px;
-        float: none;
-        margin: 20px auto;
-    }
-
-    .TittleCard {
-        font-family: Arial;
-        font-style: normal;
-        font-weight: bold;
-        font-size: 22px;
-        align-items: center;
-        text-align: center;
-        color: #2C323C;
-    }
-
-    .TittleCard2 {
-        /* Registro de Facturas Electrónicas */
-        font-family: Arial;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 12px;
-        line-height: 22px;
-        align-items: center;
-        text-align: center;
-        color: #2C323C;
-    }
-
-    .TextSelected {
-        /* Seleccione el tipo de participante: */
-        height: 21px;
-        font-family: Arial;
-        font-style: normal;
-        font-weight: bold;
-        font-size: 18px;
-        line-height: 21px;
-        /* identical to box height */
-        color: #2C323C;
-        /*margin: 20px 0px 0px 5px;*/
-    }
-
-    .imgSvg {
-        margin: 0 148px;
-    }
-</style>
 
 <div style="text-align:left; margin-left:25px; ">
     <p style="height: 34px; font-family: Arial; font-style: normal; font-weight: normal; font-size: 30px; line-height: 34px; color: #000000; ">
@@ -79,32 +18,38 @@
     </svg>
 </div>
 
-<div class="container ContainerBegin">
-    <p class="TextSelected">Seleccione el modo de opreción en el Registro de Facturas Electronicas :</p>
+<div class="container RadianContainerBegin">
+
+    <p class="RadianTextSelected">Seleccione el modo de opreción en el Registro de Facturas Electronicas :</p>
+    <svg width="1110" height="2" viewBox="0 0 1110 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 1C0 0.447715 0.447715 0 1 0H1109C1109.55 0 1110 0.447715 1110 1C1110 1.55228 1109.55 2 1109 2H1.00003C0.447741 2 0 1.55228 0 1Z" fill="#E9E8E8" />
+    </svg>
     <div class="row">
 
         <div class="col-xs-6 col-md-6 d-flex container">
-            <div class="card CardContainer">
-                <img class="imgSvg" src="~/Content/images/Svg/OperacionDirecta.svg" />
+            <div id="direct" class="card RadianCardContainer">
+                <img class="RadianimgSvg" src="~/Content/images/Svg/OperacionDirecta.svg" />
                 <div class="card-body">
-                    <h3 class="TittleCard">Operación Directa</h3>
-                    <h4 class="TittleCard2">Software Propio</h4>
+                    <p class="RadianTittleCard">Operación Directa</p>
+                    <p class="RadianTittleCard2">Software Propio</p>
                 </div>
-                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar la trasmisión de eventos al RADIAN como Proveedor Tecnológico?" />
+                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar  la trasmisión de eventos en RADIAN como Facturador Electrónico?" />
+                <input type="hidden" class="ConfirmReject" value="El participante no cuenta con un software propio activo en el sistema" />
+                <input type="hidden" class="ConfirmUserExisting" value="El participante ya se encuentra registrado en RADIAN." />
             </div>
         </div>
-
-
         <div class="col-xs-6 col-md-6">
-            <div class="card CardContainer">
-                <img class="imgSvg" src="~/Content/images/Svg/OperacionIndirecta.svg" />
+            <div id="indirect" class="card RadianCardContainer">
+                <img class="RadianimgSvg" src="~/Content/images/Svg/OperacionIndirecta.svg" />
                 <div class="card-body">
-                    <h3 class="TittleCard">Operación Indirecta</h3>
-                    <p class="TittleCard2">A través de un aliado</p>
+                    <p class="RadianTittleCard">Operación Indirecta</p>
+                    <p class="RadianTittleCard2">A través de un aliado</p>
                 </div>
-                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar la trasmisión de eventos al RADIAN como Proveedor Tecnológico?" />
+                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?" />
+                <input type="hidden" class="ConfirmUserExisting" value="El participante ya se encuentra registrado en RADIAN." />
             </div>
         </div>
+
     </div>
 
 </div>
@@ -112,33 +57,48 @@
 @section scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
     <script>
 
-        $('.CardContainer').click(function () {
-            var message = $(this).children(".ConfirmMessage").val();
+        var withSoft = '@ViewBag.WithSoft';
+        var existInRadian = '@ViewBag.ExistInRadian';
+        var contributorId = '@ViewBag.ContributorId';
+
+        $('.RadianCardContainer').click(function () {
+            var direct = $(this).attr('id') == "direct";
+            var findLabel = direct ? GetDirectLabelMessage(withSoft, existInRadian) : GetIndirectLabelMessage(existInRadian);
+            var message = $(this).children(findLabel).val()
             if (message != undefined) {
-                showConfirmation(message);
+                var buttons = {};
+                if (direct) {
+                    buttons = (withSoft == "True" && !existInRadian.includes("1")) ? ConfirmExec(EnablingInvoiceDirect) : AlertExec();
+                }
+                else {
+                    buttons = (!existInRadian.includes("1")) ? ConfirmExec(EnablingInvoiceIndirect) : AlertExec();
+                }
+                showConfirmation(message, buttons);
             }
         });
 
-        function showConfirmation(confirmMessage) {
-            bootbox.dialog({
-                title: "Advertencia",
-                message: "<div class='media'><div class='media-body'>" +
-                    "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
-                buttons: {
-                    del: {
-                        label: "Aceptar",
-                        className: "btn-gosocket",
-                        callback: function () {
-                           // var url = $("#RedirectToElectronicInvoiceView").val();
-                           // window.location.href = url;
-                        }
-                    },
-                }
-            });
+        function GetDirectLabelMessage(withSoft, existInRadian) {
+            return (withSoft == "True" && !existInRadian.includes("1")) ? ".ConfirmMessage" :  (existInRadian == 'False') ? ".ConfirmReject" : ".ConfirmUserExisting";
         }
+
+        function GetIndirectLabelMessage(existInRadian) {
+            return (!existInRadian.includes("1")) ? ".ConfirmMessage" : ".ConfirmUserExisting";
+        }
+
+    function EnablingInvoiceDirect() {
+        var url = $("#RedirectToEnablingInvoiceDirect").val() + "?ContributorId=" + contributorId;
+        window.location.href = url;
+    }
+
+    function EnablingInvoiceIndirect() {
+        var contributorId = '@ViewBag.ContributorId';
+        var url = $("#RedirectToEnablingInvoiceIndirect").val() + "?ContributorId=" + contributorId;
+        window.location.href = url;
+    }
 
     </script>
 }
