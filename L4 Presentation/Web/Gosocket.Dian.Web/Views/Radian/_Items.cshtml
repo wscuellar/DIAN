@@ -20,8 +20,8 @@
                 var urlView = User.IsInAnyRole("Administrador", "Super") ? Url.Action("View", "Contributor", new { id = RadianContributor.Id }) : "";
                 <tr class='@isClickableRow' data-href="@urlView">
                     <td class="smallText iffyTip"><a>@RadianContributor.Code</a></td>
-                    <td class="largeText iffyTip"><a>@RadianContributor.TradeName</a></td>
                     <td class="largeText iffyTip"><a>@RadianContributor.BusinessName</a></td>
+                    <td class="largeText iffyTip"><a>@RadianContributor.TradeName</a></td>
                     <td class="largeText iffyTip">
                         <a><i class="fa fa-circle @textClass"></i>&nbsp;@RadianContributor.AcceptanceStatusName</a>
                     </td>

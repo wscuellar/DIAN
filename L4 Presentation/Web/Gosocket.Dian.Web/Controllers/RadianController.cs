@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using Gosocket.Dian.Web.Models;
 using System.Linq;
 
+
 namespace Gosocket.Dian.Web.Controllers
 {
     public class RadianController : Controller
@@ -49,7 +50,26 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult AdminRadianView()
         {
+            var radianContributors = radianContributorService.GetRadianContributor(1, 3, t => true );
             var model = new AdminRadianViewModel();
+            model.RadianContributors = radianContributors.Select(c => new RadianContributorsViewModel
+            {
+                Id = c.Contributor.Id,
+                Code = c.Contributor.Code,
+                TradeName = c.Contributor.Name,
+                BusinessName = c.Contributor.BusinessName,
+                AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name
+
+            }).ToList();
+
+            model.RadianType = radianContributors.Select(c => new SelectListItem
+            {
+                Value = c.Contributor.Code,
+                Text = c.Contributor.Name
+
+            }).ToList();
+
+            model.SearchFinished = true;
             return View(model);
         }
 
