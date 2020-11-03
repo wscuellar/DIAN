@@ -99,7 +99,7 @@ namespace Gosocket.Dian.Infrastructure
                 await CloudTable.ExecuteAsync(operationToInsert);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
                 return false;
             }
