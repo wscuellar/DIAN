@@ -50,7 +50,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult AdminRadianView()
         {
-            var radianContributors = radianContributorService.GetRadianContributor(1, 3, t => true );
+            var radianContributors = radianContributorService.GetRadianContributor(t => true );
             var model = new AdminRadianViewModel();
             model.RadianContributors = radianContributors.Select(c => new RadianContributorsViewModel
             {
