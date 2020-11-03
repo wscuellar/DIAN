@@ -43,4 +43,5 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string UblVersion { get; set; }
     public string ZipKey { get; set; }
     public string EventCode { get; set; }
+    public bool InTransaction { get; set; }
 }

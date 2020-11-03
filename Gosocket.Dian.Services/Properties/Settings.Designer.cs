@@ -342,10 +342,22 @@ namespace Gosocket.Dian.Services.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ValidateDocumentReferenceId")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidateDocumentReferenceIdUrl")]
         public string Param_ValidateDocumentReferenceId {
             get {
                 return ((string)(this["Param_ValidateDocumentReferenceId"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidateEventApproveCufeUrl\r\n")]
+        public string Param_EventApproveCufe {
+            get {
+                return ((string)(this["Param_EventApproveCufe"]));
+            }
+            set {
+                this["Param_EventApproveCufe"] = value;
             }
         }
     }
