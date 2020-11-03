@@ -12,8 +12,14 @@ namespace Gosocket.Dian.Web.Controllers
     {
 
 
-        ContributorService ContributorService = new ContributorService();
-        RadianContributorService radianContributorService = new RadianContributorService();
+        private readonly ContributorService ContributorService;
+        private readonly RadianContributorService radianContributorService;
+
+        public RadianController()
+        {
+            ContributorService = new ContributorService();
+            radianContributorService = new RadianContributorService();
+        }
 
 
         private void SetContributorInfo()
@@ -22,7 +28,6 @@ namespace Gosocket.Dian.Web.Controllers
             Domain.Contributor contributor = ContributorService.GetByCode(userCode);
             if (contributor != null)
             {
-
                 List<Domain.RadianContributor> radianContributor = radianContributorService.GetRadianContributor(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
                 string rcontributorTypes = radianContributor.Aggregate("", (current, next) => current + ", " + next.RadianContributorTypeId.ToString());
                 ViewBag.ContributorId = contributor.Id;
