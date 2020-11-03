@@ -546,6 +546,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region Validate Reference Attorney
+        public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
+            string IssuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:IssuerParty/cac:PowerOfAttorney/cbc:ID").ToString();
+
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            foreach (var r in responses)
+                r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+            return responses;
+        }
+        #endregion
+
         #region Number range validation
         public List<ValidateListResponse> ValidateNumberingRange(NumberRangeModel numberRangeModel, string trackId)
         {
