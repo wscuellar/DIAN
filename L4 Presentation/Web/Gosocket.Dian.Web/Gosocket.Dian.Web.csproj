@@ -2703,6 +2703,14 @@
     <Content Include="Views\RadianTestSet\Add.cshtml" />
     <Content Include="Views\RadianTestSet\_form.cshtml" />
     <Content Include="Views\RadianTestSet\_default.cshtml" />
+    <Content Include="Views\Radian\AdminRadianView.cshtml" />
+    <Content Include="Views\Radian\_Items.cshtml" />
+    <Content Include="Views\Radian\List.cshtml" />
+    <Content Include="Views\RadianEnablingInvoiceDirect\Index.cshtml" />
+    <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
+    <Content Include="Views\RadianTradingSystem\Index.cshtml" />
+    <Content Include="Views\RadianFactor\Index.cshtml" />
+    <Content Include="Views\RadianTechnologyProvider\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
