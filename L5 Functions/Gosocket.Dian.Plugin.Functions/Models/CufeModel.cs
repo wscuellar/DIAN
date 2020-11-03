@@ -20,5 +20,7 @@
         public string ReferenceId { get; set; }
         public string ReferenceTypeCode { get; set; }
         public string SoftwareId { get; set; }
+        public string ResponseCodeListID { get; set; }
+
     }
 }

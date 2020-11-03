@@ -72,6 +72,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(ValidateEmitionEventPrev.RequestObject eventPrev)
         {
+            //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
+            if (eventPrev.EventCode == "040")
+            {
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
+                if (documentMeta != null)
+                {
+                    //Obtiene el CUFE
+                    eventPrev.TrackId = documentMeta.DocumentReferencedKey;
+                }
+            }            
+
             var validator = new Validator();
             return validator.ValidateEmitionEventPrev(eventPrev);
         }
@@ -87,18 +98,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string code;
             switch (data.EventCode)
             {
-                case "044":
-                    code = "043";
+                case "032": //Constancia de recibo del bien
+                    code = "030"; // Acuse de recibo de la FEV
                     break;
-                case "036":
-                    code = "033";
+                case "044":  //Terminacion del mandato
+                    code = "043"; //Mandato
+                    break;
+                case "036": //Solicitud de Dsiponibilizacion 
+                    code = "033"; //Aceptacion Expresa
                     break;
                 default:
-                    code = "032";
+                    code = "032"; //Constancia de recibo del bien
                     break;
             }
 
-            if (data.EventCode == "031" || data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044" || data.EventCode == "036")
+            if (data.EventCode == "031" || data.EventCode == "032" || data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044" || data.EventCode == "036")
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
                 if (documentMeta != null)
@@ -108,7 +122,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 // Validación de la Sección Signature - Fechas valida transmisión evento TASK 714
                 else if (data.EventCode == "036")
                 {
-                    code = "034";
+                    code = "034"; //Aceptacion Tácita
                     documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
                     if (documentMeta != null)
                     {
