@@ -1226,8 +1226,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "AAH07",
-                    ErrorMessage = "CUFE/CUDE no se encuentra registrado en el sistema DIAN",
+                    ErrorCode = "Regla: AAH07, Rechazo: ",
+                    ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
 
@@ -1240,8 +1240,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "AAH06",
-                    ErrorMessage = "ID no se encuentra registrado en el sistema DIAN",
+                    ErrorCode = "Regla: AAH06, Rechazo: ",
+                    ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
                 return responses;
