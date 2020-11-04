@@ -392,6 +392,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="Utils\CertificateValidations.cs" />
     <Compile Include="Utils\CertificateValidator.cs" />
+    <Compile Include="Utils\RadianUtil.cs" />
     <Compile Include="Utils\DataUtils.cs" />
     <Compile Include="Utils\EmailUtil.cs" />
     <Compile Include="Utils\EventHubHandler.cs" />
@@ -2694,6 +2695,11 @@
     <Content Include="Views\Radian\List.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceDirect\Index.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
+    <Content Include="Views\Radian\ViewDetails.cshtml" />
+    <Content Include="Views\Radian\_form.cshtml" />
+    <Content Include="Views\Radian\_default.cshtml" />
+    <Content Include="Views\Radian\_testSetResults.cshtml" />
+    <Content Include="Views\Radian\_users.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

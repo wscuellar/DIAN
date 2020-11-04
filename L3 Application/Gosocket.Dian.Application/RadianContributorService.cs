@@ -30,13 +30,13 @@ namespace Gosocket.Dian.Application
         /// <param name="length"></param>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public List<RadianContributor> GetRadianContributor(Expression<Func<RadianContributor, bool>> expression, int page=0, int length=0)
+        public List<RadianContributor> GetRadianContributor(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0)
         {
             var query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode");
-            if(page > 0 && length > 0)
-            {
-                query = query.Skip(page * length).Take(length);
-            }
+            //if (page > 0 && length > 0)
+            //{
+            //    query = query.Skip(page * length).Take(length);
+            //}
             return query.ToList();
         }
 
@@ -73,11 +73,17 @@ namespace Gosocket.Dian.Application
         public void RemoveRadianContributor(RadianContributor radianContributor)
         {
             RadianContributor rc = sqlDBContext.RadianContributors.FirstOrDefault(x => x.Id == radianContributor.Id);
-            if(rc != null)
+            if (rc != null)
             {
                 sqlDBContext.RadianContributors.Remove(rc);
                 sqlDBContext.SaveChanges();
             }
+        }
+
+        public List<RadianContributorType> GetRadianContributorTypes(Expression<Func<RadianContributorType, bool>> expression)
+        {
+            var query = sqlDBContext.RadianContributorTypes.Where(expression);
+            return query.ToList();
         }
 
     }

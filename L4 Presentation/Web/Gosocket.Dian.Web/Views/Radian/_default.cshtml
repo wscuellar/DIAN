@@ -1,0 +1,132 @@
+﻿@model Gosocket.Dian.Web.Models.RadianContributorsViewModel
+
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control" }, { "readonly", "true" } };}
+<div class="row">
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Code, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Code, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.TradeName, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.TradeName, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.BusinessName, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.BusinessName, defaultHtmlAttr)
+        </div>
+    </div>
+
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Email, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.ContributorTypeName, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ContributorTypeName, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.AcceptanceStatusName, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.AcceptanceStatusName, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.CreatedDate, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.CreatedDate, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.UpdatedDate, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.UpdatedDate, defaultHtmlAttr)
+        </div>
+    </div>
+</div>
+
+<div id="row-provider" class="row padding-top-10">
+    @if (Model.ContributorFiles != null && Model.ContributorFiles.Count > 0)
+    {
+        <div class="col-sm-6 padding-xs-0">
+            <div class="form-group">
+                <div class="table-responsive">
+                    <table id="table-contributor-files" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Archivo</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{var index = 0;}
+                            @foreach (var f in Model.ContributorFiles.OrderByDescending(f => f.ContributorFileType.Id).ToList())
+                            {
+                                var label = "";
+                                switch (f.ContributorFileStatus.Id)
+                                {
+                                    case 0:
+                                        label = "custom-label-warning";
+                                        break;
+                                    case 1:
+                                        label = "custom-label-primary";
+                                        break;
+                                    case 2:
+                                        label = "custom-label-success";
+                                        break;
+                                    case 3:
+                                        label = "custom-label-danger";
+                                        break;
+                                    case 4:
+                                        label = "custom-label-primary";
+                                        break;
+                                    default:
+                                        label = "custom-label-warning";
+                                        break;
+                                };
+                                <tr data-id="@f.ContributorFileType.Id">
+                                    <td class="text-left">@f.ContributorFileType.Name</td>
+                                    <td class="text-center"><span class="label label-table @label">@f.ContributorFileStatus.Name</span></td>
+                                    <td class="">
+                                        @if (f.ContributorFileStatus.Id != 0)
+                                        {
+                                            <span class="fa fa fa-download add-tooltip download-contributor-files" data-original-title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>
+                                        }
+                                        @if (f.ContributorFileStatus.Id != 0 && Model.CanEdit)
+                                        {
+                                            <a href="javascript:void(0)" class="text-center add-tooltip" data-comments="@f.Comments" data-original-title="Editar fichero" data-statusIndex="@f.ContributorFileStatus.Id" data-id="@f.Id" onclick="changeStatus($(this))"> <i class="fa fa-edit"></i></a>
+                                        }
+                                        @if (!f.ContributorFileType.Mandatory && Model.CanEdit)
+                                        {
+                                            <a href="javascript:void(0)" class="text-center add-tooltip" data-index-contributor-file="@index" data-original-title="Eliminar fichero" onclick="removeLine(this)"> <i class="fa fa-trash"></i></a>
+                                        }
+                                    </td>
+                                </tr>
+                                index++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+    <div class="row">
+        <div class="col-sm-6 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.AcceptanceStatusId, new { @class = "control-label" })
+                @Html.EnumDropDownListFor(m => m.RadianState, "Seleccióne el estado de la aprobación", new { @class = "form-control", @placeholder = "Hola mundo" })
+            </div>
+        </div>
+    </div>
+
