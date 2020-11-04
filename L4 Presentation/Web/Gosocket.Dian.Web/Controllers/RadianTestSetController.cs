@@ -18,7 +18,6 @@ namespace Gosocket.Dian.Web.Controllers
         // GET: RadianSetTest
         public ActionResult Index()
         {
-            //var testSetManager = new RadianTestSetManager();
             RadianTestSetTableViewModel model = new RadianTestSetTableViewModel
             {
                 RadianTestSets = testSetManager.GetAllTestSet().Select(x => new RadianTestSetViewModel
@@ -30,13 +29,22 @@ namespace Gosocket.Dian.Web.Controllers
                     Description = x.Description,
                     TotalDocumentRequired = x.TotalDocumentRequired,
                     TotalDocumentAcceptedRequired = x.TotalDocumentAcceptedRequired,
-                    //EndDate = x.EndDate,
-                    //StartDate = x.StartDate,
+                    ReceiptNoticeTotalRequired              = x.ReceiptNoticeTotalRequired,
+                    ReceiptServiceTotalRequired             = x.ReceiptServiceTotalRequired,
+                    ExpressAcceptanceTotalRequired          = x.ExpressAcceptanceTotalRequired,
+                    AutomaticAcceptanceTotalRequired        = x.AutomaticAcceptanceTotalRequired,
+                    RejectInvoiceTotalRequired              = x.RejectInvoiceTotalRequired,
+                    ApplicationAvailableTotalRequired       = x.ApplicationAvailableTotalRequired,
+                    EndorsementTotalRequired                = x.EndorsementTotalRequired,
+                    EndorsementCancellationTotalRequired    = x.EndorsementCancellationTotalRequired,
+                    GuaranteeTotalRequired                  = x.GuaranteeTotalRequired,
+                    ElectronicMandateTotalRequired          = x.ElectronicMandateTotalRequired,
+                    EndMandateTotalRequired                 = x.EndMandateTotalRequired,
+                    PaymentNotificationTotalRequired        = x.PaymentNotificationTotalRequired,
+                    CirculationLimitationTotalRequired      = x.CirculationLimitationTotalRequired,
+                    EndCirculationLimitationTotalRequired   = x.EndCirculationLimitationTotalRequired,
                     TestSetId = x.TestSetId.ToString(),
                     UpdateBy = x.UpdateBy,
-                    //InvoicesTotalRequired = x.InvoicesTotalRequired,
-                    //TotalDebitNotesRequired = x.TotalDebitNotesRequired,
-                    //TotalCreditNotesRequired = x.TotalCreditNotesRequired,
                     OperationModeId = int.Parse(x.PartitionKey)
                 }).ToList()
             };
