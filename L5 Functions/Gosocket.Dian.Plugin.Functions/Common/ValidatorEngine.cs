@@ -323,6 +323,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
+        public async Task<List<ValidateListResponse>> StartValidateReferenceAttorney(ValidateReferenceAttorney.RequestObjectReferenceAttorney data)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser, data.TrackId));
+
+            return validateResponses;
+        }
+
+
         #region Private methods
         private Dictionary<string, string> CreateTaxLevelCodeXpathsRequestObject(string trackId)
         {

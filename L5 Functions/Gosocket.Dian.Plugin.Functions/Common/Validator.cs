@@ -43,6 +43,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
         static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
         static readonly TableManager typeListTableManager = new TableManager("GlobalTypeList");
+        private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -734,6 +735,58 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
             }
 
+            foreach (var r in responses)
+                r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+            return responses;
+        }
+        #endregion
+
+        #region Validate Reference Attorney
+        public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            List<AttorneyModel> attorney = new List<AttorneyModel>();
+            string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
+            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0).InnerText.ToString();
+            string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0).InnerText.ToString();
+            string startDateAttorney = string.Empty;
+            string endDate = string.Empty;
+            XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
+            for(int i = 1; i < cufeList.Count && i < 21; i++)
+            {
+                AttorneyModel attorneyModel = new AttorneyModel();
+                string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i).InnerText.ToString();
+                string[] tempCode = new string[2];
+                tempCode = code.Split('-');
+                attorneyModel.facultityCode = tempCode[0];
+                attorneyModel.actor = tempCode[1];
+                attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i).InnerText.ToString();
+                attorney.Add(attorneyModel);
+            }
+            foreach(var attorneyDocument in attorney)
+            {
+                GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId,attorneyDocument.cufe) 
+                {
+                    Active =true,
+                    Actor =attorneyDocument.actor,
+                    EffectiveDate = effectiveDate,
+                    EndDate = endDate,
+                    FacultityCode =attorneyDocument.facultityCode,
+                    IssuerAttorney = issuerPartyCode,
+                    SenderCode = senderCode,
+                    StartDate = startDateAttorney
+                };
+                TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
+            }
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Mandato referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
