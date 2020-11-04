@@ -17,7 +17,7 @@ namespace Gosocket.Dian.Web.Controllers
         // GET: RadianTechnologyProvider
         public ActionResult Index(int contributorId)
         {
-            List<Domain.RadianContributor> radianContributor = radianContributorService.Get(t => t.ContributorId == contributorId &&  t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider);
+            List<Domain.RadianContributor> radianContributor = radianContributorService.List(t => t.ContributorId == contributorId &&  t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider);
             if (!radianContributor.Any())
             {
                 RadianContributor newRadianContributor = new RadianContributor()

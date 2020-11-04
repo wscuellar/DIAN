@@ -81,7 +81,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 new Domain.RadianContributor(){ RadianContributorTypeId=(int)Domain.Common.RadianContributorType.Factor}
             };
             _ContributorService.Setup(t => t.GetByCode(It.IsAny<string>())).Returns(contributor);
-            _RadianContributorService.Setup(t => t.Get(x => x.ContributorId == contributor.Id   && x.RadianState != "Cancelado", 0, 0)).Returns(radianContributors);
+            _RadianContributorService.Setup(t => t.List(x => x.ContributorId == contributor.Id   && x.RadianState != "Cancelado", 0, 0)).Returns(radianContributors);
 
             //ejecucion
             var result = _current.Index() as ViewResult;

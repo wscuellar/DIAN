@@ -402,6 +402,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="Utils\CertificateValidations.cs" />
     <Compile Include="Utils\CertificateValidator.cs" />
+    <Compile Include="Utils\RadianUtil.cs" />
     <Compile Include="Utils\DataUtils.cs" />
     <Compile Include="Utils\EmailUtil.cs" />
     <Compile Include="Utils\EventHubHandler.cs" />

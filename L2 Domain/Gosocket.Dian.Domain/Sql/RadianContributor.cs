@@ -22,6 +22,7 @@ namespace Gosocket.Dian.Domain
         public DateTime CreatedDate { get; set; }
         public DateTime Update { get; set; }
         public string CreatedBy { get; set; }
+        public virtual ICollection<RadianContributorFile> RadianContributorFile { get; set; }
     }
 
 }
