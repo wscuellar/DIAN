@@ -79,5 +79,11 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        public List<RadianContributorType> GetRadianContributorTypes(Expression<Func<RadianContributorType, bool>> expression)
+        {
+            var query = sqlDBContext.RadianContributorTypes.Where(expression);
+            return query.ToList();
+        }
+
     }
 }

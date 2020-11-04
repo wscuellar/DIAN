@@ -1,0 +1,76 @@
+﻿@model Gosocket.Dian.Web.Models.RadianContributorsViewModel
+
+@{
+
+    ViewBag.Title = "Listado de Participantes RADIAN";
+
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @Html.Partial("_form")
+                        <div class="panel-footer text-right">
+                          footerPanel
+                        </div>
+                    </div>
+                </div>
+
+                @if (true)
+                {
+                    if (true)
+                    {
+                        <div class="row margin-horizontal-0 margin-vertical-30">
+                            @Html.Partial("_testSetResults")
+                        </div>
+                    }
+                }
+
+                @if (true)
+                {
+                    <div class="row margin-horizontal-0 margin-vertical-30">
+                        @Html.Partial("_users")
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+   
+
+    <script>
+        $(document).ready(function () {
+
+
+        //disableFields = () => {
+        //    $('#Code').attr('readonly', true);
+        //    $('#Name').attr('readonly', true);
+        //    $('#BusinessName').attr('readonly', true);
+        //    $('#Email').attr('readonly', true);
+        //    $('#AcceptanceStatusId').attr('disabled', 'disabled');
+        //    $('#OperationModeId').attr('disabled', 'disabled');
+
+        //    $('#Software_Name').attr('readonly', true);
+        //    $('#Software_SoftwareUser').attr('readonly', true);
+        //    $('#Software_SoftwarePassword').attr('readonly', true);
+        //    $('#Software_Url').attr('readonly', true);
+ 
+        }
+
+     
+
+
+
+    </script>
+}
+

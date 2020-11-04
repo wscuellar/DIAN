@@ -297,6 +297,12 @@
                                             <!--Rol Administrador-->
                                             @if (User.IsInAnyRole("Administrador", "Super"))
                                             {
+                                                <!--RADIAN Administrador-->
+                                                if (User.IsInAnyRole("Administrador", "Super"))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.AdminRadian"><a href="@Url.Action("AdminRadianView", "Radian")">Habilitación</a></li>
+                                                }
+                                                <!--RADIAN Administrador-->
                                                 <li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("List", "Contributor", new {type = 2 })">Proveedores Tecnológicos</a></li>
                                                 <li id="@Navigation.NavigationEnum.ProviderAuthorized"><a href="@Url.Action("List", "Contributor", new {type = 3 })">Proveedores Autorizados</a></li>
                                                 <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor", new {type = 1 })">Facturadores Electrónicos</a></li>
@@ -350,12 +356,6 @@
                                                 <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor")">Facturadores</a></li>
                                             }
                                             <!--Rol Proveedor-->
-                                            <!--RADIAN Administrador-->
-                                            @if (User.IsInAnyRole("Administrador", "Super"))
-                                            {
-                                                <li id="@Navigation.NavigationEnum.AdminRadian"><a href="@Url.Action("AdminRadianView", "Radian")">RADIAN</a></li>
-                                            }
-                                            <!--RADIAN Administrador-->
                                             <!--  RADIAN -->
                                             @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
                                             {
