@@ -333,7 +333,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 throw new Exception(xmlParser.ParserError);
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser));
+            validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser, data.TrackId));
 
             return validateResponses;
         }
