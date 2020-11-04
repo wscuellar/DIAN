@@ -18,7 +18,9 @@
                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
                         @Html.Partial("_form")
                         <div class="panel-footer text-right">
-                          footerPanel
+                            <button type="button" data-id="@Model.Id" class="btn btn-default btn-set-to-provider">Cancelar</button>
+                            <button type="button" data-id="@Model.Id" class="btn btn-default btn-gosocket btn-set-to-provider">Guardar cambios</button>
+
                         </div>
                     </div>
                 </div>
@@ -46,28 +48,29 @@
 
 @section scripts
 {
-   
+    
+    <script src="~/Content/js/Radian/DownloadFile.js?1.0.0"></script>
 
     <script>
         $(document).ready(function () {
 
 
-        //disableFields = () => {
-        //    $('#Code').attr('readonly', true);
-        //    $('#Name').attr('readonly', true);
-        //    $('#BusinessName').attr('readonly', true);
-        //    $('#Email').attr('readonly', true);
-        //    $('#AcceptanceStatusId').attr('disabled', 'disabled');
-        //    $('#OperationModeId').attr('disabled', 'disabled');
+            //disableFields = () => {
+            //    $('#Code').attr('readonly', true);
+            //    $('#Name').attr('readonly', true);
+            //    $('#BusinessName').attr('readonly', true);
+            //    $('#Email').attr('readonly', true);
+            //    $('#AcceptanceStatusId').attr('disabled', 'disabled');
+            //    $('#OperationModeId').attr('disabled', 'disabled');
 
-        //    $('#Software_Name').attr('readonly', true);
-        //    $('#Software_SoftwareUser').attr('readonly', true);
-        //    $('#Software_SoftwarePassword').attr('readonly', true);
-        //    $('#Software_Url').attr('readonly', true);
- 
+            //    $('#Software_Name').attr('readonly', true);
+            //    $('#Software_SoftwareUser').attr('readonly', true);
+            //    $('#Software_SoftwarePassword').attr('readonly', true);
+            //    $('#Software_Url').attr('readonly', true);
+
         }
 
-     
+
 
 
 

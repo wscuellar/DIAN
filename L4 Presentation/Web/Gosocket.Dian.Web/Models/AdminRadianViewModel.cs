@@ -29,10 +29,10 @@ namespace Gosocket.Dian.Web.Models
         public DateTime DateInterval { get; set; }
 
         [Display(Name = "Tipo Participante")]
-        public List<RadianContributorType> Type { get; set; }
+        public List<RadianContributorTypeViewModel> Type { get; set; }
 
         [Display(Name = "Estado")]
-        public List<RadianContributorState> State { get; set; }
+        public List<RadianContributorStateViewModel> State { get; set; }
 
         public int Page { get; set; }
         public int Length { get; set; }
@@ -50,7 +50,7 @@ namespace Gosocket.Dian.Web.Models
 
         public RadianContributorsViewModel()
         {
-            ContributorType = new RadianContributorType();
+            ContributorType = new RadianContributorTypeViewModel();
             Users = new List<UserViewModel>();
             RadianContributorTestSetResults = new List<TestSetResultViewModel>();
             AcceptanceStatuses = new List<RadianContributorAcceptanceStatusViewModel>();
@@ -86,22 +86,23 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Tipo de participante")]
         public string ContributorTypeName { get; set; }
 
-        public RadianContributorType ContributorType { get; set; }
+        public RadianContributorTypeViewModel ContributorType { get; set; }
         public List<UserViewModel> Users { get; set; }
         public List<TestSetResultViewModel> RadianContributorTestSetResults { get; set; }
         public RadianUtil.UserApprovalStates? RadianState { get; set; }
-        public List<RadianContributorFileViewModel> ContributorFiles { get; set; }
-        public RadianContributorFileStatusViewModel ContributorFileStatus { get; set; }
+        public List<RadianContributorFileViewModel> RadianContributorFiles { get; set; }
+        public RadianContributorFileStatusViewModel RadianContributorFileStatus { get; set; }
         public bool CanEdit { get; set; }
+
     }
 
-    public class RadianContributorType
+    public class RadianContributorTypeViewModel
     {
          public int Id { get; set; }
         public string Name { get; set; }
     }
 
-    public class RadianContributorState
+    public class RadianContributorStateViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

@@ -11,6 +11,7 @@ using System;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
+using System.Diagnostics;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -132,22 +133,22 @@ namespace Gosocket.Dian.Web.Controllers
                 AcceptanceStatusName = radianContributor[0].Contributor.AcceptanceStatus.Name,
                 CreatedDate = radianContributor[0].CreatedDate,
                 UpdatedDate = radianContributor[0].Update,
-                ContributorFiles = radianContributor[0].Contributor.ContributorFiles.Count > 0 ? radianContributor[0].Contributor.ContributorFiles.Select(f => new RadianContributorFileViewModel
+                RadianContributorFiles = radianContributor[0].RadianContributorFile.Count > 0 ? radianContributor[0].RadianContributorFile.Select(f => new RadianContributorFileViewModel
                 {
                     Id = f.Id,
                     Comments = f.Comments,
                     ContributorFileStatus = new RadianContributorFileStatusViewModel
                     {
-                        Id = f.ContributorFileStatus.Id,
-                        Name = f.ContributorFileStatus.Name,
+                        Id = f.RadianContributorFileStatus.Id,
+                        Name = f.RadianContributorFileStatus.Name,
                     },
                     ContributorFileType = new ContributorFileTypeViewModel
                     {
-                        Id = f.ContributorFileType.Id,
-                        Mandatory = f.ContributorFileType.Mandatory,
-                        Name = f.ContributorFileType.Name,
-                        Timestamp = f.ContributorFileType.Timestamp,
-                        Updated = f.ContributorFileType.Updated
+                        Id = f.RadianContributorFileType.Id,
+                        Mandatory = f.RadianContributorFileType.Mandatory,
+                        Name = f.RadianContributorFileType.Name,
+                        Timestamp = f.RadianContributorFileType.Timestamp,
+                        Updated = f.RadianContributorFileType.Updated
                     },
                     CreatedBy = f.CreatedBy,
                     Deleted = f.Deleted,
@@ -246,5 +247,23 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View(model);
         }
+
+        public ActionResult DownloadContributorFile(string code, string fileName)
+        {
+            try
+            {
+                string fileNameURL = code + "/" + StringTools.MakeValidFileName(fileName);
+                var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+                var result = fileManager.GetBytes("radiancontributor-files", fileNameURL, out string contentType);
+                return File(result, contentType, $"{fileName}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return File(new byte[1], "application/pdf", $"error");
+            }
+
+        }
+
     }
 }

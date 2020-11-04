@@ -75,3 +75,98 @@
     color: #348441;
     cursor: pointer;
 }
+
+.input-general {
+    height: 41px !important;
+    background: #F7F7F7;
+    border: 1px solid #CCCCCC;
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+
+.radian-conventions i, #table-contributor-files i{
+    margin: 0px 7px;
+    font-style: normal;
+    font-weight: 900;
+    font-size: 16px;
+    line-height: 16px;
+}
+.radian-convention li{
+    font-family: Arial;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 16px;
+}
+
+i.fa-exclamation-circle {
+    color: #F3A632;
+}
+i.fa-check-circle {
+    color: #348441;
+}
+i.fa-times-circle {
+    color: #B81818;
+}
+i.fa-info-circle {
+    color: #62C7AB;
+}
+#table-contributor-files .download-contributor-files {
+    font-style: normal;
+    font-weight: 900;
+    font-size: 14px;
+    line-height: 14px;
+    align-items: center;
+}
+#table-contributor-files td{
+    font-family: Arial;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 16px;
+    color: #2C323C;
+}
+
+#table-contributor-files .fa-pencil{
+    font-style: normal;
+    font-weight: 900;
+    font-size: 14px;
+    line-height: 14px;
+    color: #348441;
+}
+.download-contributor-files {
+    color: #348441;
+    margin: 0px 6px;
+}
+
+.edit-state{
+    font-family: Arial;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 16px;
+    text-decoration-line: underline;
+    color: #348441;
+}
+.radian-view {
+    text-align: left;
+    margin-left: 25px;
+}
+.title-view {
+     width: 174px; 
+     height: 34px; 
+     font-family: Arial; 
+     font-style: normal; 
+     font-weight: normal; 
+     font-size: 30px; 
+     line-height: 34px; 
+     color: #000000;
+}
+.underline-title {
+    width: 282px;
+    height: 3px;
+    left: 250px;
+    top: 170px;
+    background: #62C7AB;
+    border-radius: 2px;
+}

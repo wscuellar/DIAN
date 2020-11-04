@@ -528,6 +528,7 @@
     <Content Include="Content\images\LogoAnticipos.png" />
     <Content Include="Content\images\payment-design.jpg" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\Loaded.svg" />
     <Content Include="Content\images\Svg\Factor.svg" />
     <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
     <Content Include="Content\images\Svg\OperacionDirecta.svg" />
@@ -647,6 +648,7 @@
     <Content Include="Content\js\nifty.js" />
     <Content Include="Content\js\nifty.js cambios.txt" />
     <Content Include="Content\js\nifty.min.js" />
+    <Content Include="Content\js\Radian\DownloadFile.js" />
     <Content Include="Content\js\Radian\RadianIndex.js" />
     <Content Include="Content\js\user\user.js" />
     <Content Include="Content\plugins\animate-css\animate.css" />
@@ -2700,8 +2702,6 @@
     <Content Include="Views\Radian\ElectronicInvoiceView.cshtml" />
     <Content Include="Views\RadianTestSet\Index.cshtml" />
     <Content Include="Views\RadianTestSet\_items.cshtml" />
-    <Content Include="Views\Radian\AdminRadianView.cshtml" />
-    <Content Include="Views\Radian\_Items.cshtml" />
     <Content Include="Views\Radian\List.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceDirect\Index.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
@@ -2722,6 +2722,8 @@
     <Content Include="Views\Radian\_users.cshtml" />
     <Content Include="Views\Radian\ViewDetails.cshtml" />
     <Content Include="Views\RadianTestSet\Edit.cshtml" />
+    <Content Include="Views\Radian\AdminRadianView.cshtml" />
+    <Content Include="Views\Radian\_Items.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
