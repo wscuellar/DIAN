@@ -1571,12 +1571,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var arrayTasks = new List<Task>();
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             if (eventCode == "038")
-            {
-                if (!validatorDocumentMeta.InTransaction)
-                {
-                    validatorDocumentMeta.InTransaction = false;
-                    arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
-                }
+            {              
+                validatorDocumentMeta.InTransaction = false;
+                arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));                
             }
         }
     }

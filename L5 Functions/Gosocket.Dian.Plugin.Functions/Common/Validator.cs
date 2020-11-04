@@ -43,6 +43,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
         static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
         static readonly TableManager typeListTableManager = new TableManager("GlobalTypeList");
+        private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -834,7 +835,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate Reference Attorney
-        public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser)
+        public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -856,6 +857,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i).InnerText.ToString();
                 attorney.Add(attorneyModel);
             }
+            foreach(var attorneyDocument in attorney)
+            {
+                GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId,attorneyDocument.cufe) 
+                {
+                    Active =true,
+                    Actor =attorneyDocument.actor,
+                    EffectiveDate = effectiveDate,
+                    EndDate = endDate,
+                    FacultityCode =attorneyDocument.facultityCode,
+                    IssuerAttorney = issuerPartyCode,
+                    SenderCode = senderCode,
+                    StartDate = startDateAttorney
+                };
+                TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
+            }
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Mandato referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
