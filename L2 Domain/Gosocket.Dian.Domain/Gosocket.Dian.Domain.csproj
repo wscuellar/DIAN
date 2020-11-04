@@ -172,6 +172,7 @@
     <Compile Include="Entity\GlobalContributorActivation.cs" />
     <Compile Include="Entity\GlobalDocModelFolio.cs" />
     <Compile Include="Entity\GlobalDocReference.cs" />
+    <Compile Include="Entity\GlobalDocReferenceAttorney.cs" />
     <Compile Include="Entity\GlobalDocValidatorDocument.cs" />
     <Compile Include="Entity\GlobalDataDocument.cs" />
     <Compile Include="Entity\GlobalDocumentType.cs" />

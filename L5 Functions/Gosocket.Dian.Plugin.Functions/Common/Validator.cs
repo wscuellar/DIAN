@@ -744,11 +744,25 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser)
         {
             DateTime startDate = DateTime.UtcNow;
-            string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
-            string IssuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:IssuerParty/cac:PowerOfAttorney/cbc:ID").ToString();
-
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-
+            List<AttorneyModel> attorney = new List<AttorneyModel>();
+            string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
+            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0).InnerText.ToString();
+            string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0).InnerText.ToString();
+            string startDateAttorney = string.Empty;
+            string endDate = string.Empty;
+            XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
+            for(int i = 1; i < cufeList.Count && i < 21; i++)
+            {
+                AttorneyModel attorneyModel = new AttorneyModel();
+                string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i).InnerText.ToString();
+                string[] tempCode = new string[2];
+                tempCode = code.Split('-');
+                attorneyModel.facultityCode = tempCode[0];
+                attorneyModel.actor = tempCode[1];
+                attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i).InnerText.ToString();
+                attorney.Add(attorneyModel);
+            }
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
