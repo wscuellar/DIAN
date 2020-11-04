@@ -35,11 +35,11 @@ namespace Gosocket.Dian.Web.Models
         public int ReceiptNoticeTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Recibo del bien o Prestación del servicio")]
+        [Display(Name = "Recibo del bien ")]
         public int ReceiptServiceTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Recibo del bien o Prestación del servicio")]
+        [Display(Name = "Recibo del bien ")]
         public int ReceiptServiceTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
@@ -51,19 +51,19 @@ namespace Gosocket.Dian.Web.Models
         public int ExpressAcceptanceTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Manifestación de aceptación automática")]
+        [Display(Name = "Manifestación de aceptación")]
         public int AutomaticAcceptanceTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Manifestación de aceptación automática")]
+        [Display(Name = "Manifestación de aceptación")]
         public int AutomaticAcceptanceTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Rechazo factura electrónica de venta")]
+        [Display(Name = "Rechazo factura electrónica")]
         public int RejectInvoiceTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Manifestación de aceptación automática")]
+        [Display(Name = "Rechazo factura electrónica")]
         public int RejectInvoiceTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
@@ -83,11 +83,11 @@ namespace Gosocket.Dian.Web.Models
         public int EndorsementTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Cancelación de endoso electrónico")]
+        [Display(Name = "Cancelación de endoso")]
         public int EndorsementCancellationTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Cancelación de endoso electrónico")]
+        [Display(Name = "Cancelación de endoso")]
         public int EndorsementCancellationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
@@ -107,19 +107,19 @@ namespace Gosocket.Dian.Web.Models
         public int ElectronicMandateTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación mandato electrónico")]
+        [Display(Name = "Terminación mandato")]
         public int EndMandateTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación manadato electrónico")]
+        [Display(Name = "Terminación manadato")]
         public int EndMandateTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Notificación de pago parcial o total")]
+        [Display(Name = "Notificación de pago")]
         public int PaymentNotificationTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Notificación pago parcial o total")]
+        [Display(Name = "Notificación pago")]
         public int PaymentNotificationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
@@ -131,11 +131,11 @@ namespace Gosocket.Dian.Web.Models
         public int CirculationLimitationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación limitación de circulación")]
+        [Display(Name = "Terminación limitación")]
         public int EndCirculationLimitationTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación limitación de circulación")]
+        [Display(Name = "Terminación limitación")]
         public int EndCirculationLimitationTotalAcceptedRequired { get; set; }
 
         public DateTime Date { get; set; }
