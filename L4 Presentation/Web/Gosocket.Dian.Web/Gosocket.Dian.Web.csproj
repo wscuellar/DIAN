@@ -2721,6 +2721,7 @@
     <Content Include="Views\Radian\_testSetResults.cshtml" />
     <Content Include="Views\Radian\_users.cshtml" />
     <Content Include="Views\Radian\ViewDetails.cshtml" />
+    <Content Include="Views\RadianTestSet\Edit.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

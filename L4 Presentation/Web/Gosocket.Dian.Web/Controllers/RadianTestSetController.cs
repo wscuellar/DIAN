@@ -128,7 +128,7 @@ namespace Gosocket.Dian.Web.Controllers
                 EndMandateTotalRequired = model.EndMandateTotalRequired,
                 EndMandateTotalAcceptedRequired = model.EndMandateTotalAcceptedRequired,
                 PaymentNotificationTotalRequired = model.PaymentNotificationTotalRequired,
-                PaymnetNotificationTotalAcceptedRequired = model.PaymentNotificationTotalAcceptedRequired,
+                PaymentNotificationTotalAcceptedRequired = model.PaymentNotificationTotalAcceptedRequired,
                 CirculationLimitationTotalRequired = model.CirculationLimitationTotalRequired,
                 CirculationLimitationTotalAcceptedRequired = model.CirculationLimitationTotalAcceptedRequired,
                 EndCirculationLimitationTotalAcceptedRequired = model.EndCirculationLimitationTotalAcceptedRequired,
@@ -139,11 +139,113 @@ namespace Gosocket.Dian.Web.Controllers
             );
             if (result)
             {
-                return RedirectToAction("List"/*, new { contributorId = model.ContributorId }*/);
+                return RedirectToAction("Index"/*, new { contributorId = model.ContributorId }*/);
             }
 
-            ViewBag.ErrorMessage = "Ocurrio un problema creando el Set de Pruebas";
+            ViewBag.ErrorMessage = "Ocurrio un problema creando el Set de Pruebas de Radian";
             return View("Add", model);
+        }
+
+
+        [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
+        public ActionResult Edit(int operationModeId)
+        {
+            var testSet = testSetManager.GetTestSet(operationModeId.ToString(), operationModeId.ToString());
+            if (testSet == null)
+                return RedirectToAction(nameof(Index));
+
+            var model = new RadianTestSetViewModel
+            {
+                TotalDocumentRequired = testSet.TotalDocumentRequired,
+                TotalDocumentAcceptedRequired = testSet.TotalDocumentAcceptedRequired,
+                Description = testSet.Description,
+                ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalRequired,
+                ReceiptNoticeTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
+                ReceiptServiceTotalRequired = testSet.ReceiptServiceTotalRequired,
+                ReceiptServiceTotalAcceptedRequired = testSet.ReceiptServiceTotalAcceptedRequired,
+                ExpressAcceptanceTotalRequired = testSet.ExpressAcceptanceTotalRequired,
+                ExpressAcceptanceTotalAcceptedRequired = testSet.ExpressAcceptanceTotalAcceptedRequired,
+                AutomaticAcceptanceTotalRequired = testSet.AutomaticAcceptanceTotalRequired,
+                AutomaticAcceptanceTotalAcceptedRequired = testSet.AutomaticAcceptanceTotalAcceptedRequired,
+                RejectInvoiceTotalRequired = testSet.RejectInvoiceTotalRequired,
+                RejectInvoiceTotalAcceptedRequired = testSet.RejectInvoiceTotalAcceptedRequired,
+                ApplicationAvailableTotalRequired = testSet.ApplicationAvailableTotalRequired,
+                ApplicationAvailableTotalAcceptedRequired = testSet.ApplicationAvailableTotalAcceptedRequired,
+                EndorsementTotalRequired = testSet.EndorsementTotalRequired,
+                EndorsementTotalAcceptedRequired = testSet.EndorsementTotalAcceptedRequired,
+                EndorsementCancellationTotalRequired = testSet.EndorsementCancellationTotalRequired,
+                EndorsementCancellationTotalAcceptedRequired = testSet.EndorsementCancellationTotalAcceptedRequired,
+                GuaranteeTotalRequired = testSet.GuaranteeTotalRequired,
+                GuaranteeTotalAcceptedRequired = testSet.GuaranteeTotalAcceptedRequired,
+                ElectronicMandateTotalRequired = testSet.ElectronicMandateTotalRequired,
+                ElectronicMandateTotalAcceptedRequired = testSet.ElectronicMandateTotalAcceptedRequired,
+                EndMandateTotalRequired = testSet.EndMandateTotalRequired,
+                EndMandateTotalAcceptedRequired = testSet.EndMandateTotalAcceptedRequired,
+                PaymentNotificationTotalRequired = testSet.PaymentNotificationTotalRequired,
+                PaymentNotificationTotalAcceptedRequired = testSet.PaymentNotificationTotalAcceptedRequired,
+                CirculationLimitationTotalRequired = testSet.CirculationLimitationTotalRequired,
+                CirculationLimitationTotalAcceptedRequired = testSet.CirculationLimitationTotalAcceptedRequired,
+                EndCirculationLimitationTotalAcceptedRequired = testSet.EndCirculationLimitationTotalAcceptedRequired,
+                EndCirculationLimitationTotalRequired = testSet.EndCirculationLimitationTotalRequired,
+                TestSetId = testSet.TestSetId.ToString(),
+                OperationModeId = int.Parse(testSet.PartitionKey)
+            };
+            ViewBag.CurrentPage = Navigation.NavigationEnum.RadianSetPruebas;
+            return View(model);
+        }
+
+        [HttpPost]
+        [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
+        public ActionResult Edit(RadianTestSetViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View("Edit", model);
+
+            var result = testSetManager.InsertTestSet(new RadianTestSet(model.OperationModeId.ToString(), model.OperationModeId.ToString())
+            {
+                TestSetId = Guid.Parse(model.TestSetId).ToString(),//Guid.NewGuid(),
+                Active = true,
+                CreatedBy = User.Identity.Name,
+                Description = model.Description,
+                TotalDocumentRequired = model.TotalDocumentRequired,
+                TotalDocumentAcceptedRequired = model.TotalDocumentAcceptedRequired,
+                ReceiptNoticeTotalRequired = model.ReceiptNoticeTotalRequired,
+                ReceiptNoticeTotalAcceptedRequired = model.ReceiptNoticeTotalAcceptedRequired,
+                ReceiptServiceTotalRequired = model.ReceiptServiceTotalRequired,
+                ReceiptServiceTotalAcceptedRequired = model.ReceiptServiceTotalAcceptedRequired,
+                ExpressAcceptanceTotalRequired = model.ExpressAcceptanceTotalRequired,
+                ExpressAcceptanceTotalAcceptedRequired = model.ExpressAcceptanceTotalAcceptedRequired,
+                AutomaticAcceptanceTotalRequired = model.AutomaticAcceptanceTotalRequired,
+                AutomaticAcceptanceTotalAcceptedRequired = model.AutomaticAcceptanceTotalAcceptedRequired,
+                RejectInvoiceTotalRequired = model.RejectInvoiceTotalRequired,
+                RejectInvoiceTotalAcceptedRequired = model.RejectInvoiceTotalAcceptedRequired,
+                ApplicationAvailableTotalRequired = model.ApplicationAvailableTotalRequired,
+                ApplicationAvailableTotalAcceptedRequired = model.ApplicationAvailableTotalAcceptedRequired,
+                EndorsementTotalRequired = model.EndorsementTotalRequired,
+                EndorsementTotalAcceptedRequired = model.EndorsementTotalAcceptedRequired,
+                EndorsementCancellationTotalRequired = model.EndorsementCancellationTotalRequired,
+                EndorsementCancellationTotalAcceptedRequired = model.EndorsementCancellationTotalAcceptedRequired,
+                GuaranteeTotalRequired = model.GuaranteeTotalRequired,
+                GuaranteeTotalAcceptedRequired = model.GuaranteeTotalAcceptedRequired,
+                ElectronicMandateTotalRequired = model.ElectronicMandateTotalRequired,
+                ElectronicMandateTotalAcceptedRequired = model.ElectronicMandateTotalAcceptedRequired,
+                EndMandateTotalRequired = model.EndMandateTotalRequired,
+                EndMandateTotalAcceptedRequired = model.EndMandateTotalAcceptedRequired,
+                PaymentNotificationTotalRequired = model.PaymentNotificationTotalRequired,
+                PaymentNotificationTotalAcceptedRequired = model.PaymentNotificationTotalAcceptedRequired,
+                CirculationLimitationTotalRequired = model.CirculationLimitationTotalRequired,
+                CirculationLimitationTotalAcceptedRequired = model.CirculationLimitationTotalAcceptedRequired,
+                EndCirculationLimitationTotalAcceptedRequired = model.EndCirculationLimitationTotalAcceptedRequired,
+                EndCirculationLimitationTotalRequired = model.EndCirculationLimitationTotalRequired,
+                UpdateBy = User.Identity.Name,
+                Date = DateTime.UtcNow
+            });
+
+            if (result)
+                return RedirectToAction(nameof(Index));
+
+            ViewBag.ErrorMessage = "Ocurrio un problema editando el Set de Pruebas de Radian";
+            return View("Edit", model);
         }
 
     }

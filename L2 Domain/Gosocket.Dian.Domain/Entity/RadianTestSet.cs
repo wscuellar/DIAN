@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Domain.Entity
         public int EndMandateTotalAcceptedRequired { get; set; }
 
         public int PaymentNotificationTotalRequired { get; set; }
-        public int PaymnetNotificationTotalAcceptedRequired { get; set; }
+        public int PaymentNotificationTotalAcceptedRequired { get; set; }
 
         public int CirculationLimitationTotalRequired { get; set; }
         public int CirculationLimitationTotalAcceptedRequired { get; set; }
