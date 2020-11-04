@@ -2,13 +2,14 @@
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
+using Gosocket.Dian.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Gosocket.Dian.Application
 {
-    public class ContributorService
+    public class ContributorService : IContributorService
     {
         SqlDBContext sqlDBContext;
         //private static StackExchange.Redis.IDatabase cache;

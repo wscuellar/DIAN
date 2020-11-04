@@ -1,41 +1,40 @@
-﻿using Gosocket.Dian.Application;
-using Gosocket.Dian.Web.Common;
+﻿using Gosocket.Dian.Web.Common;
 using System.Collections.Generic;
 using System.Web.Mvc;
 using Gosocket.Dian.Web.Models;
 using System.Linq;
-
+using Gosocket.Dian.Interfaces;
 
 namespace Gosocket.Dian.Web.Controllers
 {
     public class RadianController : Controller
     {
 
-
-        private readonly ContributorService ContributorService;
-        private readonly RadianContributorService radianContributorService;
-
-        public RadianController()
+        private readonly IContributorService _ContributorService;
+        private readonly IRadianContributorService _RadianContributorService;
+                
+        public RadianController(IContributorService contributorService, IRadianContributorService radianContributorService)
         {
-            ContributorService = new ContributorService();
-            radianContributorService = new RadianContributorService();
+
+            _ContributorService = contributorService;
+            _RadianContributorService = radianContributorService;
         }
 
 
         private void SetContributorInfo()
         {
             string userCode = User.UserCode();
-            Domain.Contributor contributor = ContributorService.GetByCode(userCode);
+            Domain.Contributor contributor = _ContributorService.GetByCode(userCode);
             if (contributor != null)
             {
-                List<Domain.RadianContributor> radianContributor = radianContributorService.GetRadianContributor(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
-                string rcontributorTypes = radianContributor.Aggregate("", (current, next) => current + ", " + next.RadianContributorTypeId.ToString());
                 ViewBag.ContributorId = contributor.Id;
                 ViewBag.ContributorTypeId = contributor.ContributorTypeId;
-                ViewBag.Active = contributor != null && contributor.Status;
-                ViewBag.WithSoft = contributor != null && contributor.Softwares != null && contributor.Softwares.Count > 0;
+                ViewBag.Active = contributor.Status;
+                ViewBag.WithSoft = contributor.Softwares?.Count > 0;
+                
+                List<Domain.RadianContributor> radianContributor = _RadianContributorService.Get(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
+                string rcontributorTypes =  radianContributor?.Aggregate("", (current, next) => current + ", " + next.RadianContributorTypeId.ToString());               
                 ViewBag.ExistInRadian = rcontributorTypes;
-
             }
         }
 
@@ -55,7 +54,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult AdminRadianView()
         {
-            var radianContributors = radianContributorService.GetRadianContributor(t => true );
+            var radianContributors = _RadianContributorService.Get(t => true );
             var model = new AdminRadianViewModel();
             model.RadianContributors = radianContributors.Select(c => new RadianContributorsViewModel
             {
