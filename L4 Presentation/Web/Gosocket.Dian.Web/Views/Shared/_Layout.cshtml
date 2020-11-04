@@ -370,20 +370,6 @@
                                     @if (User.IsInAnyRole("Administrador", "Super"))
                                     {
                                         <!--  RADIAN -->
-                                        <li>
-                                            <a id="@Navigation.NavigationEnum.RADIAN" class="parent-link" href="#">
-                                                <i class="fa fa-check-square"></i>
-                                                <span class="menu-title">RADIAN</span>
-                                                <i class="arrow"></i>
-                                                <!-- Configuracion -->
-                                            </a>
-                                            <!-- SubMenu -->
-                                            <ul class="collapse">
-                                                <a href="#">Configuración</a>
-                                                <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas</a></li>
-                                            </ul>
-
-                                        </li>
 
                                         <li>
                                             <a id="@Navigation.NavigationEnum.ConfigurationIndex" class="parent-link" href="#">
@@ -405,6 +391,7 @@
                                                 @if (User.IsInAnyRole("Administrator", "Super"))
                                                 {
                                                     <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("Index", "RadianContributorFileType")">Tipos de Ficheros Radian</a></li>
+                                                    <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas RADIAN</a></li>
                                                 }
                                                 @if (User.IsInAnyRole("Administrador", "Super"))
                                                 {
