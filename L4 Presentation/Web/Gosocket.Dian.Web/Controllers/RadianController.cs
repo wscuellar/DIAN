@@ -12,7 +12,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         private readonly IContributorService _ContributorService;
         private readonly IRadianContributorService _RadianContributorService;
-                
+
         public RadianController(IContributorService contributorService, IRadianContributorService radianContributorService)
         {
 
@@ -25,17 +25,16 @@ namespace Gosocket.Dian.Web.Controllers
         {
             string userCode = User.UserCode();
             Domain.Contributor contributor = _ContributorService.GetByCode(userCode);
-            if (contributor != null)
-            {
-                ViewBag.ContributorId = contributor.Id;
-                ViewBag.ContributorTypeId = contributor.ContributorTypeId;
-                ViewBag.Active = contributor.Status;
-                ViewBag.WithSoft = contributor.Softwares?.Count > 0;
-                
-                List<Domain.RadianContributor> radianContributor = _RadianContributorService.Get(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
-                string rcontributorTypes =  radianContributor?.Aggregate("", (current, next) => current + ", " + next.RadianContributorTypeId.ToString());               
-                ViewBag.ExistInRadian = rcontributorTypes;
-            }
+            if (contributor == null) return;
+
+            ViewBag.ContributorId = contributor.Id;
+            ViewBag.ContributorTypeId = contributor.ContributorTypeId;
+            ViewBag.Active = contributor.Status;
+            ViewBag.WithSoft = contributor.Softwares?.Count > 0;
+
+            List<Domain.RadianContributor> radianContributor = _RadianContributorService.Get(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
+            string rcontributorTypes = radianContributor?.Aggregate("", (current, next) => current + ", " + next.RadianContributorTypeId.ToString());
+            ViewBag.ExistInRadian = rcontributorTypes;
         }
 
 
@@ -54,7 +53,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult AdminRadianView()
         {
-            var radianContributors = _RadianContributorService.Get(t => true );
+            var radianContributors = _RadianContributorService.Get(t => true);
             var model = new AdminRadianViewModel();
             model.RadianContributors = radianContributors.Select(c => new RadianContributorsViewModel
             {
