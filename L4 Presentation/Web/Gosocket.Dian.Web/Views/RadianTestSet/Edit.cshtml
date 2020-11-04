@@ -1,0 +1,121 @@
+﻿@model Gosocket.Dian.Web.Models.RadianTestSetViewModel
+@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Domain.Common
+@{
+
+    ViewBag.Title = "Editar set de pruebas";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("Edit", "RadianTestSet", FormMethod.Post, new { id = "edit-testset-form" }))
+                        {
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("Index", "RadianTestSet")" class="btn btn-default">Cancelar</a>
+                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function ($) {
+            $('.datepicker').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                minYear: 1901
+            });
+            $('#TotalDocumentRequired').attr('readonly', true);
+
+
+            $("#InvoicesTotalRequired").change(function () {
+                var electronicInvoiceTotal = parseInt($("#InvoicesTotalRequired").val());
+                if (electronicInvoiceTotal < 2) {
+                    showErrorMessage(2);
+                    $("#InvoicesTotalRequired").val(2);
+                }
+                else {
+                    updateTotal();
+                }
+            });
+            $("#TotalDebitNotesRequired").change(function () {
+                var debitNoteTotal = parseInt($("#TotalDebitNotesRequired").val());
+                if (debitNoteTotal < 1) {
+                    showErrorMessage(1);
+                    $("#TotalDebitNotesRequired").val(1);
+                }
+                else {
+                    updateTotal();
+                }
+            });
+            $("#TotalCreditNotesRequired").change(function () {
+                var creditNoteTotal = parseInt($("#TotalCreditNotesRequired").val());
+                if (creditNoteTotal < 1) {
+                    showErrorMessage(1);
+                    $("#TotalCreditNotesRequired").val(1);
+                }
+                else {
+                    updateTotal();
+                }
+            });
+            $('#TotalDocumentAcceptedRequired').attr('readonly', true);
+
+
+            $("#TotalInvoicesAcceptedRequired").change(function () {
+                updateTotalRequired();
+            });
+            $("#TotalDebitNotesAcceptedRequired").change(function () {
+                updateTotalRequired();
+            });
+            $("#TotalCreditNotesAcceptedRequired").change(function () {
+                updateTotalRequired();
+            });
+
+            $('.btn-save').click(function () {
+
+                var form = $('#edit-testset-form');
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
+                    form.submit();
+                }
+            });
+        });
+
+        function updateTotal() {
+            var electronicInvoiceTotal = parseInt($("#InvoicesTotalRequired").val());
+            var creditNoteTotal = parseInt($("#TotalCreditNotesRequired").val());
+            var debitNoteTotal = parseInt($("#TotalDebitNotesRequired").val());
+            $("#TotalDocumentRequired").val(electronicInvoiceTotal + creditNoteTotal + debitNoteTotal);
+        }
+
+        function updateTotalRequired() {
+            var electronicInvoiceTotal = parseInt($("#TotalInvoicesAcceptedRequired").val());
+            var creditNoteTotal = parseInt($("#TotalCreditNotesAcceptedRequired").val());
+            var debitNoteTotal = parseInt($("#TotalDebitNotesAcceptedRequired").val());
+            $("#TotalDocumentAcceptedRequired").val(electronicInvoiceTotal + creditNoteTotal + debitNoteTotal);
+        }
+
+        function showErrorMessage(total) {
+            showNotification('warning', 'fa fa-check fa-2x', 'floating', 'Aviso.', 'El valor no puede ser inferior a ' + total);
+        }
+    </script>
+}

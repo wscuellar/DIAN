@@ -2718,6 +2718,7 @@
     <Content Include="Views\RadianTradingSystem\Index.cshtml" />
     <Content Include="Views\RadianFactor\Index.cshtml" />
     <Content Include="Views\RadianTechnologyProvider\Index.cshtml" />
+    <Content Include="Views\RadianTestSet\Edit.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
