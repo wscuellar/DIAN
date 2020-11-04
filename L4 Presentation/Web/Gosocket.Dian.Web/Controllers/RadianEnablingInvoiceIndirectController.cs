@@ -15,7 +15,7 @@ namespace Gosocket.Dian.Web.Controllers
         // GET: RadianEnablingInvoiceDirect
         public ActionResult Index(int contributorId)
         {
-            List<Domain.RadianContributor> radianContributor = radianContributorService.Get(t => t.ContributorId == contributorId && t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice);
+            List<Domain.RadianContributor> radianContributor = radianContributorService.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice);
             if (!radianContributor.Any())
             {
                 Domain.RadianContributor newRadianContributor = new Domain.RadianContributor()
