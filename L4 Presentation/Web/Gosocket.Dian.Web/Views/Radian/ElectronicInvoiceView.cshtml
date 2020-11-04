@@ -72,21 +72,21 @@
             if (message != undefined) {
                 var buttons = {};
                 if (direct) {
-                    buttons = (withSoft == "True" && existInRadian == 'False') ? ConfirmExec(EnablingInvoiceDirect) : AlertExec();
+                    buttons = (withSoft == "True" && !existInRadian.includes("1")) ? ConfirmExec(EnablingInvoiceDirect) : AlertExec();
                 }
                 else {
-                    buttons = (existInRadian == 'False') ? ConfirmExec(EnablingInvoiceIndirect) : AlertExec();
+                    buttons = (!existInRadian.includes("1")) ? ConfirmExec(EnablingInvoiceIndirect) : AlertExec();
                 }
                 showConfirmation(message, buttons);
             }
         });
 
         function GetDirectLabelMessage(withSoft, existInRadian) {
-            return (withSoft == "True" && existInRadian == 'False') ? ".ConfirmMessage" :  (existInRadian == 'False') ? ".ConfirmReject" : ".ConfirmUserExisting";
+            return (withSoft == "True" && !existInRadian.includes("1")) ? ".ConfirmMessage" :  (existInRadian == 'False') ? ".ConfirmReject" : ".ConfirmUserExisting";
         }
 
         function GetIndirectLabelMessage(existInRadian) {
-            return (existInRadian == 'False') ? ".ConfirmMessage" : ".ConfirmUserExisting";
+            return (!existInRadian.includes("1")) ? ".ConfirmMessage" : ".ConfirmUserExisting";
         }
 
     function EnablingInvoiceDirect() {

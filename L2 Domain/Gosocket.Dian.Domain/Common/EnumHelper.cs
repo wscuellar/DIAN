@@ -327,7 +327,7 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Sistema de Negociacion")]
         TradingSystem = 3,
         [Description("Factor")]
-        Factor = 3,
+        Factor = 4
     }
 
     public enum RadianOperationMode

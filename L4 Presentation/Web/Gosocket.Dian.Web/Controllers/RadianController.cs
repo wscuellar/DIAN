@@ -10,38 +10,58 @@ using System.Linq;
 using System;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Infrastructure;
+using Gosocket.Dian.Interfaces;
 
 namespace Gosocket.Dian.Web.Controllers
 {
     public class RadianController : Controller
     {
-        private readonly UserService userService = new UserService();
-        ContributorOperationsService contributorOperationsService = new ContributorOperationsService();
-        ContributorService contributorService = new ContributorService();
-        RadianContributorService radianContributorService = new RadianContributorService();
 
+        private readonly IContributorService _ContributorService;
+        private readonly IRadianContributorService _RadianContributorService;
+
+        public RadianController(IContributorService contributorService, IRadianContributorService radianContributorService)
+        {
+
+            _ContributorService = contributorService;
+            _RadianContributorService = radianContributorService;
+        }
+
+
+        private void SetContributorInfo()
+        {
+            string userCode = User.UserCode();
+            Domain.Contributor contributor = _ContributorService.GetByCode(userCode);
+            if (contributor == null) return;
+
+            ViewBag.ContributorId = contributor.Id;
+            ViewBag.ContributorTypeId = contributor.ContributorTypeId;
+            ViewBag.Active = contributor.Status;
+            ViewBag.WithSoft = contributor.Softwares?.Count > 0;
+
+            List<Domain.RadianContributor> radianContributor = _RadianContributorService.Get(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
+            string rcontributorTypes = radianContributor?.Aggregate("", (current, next) => current + ", " + next.RadianContributorTypeId.ToString());
+            ViewBag.ExistInRadian = rcontributorTypes;
+        }
         private static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
 
 
         // GET: Radian
         public ActionResult Index()
         {
+            SetContributorInfo();
             return View();
         }
 
         public ActionResult ElectronicInvoiceView()
         {
-            string userCode = User.UserCode();
-            Domain.Contributor contributor = contributorService.GetByCode(userCode);
-            List<Domain.RadianContributor> radianContributor =  radianContributorService.GetRadianContributor(t => t.Contributor.Code == userCode);
-            ViewBag.ContributorId = contributor.Id;
-            ViewBag.WithSoft = contributor != null && contributor.Softwares != null && contributor.Softwares.Count > 1;
-            ViewBag.ExistInRadian = radianContributor != null && radianContributor.Count > 0 && radianContributor[0].RadianState !=  Domain.Common.EnumHelper.GetDescription( Domain.Common.RadianState.Cancel);
+            SetContributorInfo();
             return View();
         }
 
         public ActionResult AdminRadianView()
         {
+            var radianContributors = _RadianContributorService.Get(t => true);
             var radianContributors = radianContributorService.GetRadianContributor(t => true, 1, 3);
             var radianContributorType = radianContributorService.GetRadianContributorTypes(t => true);
             var model = new AdminRadianViewModel();

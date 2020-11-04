@@ -4,9 +4,6 @@ using Gosocket.Dian.Infrastructure;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application.Managers
 {
@@ -38,16 +35,15 @@ namespace Gosocket.Dian.Application.Managers
 
                 return testSets;
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                //TODO: Crear o ubicar la clase que guarda logs de errores ¿Existe?
                 return new List<RadianTestSet>();
             }
         }
 
-        public GlobalTestSet GetTestSet(string partitionKey, string rowKey)
+        public RadianTestSet GetTestSet(string partitionKey, string rowKey)
         {
-            return testSetManager.Find<GlobalTestSet>(partitionKey, rowKey);
+            return testSetManager.Find<RadianTestSet>(partitionKey, rowKey);
         }
 
         //public IEnumerable<GlobalTestSetTracking> GetAllTestSetTracking(string partitionKey)
