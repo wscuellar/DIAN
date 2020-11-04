@@ -37,7 +37,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ResponseCode in the request body");
 
             //Valida eventos diferentes a Endoso en Garantia en blanco, dado que evento no informa el emisor documento AR
-            if(data.ResponseCode != "038")
+            if (data.ResponseCode != "038")
             {               
                 if (string.IsNullOrEmpty(data.SenderParty))
                     return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a SenderParty in the request body");
@@ -49,6 +49,9 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
 
             if (string.IsNullOrEmpty(data.CustomizationID))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a CustomizationID in the request body");
+
+            if (string.IsNullOrEmpty(data.CudeId))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a CudeId in the request body");
 
             try
             {
@@ -88,5 +91,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
         public string ResponseCode { get; set; }
         [JsonProperty(PropertyName = "CustomizationID")]
         public string CustomizationID { get; set; }
+        [JsonProperty(PropertyName = "UUID")]
+        public string CudeId { get; set; }
     }
 }
