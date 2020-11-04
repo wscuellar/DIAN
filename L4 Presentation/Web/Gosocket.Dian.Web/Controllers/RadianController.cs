@@ -62,8 +62,10 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult AdminRadianView()
         {
             var radianContributors = _RadianContributorService.List(t => true);
+            var radianContributorType = _RadianContributorService.GetRadianContributorTypes(t => true);
             var model = new AdminRadianViewModel();
-            model.RadianContributors = radianContributors.Select(c => new RadianContributorsViewModel
+            model.RadianContributors = radianContributors.Select(c =>
+            new RadianContributorsViewModel()
             {
                 Id = c.Contributor.Id,
                 Code = c.Contributor.Code,
@@ -73,12 +75,12 @@ namespace Gosocket.Dian.Web.Controllers
 
             }).ToList();
 
-            //model.RadianType = radianContributorType.Select(c => new SelectListItem
-            //{
-            //    Value = c.Id.ToString(),
-            //    Text = c.Name
+            model.RadianType = radianContributorType.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
 
-            //}).ToList();
+            }).ToList();
 
             model.SearchFinished = true;
             return View(model);
