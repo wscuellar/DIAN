@@ -20,17 +20,18 @@ namespace Gosocket.Dian.Web.Models
         public List<RadianContributorsViewModel> RadianContributors { get; set; }
 
         [DataType(DataType.Text)]
-        [Display(Name = "Nit Participante")]
+        [Display(Name = "Nit")]
         public string Code { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy", ApplyFormatInEditMode = true)]
+
         [DataType(DataType.Date)]
-        [Display(Name = "Fecha Registro Radian")]
+        [Display(Name = "Rango de fechas Registro")]
         public DateTime DateInterval { get; set; }
 
-        [Display(Name = "Tipo Participante")]
-        public List<RadianContributorTypeViewModel> Type { get; set; }
-
+        [Display(Name = "Tipo de participante")]
+        public int Type { get; set; }
+        public string StartDate { get; set;  }
+        public string EndDate { get; set; }
         [Display(Name = "Estado")]
         public List<RadianContributorStateViewModel> State { get; set; }
 
@@ -39,7 +40,9 @@ namespace Gosocket.Dian.Web.Models
 
         public int Id { get; set; }
         public bool SearchFinished { set; get; }
+        [Display(Name = "Tipo de participante")]
         public IEnumerable<SelectListItem> RadianType { get; set; }
+        [Display(Name = "Estado")]
         public RadianUtil.UserStates? RadianState { get; set; }
 
 

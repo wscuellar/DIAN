@@ -57,14 +57,14 @@
                                                         @Html.ValidationMessageFor(m => m.SelectedRadianContributorTypeId, "", new { @class = "text-danger" })
                                                     </div>
                                                 </div>
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group" style="padding-top:22px">
+                                                        <button type="button" class="btn btn-default btn-hover-gosocket btn-search" style="background-color: #348441; color: white;">&nbsp;&nbsp;Buscar</button>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                         </div>
-
-                                        <div class="panel-footer-grey text-right">
-                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Buscar</button>
-                                        </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -222,25 +222,37 @@
         function editRadianContributorFileType(id) {
             $.ajax({
                 url: '/RadianContributorFileType/GetEditRadianContributorFileTypePartialView/' + id,
-                success: function (data) {
-                    $('#modifyWrapper').html(data);
-                    $('#modifyModal').modal('show');
+                success: function (data, status, xhr) {
+                    var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
+                    if (injectingPartialView == "true") {
+                        $('#modifyWrapper').html(data);
+                        $('#modifyModal').modal('show');
+                    }
+                    else
+                    {
+                        window.location.href = '/User/Login';
+                    }
                 }
             });
         };
 
     </script>
     <script type="text/javascript">
-
         $(function () {
             $('.deleteModal').modal();
         });
         function deleteRadianContributorFileType(id) {
             $.ajax({
                 url: '/RadianContributorFileType/GetDeleteRadianContributorFileTypePartialView/' + id,
-                success: function (data) {
-                    $('#deleteWrapper').html(data);
-                    $('#deleteModal').modal('show');
+                success: function (data, status, xhr) {
+                    var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
+                    if (injectingPartialView == "true") {
+                        $('#deleteWrapper').html(data);
+                        $('#deleteModal').modal('show');
+                    }
+                    else {
+                        window.location.href = '/User/Login';
+                    }
                 }
             });
         };

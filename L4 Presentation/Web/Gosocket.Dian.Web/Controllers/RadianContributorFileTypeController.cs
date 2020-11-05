@@ -16,8 +16,9 @@ namespace Gosocket.Dian.Web.Controllers
     public class RadianContributorFileTypeController : Controller
     {
         RadianContributorFileTypeService radianContributorFileTypeService = new RadianContributorFileTypeService();
+        RadianContributorService radianContributorService = new RadianContributorService();
 
-        private List<RadianContributorFileTypeViewModel> RadianContributorFileTypeToViewModel(List<RadianContributorFileType> fileTypes) 
+        private List<RadianContributorFileTypeViewModel> RadianContributorFileTypeToViewModel(List<RadianContributorFileType> fileTypes)
         {
             return fileTypes.Select(ft => new RadianContributorFileTypeViewModel
             {
@@ -30,11 +31,11 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
         }
 
-        private RadianContributorFileTypeViewModel GenerateNewRadianContributorFileTypeViewModel() 
+        private RadianContributorFileTypeViewModel GenerateNewRadianContributorFileTypeViewModel()
         {
             var newModel = new RadianContributorFileTypeViewModel();
-            newModel.RadianContributorTypes = new SelectList(radianContributorFileTypeService.GetRadianContributorTypes(), "Id", "Name");
-            newModel.SelectedRadianContributorTypeId = radianContributorFileTypeService.GetRadianContributorTypes().First().Id.ToString();
+            newModel.RadianContributorTypes = new SelectList(radianContributorService.GetRadianContributorTypes(rct => rct.Id == rct.Id), "Id", "Name");
+            newModel.SelectedRadianContributorTypeId = radianContributorService.GetRadianContributorTypes(rct => rct.Id == rct.Id).First().Id.ToString();
             return newModel;
         }
 
@@ -43,7 +44,7 @@ namespace Gosocket.Dian.Web.Controllers
             var model = new RadianContributorFileTypeTableViewModel();
             var fileTypes = radianContributorFileTypeService.GetRadianContributorFileTypes(model.Page, model.Length, (ft => ft.Id == ft.Id && ft.Deleted == false));
             model.RadianContributorFileTypes = RadianContributorFileTypeToViewModel(fileTypes);
-            model.RadianContributorTypes = new SelectList(radianContributorFileTypeService.GetRadianContributorTypes(), "Id", "Name");
+            model.RadianContributorTypes = new SelectList(radianContributorService.GetRadianContributorTypes(rct => rct.Id == rct.Id), "Id", "Name");
             model.SearchFinished = true;
             model.RadianContributorFileTypeViewModel = GenerateNewRadianContributorFileTypeViewModel();
             ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
@@ -55,10 +56,10 @@ namespace Gosocket.Dian.Web.Controllers
         {
 
             var fileTypes = new List<RadianContributorFileType>();
-            int selectedType = (model.SelectedRadianContributorTypeId == null) ? 0: int.Parse(model.SelectedRadianContributorTypeId);
+            int selectedType = (model.SelectedRadianContributorTypeId == null) ? 0 : int.Parse(model.SelectedRadianContributorTypeId);
             fileTypes = radianContributorFileTypeService.GetRadianContributorFileTypes(model.Page, model.Length, (ft => ft.Id == ft.Id && ((model.Name == null) ? true : ft.Name.Contains(model.Name)) && ((model.SelectedRadianContributorTypeId == null) ? true : ft.RadianContributorTypeId == selectedType) && ft.Deleted == false));
             model.RadianContributorFileTypes = RadianContributorFileTypeToViewModel(fileTypes);
-            model.RadianContributorTypes = new SelectList(radianContributorFileTypeService.GetRadianContributorTypes(), "Id", "Name");
+            model.RadianContributorTypes = new SelectList(radianContributorService.GetRadianContributorTypes(rct => rct.Id == rct.Id), "Id", "Name");
             model.SearchFinished = true;
             model.RadianContributorFileTypeViewModel = GenerateNewRadianContributorFileTypeViewModel();
             ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
@@ -107,7 +108,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View(radianContributorFileTypeViewModel);
         }
 
-        public PartialViewResult GetEditRadianContributorFileTypePartialView(int id) 
+        public PartialViewResult GetEditRadianContributorFileTypePartialView(int id)
         {
             RadianContributorFileType fileType = radianContributorFileTypeService.Get(id);
             RadianContributorFileTypeViewModel radianContributorFileTypeViewModel = new RadianContributorFileTypeViewModel
@@ -117,8 +118,9 @@ namespace Gosocket.Dian.Web.Controllers
                 Mandatory = fileType.Mandatory,
                 RadianContributorType = fileType.RadianContributorType,
                 SelectedRadianContributorTypeId = fileType.RadianContributorType.Id.ToString(),
-                RadianContributorTypes = new SelectList(radianContributorFileTypeService.GetRadianContributorTypes(), "Id", "Name"),
+                RadianContributorTypes = new SelectList(radianContributorService.GetRadianContributorTypes(rct => rct.Id == rct.Id), "Id", "Name"),
             };
+            Response.Headers["InjectingPartialView"] = "true";
             return PartialView("~/Views/RadianContributorFileType/_Edit.cshtml", radianContributorFileTypeViewModel);
         }
 
@@ -152,6 +154,7 @@ namespace Gosocket.Dian.Web.Controllers
                 RadianContributorType = fileType.RadianContributorType,
                 SelectedRadianContributorTypeId = fileType.RadianContributorType.Id.ToString()
             };
+            Response.Headers["InjectingPartialView"] = "true";
             return PartialView("~/Views/RadianContributorFileType/_Delete.cshtml", radianContributorFileTypeViewModel);
         }
 
@@ -167,9 +170,11 @@ namespace Gosocket.Dian.Web.Controllers
                 Updated = DateTime.Now,
                 Deleted = true,
             };
-            var result = radianContributorFileTypeService.Delete(fileType);
+            if (radianContributorFileTypeService.IsAbleForDelete(fileType))
+            {
+                var result = radianContributorFileTypeService.Delete(fileType);
+            }
             ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
-
             return RedirectToAction("List");
         }
 

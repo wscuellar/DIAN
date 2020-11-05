@@ -90,7 +90,16 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult AdminRadianView(AdminRadianViewModel model)
         {
-            var radianContributors = _RadianContributorService.List(t => true, 1, 3);
+            var radianContributorType = _RadianContributorService.GetRadianContributorTypes(t => true);
+            var radianContributors = _RadianContributorService.List(t => (t.Contributor.Code == model.Code || model.Code == null) && (t.RadianContributorTypeId == model.Type || model.Type == 0) && ( t.RadianState == model.RadianState.ToString() || model.RadianState == null), model.Page, model.Length);
+            
+            model.RadianType = radianContributorType.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+
+            }).ToList();
+
             model.RadianContributors = radianContributors.Select(c => new RadianContributorsViewModel
             {
                 Id = c.Contributor.Id,
