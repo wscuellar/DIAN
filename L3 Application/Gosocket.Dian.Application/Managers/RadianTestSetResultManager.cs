@@ -7,39 +7,38 @@ using System.Collections.Generic;
 
 namespace Gosocket.Dian.Application.Managers
 {
-    public class RadianTestSetManager
+    public class RadianTestSetResultManager
     {
-        private static readonly TableManager testSetManager = new TableManager("RadianTestSet");
+        private static readonly TableManager testSetManager = new TableManager("RadianTestSetResult");
 
-        public bool InsertTestSet(RadianTestSet testSet)
+        public bool InsertTestSet(RadianTestSetResult testSetResult)
         {
-            return testSetManager.InsertOrUpdate(testSet);
+            return testSetManager.InsertOrUpdate(testSetResult);
         }
 
-        public IEnumerable<RadianTestSet> GetAllTestSet()
+        public IEnumerable<RadianTestSetResult> GetAllTestSetResult()
         {
             try
             {
                 TableContinuationToken token = null;
-                var testSets = new List<RadianTestSet>();
+                var testSets = new List<RadianTestSetResult>();
                 foreach (var operationModeId in new List<int> { (int)RadianContributorType.ElectronicInvoice, (int)RadianContributorType.TechnologyProvider, (int)RadianContributorType.TradingSystem, (int)RadianContributorType.Factor })
                 {
-                    var data = testSetManager.GetRangeRows<RadianTestSet>($"{operationModeId}", 1000, token);
+                    var data = testSetManager.GetRangeRows<RadianTestSetResult>($"{operationModeId}", 1000, token);
                     testSets.AddRange(data.Item1);
                 }
 
                 return testSets;
             }
-            catch (Exception )
+            catch (Exception)
             {
-                return new List<RadianTestSet>();
+                return new List<RadianTestSetResult>();
             }
         }
 
-        public RadianTestSet GetTestSet(string partitionKey, string rowKey)
+        public RadianTestSetResult GetTestSetResult(string partitionKey, string rowKey)
         {
-            return testSetManager.Find<RadianTestSet>(partitionKey, rowKey);
+            return testSetManager.Find<RadianTestSetResult>(partitionKey, rowKey);
         }
-
     }
 }
