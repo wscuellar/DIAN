@@ -135,7 +135,7 @@ namespace Gosocket.Dian.Web.Controllers
             );
             if (result)
             {
-                return RedirectToAction("Index";
+                return RedirectToAction("Index");
             }
 
             ViewBag.ErrorMessage = "Ocurrio un problema creando el Set de Pruebas de Radian";

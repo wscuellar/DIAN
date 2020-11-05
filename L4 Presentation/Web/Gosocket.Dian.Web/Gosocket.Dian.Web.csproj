@@ -2698,7 +2698,6 @@
     <Content Include="Views\Support\_personLogin.cshtml" />
     <Content Include="Views\Support\_adminCredentials.cshtml" />
     <Content Include="Views\Radian\Index.cshtml" />
-    <Content Include="Views\RadiantContributorFileType\Index.cshtml" />
     <Content Include="Views\Radian\ElectronicInvoiceView.cshtml" />
     <Content Include="Views\RadianTestSet\Index.cshtml" />
     <Content Include="Views\RadianTestSet\_items.cshtml" />
@@ -2724,6 +2723,11 @@
     <Content Include="Views\RadianTestSet\Edit.cshtml" />
     <Content Include="Views\Radian\AdminRadianView.cshtml" />
     <Content Include="Views\Radian\_Items.cshtml" />
+    <Content Include="Views\RadianContributorFileType\List.cshtml" />
+    <Content Include="Views\RadianContributorFileType\_Add.cshtml" />
+    <Content Include="Views\RadianContributorFileType\_Delete.cshtml" />
+    <Content Include="Views\RadianContributorFileType\_Edit.cshtml" />
+    <Content Include="Views\RadianContributorFileType\_Items.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
