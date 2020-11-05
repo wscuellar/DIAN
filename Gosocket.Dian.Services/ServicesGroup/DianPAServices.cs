@@ -767,7 +767,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
 
             //Solicitud de Disponibilizacion
-            if(eventCode == "036")
+            if (eventCode == "036")
             {
                 var eventApproveCufe = EventApproveCufe(trackId, eventCode, docTypeCode);
                 if (!eventApproveCufe.IsValid)
@@ -779,7 +779,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     return dianResponse;
                 }
             }
-               
+
             var approveCufe = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_ValidateParty) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             //Validate Sendercode and ReceiverCode
@@ -899,7 +899,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 documentTypeId = docTypeCode,
                 trackId,
                 isEvent,
-                eventCode,              
+                eventCode,
                 customizationID
             };
             var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
@@ -961,6 +961,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
                 var notifications = validations.Where(r => r.IsNotification).ToList();
+                if (errors.Any(t => t.ErrorCode == "AAD06"))
+                {
+                    documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMeta);
+
+                }
 
                 if (!errors.Any() && !notifications.Any())
                 {
@@ -1054,7 +1060,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var lastZone = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_LastZone) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 TableManagerGlobalLogger.InsertOrUpdate(lastZone);
                 // LAST ZONE
-              
+
                 return dianResponse;
             }
         }
@@ -1571,9 +1577,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var arrayTasks = new List<Task>();
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             if (eventCode == "038")
-            {              
+            {
                 validatorDocumentMeta.InTransaction = false;
-                arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));                
+                arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
             }
         }
     }
