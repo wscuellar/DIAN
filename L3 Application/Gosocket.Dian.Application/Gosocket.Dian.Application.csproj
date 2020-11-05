@@ -177,6 +177,7 @@
   <ItemGroup>
     <Compile Include="Common\CertificateExtensions.cs" />
     <Compile Include="Common\RedisExtensions.cs" />
+    <Compile Include="EmailService.cs" />
     <Compile Include="RadianContributorFileTypeService.cs" />
     <Compile Include="ContributorOperationsService.cs" />
     <Compile Include="ContributorService.cs" />
