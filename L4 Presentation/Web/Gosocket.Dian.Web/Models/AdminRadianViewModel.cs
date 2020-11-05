@@ -96,6 +96,7 @@ namespace Gosocket.Dian.Web.Models
         public List<RadianContributorFileViewModel> RadianContributorFiles { get; set; }
         public RadianContributorFileStatusViewModel RadianContributorFileStatus { get; set; }
         public bool CanEdit { get; set; }
+  
 
     }
 
