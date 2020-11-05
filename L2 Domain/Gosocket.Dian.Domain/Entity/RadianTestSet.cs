@@ -13,13 +13,8 @@ namespace Gosocket.Dian.Domain.Entity
         }
 
         public string TestSetId { get; set; }
-        //public int Status { get; set; }
-        //public bool TestSetReplace { get; set; }
 
         public string Description { get; set; }
-
-        //public int OperationModeId { get; set; }
-        //public string OperationModeName { get; set; }
 
         public int TotalDocumentRequired { get; set; }
         public int TotalDocumentAcceptedRequired { get; set; }
