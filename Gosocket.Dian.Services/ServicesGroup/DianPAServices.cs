@@ -859,7 +859,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE MAPPER
 
             // Validate EventCode
-            var eventCodeResponse = ValidateEventCode(trackId, eventCode, docTypeCode);
+            var eventCodeResponse = ValidateEventCode(trackId, eventCode, docTypeCode, trackIdCude);
             if (!eventCodeResponse.IsValid)
             {
                 dianResponse = eventCodeResponse;
@@ -1489,9 +1489,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId)
+        private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

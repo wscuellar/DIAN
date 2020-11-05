@@ -70,27 +70,43 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
-        public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(ValidateEmitionEventPrev.RequestObject eventPrev)
+        public async Task<List<ValidateListResponse>> StartValidateEmitionEventPrevAsync(ValidateEmitionEventPrev.RequestObject eventPrev)
         {
+            var validateResponses = new List<ValidateListResponse>();
+
             //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
             if (eventPrev.EventCode == "040")
             {
-                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackIdCude, eventPrev.TrackIdCude);
                 if (documentMeta != null)
                 {
                     //Obtiene el CUFE
                     eventPrev.TrackId = documentMeta.DocumentReferencedKey;
                 }
-            }            
+            }
+
+            var xmlBytes = await GetXmlFromStorageAsync(eventPrev.TrackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var cufeModel = xmlParser.Fields.ToObject<CufeModel>();
 
             var validator = new Validator();
-            return validator.ValidateEmitionEventPrev(eventPrev);
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, cufeModel));
+
+            return validateResponses;
+
         }
+
+
         public List<ValidateListResponse> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
         {
             var validator = new Validator();
             return validator.ValidateDocumentReferencePrev(trackId, idDocumentReference);
         }
+
+
         public async Task<List<ValidateListResponse>> StartValidateSigningTimeAsync(ValidateSigningTime.RequestObject data)
         {           
             var validateResponses = new List<ValidateListResponse>();

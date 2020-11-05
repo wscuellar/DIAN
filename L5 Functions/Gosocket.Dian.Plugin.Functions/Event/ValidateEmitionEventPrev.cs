@@ -37,9 +37,11 @@ namespace Gosocket.Dian.Plugin.Functions.Event
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a EventCode in the request body");
             if (string.IsNullOrEmpty(data.DocumentTypeId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId in the request body");
-         try
+            if (string.IsNullOrEmpty(data.TrackIdCude))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a TrackIdCude in the request body");
+            try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateEmitionEventPrevAsync(data);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateEmitionEventPrevAsync(data);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -70,6 +72,8 @@ namespace Gosocket.Dian.Plugin.Functions.Event
             public string EventCode { get; set; }
             [JsonProperty(PropertyName = "DocumentTypeId")]
             public string DocumentTypeId { get; set; }
+            [JsonProperty(PropertyName = "trackIdCude")]
+            public string TrackIdCude { get; set; }
         }
     }
 }
