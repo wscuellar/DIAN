@@ -744,16 +744,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validate Reference Attorney
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
         {
+            int attorneyLimit = Properties.Settings.Default.MAX_Attorney;
+            bool validate = true;
+            string validateCufeErrorCode = "89";
+            string startDateAttorney = string.Empty;
+            string endDate = string.Empty;
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             List<AttorneyModel> attorney = new List<AttorneyModel>();
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
             string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0).InnerText.ToString();
             string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0).InnerText.ToString();
-            string startDateAttorney = string.Empty;
-            string endDate = string.Empty;
             XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
-            for(int i = 1; i < cufeList.Count && i < 21; i++)
+            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0).InnerText.ToString();
+            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0).Attributes["listID"].Value;
+            if(customizationID == "432" && listID == "2")
+            {
+                startDateAttorney = string.Empty;
+                endDate = string.Empty;
+            }
+            else
+            {
+                validate = false;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = validateCufeErrorCode,
+                    ErrorMessage = "Error en los campos de validacion de mandato ilimitado",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+            }
+            for (int i = 1; i < cufeList.Count && i < attorneyLimit+1 && validate; i++)
             {
                 AttorneyModel attorneyModel = new AttorneyModel();
                 string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i).InnerText.ToString();
@@ -762,31 +785,50 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 attorneyModel.facultityCode = tempCode[0];
                 attorneyModel.actor = tempCode[1];
                 attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i).InnerText.ToString();
-                attorney.Add(attorneyModel);
-            }
-            foreach(var attorneyDocument in attorney)
-            {
-                GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId,attorneyDocument.cufe) 
+                attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i).InnerText.ToString();
+                var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference);
+                if (resultValidateCufe[0].IsValid)
+                    attorney.Add(attorneyModel);
+                else
                 {
-                    Active =true,
-                    Actor =attorneyDocument.actor,
-                    EffectiveDate = effectiveDate,
-                    EndDate = endDate,
-                    FacultityCode =attorneyDocument.facultityCode,
-                    IssuerAttorney = issuerPartyCode,
-                    SenderCode = senderCode,
-                    StartDate = startDateAttorney
-                };
-                TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
+                    validate = false;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = validateCufeErrorCode,
+                        ErrorMessage = "Error en la validación del CUFE referenciado, No existe en sistema DIAN",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                }
             }
-            responses.Add(new ValidateListResponse
+            if(validate)
             {
-                IsValid = true,
-                Mandatory = true,
-                ErrorCode = "100",
-                ErrorMessage = "Mandato referenciado correctamente",
-                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-            });
+                foreach (var attorneyDocument in attorney)
+                {
+                    GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId,attorneyDocument.cufe) 
+                    {
+                        Active =true,
+                        Actor =attorneyDocument.actor,
+                        EffectiveDate = effectiveDate,
+                        EndDate = endDate,
+                        FacultityCode =attorneyDocument.facultityCode,
+                        IssuerAttorney = issuerPartyCode,
+                        SenderCode = senderCode,
+                        StartDate = startDateAttorney
+                    };
+                    TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
+                }
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = true,
+                    Mandatory = true,
+                    ErrorCode = "100",
+                    ErrorMessage = "Mandato referenciado correctamente",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;

@@ -331,7 +331,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
-
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser, data.TrackId));
 

@@ -12,6 +12,8 @@ namespace Gosocket.Dian.Plugin.Functions.Models
 
         public string cufe { get; set; }
         public string facultityCode { get; set; }
+        
+        public string idDocumentReference { get; set; }
 
     }
 }
