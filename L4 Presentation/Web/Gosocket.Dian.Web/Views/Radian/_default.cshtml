@@ -54,7 +54,7 @@
 </div>
 
 <div class="row">
-    <div class="col-sm-12 padding-xs-0">
+    <div class="col-sm-12 padding-xs-0 ">
         <ul class="list-inline radian-conventions">
             <li class="list-inline-item"><i class="fa fa-exclamation-circle"></i>Pendiente</li>
             <li class="list-inline-item"><img src="~/Content/images/Svg/Loaded.svg">Cargado y en revisión </li>
@@ -76,7 +76,7 @@
                                 <tr>
                                     <th class="text-left">Archivo</th>
                                     <th class="text-center">Estado</th>
-                                    <th class="text-center">Estado</th>
+                                    <th class="text-center"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -108,7 +108,7 @@
                                     <tr data-id="@f.ContributorFileType.Id">
                                         <td class="text-left"><span class="fa fa fa-download add-tooltip download-contributor-files" data-original-title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>@f.ContributorFileType.Name</td>
                                         <td class="text-center"><div><span class="">@Html.Raw(label) @f.ContributorFileStatus.Name</span></div></td>
-                                        <td class="text-center"><i class="fa fa-pencil"></i><span class="label edit-state">Editar</span></td>
+                                        <td class="text-center"><i class="fa fa-pencil"></i><button type="button" class="btn btn-link edit-state">Editar</button></td>
                                     </tr>
                                     index++;
                                 }
@@ -120,7 +120,7 @@
         }
     </div>
 
-    <div class="row">
+    <div class="row dropdown-state">
         <div class="col-sm-6 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.AcceptanceStatusId, new { @class = "control-label" })

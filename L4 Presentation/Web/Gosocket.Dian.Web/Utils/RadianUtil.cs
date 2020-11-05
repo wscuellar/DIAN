@@ -11,13 +11,13 @@ namespace Gosocket.Dian.Web.Utils
         public enum UserStates
         {
             [Display(Name = "Registrado")]
-            Registered,
+            Registrado,
             [Display(Name = "En pruebas")]
             Test,
             [Display(Name = "Habilitado")]
-            Enabled,
+            Habilitado,
             [Display(Name = "Cancelado")]
-            Canceled
+            Cancelado
         }
 
         public enum UserApprovalStates
