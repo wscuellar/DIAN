@@ -3,6 +3,9 @@
 
 
 <div class="row">
+    <h4 class="text-thin">Datos del modo operación </h4>
+    <hr class="margin-5" />
+
     <div class="col-sm-3 padding-xs-0">
         <div class="form-group">
             @Html.Label("Seleccione el modo de operación", new { @class = "control-label" })
@@ -65,7 +68,6 @@
             @Html.ValidationMessageFor(m => m.ExpressAcceptanceTotalRequired, "", new { @class = "control-label" })
         </div>
     </div>
-    <!-- Segunda linea de captura -->
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.AutomaticAcceptanceTotalRequired, new { @class = "control-label" })
@@ -93,7 +95,6 @@
             @Html.ValidationMessageFor(m => m.EndorsementTotalRequired, "", new { @class = "control-label" })
         </div>
     </div>
-    <!-- Tercera linea de captura de datos -->
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.EndorsementCancellationTotalRequired, new { @class = "control-label" })
@@ -122,7 +123,6 @@
             @Html.ValidationMessageFor(m => m.EndMandateTotalRequired, "", new { @class = "control-label" })
         </div>
     </div>
-    <!-- Cuarta linea de datos de captura -->
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.PaymentNotificationTotalRequired, new { @class = "control-label" })
