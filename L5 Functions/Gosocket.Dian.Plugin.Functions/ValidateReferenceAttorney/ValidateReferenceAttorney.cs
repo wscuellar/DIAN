@@ -32,6 +32,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateReferenceAttorney
 
             if (string.IsNullOrEmpty(data.TrackId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
+
             try
             {
                 var validateResponses = await ValidatorEngine.Instance.StartValidateReferenceAttorney(data);
@@ -60,7 +61,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateReferenceAttorney
     }
     public class RequestObjectReferenceAttorney
     {
-        [JsonProperty(PropertyName = "trackId")]
+        [JsonProperty(PropertyName = "trackId")]        
         public string TrackId { get; set; }
     }
 
