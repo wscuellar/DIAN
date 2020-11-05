@@ -17,7 +17,7 @@
         <tbody>
             @foreach (var user in Model.Users)
             {
-                <tr class='clickable-row' data-href="@Url.Action("View","User", new { id = user.Id })">
+                <tr @*class='clickable-row' data-href="@Url.Action("View","User", new { id = user.Id })"*@>
                     <td class="text-nowrap"><a>@user.Code</a></td>
                     <td class="text-nowrap"><a>@user.Name</a></td>
                     <td class="text-nowrap"><a>@user.Email</a></td>

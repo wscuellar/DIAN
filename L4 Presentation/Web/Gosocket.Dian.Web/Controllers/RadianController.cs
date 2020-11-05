@@ -12,6 +12,7 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
 using System.Diagnostics;
+using System.Data.Entity;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -20,6 +21,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         private readonly IContributorService _ContributorService;
         private readonly IRadianContributorService _RadianContributorService;
+        private readonly UserService userService = new UserService();
 
         public RadianController(IContributorService contributorService, IRadianContributorService radianContributorService)
         {
@@ -91,7 +93,15 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult AdminRadianView(AdminRadianViewModel model)
         {
             var radianContributorType = _RadianContributorService.GetRadianContributorTypes(t => true);
-            var radianContributors = _RadianContributorService.List(t => (t.Contributor.Code == model.Code || model.Code == null) && (t.RadianContributorTypeId == model.Type || model.Type == 0) && ( t.RadianState == model.RadianState.ToString() || model.RadianState == null), model.Page, model.Length);
+            DateTime? startDate = string.IsNullOrEmpty(model.StartDate) ? null : (DateTime?)Convert.ToDateTime(model.StartDate).Date;
+            DateTime? endDate = string.IsNullOrEmpty(model.EndDate) ? null : (DateTime?)Convert.ToDateTime(model.EndDate).Date;
+            var radianContributors = _RadianContributorService.List(t => 
+            (t.Contributor.Code == model.Code || model.Code == null) && 
+            (t.RadianContributorTypeId == model.Type || model.Type == 0) && 
+            ( t.RadianState == model.RadianState.ToString() || model.RadianState == null) &&
+            (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) && 
+            (DbFunctions.TruncateTime(t.CreatedDate) <= endDate || !endDate.HasValue), 
+            model.Page, model.Length);
             
             model.RadianType = radianContributorType.Select(c => new SelectListItem
             {
@@ -118,6 +128,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
 
             var radianContributor = _RadianContributorService.List(t => t.ContributorId == id);
+            var userIds = _ContributorService.GetUserContributors(id).Select(u => u.UserId);
             //RadianContributor contributor = contributorService.ObsoleteGet(id);
 
             //var userIds = contributorService.GetUserContributors(id).Select(u => u.UserId);
@@ -166,7 +177,13 @@ namespace Gosocket.Dian.Web.Controllers
                     Updated = f.Updated
 
                 }).ToList() : null,
-
+                Users = userService.GetUsers(userIds.ToList()).Select(u => new UserViewModel
+                {
+                    Id = u.Id,
+                    Code = u.Code,
+                    Name = u.Name,
+                    Email = u.Email
+                }).ToList(),
 
             };
             //var model = new ContributorViewModel
@@ -273,6 +290,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
         }
+
 
     }
 }

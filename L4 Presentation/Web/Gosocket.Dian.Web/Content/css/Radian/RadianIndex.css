@@ -31,9 +31,11 @@ th {
     color: #2C323C;
     padding: 6px 10px;
 }
+.button-top-left-radian {
+    margin: 25px 0px;
+    cursor: pointer;
+}
 /*    general Styles      */
-
-
 .RadianContainerBegin {
     margin: 25px;
     background: #FFFFFF;
@@ -163,7 +165,7 @@ i.fa-info-circle {
     padding: 6px 10px;
 }
 
-#table-contributor-files .fa-pencil{
+.fa-pencil{
     font-style: normal;
     font-weight: 900;
     font-size: 14px;
@@ -236,4 +238,8 @@ i.fa-info-circle {
 
 .panel-title-radian{
     font-size: 18px;
+}
+
+#DateInterval {
+    cursor: pointer;
 }

@@ -17,64 +17,66 @@
         {
             <thead>
                 <tr>
-                    <th>Modo de operación</th>
-                    <th>Descripción</th>
-                    <th>Documentos</th>
-                    <th>Acuse de recibo</th>
-                    <th>Recibo del bien</th>
-                    <th>Aceptación expresa</th>
-                    <th>Aceptación tácita</th>
-                    <th>Rechazo factura electrónica</th>
-                    <th>Solicitud de disponibilización</th>
-                    <th>Endoso electrónico</th>
-                    <th>Anulación de endoso</th>
-                    <th>Avales</th>
-                    <th>Mandato Electrónico</th>
-                    <th>Terminación del mandato</th>
-                    <th>Notificación de pago</th>
-                    <th>Limitación de circulación</th>
-                    <th>Terminación de limitación</th>
-                    <th>Estado</th>
-                    <th>Creado por</th>
+                    <th class="col-md-2">Modo de operación</th>
+                    <th class="col-md-2">Descripción</th>
+                    <th class="col-md-2">Documentos</th>
+                    @*<th>Acuse de recibo</th>
+        <th>Recibo del bien</th>
+        <th>Aceptación expresa</th>
+        <th>Aceptación tácita</th>
+        <th>Rechazo factura electrónica</th>
+        <th>Solicitud de disponibilización</th>
+        <th>Endoso electrónico</th>
+        <th>Anulación de endoso</th>
+        <th>Avales</th>
+        <th>Mandato Electrónico</th>
+        <th>Terminación del mandato</th>
+        <th>Notificación de pago</th>
+        <th>Limitación de circulación</th>
+        <th>Terminación de limitación</th>*@
+                    <th class="col-md-2">Estado</th>
+                    <th class="col-md-2">Creado por</th>
+                    <th class="col-md-2"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var set in Model.RadianTestSets)
                 {
 
-                    <tr class='clickable-row' data-href="@Url.Action("Edit","RadianTestSet",new { operationModeId = set.OperationModeId})">
-                        <td class="text-nowrap"><a>@set.OperationModeName</a></td>
-                        <td class="text-nowrap"><a>@set.Description</a></td>
-                        <td class="text-nowrap"><a>@set.TotalDocumentRequired</a></td>
-                        <td class="text-nowrap"><a>@set.ReceiptNoticeTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.ReceiptServiceTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.ExpressAcceptanceTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.AutomaticAcceptanceTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.RejectInvoiceTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.ApplicationAvailableTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.EndorsementTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.EndorsementCancellationTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.GuaranteeTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.ElectronicMandateTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.EndMandateTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.PaymentNotificationTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.CirculationLimitationTotalRequired</a></td>
-                        <td class="text-nowrap"><a>@set.EndCirculationLimitationTotalRequired</a></td>
-                        <td class="text-nowrap">
-                            @{
-                                var text_color = set.Active ? "text-gosocket" : "text-red";
-                                var text_status = set.Active ? "Activo" : "Inactivo";
-                                <a><i class="fa fa-circle @text_color"></i>&nbsp;@text_status</a>
-                            }
-                        </td>
-                        @*<td class="text-nowrap">
-                                <a>@set.StartDate.ToString("dd-MM-yyyy")</a>
-                            </td>
-                            <td class="text-nowrap">
-                                <a>@set.EndDate.ToString("dd-MM-yyyy")</a>
-                            </td>*@
-                        <td class="text-nowrap"><a>@set.CreatedBy</a></td>
-                    </tr>
+                <tr class='clickable-row' data-href="@Url.Action("Edit","RadianTestSet",new { operationModeId = set.OperationModeId})">
+                    <td class="text-nowrap"><a>@set.OperationModeName</a></td>
+                    <td class="text-nowrap"><a>@set.Description</a></td>
+                    <td class="text-nowrap"><a>@set.TotalDocumentRequired</a></td>
+                    @*<td class="text-nowrap"><a>@set.ReceiptNoticeTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.ReceiptServiceTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.ExpressAcceptanceTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.AutomaticAcceptanceTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.RejectInvoiceTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.ApplicationAvailableTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.EndorsementTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.EndorsementCancellationTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.GuaranteeTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.ElectronicMandateTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.EndMandateTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.PaymentNotificationTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.CirculationLimitationTotalRequired</a></td>
+        <td class="text-nowrap"><a>@set.EndCirculationLimitationTotalRequired</a></td>*@
+                    <td class="text-nowrap">
+                        @{
+                            var text_color = set.Active ? "text-gosocket" : "text-red";
+                            var text_status = set.Active ? "Activo" : "Inactivo";
+                            <a>@*<i class="fa fa-circle @text_color"></i>&nbsp;*@@text_status</a>
+                        }
+                    </td>
+                    @*<td class="text-nowrap">
+            <a>@set.StartDate.ToString("dd-MM-yyyy")</a>
+        </td>
+        <td class="text-nowrap">
+            <a>@set.EndDate.ToString("dd-MM-yyyy")</a>
+        </td>*@
+                    <td class="text-nowrap"><a>@set.CreatedBy</a></td>
+                    <td class="text-nowrap"><i class="fa fa-pencil"></i></td>
+                </tr>
                 }
             </tbody>
         }

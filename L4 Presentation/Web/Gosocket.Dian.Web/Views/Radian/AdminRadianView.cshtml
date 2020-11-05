@@ -113,16 +113,32 @@
 
     <script>
         $(document).ready(function () {
-
+            debugger
             var form = $('#radian-contributors-form');
             $('#DateInterval').daterangepicker({
-                startDate: moment(),
-                endDate: moment().add(2, 'days'),
-                language: 'es',
                 locale: {
-                    format: 'DD/MMMM/yyyy'
+                    applyLabel: "Aplicar",
+                    cancelLabel: "Cancelar",
+                    format: 'DD-MMMM-yyyy',
+                    monthNames: [
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre"
+                    ],
+                    separator: " al ",
                 }
+                
             });
+
 
              $("#Code").focus();
 
@@ -131,7 +147,11 @@
             }
 
             $('.btn-search').click(function () {
+                var dateRange = $("#DateInterval").val();
+                $('#StartDate').val(dateRange.split("al")[0]);
+                $('#EndDate').val(dateRange.split("al")[1]);
                 $('#Page').val(0);
+
                 $('#Type').val($("#RadianType").val());
                 showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
                 $(this).attr('disabled', 'disabled');
