@@ -48,7 +48,7 @@ namespace Gosocket.Dian.Web.Controllers
                     OperationModeId = int.Parse(x.PartitionKey)
                 }).ToList()
             };
-            ViewBag.CurrentPage = Navigation.NavigationEnum.TestSet;
+            ViewBag.CurrentPage = Navigation.NavigationEnum.RadianSetPruebas;
             return View(model);
         }
 
