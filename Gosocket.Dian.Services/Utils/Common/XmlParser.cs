@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string CustomizationID { get; set; }
         public string DocumentReferenceId { get; set; }
         public string PaymentMeansID { get; set; }
-
+        public string PaymentDueDate { get; set; }
 
     public XmlParser()
         {
@@ -74,14 +74,19 @@ namespace Gosocket.Dian.Services.Utils.Common
                     XmlDocument.Load(sr);
                     var node = XmlDocument.GetElementsByTagName("xades:SigningTime")[0];
                     var nodeCustomizationID = XmlDocument.GetElementsByTagName("cbc:CustomizationID")[0];
-                    var nodePaymentMeansID = XmlDocument.GetElementsByTagName("cac:PaymentMeans/cbc:ID")[0];
+                    var nodePaymentMeansValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='ID']";                    
+                    var nodePaymentDueDateValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='PaymentDueDate']";
                     var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";
+                    
                     var documentReferenceId = XmlDocument.SelectSingleNode(documentReferenceIdValueXpath)?.InnerText;
+                    var nodePaymentMeans = XmlDocument.SelectSingleNode(nodePaymentMeansValuesXpath)?.InnerText;
+                    var nodePaymentDueDate = XmlDocument.SelectSingleNode(nodePaymentDueDateValuesXpath)?.InnerText;
 
                     SigningTime = node?.InnerText;
                     CustomizationID = nodeCustomizationID?.InnerText;
-                    PaymentMeansID = nodePaymentMeansID?.InnerText;
+                    PaymentMeansID = nodePaymentMeans;
                     DocumentReferenceId = documentReferenceId;
+                    PaymentDueDate = nodePaymentDueDate;
                 }
             }
         }

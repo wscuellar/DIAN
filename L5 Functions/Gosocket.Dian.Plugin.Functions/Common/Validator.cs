@@ -520,13 +520,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                         if (party.SenderParty != senderCode)
                         {
-                            //valida si existe los permisos del mandatario 
-                            var response = ValidateFacultityAttorney(party.CudeId, party.TrackId, party.SenderParty, senderCode,
-                                party.ResponseCode);
-                            if (response != null)
+                            responses.Add(new ValidateListResponse
                             {
-                                responses.Add(response);
-                            }
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = receiver2DvErrorCode,
+                                ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+
+
+                            ////valida si existe los permisos del mandatario 
+                            //var response = ValidateFacultityAttorney(party.CudeId, party.TrackId, party.SenderParty, senderCode,
+                            //    party.ResponseCode);
+                            //if (response != null)
+                            //{
+                            //    responses.Add(response);
+                            //}
                         }
                         else
                         {
@@ -1656,48 +1666,48 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             //Validación de la existencia eventos previos Endoso en Garantía TASK  716
-                            case "038":  //Endoso en Garantía
-                                if (documentMeta
-                                    .Where(t => t.EventCode == "036" && t.Identifier == document.PartitionKey).ToList()
-                                    .Count > decimal.Zero)
-                                {
-                                    if (documentMeta
-                                       .Where(t => t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
-                                       .Count > decimal.Zero)
-                                    {
-                                        responses.Add(new ValidateListResponse
-                                        {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = "89",
-                                            ErrorMessage = "No se pueda transmitir el evento 038-Endoso en Garantía ya existen asociados los eventos 039 Endoso en Procuración o 041 Limitación de circulación.",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
-                                    else
-                                    {
-                                        responses.Add(new ValidateListResponse
-                                        {
-                                            IsValid = true,
-                                            Mandatory = true,
-                                            ErrorCode = "100",
-                                            ErrorMessage = "Evento referenciado correctamente",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
-                                }
-                                else
-                                {
-                                    responses.Add(new ValidateListResponse
-                                    {
-                                        IsValid = false,
-                                        Mandatory = true,
-                                        ErrorCode = "89",
-                                        ErrorMessage = "Solo se podrá transmitir el evento 038-Endoso en Garantía de una FEV después de haber transmitido el evento 036-Solicitud de Disponibilización",
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
-                                }
-                                break;
+                            //case "038":  //Endoso en Garantía
+                            //    if (documentMeta
+                            //        .Where(t => t.EventCode == "036" && t.Identifier == document.PartitionKey).ToList()
+                            //        .Count > decimal.Zero)
+                            //    {
+                            //        if (documentMeta
+                            //           .Where(t => t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                            //           .Count > decimal.Zero)
+                            //        {
+                            //            responses.Add(new ValidateListResponse
+                            //            {
+                            //                IsValid = false,
+                            //                Mandatory = true,
+                            //                ErrorCode = "89",
+                            //                ErrorMessage = "No se pueda transmitir el evento 038-Endoso en Garantía ya existen asociados los eventos 039 Endoso en Procuración o 041 Limitación de circulación.",
+                            //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            //            });
+                            //        }
+                            //        else
+                            //        {
+                            //            responses.Add(new ValidateListResponse
+                            //            {
+                            //                IsValid = true,
+                            //                Mandatory = true,
+                            //                ErrorCode = "100",
+                            //                ErrorMessage = "Evento referenciado correctamente",
+                            //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            //            });
+                            //        }
+                            //    }
+                            //    else
+                            //    {
+                            //        responses.Add(new ValidateListResponse
+                            //        {
+                            //            IsValid = false,
+                            //            Mandatory = true,
+                            //            ErrorCode = "89",
+                            //            ErrorMessage = "Solo se podrá transmitir el evento 038-Endoso en Garantía de una FEV después de haber transmitido el evento 036-Solicitud de Disponibilización",
+                            //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            //        });
+                            //    }
+                            //    break;
                             //Validación de la existencia de Endosos y Limitaciones TASK  730
                             case "040": //Anulacion de endoso electronico  
                                 if (documentMeta
@@ -1937,9 +1947,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
-                //Validación de la existencia eventos previos Endoso en Garantía TASK 716
+                //Validación fecha emite evento AR menor a fecha de vencimiento factura
                 case "038": //Endoso en Garantía
-                    responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModel.SigningTime)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModel.PaymentDueDate)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
