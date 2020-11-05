@@ -1,0 +1,76 @@
+﻿@model Gosocket.Dian.Web.Models.RadianContributorFileTypeViewModel
+
+@{
+    ViewBag.Title = "Agregar tipo de fichero";
+}
+
+@using (Html.BeginForm("Add", "RadianContributorFileType", FormMethod.Post, new { id = "add-radianContributorFileType-form" }))
+{
+    <div class="panel-body padding-20 padding-bottom-10">
+        <div class="row">
+            <div class="col-sm-4 padding-xs-0">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control contributorFileType-props" })
+                    @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="col-sm-3 padding-xs-0">
+                <div class="form-group">
+                    <div class="form-block" style="padding-top: 16px;">
+                        <label id="label-check" class="form-checkbox form-icon btn btn-gosocket form-text textEllipsis add-tooltip" data-toggle="tooltip" data-original-title="@Html.DisplayNameFor(model => model.Mandatory)">
+                            @Html.DisplayNameFor(model => model.Mandatory)
+                            @Html.CheckBoxFor(model => model.Mandatory)
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 padding-xs-0">
+                <div class="form-group">
+                    @Html.DisplayNameFor(model => model.SelectedRadianContributorTypeId)
+                    <div class="form-block" style="padding-top: 5px;">
+                        @Html.DropDownListFor(m => m.SelectedRadianContributorTypeId, Model.RadianContributorTypes, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-1 padding-xs-0">
+                <div class="form-group">
+                    <div class="form-block" style="padding-top: 20px;">
+                        <button type="submit" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function ($) {
+
+            var form = $('#add-radianContributorFileType-form');
+
+            $("#label-check").click(function () {
+                var check = $("#label-check");
+                if (!check.hasClass("active")) {
+                    check.addClass("active");
+                    $("#Mandatory").val(true);
+                } else {
+                    check.removeClass("active");
+                    $("#Mandatory").val(false);
+                }
+            });
+
+            $('.btn-save').click(function () {
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+                    form.submit();
+                }
+            });
+        });
+
+    </script>
+}

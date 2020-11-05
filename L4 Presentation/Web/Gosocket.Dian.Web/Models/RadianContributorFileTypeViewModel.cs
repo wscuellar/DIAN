@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Gosocket.Dian.Domain;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Models
 {
@@ -18,7 +20,13 @@ namespace Gosocket.Dian.Web.Models
         public int Length { get; set; }
 
         public bool SearchFinished { get; set; }
+
+        [Display(Name = "Tipo de Participante")]
+        public string SelectedRadianContributorTypeId { get; set; }
+        public SelectList RadianContributorTypes { get; set; }
+
         public List<RadianContributorFileTypeViewModel> RadianContributorFileTypes { get; set; }
+        public RadianContributorFileTypeViewModel RadianContributorFileTypeViewModel { get; set; }
 
         [DataType(DataType.Text)]
         [Display(Name = "Nombre")]
@@ -35,5 +43,12 @@ namespace Gosocket.Dian.Web.Models
 
         [Display(Name = "Obligatorio")]
         public bool Mandatory { get; set; }
+
+        [Display(Name = "Tipo de Participante")]
+        public RadianContributorType RadianContributorType { get; set; }
+
+        [Display(Name = "Tipo de Participante")]
+        public string SelectedRadianContributorTypeId { get; set; }
+        public SelectList RadianContributorTypes { get; set; }
     }
 }

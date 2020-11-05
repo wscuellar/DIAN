@@ -388,18 +388,12 @@
                                                     <li id="@Navigation.NavigationEnum.ContributorFileType"><a href="@Url.Action("List", "ContributorFileType")">Tipos de Ficheros</a></li>
                                                     <li id="@Navigation.NavigationEnum.TestSet"><a href="@Url.Action("List", "TestSet")">Set de Pruebas</a></li>
                                                 }
-                                                <!-- Tipos Ficheros Radian RADIAN -->
-                                                @if (User.IsInAnyRole("Administrator", "Super"))
-                                                {
-                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("Index", "RadianContributorFileType")">Tipos de Ficheros Radian</a></li>
-                                                    <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas RADIAN</a></li>
-                                                }
+                                                <!-- Configuracion RADIAN -->
                                                 @if (User.IsInAnyRole("Administrador", "Super"))
                                                 {
+                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("List", "RadianContributorFileType")">Tipos de Ficheros Radian</a></li>
+                                                    <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas Radian</a></li>
                                                     <li id="@Navigation.NavigationEnum.Contingencies"><a href="@Url.Action("Contingencies", "Settings")">Administrar Contingencias</a></li>
-                                                }
-                                                @if (User.IsInAnyRole("Administrador", "Super"))
-                                                {
                                                     <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("Users", "Settings")">Usuarios</a></li>
                                                 }
                                             </ul>

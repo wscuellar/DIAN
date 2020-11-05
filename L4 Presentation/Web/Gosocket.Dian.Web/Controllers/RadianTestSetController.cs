@@ -13,7 +13,7 @@ namespace Gosocket.Dian.Web.Controllers
     public class RadianTestSetController : Controller
     {
         readonly ContributorService contributorService = new ContributorService();
-        private RadianTestSetManager testSetManager = new RadianTestSetManager();
+        private readonly RadianTestSetManager testSetManager = new RadianTestSetManager();
 
         // GET: RadianSetTest
         public ActionResult Index()
@@ -57,8 +57,6 @@ namespace Gosocket.Dian.Web.Controllers
         {
             var model = new RadianTestSetViewModel
             {
-                //StartDate = DateTime.UtcNow,
-                //EndDate = DateTime.UtcNow.AddMonths(3),
                 TotalDocumentRequired = 14,
                 TotalDocumentAcceptedRequired = 0,
                 ReceiptNoticeTotalRequired = 1,
@@ -133,13 +131,11 @@ namespace Gosocket.Dian.Web.Controllers
                 CirculationLimitationTotalAcceptedRequired = model.CirculationLimitationTotalAcceptedRequired,
                 EndCirculationLimitationTotalAcceptedRequired = model.EndCirculationLimitationTotalAcceptedRequired,
                 EndCirculationLimitationTotalRequired = model.EndCirculationLimitationTotalRequired
-                //EndDate = model.EndDate,
-                //StartDate = model.StartDate,
             }
             );
             if (result)
             {
-                return RedirectToAction("Index"/*, new { contributorId = model.ContributorId }*/);
+                return RedirectToAction("Index";
             }
 
             ViewBag.ErrorMessage = "Ocurrio un problema creando el Set de Pruebas de Radian";
@@ -203,7 +199,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             var result = testSetManager.InsertTestSet(new RadianTestSet(model.OperationModeId.ToString(), model.OperationModeId.ToString())
             {
-                TestSetId = Guid.Parse(model.TestSetId).ToString(),//Guid.NewGuid(),
+                TestSetId = Guid.Parse(model.TestSetId).ToString(),
                 Active = true,
                 CreatedBy = User.Identity.Name,
                 Description = model.Description,
