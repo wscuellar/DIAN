@@ -1,4 +1,39 @@
-﻿
+﻿/*    general Styles      */
+h1, h2, h3, h4, h5, h6 {
+    font-family: Arial;
+    font-style: normal;
+    font-weight: normal;
+    color: #2C323C;
+}
+label {
+    font-family: Arial;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 14px;
+}
+
+li.list-inline-item{
+    font-family: Arial;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 16px;
+    color: #2C323C;
+}
+
+th {
+    font-family: Arial;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 18px;
+    color: #2C323C;
+    padding: 6px 10px;
+}
+/*    general Styles      */
+
+
 .RadianContainerBegin {
     margin: 25px;
     background: #FFFFFF;
@@ -118,13 +153,14 @@ i.fa-info-circle {
     line-height: 14px;
     align-items: center;
 }
-#table-contributor-files td{
+#table-contributor-files td {
     font-family: Arial;
     font-style: normal;
     font-weight: normal;
     font-size: 14px;
     line-height: 16px;
     color: #2C323C;
+    padding: 6px 10px;
 }
 
 #table-contributor-files .fa-pencil{
@@ -139,7 +175,7 @@ i.fa-info-circle {
     margin: 0px 6px;
 }
 
-.edit-state{
+.edit-state {
     font-family: Arial;
     font-style: normal;
     font-weight: normal;
@@ -147,13 +183,13 @@ i.fa-info-circle {
     line-height: 16px;
     text-decoration-line: underline;
     color: #348441;
+    padding: 0px 10px;
 }
 .radian-view {
     text-align: left;
     margin-left: 25px;
 }
 .title-view {
-     width: 174px; 
      height: 34px; 
      font-family: Arial; 
      font-style: normal; 
@@ -163,10 +199,41 @@ i.fa-info-circle {
      color: #000000;
 }
 .underline-title {
-    width: 282px;
+    width: calc(100% + 5%);
     height: 3px;
     left: 250px;
     top: 170px;
     background: #62C7AB;
     border-radius: 2px;
+}
+
+.title-container {
+    width: max-content;
+    margin-bottom: 40px
+}
+
+.btn-radian-default {
+    background: #FFFFFF;
+    border: 2px solid #B4B4B4;
+    box-sizing: border-box;
+    border-radius: 10px;
+    margin-right: 30px;
+}
+
+.btn-radian-success {
+    background: #348441;
+    border-radius: 10px;
+}
+
+.dropdown-state #RadianState {
+    height: 41px;
+    background: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    box-sizing: border-box;
+    border-radius: 4px;
+    width: auto;
+}
+
+.panel-title-radian{
+    font-size: 18px;
 }

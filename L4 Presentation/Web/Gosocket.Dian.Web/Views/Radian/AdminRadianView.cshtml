@@ -4,12 +4,12 @@
 
 @{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" } };}
 
-<div class="page-content container radian-view margin-15">
-    <div class="row title-container">
+<div class="page-content radian-view margin-15">
+    <div class="row title-container">  
         <p class="title-view">
-            Participantes
+            @ViewBag.title
         </p>
-        <span class="underline-title"></span>
+        <div class="underline-title"></div>
     </div>
     <div class="row margin-horizontal-0">
         <div class="panel">
@@ -23,6 +23,10 @@
                         @using (Html.BeginForm("AdminRadianView", "Radian", FormMethod.Post, new { id = "radian-contributors-form" }))
                         {
                             @Html.HiddenFor(m => m.Page)
+                            @Html.HiddenFor(m => m.Length)
+                            @Html.HiddenFor(m => m.Type)
+                            @Html.HiddenFor(m => m.StartDate)
+                            @Html.HiddenFor(m => m.EndDate)
 
                             <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                 <div class="col-md-12 padding-horizontal-0">
@@ -45,13 +49,13 @@
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.Type, new { @class = "control-label" })
-                                                        @Html.DropDownList("Tipo Participante", Model.RadianType, "", defaultHtmlAttr)
+                                                        @Html.LabelFor(m => m.RadianType, new { @class = "control-label" })
+                                                        @Html.DropDownListFor(m => m.RadianType, Model.RadianType, "", defaultHtmlAttr)
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.Type, new { @class = "control-label" })
+                                                        @Html.LabelFor(m => m.RadianState, new { @class = "control-label" })
                                                         @Html.EnumDropDownListFor(m => m.RadianState, defaultHtmlAttr)
                                                     </div>
                                                 </div>
@@ -65,32 +69,32 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="row margin-horizontal-0">
-                                <div class="col-md-9 table-toolbar-left padding-left-0">
-                                </div>
-                                <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
-                                    @if (Model.RadianContributors.Count > 0)
-                                    {
-                                        <span class="text-muted">
-                                            <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.RadianContributors.Count ? (Model.Page) * Model.Length + Model.RadianContributors.Count : (Model.Page + 1) * Model.Length)</strong>
-                                        </span>
-                                        <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
-                                            <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
-                                                <span class="fa fa-chevron-left"></span>
-                                            </a>
-                                            <a class="btn btn-default paginate-btn next-page" @(Model.RadianContributors.Count < Model.Length ? "disabled=\"disabled\"" : "")>
-                                                <span class="fa fa-chevron-right"></span>
-                                            </a>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
                         }
                     </div>
                 </div>
 
                 @Html.Partial("_Items")
+
+                <div class="row margin-horizontal-0">
+                    <div class="col-md-9 table-toolbar-left padding-left-0">
+                    </div>
+                    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+                        @if (Model.RadianContributors.Count > 0)
+                        {
+                            <span class="text-muted">
+                                <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.RadianContributors.Count ? (Model.Page) * Model.Length + Model.RadianContributors.Count : (Model.Page + 1) * Model.Length)</strong>
+                            </span>
+                            <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
+                                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                                    <span class="fa fa-chevron-left"></span>
+                                </a>
+                                <a class="btn btn-default paginate-btn next-page" @(Model.RadianContributors.Count < Model.Length ? "disabled=\"disabled\"" : "")>
+                                    <span class="fa fa-chevron-right"></span>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
 
                 @if (Model.RadianContributors.Count == 0)
                 {
@@ -110,6 +114,7 @@
     <script>
         $(document).ready(function () {
 
+            var form = $('#radian-contributors-form');
             $('#DateInterval').daterangepicker({
                 startDate: moment(),
                 endDate: moment().add(2, 'days'),
@@ -125,14 +130,40 @@
                 $('.table-responsive').css('display', 'none');
             }
 
+            $('.btn-search').click(function () {
+                $('#Page').val(0);
+                $('#Type').val($("#RadianType").val());
+                showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
+                $(this).attr('disabled', 'disabled');
+                $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
+                $('.table-pagination').css('display', 'none');
+                $('.table-responsive').css('display', 'none');
+                form.submit();
+            });
+
             //Pagination
             $(".next-page").click(function () {
                 $("#Page").val(@Model.Page + 1);
+                form.submit();
             })
 
             $(".prev-page").click(function () {
                 $("#Page").val(@Model.Page - 1);
+                form.submit();
             })
+
         })
+
+        //$(document).on('mouseenter', ".iffyTip", function () {
+        //    var $this = $(this);
+        //    if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+        //        $this.tooltip({
+        //            title: $this.text(),
+        //            placement: "bottom",
+        //            container: "body"
+        //        });
+        //        $this.tooltip('show');
+        //    }
+        //});
     </script>
 }
