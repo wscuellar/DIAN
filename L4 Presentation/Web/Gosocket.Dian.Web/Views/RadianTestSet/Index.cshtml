@@ -35,10 +35,11 @@
                         <div class="panel-body padding-top-20">
                             @if (User.IsInAnyRole("Administrador", "Super"))
                             {
-                                <div class="pad-btm form-inline padding-bottom-0">
+                                <div class="form-inline padding-bottom-0">
                                     <div class="row margin-horizontal-0">
-                                        <div class="col-md-10 table-toolbar-left padding-left-0">
-                                            <a href="@Url.Action("Add", "RadianTestSet")" class="btn btn-default btn-default btn-hover-gosocket btn-labeled fa fa-plus margin-right-10">Agregar Set de Pruebas</a>
+                                        <div class="col-md-10 table-toolbar-right padding-left-0">
+                                            @*<a href="@Url.Action("Add", "RadianTestSet")" class="btn btn-default btn-default btn-hover-gosocket btn-labeled fa fa-plus margin-right-10">Agregar Set de Pruebas</a>*@
+                                            <a href="@Url.Action("Add", "RadianTestSet")" class="btn margin-right-10" style="background-color: #348441; color: white;">Agregar Set de Pruebas</a>
                                         </div>
 
                                         <div class="col-md-2 table-toolbar-right padding-right-0">

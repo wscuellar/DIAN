@@ -2725,6 +2725,13 @@
     <Content Include="Views\RadianContributorFileType\_Delete.cshtml" />
     <Content Include="Views\RadianContributorFileType\_Edit.cshtml" />
     <Content Include="Views\RadianContributorFileType\_Items.cshtml" />
+    <Content Include="Views\Radian\AdminRadianView.cshtml" />
+    <Content Include="Views\Radian\_Items.cshtml" />
+    <Content Include="Views\RadianContributorFileType\List.cshtml" />
+    <Content Include="Views\RadianContributorFileType\_Add.cshtml" />
+    <Content Include="Views\RadianContributorFileType\_Delete.cshtml" />
+    <Content Include="Views\RadianContributorFileType\_Edit.cshtml" />
+    <Content Include="Views\RadianContributorFileType\_Items.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
