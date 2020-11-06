@@ -85,5 +85,11 @@ namespace Gosocket.Dian.Application
             return query.ToList();
         }
 
+        public List<RadianContributorFileStatus> GetRadianContributorFileStatus(Expression<Func<RadianContributorFileStatus, bool>> expression)
+        {
+            var query = sqlDBContext.RadianContributorFileStatuses.Where(expression);
+            return query.ToList();
+        }
+
     }
 }

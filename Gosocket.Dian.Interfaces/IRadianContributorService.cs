@@ -11,6 +11,7 @@ namespace Gosocket.Dian.Interfaces
         List<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0);
         void RemoveRadianContributor(RadianContributor radianContributor);
         List<RadianContributorType> GetRadianContributorTypes(Expression<Func<RadianContributorType, bool>> expression);
+        List<RadianContributorFileStatus> GetRadianContributorFileStatus(Expression<Func<RadianContributorFileStatus, bool>> expression);
 
     }
 }

@@ -45,7 +45,6 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Estado")]
         public RadianUtil.UserStates? RadianState { get; set; }
 
-
     }
 
     public class RadianContributorsViewModel
@@ -92,11 +91,13 @@ namespace Gosocket.Dian.Web.Models
         public RadianContributorTypeViewModel ContributorType { get; set; }
         public List<UserViewModel> Users { get; set; }
         public List<TestSetResultViewModel> RadianContributorTestSetResults { get; set; }
-        public RadianUtil.UserApprovalStates? RadianState { get; set; }
+        [Display(Name = "Estado de aprobación")]
+        public RadianUtil.UserApprovalStates? RadianApprovalState { get; set; }
         public List<RadianContributorFileViewModel> RadianContributorFiles { get; set; }
         public RadianContributorFileStatusViewModel RadianContributorFileStatus { get; set; }
         public bool CanEdit { get; set; }
-  
+        public IEnumerable<SelectListItem> RadianFileStatus { get; set; }
+        public bool SuccessMessage { get; set; }
 
     }
 

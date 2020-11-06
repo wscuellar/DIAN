@@ -68,7 +68,9 @@ namespace Gosocket.Dian.Web.Controllers
         {
             var radianContributors = _RadianContributorService.List(t => true);
             var radianContributorType = _RadianContributorService.GetRadianContributorTypes(t => true);
+            var radianFileStatus = _RadianContributorService.GetRadianContributorFileStatus(t => true);
             var model = new AdminRadianViewModel();
+            var model2 = new RadianContributorsViewModel();
             model.RadianContributors = radianContributors.Select(c =>
             new RadianContributorsViewModel()
             {
@@ -76,9 +78,16 @@ namespace Gosocket.Dian.Web.Controllers
                 Code = c.Contributor.Code,
                 TradeName = c.Contributor.Name,
                 BusinessName = c.Contributor.BusinessName,
-                AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name
+                AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name  
 
             }).ToList();
+
+            //model2.RadianFileStatus = radianFileStatus.Select(c => new SelectListItem
+            //{
+            //    Value = c.Id.ToString(),
+            //    Text = c.Name
+
+            //}).ToList();
 
             model.RadianType = radianContributorType.Select(c => new SelectListItem
             {
@@ -297,10 +306,28 @@ namespace Gosocket.Dian.Web.Controllers
 
         }
 
-        //public JsonResult ChangeRadianState(AdminRadianViewModel model)
-        //{
+        [HttpPost]
+        public ActionResult ChangeRadianState(RadianContributorsViewModel model)
+        {
+            try
+            {
+                var RadianFileStatus = _RadianContributorService.GetRadianContributorFileStatus(t => true);
+                model.SuccessMessage = true;
+                //Actualizar BD
+                //enviar correo
 
-        //}
+
+
+
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                model.SuccessMessage = false;
+                return View(model);
+            }
+        }
 
     }
 }
