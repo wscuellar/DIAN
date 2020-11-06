@@ -84,32 +84,42 @@
                                 @foreach (var f in Model.RadianContributorFiles.OrderByDescending(f => f.ContributorFileType.Id).ToList())
                                 {
                                     var label = "";
+                                    var statusId = "";
                                     switch (f.ContributorFileStatus.Id)
                                     {
                                         case 0:
                                             label = "<i class='fa fa-exclamation-circle'></i>";
+                                            statusId = "status-0";
                                             break;
                                         case 1:
                                             label = "<img src='~/Content/images/Svg/Loaded.svg'>";
+                                            statusId = "status-1";
                                             break;
                                         case 2:
                                             label = "<i class='fa fa-check-circle'></i>";
+                                            statusId = "status-2";
                                             break;
                                         case 3:
                                             label = "<i class='fa fa-times-circle'></i>";
+                                            statusId = "status-3";
                                             break;
                                         case 4:
                                             label = "<i class='fa fa-info-circle'></i>";
+                                            statusId = "status-4";
                                             break;
                                         default:
                                             label = "<i class='fa fa-exclamation-circle'></i>";
+                                            statusId = "status-5";
                                             break;
                                     };
-                                    <tr data-id="@f.ContributorFileType.Id">
-                                        <td class="text-left"><span class="fa fa fa-download add-tooltip download-contributor-files" data-original-title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>@f.ContributorFileType.Name</td>
-                                        <td class="text-center"><div><span class="">@Html.Raw(label) @f.ContributorFileStatus.Name</span></div></td>
-                                        <td class="text-center"><i class="fa fa-pencil"></i><button type="button" class="btn btn-link edit-state">Editar</button></td>
-                                    </tr>
+                                <tr data-id="@f.ContributorFileType.Id">
+                                    <td class="text-left"><span class="fa fa fa-download add-tooltip download-contributor-files" data-original-title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>@f.ContributorFileType.Name</td>
+                                   
+                                    @*<td class="text-center @statusId">@Html.DropDownListFor(m => m.RadianFileStatus, Model.RadianFileStatus, "", defaultHtmlAttr)</td>*@
+                                    
+                                    <td class="text-center"><div><span class="">@Html.Raw(label) @f.ContributorFileStatus.Name</span></div></td>
+                                    <td class="text-center"><i class="fa fa-pencil"></i><button type="button" class="btn btn-link edit-state">Editar</button></td>
+                                </tr>
                                     index++;
                                 }
                             </tbody>
@@ -123,8 +133,8 @@
     <div class="row dropdown-state">
         <div class="col-sm-6 padding-xs-0">
             <div class="form-group">
-                @Html.LabelFor(m => m.AcceptanceStatusId, new { @class = "control-label" })
-                @Html.EnumDropDownListFor(m => m.RadianState, "Seleccióne el estado de la aprobación", new { @class = "form-control" })
+                @Html.LabelFor(m => m.RadianApprovalState, new { @class = "control-label" })
+                @Html.EnumDropDownListFor(m => m.RadianApprovalState, "Seleccióne el estado de la aprobación", new { @class = "form-control" })
             </div>
         </div>
     </div>

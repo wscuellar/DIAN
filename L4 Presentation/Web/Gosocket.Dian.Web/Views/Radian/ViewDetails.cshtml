@@ -16,38 +16,41 @@
     <div class="row margin-horizontal-0">
         <div class="panel">
             @*<div class="panel-heading">
-                    <h3 class="panel-title">@ViewBag.Title</h3>
-                </div>*@
+            <h3 class="panel-title">@ViewBag.Title</h3>
+        </div>*@
 
-            <div class="panel-body padding-top-20">
-                <div class="row margin-horizontal-0">
-                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
-                        @Html.Partial("_form")
-                        <div class="panel-footer text-right">
-                            <button type="button" class="btn btn-default btn-radian-default">Cancelar</button>
-                            <button type="button" data-id="@Model.RadianState" class="btn btn-success btn-radian-success">Guardar cambios</button>
+            @using (Html.BeginForm("ChangeRadianState", "Radian", FormMethod.Post, new { id = "radian-contributor-form" }))
+            {
 
+                <div class="panel-body padding-top-20">
+                    <div class="row margin-horizontal-0">
+                        <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-right">
+                                <button type="button" class="btn btn-default btn-radian-default">Cancelar</button>
+                                <button type="button" class="btn btn-success btn-radian-success button-change-state">Guardar cambios</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                @if (true)
-                {
-                    if (true)
+                    @if (true)
+                    {
+                        if (true)
+                        {
+                            <div class="row margin-horizontal-0 margin-vertical-30">
+                                @Html.Partial("_testSetResults")
+                            </div>
+                        }
+                    }
+
+                    @if (true)
                     {
                         <div class="row margin-horizontal-0 margin-vertical-30">
-                            @Html.Partial("_testSetResults")
+                            @Html.Partial("_users")
                         </div>
                     }
-                }
-
-                @if (true)
-                {
-                    <div class="row margin-horizontal-0 margin-vertical-30">
-                        @Html.Partial("_users")
-                    </div>
-                }
-            </div>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -59,7 +62,10 @@
 
     <script>
         $(document).ready(function () {
-
+            var form = $('#radian-contributor-form');
+            $(".button-change-state").click(function () {
+                form.submit();
+            });
 
             //disableFields = () => {
             //    $('#Code').attr('readonly', true);
@@ -74,7 +80,7 @@
             //    $('#Software_SoftwarePassword').attr('readonly', true);
             //    $('#Software_Url').attr('readonly', true);
 
-        }
+        });
 
 
 
