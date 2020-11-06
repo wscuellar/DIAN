@@ -3,7 +3,7 @@
 @using Gosocket.Dian.Domain.Common
 @{
 
-    ViewBag.Title = "Editar set de pruebas";
+    ViewBag.Title = "Editar set de pruebas Radian";
 }
 
 <div class="page-content margin-15">
@@ -23,8 +23,8 @@
                         {
                             @Html.Partial("_form")
                             <div class="panel-footer text-right">
-                                <a href="@Url.Action("Index", "RadianTestSet")" class="btn btn-default">Cancelar</a>
-                                <button type="button" class="btn btn-default btn-save button-top-left-radian">Guardar</button>
+                                <a href="@Url.Action("Index", "RadianTestSet")" class="btn btn-default btn-radian-default">Cancelar</a>
+                                <button type="button" class="btn btn-success btn-radian-success">Guardar</button>
                             </div>
                         }
                     </div>
