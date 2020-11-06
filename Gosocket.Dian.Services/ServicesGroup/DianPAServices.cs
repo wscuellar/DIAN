@@ -856,37 +856,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var trackIdMapperEntity = new GlobalOseTrackIdMapper(contentFileList[0].XmlFileName, trackId);
             TableManagerDianFileMapper.InsertOrUpdate(trackIdMapperEntity);
             var mapper = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone4Mapper) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-            // ZONE MAPPER
-
-            // Validate EventCode
-            var eventCodeResponse = ValidateEventCode(trackId, eventCode, docTypeCode, trackIdCude);
-            if (!eventCodeResponse.IsValid)
-            {
-                dianResponse = eventCodeResponse;
-                dianResponse.XmlDocumentKey = trackIdCude;
-                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                dianResponse.IsValid = false;
-                UpdateInTransactions(trackId, eventCode);
-
-                return dianResponse;
-            }
-            var validateEventCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-
-            // Valida fechas y dia habil SigningTime
-
-            var validationAcceptanceTacitaExpresa = ValidationSigningTime(trackId, eventCode, signingTime, docTypeCode, customizationID);
-            if (!validationAcceptanceTacitaExpresa.IsValid)
-            {
-                dianResponse = validationAcceptanceTacitaExpresa;
-                dianResponse.XmlDocumentKey = trackIdCude;
-                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                dianResponse.IsValid = false;
-                UpdateInTransactions(trackId, eventCode);
-                return dianResponse;
-            }
-
-            var validateSinginTime = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSigningTime) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-
+            // ZONE MAPPER          
 
             // upload xml
             start = DateTime.UtcNow;
@@ -919,6 +889,35 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             var upload = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Upload5) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // upload xml
+
+            // Validate EventCode
+            var eventCodeResponse = ValidateEventCode(documentParsed.DocumentKey.ToLower(), eventCode, docTypeCode, trackIdCude);
+            if (!eventCodeResponse.IsValid)
+            {
+                dianResponse = eventCodeResponse;
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
+                UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+
+                return dianResponse;
+            }
+            var validateEventCode = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+
+            // Valida fechas y dia habil SigningTime
+
+            var validationAcceptanceTacitaExpresa = ValidationSigningTime(documentParsed.DocumentKey.ToLower(), eventCode, signingTime, docTypeCode, customizationID);
+            if (!validationAcceptanceTacitaExpresa.IsValid)
+            {
+                dianResponse = validationAcceptanceTacitaExpresa;
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
+                UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+                return dianResponse;
+            }
+
+            var validateSinginTime = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_ValidateSigningTime) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             // send to validate document sync
             start = DateTime.UtcNow;
