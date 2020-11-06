@@ -140,7 +140,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             var radianContributor = _RadianContributorService.List(t => t.ContributorId == id);
             var userIds = _ContributorService.GetUserContributors(id).Select(u => u.UserId);
-            var testSet = radianTestSetManager.GetAllTestSetResult();
+            var testSet = radianTestSetManager.GetAllTestSetResultByContributor(id);
             //RadianContributor contributor = contributorService.ObsoleteGet(id);
 
             //var userIds = contributorService.GetUserContributors(id).Select(u => u.UserId);

@@ -40,5 +40,10 @@ namespace Gosocket.Dian.Application.Managers
         {
             return testSetManager.Find<RadianTestSetResult>(partitionKey, rowKey);
         }
+
+        public IEnumerable<RadianTestSetResult> GetAllTestSetResultByContributor(int contributorId)
+        {
+           return testSetManager.FindByContributorIdWithPagination<RadianTestSetResult>(contributorId);
+        }
     }
 }
