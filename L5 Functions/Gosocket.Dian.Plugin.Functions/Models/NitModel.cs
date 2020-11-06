@@ -14,5 +14,8 @@
         public string ReceiverCode2SchemaValue { get; set; }
         public string SoftwareProviderCode { get; set; }
         public string SoftwareProviderCodeDigit { get; set; }
+        public string IssuerPartySchemeAgencyCode { get; set; }
+        public string IssuerPartySchemeCode { get; set; }
+        public string IssuerPartyCode { get; set; }
     }
 }

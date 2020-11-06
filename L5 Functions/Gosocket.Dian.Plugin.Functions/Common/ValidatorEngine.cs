@@ -73,6 +73,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateEmitionEventPrevAsync(ValidateEmitionEventPrev.RequestObject eventPrev)
         {
             var validateResponses = new List<ValidateListResponse>();
+            XmlParser xmlParserCufe = null;
+            XmlParser xmlParserCude = null;
 
             //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
             if (eventPrev.EventCode == "040")
@@ -84,16 +86,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     eventPrev.TrackId = documentMeta.DocumentReferencedKey;
                 }
             }
+            //Obtiene información factura referenciada Endoso electronico y AR CUDE
+            if(eventPrev.EventCode == "038")
+            {
+                //Obtiene XML Factura electronica CUFE
+                var xmlBytes = await GetXmlFromStorageAsync(eventPrev.TrackId);
+                xmlParserCufe = new XmlParser(xmlBytes);
+                if (!xmlParserCufe.Parser())
+                    throw new Exception(xmlParserCufe.ParserError);
 
-            var xmlBytes = await GetXmlFromStorageAsync(eventPrev.TrackId);
-            var xmlParser = new XmlParser(xmlBytes);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
+                //Obtiene XML ApplicationResponse CUDE
+                var xmlBytesCude = await GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                xmlParserCude = new XmlParser(xmlBytesCude);
+                if (!xmlParserCude.Parser())
+                    throw new Exception(xmlParserCude.ParserError);
+            }
 
-            var cufeModel = xmlParser.Fields.ToObject<CufeModel>();
-
-            var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, cufeModel));
+            var validator = new Validator();           
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude));
 
             return validateResponses;
 

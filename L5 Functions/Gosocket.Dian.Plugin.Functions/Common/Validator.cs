@@ -29,6 +29,9 @@ using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.Event;
 using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
+using Gosocket.Dian.Plugin.Functions.Common;
+using System.Text.RegularExpressions;
+
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -51,6 +54,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         readonly XPathNavigator _navNs;
         readonly XmlNamespaceManager _ns;
         readonly byte[] _xmlBytes;
+
+        static readonly Regex _base64RegexPattern = new Regex(BASE64_REGEX_STRING, RegexOptions.Compiled);
+
+        private const String BASE64_REGEX_STRING = @"^[a-zA-Z0-9\+/]*={0,3}$";
+
         #endregion
 
         #region Constructors
@@ -318,9 +326,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var receiver2CodeDigit = nitModel.ReceiverCode2Digit;
                     if (string.IsNullOrEmpty(receiver2CodeDigit) || receiver2CodeDigit == "undefined") receiver2CodeDigit = "11";
                     if (ValidateDigitCode(receiver2Code, int.Parse(receiver2CodeDigit)))
-                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "(R) DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
+            }
+
+            //IssuerParty Adquiriente/deudor de la Factura Electrónica evento Endoso Electronico
+            if(nitModel.IssuerPartySchemeAgencyCode == "195")
+            {
+                var issuerPartyCode = nitModel.IssuerPartyCode;
+                var IssuerPartyCodeDigit = nitModel.IssuerPartySchemeCode;
+                if (string.IsNullOrEmpty(IssuerPartyCodeDigit) || IssuerPartyCodeDigit == "undefined") IssuerPartyCodeDigit = "11";
+                if (ValidateDigitCode(issuerPartyCode, int.Parse(IssuerPartyCodeDigit)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAH63", ErrorMessage = "(R) DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAH63", ErrorMessage = "(R) El DV no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
 
             var softwareProviderCode = nitModel.SoftwareProviderCode;
@@ -750,11 +769,69 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
         }
+        #endregion
 
+        #region ValidateEndoso
+        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            //valor total Endoso Electronico AR
+            string valueDiscountRateEndoso = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[3]']").Item(0).InnerText.ToString();
+            string valuePriceToPay = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[2]']").Item(0).InnerText.ToString();
+            string valueTotalEndoso = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[1]']").Item(0).InnerText.ToString();
+            string valueTotalInvoice = xmlParserCufe.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']").Item(0).InnerText.ToString();
+
+            //Valida informacion Endoso 
+            if (valueTotalEndoso == null)
+            {
+                return new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAI05a, Rechazo: ",
+                    ErrorMessage = $"{(string)null} El valor no es informado .",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
+            }
+            else
+            {
+                if(!String.Equals(valueTotalEndoso, valueTotalInvoice))
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAI05b, Rechazo: ",
+                        ErrorMessage = $"{(string)null} Valor Total del Endoso no es igual al Valor total FEVTV .",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+            }
+
+            //Valida precio a pagar endoso
+            int resultValuePriceToPay = (Convert.ToInt32(valueTotalEndoso) * Convert.ToInt32(valueDiscountRateEndoso));
+
+            int valuePriceToPay2 = Convert.ToInt32(valuePriceToPay);
+            if (valuePriceToPay2 != resultValuePriceToPay)
+            {
+                return new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAI07b, Rechazo: ",
+                    ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
+            }
+
+            return null;
+        }
+        #endregion
+
+        #region ValidateFacultityAttorney
         private ValidateListResponse ValidateFacultityAttorney(string partitionKey, string rowKey, string issueAtorney, string senderCode,string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
-
 
             var sender = GetContributorInstanceCache(issueAtorney);
 
@@ -844,6 +921,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #endregion
 
+        #region IsBase64
+        private bool IsBase64(String base64String)
+        {
+            var rs = (!string.IsNullOrEmpty(base64String) && !string.IsNullOrWhiteSpace(base64String) && base64String.Length != 0 && base64String.Length % 4 == 0 && !base64String.Contains(" ") && !base64String.Contains("\t") && !base64String.Contains("\r") && !base64String.Contains("\n")) && (base64String.Length % 4 == 0 && _base64RegexPattern.Match(base64String, 0).Success);
+            return rs;
+        }
+        #endregion
+
+
         #region Validate Reference Attorney
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
         {
@@ -856,12 +942,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             List<AttorneyModel> attorney = new List<AttorneyModel>();
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
+            string AttachmentBase64 = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(0).InnerText.ToString();
             string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0).InnerText.ToString();
             string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0).InnerText.ToString();
             XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0).InnerText.ToString();
             string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0).Attributes["listID"].Value;
-            if(customizationID == "432" && listID == "2")
+
+            //Valida existe Contrato del mandatos entre las partes
+            if(AttachmentBase64 != null)
+            {
+                if (!IsBase64(AttachmentBase64))
+                {
+                    validate = false;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAH84, Rechazo:",
+                        ErrorMessage = "Debe ser informado el contrato del mandato en base64",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
+            //Valida Mandato registra Ilimitado
+            if (customizationID == "432" && listID == "2")
             {
                 startDateAttorney = string.Empty;
                 endDate = string.Empty;
@@ -879,6 +985,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
 
             }
+            //Grupo de información alcances para el mandato sobre los CUFE.
             for (int i = 1; i < cufeList.Count && i < attorneyLimit+1 && validate; i++)
             {
                 AttorneyModel attorneyModel = new AttorneyModel();
@@ -899,7 +1006,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = validateCufeErrorCode,
+                        ErrorCode = "Regla: AAL07, Rechazo: ",
                         ErrorMessage = "Error en la validación del CUFE referenciado, No existe en sistema DIAN",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1087,7 +1194,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
+        #endregion
 
+        #region ValidateSignXades
         public List<ValidateListResponse> ValidateSignXades()
         {
             DateTime startDate = DateTime.UtcNow;
@@ -1264,6 +1373,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return contributor;
         }
+        #endregion
+
+
         private List<GlobalNumberRange> GetNumberRangeInstanceCache(string senderCode)
         {
             var env = ConfigurationManager.GetValue("Environment");
@@ -1382,6 +1494,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             decimal tmp = Math.Truncate(step * value);
             return tmp / step;
         }
+
+        #region ValidateDigitCode
         public bool ValidateDigitCode(string code, int digit)
         {
             try
@@ -1460,8 +1574,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region validation to emition to event
-
-        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, CufeModel cufeModel)
+        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude)
         {
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
@@ -1709,11 +1822,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 break;
                             //Validación de la existencia eventos previos Endoso en Garantía TASK  716
                             case "038":  //Endoso en Garantía
-                                         //Valida  Valor Total del Endoso igual a Valor total de FEVTV).
-                                         //cufeModel.TotalAmount != eventPrev.valueEndoso
-
-
-
+                                         //Valida Valores endoso electronico versus FEVTV
+                                var response = ValidateEndoso(xmlParserCufe, xmlParserCude);
+                                if(response != null)
+                                {
+                                    responses.Add(response);
+                                }
 
                                 //    if (documentMeta
                                 //        .Where(t => t.EventCode == "036" && t.Identifier == document.PartitionKey).ToList()
@@ -1816,8 +1930,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return responses;
         }
-
-
         #endregion
 
         # region Validación de la Sección prerrequisitos Solicitud Disponibilizacion
@@ -1885,6 +1997,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region ValidateSigningTime
         public List<ValidateListResponse> ValidateSigningTime(ValidateSigningTime.RequestObject data, XmlParser dataModel)
         {
             DateTime startDate = DateTime.UtcNow;
@@ -2086,6 +2199,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return responses;
         }
+        #endregion
 
         #region validation for CBC ID
         public List<ValidateListResponse> ValidateSerieAndNumber(string trackId, string number, string documentTypeId)
