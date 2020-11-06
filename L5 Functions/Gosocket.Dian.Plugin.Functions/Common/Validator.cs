@@ -776,10 +776,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
-            string valueDiscountRateEndoso = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[3]']").Item(0).InnerText.ToString();
-            string valuePriceToPay = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[2]']").Item(0).InnerText.ToString();
-            string valueTotalEndoso = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[1]']").Item(0).InnerText.ToString();
-            string valueTotalInvoice = xmlParserCufe.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']").Item(0).InnerText.ToString();
+            string valueDiscountRateEndoso = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[3]']").Item(0)?.InnerText.ToString();
+            string valuePriceToPay = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[2]']").Item(0)?.InnerText.ToString();
+            string valueTotalEndoso = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[1]']").Item(0)?.InnerText.ToString();
+            string valueTotalInvoice = xmlParserCufe.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']").Item(0)?.InnerText.ToString();
 
             //Valida informacion Endoso 
             if (valueTotalEndoso == null)
@@ -942,12 +942,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             List<AttorneyModel> attorney = new List<AttorneyModel>();
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
-            string AttachmentBase64 = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(0).InnerText.ToString();
-            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0).InnerText.ToString();
-            string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0).InnerText.ToString();
+            string AttachmentBase64 = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(0)?.InnerText.ToString();
+            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
+            string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0)?.InnerText.ToString();
             XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
-            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0).InnerText.ToString();
-            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0).Attributes["listID"].Value;
+            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
+            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
 
             //Valida existe Contrato del mandatos entre las partes
             if(AttachmentBase64 != null)
@@ -989,13 +989,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             for (int i = 1; i < cufeList.Count && i < attorneyLimit+1 && validate; i++)
             {
                 AttorneyModel attorneyModel = new AttorneyModel();
-                string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i).InnerText.ToString();
+                string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
                 string[] tempCode = new string[2];
                 tempCode = code.Split('-');
                 attorneyModel.facultityCode = tempCode[0];
                 attorneyModel.actor = tempCode[1];
-                attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i).InnerText.ToString();
-                attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i).InnerText.ToString();
+                attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference);
                 if (resultValidateCufe[0].IsValid)
                     attorney.Add(attorneyModel);

@@ -899,6 +899,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                 dianResponse.IsValid = false;
                 UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+                var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMeta);
 
                 return dianResponse;
             }
@@ -914,6 +916,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                 dianResponse.IsValid = false;
                 UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+                var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMeta);
                 return dianResponse;
             }
 
