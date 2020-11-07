@@ -233,8 +233,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (cufeModel.DocumentTypeId == "96")
             {
                 fakeData = $"{cufeModel.SerieAndNumber}---{cufeModel.EmissionDate}---{cufeModel.HourEmission}---{cufeModel.SenderCode}---{cufeModel.ReceiverCode}---{cufeModel.ResponseCode}---{cufeModel.ReferenceId}---{cufeModel.ReferenceTypeCode}---{key}";
-
-                if (cufeModel.ResponseCode == "038")
+                
+                if (cufeModel.ResponseCode == "038" && cufeModel.ResponseCodeListID == "2")
                 {
                     //Endoso en garantia en blanco
                     data = $"{cufeModel.SerieAndNumber}{cufeModel.EmissionDate}{cufeModel.HourEmission}{cufeModel.ReceiverCode}{cufeModel.ResponseCode}{cufeModel.ResponseCodeListID}{cufeModel.ReferenceId}{cufeModel.ReferenceTypeCode}{key}";

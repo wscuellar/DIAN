@@ -964,12 +964,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
                 var notifications = validations.Where(r => r.IsNotification).ToList();
-                if (errors.Any(t => t.ErrorCode == "AAD06"))
-                {
-                    documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-                    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMeta);
-
-                }
+               
 
                 if (!errors.Any() && !notifications.Any())
                 {
@@ -1004,6 +999,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
                 dianResponse.XmlBase64Bytes = applicationResponse ?? XmlUtil.GenerateApplicationResponseBytes(trackIdCude, documentMeta, validations);
+                bool flag = false;
+                if (errors.Any(t => t.ErrorCode == "AAD06"))
+                {
+                    flag = true;
+                    UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+                    documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMeta);
+
+                }
 
                 dianResponse.XmlDocumentKey = trackIdCude;
 
@@ -1057,7 +1061,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 };
                 if (dianResponse.IsValid && !existDocument)
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
-                UpdateInTransactions(trackId, eventCode);
+                
+                if(!flag)
+                    UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                 Task.WhenAll(arrayTasks);
 
                 var lastZone = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_LastZone) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -1494,7 +1500,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude });
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId, trackIdCude });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
