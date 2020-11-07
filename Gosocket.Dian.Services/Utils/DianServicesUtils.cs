@@ -690,6 +690,7 @@ namespace Gosocket.Dian.Services.Utils
             var senderCode = documentParsed.SenderCode;
             var eventCode = documentParsed.ResponseCode;
             var documentCude = documentParsed.Cude;
+            var customizationId = documentParsed.CustomizationId;
 
             switch (docTypeCode)
             {
@@ -755,8 +756,15 @@ namespace Gosocket.Dian.Services.Utils
                     stringBuilder.Clear();
                     isValid = false;
                 }
+
+                if (string.IsNullOrEmpty(customizationId))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}D02-(R) CustomizationID no corresponde un codigo válido.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
             }
-            
 
             if (string.IsNullOrEmpty(documentKey))
             {
