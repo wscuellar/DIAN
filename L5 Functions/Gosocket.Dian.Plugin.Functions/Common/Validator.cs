@@ -776,10 +776,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
-            string valueDiscountRateEndoso = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[3]']").Item(0)?.InnerText.ToString();
-            string valuePriceToPay = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[2]']").Item(0)?.InnerText.ToString();
-            string valueTotalEndoso = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[1]']").Item(0)?.InnerText.ToString();
-            string valueTotalInvoice = xmlParserCufe.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']").Item(0)?.InnerText.ToString();
+            string valueDiscountRateEndoso = xmlParserCude.DiscountRateEndoso;
+            string valuePriceToPay = xmlParserCude.PriceToPay;
+            string valueTotalEndoso = xmlParserCude.TotalEndoso;
+            string valueTotalInvoice = xmlParserCufe.TotalInvoice;
 
             //Valida informacion Endoso 
             if (valueTotalEndoso == null)
@@ -1576,6 +1576,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region validation to emition to event
         public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude)
         {
+            bool validFor = false;
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -1826,6 +1827,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 var response = ValidateEndoso(xmlParserCufe, xmlParserCude);
                                 if(response != null)
                                 {
+                                    validFor = true;
                                     responses.Add(response);
                                 }
 
@@ -1912,6 +1914,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                         }
+                    }
+                    if (validFor)
+                    {                        
+                        return responses;
                     }
                 }
                 else

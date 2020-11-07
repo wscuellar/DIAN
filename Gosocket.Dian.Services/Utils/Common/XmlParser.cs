@@ -30,8 +30,12 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string DocumentReferenceId { get; set; }
         public string PaymentMeansID { get; set; }
         public string PaymentDueDate { get; set; }
+        public string DiscountRateEndoso { get; set; }
+        public string PriceToPay { get; set; }
+        public string TotalEndoso { get; set; }
+        public string TotalInvoice { get; set; }
 
-    public XmlParser()
+        public XmlParser()
         {
             Fields = new Dictionary<string, object>();
             AllXmlDefinitions = new XmlDocument();
@@ -77,16 +81,34 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var nodePaymentMeansValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='ID']";                    
                     var nodePaymentDueDateValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='PaymentDueDate']";
                     var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";
-                    
+                    //var valueDiscountRateEndoso = "//*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[3]']";
+                    var valueDiscountRateEndoso = XmlDocument.GetElementsByTagName("InformacionNegociacion")[0];
+                    var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
+
                     var documentReferenceId = XmlDocument.SelectSingleNode(documentReferenceIdValueXpath)?.InnerText;
                     var nodePaymentMeans = XmlDocument.SelectSingleNode(nodePaymentMeansValuesXpath)?.InnerText;
                     var nodePaymentDueDate = XmlDocument.SelectSingleNode(nodePaymentDueDateValuesXpath)?.InnerText;
+                    var nodeTotalInvoice = XmlDocument.SelectSingleNode(valueTotalInvoice)?.InnerText;
 
                     SigningTime = node?.InnerText;
                     CustomizationID = nodeCustomizationID?.InnerText;
                     PaymentMeansID = nodePaymentMeans;
                     DocumentReferenceId = documentReferenceId;
                     PaymentDueDate = nodePaymentDueDate;
+                    DiscountRateEndoso = valueDiscountRateEndoso?.InnerText;
+                    if(DiscountRateEndoso != null)
+                    {
+                        //string[] datos = DiscountRateEndoso.Split(new string[] { "\r\n\t\t\t\t\t", "\r\n\t\t\t\t", " " }, StringSplitOptions.None);
+                        string auxD = DiscountRateEndoso.Replace("\r\n\t\t\t\t\t", " ");
+                        string[] datos = auxD.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                        DiscountRateEndoso = datos[5];
+                        PriceToPay = datos[3];
+                        TotalEndoso = datos[1];
+                    }
+                    if(nodeTotalInvoice != null)
+                    {
+                        TotalInvoice = nodeTotalInvoice;
+                    }
                 }
             }
         }
