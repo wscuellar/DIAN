@@ -11,7 +11,7 @@ namespace Gosocket.Dian.TestProject.Functions.Validator
     [TestClass]
     public class AllTest
     {
-        [TestMethod]
+       
         public async Task TestSuccessValidateDocument()
         {
             var trackId = "000b1180-a9a5-45b3-85cf-cd5b020d0651";
