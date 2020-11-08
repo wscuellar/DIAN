@@ -1,14 +1,10 @@
-﻿using Gosocket.Dian.Application;
-using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Domain;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Web.Mvc;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
 using Gosocket.Dian.Web.Common;
 using System.Linq;
 using System;
-using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
 using System.Diagnostics;
