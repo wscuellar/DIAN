@@ -3,6 +3,10 @@
 
 
 <div class="row">
+    <h4 class="panel-title-radian padding-0"><strong>Datos del modo operación </strong></h4>
+
+    <hr class="margin-5" />
+
     <div class="col-sm-3 padding-xs-0">
         <div class="form-group">
             @Html.Label("Seleccione el modo de operación", new { @class = "control-label" })
@@ -34,7 +38,7 @@
 
 
 <div class="row">
-    <h4 class="text-thin">Total de documentos requeridos</h4>
+    <h4 class="panel-title-radian padding-0"><strong>Total de documentos requeridos</strong></h4>
     <hr class="margin-5" />
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
@@ -65,14 +69,13 @@
             @Html.ValidationMessageFor(m => m.ExpressAcceptanceTotalRequired, "", new { @class = "control-label" })
         </div>
     </div>
-    <!-- Segunda linea de captura -->
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.AutomaticAcceptanceTotalRequired, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.AutomaticAcceptanceTotalRequired, defaultHtmlAttr)
             @Html.ValidationMessageFor(m => m.AutomaticAcceptanceTotalRequired, "", new { @class = "control-label" })
         </div>
-    </div>    
+    </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.RejectInvoiceTotalRequired, new { @class = "control-label" })
@@ -85,7 +88,7 @@
             @Html.TextBoxFor(m => m.ApplicationAvailableTotalRequired, defaultHtmlAttr)
             @Html.ValidationMessageFor(m => m.ApplicationAvailableTotalRequired, "", new { @class = "control-label" })
         </div>
-    </div>    
+    </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.EndorsementTotalRequired, new { @class = "control-label" })
@@ -93,7 +96,6 @@
             @Html.ValidationMessageFor(m => m.EndorsementTotalRequired, "", new { @class = "control-label" })
         </div>
     </div>
-    <!-- Tercera linea de captura de datos -->
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.EndorsementCancellationTotalRequired, new { @class = "control-label" })
@@ -122,7 +124,6 @@
             @Html.ValidationMessageFor(m => m.EndMandateTotalRequired, "", new { @class = "control-label" })
         </div>
     </div>
-    <!-- Cuarta linea de datos de captura -->
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.PaymentNotificationTotalRequired, new { @class = "control-label" })
@@ -152,7 +153,7 @@
 </div>
 
 <div class="row">
-    <h4 class="text-thin">Total de documentos aceptados requeridos</h4>
+    <h4 class="panel-title-radian padding-0"><strong>Total de documentos aceptados requeridos</strong></h4>
     <hr class="margin-5" />
 
     <div class="col-sm-2 padding-xs-0">
@@ -164,103 +165,100 @@
     </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.ReceiptNoticeTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.ReceiptNoticeTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.ReceiptNoticeTotalAcceptedRequired , "", new { @class = "text-danger" })
+            @Html.LabelFor(m => m.ReceiptNoticeTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ReceiptNoticeTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.ReceiptNoticeTotalAcceptedRequired, "", new { @class = "text-danger" })
         </div>
     </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.ReceiptServiceTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.ReceiptServiceTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.ReceiptServiceTotalAcceptedRequired , "", new { @class = "text-danger" })
+            @Html.LabelFor(m => m.ReceiptServiceTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ReceiptServiceTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.ReceiptServiceTotalAcceptedRequired, "", new { @class = "text-danger" })
         </div>
 
     </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.ExpressAcceptanceTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.ExpressAcceptanceTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.ExpressAcceptanceTotalAcceptedRequired , "", new { @class = "control-label" })
-        </div>
-    </div>
-    <!-- Segunda linea de captura -->
-    <div class="col-sm-2 padding-xs-0">
-        <div class="form-group">
-            @Html.LabelFor(m => m.AutomaticAcceptanceTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.AutomaticAcceptanceTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.AutomaticAcceptanceTotalAcceptedRequired , "", new { @class = "control-label" })
+            @Html.LabelFor(m => m.ExpressAcceptanceTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ExpressAcceptanceTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.ExpressAcceptanceTotalAcceptedRequired, "", new { @class = "control-label" })
         </div>
     </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.RejectInvoiceTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.RejectInvoiceTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.RejectInvoiceTotalAcceptedRequired , "", new { @class = "control-label" })
+            @Html.LabelFor(m => m.AutomaticAcceptanceTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.AutomaticAcceptanceTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.AutomaticAcceptanceTotalAcceptedRequired, "", new { @class = "control-label" })
+        </div>
+    </div>
+    <div class="col-sm-2 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.RejectInvoiceTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.RejectInvoiceTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.RejectInvoiceTotalAcceptedRequired, "", new { @class = "control-label" })
         </div>
     </div>    <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.ApplicationAvailableTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.ApplicationAvailableTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.ApplicationAvailableTotalAcceptedRequired , "", new { @class = "control-label" })
+            @Html.LabelFor(m => m.ApplicationAvailableTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ApplicationAvailableTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.ApplicationAvailableTotalAcceptedRequired, "", new { @class = "control-label" })
         </div>
     </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.EndorsementTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.EndorsementTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.EndorsementTotalAcceptedRequired , "", new { @class = "control-label" })
-        </div>
-    </div>
-    <!-- Tercera linea de captura de datos -->
-    <div class="col-sm-2 padding-xs-0">
-        <div class="form-group">
-            @Html.LabelFor(m => m.EndorsementCancellationTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.EndorsementCancellationTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.EndorsementCancellationTotalAcceptedRequired , "", new { @class = "control-label" })
+            @Html.LabelFor(m => m.EndorsementTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.EndorsementTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.EndorsementTotalAcceptedRequired, "", new { @class = "control-label" })
         </div>
     </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.GuaranteeTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.GuaranteeTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.GuaranteeTotalAcceptedRequired , "", new { @class = "control-label" })
+            @Html.LabelFor(m => m.EndorsementCancellationTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.EndorsementCancellationTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.EndorsementCancellationTotalAcceptedRequired, "", new { @class = "control-label" })
         </div>
     </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.ElectronicMandateTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.ElectronicMandateTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.ElectronicMandateTotalAcceptedRequired , "", new { @class = "control-label" })
+            @Html.LabelFor(m => m.GuaranteeTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.GuaranteeTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.GuaranteeTotalAcceptedRequired, "", new { @class = "control-label" })
         </div>
     </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.EndMandateTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.EndMandateTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.EndMandateTotalAcceptedRequired , "", new { @class = "control-label" })
-        </div>
-    </div>
-    <!-- Cuarta linea de datos de captura -->
-    <div class="col-sm-2 padding-xs-0">
-        <div class="form-group">
-            @Html.LabelFor(m => m.PaymentNotificationTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.PaymentNotificationTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.PaymentNotificationTotalAcceptedRequired , "", new { @class = "control-label" })
+            @Html.LabelFor(m => m.ElectronicMandateTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ElectronicMandateTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.ElectronicMandateTotalAcceptedRequired, "", new { @class = "control-label" })
         </div>
     </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.CirculationLimitationTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.CirculationLimitationTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.CirculationLimitationTotalAcceptedRequired , "", new { @class = "control-label" })
+            @Html.LabelFor(m => m.EndMandateTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.EndMandateTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.EndMandateTotalAcceptedRequired, "", new { @class = "control-label" })
         </div>
     </div>
     <div class="col-sm-2 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.EndCirculationLimitationTotalAcceptedRequired , new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.EndCirculationLimitationTotalAcceptedRequired , defaultHtmlAttr)
-            @Html.ValidationMessageFor(m => m.EndCirculationLimitationTotalAcceptedRequired , "", new { @class = "control-label" })
+            @Html.LabelFor(m => m.PaymentNotificationTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.PaymentNotificationTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.PaymentNotificationTotalAcceptedRequired, "", new { @class = "control-label" })
+        </div>
+    </div>
+    <div class="col-sm-2 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.CirculationLimitationTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.CirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.CirculationLimitationTotalAcceptedRequired, "", new { @class = "control-label" })
+        </div>
+    </div>
+    <div class="col-sm-2 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.EndCirculationLimitationTotalAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.EndCirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
+            @Html.ValidationMessageFor(m => m.EndCirculationLimitationTotalAcceptedRequired, "", new { @class = "control-label" })
         </div>
     </div>
     <div class="col-sm-2 padding-xs-0">

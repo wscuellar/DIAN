@@ -484,6 +484,31 @@ namespace Gosocket.Dian.Infrastructure
             return results;
         }
 
+
+        public List<T> FindByContributorIdWithPagination<T>(int contributorId) where T : ITableEntity, new()
+        {
+            var query =
+                new TableQuery<T>().Where(TableQuery.GenerateFilterConditionForInt("ContributorId", QueryComparisons.Equal,
+                    contributorId)).Take(1000).AsTableQuery();
+
+            var results = new List<T>();
+            var queryResult = CloudTable.ExecuteQuerySegmented(query, null,
+                new TableRequestOptions { PayloadFormat = TablePayloadFormat.Json });
+
+            while (queryResult.Results.Any())
+            {
+                results.AddRange(queryResult.Results);
+                if (queryResult.ContinuationToken == null) break;
+
+                queryResult = CloudTable.ExecuteQuerySegmented(query, queryResult.ContinuationToken,
+                    new TableRequestOptions { PayloadFormat = TablePayloadFormat.Json });
+
+                Thread.Sleep(100);
+            }
+
+            return results;
+        }
+
         public List<DynamicTableEntity> FindByPartitionWithPagination(string partitionKey)
         {
             var query =

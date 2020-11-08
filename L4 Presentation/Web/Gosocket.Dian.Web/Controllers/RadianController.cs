@@ -13,6 +13,7 @@ using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
 using System.Diagnostics;
 using System.Data.Entity;
+using Gosocket.Dian.Application.Managers;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -22,6 +23,9 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IContributorService _ContributorService;
         private readonly IRadianContributorService _RadianContributorService;
         private readonly UserService userService = new UserService();
+        private static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
+        private readonly RadianTestSetResultManager radianTestSetManager = new RadianTestSetResultManager();
+
 
         public RadianController(IContributorService contributorService, IRadianContributorService radianContributorService)
         {
@@ -46,9 +50,7 @@ namespace Gosocket.Dian.Web.Controllers
             string rcontributorTypes = radianContributor?.Aggregate("", (current, next) => current + ", " + next.RadianContributorTypeId.ToString());
             ViewBag.ExistInRadian = rcontributorTypes;
         }
-        private static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
-
-
+        
         // GET: Radian
         public ActionResult Index()
         {
@@ -66,7 +68,9 @@ namespace Gosocket.Dian.Web.Controllers
         {
             var radianContributors = _RadianContributorService.List(t => true);
             var radianContributorType = _RadianContributorService.GetRadianContributorTypes(t => true);
+            var radianFileStatus = _RadianContributorService.GetRadianContributorFileStatus(t => true);
             var model = new AdminRadianViewModel();
+            var model2 = new RadianContributorsViewModel();
             model.RadianContributors = radianContributors.Select(c =>
             new RadianContributorsViewModel()
             {
@@ -74,9 +78,16 @@ namespace Gosocket.Dian.Web.Controllers
                 Code = c.Contributor.Code,
                 TradeName = c.Contributor.Name,
                 BusinessName = c.Contributor.BusinessName,
-                AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name
+                AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name  
 
             }).ToList();
+
+            //model2.RadianFileStatus = radianFileStatus.Select(c => new SelectListItem
+            //{
+            //    Value = c.Id.ToString(),
+            //    Text = c.Name
+
+            //}).ToList();
 
             model.RadianType = radianContributorType.Select(c => new SelectListItem
             {
@@ -129,6 +140,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             var radianContributor = _RadianContributorService.List(t => t.ContributorId == id);
             var userIds = _ContributorService.GetUserContributors(id).Select(u => u.UserId);
+            var testSet = radianTestSetManager.GetAllTestSetResultByContributor(id);
             //RadianContributor contributor = contributorService.ObsoleteGet(id);
 
             //var userIds = contributorService.GetUserContributors(id).Select(u => u.UserId);
@@ -186,6 +198,26 @@ namespace Gosocket.Dian.Web.Controllers
                 }).ToList(),
 
             };
+
+
+            //model.RadianContributorTestSetResults = testsetresults.where(t => !t.deleted).select(t => new testsetresultviewmodel
+            //{
+            //    id = t.id,
+            //    operationmodename = t.operationmodename,
+            //    softwareid = t.softwareid,
+            //    status = t.status,
+            //    statusdescription = domain.common.enumhelper.getenumdescription((testsetstatus)t.status),
+            //    totalinvoicesacceptedrequired = t.totalinvoicesacceptedrequired,
+            //    totalinvoicesaccepted = t.totalinvoicesaccepted,
+            //    totalinvoicesrejected = t.totalinvoicesrejected,
+            //    totalcreditnotesacceptedrequired = t.totalcreditnotesacceptedrequired,
+            //    totalcreditnotesaccepted = t.totalcreditnotesaccepted,
+            //    totalcreditnotesrejected = t.totalcreditnotesrejected,
+            //    totaldebitnotesacceptedrequired = t.totaldebitnotesacceptedrequired,
+            //    totaldebitnotesaccepted = t.totaldebitnotesaccepted,
+            //    totaldebitnotesrejected = t.totaldebitnotesrejected
+            //}).tolist();
+
             //var model = new ContributorViewModel
             //{
             //    Id = contributor.Id,
@@ -252,23 +284,6 @@ namespace Gosocket.Dian.Web.Controllers
             //    ContributorOperations = contributorOperations
             //};
 
-            //model.ContributorTestSetResults = testSetResults.Where(t => !t.Deleted).Select(t => new TestSetResultViewModel
-            //{
-            //    Id = t.Id,
-            //    OperationModeName = t.OperationModeName,
-            //    SoftwareId = t.SoftwareId,
-            //    Status = t.Status,
-            //    StatusDescription = Domain.Common.EnumHelper.GetEnumDescription((TestSetStatus)t.Status),
-            //    TotalInvoicesAcceptedRequired = t.TotalInvoicesAcceptedRequired,
-            //    TotalInvoicesAccepted = t.TotalInvoicesAccepted,
-            //    TotalInvoicesRejected = t.TotalInvoicesRejected,
-            //    TotalCreditNotesAcceptedRequired = t.TotalCreditNotesAcceptedRequired,
-            //    TotalCreditNotesAccepted = t.TotalCreditNotesAccepted,
-            //    TotalCreditNotesRejected = t.TotalCreditNotesRejected,
-            //    TotalDebitNotesAcceptedRequired = t.TotalDebitNotesAcceptedRequired,
-            //    TotalDebitNotesAccepted = t.TotalDebitNotesAccepted,
-            //    TotalDebitNotesRejected = t.TotalDebitNotesRejected
-            //}).ToList();
 
 
             return View(model);
@@ -291,6 +306,28 @@ namespace Gosocket.Dian.Web.Controllers
 
         }
 
+        [HttpPost]
+        public ActionResult ChangeRadianState(RadianContributorsViewModel model)
+        {
+            try
+            {
+                var RadianFileStatus = _RadianContributorService.GetRadianContributorFileStatus(t => true);
+                model.SuccessMessage = true;
+                //Actualizar BD
+                //enviar correo
+
+
+
+
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                model.SuccessMessage = false;
+                return View(model);
+            }
+        }
 
     }
 }
