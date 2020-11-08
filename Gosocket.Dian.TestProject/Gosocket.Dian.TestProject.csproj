@@ -173,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContributorActivation\ActivationTest.cs" />
+    <Compile Include="Controllers\RadianFileTypeControllerTests.cs" />
     <Compile Include="Controllers\RadianControllerTests.cs" />
     <Compile Include="Functions\Commons\AllTest.cs" />
     <Compile Include="Functions\Plugins\AllTest.cs" />

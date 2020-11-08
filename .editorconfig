@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# S1764: Identical expressions should not be used on both sides of a binary operator
+dotnet_diagnostic.S1764.severity = silent

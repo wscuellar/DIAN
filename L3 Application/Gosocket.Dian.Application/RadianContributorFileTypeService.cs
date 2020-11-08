@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
+using Gosocket.Dian.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application
 {
-    public class RadianContributorFileTypeService
+    public class RadianContributorFileTypeService : IRadianContributorFileTypeService
     {
         SqlDBContext _sqlDBContext;
         public RadianContributorFileTypeService()
