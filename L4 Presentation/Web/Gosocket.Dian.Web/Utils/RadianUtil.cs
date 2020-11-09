@@ -27,5 +27,19 @@ namespace Gosocket.Dian.Web.Utils
             [Display(Name = "Cancelado")]
             Canceled
         }
+
+        public enum DocumentStates
+        {
+            [Display(Name = "Pendiente")]
+            Pendiente,
+            [Display(Name = "Cargado y en revisión ")]
+            Cargado,
+            [Display(Name = "Aprobado")]
+            Aprobado,
+            [Display(Name = "Rechazado")]
+            Rechazado,
+            [Display(Name = "Observaciones")]
+            Observaciones
+        }
     }
 }

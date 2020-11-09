@@ -10,6 +10,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using System;
 using System.Linq;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -20,6 +21,21 @@ namespace Gosocket.Dian.Web
         public Task SendAsync(IdentityMessage message)
         {
             // Plug in your email service here to send an email.
+            MailMessage correo = new MailMessage();
+            correo.From = new MailAddress("camilo.lizarazo87@gmail.com");
+            correo.To.Add("calizarazo@indracompany.com");
+            correo.Subject = "asunto";
+            correo.Body = "<h1>mensaje</1>";
+            correo.IsBodyHtml = true;
+            correo.Priority = MailPriority.Normal;
+
+
+            SmtpClient smtp = new SmtpClient();
+            smtp.Host = "smtp.gmail.com";
+            smtp.Port = 25;
+            smtp.UseDefaultCredentials = true;
+            smtp.Credentials = new System.Net.NetworkCredential("camilo.lizarazo87@gmail.com", "87101172447");
+            smtp.Send(correo);
             return Task.FromResult(0);
         }
     }

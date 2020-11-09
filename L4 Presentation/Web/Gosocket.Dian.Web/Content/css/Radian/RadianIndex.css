@@ -331,6 +331,7 @@ i.fa-info-circle {
     font-size: 14px;
     line-height: 14px;
     color: #348441;
+    cursor: pointer;
 }
 .download-contributor-files {
     color: #348441;
@@ -403,4 +404,7 @@ i.fa-info-circle {
 #DateInterval {
     cursor: pointer;
     font-size: 11px;
+}
+.init-hide{
+    display: none;
 }

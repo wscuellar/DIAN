@@ -13,7 +13,7 @@ namespace Gosocket.Dian.Application
 {
     public class EmailService
     {
-        public EmailSenderResponse SendEmailAsync(string receiver, string subject, Dictionary<string, string> replacement)
+        public EmailSenderResponse SendEmail(string receiver, string subject, Dictionary<string, string> replacement)
         {
             try
             {
