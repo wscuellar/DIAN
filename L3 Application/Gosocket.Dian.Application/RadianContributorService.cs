@@ -44,7 +44,7 @@ namespace Gosocket.Dian.Application
         /// </summary>
         /// <param name="radianContributor"></param>
         /// <returns></returns>
-        public int AddOrUpdate(RadianContributor radianContributor)
+        public int AddOrUpdate(RadianContributor radianContributor, string approveState = "")
         {
             using (var context = new SqlDBContext())
             {
@@ -52,6 +52,11 @@ namespace Gosocket.Dian.Application
                 if (radianContributorInstance != null)
                 {
                     radianContributorInstance.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
+                    radianContributorInstance.Update = DateTime.Now;
+                    if (approveState != "")
+                    {
+                        radianContributorInstance.RadianState = approveState == "0" ? "En pruebas" : "Cancelado";
+                    }
                     context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
                 }
                 else
@@ -89,6 +94,32 @@ namespace Gosocket.Dian.Application
         {
             var query = sqlDBContext.RadianContributorFileStatuses.Where(expression);
             return query.ToList();
+        }
+
+        public List<RadianContributorFile> GetRadianContributorFile(Expression<Func<RadianContributorFile, bool>> expression)
+        {
+            var query = sqlDBContext.RadianContributorFiles.Where(expression);
+            return query.ToList();
+        }
+
+        public Guid UpdateRadianContributorFile(RadianContributorFile radianContributorFile)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var radianContributorFileInstance = context.RadianContributorFiles.FirstOrDefault(c => c.Id == radianContributorFile.Id);
+                if (radianContributorFileInstance != null)
+                {
+                    radianContributorFileInstance.Status = radianContributorFile.Status;
+                    context.Entry(radianContributorFileInstance).State = System.Data.Entity.EntityState.Modified;
+                    context.SaveChanges();
+                    return radianContributorFileInstance.Id;
+                }
+                else
+                {
+                    return radianContributorFile.Id;
+                }
+
+            }
         }
 
     }

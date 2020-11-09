@@ -92,7 +92,7 @@
                                             statusId = "status-0";
                                             break;
                                         case 1:
-                                            label = "<img src='~/Content/images/Svg/Loaded.svg'>";
+                                            label = "<img src='../../Content/images/Svg/Loaded.svg'>";
                                             statusId = "status-1";
                                             break;
                                         case 2:
@@ -112,12 +112,10 @@
                                             statusId = "status-5";
                                             break;
                                     };
-                                <tr data-id="@f.ContributorFileType.Id">
+                                <tr data-id="@f.ContributorFileType.Id" data-idFile="@f.Id" class="select-radian-contributor">
                                     <td class="text-left"><span class="fa fa fa-download add-tooltip download-contributor-files" data-original-title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>@f.ContributorFileType.Name</td>
-                                   
-                                    @*<td class="text-center @statusId">@Html.DropDownListFor(m => m.RadianFileStatus, Model.RadianFileStatus, "", defaultHtmlAttr)</td>*@
-                                    
-                                    <td class="text-center"><div><span class="">@Html.Raw(label) @f.ContributorFileStatus.Name</span></div></td>
+                                        <td class="text-center init-hide @statusId">@Html.EnumDropDownListFor(m => m.RadianFileStatus, new { @class = "list-change-status"})</td>
+                                        <td class="text-center init-show"><div><span class="">@Html.Raw(label) @f.ContributorFileStatus.Name</span></div></td>
                                     <td class="text-center"><i class="fa fa-pencil"></i><button type="button" class="btn btn-link edit-state">Editar</button></td>
                                 </tr>
                                     index++;
@@ -134,7 +132,7 @@
         <div class="col-sm-6 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.RadianApprovalState, new { @class = "control-label" })
-                @Html.EnumDropDownListFor(m => m.RadianApprovalState, "Seleccióne el estado de la aprobación", new { @class = "form-control" })
+                @Html.EnumDropDownListFor(m => m.RadianApprovalState, "Seleccióne el estado de la aprobación", new { @class = "form-control input-general" })
             </div>
         </div>
     </div>

@@ -57,6 +57,7 @@ namespace Gosocket.Dian.Web.Models
             RadianContributorTestSetResults = new List<TestSetResultViewModel>();
             AcceptanceStatuses = new List<RadianContributorAcceptanceStatusViewModel>();
             CanEdit = false;
+            IsEdit = false;
         }
 
         public int Id { get; set; }
@@ -68,6 +69,11 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Razón Social")]
         public string BusinessName { get; set; }
         public string State { get; set; }
+
+        public int RadianContributorTypeId { get; set; }
+        public int RadianOperationModeId { get; set; }
+        public string RadianState { get; set; }
+        public int CreatedBy { get; set; }
 
         [Display(Name = "Estado de aprobación")]
         public int AcceptanceStatusId { get; set; }
@@ -96,8 +102,10 @@ namespace Gosocket.Dian.Web.Models
         public List<RadianContributorFileViewModel> RadianContributorFiles { get; set; }
         public RadianContributorFileStatusViewModel RadianContributorFileStatus { get; set; }
         public bool CanEdit { get; set; }
-        public IEnumerable<SelectListItem> RadianFileStatus { get; set; }
+        public RadianUtil.DocumentStates? RadianFileStatus { get; set; }
         public bool SuccessMessage { get; set; }
+        public bool IsEdit { get; set; }
+        public List<FilesChangeStateViewModel> ListChangeStateFiles { get; set; }
 
     }
 
@@ -146,6 +154,12 @@ namespace Gosocket.Dian.Web.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+    }
+
+    public class FilesChangeStateViewModel
+    {
+        public string Id { get; set; }
+        public int NewState { get; set; }
     }
 
 }
