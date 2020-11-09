@@ -1,12 +1,16 @@
 ﻿using Gosocket.Dian.Domain;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq.Expressions;
 
 namespace Gosocket.Dian.Interfaces
 {
     public interface IRadianContributorService
     {
+
+        NameValueCollection Summary(string userCode);
+
         int AddOrUpdate(RadianContributor radianContributor, string approveState);
         List<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0);
         void RemoveRadianContributor(RadianContributor radianContributor);

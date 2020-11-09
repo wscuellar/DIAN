@@ -12,6 +12,7 @@ using System.Data.Entity;
 using Gosocket.Dian.Application.Managers;
 using Microsoft.AspNet.Identity;
 using Gosocket.Dian.Domain;
+using System.Collections.Specialized;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -25,7 +26,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly RadianTestSetResultManager radianTestSetManager = new RadianTestSetResultManager();
 
 
-        public RadianController(IContributorService contributorService, IRadianContributorService radianContributorService)
+        public RadianController(IContributorService contributorService,  IRadianContributorService radianContributorService)
         {
 
             _ContributorService = contributorService;
@@ -33,32 +34,27 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-        private void SetContributorInfo()
-        {
-            string userCode = User.UserCode();
-            Domain.Contributor contributor = _ContributorService.GetByCode(userCode);
-            if (contributor == null) return;
-
-            ViewBag.ContributorId = contributor.Id;
-            ViewBag.ContributorTypeId = contributor.ContributorTypeId;
-            ViewBag.Active = contributor.Status;
-            ViewBag.WithSoft = contributor.Softwares?.Count > 0;
-
-            List<Domain.RadianContributor> radianContributor = _RadianContributorService.List(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
-            string rcontributorTypes = radianContributor?.Aggregate("", (current, next) => current + ", " + next.RadianContributorTypeId.ToString());
-            ViewBag.ExistInRadian = rcontributorTypes;
-        }
         
         // GET: Radian
         public ActionResult Index()
         {
-            SetContributorInfo();
+            NameValueCollection result =  _RadianContributorService.Summary(User.UserCode());
+            ViewBag.ContributorId = result["ContributorId"];
+            ViewBag.ContributorTypeId = result["ContributorTypeId"];
+            ViewBag.Active = result["Active"];
+            ViewBag.WithSoft = result["WithSoft"];
+            ViewBag.ExistInRadian = result["ExistInRadian"];
             return View();
         }
 
         public ActionResult ElectronicInvoiceView()
         {
-            SetContributorInfo();
+            NameValueCollection result = _RadianContributorService.Summary(User.UserCode());
+            ViewBag.ContributorId = result["ContributorId"];
+            ViewBag.ContributorTypeId = result["ContributorTypeId"];
+            ViewBag.Active = result["Active"];
+            ViewBag.WithSoft = result["WithSoft"];
+            ViewBag.ExistInRadian = result["ExistInRadian"];
             return View();
         }
 

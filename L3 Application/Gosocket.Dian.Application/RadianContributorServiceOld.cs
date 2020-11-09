@@ -1,56 +1,27 @@
 ﻿using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Interfaces;
-using Gosocket.Dian.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace Gosocket.Dian.Application
 {
-    public class RadianContributorService : IRadianContributorService
+    public class RadianContributorServiceOld : IRadianContributorService
     {
-        private readonly IContributorService _contributorService;
-        private readonly IRadianContributorRepository _radianContributorRepository;
 
         SqlDBContext sqlDBContext;
         //private static StackExchange.Redis.IDatabase cache;
 
-        public RadianContributorService()
+        public RadianContributorServiceOld()
         {
             if (sqlDBContext == null)
                 sqlDBContext = new SqlDBContext();
         }
 
-        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository )
-        {
-            _contributorService = contributorService;
-            _radianContributorRepository = radianContributorRepository;
-        }
 
-
-        public NameValueCollection Summary(string userCode)
-        {
-            NameValueCollection collection = new NameValueCollection();
-            Domain.Contributor contributor = _contributorService.GetByCode(userCode);
-            if (contributor == null) return collection;
-
-            List<Domain.RadianContributor> radianContributor = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
-            string rcontributorTypes = radianContributor?.Aggregate("", (current, next) => current + ", " + next.RadianContributorTypeId.ToString());
-            collection.Add("ContributorId", contributor.Id.ToString());
-            collection.Add("ContributorTypeId", contributor.ContributorTypeId.ToString());
-            collection.Add("Active", contributor.Status.ToString());
-            collection.Add("WithSoft", (contributor.Softwares?.Count > 0).ToString());
-            collection.Add("ExistInRadian", rcontributorTypes);
-            return collection;
-        }
-
-
-        #region Repo 1
         /// <summary>
         /// Consulta los contribuyentes de radian.
         /// </summary>
@@ -113,28 +84,17 @@ namespace Gosocket.Dian.Application
             }
         }
 
-        #endregion
-
-        #region Repo2
-
         public List<RadianContributorType> GetRadianContributorTypes(Expression<Func<RadianContributorType, bool>> expression)
         {
             var query = sqlDBContext.RadianContributorTypes.Where(expression);
             return query.ToList();
         }
 
-        #endregion
-
-        #region Repo 3
-
         public List<RadianContributorFileStatus> GetRadianContributorFileStatus(Expression<Func<RadianContributorFileStatus, bool>> expression)
         {
             var query = sqlDBContext.RadianContributorFileStatuses.Where(expression);
             return query.ToList();
         }
-        #endregion
-
-        #region Repo 4
 
         public List<RadianContributorFile> GetRadianContributorFile(Expression<Func<RadianContributorFile, bool>> expression)
         {
@@ -161,9 +121,6 @@ namespace Gosocket.Dian.Application
 
             }
         }
-        #endregion
-
-        #region Repo 6
 
         public Guid AddRegisterHistory(RadianContributorFileHistory radianContributorFileHistory)
         {
@@ -174,8 +131,7 @@ namespace Gosocket.Dian.Application
                 context.SaveChanges();
                 return radianContributorFileHistory.Id;
             }
-        } 
-        #endregion
+        }
 
     }
 }

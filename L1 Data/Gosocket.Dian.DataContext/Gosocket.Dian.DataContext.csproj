@@ -131,9 +131,18 @@
   <ItemGroup>
     <Compile Include="CosmosDbManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\IRadianContributorFileRepository.cs" />
+    <Compile Include="Repositories\RadianContributorFileHistoryRepository.cs" />
+    <Compile Include="Repositories\RadianContributorFileStatusRepository.cs" />
+    <Compile Include="Repositories\RadianContributorRepository.cs" />
+    <Compile Include="Repositories\RadianContributorTypeRepository.cs" />
     <Compile Include="SqlDBContext.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Gosocket.Dian.Interfaces\Gosocket.Dian.Interfaces.csproj">
+      <Project>{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1}</Project>
+      <Name>Gosocket.Dian.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\L0 Infrastructure\Gosocket.Dian.Infrastructure\Gosocket.Dian.Infrastructure.csproj">
       <Project>{72E3852A-75D8-4007-93A5-8EE16BDFB5D7}</Project>
       <Name>Gosocket.Dian.Infrastructure</Name>
