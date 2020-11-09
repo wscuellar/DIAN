@@ -13,6 +13,7 @@ namespace Gosocket.Dian.Web
 			var container = new UnityContainer();
             container.RegisterType<IContributorService, ContributorService>();
             container.RegisterType<IRadianContributorService, RadianContributorService>();
+            container.RegisterType<IRadianContributorFileTypeService, RadianContributorFileTypeService>();
             // register all your components with the container here
             // it is NOT necessary to register your controllers
 

@@ -37,21 +37,138 @@ th {
 }
 /*    general Styles      */
 .RadianContainerBegin {
-    margin: 25px;
+    margin: 15px;
     background: #FFFFFF;
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
 }
 
 .RadianTextSelected {
-    /*width: 292px;*/
     height: 21px;
     font-family: Arial;
     font-style: normal;
     font-weight: bold;
-    font-size: 18px;
+    font-size: 1vw;
     line-height: 21px;
     color: #2C323C;
     margin-top: 25px;
+
+}
+
+@media screen and (min-width: 801px) {
+
+    .RadianTittleCard {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 1.5vw;
+        align-items: center;
+        text-align: center;
+        color: #2C323C;
+    }
+
+    .RadianTittleCard2 {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 1vw;
+        line-height: 22px;
+        align-items: center;
+        text-align: center;
+        color: #2C323C;
+        margin-top: -10px;
+    }
+
+
+    .RadianCardContainer:hover .RadianTittleCard {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 1.5vw;
+        line-height: 25px;
+        align-items: center;
+        text-align: center;
+        letter-spacing: 0.4px;
+        color: #348441;
+        cursor: pointer;
+    }
+}
+
+@media screen and (max-width: 800px) {
+
+    .RadianTittleCard {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 2vw;
+        align-items: center;
+        text-align: center;
+        color: #2C323C;
+    }
+
+
+    .RadianCardContainer:hover .RadianTittleCard {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 2vw;
+        line-height: 25px;
+        align-items: center;
+        text-align: center;
+        letter-spacing: 0.4px;
+        color: #348441;
+        cursor: pointer;
+    }
+
+    .RadianTittleCard2 {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 1.5vw;
+        line-height: 22px;
+        align-items: center;
+        text-align: center;
+        color: #2C323C;
+        margin-top: -10px;
+    }
+}
+
+@media screen and (max-width: 700px) {
+
+    .RadianTittleCard {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 3vw;
+        align-items: center;
+        text-align: center;
+        color: #2C323C;
+    }
+
+
+    .RadianCardContainer:hover .RadianTittleCard {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 3vw;
+        line-height: 25px;
+        align-items: center;
+        text-align: center;
+        letter-spacing: 0.4px;
+        color: #348441;
+        cursor: pointer;
+    }
+
+    .RadianTittleCard2 {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 2vw;
+        line-height: 22px;
+        align-items: center;
+        text-align: center;
+        color: #2C323C;
+        margin-top: -10px;
+    }
 }
 
 
@@ -62,56 +179,23 @@ th {
 .RadianCardContainer {
     background: #F2F6FB;
     border-radius: 10px;
-    width: 379px;
+    width: 60%;
     height: 200px;
     background: #F2F6FB;
     border-radius: 10px;
     float: none;
-    margin: 25px auto;
+    margin: 15px auto;
 }
 
-.RadianTittleCard {
-    font-family: Arial;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 22px;
-    align-items: center;
-    text-align: center;
-    color: #2C323C;
-}
-
-.RadianTittleCard2 {
-    font-family: Arial;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 12px;
-    line-height: 22px;
-    align-items: center;
-    text-align: center;
-    color: #2C323C;
-    margin-top: -17px;
-}
 
 .RadianimgSvg {
-    margin: 10px 138px;
+    margin: 10px 35%;
 }
 
 .RadianCardContainer:hover .RadianimgSvg path {
     fill: #348441 !important;
 }
 
-.RadianCardContainer:hover .RadianTittleCard {
-    font-family: Arial;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 22px;
-    line-height: 25px;
-    align-items: center;
-    text-align: center;
-    letter-spacing: 0.4px;
-    color: #348441;
-    cursor: pointer;
-}
 
 .input-general {
     height: 41px !important;

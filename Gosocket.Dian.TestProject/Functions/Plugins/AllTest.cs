@@ -13,7 +13,7 @@ namespace Gosocket.Dian.TestProject.Fucntions.Plugins
         private readonly string trackIdDebitNoteHab = "3f4c2d167a90faca85393639bf5db72270e3600f089bdbaa7a22ace9d74563035a492234773f077042a2d0bdca419d90";
 
         #region Invoices
-        [TestMethod]
+
         public async Task TestSuccessInvoiceCufeValidations()
         {
             var responses = await ValidatorEngine.Instance.StartCufeValidationAsync(trackIdInvoiceHab);
@@ -66,7 +66,6 @@ namespace Gosocket.Dian.TestProject.Fucntions.Plugins
             Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
         }
 
-        [TestMethod]
         public async Task TestSuccessCreditNoteCudeValidations()
         {
             var responses = await ValidatorEngine.Instance.StartCufeValidationAsync(trackIdCreditNoteHab);
@@ -97,7 +96,7 @@ namespace Gosocket.Dian.TestProject.Fucntions.Plugins
             //Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
         }
 
-        [TestMethod]
+      
         public async Task TestSuccessDebitNoteCudeValidations()
         {
             var responses = await ValidatorEngine.Instance.StartCufeValidationAsync(trackIdCreditNoteHab);
