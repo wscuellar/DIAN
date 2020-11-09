@@ -122,5 +122,16 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        public Guid AddRegisterHistory(RadianContributorFileHistory radianContributorFileHistory)
+        {
+            using (var context = new SqlDBContext())
+            {
+                context.Entry(radianContributorFileHistory).State = System.Data.Entity.EntityState.Added;
+
+                context.SaveChanges();
+                return radianContributorFileHistory.Id;
+            }
+        }
+
     }
 }

@@ -67,9 +67,11 @@
 
     <script>
         $(document).ready(function () {
-            debugger
             var id = @Model.Id;
-            var radianState = "@Model.RadianState" == "Cancelado" ? "1" : "0" ;
+            var radianState = "";
+            if ("@Model.RadianState" != "Registrado") {
+                radianState = "@Model.RadianState" == "Cancelado" ? "1" : "0";
+            }
             var documentsEdited = [];
             $("#Id").val(id);
             $("#RadianApprovalState").val(radianState);
