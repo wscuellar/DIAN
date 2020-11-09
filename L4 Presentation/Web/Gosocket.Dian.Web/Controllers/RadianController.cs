@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Data.Entity;
 using Gosocket.Dian.Application.Managers;
 using Microsoft.AspNet.Identity;
+using Gosocket.Dian.Domain;
 
 namespace Gosocket.Dian.Web.Controllers
 {
