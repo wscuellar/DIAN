@@ -904,28 +904,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 return dianResponse;
             }
-
-            //if (eventCodeResponse.StatusCode.Contains("Regla"))
-            //{
-            //    dianResponse = eventCodeResponse;
-            //    dianResponse.XmlDocumentKey = trackIdCude;
-            //    dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-            //    dianResponse.IsValid = false;
-            //    UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
-            //    var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-            //    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMeta);
-            //}else if (!eventCodeResponse.IsValid)
-            //{
-            //    dianResponse = eventCodeResponse;
-            //    dianResponse.XmlDocumentKey = trackIdCude;
-            //    dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-            //    dianResponse.IsValid = false;
-            //    UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
-            //    var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-            //    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMeta);
-
-            //    return dianResponse;
-            //}
+            
             var validateEventCode = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             // Valida fechas y dia habil SigningTime

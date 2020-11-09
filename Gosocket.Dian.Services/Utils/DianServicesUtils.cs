@@ -759,7 +759,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(customizationId))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D02-(R) CustomizationID no corresponde un codigo válido.");
+                    stringBuilder.AppendLine($"{codeMessage}D02-(R) CustomizationID no corresponde un código valido.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;

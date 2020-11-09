@@ -772,7 +772,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndoso
-        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude)
+        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
@@ -781,49 +781,54 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueTotalEndoso = xmlParserCude.TotalEndoso;
             string valueTotalInvoice = xmlParserCufe.TotalInvoice;
 
-            //Valida informacion Endoso 
-            if (valueTotalEndoso == null)
+            if(eventCode == "038")
             {
-                return new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAI05a, Rechazo: ",
-                    ErrorMessage = $"{(string)null} El valor no es informado .",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
-            }
-            else
-            {
-                if(!String.Equals(valueTotalEndoso, valueTotalInvoice))
+                //Valida informacion Endoso 
+                if (valueTotalEndoso == null)
                 {
                     return new ValidateListResponse
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: AAI05b, Rechazo: ",
-                        ErrorMessage = $"{(string)null} Valor Total del Endoso no es igual al Valor total FEVTV .",
+                        ErrorCode = "Regla: AAI05a, Rechazo: ",
+                        ErrorMessage = $"{(string)null} El valor no es informado .",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+                else
+                {
+                    if (!String.Equals(valueTotalEndoso, valueTotalInvoice))
+                    {
+                        return new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: AAI05b, Rechazo: ",
+                            ErrorMessage = $"{(string)null} Valor Total del Endoso no es igual al Valor total FEVTV .",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        };
+                    }
+                }
+            }
+            else
+            {
+                //Valida precio a pagar endoso
+                int resultValuePriceToPay = (Convert.ToInt32(valueTotalEndoso) * Convert.ToInt32(valueDiscountRateEndoso));
+
+                int valuePriceToPay2 = Convert.ToInt32(valuePriceToPay);
+                if (valuePriceToPay2 != resultValuePriceToPay)
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAI07b, Rechazo: ",
+                        ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
                 }
             }
-
-            //Valida precio a pagar endoso
-            int resultValuePriceToPay = (Convert.ToInt32(valueTotalEndoso) * Convert.ToInt32(valueDiscountRateEndoso));
-
-            int valuePriceToPay2 = Convert.ToInt32(valuePriceToPay);
-            if (valuePriceToPay2 != resultValuePriceToPay)
-            {
-                return new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAI07b, Rechazo: ",
-                    ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
-            }
-
+    
             return null;
         }
         #endregion
@@ -1577,6 +1582,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude)
         {
             bool validFor = false;
+            string eventCode = eventPrev.EventCode;
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -1824,7 +1830,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             //Validación de la existencia eventos previos Endoso en Garantía TASK  716
                             case "038":  //Endoso en Garantía
                                          //Valida Valores endoso electronico versus FEVTV
-                                var response = ValidateEndoso(xmlParserCufe, xmlParserCude);
+                                var response = ValidateEndoso(xmlParserCufe, xmlParserCude, eventCode);
                                 if(response != null)
                                 {
                                     validFor = true;
