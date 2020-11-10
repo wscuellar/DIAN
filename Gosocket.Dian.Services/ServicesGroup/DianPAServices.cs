@@ -652,6 +652,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var start = DateTime.UtcNow;
             var globalStart = DateTime.UtcNow;
             var contentFileList = contentFile.ExtractMultipleZip();
+            List<Task> arrayTasks = new List<Task>();
             var unzip = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_GlobalLogger)
             {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture)
@@ -723,19 +724,73 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var trackIdCude = documentParsed.Cude;
             var receiverCode = documentParsed.ReceiverCode;
             var signingTime = xmlParser.SigningTime;
-            signingTime = Convert.ToDateTime(signingTime).ToString("dd/MM/yyyy");
+            var customizationID = xmlParser.CustomizationID;
 
+            var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
+            //Validation of the DocumentReference Section - Informed CUFE and CUDE         
+            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId);
+            if (!documentReferenceCufe.IsValid)
+            {
+                dianResponse = documentReferenceCufe;
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
+                return dianResponse;
+            }
+
+            //validation if is an endoso of endorsement (Code 038)
+            GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (eventCode == "038")
+            {
+                if (!validatorDocumentMeta.InTransaction)
+                {
+                    validatorDocumentMeta.InTransaction = true;
+                    arrayTasks.Add(
+                        TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
+                }
+                else
+                {
+                    dianResponse = new DianResponse()
+                    {
+                        StatusMessage = "CUFE relacionado ya cuenta con un proceso En Negociación",
+                        StatusCode = "89",
+                        IsValid = false
+                    };
+                    ;
+                    dianResponse.XmlDocumentKey = trackIdCude;
+                    dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                    dianResponse.IsValid = false;
+                    return dianResponse;
+                }
+            }
+
+            //Solicitud de Disponibilizacion
+            if (eventCode == "036")
+            {
+                var eventApproveCufe = EventApproveCufe(trackId, eventCode, docTypeCode);
+                if (!eventApproveCufe.IsValid)
+                {
+                    dianResponse = eventApproveCufe;
+                    dianResponse.XmlDocumentKey = trackIdCude;
+                    dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                    dianResponse.IsValid = false;
+                    return dianResponse;
+                }
+            }
+
+            var approveCufe = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_ValidateParty) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             //Validate Sendercode and ReceiverCode
-            var sender_receiver_response = ValidateParty(trackId, senderCode, receiverCode, eventCode);
+            var sender_receiver_response = ValidateParty(trackId, trackIdCude, senderCode, receiverCode, eventCode, customizationID);
             if (!sender_receiver_response.IsValid)
             {
                 dianResponse = sender_receiver_response;
                 dianResponse.XmlDocumentKey = trackIdCude;
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                 dianResponse.IsValid = false;
+                UpdateInTransactions(trackId, eventCode);
                 return dianResponse;
             }
             var validateParty = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_ValidateParty) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -754,6 +809,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Auth };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
                 }
+                UpdateInTransactions(trackId, eventCode);
+
                 return dianResponse;
             }
             var auth = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Auth3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -767,6 +824,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse.XmlDocumentKey = trackIdCude;
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                 dianResponse.IsValid = false;
+                UpdateInTransactions(trackId, eventCode);
+
                 return dianResponse;
             }
             var validateSerie = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -774,7 +833,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Duplicity
             start = DateTime.UtcNow;
             var response = CheckDocumentDuplicity(senderCode, docTypeCode, serie, serieAndNumber, trackIdCude);
-            if (response != null) return response;
+            if (response != null)
+            {
+                UpdateInTransactions(trackId, eventCode);
+                return response;
+            }
             var duplicity = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Duplicity) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // Duplicity
 
@@ -793,40 +856,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var trackIdMapperEntity = new GlobalOseTrackIdMapper(contentFileList[0].XmlFileName, trackId);
             TableManagerDianFileMapper.InsertOrUpdate(trackIdMapperEntity);
             var mapper = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone4Mapper) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-            // ZONE MAPPER
-
-            // Validate EventCode
-            var eventCodeResponse = ValidateEventCode(trackId, eventCode, docTypeCode);
-            if (!eventCodeResponse.IsValid)
-            {
-                dianResponse = eventCodeResponse;
-                dianResponse.XmlDocumentKey = trackIdCude;
-                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                dianResponse.IsValid = false;
-                return dianResponse;
-            }
-            var validateEventCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-
-            // Valida dia hábil aceptación Tacita o Expresa o acuse de recibo
-            if (eventCode == "033" || eventCode == "034" || eventCode == "030")
-            {
-                var validationAcceptanceTacitaExpresa = ValidationAcceptanceTacitaExpresa(trackId, eventCode, signingTime,docTypeCode);
-                if (!validationAcceptanceTacitaExpresa.IsValid)
-                {
-                    dianResponse = validationAcceptanceTacitaExpresa;
-                    dianResponse.XmlDocumentKey = trackIdCude;
-                    dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                    dianResponse.IsValid = false;
-                    return dianResponse;
-                }
-            }
-            var validateSinginTime = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSigningTime) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-
+            // ZONE MAPPER          
 
             // upload xml
             start = DateTime.UtcNow;
             trackId = trackIdCude;
-            bool isEvent = true;            
+            bool isEvent = true;
             var uploadXmlRequest = new
             {
                 xmlBase64,
@@ -835,7 +870,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 trackId,
                 isEvent,
                 eventCode,
-                signingTime
+                customizationID
             };
             var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
             if (!uploadXmlResponse.Success)
@@ -849,10 +884,45 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
                 }
+                UpdateInTransactions(trackId, eventCode);
                 return dianResponse;
             }
             var upload = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Upload5) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // upload xml
+
+            // Validate EventCode
+            var eventCodeResponse = ValidateEventCode(documentParsed.DocumentKey.ToLower(), eventCode, docTypeCode, trackIdCude);
+            if (!eventCodeResponse.IsValid)
+            {
+                dianResponse = eventCodeResponse;
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
+                UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+                var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMeta);
+
+                return dianResponse;
+            }
+            
+            var validateEventCode = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+
+            // Valida fechas y dia habil SigningTime
+
+            var validationAcceptanceTacitaExpresa = ValidationSigningTime(documentParsed.DocumentKey.ToLower(), eventCode, signingTime, docTypeCode, customizationID);
+            if (!validationAcceptanceTacitaExpresa.IsValid)
+            {
+                dianResponse = validationAcceptanceTacitaExpresa;
+                dianResponse.XmlDocumentKey = trackIdCude;
+                dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                dianResponse.IsValid = false;
+                UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+                var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMeta);
+                return dianResponse;
+            }
+
+            var validateSinginTime = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_ValidateSigningTime) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             // send to validate document sync
             start = DateTime.UtcNow;
@@ -873,6 +943,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Validate };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
                 }
+                UpdateInTransactions(trackId, eventCode);
                 return dianResponse;
             }
             else
@@ -882,7 +953,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 string message = string.Empty;
                 bool existDocument = false;
                 GlobalDocValidatorDocumentMeta documentMeta = null;
-                List<Task> arrayTasks = new List<Task>();
+
 
                 Task secondLocalRun = Task.Run(() =>
                 {
@@ -894,6 +965,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
                 var notifications = validations.Where(r => r.IsNotification).ToList();
+               
 
                 if (!errors.Any() && !notifications.Any())
                 {
@@ -928,6 +1000,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
                 dianResponse.XmlBase64Bytes = applicationResponse ?? XmlUtil.GenerateApplicationResponseBytes(trackIdCude, documentMeta, validations);
+                bool flag = false;
+                if (errors.Any(t => t.ErrorCode == "AAD06"))
+                {
+                    flag = true;
+                    UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+                    documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMeta);
+
+                }
 
                 dianResponse.XmlDocumentKey = trackIdCude;
 
@@ -946,6 +1027,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.XmlFileName = contentFileList.First().XmlFileName;
                         dianResponse.StatusCode = processEventResponse.Code;
                         dianResponse.StatusDescription = processEventResponse.Message;
+                        UpdateInTransactions(trackId, eventCode);
                         return dianResponse;
                     }
                 }
@@ -980,17 +1062,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 };
                 if (dianResponse.IsValid && !existDocument)
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
-
+                
+                if(!flag)
+                    UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                 Task.WhenAll(arrayTasks);
-
-
 
                 var lastZone = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_LastZone) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 TableManagerGlobalLogger.InsertOrUpdate(lastZone);
                 // LAST ZONE
-
-
-
 
                 return dianResponse;
             }
@@ -1341,7 +1420,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidateSerie(string trackId, string serieAndNumber, string documentTypeId)
         {
             var number = serieAndNumber;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number, documentTypeId });            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number, documentTypeId });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1364,12 +1443,39 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidateParty(string trackId, string senderCode, string receiverCode, string eventCode)
+        private DianResponse EventApproveCufe(string trackId, string eventCode, string DocumentTypeId)
+        {
+            var ResponseCode = eventCode;
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_EventApproveCufe), new { trackId, ResponseCode, DocumentTypeId });
+            DianResponse response = new DianResponse();
+            if (validations.Count > 0)
+            {
+                response = new DianResponse()
+                {
+                    StatusMessage = validations[0].ErrorMessage,
+                    StatusCode = validations[0].ErrorCode,
+                    IsValid = validations[0].IsValid
+                };
+                response.ErrorMessage = new List<string>();
+                if (!response.IsValid)
+                {
+                    foreach (var item in validations)
+                    {
+                        response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                    }
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                }
+
+            }
+            return response;
+        }
+
+        private DianResponse ValidateParty(string trackId, string cudeId, string senderCode, string receiverCode, string eventCode, string customizationID)
         {
             var SenderParty = senderCode;
             var ReceiverParty = receiverCode;
             var ResponseCode = eventCode;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, SenderParty, ReceiverParty, ResponseCode });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, cudeId, SenderParty, ReceiverParty, ResponseCode, customizationID });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1393,9 +1499,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId)
+        private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude });
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId, trackIdCude });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1413,16 +1520,43 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
                     }
                     response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                }                
+                }
             }
             return response;
         }
 
-        private DianResponse ValidationAcceptanceTacitaExpresa(string trackId, string eventCode, string signingTime, string documentTypeId)
+        private DianResponse ValidationSigningTime(string trackId, string eventCode, string signingTime, string documentTypeId, string customizationID)
         {
 
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId });
-            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId, customizationID });
+
+            DianResponse response = new DianResponse();
+            if (validations.Count > 0)
+            {
+                response = new DianResponse
+                {
+                    StatusMessage = validations[0].ErrorMessage,
+                    StatusCode = validations[0].ErrorCode,
+                    IsValid = validations[0].IsValid,
+                    ErrorMessage = new List<string>()
+                };
+                response.ErrorMessage = new List<string>();
+                if (!response.IsValid)
+                {
+                    foreach (var item in validations)
+                    {
+                        response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                    }
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                }
+            }
+            return response;
+        }
+        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference)
+        {
+
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, IdDocumentReference = idDocumentReference });
+
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1446,5 +1580,18 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
         #endregion
+
+        private void UpdateInTransactions(string trackId, string eventCode)
+        {
+            //validation if is an endoso of endorsement (Code 038)
+
+            var arrayTasks = new List<Task>();
+            GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (eventCode == "038")
+            {
+                validatorDocumentMeta.InTransaction = false;
+                arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
+            }
+        }
     }
 }

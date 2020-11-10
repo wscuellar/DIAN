@@ -339,5 +339,23 @@ namespace Gosocket.Dian.Services.Properties {
                 return ((string)(this["Param_ValidateSigningTime"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidateDocumentReferenceIdUrl")]
+        public string Param_ValidateDocumentReferenceId {
+            get {
+                return ((string)(this["Param_ValidateDocumentReferenceId"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidateEventApproveCufeUrl\r\n")]
+        public string Param_EventApproveCufe {
+            get {
+                return ((string)(this["Param_EventApproveCufe"]));
+            }
+        }
     }
 }

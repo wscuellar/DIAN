@@ -160,6 +160,7 @@
     <Compile Include="Entity\DianEmailTracker.cs" />
     <Compile Include="Entity\DianNsuControl.cs" />
     <Compile Include="Entity\DianOfeControl.cs" />
+    <Compile Include="Entity\GlobalAttorneyFacultity.cs" />
     <Compile Include="Entity\GlobalAuthorization.cs" />
     <Compile Include="Entity\GlobalBatchFileFailed.cs" />
     <Compile Include="Entity\GlobalBatchFileMapper.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="Entity\GlobalContributorActivation.cs" />
     <Compile Include="Entity\GlobalDocModelFolio.cs" />
     <Compile Include="Entity\GlobalDocReference.cs" />
+    <Compile Include="Entity\GlobalDocReferenceAttorney.cs" />
     <Compile Include="Entity\GlobalDocValidatorDocument.cs" />
     <Compile Include="Entity\GlobalDataDocument.cs" />
     <Compile Include="Entity\GlobalDocumentType.cs" />

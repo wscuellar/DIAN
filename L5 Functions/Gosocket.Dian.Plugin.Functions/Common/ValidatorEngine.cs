@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Plugin.Functions.Models;
+using Gosocket.Dian.Plugin.Functions.ValidateParty;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
@@ -8,6 +9,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Gosocket.Dian.Plugin.Functions.SigningTime;
+using Gosocket.Dian.Plugin.Functions.Event;
+using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -66,39 +70,124 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
-        public List<ValidateListResponse> StartValidateEmitionEventPrevAsync(string trackId, string eventCode, string documentTypeId)
+        public async Task<List<ValidateListResponse>> StartValidateEmitionEventPrevAsync(ValidateEmitionEventPrev.RequestObject eventPrev)
         {
-            var validator = new Validator();
-            return validator.ValidateEmitionEventPrev(trackId, eventCode,documentTypeId);
-        }
-        public async Task<List<ValidateListResponse>> StartValidationAcceptanceTacitaExpresaAsync(string trackId, string eventCode, string signingTime, string documentTypeId)
-        {           
             var validateResponses = new List<ValidateListResponse>();
-            if (eventCode == "033" || eventCode == "034")
+            XmlParser xmlParserCufe = null;
+            XmlParser xmlParserCude = null;
+
+            //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
+            if (eventPrev.EventCode == "040")
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId, "032").FirstOrDefault();
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackIdCude, eventPrev.TrackIdCude);
                 if (documentMeta != null)
                 {
-                    trackId = documentMeta.PartitionKey;
+                    //Obtiene el CUFE
+                    eventPrev.TrackId = documentMeta.DocumentReferencedKey;
                 }
-                else
+            }
+            //Obtiene información factura referenciada Endoso electronico y AR CUDE
+            if(eventPrev.EventCode == "038")
+            {
+                //Obtiene XML Factura electronica CUFE
+                var xmlBytes = await GetXmlFromStorageAsync(eventPrev.TrackId);
+                xmlParserCufe = new XmlParser(xmlBytes);
+                if (!xmlParserCufe.Parser())
+                    throw new Exception(xmlParserCufe.ParserError);
+
+                //Obtiene XML ApplicationResponse CUDE
+                var xmlBytesCude = await GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                xmlParserCude = new XmlParser(xmlBytesCude);
+                if (!xmlParserCude.Parser())
+                    throw new Exception(xmlParserCude.ParserError);
+            }
+
+            var validator = new Validator();           
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude));
+
+            return validateResponses;
+
+        }
+
+
+        public List<ValidateListResponse> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
+        {
+            var validator = new Validator();
+            return validator.ValidateDocumentReferencePrev(trackId, idDocumentReference);
+        }
+
+
+        public async Task<List<ValidateListResponse>> StartValidateSigningTimeAsync(ValidateSigningTime.RequestObject data)
+        {           
+            var validateResponses = new List<ValidateListResponse>();
+            DateTime startDate = DateTime.UtcNow;
+            string code;
+            switch (data.EventCode)
+            {
+                case "032": //Constancia de recibo del bien
+                    code = "030"; // Acuse de recibo de la FEV
+                    break;
+                case "044":  //Terminacion del mandato
+                    code = "043"; //Mandato
+                    break;
+                case "036": //Solicitud de Dsiponibilizacion 
+                    code = "033"; //Aceptacion Expresa
+                    break;
+                default:
+                    code = "032"; //Constancia de recibo del bien
+                    break;
+            }
+
+            if (data.EventCode == "031" || data.EventCode == "032" || data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044" || data.EventCode == "036")
+            {
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
+                if (documentMeta != null)
+                {
+                    data.TrackId = documentMeta.PartitionKey;
+                }
+                // Validación de la Sección Signature - Fechas valida transmisión evento TASK 714
+                else if (data.EventCode == "036")
+                {
+                    code = "034"; //Aceptacion Tácita
+                    documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
+                    if (documentMeta != null)
+                    {
+                        data.TrackId = documentMeta.PartitionKey;
+                    }
+                    else
+                    {
+                        ValidateListResponse response = new ValidateListResponse();
+                        response.ErrorMessage = $"No se encuentran registros de Eventos de Aceptación Expresa - Tácita  prerrequisito para esta transmisión de Disponibilizacion";
+                        response.IsValid = false;
+                        response.ErrorCode = "89";
+                        response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                        validateResponses.Add(response);
+                        return validateResponses;
+                    }
+                }
+                //Solo si es eventcode AR Aceptacion Expresa - Tácita
+                else if (data.EventCode != "031")
                 {
                     ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE {trackId}";
+                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE/CUFE {data.TrackId}";
                     response.IsValid = false;
+                    response.ErrorCode = "89";
+                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     validateResponses.Add(response);
                     return validateResponses;
                 }
             }
-            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            
+            var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
         
             //DateTime dateReceived = DateTime.ParseExact(xmlParser.SigningTime, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-            DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            //DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            string dateEntrie = Convert.ToDateTime(data.SigningTime).ToString("dd/MM/yyyy");
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateAcceptanceTacitaExpresa(eventCode, xmlParser.SigningTime, dateEntrie));
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser));
 
             return validateResponses;
         }
@@ -138,11 +227,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-        public async Task<List<ValidateListResponse>> StartValidateParty(string trackId, string senderParty, string receiverParty, string eventCode)
+        public async Task<List<ValidateListResponse>> StartValidateParty(RequestObjectParty party)
         {
             var validateResponses = new List<ValidateListResponse>();
 
-            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlBytes = await GetXmlFromStorageAsync(party.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
@@ -150,7 +239,36 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateParty(nitModel, trackId, senderParty, receiverParty, eventCode));
+            validateResponses.AddRange(validator.ValidateParty(nitModel, party));
+
+            return validateResponses;
+        }
+
+        public async Task<List<ValidateListResponse>> StartEventApproveCufe(EventApproveCufeObjectParty eventApproveCufe)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(eventApproveCufe.TrackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+
+            if(xmlParser.PaymentMeansID != "2")
+            {
+                ValidateListResponse response = new ValidateListResponse();
+                response.ErrorMessage = $"Tipo factura diferente a Credito.";
+                response.IsValid = false;
+                response.ErrorCode = "89";
+                response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                validateResponses.Add(response);
+                return validateResponses;
+            }
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.EventApproveCufe(nitModel, eventApproveCufe));
 
             return validateResponses;
         }
@@ -230,6 +348,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
+
+        public async Task<List<ValidateListResponse>> StartValidateReferenceAttorney(ValidateReferenceAttorney.RequestObjectReferenceAttorney data)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser, data.TrackId));
+
+            return validateResponses;
+        }
+
 
         #region Private methods
         private Dictionary<string, string> CreateTaxLevelCodeXpathsRequestObject(string trackId)

@@ -690,6 +690,7 @@ namespace Gosocket.Dian.Services.Utils
             var senderCode = documentParsed.SenderCode;
             var eventCode = documentParsed.ResponseCode;
             var documentCude = documentParsed.Cude;
+            var customizationId = documentParsed.CustomizationId;
 
             switch (docTypeCode)
             {
@@ -734,14 +735,14 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (string.IsNullOrEmpty(eventCode.Trim()))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D06-(R) Código tipo de evento no puede estar vacío.");
+                    stringBuilder.AppendLine($"{codeMessage}H03-(R) Código tipo de evento no puede estar vacío.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
                 }
-                else if (Convert.ToInt32(eventCode) < 30 | Convert.ToInt32(eventCode) > 34)
+                else if (Convert.ToInt32(eventCode) < 30 | Convert.ToInt32(eventCode) > 45)
                 {
-                    stringBuilder.AppendLine($"{codeMessage}222 - Evento no Implementado.");
+                    stringBuilder.AppendLine($"{codeMessage}H03-(R) Evento no Implementado.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -755,8 +756,15 @@ namespace Gosocket.Dian.Services.Utils
                     stringBuilder.Clear();
                     isValid = false;
                 }
+
+                if (string.IsNullOrEmpty(customizationId))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}D02-(R) CustomizationID no corresponde un código valido.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
             }
-            
 
             if (string.IsNullOrEmpty(documentKey))
             {
