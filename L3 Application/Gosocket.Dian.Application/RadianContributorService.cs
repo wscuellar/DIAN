@@ -1,16 +1,15 @@
-﻿using Gosocket.Dian.DataContext;
+﻿using Gosocket.Dian.Application.Managers;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Repositories;
+using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Gosocket.Dian.Application
 {
@@ -19,21 +18,15 @@ namespace Gosocket.Dian.Application
         private readonly IContributorService _contributorService;
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
+        private readonly IRadianContributorFileRepository _radianContributorFileRepository;
+        private readonly RadianTestSetResultManager radianTestSetManager = new RadianTestSetResultManager();
 
-        SqlDBContext sqlDBContext;
-        //private static StackExchange.Redis.IDatabase cache;
-
-        public RadianContributorService()
-        {
-            if (sqlDBContext == null)
-                sqlDBContext = new SqlDBContext();
-        }
-
-        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository)
+        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository)
         {
             _contributorService = contributorService;
             _radianContributorRepository = radianContributorRepository;
             _radianContributorTypeRepository = radianContributorTypeRepository;
+            _radianContributorFileRepository = radianContributorFileRepository;
         }
 
 
@@ -61,7 +54,7 @@ namespace Gosocket.Dian.Application
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
             {
-                contributors = radianContributors.Select(c =>
+                Contributors = radianContributors.Select(c =>
                new RedianContributorWithTypes()
                {
                    Id = c.Contributor.Id,
@@ -82,7 +75,7 @@ namespace Gosocket.Dian.Application
             DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
             DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
 
-            var radianContributors = _radianContributorRepository.List(t =>  (t.Contributor.Code == filter.Code || filter.Code == null) &&
+            var radianContributors = _radianContributorRepository.List(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
                                                                              (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
                                                                              (t.RadianState == filter.RadianState.GetDescription() || (filter.RadianState == null && t.RadianState != cancelState)) &&
                                                                              (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) &&
@@ -91,7 +84,7 @@ namespace Gosocket.Dian.Application
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
             {
-                contributors = radianContributors.Select(c =>
+                Contributors = radianContributors.Select(c =>
                new RedianContributorWithTypes()
                {
                    Id = c.Contributor.Id,
@@ -105,137 +98,200 @@ namespace Gosocket.Dian.Application
             return radianAdmin;
         }
 
-        #region Repo 1
-        /// <summary>
-        /// Consulta los contribuyentes de radian.
-        /// </summary>
-        /// <param name="page"></param>
-        /// <param name="length"></param>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public List<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0)
+        public RadianAdmin ContributorSummary(int contributorId)
         {
-            var query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode").Include("RadianContributorFile");
-            if (page > 0 && length > 0)
-            {
-                query = query.Skip(page * length).Take(length);
-            }
-            return query.ToList();
-        }
+            List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId);
+            List<RadianTestSetResult> testSet = radianTestSetManager.GetAllTestSetResultByContributor(contributorId).ToList();
+            List<string> userIds = _contributorService.GetUserContributors(contributorId).Select(u => u.UserId).ToList();
 
-        /// <summary>
-        /// Inserta y actualiza
-        /// </summary>
-        /// <param name="radianContributor"></param>
-        /// <returns></returns>
-        public int AddOrUpdate(RadianContributor radianContributor, string approveState = "")
-        {
-            using (var context = new SqlDBContext())
+            RadianAdmin radianAdmin = null;
+
+            radianContributors.ForEach(c =>
             {
-                var radianContributorInstance = context.RadianContributors.FirstOrDefault(c => c.Id == radianContributor.Id);
-                if (radianContributorInstance != null)
+                radianAdmin = new RadianAdmin()
                 {
-                    radianContributorInstance.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
-                    radianContributorInstance.Update = DateTime.Now;
-                    if (approveState != "")
+                    Contributor = new RedianContributorWithTypes()
                     {
-                        radianContributorInstance.RadianState = approveState == "0" ? "En pruebas" : "Cancelado";
-                    }
-                    context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
-                }
-                else
-                {
-                    context.Entry(radianContributor).State = System.Data.Entity.EntityState.Added;
-                }
+                        Id = c.Contributor.Id,
+                        Code = c.Contributor.Code,
+                        TradeName = c.Contributor.Name,
+                        BusinessName = c.Contributor.BusinessName,
+                        AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name,
+                        Email = c.Contributor.Email,
+                        Update = c.Update,
+                        RadianState = c.RadianState,
+                        AcceptanceStatusId = c.Contributor.AcceptanceStatus.Id,
+                        CreatedDate = c.CreatedDate
+                    },
+                    Files = c.RadianContributorFile.ToList(),
+                    Tests = testSet,
+                    LegalRepresentativeIds = userIds
+                };
+            });
 
-                context.SaveChanges();
-                return radianContributorInstance != null ? radianContributorInstance.Id : radianContributor.Id;
-            }
+            return radianAdmin;
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="radianContributor"></param>
-        public void RemoveRadianContributor(RadianContributor radianContributor)
+        public bool ChangeParticipantStatus(int id, string approveState)
         {
-            RadianContributor rc = sqlDBContext.RadianContributors.FirstOrDefault(x => x.Id == radianContributor.Id);
-            if (rc != null)
+            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.Id == id);
+
+            if (contributors.Any())
             {
-                sqlDBContext.RadianContributors.Remove(rc);
-                sqlDBContext.SaveChanges();
+                _radianContributorRepository.AddOrUpdate(contributors.FirstOrDefault(), approveState);
+                return true;
             }
-        }
 
-        #endregion
-
-        #region Repo2
-
-        //public List<RadianContributorType> GetRadianContributorTypes(Expression<Func<RadianContributorType, bool>> expression)
-        //{
-        //    var query = sqlDBContext.RadianContributorTypes.Where(expression);
-        //    return query.ToList();
-        //}
-
-        #endregion
-
-        #region Repo 3
-
-        public List<RadianContributorFileStatus> GetRadianContributorFileStatus(Expression<Func<RadianContributorFileStatus, bool>> expression)
-        {
-            var query = sqlDBContext.RadianContributorFileStatuses.Where(expression);
-            return query.ToList();
-        }
-        #endregion
-
-        #region Repo 4
-
-        public List<RadianContributorFile> GetRadianContributorFile(Expression<Func<RadianContributorFile, bool>> expression)
-        {
-            var query = sqlDBContext.RadianContributorFiles.Where(expression);
-            return query.ToList();
+            return false;
         }
 
         public Guid UpdateRadianContributorFile(RadianContributorFile radianContributorFile)
         {
-            using (var context = new SqlDBContext())
-            {
-                var radianContributorFileInstance = context.RadianContributorFiles.FirstOrDefault(c => c.Id == radianContributorFile.Id);
-                if (radianContributorFileInstance != null)
-                {
-                    radianContributorFileInstance.Status = radianContributorFile.Status;
-                    context.Entry(radianContributorFileInstance).State = System.Data.Entity.EntityState.Modified;
-                    context.SaveChanges();
-                    return radianContributorFileInstance.Id;
-                }
-                else
-                {
-                    return radianContributorFile.Id;
-                }
-
-            }
+            return _radianContributorFileRepository.Update(radianContributorFile);
         }
-        #endregion
 
-        #region Repo 6
-
-        public Guid AddRegisterHistory(RadianContributorFileHistory radianContributorFileHistory)
+        public void CreateContributor(int contributorId, RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy)
         {
-            using (var context = new SqlDBContext())
-            {
-                context.Entry(radianContributorFileHistory).State = System.Data.Entity.EntityState.Added;
+            List<Domain.RadianContributor> radianContributor = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == (int)radianContributorType);
 
-                context.SaveChanges();
-                return radianContributorFileHistory.Id;
+
+            if (!radianContributor.Any())
+            {
+                RadianContributor newRadianContributor = new Domain.RadianContributor()
+                {
+                    ContributorId = contributorId,
+                    CreatedBy = createdBy,
+                    RadianContributorTypeId = (int)radianContributorType,
+                    RadianOperationModeId = (int)radianOperationMode,
+                    RadianState = radianState.GetDescription(),
+                    CreatedDate = System.DateTime.Now,
+                    Update = System.DateTime.Now,
+                };
+                int id = _radianContributorRepository.AddOrUpdate(newRadianContributor, newRadianContributor.RadianState);
+                newRadianContributor.Id = id;
             }
         }
 
-        public List<Domain.RadianContributorType> GetRadianContributorTypes(Expression<Func<Domain.RadianContributorType, bool>> expression)
+        public List<RadianContributorFile> RadianContributorFileList(string id)
         {
-            throw new NotImplementedException();
+            return _radianContributorFileRepository.List(t => t.Id.ToString() == id);
         }
-        #endregion
+
+        //#region Repo 1
+        ///// <summary>
+        ///// Consulta los contribuyentes de radian.
+        ///// </summary>
+        ///// <param name="page"></param>
+        ///// <param name="length"></param>
+        ///// <param name="expression"></param>
+        ///// <returns></returns>
+        //public List<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 1, int length = 10)
+        //{
+        //    var query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode").Include("RadianContributorFile");
+        //    if (page > 0 && length > 0)
+        //    {
+        //        query = query.Skip(page * length).Take(length);
+        //    }
+        //    return query.ToList();
+        //}
+
+        ///// <summary>
+        ///// Inserta y actualiza
+        ///// </summary>
+        ///// <param name="radianContributor"></param>
+        ///// <returns></returns>
+        //public int AddOrUpdate(RadianContributor radianContributor, string approveState = "")
+        //{
+        //    using (var context = new SqlDBContext())
+        //    {
+        //        var radianContributorInstance = context.RadianContributors.FirstOrDefault(c => c.Id == radianContributor.Id);
+        //        if (radianContributorInstance != null)
+        //        {
+        //            radianContributorInstance.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
+        //            radianContributorInstance.Update = DateTime.Now;
+        //            if (approveState != "")
+        //            {
+        //                radianContributorInstance.RadianState = approveState == "0" ? "En pruebas" : "Cancelado";
+        //            }
+        //            context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
+        //        }
+        //        else
+        //        {
+        //            context.Entry(radianContributor).State = System.Data.Entity.EntityState.Added;
+        //        }
+
+        //        context.SaveChanges();
+        //        return radianContributorInstance != null ? radianContributorInstance.Id : radianContributor.Id;
+        //    }
+        //}
+
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="radianContributor"></param>
+        //public void RemoveRadianContributor(RadianContributor radianContributor)
+        //{
+        //    RadianContributor rc = sqlDBContext.RadianContributors.FirstOrDefault(x => x.Id == radianContributor.Id);
+
+        //    if (rc != null)
+        //    {
+        //        sqlDBContext.RadianContributors.Remove(rc);
+        //        sqlDBContext.SaveChanges();
+        //    }
+        //}
+
+        //#endregion
+
+        //#region Repo2
+
+        ////public List<RadianContributorType> GetRadianContributorTypes(Expression<Func<RadianContributorType, bool>> expression)
+        ////{
+        ////    var query = sqlDBContext.RadianContributorTypes.Where(expression);
+        ////    return query.ToList();
+        ////}
+
+        //#endregion
+
+        //#region Repo 3
+
+        //public List<RadianContributorFileStatus> GetRadianContributorFileStatus(Expression<Func<RadianContributorFileStatus, bool>> expression)
+        //{
+        //    var query = sqlDBContext.RadianContributorFileStatuses.Where(expression);
+        //    return query.ToList();
+        //}
+        //#endregion
+
+        //#region Repo 4
+
+        //public List<RadianContributorFile> GetRadianContributorFile(Expression<Func<RadianContributorFile, bool>> expression)
+        //{
+        //    var query = sqlDBContext.RadianContributorFiles.Where(expression);
+        //    return query.ToList();
+        //}
+
+
+        //#endregion
+
+        //#region Repo 6
+
+        //public Guid AddRegisterHistory(RadianContributorFileHistory radianContributorFileHistory)
+        //{
+        //    using (var context = new SqlDBContext())
+        //    {
+        //        context.Entry(radianContributorFileHistory).State = System.Data.Entity.EntityState.Added;
+
+        //        context.SaveChanges();
+        //        return radianContributorFileHistory.Id;
+        //    }
+        //}
+
+        //public List<Domain.RadianContributorType> GetRadianContributorTypes(Expression<Func<Domain.RadianContributorType, bool>> expression)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //#endregion
 
     }
 }

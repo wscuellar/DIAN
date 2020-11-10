@@ -18,13 +18,13 @@ namespace Gosocket.Dian.DataContext.Repositories
                 sqlDBContext = new SqlDBContext();
         }
 
-        public List<RadianContributorFile> GetRadianContributorFile(Expression<Func<RadianContributorFile, bool>> expression)
+        public List<RadianContributorFile> List(Expression<Func<RadianContributorFile, bool>> expression)
         {
             var query = sqlDBContext.RadianContributorFiles.Where(expression);
             return query.ToList();
         }
 
-        public Guid UpdateRadianContributorFile(RadianContributorFile radianContributorFile)
+        public Guid Update(RadianContributorFile radianContributorFile)
         {
             using (var context = new SqlDBContext())
             {

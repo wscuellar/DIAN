@@ -29,10 +29,21 @@ namespace Gosocket.Dian.Domain.Entity
 
     public class RadianAdmin
     {
-        public List<RedianContributorWithTypes> contributors { get; set; }
+        public RedianContributorWithTypes Contributor { get; set; }
+
+        public RadianContributorType Type { get; set; }
+
+        public RadianContributorFile File { get; set; }
+
+        public List<RedianContributorWithTypes> Contributors { get; set; }
 
         public List<RadianContributorType> Types { get; set; }
 
+        public List<RadianContributorFile> Files { get; set; }
+
+        public List<RadianTestSetResult> Tests { get; set; }
+
+        public List<string> LegalRepresentativeIds { get; set; }
     }
 
     public class RedianContributorWithTypes
@@ -48,6 +59,14 @@ namespace Gosocket.Dian.Domain.Entity
 
         public string AcceptanceStatusName { get; set; }
 
+        public string Email { get; set; }
 
+        public int AcceptanceStatusId { get; set; }
+
+        public DateTime CreatedDate { get; set; }
+
+        public DateTime Update { get; set; }
+
+        public string RadianState { get; set; }
     }
 }

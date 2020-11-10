@@ -1,88 +1,128 @@
-﻿using Gosocket.Dian.DataContext;
-using Gosocket.Dian.Domain;
-using Gosocket.Dian.Interfaces;
-using System;
+﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Interfaces.Repositories;
+using Gosocket.Dian.Interfaces.Services;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application
 {
     public class RadianContributorFileTypeService : IRadianContributorFileTypeService
     {
-        SqlDBContext _sqlDBContext;
-        public RadianContributorFileTypeService()
+        private readonly IRadianContributorFileTypeRepository _radianContributorFileTypeRepository;
+        private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
+
+        public RadianContributorFileTypeService(IRadianContributorFileTypeRepository radianContributorFileTypeRepository, IRadianContributorTypeRepository radianContributorTypeRepository)
         {
-            if (_sqlDBContext == null)
-            {
-                _sqlDBContext = new SqlDBContext();
-            }
+            _radianContributorFileTypeRepository = radianContributorFileTypeRepository;
+            _radianContributorTypeRepository = radianContributorTypeRepository;
+        }
+
+        public List<RadianContributorFileType> FileTypeList()
+        {
+            return _radianContributorFileTypeRepository.List(ft => !ft.Deleted);
+        }
+
+        public List<RadianContributorType> ContributorTypeList()
+        {
+            return _radianContributorTypeRepository.List(t => true);
+        }
+
+        public List<RadianContributorFileType> Filter(string name, string selectedRadianContributorTypeId)
+        {
+            int selectedType = (selectedRadianContributorTypeId == null) ? 0 : int.Parse(selectedRadianContributorTypeId);
+
+            return _radianContributorFileTypeRepository.List(ft => ((name == null) || ft.Name.Contains(name)) && ((selectedRadianContributorTypeId == null) || ft.RadianContributorTypeId == selectedType) && !ft.Deleted);
+        }
+
+        public int Update(RadianContributorFileType radianContributorFileType)
+        {
+            return _radianContributorFileTypeRepository.AddOrUpdate(radianContributorFileType);
         }
 
         public RadianContributorFileType Get(int id)
         {
-            return _sqlDBContext.RadianContributorFileTypes.FirstOrDefault(x => x.Id == id);
+            return _radianContributorFileTypeRepository.Get(id);
         }
 
-        public List<RadianContributorFileType> GetRadianContributorFileTypes(int page, int length, Expression<Func<RadianContributorFileType, bool>> expression)
+        public bool IsAbleForDelete(RadianContributorFileType radianContributorFileType)
         {
-            var query = _sqlDBContext.RadianContributorFileTypes.Where(expression).OrderBy(c => c.RadianContributorType.Id).Skip(page * length).Take(length).Include("RadianContributorType");
-
-            return query.ToList();
-        }
-
-        public int AddOrUpdate(RadianContributorFileType radianContributorFileType)
-        {
-            var fileTypeInstance = _sqlDBContext.RadianContributorFileTypes.FirstOrDefault(c => c.Id == radianContributorFileType.Id);
-
-            if (fileTypeInstance != null)
-            {
-                fileTypeInstance.Name = radianContributorFileType.Name;
-                fileTypeInstance.Mandatory = radianContributorFileType.Mandatory;
-                fileTypeInstance.Updated = radianContributorFileType.Updated;
-                fileTypeInstance.CreatedBy = radianContributorFileType.CreatedBy;
-                fileTypeInstance.Deleted = radianContributorFileType.Deleted;
-                fileTypeInstance.Timestamp = radianContributorFileType.Timestamp;
-                fileTypeInstance.RadianContributorTypeId = radianContributorFileType.RadianContributorTypeId;
-                fileTypeInstance.RadianContributorType = radianContributorFileType.RadianContributorType;
-                _sqlDBContext.Entry(fileTypeInstance).State = System.Data.Entity.EntityState.Modified;
-            }
-            else
-            {
-                _sqlDBContext.Entry(radianContributorFileType).State = System.Data.Entity.EntityState.Added;
-            }
-
-            _sqlDBContext.SaveChanges();
-
-            return fileTypeInstance != null ? fileTypeInstance.Id : radianContributorFileType.Id;
+            return _radianContributorFileTypeRepository.IsAbleForDelete(radianContributorFileType);
         }
 
         public int Delete(RadianContributorFileType radianContributorFileType)
         {
-            var fileTypeInstance = _sqlDBContext.RadianContributorFileTypes.FirstOrDefault(c => c.Id == radianContributorFileType.Id);
-
-            if (fileTypeInstance != null)
-            {
-                fileTypeInstance.Updated = radianContributorFileType.Updated;
-                fileTypeInstance.Timestamp = radianContributorFileType.Timestamp;
-                fileTypeInstance.Deleted = radianContributorFileType.Deleted;
-                _sqlDBContext.Entry(fileTypeInstance).State = System.Data.Entity.EntityState.Modified;
-            }
-
-            _sqlDBContext.SaveChanges();
-
-            return fileTypeInstance != null ? fileTypeInstance.Id : radianContributorFileType.Id;
+            return _radianContributorFileTypeRepository.Delete(radianContributorFileType);
         }
-        public bool IsAbleForDelete(RadianContributorFileType radianContributorFileType)
-        {
-            var fileTypeInstance = _sqlDBContext.RadianContributorFileTypes.FirstOrDefault(c => c.Id == radianContributorFileType.Id);
 
-            var amountOfFiles = _sqlDBContext.RadianContributorFiles.Where(rcf => rcf.FileType == fileTypeInstance.Id);
+        //SqlDBContext _sqlDBContext;
+        //public RadianContributorFileTypeService()
+        //{
+        //    if (_sqlDBContext == null)
+        //    {
+        //        _sqlDBContext = new SqlDBContext();
+        //    }
+        //}
 
-            return (amountOfFiles.Count() > 0) ? false : true;
-        }
+        //public RadianContributorFileType Get(int id)
+        //{
+        //    return _sqlDBContext.RadianContributorFileTypes.FirstOrDefault(x => x.Id == id);
+        //}
+
+        //public List<RadianContributorFileType> GetRadianContributorFileTypes(int page, int length, Expression<Func<RadianContributorFileType, bool>> expression)
+        //{
+        //    var query = _sqlDBContext.RadianContributorFileTypes.Where(expression).OrderBy(c => c.RadianContributorType.Id).Skip(page * length).Take(length).Include("RadianContributorType");
+
+        //    return query.ToList();
+        //}
+
+        //public int AddOrUpdate(RadianContributorFileType radianContributorFileType)
+        //{
+        //    var fileTypeInstance = _sqlDBContext.RadianContributorFileTypes.FirstOrDefault(c => c.Id == radianContributorFileType.Id);
+
+        //    if (fileTypeInstance != null)
+        //    {
+        //        fileTypeInstance.Name = radianContributorFileType.Name;
+        //        fileTypeInstance.Mandatory = radianContributorFileType.Mandatory;
+        //        fileTypeInstance.Updated = radianContributorFileType.Updated;
+        //        fileTypeInstance.CreatedBy = radianContributorFileType.CreatedBy;
+        //        fileTypeInstance.Deleted = radianContributorFileType.Deleted;
+        //        fileTypeInstance.Timestamp = radianContributorFileType.Timestamp;
+        //        fileTypeInstance.RadianContributorTypeId = radianContributorFileType.RadianContributorTypeId;
+        //        fileTypeInstance.RadianContributorType = radianContributorFileType.RadianContributorType;
+        //        _sqlDBContext.Entry(fileTypeInstance).State = System.Data.Entity.EntityState.Modified;
+        //    }
+        //    else
+        //    {
+        //        _sqlDBContext.Entry(radianContributorFileType).State = System.Data.Entity.EntityState.Added;
+        //    }
+
+        //    _sqlDBContext.SaveChanges();
+
+        //    return fileTypeInstance != null ? fileTypeInstance.Id : radianContributorFileType.Id;
+        //}
+
+        //public int Delete(RadianContributorFileType radianContributorFileType)
+        //{
+        //    var fileTypeInstance = _sqlDBContext.RadianContributorFileTypes.FirstOrDefault(c => c.Id == radianContributorFileType.Id);
+
+        //    if (fileTypeInstance != null)
+        //    {
+        //        fileTypeInstance.Updated = radianContributorFileType.Updated;
+        //        fileTypeInstance.Timestamp = radianContributorFileType.Timestamp;
+        //        fileTypeInstance.Deleted = radianContributorFileType.Deleted;
+        //        _sqlDBContext.Entry(fileTypeInstance).State = System.Data.Entity.EntityState.Modified;
+        //    }
+
+        //    _sqlDBContext.SaveChanges();
+
+        //    return fileTypeInstance != null ? fileTypeInstance.Id : radianContributorFileType.Id;
+        //}
+        //public bool IsAbleForDelete(RadianContributorFileType radianContributorFileType)
+        //{
+        //    var fileTypeInstance = _sqlDBContext.RadianContributorFileTypes.FirstOrDefault(c => c.Id == radianContributorFileType.Id);
+
+        //    var amountOfFiles = _sqlDBContext.RadianContributorFiles.Where(rcf => rcf.FileType == fileTypeInstance.Id);
+
+        //    return (amountOfFiles.Count() > 0) ? false : true;
+        //}
     }
 }

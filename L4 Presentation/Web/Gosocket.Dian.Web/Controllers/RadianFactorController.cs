@@ -1,9 +1,6 @@
-﻿using Gosocket.Dian.Application;
-using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
@@ -11,27 +8,22 @@ namespace Gosocket.Dian.Web.Controllers
     public class RadianFactorController : Controller
     {
 
-        RadianContributorService radianContributorService = new RadianContributorService();
+        private readonly IRadianContributorService _radianContributorService;
+
+        public RadianFactorController(IRadianContributorService radianContributorService)
+        {
+            _radianContributorService = radianContributorService;
+        }
 
         // GET: RadianFactor
         public ActionResult Index(int contributorId)
         {
-            List<Domain.RadianContributor> radianContributor = radianContributorService.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor);
-            if (!radianContributor.Any())
-            {
-                RadianContributor newRadianContributor = new Domain.RadianContributor()
-                {
-                    ContributorId = contributorId,
-                    CreatedBy = User.UserName(),
-                    RadianContributorTypeId = (int)Domain.Common.RadianContributorType.Factor,
-                    RadianOperationModeId = (int)Domain.Common.RadianOperationMode.Direct,
-                    RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Registrado),
-                    CreatedDate = DateTime.Now,
-                    Update = DateTime.Now,
-                };
-                int id = radianContributorService.AddOrUpdate(newRadianContributor);
-                newRadianContributor.Id = id;
-            }
+            _radianContributorService.CreateContributor(contributorId,
+                                                        RadianState.Registrado,
+                                                        Domain.Common.RadianContributorType.Factor,
+                                                        Domain.Common.RadianOperationMode.Direct,
+                                                        User.UserName());
+
             return View();
         }
     }

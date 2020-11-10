@@ -1,37 +1,29 @@
-﻿using Gosocket.Dian.Application;
-using Gosocket.Dian.Domain;
-using Gosocket.Dian.Domain.Common;
+﻿using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
 {
     public class RadianEnablingInvoiceDirectController : Controller
     {
+        private readonly IRadianContributorService _radianContributorService;
 
-        RadianContributorService radianContributorService = new RadianContributorService();
+        public RadianEnablingInvoiceDirectController(IRadianContributorService radianContributorService)
+        {
+            _radianContributorService = radianContributorService;
+        }
+
 
         // GET: RadianEnablingInvoiceDirect
         public ActionResult Index(int contributorId)
         {
-            List<Domain.RadianContributor> radianContributor = radianContributorService.List(t => t.ContributorId == contributorId &&  t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice);
-            if (!radianContributor.Any())
-            {
-                RadianContributor newRadianContributor = new Domain.RadianContributor()
-                {
-                    ContributorId = contributorId,
-                    CreatedBy = User.UserName(),
-                    RadianContributorTypeId = (int)Domain.Common.RadianContributorType.ElectronicInvoice,
-                    RadianOperationModeId = (int)Domain.Common.RadianOperationMode.Direct,
-                    RadianState = Domain.Common.RadianState.Registrado.GetDescription(),
-                    CreatedDate = System.DateTime.Now,
-                    Update = System.DateTime.Now,
-                };
-                int id = radianContributorService.AddOrUpdate(newRadianContributor);
-                newRadianContributor.Id = id;
-            }
+            _radianContributorService.CreateContributor(contributorId,
+                                                        RadianState.Registrado,
+                                                        Domain.Common.RadianContributorType.ElectronicInvoice,
+                                                        Domain.Common.RadianOperationMode.Direct,
+                                                        User.UserName());
+
             return View();
         }
     }

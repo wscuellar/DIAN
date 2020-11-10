@@ -8,9 +8,9 @@ namespace Gosocket.Dian.Interfaces.Repositories
     public interface IRadianContributorFileRepository
     {
         
-        List<RadianContributorFile> GetRadianContributorFile(Expression<Func<RadianContributorFile, bool>> expression);
+        List<RadianContributorFile> List(Expression<Func<RadianContributorFile, bool>> expression);
 
-        Guid UpdateRadianContributorFile(RadianContributorFile radianContributorFile);
+        Guid Update(RadianContributorFile radianContributorFile);
 
     }
 }

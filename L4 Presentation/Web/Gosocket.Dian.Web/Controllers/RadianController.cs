@@ -15,32 +15,27 @@ using Gosocket.Dian.Domain;
 using System.Collections.Specialized;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
+using System.Text;
+using Gosocket.Dian.Interfaces.Services;
 
 namespace Gosocket.Dian.Web.Controllers
 {
     public class RadianController : Controller
     {
-
-        private readonly IContributorService _ContributorService;
-        private readonly IRadianContributorService _RadianContributorService;
+        private readonly IRadianContributorService _radianContributorService;
         private readonly UserService userService = new UserService();
-        private static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
-        private readonly RadianTestSetResultManager radianTestSetManager = new RadianTestSetResultManager();
 
 
-        public RadianController(IContributorService contributorService, IRadianContributorService radianContributorService)
+        public RadianController(IRadianContributorService radianContributorService)
         {
-
-            _ContributorService = contributorService;
-            _RadianContributorService = radianContributorService;
+            _radianContributorService = radianContributorService;
         }
-
 
 
         // GET: Radian
         public ActionResult Index()
         {
-            NameValueCollection result = _RadianContributorService.Summary(User.UserCode());
+            NameValueCollection result = _radianContributorService.Summary(User.UserCode());
             ViewBag.ContributorId = result["ContributorId"];
             ViewBag.ContributorTypeId = result["ContributorTypeId"];
             ViewBag.Active = result["Active"];
@@ -51,7 +46,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult ElectronicInvoiceView()
         {
-            NameValueCollection result = _RadianContributorService.Summary(User.UserCode());
+            NameValueCollection result = _radianContributorService.Summary(User.UserCode());
             ViewBag.ContributorId = result["ContributorId"];
             ViewBag.ContributorTypeId = result["ContributorTypeId"];
             ViewBag.Active = result["Active"];
@@ -63,11 +58,11 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult AdminRadianView()
         {
             int page = 1, size = 10;
-            RadianAdmin radianAdmin = _RadianContributorService.ListParticipants(page, size);
+            RadianAdmin radianAdmin = _radianContributorService.ListParticipants(page, size);
 
             AdminRadianViewModel model = new AdminRadianViewModel()
             {
-                RadianContributors = radianAdmin.contributors.Select(c => new RadianContributorsViewModel()
+                RadianContributors = radianAdmin.Contributors.Select(c => new RadianContributorsViewModel()
                 {
                     Id = c.Id,
                     Code = c.Code,
@@ -89,7 +84,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        
+
 
         [HttpPost]
         public ActionResult AdminRadianView(AdminRadianViewModel model)
@@ -103,11 +98,11 @@ namespace Gosocket.Dian.Web.Controllers
                 EndDate = model.EndDate,
                 RadianState = model.RadianState != null ? model.RadianState.Value.GetDescription() : null
             };
-            RadianAdmin radianAdmin = _RadianContributorService.ListParticipantsFilter(filter, model.Page, model.Length);
+            RadianAdmin radianAdmin = _radianContributorService.ListParticipantsFilter(filter, model.Page, model.Length);
 
             AdminRadianViewModel result = new AdminRadianViewModel()
             {
-                RadianContributors = radianAdmin.contributors.Select(c => new RadianContributorsViewModel()
+                RadianContributors = radianAdmin.Contributors.Select(c => new RadianContributorsViewModel()
                 {
                     Id = c.Id,
                     Code = c.Code,
@@ -125,31 +120,28 @@ namespace Gosocket.Dian.Web.Controllers
                 SearchFinished = true
             };
 
-          
+
             return View(result);
         }
 
         public ActionResult ViewDetails(int id)
         {
+            RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
 
-            var radianContributor = _RadianContributorService.List(t => t.ContributorId == id).FirstOrDefault();
-            var userIds = _ContributorService.GetUserContributors(id).Select(u => u.UserId);
-            var testSet = radianTestSetManager.GetAllTestSetResultByContributor(id);
-
-            var model = new RadianContributorsViewModel
+            RadianContributorsViewModel model = new RadianContributorsViewModel
             {
-                Id = radianContributor.Id,
-                Code = radianContributor.Contributor.Code,
-                TradeName = radianContributor.Contributor.Name,
-                BusinessName = radianContributor.Contributor.BusinessName,
-                Email = radianContributor.Contributor.Email,
-                ContributorTypeName = radianContributor.Contributor.ContributorTypeId != null ? radianContributor.Contributor.ContributorType.Name : "",
-                AcceptanceStatusId = radianContributor.Contributor.AcceptanceStatusId,
-                AcceptanceStatusName = radianContributor.Contributor.AcceptanceStatus.Name,
-                CreatedDate = radianContributor.CreatedDate,
-                UpdatedDate = radianContributor.Update,
-                RadianState = radianContributor.RadianState,
-                RadianContributorFiles = radianContributor.RadianContributorFile.Count > 0 ? radianContributor.RadianContributorFile.Select(f => new RadianContributorFileViewModel
+                Id = radianAdmin.Contributor.Id,
+                Code = radianAdmin.Contributor.Code,
+                TradeName = radianAdmin.Contributor.TradeName,
+                BusinessName = radianAdmin.Contributor.BusinessName,
+                Email = radianAdmin.Contributor.Email,
+                ContributorTypeName = radianAdmin.Type?.Name,
+                AcceptanceStatusId = radianAdmin.Contributor.AcceptanceStatusId,
+                AcceptanceStatusName = radianAdmin.Contributor.AcceptanceStatusName,
+                CreatedDate = radianAdmin.Contributor.CreatedDate,
+                UpdatedDate = radianAdmin.Contributor.Update,
+                RadianState = radianAdmin.Contributor.RadianState,
+                RadianContributorFiles = radianAdmin.Files.Count > 0 ? radianAdmin.Files.Select(f => new RadianContributorFileViewModel
                 {
                     Id = f.Id,
                     Comments = f.Comments,
@@ -173,7 +165,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Updated = f.Updated
 
                 }).ToList() : null,
-                Users = userService.GetUsers(userIds.ToList()).Select(u => new UserViewModel
+                Users = userService.GetUsers(radianAdmin.LegalRepresentativeIds).Select(u => new UserViewModel
                 {
                     Id = u.Id,
                     Code = u.Code,
@@ -183,8 +175,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             };
 
-
-            model.RadianContributorTestSetResults = testSet.Select(t => new TestSetResultViewModel
+            model.RadianContributorTestSetResults = radianAdmin.Tests.Select(t => new TestSetResultViewModel
             {
                 Id = t.Id,
                 OperationModeName = t.OperationModeName,
@@ -228,25 +219,24 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-                var sendEmail = false;
-                var radianContributorFileInstance = new RadianContributorFile();
-                var fileStateUpdated = "0";
-                var radianContributor = _RadianContributorService.List(t => t.Id == id).FirstOrDefault();
-                var radianUpdateContributor = new RadianContributor();
-                radianUpdateContributor = radianContributor;
+                bool sendEmail = false;
+                string fileStateUpdated = "0";
+
                 if (data != null)
                 {
+                    RadianContributorFile radianContributorFileInstance = new RadianContributorFile();
+
                     foreach (var n in data)
                     {
-                        radianContributorFileInstance = _RadianContributorService.GetRadianContributorFile(t => t.Id.ToString() == n.Id.ToString()).FirstOrDefault();
+                        radianContributorFileInstance = _radianContributorService.RadianContributorFileList(n.Id).FirstOrDefault();
                         radianContributorFileInstance.Status = n.NewState;
-                        fileStateUpdated = _RadianContributorService.UpdateRadianContributorFile(radianContributorFileInstance).ToString();
+                        fileStateUpdated = _radianContributorService.UpdateRadianContributorFile(radianContributorFileInstance).ToString();
                     }
                 }
 
-                radianContributor = _RadianContributorService.List(t => t.Id == id).FirstOrDefault();
+                RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
 
-                foreach (var n in radianContributor.RadianContributorFile)
+                foreach (var n in radianAdmin.Files)
                 {
                     if (n.Status != 2)
                     {
@@ -255,7 +245,7 @@ namespace Gosocket.Dian.Web.Controllers
                         {
                             messasge = "Todos los archivos deben estar en estado 'Aceptado' para poder cambiar el estado del participante.",
                             success = true,
-                            id = radianContributor.ContributorId
+                            id = radianAdmin.Contributor.Id
                         }, JsonRequestBehavior.AllowGet);
                     }
                     else
@@ -263,16 +253,17 @@ namespace Gosocket.Dian.Web.Controllers
                         sendEmail = true;
                     }
                 }
+
                 if (sendEmail)
                 {
-                    var isUpdate = UpdateTime(radianUpdateContributor, approveState);
-                    var emailSended = SendMail();
+                    _ = _radianContributorService.ChangeParticipantStatus(id, approveState);
+                    _ = SendMail(radianAdmin);
                 }
                 return Json(new
                 {
                     messasge = "Datos actualizados correctamente.",
                     success = true,
-                    id = radianContributor.ContributorId
+                    id = radianAdmin.Contributor.Id
                 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -286,34 +277,28 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
-        public bool UpdateTime(RadianContributor model, string approveState)
+        public bool SendMail(RadianAdmin radianAdmin, string observations = "")
         {
-            try
-            {
-                _RadianContributorService.AddOrUpdate(model, approveState);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
+            var emailService = new Gosocket.Dian.Application.EmailService();
+            StringBuilder message = new StringBuilder();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
 
-        public bool SendMail()
-        {
-            try
-            {
-                var emailService = new Gosocket.Dian.Application.EmailService();
-                Dictionary<string, string> dic = new Dictionary<string, string>();
-                dic.Add("##CONTENT##", "Este es un mensaje de prueba");
-                emailService.SendEmail("camilo.lizarazo87@gmail.com", "Esta es una prueba", dic);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            message.Append("A continuacion encontrara el resultado de validación de los documentos requisitos que la DIAN verificó en su proceso RADIAN");
 
+            foreach (RadianContributorFile file in radianAdmin.Files)
+            {
+                message.AppendFormat("</br> Nombre del Archivo: {0}", file.FileName);
+                message.AppendFormat("</br> Estado: {0}", file.Status.GetDescription());
+            }
+                        
+            message.AppendFormat("</br> Observaciones: {0}", radianAdmin.Contributor.RadianState);
+
+            //Nombre del documento, estado, observaciones
+            dic.Add("##CONTENT##", message.ToString());
+
+            emailService.SendEmail(radianAdmin.Contributor.Email, "Resultado Validación Documentos Requisitos RADIAN", dic);
+
+            return true;
         }
     }
 }

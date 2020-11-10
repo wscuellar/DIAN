@@ -131,9 +131,10 @@
   <ItemGroup>
     <Compile Include="CosmosDbManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repositories\IRadianContributorFileRepository.cs" />
+    <Compile Include="Repositories\RadianContributorFileRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileHistoryRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileStatusRepository.cs" />
+    <Compile Include="Repositories\RadianContributorFileTypeRepository.cs" />
     <Compile Include="Repositories\RadianContributorRepository.cs" />
     <Compile Include="Repositories\RadianContributorTypeRepository.cs" />
     <Compile Include="SqlDBContext.cs" />
