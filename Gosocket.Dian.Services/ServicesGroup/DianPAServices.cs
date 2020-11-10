@@ -679,7 +679,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
 
-                var appResponseKey = documentParsed.Cude;
+                var appResponseKey = documentParsed.Cude.ToLower();
                 var documentKey = documentParsed.DocumentKey.ToLower();
                 var responseCode = documentParsed.ResponseCode;
 
