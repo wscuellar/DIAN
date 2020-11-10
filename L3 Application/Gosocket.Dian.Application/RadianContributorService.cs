@@ -1,5 +1,7 @@
 ﻿using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Repositories;
 using System;
@@ -16,6 +18,7 @@ namespace Gosocket.Dian.Application
     {
         private readonly IContributorService _contributorService;
         private readonly IRadianContributorRepository _radianContributorRepository;
+        private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
 
         SqlDBContext sqlDBContext;
         //private static StackExchange.Redis.IDatabase cache;
@@ -26,10 +29,11 @@ namespace Gosocket.Dian.Application
                 sqlDBContext = new SqlDBContext();
         }
 
-        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository )
+        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository)
         {
             _contributorService = contributorService;
             _radianContributorRepository = radianContributorRepository;
+            _radianContributorTypeRepository = radianContributorTypeRepository;
         }
 
 
@@ -49,6 +53,57 @@ namespace Gosocket.Dian.Application
             return collection;
         }
 
+
+        public RadianAdmin ListParticipants(int page, int size)
+        {
+            string cancelState = Domain.Common.RadianState.Cancelado.GetDescription();
+            List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.RadianState != cancelState, page, size);
+            List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
+            RadianAdmin radianAdmin = new RadianAdmin()
+            {
+                contributors = radianContributors.Select(c =>
+               new RedianContributorWithTypes()
+               {
+                   Id = c.Contributor.Id,
+                   Code = c.Contributor.Code,
+                   TradeName = c.Contributor.Name,
+                   BusinessName = c.Contributor.BusinessName,
+                   AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name
+               }).ToList(),
+                Types = radianContributorType
+            };
+            return radianAdmin;
+        }
+
+
+        public RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size)
+        {
+            string cancelState = Domain.Common.RadianState.Cancelado.GetDescription();
+            DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
+            DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
+
+            var radianContributors = _radianContributorRepository.List(t =>  (t.Contributor.Code == filter.Code || filter.Code == null) &&
+                                                                             (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
+                                                                             (t.RadianState == filter.RadianState.GetDescription() || (filter.RadianState == null && t.RadianState != cancelState)) &&
+                                                                             (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) &&
+                                                                             (DbFunctions.TruncateTime(t.CreatedDate) <= endDate || !endDate.HasValue),
+            page, size);
+            List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
+            RadianAdmin radianAdmin = new RadianAdmin()
+            {
+                contributors = radianContributors.Select(c =>
+               new RedianContributorWithTypes()
+               {
+                   Id = c.Contributor.Id,
+                   Code = c.Contributor.Code,
+                   TradeName = c.Contributor.Name,
+                   BusinessName = c.Contributor.BusinessName,
+                   AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name
+               }).ToList(),
+                Types = radianContributorType
+            };
+            return radianAdmin;
+        }
 
         #region Repo 1
         /// <summary>
@@ -117,11 +172,11 @@ namespace Gosocket.Dian.Application
 
         #region Repo2
 
-        public List<RadianContributorType> GetRadianContributorTypes(Expression<Func<RadianContributorType, bool>> expression)
-        {
-            var query = sqlDBContext.RadianContributorTypes.Where(expression);
-            return query.ToList();
-        }
+        //public List<RadianContributorType> GetRadianContributorTypes(Expression<Func<RadianContributorType, bool>> expression)
+        //{
+        //    var query = sqlDBContext.RadianContributorTypes.Where(expression);
+        //    return query.ToList();
+        //}
 
         #endregion
 
@@ -174,7 +229,12 @@ namespace Gosocket.Dian.Application
                 context.SaveChanges();
                 return radianContributorFileHistory.Id;
             }
-        } 
+        }
+
+        public List<Domain.RadianContributorType> GetRadianContributorTypes(Expression<Func<Domain.RadianContributorType, bool>> expression)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
     }

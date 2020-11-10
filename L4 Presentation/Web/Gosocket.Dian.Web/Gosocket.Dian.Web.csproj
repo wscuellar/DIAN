@@ -2785,6 +2785,10 @@
       <Project>{72E3852A-75D8-4007-93A5-8EE16BDFB5D7}</Project>
       <Name>Gosocket.Dian.Infrastructure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\L1 Data\Gosocket.Dian.DataContext\Gosocket.Dian.DataContext.csproj">
+      <Project>{CBAA925A-695B-41B2-90B9-5C061A9CC30E}</Project>
+      <Name>Gosocket.Dian.DataContext</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\L2 Domain\Gosocket.Dian.Domain\Gosocket.Dian.Domain.csproj">
       <Project>{fba40283-71df-4b48-8e64-663468e6e0c6}</Project>
       <Name>Gosocket.Dian.Domain</Name>

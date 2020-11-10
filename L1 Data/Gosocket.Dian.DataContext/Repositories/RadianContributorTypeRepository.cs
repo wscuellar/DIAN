@@ -18,7 +18,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                 sqlDBContext = new SqlDBContext();
         }
 
-        public List<RadianContributorType> GetRadianContributorTypes(Expression<Func<RadianContributorType, bool>> expression)
+        public List<RadianContributorType> List(Expression<Func<RadianContributorType, bool>> expression)
         {
             var query = sqlDBContext.RadianContributorTypes.Where(expression);
             return query.ToList();

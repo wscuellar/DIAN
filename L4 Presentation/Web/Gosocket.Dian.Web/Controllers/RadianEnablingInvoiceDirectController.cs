@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Web.Common;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace Gosocket.Dian.Web.Controllers
                     CreatedBy = User.UserName(),
                     RadianContributorTypeId = (int)Domain.Common.RadianContributorType.ElectronicInvoice,
                     RadianOperationModeId = (int)Domain.Common.RadianOperationMode.Direct,
-                    RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Registered),
+                    RadianState = Domain.Common.RadianState.Registrado.GetDescription(),
                     CreatedDate = System.DateTime.Now,
                     Update = System.DateTime.Now,
                 };

@@ -26,7 +26,7 @@ namespace Gosocket.Dian.Web.Controllers
                     CreatedBy = User.UserName(),
                     RadianContributorTypeId = (int)Domain.Common.RadianContributorType.TechnologyProvider,
                     RadianOperationModeId = (int)Domain.Common.RadianOperationMode.Direct,
-                    RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Registered),
+                    RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Registrado),
                     CreatedDate = DateTime.Now,
                     Update = DateTime.Now,
                 };

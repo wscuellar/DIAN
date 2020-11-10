@@ -13,6 +13,8 @@ using Gosocket.Dian.Application.Managers;
 using Microsoft.AspNet.Identity;
 using Gosocket.Dian.Domain;
 using System.Collections.Specialized;
+using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Entity;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -26,7 +28,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly RadianTestSetResultManager radianTestSetManager = new RadianTestSetResultManager();
 
 
-        public RadianController(IContributorService contributorService,  IRadianContributorService radianContributorService)
+        public RadianController(IContributorService contributorService, IRadianContributorService radianContributorService)
         {
 
             _ContributorService = contributorService;
@@ -34,11 +36,11 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-        
+
         // GET: Radian
         public ActionResult Index()
         {
-            NameValueCollection result =  _RadianContributorService.Summary(User.UserCode());
+            NameValueCollection result = _RadianContributorService.Summary(User.UserCode());
             ViewBag.ContributorId = result["ContributorId"];
             ViewBag.ContributorTypeId = result["ContributorTypeId"];
             ViewBag.Active = result["Active"];
@@ -60,72 +62,71 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult AdminRadianView()
         {
-            var radianContributors = _RadianContributorService.List(t => true);
-            var radianContributorType = _RadianContributorService.GetRadianContributorTypes(t => true);
-            var radianFileStatus = _RadianContributorService.GetRadianContributorFileStatus(t => true);
-            var model = new AdminRadianViewModel();
-            var model2 = new RadianContributorsViewModel();
-            model.RadianContributors = radianContributors.Select(c =>
-            new RadianContributorsViewModel()
+            int page = 1, size = 10;
+            RadianAdmin radianAdmin = _RadianContributorService.ListParticipants(page, size);
+
+            AdminRadianViewModel model = new AdminRadianViewModel()
             {
-                Id = c.Contributor.Id,
-                Code = c.Contributor.Code,
-                TradeName = c.Contributor.Name,
-                BusinessName = c.Contributor.BusinessName,
-                AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name  
+                RadianContributors = radianAdmin.contributors.Select(c => new RadianContributorsViewModel()
+                {
+                    Id = c.Id,
+                    Code = c.Code,
+                    TradeName = c.TradeName,
+                    BusinessName = c.BusinessName,
+                    AcceptanceStatusName = c.AcceptanceStatusName
 
-            }).ToList();
+                }).ToList(),
+                RadianType = radianAdmin.Types.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
 
-            //model2.RadianFileStatus = radianFileStatus.Select(c => new SelectListItem
-            //{
-            //    Value = c.Id.ToString(),
-            //    Text = c.Name
+                }).ToList(),
+                SearchFinished = true
+            };
 
-            //}).ToList();
 
-            model.RadianType = radianContributorType.Select(c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.Name
-
-            }).ToList();
-            model.SearchFinished = true;
             return View(model);
         }
+
+        
 
         [HttpPost]
         public ActionResult AdminRadianView(AdminRadianViewModel model)
         {
-            var radianContributorType = _RadianContributorService.GetRadianContributorTypes(t => true);
-            DateTime? startDate = string.IsNullOrEmpty(model.StartDate) ? null : (DateTime?)Convert.ToDateTime(model.StartDate).Date;
-            DateTime? endDate = string.IsNullOrEmpty(model.EndDate) ? null : (DateTime?)Convert.ToDateTime(model.EndDate).Date;
-            var radianContributors = _RadianContributorService.List(t => 
-            (t.Contributor.Code == model.Code || model.Code == null) && 
-            (t.RadianContributorTypeId == model.Type || model.Type == 0) && 
-            ( t.RadianState == model.RadianState.ToString() || model.RadianState == null) &&
-            (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) && 
-            (DbFunctions.TruncateTime(t.CreatedDate) <= endDate || !endDate.HasValue), 
-            model.Page, model.Length);
-            
-            model.RadianType = radianContributorType.Select(c => new SelectListItem
+
+            AdminRadianFilter filter = new AdminRadianFilter()
             {
-                Value = c.Id.ToString(),
-                Text = c.Name
+                Id = model.Id,
+                Code = model.Code,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                RadianState = model.RadianState != null ? model.RadianState.Value.GetDescription() : null
+            };
+            RadianAdmin radianAdmin = _RadianContributorService.ListParticipantsFilter(filter, model.Page, model.Length);
 
-            }).ToList();
-
-            model.RadianContributors = radianContributors.Select(c => new RadianContributorsViewModel
+            AdminRadianViewModel result = new AdminRadianViewModel()
             {
-                Id = c.Contributor.Id,
-                Code = c.Contributor.Code,
-                TradeName = c.Contributor.Name,
-                BusinessName = c.Contributor.BusinessName,
-                AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name
+                RadianContributors = radianAdmin.contributors.Select(c => new RadianContributorsViewModel()
+                {
+                    Id = c.Id,
+                    Code = c.Code,
+                    TradeName = c.TradeName,
+                    BusinessName = c.BusinessName,
+                    AcceptanceStatusName = c.AcceptanceStatusName
 
-            }).ToList();
+                }).ToList(),
+                RadianType = radianAdmin.Types.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
 
-            model.SearchFinished = true;
-            return View(model);
+                }).ToList(),
+                SearchFinished = true
+            };
+
+          
+            return View(result);
         }
 
         public ActionResult ViewDetails(int id)
@@ -201,7 +202,7 @@ namespace Gosocket.Dian.Web.Controllers
                 TotalDebitNotesRejected = t.TotalDebitNotesRejected
             }).ToList();
 
-         
+
             return View(model);
         }
 
@@ -245,9 +246,9 @@ namespace Gosocket.Dian.Web.Controllers
 
                 radianContributor = _RadianContributorService.List(t => t.Id == id).FirstOrDefault();
 
-                foreach(var n in radianContributor.RadianContributorFile)
+                foreach (var n in radianContributor.RadianContributorFile)
                 {
-                    if(n.Status != 2)
+                    if (n.Status != 2)
                     {
                         sendEmail = false;
                         return Json(new
@@ -276,7 +277,8 @@ namespace Gosocket.Dian.Web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new {
+                return Json(new
+                {
                     messasge = "Tenemos problemas al actualizar los datos.",
                     success = false,
                     error = ex
@@ -307,11 +309,11 @@ namespace Gosocket.Dian.Web.Controllers
                 emailService.SendEmail("camilo.lizarazo87@gmail.com", "Esta es una prueba", dic);
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return false;
             }
-           
+
         }
     }
 }

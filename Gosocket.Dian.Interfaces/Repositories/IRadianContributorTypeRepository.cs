@@ -7,7 +7,7 @@ namespace Gosocket.Dian.Interfaces.Repositories
 {
     public interface IRadianContributorTypeRepository
     {
-         List<RadianContributorType> GetRadianContributorTypes(Expression<Func<RadianContributorType, bool>> expression);
+         List<RadianContributorType> List(Expression<Func<RadianContributorType, bool>> expression);
 
     }
 }
