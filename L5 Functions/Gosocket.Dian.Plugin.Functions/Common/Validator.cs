@@ -531,9 +531,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     return responses;
-                case 38: //Endoso en Garantia
-                    
-
+                case 38: //Endoso en Garantia                    
                     if (!string.IsNullOrEmpty(party.SenderParty.Trim())) // No informa SenderParty es un endoso en blanco entonces no valida emisor documento
                     {
 
@@ -711,6 +709,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
                 // Validación de la Sección SenderParty / ReceiverParty TASK 791
                 case 44: //Terminacion del mandato
+                    //Revocación es información del mandante
                     if (party.CustomizationID == "441")
                     {
                         if (party.SenderParty != senderCode)
@@ -720,7 +719,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = receiver2DvErrorCode,
-                                ErrorMessage = "Emisor/Facturador Electrónico no coincide con la información de la factura  referenciada",
+                                ErrorMessage = "Emisor/Facturador Electrónico no coincide con la información de la factura referenciada",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -747,21 +746,44 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                     }
-                    //else if(party.CustomizationID == "442")
-                    //{
-                    //    //Tener encuenta la validacion puesto que se va a realizar como una funcion con el mandato
-                    //    if (party.SenderParty != nitModel.ProviderCode)
-                    //    {
-                    //        responses.Add(new ValidateListResponse
-                    //        {
-                    //            IsValid = false,
-                    //            Mandatory = true,
-                    //            ErrorCode = receiver2DvErrorCode,
-                    //            ErrorMessage = "Información del Mandatario/Representante no se encuentra registrada en RADIAN",
-                    //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    //        });
-                    //    }
-                    //}
+                    //Renuncia
+                    else if (party.CustomizationID == "442")
+                    {
+                        //Renuncia es información del mandatario
+                        if (party.SenderParty != nitModel.IssuerPartyID)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = receiver2DvErrorCode,
+                                ErrorMessage = "Información del Mandatario/Representante no coincide con la información del evento referenciado",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        else if (party.ReceiverParty != "800197268")
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = sender2DvErrorCode,
+                                ErrorMessage = "El receptor del documento transmitido no coincide con el NIT DIAN",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
                     return responses;
             }
 
@@ -944,18 +966,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string startDateAttorney = string.Empty;
             string endDate = string.Empty;
             DateTime startDate = DateTime.UtcNow;
+            ValidateSigningTime.RequestObject data = new ValidateSigningTime.RequestObject();           
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             List<AttorneyModel> attorney = new List<AttorneyModel>();
-            string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
+            string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();           
             string AttachmentBase64 = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(0)?.InnerText.ToString();
             string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0)?.InnerText.ToString();
             XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
             string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
-
+            data.EventCode = "043";
+            data.SigningTime = xmlParser.SigningTime;
             //Valida existe Contrato del mandatos entre las partes
-            if(AttachmentBase64 != null)
+            if (AttachmentBase64 != null)
             {
                 if (!IsBase64(AttachmentBase64))
                 {
@@ -1001,6 +1025,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 attorneyModel.actor = tempCode[1];
                 attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                 attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                //Valida CUFE referenciado existe en sistema DIAN
                 var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference);
                 if (resultValidateCufe[0].IsValid)
                     attorney.Add(attorneyModel);
@@ -1015,8 +1040,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorMessage = "Error en la validación del CUFE referenciado, No existe en sistema DIAN",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
-
                 }
+                //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
+                //var resultValidateSingInTime = ValidateSigningTime(data, xmlParser);
             }
             if(validate)
             {
@@ -2022,6 +2048,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case "032": //Constancia de recibo del bien
                 //Validación de la Sección Signature - Fecha mayor o igual al endoso referenciado TASK 727
                 case "040": //Anulacion de endoso electronico
+                case "043": //Mandato
                     responses.Add(Convert.ToDateTime(data.SigningTime) >= Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
@@ -2142,6 +2169,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case "044": // Terminacion del mandato 
                     DateTime signingTime = Convert.ToDateTime(data.SigningTime);
+                    //General por tiempo ilimitado_432 - limitado por tiempo ilimitado_434
                     if (dataModel.CustomizationID == "432" || dataModel.CustomizationID == "434") //que se mayor
                     {
                         DateTime dateMandato = Convert.ToDateTime(dataModel.SigningTime);
@@ -2168,6 +2196,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                     }
+                    // General por tiempo limitado_431 - limitado por tiempo limitado_433
                     else if (dataModel.CustomizationID == "431" || dataModel.CustomizationID == "433")  //que sea menor
                     {
                         DateTime endDateMandato = Convert.ToDateTime(dataModel.FieldValue("EndDate"));

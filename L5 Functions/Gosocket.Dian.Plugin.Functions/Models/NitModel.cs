@@ -17,5 +17,8 @@
         public string IssuerPartySchemeAgencyCode { get; set; }
         public string IssuerPartySchemeCode { get; set; }
         public string IssuerPartyCode { get; set; }
+        public string CustomizationId { get; set; }
+        public string IssuerPartySchemeID { get; set; }
+        public string IssuerPartyID { get; set; }
     }
 }
