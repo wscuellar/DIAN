@@ -683,6 +683,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var documentKey = documentParsed.DocumentKey.ToLower();
                 var responseCode = documentParsed.ResponseCode;
 
+                if (appResponseKey == documentKey)
+                {
+                    var eventResponse = new EventResponse()
+                    {
+                        Code = "Error",
+                        Message = "CUDE no puede ser igual al CUFE"
+                    };
+                    eventsResponse.Add(eventResponse);
+                    continue;
+                }
+
                 var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
 
                 var documentEntity = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
