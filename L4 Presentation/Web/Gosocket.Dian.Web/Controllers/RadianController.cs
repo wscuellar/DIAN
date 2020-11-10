@@ -219,28 +219,22 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-                bool sendEmail = false;
-                string fileStateUpdated = "0";
-
                 if (data != null)
                 {
-                    RadianContributorFile radianContributorFileInstance = new RadianContributorFile();
-
+                    RadianContributorFile radianContributorFileInstance = null;
                     foreach (var n in data)
                     {
                         radianContributorFileInstance = _radianContributorService.RadianContributorFileList(n.Id).FirstOrDefault();
                         radianContributorFileInstance.Status = n.NewState;
-                        fileStateUpdated = _radianContributorService.UpdateRadianContributorFile(radianContributorFileInstance).ToString();
+                        _ = _radianContributorService.UpdateRadianContributorFile(radianContributorFileInstance).ToString();
                     }
                 }
 
                 RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
-
                 foreach (var n in radianAdmin.Files)
                 {
                     if (n.Status != 2)
                     {
-                        sendEmail = false;
                         return Json(new
                         {
                             messasge = "Todos los archivos deben estar en estado 'Aceptado' para poder cambiar el estado del participante.",
@@ -248,17 +242,11 @@ namespace Gosocket.Dian.Web.Controllers
                             id = radianAdmin.Contributor.Id
                         }, JsonRequestBehavior.AllowGet);
                     }
-                    else
-                    {
-                        sendEmail = true;
-                    }
                 }
 
-                if (sendEmail)
-                {
-                    _ = _radianContributorService.ChangeParticipantStatus(id, approveState);
-                    _ = SendMail(radianAdmin);
-                }
+                _ = _radianContributorService.ChangeParticipantStatus(id, approveState);
+                _ = SendMail(radianAdmin);
+
                 return Json(new
                 {
                     messasge = "Datos actualizados correctamente.",
@@ -290,7 +278,7 @@ namespace Gosocket.Dian.Web.Controllers
                 message.AppendFormat("</br> Nombre del Archivo: {0}", file.FileName);
                 message.AppendFormat("</br> Estado: {0}", file.Status.GetDescription());
             }
-                        
+
             message.AppendFormat("</br> Observaciones: {0}", radianAdmin.Contributor.RadianState);
 
             //Nombre del documento, estado, observaciones
