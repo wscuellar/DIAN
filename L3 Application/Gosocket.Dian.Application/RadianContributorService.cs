@@ -3,6 +3,7 @@ using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces;
+using Gosocket.Dian.Interfaces.Managers;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System;
@@ -19,14 +20,17 @@ namespace Gosocket.Dian.Application
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
         private readonly IRadianContributorFileRepository _radianContributorFileRepository;
-        private readonly RadianTestSetResultManager radianTestSetManager = new RadianTestSetResultManager();
+        private readonly IRadianTestSetResultManager _radianTestSetResultManager;
 
-        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository)
+        //private readonly RadianTestSetResultManager radianTestSetManager = new RadianTestSetResultManager();
+
+        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianTestSetResultManager radianTestSetResultManager)
         {
             _contributorService = contributorService;
             _radianContributorRepository = radianContributorRepository;
             _radianContributorTypeRepository = radianContributorTypeRepository;
             _radianContributorFileRepository = radianContributorFileRepository;
+            _radianTestSetResultManager = radianTestSetResultManager;
         }
 
 
@@ -101,7 +105,7 @@ namespace Gosocket.Dian.Application
         public RadianAdmin ContributorSummary(int contributorId)
         {
             List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId);
-            List<RadianTestSetResult> testSet = radianTestSetManager.GetAllTestSetResultByContributor(contributorId).ToList();
+            List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(contributorId).ToList();
             List<string> userIds = _contributorService.GetUserContributors(contributorId).Select(u => u.UserId).ToList();
 
             RadianAdmin radianAdmin = null;
@@ -121,24 +125,30 @@ namespace Gosocket.Dian.Application
                         Update = c.Update,
                         RadianState = c.RadianState,
                         AcceptanceStatusId = c.Contributor.AcceptanceStatus.Id,
-                        CreatedDate = c.CreatedDate
+                        CreatedDate = c.CreatedDate                       
                     },
                     Files = c.RadianContributorFile.ToList(),
                     Tests = testSet,
-                    LegalRepresentativeIds = userIds
+                    LegalRepresentativeIds = userIds,
+                    Type = c.RadianContributorType
                 };
             });
 
             return radianAdmin;
         }
 
-        public bool ChangeParticipantStatus(int id, string approveState)
+        public bool ChangeParticipantStatus(int contributorId, string approveState)
         {
-            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.Id == id);
+            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId);
 
             if (contributors.Any())
             {
-                _radianContributorRepository.AddOrUpdate(contributors.FirstOrDefault(), approveState);
+                var radianContributor = contributors.FirstOrDefault();
+
+                if (approveState != "")
+                    radianContributor.RadianState = approveState == "0" ? RadianState.Test.GetDescription() : RadianState.Cancelado.GetDescription();
+
+                _radianContributorRepository.AddOrUpdate(radianContributor);
                 return true;
             }
 
@@ -167,7 +177,7 @@ namespace Gosocket.Dian.Application
                     CreatedDate = System.DateTime.Now,
                     Update = System.DateTime.Now,
                 };
-                int id = _radianContributorRepository.AddOrUpdate(newRadianContributor, newRadianContributor.RadianState);
+                int id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
                 newRadianContributor.Id = id;
             }
         }

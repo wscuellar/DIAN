@@ -1,6 +1,8 @@
 using Gosocket.Dian.Application;
+using Gosocket.Dian.Application.Managers;
 using Gosocket.Dian.DataContext.Repositories;
 using Gosocket.Dian.Interfaces;
+using Gosocket.Dian.Interfaces.Managers;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System.Web.Mvc;
@@ -15,7 +17,7 @@ namespace Gosocket.Dian.Web
         {
 			var container = new UnityContainer();
 
-            #region Repositorios
+            #region Repositories
 
             container.RegisterType<IRadianContributorFileHistoryRepository, RadianContributorFileHistoryRepository>();
             container.RegisterType<IRadianContributorFileRepository, RadianContributorFileRepository>();
@@ -25,17 +27,19 @@ namespace Gosocket.Dian.Web
 
             #endregion
 
-            #region Servicios
+            #region Services
 
             container.RegisterType<IContributorService, ContributorService>();
             container.RegisterType<IRadianContributorService, RadianContributorService>();
-            container.RegisterType<IRadianContributorFileTypeService, RadianContributorFileTypeService>(); 
+            container.RegisterType<IRadianContributorFileTypeService, RadianContributorFileTypeService>();
 
             #endregion
-            // register all your components with the container here
-            // it is NOT necessary to register your controllers
 
-            // e.g. container.RegisterType<ITestService, TestService>();
+            #region Managers
+
+            container.RegisterType<IRadianTestSetResultManager, RadianTestSetResultManager>();
+
+            #endregion
 
             DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }

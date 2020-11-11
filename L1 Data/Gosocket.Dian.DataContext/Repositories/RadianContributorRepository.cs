@@ -3,6 +3,7 @@ using Gosocket.Dian.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -42,19 +43,20 @@ namespace Gosocket.Dian.DataContext.Repositories
         /// </summary>
         /// <param name="radianContributor"></param>
         /// <returns></returns>
-        public int AddOrUpdate(RadianContributor radianContributor, string approveState = "")
+        public int AddOrUpdate(RadianContributor radianContributor)
         {
             using (var context = new SqlDBContext())
             {
-                var radianContributorInstance = context.RadianContributors.FirstOrDefault(c => c.Id == radianContributor.Id);
+                RadianContributor radianContributorInstance = context.RadianContributors.FirstOrDefault(c => c.Id == radianContributor.Id);
+
                 if (radianContributorInstance != null)
                 {
                     radianContributorInstance.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
                     radianContributorInstance.Update = DateTime.Now;
-                    if (approveState != "")
-                    {
-                        radianContributorInstance.RadianState = approveState == "0" ? "En pruebas" : "Cancelado";
-                    }
+                    radianContributorInstance.RadianState = radianContributor.RadianState;
+                    radianContributorInstance.RadianOperationModeId = radianContributor.RadianOperationModeId;
+                    radianContributorInstance.CreatedBy = radianContributor.CreatedBy;
+
                     context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
                 }
                 else
@@ -63,6 +65,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                 }
 
                 context.SaveChanges();
+
                 return radianContributorInstance != null ? radianContributorInstance.Id : radianContributor.Id;
             }
         }

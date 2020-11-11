@@ -25,7 +25,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         RadianAdmin ContributorSummary(int contributorId);
 
-        bool ChangeParticipantStatus(int id, string approveState);
+        bool ChangeParticipantStatus(int contributorId, string approveState);
 
         RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size);
 

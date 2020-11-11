@@ -6,11 +6,7 @@ using Gosocket.Dian.Web.Common;
 using System.Linq;
 using System;
 using Gosocket.Dian.Infrastructure;
-using Gosocket.Dian.Interfaces;
 using System.Diagnostics;
-using System.Data.Entity;
-using Gosocket.Dian.Application.Managers;
-using Microsoft.AspNet.Identity;
 using Gosocket.Dian.Domain;
 using System.Collections.Specialized;
 using Gosocket.Dian.Domain.Common;
@@ -140,7 +136,7 @@ namespace Gosocket.Dian.Web.Controllers
                 AcceptanceStatusName = radianAdmin.Contributor.AcceptanceStatusName,
                 CreatedDate = radianAdmin.Contributor.CreatedDate,
                 UpdatedDate = radianAdmin.Contributor.Update,
-                RadianState = radianAdmin.Contributor.RadianState,
+                RadianState = radianAdmin.Contributor.RadianState,                
                 RadianContributorFiles = radianAdmin.Files.Count > 0 ? radianAdmin.Files.Select(f => new RadianContributorFileViewModel
                 {
                     Id = f.Id,
