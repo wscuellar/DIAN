@@ -7,8 +7,10 @@ namespace Gosocket.Dian.Interfaces.Services
     public interface IRadianTestSetService
     {
         List<RadianTestSet> GetAllTestSet();
-        OperationMode GetOperationMode(int id);
+        RadianOperationMode GetOperationMode(int id);
         RadianTestSet GetTestSet(string partitionKey, string rowKey);
         bool InsertTestSet(RadianTestSet testSet);
+        List<RadianOperationMode> OperationModeList();
+
     }
 }

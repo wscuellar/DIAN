@@ -34,5 +34,9 @@ namespace Gosocket.Dian.Interfaces.Services
         void CreateContributor(int contributorId, Domain.Common.RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy);
 
         List<RadianContributorFile> RadianContributorFileList(string id);
+
+        RadianOperationMode GetOperationMode(int id);
+
+        List<Domain.RadianOperationMode> OperationModeList();
     }
 }

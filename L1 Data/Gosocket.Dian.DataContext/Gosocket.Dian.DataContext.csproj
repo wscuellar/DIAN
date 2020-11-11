@@ -137,6 +137,7 @@
     <Compile Include="Repositories\RadianContributorFileTypeRepository.cs" />
     <Compile Include="Repositories\RadianContributorRepository.cs" />
     <Compile Include="Repositories\RadianContributorTypeRepository.cs" />
+    <Compile Include="Repositories\RadianOperationModeRepository.cs" />
     <Compile Include="SqlDBContext.cs" />
   </ItemGroup>
   <ItemGroup>

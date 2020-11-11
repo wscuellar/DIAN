@@ -356,5 +356,20 @@ namespace Gosocket.Dian.Domain.Common
     }
 
   
+    public enum RadianOperationModeTestSet
+    {
+        [Display(Name = "Software Propio")]
+        [Description("Software Propio")]
+        OwnSoftware = 1,
+        [Display(Name = "Software Proveedor Tecnológico")]
+        [Description("Software Proveedor Tecnológico")]
+        SoftwareTechnologyProvider=2,
+        [Display(Name = "Software Sistema de Negociacion")]
+        [Description("Software Sistema de Negociacion")]
+        SoftwareTradingSystem = 3,
+        [Display(Name = "Software Factor")]
+        [Description("Software Factor")]
+        SoftwareFactor = 4
+    }
 
 }

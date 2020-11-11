@@ -25,6 +25,7 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IRadianContributorRepository, RadianContributorRepository>();
             container.RegisterType<IRadianContributorTypeRepository, RadianContributorTypeRepository>();
             container.RegisterType<IRadianContributorFileTypeRepository, RadianContributorFileTypeRepository>();
+            container.RegisterType<IRadianOperationModeRepository, RadianOperationModeRepository>();
 
             #endregion
 
