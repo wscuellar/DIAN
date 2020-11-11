@@ -90,14 +90,27 @@ namespace Gosocket.Dian.Infrastructure
             {
                 if (string.IsNullOrEmpty(name)) throw new System.Exception("Parameter name can't be null or empty");
 
-
-
                 var x509Collection = new X509Certificate2Collection();
                 x509Collection.Import(content, password, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable);
 
                 // A pfx can contain a chain            
                 var cert = x509Collection.Cast<X509Certificate2>().Single(s => s.HasPrivateKey);
                 using (cert.GetRSAPrivateKey()) { }
+
+                if (DateTime.UtcNow < cert.NotBefore)
+                {
+                    result.Success = false;
+                    result.Error = "Certificado aún no se encuentra vigente.";
+                    return result;
+                }
+
+                if (DateTime.UtcNow > cert.NotAfter)
+                {
+                    result.Success = false;
+                    result.Error = "Certificado se encuentra expirado.";
+                    return result;
+                }
+
                 var x509Bytes = cert.Export(X509ContentType.Pfx, password);
                 var base64X509 = Convert.ToBase64String(x509Bytes);
 
