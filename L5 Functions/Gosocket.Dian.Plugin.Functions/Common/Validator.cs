@@ -1041,10 +1041,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
+
+                ValidatorEngine validatorEngine = new ValidatorEngine();
+                var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+                var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
+                if (!xmlParserCufe.Parser())
+                    throw new Exception(xmlParserCufe.ParserError);
+
                 //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-                //var resultValidateSingInTime = ValidateSigningTime(data, xmlParser);
+                var resultValidateSingInTime = ValidateSigningTime(data, xmlParserCufe);
+                if (!resultValidateSingInTime[0].IsValid)
+                {
+                    validate = false;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "089",
+                        ErrorMessage = "La fecha debe ser mayor o igual al evento de la factura referenciada",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+
             }
-            if(validate)
+            if (validate)
             {
                 foreach (var attorneyDocument in attorney)
                 {
