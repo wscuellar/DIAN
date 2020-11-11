@@ -16,75 +16,158 @@
     <div class="row margin-horizontal-0">
         <div class="panel">
             @*<div class="panel-heading">
-            <h3 class="panel-title">@ViewBag.Title</h3>
-        </div>*@
+                    <h3 class="panel-title">@ViewBag.Title</h3>
+                </div>*@
 
-            @using (Html.BeginForm("ChangeRadianState", "Radian", FormMethod.Post, new { id = "radian-contributor-form" }))
-            {
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
 
-                <div class="panel-body padding-top-20">
-                    <div class="row margin-horizontal-0">
-                        <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
-                            @Html.Partial("_form")
-                            <div class="panel-footer text-right">
-                                <button type="button" class="btn btn-default btn-radian-default">Cancelar</button>
-                                <button type="button" class="btn btn-success btn-radian-success button-change-state">Guardar cambios</button>
-                            </div>
+                    @*@using (Html.BeginForm("ViewDetails", "Radian", FormMethod.Post, new { id = "radian-contributor-form" }))
+                        {*@
+                    @*@Html.HiddenFor(m => m.Id)
+                        @Html.HiddenFor(m => m.IsEdit)*@
+
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        <div class="panel-body padding-20 padding-bottom-10">
+                            @Html.Partial("_default")
+                        </div>
+                        <div class="panel-footer text-right">
+                            <button type="button" class="btn btn-default btn-radian-default">Cancelar</button>
+                            <button type="button" class="btn btn-success btn-radian-success button-change-state">Guardar cambios</button>
                         </div>
                     </div>
+                    @*}*@
+                </div>
 
-                    @if (true)
-                    {
-                        if (true)
-                        {
-                            <div class="row margin-horizontal-0 margin-vertical-30">
-                                @Html.Partial("_testSetResults")
-                            </div>
-                        }
-                    }
-
-                    @if (true)
+                @if (true)
+                {
+                    if (true)
                     {
                         <div class="row margin-horizontal-0 margin-vertical-30">
-                            @Html.Partial("_users")
+                            @Html.Partial("_testSetResults")
                         </div>
                     }
-                </div>
-            }
+                }
+
+                @if (true)
+                {
+                    <div class="row margin-horizontal-0 margin-vertical-30">
+                        @Html.Partial("_users")
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>
 
 @section scripts
 {
-    
+
     <script src="~/Content/js/Radian/DownloadFile.js?1.0.0"></script>
 
     <script>
         $(document).ready(function () {
-            var form = $('#radian-contributor-form');
-            $(".button-change-state").click(function () {
-                form.submit();
+            var id = @Model.Id;
+            var radianState = "";
+            if ("@Model.RadianState" != "Registrado") {
+                radianState = "@Model.RadianState" == "Cancelado" ? "1" : "0";
+            }
+            var documentsEdited = [];
+            $("#Id").val(id);
+            $("#RadianApprovalState").val(radianState);
+            $(".button-change-state").click(function (e) {
+                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                var radianApproveState = $("#RadianApprovalState").val();
+                e.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("ViewDetails", "Radian")',
+                    type: "POST",
+                    data: {
+                        data: documentsEdited,
+                        id: id,
+                        approveState: radianApproveState
+                    },
+                    error: function (error) {
+                        var messageError = Object.values(error)[0];
+                        var id = Object.values(error)[2];
+                        bootbox.alert({
+                            title: "Advertencia",
+                            message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + messageError + "</strong></h4></div></div>",
+                            buttons: {
+                                ok: {
+                                    label: 'Aceptar',
+                                    className: 'btn-success'
+                                }
+                            },
+                            callback: function () {
+                                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                window.location.href = "/Radian/ViewDetails/" + id;
+                            }
+                        });
+                    },
+                    success: function (data) {
+                        var messageSuccess = Object.values(data)[0];
+                        var id = Object.values(data)[2];
+                        bootbox.alert({
+                            title: "Advertencia",
+                            message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + messageSuccess + "</strong></h4></div></div>",
+                            buttons: {
+                                ok: {
+                                    label: 'Aceptar',
+                                    className: 'btn-success'
+                                }
+                            },
+                            callback: function () {
+                                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                window.location.href = "/Radian/ViewDetails/" + id;
+                            }
+                        });
+                    }
+                });
             });
 
-            //disableFields = () => {
-            //    $('#Code').attr('readonly', true);
-            //    $('#Name').attr('readonly', true);
-            //    $('#BusinessName').attr('readonly', true);
-            //    $('#Email').attr('readonly', true);
-            //    $('#AcceptanceStatusId').attr('disabled', 'disabled');
-            //    $('#OperationModeId').attr('disabled', 'disabled');
+            $(".edit-state").click(function () {
+                $(this).parents("tr").children(".init-show").toggle();
+                $(this).parents("tr").children(".init-hide").toggle();
+                var string = $(this).html() == "Editar" ? "Cancelar" : "Editar"
+                $(this).html(string);
+            })
 
-            //    $('#Software_Name').attr('readonly', true);
-            //    $('#Software_SoftwareUser').attr('readonly', true);
-            //    $('#Software_SoftwarePassword').attr('readonly', true);
-            //    $('#Software_Url').attr('readonly', true);
+            $(".list-change-status").change(function () {
+                var element = this;
+                bootbox.confirm({
+                    title: "Advertencia",
+                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>¿Está seguro que desea cambiar el estado del archivo?</strong></h4></div></div>",
+                    buttons: {
+                        confirm: {
+                            label: 'Confirmar',
+                            className: 'btn-success btn-gosocket'
+                        },
+                        cancel: {
+                            label: 'Cancelar',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (confirmation) {
+                        if (confirmation) {
+                            var idFile = $(element).parents("tr").attr("data-idFile");
+                            var newState = $(element).val();
+                            var objToAdd = {
+                                Id: idFile,
+                                NewState: Number(newState)
+                            };
+                            documentsEdited.push(objToAdd);
+                        } else {
+                            $(element).parents("tr").children(".init-show").toggle();
+                            $(element).parents("tr").children(".init-hide").toggle();
+                            var string = $(element).parents("tr").children(".edit-state").html() == "Editar" ? "Cancelar" : "Editar"
+                            $(element).parents("tr").children(".edit-state").html(string);
+                        }
+                    }
+                });
+            })
 
         });
-
-
-
-
 
     </script>
 }

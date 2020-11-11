@@ -1,13 +1,14 @@
 ﻿using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
+using Gosocket.Dian.Interfaces.Managers;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 
 namespace Gosocket.Dian.Application.Managers
 {
-    public class RadianTestSetManager
+    public class RadianTestSetManager : IRadianTestSetManager
     {
         private static readonly TableManager testSetManager = new TableManager("RadianTestSet");
 
@@ -30,7 +31,7 @@ namespace Gosocket.Dian.Application.Managers
 
                 return testSets;
             }
-            catch (Exception )
+            catch (Exception)
             {
                 return new List<RadianTestSet>();
             }

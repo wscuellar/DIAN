@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -340,10 +341,20 @@ namespace Gosocket.Dian.Domain.Common
 
     public enum RadianState
     {
+        [Display(Name = "Registrado")]
         [Description("Registrado")]
-        Registered = 1,
+        Registrado =1,
+        [Display(Name = "En pruebas")]
+        [Description("En pruebas")]
+        Test = 2,
+        [Display(Name = "Habilitado")]
+        [Description("Habilitado")]
+        Habilitado  = 3,
+        [Display(Name = "Cancelado")]
         [Description("Cancelado")]
-        Cancel = 2,
+        Cancelado = 4
     }
+
+  
 
 }

@@ -1,0 +1,72 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Gosocket.Dian.Domain.Entity
+{
+
+    public class AdminRadianFilter
+    {
+
+        public int Id { get; set; }
+
+        public string Code { get; set; }
+
+        public string StartDate { get; set; }
+
+        public string EndDate { get; set; }
+
+        public int Type { get; set; }
+
+        public string RadianState { get; set; }
+
+        public int Page { get; set; }
+
+        public int Length { get; set; }
+
+
+    }
+
+
+    public class RadianAdmin
+    {
+        public RedianContributorWithTypes Contributor { get; set; }
+
+        public RadianContributorType Type { get; set; }
+
+        public RadianContributorFile File { get; set; }
+
+        public List<RedianContributorWithTypes> Contributors { get; set; }
+
+        public List<RadianContributorType> Types { get; set; }
+
+        public List<RadianContributorFile> Files { get; set; }
+
+        public List<RadianTestSetResult> Tests { get; set; }
+
+        public List<string> LegalRepresentativeIds { get; set; }
+    }
+
+    public class RedianContributorWithTypes
+    {
+
+        public int Id { get; set; }
+
+        public string Code { get; set; }
+
+        public string TradeName { get; set; }
+
+        public string BusinessName { get; set; }
+
+        public string AcceptanceStatusName { get; set; }
+
+        public string Email { get; set; }
+
+        public int AcceptanceStatusId { get; set; }
+
+        public DateTime CreatedDate { get; set; }
+
+        public DateTime Update { get; set; }
+
+        public string RadianState { get; set; }
+    }
+}

@@ -12,7 +12,7 @@ namespace Gosocket.Dian.TestProject.Functions.Commons
         private static readonly TableManager tableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
         private static readonly TableManager tableManagerDocumentTracking = new TableManager("GlobalDocValidatorTracking");
 
-        [TestMethod]
+        //[TestMethod]
         public void TestSuccessGetApplicationResponse()
         {
             var trackId = "eb24a315e134bbec7f863c8a7b5756c089a71f740e378cf50452c86696d58cff34efcd9ffa17d640cc85a6e6ddf93fc5";

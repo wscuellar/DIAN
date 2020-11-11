@@ -37,14 +37,14 @@ function ConfirmExec(operation) {
     return {
         del: {
             label: "Aceptar",
-            className: "btn-gosocket",
+            className: "btn-radian-default",
             callback: function () {
                 operation();
             }
         },
         del1: {
             label: "Cancelar",
-            className: "btn-gosocket",
+            className: "btn-radian-default",
         }
     }
 }
@@ -53,7 +53,7 @@ function AlertExec() {
     return {
         del: {
             label: "Aceptar",
-            className: "btn-gosocket",
+            className: "btn-radian-default",
         }
     }
 }

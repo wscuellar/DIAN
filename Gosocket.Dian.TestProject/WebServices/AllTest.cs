@@ -41,7 +41,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             Assert.AreEqual(response.StatusDescription, "Procesado Correctamente.");
             Assert.IsNotNull(response.XmlBase64Bytes);
         }
-        [TestMethod]
+       
         public void SendEventUpdateStatus()
         {
             
@@ -102,7 +102,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             Assert.IsTrue(response.XmlBase64Bytes != null);
         }
 
-        [TestMethod]
+      
         public void TestNotFoundTrackIdGetStatus()
         {
             var trackId = "1";
