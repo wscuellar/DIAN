@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gosocket.Dian.Interfaces.Repositories;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -144,15 +145,9 @@ namespace Gosocket.Dian.Web.Models
         public string UpdateBy { get; set; }
         public bool Active { get; set; }
 
-        public List<OperationModeViewModel> GetOperationModes()
+        public List<OperationModeViewModel> OperationModes
         {
-            return new List<OperationModeViewModel>
-            {
-                new OperationModeViewModel{ Id = 1, Name = "Software Propio" },
-                new OperationModeViewModel{ Id = 2, Name = "Software de un Proveedor Tecnológico" },
-                new OperationModeViewModel{ Id = 3, Name = "Software de un Sistema de Negociación" },
-                new OperationModeViewModel{ Id = 4, Name = "Software de un Factor" }
-            };
+            get; set;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Tipo de participante")]
         public IEnumerable<SelectListItem> RadianType { get; set; }
         [Display(Name = "Estado")]
-        public RadianUtil.UserStates? RadianState { get; set; }
+        public Domain.Common.RadianState? RadianState { get; set; }
 
     }
 
