@@ -179,6 +179,7 @@
     <Compile Include="Common\RedisExtensions.cs" />
     <Compile Include="Managers\RadianTestSetResultManager.cs" />
     <Compile Include="EmailService.cs" />
+    <Compile Include="RadianAprovedService.cs" />
     <Compile Include="RadianContributorFileTypeService.cs" />
     <Compile Include="ContributorOperationsService.cs" />
     <Compile Include="ContributorService.cs" />
@@ -196,6 +197,7 @@
     <Compile Include="ContributorFileTypeService.cs" />
     <Compile Include="GlobalDocumentService.cs" />
     <Compile Include="RadianContributorService.cs" />
+    <Compile Include="RadianTestSetAppliedService.cs" />
     <Compile Include="RadianTestSetService.cs" />
     <Compile Include="SoftwareService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

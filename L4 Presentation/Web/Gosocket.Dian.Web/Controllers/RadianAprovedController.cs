@@ -5,12 +5,12 @@ using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
 {
-    public class RadianFactorController : Controller
+    public class RadianAprovedController : Controller
     {
 
         private readonly IRadianContributorService _radianContributorService;
 
-        public RadianFactorController(IRadianContributorService radianContributorService)
+        public RadianAprovedController(IRadianContributorService radianContributorService)
         {
             _radianContributorService = radianContributorService;
         }

@@ -35,6 +35,7 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IRadianContributorService, RadianContributorService>();
             container.RegisterType<IRadianTestSetService, RadianTestSetService>();
             container.RegisterType<IRadianContributorFileTypeService, RadianContributorFileTypeService>();
+            container.RegisterType<IRadianAprovedService, RadianAprovedService>();
 
             #endregion
 
@@ -42,6 +43,7 @@ namespace Gosocket.Dian.Web
 
             container.RegisterType<IRadianTestSetResultManager, RadianTestSetResultManager>();
             container.RegisterType<IRadianTestSetManager, RadianTestSetManager>();
+            container.RegisterType<IRadianTesSetAppliedManager, RadianTestSetAppliedService>();
 
             #endregion
 

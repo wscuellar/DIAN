@@ -334,7 +334,7 @@
     <Compile Include="Controllers\RadianController.cs" />
     <Compile Include="Controllers\RadianEnablingInvoiceDirectController.cs" />
     <Compile Include="Controllers\RadianEnablingInvoiceIndirectController.cs" />
-    <Compile Include="Controllers\RadianFactorController.cs" />
+    <Compile Include="Controllers\RadianAprovedController.cs" />
     <Compile Include="Controllers\RadianTechnologyProviderController.cs" />
     <Compile Include="Controllers\RadianTestSetController.cs" />
     <Compile Include="Controllers\RadianTradingSystemController.cs" />
