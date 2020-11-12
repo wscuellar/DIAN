@@ -54,15 +54,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult RegistrationValidation(RegistrationDataViewModel registrationData)
         {
-            RadianRegistrationValidation validation = _radianContributorService.RegistratioValidation(registrationData.ContributorId, User.UserCode(), (int)registrationData.RadianContributorType, (int)registrationData.RadianOperationMode);
-            if (validation == null)
-                validation = new RadianRegistrationValidation()
-                {
-                    Message = "Se logro realizar la validación del usuario a Registrar!!!",
-                    MessageType = "alert",
-                    UrlRedirect = string.Empty
-                };
-
+            RadianRegistrationValidation validation = _radianContributorService.RegistrationValidation(User.UserCode(), registrationData.RadianContributorType, registrationData.RadianOperationMode);
             return Json(validation, JsonRequestBehavior.AllowGet);
         }
 

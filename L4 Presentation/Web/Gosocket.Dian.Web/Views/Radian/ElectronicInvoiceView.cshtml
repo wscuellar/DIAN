@@ -2,10 +2,7 @@
 @{
     ViewBag.Title = "Modo de operación";
 }
-@Html.Hidden("RedirectToEnablingInvoiceDirect", Url.Action("Index", "RadianEnablingInvoiceDirect"))
-@Html.Hidden("RedirectToEnablingInvoiceIndirect", Url.Action("Index", "RadianEnablingInvoiceIndirect"))
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
-
 
 <div style="text-align:left; margin-left:25px; margin-top:20px; ">
     <p style="height: 34px; font-family: Arial; font-style: normal; font-weight: normal; font-size: 30px; line-height: 34px; color: #000000; ">
@@ -67,7 +64,6 @@
 
             CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
                 function (param) {
-                    showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                     CallExecution("POST", '@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel,
                         function (param) {
                             window.location.href = '@Url.Action("Index", "RadianApproved")';
