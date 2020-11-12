@@ -95,15 +95,12 @@ namespace Gosocket.Dian.Plugin.Functions.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("20")]
         public int MAX_Attorney {
             get {
                 return ((int)(this["MAX_Attorney"]));
-            }
-            set {
-                this["MAX_Attorney"] = value;
             }
         }
     }

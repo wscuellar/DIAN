@@ -213,13 +213,13 @@
     </Content>
     <Content Include="libman.json" />
     <None Include="Properties\PublishProfiles\gtpa-dian-webservices-input-sbx - Web Deploy.pubxml" />
-
+    <None Include="Properties\PublishProfiles\gtpa-webservices-input-test .pubxml" />
+    <None Include="Properties\PublishProfiles\gtpa-webservices-input-test-indra.pubxml" />
     <None Include="Properties\PublishProfiles\webservices-TEST- Web Deploy.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-	  
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

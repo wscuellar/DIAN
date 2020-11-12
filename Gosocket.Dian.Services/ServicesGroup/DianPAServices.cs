@@ -1027,8 +1027,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.IsValid = false;
                         dianResponse.XmlFileName = contentFileList.First().XmlFileName;
                         dianResponse.StatusCode = processEventResponse.Code;
-                        dianResponse.StatusDescription = processEventResponse.Message;
-                        UpdateInTransactions(trackId, eventCode);
+                        dianResponse.StatusDescription = processEventResponse.Message;                      
+                        UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                         return dianResponse;
                     }
                 }
