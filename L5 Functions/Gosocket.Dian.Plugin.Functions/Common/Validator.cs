@@ -1041,10 +1041,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
+
+                ValidatorEngine validatorEngine = new ValidatorEngine();
+                var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+                var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
+                if (!xmlParserCufe.Parser())
+                    throw new Exception(xmlParserCufe.ParserError);
+
                 //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-                //var resultValidateSingInTime = ValidateSigningTime(data, xmlParser);
+                var resultValidateSingInTime = ValidateSigningTime(data, xmlParserCufe);
+                if (!resultValidateSingInTime[0].IsValid)
+                {
+                    validate = false;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "089",
+                        ErrorMessage = "La fecha debe ser mayor o igual al evento de la factura referenciada",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+
             }
-            if(validate)
+            if (validate)
             {
                 foreach (var attorneyDocument in attorney)
                 {
@@ -1827,19 +1847,34 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             case "036": // Solicitud de Dsiponibilizacion
-                                //Validacion de la Solicitud de Disponibilidad TAKS 723
-                                if (documentMeta
-                                    .Where(t => t.EventCode == "037" || t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
-                                    .Count > decimal.Zero)
+                                //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
+                                if(xmlParserCude.CustomizationID == "363" || xmlParserCude.CustomizationID == "364")
                                 {
-                                    responses.Add(new ValidateListResponse
+                                    if (documentMeta
+                                   .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                   .Count > decimal.Zero)
                                     {
-                                        IsValid = false,
-                                        Mandatory = true,
-                                        ErrorCode = "89",
-                                        ErrorMessage = "Ya existe un tipo de instrumento de limitación registrado en el sistema",
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "89",
+                                            ErrorMessage = "Ya existe un tipo de instrumento de limitación registrado en el sistema",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
                                 }
                                 else
                                 {
@@ -1852,6 +1887,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+
                                 break;
                             //Validación de la existencia eventos previos Endoso en Garantía TASK  716
                             case "038":  //Endoso en Garantía
@@ -2245,6 +2281,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region validation for CBC ID
         public List<ValidateListResponse> ValidateSerieAndNumber(string trackId, string number, string documentTypeId)
         {
+            bool validFor = false;
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -2262,6 +2299,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         && t.Identifier == document.PartitionKey
                         ).ToList().Count > decimal.Zero)
                         {
+                            validFor = true;
                             responses.Add(new ValidateListResponse
                             {
                                 IsValid = false,
@@ -2293,6 +2331,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
+                    }
+                    if (validFor)
+                    {
+                        return responses;
                     }
                 }
             }

@@ -1,10 +1,11 @@
-﻿using Gosocket.Dian.Application;
-using Gosocket.Dian.Application.Managers;
+﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Filters;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -12,37 +13,42 @@ namespace Gosocket.Dian.Web.Controllers
 {
     public class RadianTestSetController : Controller
     {
-        readonly ContributorService contributorService = new ContributorService();
-        private readonly RadianTestSetManager testSetManager = new RadianTestSetManager();
+
+        private readonly IRadianTestSetService _radianTestSetService;
+
+        public RadianTestSetController(IRadianTestSetService radianTestSetService)
+        {
+            _radianTestSetService = radianTestSetService;
+        }
 
         // GET: RadianSetTest
         public ActionResult Index()
         {
             RadianTestSetTableViewModel model = new RadianTestSetTableViewModel
             {
-                RadianTestSets = testSetManager.GetAllTestSet().Select(x => new RadianTestSetViewModel
+                RadianTestSets = _radianTestSetService.GetAllTestSet().Select(x => new RadianTestSetViewModel
                 {
-                    OperationModeName = contributorService.GetOperationMode(int.Parse(x.PartitionKey)).Name,
+                    OperationModeName = _radianTestSetService.GetOperationMode(int.Parse(x.PartitionKey))?.Name,
                     Active = x.Active,
                     CreatedBy = x.CreatedBy,
                     Date = x.Date,
                     Description = x.Description,
                     TotalDocumentRequired = x.TotalDocumentRequired,
                     TotalDocumentAcceptedRequired = x.TotalDocumentAcceptedRequired,
-                    ReceiptNoticeTotalRequired              = x.ReceiptNoticeTotalRequired,
-                    ReceiptServiceTotalRequired             = x.ReceiptServiceTotalRequired,
-                    ExpressAcceptanceTotalRequired          = x.ExpressAcceptanceTotalRequired,
-                    AutomaticAcceptanceTotalRequired        = x.AutomaticAcceptanceTotalRequired,
-                    RejectInvoiceTotalRequired              = x.RejectInvoiceTotalRequired,
-                    ApplicationAvailableTotalRequired       = x.ApplicationAvailableTotalRequired,
-                    EndorsementTotalRequired                = x.EndorsementTotalRequired,
-                    EndorsementCancellationTotalRequired    = x.EndorsementCancellationTotalRequired,
-                    GuaranteeTotalRequired                  = x.GuaranteeTotalRequired,
-                    ElectronicMandateTotalRequired          = x.ElectronicMandateTotalRequired,
-                    EndMandateTotalRequired                 = x.EndMandateTotalRequired,
-                    PaymentNotificationTotalRequired        = x.PaymentNotificationTotalRequired,
-                    CirculationLimitationTotalRequired      = x.CirculationLimitationTotalRequired,
-                    EndCirculationLimitationTotalRequired   = x.EndCirculationLimitationTotalRequired,
+                    ReceiptNoticeTotalRequired = x.ReceiptNoticeTotalRequired,
+                    ReceiptServiceTotalRequired = x.ReceiptServiceTotalRequired,
+                    ExpressAcceptanceTotalRequired = x.ExpressAcceptanceTotalRequired,
+                    AutomaticAcceptanceTotalRequired = x.AutomaticAcceptanceTotalRequired,
+                    RejectInvoiceTotalRequired = x.RejectInvoiceTotalRequired,
+                    ApplicationAvailableTotalRequired = x.ApplicationAvailableTotalRequired,
+                    EndorsementTotalRequired = x.EndorsementTotalRequired,
+                    EndorsementCancellationTotalRequired = x.EndorsementCancellationTotalRequired,
+                    GuaranteeTotalRequired = x.GuaranteeTotalRequired,
+                    ElectronicMandateTotalRequired = x.ElectronicMandateTotalRequired,
+                    EndMandateTotalRequired = x.EndMandateTotalRequired,
+                    PaymentNotificationTotalRequired = x.PaymentNotificationTotalRequired,
+                    CirculationLimitationTotalRequired = x.CirculationLimitationTotalRequired,
+                    EndCirculationLimitationTotalRequired = x.EndCirculationLimitationTotalRequired,
                     TestSetId = x.TestSetId.ToString(),
                     UpdateBy = x.UpdateBy,
                     OperationModeId = int.Parse(x.PartitionKey)
@@ -55,8 +61,12 @@ namespace Gosocket.Dian.Web.Controllers
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult Add()
         {
-            var model = new RadianTestSetViewModel
+            List<OperationModeViewModel> list;
+            list = LoadSoftwareOperationMode();
+
+            RadianTestSetViewModel model = new RadianTestSetViewModel
             {
+                OperationModes = list,
                 TotalDocumentRequired = 14,
                 TotalDocumentAcceptedRequired = 0,
                 ReceiptNoticeTotalRequired = 1,
@@ -88,14 +98,15 @@ namespace Gosocket.Dian.Web.Controllers
             }
             if (!model.TestSetReplace)
             {
-                var testSetExists = testSetManager.GetTestSet(model.OperationModeId.ToString(), model.OperationModeId.ToString());
+                RadianTestSet testSetExists = _radianTestSetService.GetTestSet(model.OperationModeId.ToString(), model.OperationModeId.ToString());
                 if (testSetExists != null)
                 {
                     ViewBag.ErrorExistsTestSet = true;
+                    model.OperationModes = LoadSoftwareOperationMode();
                     return View("Add", model);
                 }
             }
-            var result = testSetManager.InsertTestSet(new RadianTestSet(model.OperationModeId.ToString(), model.OperationModeId.ToString())
+            bool result = _radianTestSetService.InsertTestSet(new RadianTestSet(model.OperationModeId.ToString(), model.OperationModeId.ToString())
             {
                 TestSetId = Guid.NewGuid().ToString(),
                 Active = true,
@@ -142,15 +153,21 @@ namespace Gosocket.Dian.Web.Controllers
             return View("Add", model);
         }
 
+        private List<OperationModeViewModel> LoadSoftwareOperationMode()
+        {
+            List<RadianOperationMode> list = _radianTestSetService.OperationModeList();
+            List<OperationModeViewModel> OperationModes = list.Select(t => new OperationModeViewModel() { Id = t.Id, Name = t.Name }).ToList();
+            return OperationModes;
+        }
 
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult Edit(int operationModeId)
         {
-            var testSet = testSetManager.GetTestSet(operationModeId.ToString(), operationModeId.ToString());
+            RadianTestSet testSet = _radianTestSetService.GetTestSet(operationModeId.ToString(), operationModeId.ToString());
             if (testSet == null)
                 return RedirectToAction(nameof(Index));
 
-            var model = new RadianTestSetViewModel
+            RadianTestSetViewModel model = new RadianTestSetViewModel
             {
                 TotalDocumentRequired = testSet.TotalDocumentRequired,
                 TotalDocumentAcceptedRequired = testSet.TotalDocumentAcceptedRequired,
@@ -186,6 +203,8 @@ namespace Gosocket.Dian.Web.Controllers
                 TestSetId = testSet.TestSetId.ToString(),
                 OperationModeId = int.Parse(testSet.PartitionKey)
             };
+            model.OperationModes = LoadSoftwareOperationMode();
+
             ViewBag.CurrentPage = Navigation.NavigationEnum.RadianSetPruebas;
             return View(model);
         }
@@ -197,7 +216,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (!ModelState.IsValid)
                 return View("Edit", model);
 
-            var result = testSetManager.InsertTestSet(new RadianTestSet(model.OperationModeId.ToString(), model.OperationModeId.ToString())
+            bool result = _radianTestSetService.InsertTestSet(new RadianTestSet(model.OperationModeId.ToString(), model.OperationModeId.ToString())
             {
                 TestSetId = Guid.Parse(model.TestSetId).ToString(),
                 Active = true,

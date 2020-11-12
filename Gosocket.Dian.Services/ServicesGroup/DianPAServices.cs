@@ -885,7 +885,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
                 }
-                UpdateInTransactions(trackId, eventCode);
+                UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                 return dianResponse;
             }
             var upload = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Upload5) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -944,7 +944,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Validate };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
                 }
-                UpdateInTransactions(trackId, eventCode);
+                UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                 return dianResponse;
             }
             else
@@ -983,6 +983,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.IsValid = false;
                     dianResponse.StatusMessage = Properties.Settings.Default.Msg_Error_FieldMandatori;
                     dianResponse.ErrorMessage.AddRange(failedList);
+                    UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                 }
 
                 if (notifications.Any())
@@ -1027,8 +1028,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.IsValid = false;
                         dianResponse.XmlFileName = contentFileList.First().XmlFileName;
                         dianResponse.StatusCode = processEventResponse.Code;
-                        dianResponse.StatusDescription = processEventResponse.Message;
-                        UpdateInTransactions(trackId, eventCode);
+                        dianResponse.StatusDescription = processEventResponse.Message;                      
+                        UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                         return dianResponse;
                     }
                 }
