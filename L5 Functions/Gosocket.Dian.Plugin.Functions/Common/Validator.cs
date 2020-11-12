@@ -2265,6 +2265,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region validation for CBC ID
         public List<ValidateListResponse> ValidateSerieAndNumber(string trackId, string number, string documentTypeId)
         {
+            bool validFor = false;
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -2282,6 +2283,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         && t.Identifier == document.PartitionKey
                         ).ToList().Count > decimal.Zero)
                         {
+                            validFor = true;
                             responses.Add(new ValidateListResponse
                             {
                                 IsValid = false,
@@ -2313,6 +2315,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
+                    }
+                    if (validFor)
+                    {
+                        return responses;
                     }
                 }
             }
