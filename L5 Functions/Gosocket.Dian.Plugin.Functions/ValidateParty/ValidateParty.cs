@@ -93,5 +93,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
         public string CustomizationID { get; set; }
         [JsonProperty(PropertyName = "UUID")]
         public string CudeId { get; set; }
+        [JsonProperty(PropertyName = "ListID")]
+        public string ListId { get; set; }
     }
 }

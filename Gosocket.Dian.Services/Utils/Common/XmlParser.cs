@@ -34,6 +34,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string PriceToPay { get; set; }
         public string TotalEndoso { get; set; }
         public string TotalInvoice { get; set; }
+        public string ListID { get; set; }
 
         public XmlParser()
         {
@@ -80,6 +81,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var nodeCustomizationID = XmlDocument.GetElementsByTagName("cbc:CustomizationID")[0];
                     var nodePaymentMeansValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='ID']";                    
                     var nodePaymentDueDateValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='PaymentDueDate']";
+                    var listIDValueXpath = XmlDocument.GetElementsByTagName("cbc:ResponseCode")[0];
                     var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";
                     //var valueDiscountRateEndoso = "//*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[3]']";
                     var valueDiscountRateEndoso = XmlDocument.GetElementsByTagName("InformacionNegociacion")[0];
@@ -96,6 +98,8 @@ namespace Gosocket.Dian.Services.Utils.Common
                     DocumentReferenceId = documentReferenceId;
                     PaymentDueDate = nodePaymentDueDate;
                     DiscountRateEndoso = valueDiscountRateEndoso?.InnerText;
+                    ListID = listIDValueXpath?.OuterXml.Substring(26,4).Replace("\" n", "");
+
                     if(DiscountRateEndoso != null)
                     {
                         //string[] datos = DiscountRateEndoso.Split(new string[] { "\r\n\t\t\t\t\t", "\r\n\t\t\t\t", " " }, StringSplitOptions.None);
