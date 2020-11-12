@@ -55,51 +55,28 @@
 
     <script>
 
-        var withSoft = '@ViewBag.WithSoft';
-        var existInRadian = '@ViewBag.ExistInRadian';
         var contributorId = '@ViewBag.ContributorId';
 
         $('.RadianCardContainer').click(function () {
+
             var RegistrationDataViewModel = {
                 ContributorId: '@ViewBag.ContributorId',
                 RadianContributorType: $(this).attr('contributorType'),
                 RadianOperationMode: $(this).attr('operationMode'),
             };
 
-            //function ejemplo2(fn) {
-            //    var nombre = "Pepe";
-            //    fn(nombre);
-            //}
-
-            //ejemplo2(function (nom) {
-            //    console.log("hola " + nom);
-            //});  // "hola Pepe"
-            CallExecution('@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
+            CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
                 function (param) {
                     showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
-                    CallExecution('@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel)
+                    CallExecution("POST", '@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel,
+                        function (param) {
+                            window.location.url = '@Url.Action("Index", "RadianApproved")';
+                        }
+                    );
                 }
             );
+
         });
-
-        function GetDirectLabelMessage(withSoft, existInRadian) {
-            return (withSoft == "True" && !existInRadian.includes("1")) ? ".ConfirmMessage" :  (existInRadian == 'False') ? ".ConfirmReject" : ".ConfirmUserExisting";
-        }
-
-        function GetIndirectLabelMessage(existInRadian) {
-            return (!existInRadian.includes("1")) ? ".ConfirmMessage" : ".ConfirmUserExisting";
-        }
-
-        function OperationConfirm(RegistrationDataViewModel) {
-            showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
-            CallExecution('@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel)
-        }
-
-        function EnablingInvoiceIndirect(RegistrationDataViewModel) {
-            var contributorId = '@ViewBag.ContributorId';
-            var url = $("#RedirectToEnablingInvoiceIndirect").val() + "?ContributorId=" + contributorId;
-            window.location.href = url;
-        }
 
     </script>
 }

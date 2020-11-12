@@ -16,8 +16,14 @@ namespace Gosocket.Dian.Web.Controllers
             _radianContributorService = radianContributorService;
         }
 
-        [HttpPost]
+
+        public ActionResult Index()
+        {
+            return View();
+        }
+
         // GET: RadianFactor
+        [HttpPost]
         public ActionResult Index(RegistrationDataViewModel registrationData)
         {
             _radianContributorService.CreateContributor(registrationData.ContributorId,
@@ -28,5 +34,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View();
         }
+
     }
 }

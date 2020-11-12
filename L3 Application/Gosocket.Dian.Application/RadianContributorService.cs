@@ -63,10 +63,10 @@ namespace Gosocket.Dian.Application
                 case 1: //Facturador electronico
                     if(radianOperationModeId == 1)
                     {
-                        //if(contributor.Softwares.Count <= 0)
-                        //    return new RadianRegistrationValidation() { Message = "El participante no cuenta con un software propio activo en el sistema", MessageType = "alert" };
-                        //if(radianContributor != null && radianContributor.RadianState == RadianState.Cancelado.GetDescription())
-                        //    return new RadianRegistrationValidation() { Message = "El participante ya se encuentra registrado en RADIAN", MessageType = "alert" };
+                        if(contributor.Softwares.Count <= 0)
+                            return new RadianRegistrationValidation() { Message = "El participante no cuenta con un software propio activo en el sistema", MessageType = "alert" };
+                        if(radianContributor != null && radianContributor.RadianState == RadianState.Cancelado.GetDescription())
+                            return new RadianRegistrationValidation() { Message = "El participante ya se encuentra registrado en RADIAN", MessageType = "alert" };
                         return new RadianRegistrationValidation()
                         {
                             Message= "¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico ? ",

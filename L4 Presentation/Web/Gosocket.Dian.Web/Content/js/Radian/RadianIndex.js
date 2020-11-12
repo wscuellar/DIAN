@@ -26,19 +26,22 @@
 }));
 
 
-function CallExecution(url, jsonvalue, method) {
+function CallExecution(callMethod, url, jsonvalue, method, showMessage) {
     $.ajax({
         url: url,
-        type: "POST",
+        type: callMethod,
         data: jsonvalue,
         success: function (data) {
-            if (method !== null && method !== undefined) {
+            if (showMessage) {
                 if (data.MessageType === "alert") {
                     showConfirmation(data.Message, AlertExec());
                 }
                 else {
                     showConfirmation(data.Message, ConfirmExec(method, jsonvalue));
-                }                  
+                }
+            }
+            else {
+                method(jsonvalue);
             }
         }
     });
