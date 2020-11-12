@@ -19,10 +19,16 @@ namespace Gosocket.Dian.Web.Controllers
             _radianTestSetService = radianTestSetService;
         }
 
+
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        // GET: RadianFactor
         public IRadianTestSetService RadianTestSetService { get; }
 
         [HttpPost]
-        // GET: RadianFactor
         public ActionResult Index(RegistrationDataViewModel registrationData)
         {
             _radianContributorService.CreateContributor(registrationData.ContributorId,
@@ -43,5 +49,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View();
         }
+
     }
 }
