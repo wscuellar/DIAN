@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Gosocket.Dian.Domain;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Gosocket.Dian.Web.Models.RadianApproved
@@ -31,6 +32,9 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public string SarlafCertificate { get; set; }
 
-        public List<RadianContributorFileTypeTableViewModel> RadianFileList { get; set; }  
+        public List<RadianContributorFileTypeTableViewModel> RadianFileList { get; set; }
+        public List<RadianContributorFile> Files { get; set; }
+        public List<RadianCustomerViewModel> Customers { get; set; }
+
     }
 }
