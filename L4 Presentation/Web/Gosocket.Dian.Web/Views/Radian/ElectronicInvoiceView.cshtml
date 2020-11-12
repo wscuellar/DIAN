@@ -68,16 +68,17 @@
             var direct = $(this).attr('id') == "direct";
             var findLabel = direct ? GetDirectLabelMessage(withSoft, existInRadian) : GetIndirectLabelMessage(existInRadian);
             var message = $(this).children(findLabel).val()
-            if (message != undefined) {
-                var buttons = {};
-                if (direct) {
-                    buttons = (withSoft == "True" && !existInRadian.includes("1")) ? ConfirmExec(EnablingInvoiceDirect) : AlertExec();
-                }
-                else {
-                    buttons = (!existInRadian.includes("1")) ? ConfirmExec(EnablingInvoiceIndirect) : AlertExec();
-                }
-                showConfirmation(message, buttons);
-            }
+            //if (message != undefined) {
+            //    var buttons = {};
+            //    if (direct) {
+            //        buttons = (withSoft == "True" && !existInRadian.includes("1")) ? ConfirmExec(EnablingInvoiceDirect) : AlertExec();
+            //    }
+            //    else {
+            //        buttons = (!existInRadian.includes("1")) ? ConfirmExec(EnablingInvoiceIndirect) : AlertExec();
+            //    }
+            //    showConfirmation(message, buttons);
+            //}
+            EnablingInvoiceIndirect();
         });
 
         function GetDirectLabelMessage(withSoft, existInRadian) {
