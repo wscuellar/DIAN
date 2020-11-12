@@ -334,7 +334,7 @@
     <Compile Include="Controllers\RadianController.cs" />
     <Compile Include="Controllers\RadianEnablingInvoiceDirectController.cs" />
     <Compile Include="Controllers\RadianEnablingInvoiceIndirectController.cs" />
-    <Compile Include="Controllers\RadianAprovedController.cs" />
+    <Compile Include="Controllers\RadianApprovedController.cs" />
     <Compile Include="Controllers\RadianTechnologyProviderController.cs" />
     <Compile Include="Controllers\RadianTestSetController.cs" />
     <Compile Include="Controllers\RadianTradingSystemController.cs" />
@@ -388,6 +388,7 @@
     <Compile Include="Models\RadianTestSetTableViewModel.cs" />
     <Compile Include="Models\RadianTestSetTrackingViewModel.cs" />
     <Compile Include="Models\RadianTestSetViewModel.cs" />
+    <Compile Include="Models\RegistrationDataViewModel.cs" />
     <Compile Include="Models\RequestAuthorizationBigContributorViewModel.cs" />
     <Compile Include="Models\Role\RoleModel.cs" />
     <Compile Include="Models\Role\Roles.cs" />

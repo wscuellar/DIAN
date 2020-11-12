@@ -51,6 +51,23 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
+        [HttpPost]
+        public JsonResult RegistrationValidation(RegistrationDataViewModel registrationData)
+        {
+            RadianRegistrationValidation validation = _radianContributorService.RegistratioValidation(registrationData.ContributorId, User.UserCode(), (int)registrationData.RadianContributorType, (int)registrationData.RadianOperationMode);
+            if (validation == null)
+                validation = new RadianRegistrationValidation()
+                {
+                    Message = "Se logro realizar la validación del usuario a Registrar!!!",
+                    MessageType = "alert",
+                    UrlRedirect = string.Empty
+                };
+
+            return Json(validation, JsonRequestBehavior.AllowGet);
+        }
+
+
+
         public ActionResult AdminRadianView()
         {
             int page = 1, size = 10;
@@ -136,7 +153,7 @@ namespace Gosocket.Dian.Web.Controllers
                 AcceptanceStatusName = radianAdmin.Contributor.AcceptanceStatusName,
                 CreatedDate = radianAdmin.Contributor.CreatedDate,
                 UpdatedDate = radianAdmin.Contributor.Update,
-                RadianState = radianAdmin.Contributor.RadianState,                
+                RadianState = radianAdmin.Contributor.RadianState,
                 RadianContributorFiles = radianAdmin.Files.Count > 0 ? radianAdmin.Files.Select(f => new RadianContributorFileViewModel
                 {
                     Id = f.Id,

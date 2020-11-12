@@ -15,6 +15,8 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <returns></returns>
         NameValueCollection Summary(string userCode);
 
+        RadianRegistrationValidation RegistratioValidation(int contributorId, string userCode, int radianContributorTypeId, int radianOperationModeId);
+
         /// <summary>
         /// Consulta de participantes de radian en estado Registrado
         /// </summary>
@@ -24,6 +26,8 @@ namespace Gosocket.Dian.Interfaces.Services
         RadianAdmin ListParticipants(int page, int size);
 
         RadianAdmin ContributorSummary(int contributorId);
+
+        
 
         bool ChangeParticipantStatus(int contributorId, string approveState);
 
@@ -38,5 +42,6 @@ namespace Gosocket.Dian.Interfaces.Services
         RadianOperationMode GetOperationMode(int id);
 
         List<Domain.RadianOperationMode> OperationModeList();
+        
     }
 }
