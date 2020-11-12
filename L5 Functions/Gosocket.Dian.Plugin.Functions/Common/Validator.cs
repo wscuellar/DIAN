@@ -233,7 +233,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (cufeModel.DocumentTypeId == "96")
             {
                 fakeData = $"{cufeModel.SerieAndNumber}---{cufeModel.EmissionDate}---{cufeModel.HourEmission}---{cufeModel.SenderCode}---{cufeModel.ReceiverCode}---{cufeModel.ResponseCode}---{cufeModel.ReferenceId}---{cufeModel.ReferenceTypeCode}---{key}";
-                
+
                 if (cufeModel.ResponseCode == "038" && cufeModel.ResponseCodeListID == "2")
                 {
                     //Endoso en garantia en blanco
@@ -332,7 +332,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //IssuerParty Adquiriente/deudor de la Factura Electrónica evento Endoso Electronico
-            if(nitModel.IssuerPartySchemeAgencyCode == "195")
+            if (nitModel.IssuerPartySchemeAgencyCode == "195")
             {
                 var issuerPartyCode = nitModel.IssuerPartyCode;
                 var IssuerPartyCodeDigit = nitModel.IssuerPartySchemeCode;
@@ -803,42 +803,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueTotalEndoso = xmlParserCude.TotalEndoso;
             string valueTotalInvoice = xmlParserCufe.TotalInvoice;
 
-            if(eventCode == "038")
+            //Valida informacion Endoso 
+            if (valueTotalEndoso == null)
             {
-                //Valida informacion Endoso 
-                if (valueTotalEndoso == null)
+                return new ValidateListResponse
                 {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAI05a, Rechazo: ",
-                        ErrorMessage = $"{(string)null} El valor no es informado .",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
-                else
-                {
-                    if (!String.Equals(valueTotalEndoso, valueTotalInvoice))
-                    {
-                        return new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: AAI05b, Rechazo: ",
-                            ErrorMessage = $"{(string)null} Valor Total del Endoso no es igual al Valor total FEVTV .",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        };
-                    }
-                }
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAI05a, Rechazo: ",
+                    ErrorMessage = $"{(string)null} El valor no es informado .",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
             }
-            else
+
+            if (!String.Equals(valueTotalEndoso, valueTotalInvoice))
+            {
+                return new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAI05b, Rechazo: ",
+                    ErrorMessage = $"{(string)null} Valor Total del Endoso no es igual al Valor total FEVTV .",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
+            }
+
+            if (eventCode == "037")
             {
                 //Valida precio a pagar endoso
                 int resultValuePriceToPay = (Convert.ToInt32(valueTotalEndoso) * Convert.ToInt32(valueDiscountRateEndoso));
 
-                int valuePriceToPay2 = Convert.ToInt32(valuePriceToPay);
-                if (valuePriceToPay2 != resultValuePriceToPay)
+                if (Convert.ToInt32(valuePriceToPay) != resultValuePriceToPay)
                 {
                     return new ValidateListResponse
                     {
@@ -850,13 +845,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     };
                 }
             }
-    
+
             return null;
         }
         #endregion
 
         #region ValidateFacultityAttorney
-        private ValidateListResponse ValidateFacultityAttorney(string partitionKey, string rowKey, string issueAtorney, string senderCode,string eventCode)
+        private ValidateListResponse ValidateFacultityAttorney(string partitionKey, string rowKey, string issueAtorney, string senderCode, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
 
@@ -966,10 +961,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string startDateAttorney = string.Empty;
             string endDate = string.Empty;
             DateTime startDate = DateTime.UtcNow;
-            ValidateSigningTime.RequestObject data = new ValidateSigningTime.RequestObject();           
+            ValidateSigningTime.RequestObject data = new ValidateSigningTime.RequestObject();
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             List<AttorneyModel> attorney = new List<AttorneyModel>();
-            string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();           
+            string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
             string AttachmentBase64 = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(0)?.InnerText.ToString();
             string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0)?.InnerText.ToString();
@@ -1015,7 +1010,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             }
             //Grupo de información alcances para el mandato sobre los CUFE.
-            for (int i = 1; i < cufeList.Count && i < attorneyLimit+1 && validate; i++)
+            for (int i = 1; i < cufeList.Count && i < attorneyLimit + 1 && validate; i++)
             {
                 AttorneyModel attorneyModel = new AttorneyModel();
                 string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
@@ -1044,17 +1039,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
                 //var resultValidateSingInTime = ValidateSigningTime(data, xmlParser);
             }
-            if(validate)
+            if (validate)
             {
                 foreach (var attorneyDocument in attorney)
                 {
-                    GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId,attorneyDocument.cufe) 
+                    GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId, attorneyDocument.cufe)
                     {
-                        Active =true,
-                        Actor =attorneyDocument.actor,
+                        Active = true,
+                        Actor = attorneyDocument.actor,
                         EffectiveDate = effectiveDate,
                         EndDate = endDate,
-                        FacultityCode =attorneyDocument.facultityCode,
+                        FacultityCode = attorneyDocument.facultityCode,
                         IssuerAttorney = issuerPartyCode,
                         SenderCode = senderCode,
                         StartDate = startDateAttorney
@@ -1855,9 +1850,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 break;
                             //Validación de la existencia eventos previos Endoso en Garantía TASK  716
                             case "038":  //Endoso en Garantía
-                                         //Valida Valores endoso electronico versus FEVTV
+                            case "037":
+                            case "039"://Valida Valores endoso electronico versus FEVTV
                                 var response = ValidateEndoso(xmlParserCufe, xmlParserCude, eventCode);
-                                if(response != null)
+                                if (response != null)
                                 {
                                     validFor = true;
                                     responses.Add(response);
@@ -1948,7 +1944,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
                     if (validFor)
-                    {                        
+                    {
                         return responses;
                     }
                 }
@@ -2049,6 +2045,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Validación de la Sección Signature - Fecha mayor o igual al endoso referenciado TASK 727
                 case "040": //Anulacion de endoso electronico
                 case "043": //Mandato
+                case "039": //Endoso en procuracion
+                case "037": //Endoso en propiedad
                     responses.Add(Convert.ToDateTime(data.SigningTime) >= Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
@@ -2127,7 +2125,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
-                case "036": //Solicitud de Dsiponibilizacion
+                case "036":
+                case "041":
+                case "042":
+                case "045"://Solicitud de Dsiponibilizacion
                     responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
@@ -2147,6 +2148,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
+
                 //Validación fecha emite evento AR menor a fecha de vencimiento factura
                 case "038": //Endoso en Garantía
                     responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModel.PaymentDueDate)
