@@ -2704,7 +2704,6 @@
     <Content Include="Views\RadianEnablingInvoiceDirect\Index.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
     <Content Include="Views\RadianTradingSystem\Index.cshtml" />
-    <Content Include="Views\RadianFactor\Index.cshtml" />
     <Content Include="Views\RadianTechnologyProvider\Index.cshtml" />
     <Content Include="Views\RadianTestSet\Add.cshtml" />
     <Content Include="Views\RadianTestSet\_form.cshtml" />
@@ -2712,7 +2711,6 @@
     <Content Include="Views\RadianEnablingInvoiceDirect\Index.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
     <Content Include="Views\RadianTradingSystem\Index.cshtml" />
-    <Content Include="Views\RadianFactor\Index.cshtml" />
     <Content Include="Views\RadianTechnologyProvider\Index.cshtml" />
     <Content Include="Views\Radian\_default.cshtml" />
     <Content Include="Views\Radian\_form.cshtml" />
@@ -2732,6 +2730,7 @@
     <Content Include="Views\RadianContributorFileType\_Delete.cshtml" />
     <Content Include="Views\RadianContributorFileType\_Edit.cshtml" />
     <Content Include="Views\RadianContributorFileType\_Items.cshtml" />
+    <Content Include="Views\RadianAproved\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2756,6 +2755,7 @@
     <Folder Include="Content\js\NewFolder1\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
+    <Folder Include="Models\RadianApproved\" />
     <Folder Include="Views\RadianSetTest\" />
   </ItemGroup>
   <ItemGroup>
