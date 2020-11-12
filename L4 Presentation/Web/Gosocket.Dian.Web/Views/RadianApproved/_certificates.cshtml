@@ -1,0 +1,68 @@
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@{
+    ViewBag.Title = "Certificados";
+}
+
+@* Todo: validar nombre y método del controlador *@
+@using (Html.BeginForm("UpdateCertificates", "RadianApproved", FormMethod.Post, new { id = "add-radianContributorFileType-form" }))
+{
+    <div class="panel-body padding-20 padding-bottom-10">
+        <div class="container">
+            <div class="row title-container">
+                <p class="title-view">
+                    @ViewBag.title
+                </p>
+                <a><i class="far fa-clock green-text"></i><u class="green-text">Ver Historial</u></a>
+                <div class="underline-title"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2">
+                    <i class="fas fa-hourglass-half fa-sm"></i> Cargado y en revisión
+                </div>
+                <div class="col-sm-2">
+                    <i class="fas fa-check-circle fa-sm green-text"></i> Aprovado
+                </div>
+                <div class="col-sm-2">
+                    <i class="fas fa-times-circle red-text"></i> Rechazado
+                </div>
+                <div class="col-sm-6">
+                    <i class="fas fa-info-circle cyan-text"></i> Observaciones
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.IsoCertificate, new { @class = "control-label" })
+                        <label id="lblIsoCertificateWarning"></label>
+                        @Html.LabelFor(m => m.IsoCertificate, new { @class = "control-label" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.SarlafCertificate, new { @class = "control-label" })
+                        <label id="lblSarlafCertificateWarning"></label>
+                        @Html.LabelFor(m => m.SarlafCertificate, new { @class = "control-label" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="col-sm-1 padding-xs-0">
+                    <div class="form-group">
+                        <div class="form-block" style="padding-top: 20px;">
+                            <button type="submit" class="btn btn-action btn-radian-success">Cancelar Registro</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-1 padding-xs-0">
+                    <div class="form-group">
+                        <div class="form-block" style="padding-top: 20px;">
+                            <button type="submit" class="btn btn-success btn-radian-success">Enviar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
