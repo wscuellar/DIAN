@@ -25,6 +25,25 @@
 
 }));
 
+
+function CallExecution(url, jsonvalue, method) {
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: jsonvalue,
+        success: function (data) {
+            if (method !== null && method !== undefined) {
+                if (data.MessageType === "alert") {
+                    showConfirmation(data.Message, AlertExec());
+                }
+                else {
+                    showConfirmation(data.Message, ConfirmExec(method, jsonvalue));
+                }                  
+            }
+        }
+    });
+}
+
 function showConfirmation(confirmMessage, buttons) {
     bootbox.dialog({
         title: "Advertencia",
@@ -33,13 +52,13 @@ function showConfirmation(confirmMessage, buttons) {
     });
 }
 
-function ConfirmExec(operation) {
+function ConfirmExec(operation, param) {
     return {
         del: {
             label: "Aceptar",
             className: "btn-radian-default",
             callback: function () {
-                operation();
+                operation(param);
             }
         },
         del1: {
