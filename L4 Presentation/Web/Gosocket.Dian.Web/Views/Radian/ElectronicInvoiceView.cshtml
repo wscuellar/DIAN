@@ -70,10 +70,10 @@
                     showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                     CallExecution("POST", '@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel,
                         function (param) {
-                            window.location.url = '@Url.Action("Index", "RadianApproved")';
-                        }
+                            window.location.href = '@Url.Action("Index", "RadianApproved")';
+                        },false
                     );
-                }
+                },true
             );
 
         });
