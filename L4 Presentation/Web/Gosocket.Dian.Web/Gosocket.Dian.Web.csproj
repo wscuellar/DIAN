@@ -374,6 +374,7 @@
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\ContributorCategoryViewModel.cs" />
+    <Compile Include="Models\RadianApproved\RadianApprovedViewModel.cs" />
     <Compile Include="Models\RadianContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorViewModel.cs" />
@@ -2730,7 +2731,7 @@
     <Content Include="Views\RadianContributorFileType\_Delete.cshtml" />
     <Content Include="Views\RadianContributorFileType\_Edit.cshtml" />
     <Content Include="Views\RadianContributorFileType\_Items.cshtml" />
-    <Content Include="Views\RadianAproved\Index.cshtml" />
+    <Content Include="Views\RadianApproved\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2755,7 +2756,6 @@
     <Folder Include="Content\js\NewFolder1\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
-    <Folder Include="Models\RadianApproved\" />
     <Folder Include="Views\RadianSetTest\" />
   </ItemGroup>
   <ItemGroup>
