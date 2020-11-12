@@ -76,6 +76,11 @@ namespace Gosocket.Dian.Application
                     else
                     {
                         //indirecta
+                        return new RadianRegistrationValidation()
+                        {
+                            Message = "¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico ? ",
+                            MessageType = "confirm"
+                        };
                     }
                     break;
                 case 2: //Proveedor Tecnologico
