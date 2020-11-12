@@ -86,8 +86,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     eventPrev.TrackId = documentMeta.DocumentReferencedKey;
                 }
             }
-            //Obtiene información factura referenciada Endoso electronico y AR CUDE
-            if(eventPrev.EventCode == "038")
+            //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
+            if (eventPrev.EventCode == "036" || eventPrev.EventCode == "038")
             {
                 //Obtiene XML Factura electronica CUFE
                 var xmlBytes = await GetXmlFromStorageAsync(eventPrev.TrackId);

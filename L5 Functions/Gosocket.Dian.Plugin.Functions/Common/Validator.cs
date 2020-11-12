@@ -1875,7 +1875,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
-                                }                               
+                                }
+                                else
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+
                                 break;
                             //Validación de la existencia eventos previos Endoso en Garantía TASK  716
                             case "038":  //Endoso en Garantía
