@@ -25,21 +25,42 @@
 
 }));
 
+
+function CallExecution(callMethod, url, jsonvalue, method, showMessage) {
+    $.ajax({
+        url: url,
+        type: callMethod,
+        data: jsonvalue,
+        success: function (data) {
+            if (showMessage) {
+                if (data.MessageType === "alert") {
+                    showConfirmation(data.Message, AlertExec());
+                }
+                else {
+                    showConfirmation(data.Message, ConfirmExec(method, jsonvalue));
+                }
+            }
+            else {
+                method(jsonvalue);
+            }
+        }
+    });
+}
+
 function showConfirmation(confirmMessage, buttons) {
     bootbox.dialog({
-        title: "Advertencia",
         message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
         buttons: buttons
     });
 }
 
-function ConfirmExec(operation) {
+function ConfirmExec(operation, param) {
     return {
         del: {
             label: "Aceptar",
-            className: "btn-radian-default",
+            className: "btn-radian-default btn-radian-success",
             callback: function () {
-                operation();
+                operation(param);
             }
         },
         del1: {

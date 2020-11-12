@@ -23,7 +23,7 @@ namespace Gosocket.Dian.Application
         private readonly IRadianTestSetResultManager _radianTestSetResultManager;
         private readonly IRadianOperationModeRepository _radianOperationModeRepository;
 
-        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianTestSetResultManager radianTestSetResultManager, IRadianOperationModeRepository radianOperationModeRepository )
+        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianTestSetResultManager radianTestSetResultManager, IRadianOperationModeRepository radianOperationModeRepository)
         {
             _contributorService = contributorService;
             _radianContributorRepository = radianContributorRepository;
@@ -33,6 +33,7 @@ namespace Gosocket.Dian.Application
             _radianOperationModeRepository = radianOperationModeRepository;
         }
 
+        #region Registro de participantes
 
         public NameValueCollection Summary(string userCode)
         {
@@ -50,6 +51,36 @@ namespace Gosocket.Dian.Application
             return collection;
         }
 
+        public RadianRegistrationValidation RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode)
+        {
+            Contributor contributor = _contributorService.GetByCode(userCode);
+            if (contributor == null)
+                return new RadianRegistrationValidation() { Message = "El usuario no existe en el sistema!!!", MessageType = "alert" };
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id &&
+                                                                                               t.RadianContributorTypeId == (int)radianContributorType);
+
+            if (radianContributor != null && radianContributor.RadianState != RadianState.Cancelado.GetDescription())
+                return new RadianRegistrationValidation() { Message = "El participante ya se encuentra registrado en RADIAN", MessageType = "alert" };
+            if (!contributor.Softwares.Any(t => t.Status))
+                return new RadianRegistrationValidation() { Message = "El participante no cuenta con un software propio activo en el sistema", MessageType = "alert" };
+
+            switch (radianContributorType)
+            {
+                case Domain.Common.RadianContributorType.ElectronicInvoice:
+                    return new RadianRegistrationValidation() { Message = "¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico ? ", MessageType = "confirm" };
+                case Domain.Common.RadianContributorType.TechnologyProvider:
+                    if (contributor.ContributorTypeId != (int)Domain.Common.RadianContributorType.TechnologyProvider && contributor.Status)
+                        return new RadianRegistrationValidation() { Message = "El participante no es un proveedor tecnológico habilitado", MessageType = "alert" };
+                    return new RadianRegistrationValidation() { Message = "¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?", MessageType = "confirm" };
+                case Domain.Common.RadianContributorType.TradingSystem: 
+                    return new RadianRegistrationValidation() { Message = "¿Está seguro que desea operar como Sistema de Negociación?", MessageType = "confirm" };
+                case Domain.Common.RadianContributorType.Factor:
+                    return new RadianRegistrationValidation() { Message = "¿Está seguro que desea operar como Factor?", MessageType = "confirm" };
+            }
+            return new RadianRegistrationValidation() { Message = "Se logro realizar la validación del usuario a Registrar!!!", MessageType = "alert" };
+        }
+
+        #endregion
 
         public RadianAdmin ListParticipants(int page, int size)
         {
@@ -196,5 +227,7 @@ namespace Gosocket.Dian.Application
         {
             return _radianOperationModeRepository.List(t => true);
         }
+
+
     }
 }

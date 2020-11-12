@@ -1,9 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Gosocket.Dian.Web.Models.RadianApproved
 {
     public class RadianApprovedViewModel
     {
+        public RadianApprovedViewModel()
+        {
+            RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
+        }
         public int Step { get; set; }
 
         public int CurrentlyStep { get; set; }
@@ -22,8 +27,12 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         [Display(Name = "Correo electrónico")]
         public int Email { get; set; }
 
+        [Display(Name = "Certificación ISO 27001")]
         public string IsoCertificate { get; set; }
 
+        [Display(Name = "Certificado Sarlaf")]
         public string SarlafCertificate { get; set; }
+
+        public List<RadianContributorFileTypeTableViewModel> RadianFileList { get; set; }
     }
 }

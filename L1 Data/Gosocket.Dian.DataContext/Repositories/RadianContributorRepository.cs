@@ -3,7 +3,6 @@ using Gosocket.Dian.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -20,6 +19,11 @@ namespace Gosocket.Dian.DataContext.Repositories
                 sqlDBContext = new SqlDBContext();
         }
 
+        public RadianContributor Get(Expression<Func<RadianContributor, bool>> expression)
+        {
+            IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode").Include("RadianContributorFile");
+            return query.FirstOrDefault();
+        }
 
         /// <summary>
         /// Consulta los contribuyentes de radian.

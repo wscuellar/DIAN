@@ -334,7 +334,7 @@
     <Compile Include="Controllers\RadianController.cs" />
     <Compile Include="Controllers\RadianEnablingInvoiceDirectController.cs" />
     <Compile Include="Controllers\RadianEnablingInvoiceIndirectController.cs" />
-    <Compile Include="Controllers\RadianAprovedController.cs" />
+    <Compile Include="Controllers\RadianApprovedController.cs" />
     <Compile Include="Controllers\RadianTechnologyProviderController.cs" />
     <Compile Include="Controllers\RadianTestSetController.cs" />
     <Compile Include="Controllers\RadianTradingSystemController.cs" />
@@ -389,6 +389,7 @@
     <Compile Include="Models\RadianTestSetTableViewModel.cs" />
     <Compile Include="Models\RadianTestSetTrackingViewModel.cs" />
     <Compile Include="Models\RadianTestSetViewModel.cs" />
+    <Compile Include="Models\RegistrationDataViewModel.cs" />
     <Compile Include="Models\RequestAuthorizationBigContributorViewModel.cs" />
     <Compile Include="Models\Role\RoleModel.cs" />
     <Compile Include="Models\Role\Roles.cs" />
@@ -529,6 +530,7 @@
     <Content Include="Content\images\LogoAnticipos.png" />
     <Content Include="Content\images\payment-design.jpg" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\StepOneOk.svg" />
     <Content Include="Content\images\Svg\Factor.svg" />
     <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
     <Content Include="Content\images\Svg\OperacionDirecta.svg" />
@@ -2703,14 +2705,12 @@
     <Content Include="Views\Radian\AdminRadianView.cshtml" />
     <Content Include="Views\Radian\_Items.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceDirect\Index.cshtml" />
-    <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
     <Content Include="Views\RadianTradingSystem\Index.cshtml" />
     <Content Include="Views\RadianTechnologyProvider\Index.cshtml" />
     <Content Include="Views\RadianTestSet\Add.cshtml" />
     <Content Include="Views\RadianTestSet\_form.cshtml" />
     <Content Include="Views\RadianTestSet\_default.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceDirect\Index.cshtml" />
-    <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
     <Content Include="Views\RadianTradingSystem\Index.cshtml" />
     <Content Include="Views\RadianTechnologyProvider\Index.cshtml" />
     <Content Include="Views\Radian\_default.cshtml" />
@@ -2732,6 +2732,9 @@
     <Content Include="Views\RadianContributorFileType\_Edit.cshtml" />
     <Content Include="Views\RadianContributorFileType\_Items.cshtml" />
     <Content Include="Views\RadianApproved\Index.cshtml" />
+    <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
+    <Content Include="Views\RadianApproved\_personalInfo.cshtml" />
+    <Content Include="Views\RadianApproved\_certificates.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
