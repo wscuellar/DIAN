@@ -425,6 +425,10 @@ namespace Gosocket.Dian.Infrastructure
                     QueryComparisons.Equal,
                     documentTypeId));
 
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
+              QueryComparisons.NotEqual,
+              null));
+
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
             return entities.ToList();
