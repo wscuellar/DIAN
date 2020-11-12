@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
-    public class IRadianAprovedService
+    public interface IRadianAprovedService
     {
     }
 }
