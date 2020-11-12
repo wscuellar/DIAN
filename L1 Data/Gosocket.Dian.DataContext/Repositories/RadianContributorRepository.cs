@@ -20,6 +20,11 @@ namespace Gosocket.Dian.DataContext.Repositories
                 sqlDBContext = new SqlDBContext();
         }
 
+        public RadianContributor Get(Expression<Func<RadianContributor, bool>> expression)
+        {
+            IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode").Include("RadianContributorFile");
+            return query.FirstOrDefault();
+        }
 
         /// <summary>
         /// Consulta los contribuyentes de radian.

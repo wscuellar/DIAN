@@ -199,6 +199,7 @@
     <Compile Include="RadianContributorService.cs" />
     <Compile Include="RadianTestSetAppliedService.cs" />
     <Compile Include="RadianTestSetService.cs" />
+    <Compile Include="RadianValidationService.cs" />
     <Compile Include="SoftwareService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Managers\DocumentTypeManager.cs" />

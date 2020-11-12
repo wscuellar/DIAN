@@ -1,27 +1,29 @@
 ﻿using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
+using Gosocket.Dian.Web.Models;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
 {
-    public class RadianAprovedController : Controller
+    public class RadianApprovedController : Controller
     {
 
         private readonly IRadianContributorService _radianContributorService;
 
-        public RadianAprovedController(IRadianContributorService radianContributorService)
+        public RadianApprovedController(IRadianContributorService radianContributorService)
         {
             _radianContributorService = radianContributorService;
         }
 
+        [HttpPost]
         // GET: RadianFactor
-        public ActionResult Index(int contributorId)
+        public ActionResult Index(RegistrationDataViewModel registrationData)
         {
-            _radianContributorService.CreateContributor(contributorId,
+            _radianContributorService.CreateContributor(registrationData.ContributorId,
                                                         RadianState.Registrado,
-                                                        Domain.Common.RadianContributorType.Factor,
-                                                        Domain.Common.RadianOperationMode.Direct,
+                                                        registrationData.RadianContributorType,
+                                                        registrationData.RadianOperationMode,
                                                         User.UserName());
 
             return View();
