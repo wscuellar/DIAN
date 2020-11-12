@@ -532,9 +532,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     return responses;
                 case 38: //Endoso en Garantia                    
-                    if (!string.IsNullOrEmpty(party.SenderParty.Trim())) // No informa SenderParty es un endoso en blanco entonces no valida emisor documento
+                    if (party.ListId != "2") // No informa SenderParty es un endoso en blanco entonces no valida emisor documento
                     {
-
                         if (party.SenderParty != senderCode)
                         {
                             responses.Add(new ValidateListResponse
@@ -2014,58 +2013,51 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId);
-
+            int count = 0;
             //Validación de la Sección prerrequisitos Solicitud Disponibilizacion Task 719
             foreach (var documentIdentifier in documentMeta)
             {
                 document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier);
                 if (document != null)
                 {
-                    if (documentMeta.Where(t => t.EventCode == "030" || t.EventCode == "032" || t.EventCode == "033" && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
+                    foreach (var eventCode in documentMeta)
                     {
-                        responses.Add(new ValidateListResponse
+                        switch (eventCode.EventCode)
                         {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "Factura no cuenta con características para considerarse título valor",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    else if (documentMeta.Where(t => t.EventCode == "030" || t.EventCode == "032" || t.EventCode == "034" && t.Identifier == document.PartitionKey).ToList().Count == decimal.Zero)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "202",
-                            ErrorMessage = "Factura no cuenta con características para considerarse título valor",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    else
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = true,
-                            Mandatory = true,
-                            ErrorCode = "100",
-                            ErrorMessage = "Evento referenciado correctamente",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                            case "030":
+                            case "032":
+                            case "033":
+                            case "034":
+                                if (eventCode.Identifier == document.PartitionKey)
+                                {
+                                    count++;
+                                }
+                                break;
+                        }
                     }
                 }
-                else
+            }
+            if (count == 3)
+            {
+                responses.Add(new ValidateListResponse
                 {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = "Evento referenciado correctamente",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
+                    IsValid = true,
+                    Mandatory = true,
+                    ErrorCode = "100",
+                    ErrorMessage = "Evento referenciado correctamente",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            else
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "89",
+                    ErrorMessage = "Factura no cuenta con características para considerarse título valor",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
             return responses;
         }
