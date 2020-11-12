@@ -724,7 +724,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var trackIdCude = documentParsed.Cude;
             var receiverCode = documentParsed.ReceiverCode;
             var signingTime = xmlParser.SigningTime;
-            var customizationID = xmlParser.CustomizationID;
+            var customizationID = documentParsed.CustomizationId;
+            var listId = documentParsed.listID;
 
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -783,7 +784,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var approveCufe = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_ValidateParty) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             //Validate Sendercode and ReceiverCode
-            var sender_receiver_response = ValidateParty(trackId, trackIdCude, senderCode, receiverCode, eventCode, customizationID);
+            var sender_receiver_response = ValidateParty(trackId, trackIdCude, senderCode, receiverCode, eventCode, customizationID, listId);
             if (!sender_receiver_response.IsValid)
             {
                 dianResponse = sender_receiver_response;
@@ -884,7 +885,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
                 }
-                UpdateInTransactions(trackId, eventCode);
+                UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                 return dianResponse;
             }
             var upload = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Upload5) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -943,7 +944,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Validate };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
                 }
-                UpdateInTransactions(trackId, eventCode);
+                UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                 return dianResponse;
             }
             else
@@ -982,6 +983,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.IsValid = false;
                     dianResponse.StatusMessage = Properties.Settings.Default.Msg_Error_FieldMandatori;
                     dianResponse.ErrorMessage.AddRange(failedList);
+                    UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                 }
 
                 if (notifications.Any())
@@ -1026,8 +1028,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.IsValid = false;
                         dianResponse.XmlFileName = contentFileList.First().XmlFileName;
                         dianResponse.StatusCode = processEventResponse.Code;
-                        dianResponse.StatusDescription = processEventResponse.Message;
-                        UpdateInTransactions(trackId, eventCode);
+                        dianResponse.StatusDescription = processEventResponse.Message;                      
+                        UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                         return dianResponse;
                     }
                 }
@@ -1470,12 +1472,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidateParty(string trackId, string cudeId, string senderCode, string receiverCode, string eventCode, string customizationID)
+        private DianResponse ValidateParty(string trackId, string cudeId, string senderCode, string receiverCode, string eventCode, string customizationID, string listID)
         {
             var SenderParty = senderCode;
             var ReceiverParty = receiverCode;
             var ResponseCode = eventCode;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, cudeId, SenderParty, ReceiverParty, ResponseCode, customizationID });
+            var ListID = listID;
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateParty", new { trackId, cudeId, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

@@ -1,13 +1,14 @@
 ﻿using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
+using Gosocket.Dian.Interfaces.Managers;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 
 namespace Gosocket.Dian.Application.Managers
 {
-    public class RadianTestSetResultManager
+    public class RadianTestSetResultManager : IRadianTestSetResultManager
     {
         private static readonly TableManager testSetManager = new TableManager("RadianTestSetResult");
 
@@ -43,7 +44,7 @@ namespace Gosocket.Dian.Application.Managers
 
         public IEnumerable<RadianTestSetResult> GetAllTestSetResultByContributor(int contributorId)
         {
-           return testSetManager.FindByContributorIdWithPagination<RadianTestSetResult>(contributorId);
+            return testSetManager.FindByContributorIdWithPagination<RadianTestSetResult>(contributorId);
         }
     }
 }
