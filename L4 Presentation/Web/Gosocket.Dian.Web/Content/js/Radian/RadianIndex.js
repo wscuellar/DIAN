@@ -49,7 +49,6 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage) {
 
 function showConfirmation(confirmMessage, buttons) {
     bootbox.dialog({
-        title: "Advertencia",
         message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
         buttons: buttons
     });
@@ -59,7 +58,7 @@ function ConfirmExec(operation, param) {
     return {
         del: {
             label: "Aceptar",
-            className: "btn-radian-default",
+            className: "btn-radian-default btn-radian-success",
             callback: function () {
                 operation(param);
             }

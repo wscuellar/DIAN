@@ -28,44 +28,29 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
+        #region Registro de participantes
+        
         // GET: Radian
         public ActionResult Index()
         {
             NameValueCollection result = _radianContributorService.Summary(User.UserCode());
             ViewBag.ContributorId = result["ContributorId"];
-            ViewBag.ContributorTypeId = result["ContributorTypeId"];
-            ViewBag.Active = result["Active"];
-            ViewBag.WithSoft = result["WithSoft"];
-            ViewBag.ExistInRadian = result["ExistInRadian"];
             return View();
         }
 
         public ActionResult ElectronicInvoiceView()
         {
-            NameValueCollection result = _radianContributorService.Summary(User.UserCode());
-            ViewBag.ContributorId = result["ContributorId"];
-            ViewBag.ContributorTypeId = result["ContributorTypeId"];
-            ViewBag.Active = result["Active"];
-            ViewBag.WithSoft = result["WithSoft"];
-            ViewBag.ExistInRadian = result["ExistInRadian"];
-            return View();
+            return Index();
         }
 
         [HttpPost]
         public JsonResult RegistrationValidation(RegistrationDataViewModel registrationData)
         {
-            RadianRegistrationValidation validation = _radianContributorService.RegistratioValidation(registrationData.ContributorId, User.UserCode(), (int)registrationData.RadianContributorType, (int)registrationData.RadianOperationMode);
-            if (validation == null)
-                validation = new RadianRegistrationValidation()
-                {
-                    Message = "Se logro realizar la validación del usuario a Registrar!!!",
-                    MessageType = "alert",
-                    UrlRedirect = string.Empty
-                };
-
+            RadianRegistrationValidation validation = _radianContributorService.RegistrationValidation(User.UserCode(), registrationData.RadianContributorType, registrationData.RadianOperationMode);
             return Json(validation, JsonRequestBehavior.AllowGet);
-        }
+        } 
 
+        #endregion
 
 
         public ActionResult AdminRadianView()
