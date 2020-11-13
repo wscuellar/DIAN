@@ -443,3 +443,42 @@ h4.text-thin {
 .RadianImgContainer{
     text-align: center;
 }
+
+#steps-approved .steps li {
+    width: 86.01px;
+    height: 86.15px;
+    left: 467px;
+    top: 278px;
+    background: linear-gradient(136.21deg, #F2F6FB 8.03%, #FFFFFF 85.07%);
+    opacity: 0.65;
+    box-shadow: -4px -4px 10px #FFFFFF, 4px 4px 10px rgba(0, 0, 0, 0.25);
+    border-radius: 50%;
+    border: solid #b7d3bc;
+}
+
+#steps-approved .steps a {
+    background: none;
+    top: 11px;
+    position: relative;
+}
+
+#steps-approved .steps span.number {
+    display: none;
+}
+
+#steps-approved .steps img {
+    width: 100%;
+}
+
+#steps-approved .steps li.current {
+    background: linear-gradient(142.43deg, #348441 26.48%, #255F2E 78.19%);
+    border: #b7d3bc;
+}
+
+#steps-approved .steps li.current a {
+    background: url(../../images/pendiente-3.png);
+    height: inherit;
+    background-repeat: no-repeat;
+    background-size: 73px;
+    background-position: center;
+}

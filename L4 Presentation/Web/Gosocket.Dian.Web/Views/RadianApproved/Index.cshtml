@@ -2,7 +2,7 @@
 @{
     ViewBag.title = "Titulo";
 }
-<div class="page-content">
+<div class="page-content radian-view margin-15">
     <div class="row title-container">
         <p class="title-view">
             @ViewBag.title
@@ -10,21 +10,27 @@
         <div class="underline-title"></div>
     </div>
     <div class="row margin-horizontal-0">
-        @Html.Partial("_personalInfo")
-    </div>
-    <div class="row margin-horizontal-0">
         <div class="panel">
             <div class="panel-body padding-top-20">
-                <div id="example-basic">
-                    <h3>Keyboard</h3>
+                <div id="steps-approved">
+                     @Html.Partial("_personalInfo")
+                    <h3></h3>
                     <section>
                         @Html.Partial("_certificates")
                     </section>
-                    <h3>Effects</h3>
+                    <h3></h3>
                     <section>
                         @Html.Partial("_documentStates");
                     </section>
-                    <h3>Pager</h3>
+                    <h3></h3>
+                    <section>
+                        <p>The next and previous buttons help you to navigate through your content.</p>
+                    </section>
+                    <h3></h3>
+                    <section>
+                        <p>The next and previous buttons help you to navigate through your content.</p>
+                    </section>
+                    <h3></h3>
                     <section>
                         <p>The next and previous buttons help you to navigate through your content.</p>
                     </section>
@@ -37,7 +43,7 @@
     @section scripts{
         <script>
             $(document).ready(function () {
-                $("#example-basic").steps({
+                $("#steps-approved").steps({
                     headerTag: "h3",
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
