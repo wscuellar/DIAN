@@ -741,9 +741,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 return dianResponse;
             }
 
-            //validation if is an endoso of endorsement (Code 038)
+            //validation if is an endoso of endorsement (Code 037-038-039)
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (eventCode == "038")
+            if (eventCode == "037" || eventCode == "038" || eventCode == "039")
             {
                 if (!validatorDocumentMeta.InTransaction)
                 {
@@ -1590,7 +1590,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var arrayTasks = new List<Task>();
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (eventCode == "038")
+            if (eventCode == "037" || eventCode == "038" || eventCode == "039")
             {
                 validatorDocumentMeta.InTransaction = false;
                 arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
