@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain.Common;
+﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
@@ -13,11 +14,13 @@ namespace Gosocket.Dian.Web.Controllers
     {
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianTestSetService _radianTestSetService;
+        private readonly IRadianApprovedService _radianAprovedService;
 
-        public RadianApprovedController(IRadianContributorService radianContributorService, IRadianTestSetService radianTestSetService)
+        public RadianApprovedController(IRadianContributorService radianContributorService, IRadianTestSetService radianTestSetService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianApprovedService radianAprovedService)
         {
             _radianContributorService = radianContributorService;
             _radianTestSetService = radianTestSetService;
+            _radianAprovedService = radianAprovedService;
         }
 
         [HttpGet]
@@ -40,7 +43,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             // Lista de Software Modo de Operacion 
             // CA 2.3
-            LoadSoftwareModeOperation();
+           // LoadSoftwareModeOperation();
 
             // CA 2.4 
             // Software de un Proveedor Electronico
@@ -54,6 +57,15 @@ namespace Gosocket.Dian.Web.Controllers
                 Email = radianAdmin.Contributor.Email,
                 Files = radianAdmin.Files
             });
+        }
+
+        public List<Software> Software(int radianContributorId)
+        {
+            var softwares = _radianAprovedService.ListSoftwareByContributor(radianContributorId);
+
+            return null;
+
+            //foreach(var software in softwares)
         }
 
         private void LoadSoftwareModeOperation()

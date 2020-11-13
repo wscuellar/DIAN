@@ -4,14 +4,14 @@ using System.Collections.Generic;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
-    public interface IRadianAprovedService
+    public interface IRadianApprovedService
     {
         List<Domain.RadianOperationMode> ListSoftwareModeOperation();
 
-        List<Contributor> ListContributorByType(int RadianContributorTypeId);
+        List<RadianContributor> ListContributorByType(int radianContributorTypeId);
 
-        List<Software> ListSoftwareByContributor(int RadianContributorId);
+        List<Software> ListSoftwareByContributor(int radianContributorId);
 
-       Tuple<string,string> FindNamesContributorAndSoftware(int contributorId, int softwareId);
+       Tuple<string,string> FindNamesContributorAndSoftware(int radianContributorId, string softwareId);
     }
 }

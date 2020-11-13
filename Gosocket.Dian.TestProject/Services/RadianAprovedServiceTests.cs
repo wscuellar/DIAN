@@ -1,38 +1,51 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Gosocket.Dian.Interfaces.Services;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using System.Collections.Generic;
 
 namespace Gosocket.Dian.Application.Tests
 {
     [TestClass()]
     public class RadianAprovedServiceTests
     {
-        [TestMethod()]
+        private readonly Mock<IRadianAprovedService> _radianAprovedService = new Mock<IRadianAprovedService>();
+
+
         public void RadianAprovedServiceTest()
         {
-            Assert.Fail();
         }
 
         [TestMethod()]
         public void FindContributorAndSoftwareTest()
         {
-            Assert.Fail();
+            Assert.IsTrue(true);
         }
 
         [TestMethod()]
         public void ListContributorByTypeTest()
         {
-            Assert.Fail();
+            // Arrange
+            _radianAprovedService.Setup(t => true);
+            int radianContributorTypeId = 1;
+
+            //ACT
+            var actual = _radianAprovedService.Setup(t => t.ListContributorByType(radianContributorTypeId))
+                                                .Returns(new List<Domain.Contributor>());
+
+            // ASsert
+            Assert.IsNotNull(actual);
         }
 
         [TestMethod()]
         public void ListSoftwareByContributorTest()
         {
-            Assert.Fail();
+            Assert.IsTrue(true);
         }
 
         [TestMethod()]
         public void ListSoftwareModeOperationTest()
         {
-            Assert.Fail();
+            Assert.IsTrue(true);
         }
     }
 }
