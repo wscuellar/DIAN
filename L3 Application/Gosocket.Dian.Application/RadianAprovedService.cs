@@ -20,7 +20,9 @@ namespace Gosocket.Dian.Application
         // Manquip
         public Tuple<string, string> FindNamesContributorAndSoftware(int radianContributorId, string softwareId)
         {
-            RadianContributor radianContributor = _radianContributorRepository.Get(rc => rc.ContributorId == radianContributorId);
+            RadianContributor radianContributor = _radianContributorRepository
+                .Get(rc => rc.ContributorId == radianContributorId);
+
             string radianContributorName = radianContributor.Contributor.Name;
             string softwareName = radianContributor
                 .Contributor
@@ -40,7 +42,10 @@ namespace Gosocket.Dian.Application
         // Manquip
         public List<Software> ListSoftwareByContributor(int radianContributorId)
         {
-            return _radianContributorRepository.Get(rc => rc.ContributorId == radianContributorId).Contributor.Softwares.ToList();
+            return _radianContributorRepository
+                .Get(rc => rc.ContributorId == radianContributorId)
+                .Contributor
+                .Softwares.ToList();
         }
 
         public List<RadianOperationMode> ListSoftwareModeOperation()
