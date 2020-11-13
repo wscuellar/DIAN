@@ -375,6 +375,7 @@
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\ContributorCategoryViewModel.cs" />
+    <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedViewModel.cs" />
     <Compile Include="Models\RadianContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorFileTypeViewModel.cs" />
@@ -614,6 +615,7 @@
     <Content Include="Content\img\video_advance.png" />
     <Content Include="Content\img\visa.png" />
     <Content Include="Content\img\walmart.png" />
+    <Content Include="Content\jquery.steps.css" />
     <Content Include="Content\js\bootstrap-datepicker.es.min.js" />
     <Content Include="Content\js\bootstrap-filestyle.js" />
     <Content Include="Content\js\bootstrap-filestyle.min.js" />
@@ -2536,6 +2538,8 @@
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.steps.js" />
+    <Content Include="Scripts\jquery.steps.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -2736,6 +2740,7 @@
     <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
     <Content Include="Views\RadianApproved\_personalInfo.cshtml" />
     <Content Include="Views\RadianApproved\_certificates.cshtml" />
+    <Content Include="Views\RadianApproved\_documentStates.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

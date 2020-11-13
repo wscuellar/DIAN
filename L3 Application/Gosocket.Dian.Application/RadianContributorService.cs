@@ -226,7 +226,5 @@ namespace Gosocket.Dian.Application
         {
             return _radianOperationModeRepository.List(t => true);
         }
-
-
     }
 }

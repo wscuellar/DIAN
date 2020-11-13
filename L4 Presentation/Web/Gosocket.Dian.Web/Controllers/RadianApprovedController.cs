@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain.Common;
+﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
@@ -12,17 +13,19 @@ namespace Gosocket.Dian.Web.Controllers
 
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianTestSetService _radianTestSetService;
+        private readonly IRadianAprovedService _radianAprovedService;
 
-        public RadianApprovedController(IRadianContributorService radianContributorService, IRadianTestSetService radianTestSetService, IRadianContributorFileTypeService radianContributorFileTypeService)
+        public RadianApprovedController(IRadianContributorService radianContributorService, IRadianTestSetService radianTestSetService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianAprovedService radianAprovedService)
         {
             _radianContributorService = radianContributorService;
             _radianTestSetService = radianTestSetService;
+            _radianAprovedService = radianAprovedService;
         }
 
         [HttpGet]
         public ActionResult Index()
         {
-            LoadSoftwareModeOperation();
+           // LoadSoftwareModeOperation();
             return View();
         }
 
@@ -47,6 +50,15 @@ namespace Gosocket.Dian.Web.Controllers
 
 
             return View();
+        }
+
+        public List<Software> Software(int radianContributorId)
+        {
+            var softwares = _radianAprovedService.ListSoftwareByContributor(radianContributorId);
+
+            return null;
+
+            //foreach(var software in softwares)
         }
 
         private void LoadSoftwareModeOperation()
