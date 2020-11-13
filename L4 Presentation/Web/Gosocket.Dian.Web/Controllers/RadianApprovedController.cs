@@ -25,7 +25,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            LoadSoftwareModeOperation();
+           // LoadSoftwareModeOperation();
             return View();
         }
 
