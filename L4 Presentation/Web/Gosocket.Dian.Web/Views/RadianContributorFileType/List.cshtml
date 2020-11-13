@@ -226,6 +226,7 @@
                     var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
                     if (injectingPartialView == "true") {
                         $('#modifyWrapper').html(data);
+                        $.validator.unobtrusive.parse($("#edit-radianContributorFileType-form"));
                         $('#modifyModal').modal('show');
                     }
                     else
