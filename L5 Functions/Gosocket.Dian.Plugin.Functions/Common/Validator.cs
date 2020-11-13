@@ -1624,7 +1624,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool validFor = false;
             string eventCode = eventPrev.EventCode;
             DateTime startDate = DateTime.UtcNow;
-            int count = 0;
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
@@ -1904,20 +1903,92 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 //Solicitud de Disponibilización
                                 else if (documentMeta
-                                    .Where(t => t.EventCode == "030" || t.EventCode == "032"  || t.EventCode == "033"  ||
-                                    t.EventCode == "034" && t.Identifier == document.PartitionKey).ToList()
+                                    .Where(t => t.EventCode == "036" && t.Identifier == document.PartitionKey).ToList()
                                     .Count > decimal.Zero)
                                 {
-                                    count++;
+                                    var response = ValidateEndoso(xmlParserCufe, xmlParserCude, eventCode);
+                                    if (response != null)
+                                    {
+                                        validFor = true;
+                                        responses.Add(response);
+                                    }
+                                    else
+                                    {
+                                        //Endoso Garantia
+                                        if (eventPrev.EventCode == "038")
+                                        {
+                                            if (documentMeta
+                                               .Where(t => t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                               .Count > decimal.Zero)
+                                            {
+                                                validFor = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = "89",
+                                                    ErrorMessage = "No se pueda transmitir el evento 038-Endoso en Garantía ya existen asociados los eventos 039 Endoso en Procuración o 041 Limitación de circulación.",
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                            }
+                                        }
+                                        //Endoso de Procuracion 
+                                        else if (eventPrev.EventCode == "039")
+                                        {
+                                            if (documentMeta
+                                                  .Where(t => t.EventCode == "038" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                                  .Count > decimal.Zero)
+                                            {
+                                                validFor = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = "89",
+                                                    ErrorMessage = "No se pueda transmitir el evento 039-Endoso en Procuración ya existen asociados los eventos 038 Endoso en Procuración o 041 Limitación de circulación.",
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                            }
+                                        }
+                                        //Endoso propiedad
+                                        else if (eventPrev.EventCode == "037")
+                                        {
+                                            if (documentMeta
+                                                 .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.EventCode == "037" && t.Identifier == document.PartitionKey).ToList()
+                                                 .Count > decimal.Zero)
+                                            {
+                                                validFor = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = "89",
+                                                    ErrorMessage = "No se pueda transmitir el evento 037-Endoso en Propiedad ya existen asociados los eventos 038 Endoso en Garantia, 039 Endoso en Procuracion, 041 Limitación de circulación.",
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                            }
+                                        }
+                                        else
+                                        {
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = true,
+                                                Mandatory = true,
+                                                ErrorCode = "100",
+                                                ErrorMessage = "Evento referenciado correctamente",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                    }
                                 }
                                 else
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
-                                        IsValid = true,
+                                        IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "100",
-                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ErrorCode = "89",
+                                        ErrorMessage = "Error no es posible transmitir el evento Endoso",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -1938,6 +2009,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+                                //Anulacion de Endoso solo aplica para Endoso en Garantia o Endoso en Procuracion
                                 else if (documentMeta
                                 .Where(t => t.EventCode == "038" || t.EventCode == "039 " && t.Identifier == document.PartitionKey).ToList()
                                 .Count > decimal.Zero)
@@ -1965,6 +2037,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 break;
                         }
                     }
+                    if (validFor)
+                    {
+                        return responses;
+                    }
                 }
                 else
                 {
@@ -1979,77 +2055,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
             }
-
-            if (count == 3)
-            {
-                var response = ValidateEndoso(xmlParserCufe, xmlParserCude, eventCode);
-                if (response != null)
-                {
-                    responses.Add(response);
-                }
-                //Endoso Garantia
-                if (eventPrev.EventCode == "038")
-                {
-                    if (documentMeta
-                       .Where(t => t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
-                       .Count > decimal.Zero)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "No se pueda transmitir el evento 038-Endoso en Garantía ya existen asociados los eventos 039 Endoso en Procuración o 041 Limitación de circulación.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                }
-                //Endoso de Procuracion 
-                else if (eventPrev.EventCode == "039")
-                {
-                    if (documentMeta
-                          .Where(t => t.EventCode == "038" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
-                          .Count > decimal.Zero)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "No se pueda transmitir el evento 039-Endoso en Procuración ya existen asociados los eventos 038 Endoso en Procuración o 041 Limitación de circulación.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                }
-                //Endoso propiedad
-                else if (eventPrev.EventCode == "037")
-                {
-                    if (documentMeta
-                         .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.EventCode == "037" && t.Identifier == document.PartitionKey).ToList()
-                         .Count > decimal.Zero)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "No se pueda transmitir el evento 037-Endoso en Propiedad ya existen asociados los eventos 038 Endoso en Garantia, 039 Endoso en Procuracion, 041 Limitación de circulación.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                }
-            }else
-            {
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "89",
-                    ErrorMessage = "No se pueda transmitir el evento, no existe una Solicitud de Disponibilización.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
-
+          
             return responses;
         }
         #endregion
