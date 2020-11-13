@@ -28,14 +28,10 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         [Display(Name = "Correo electrónico")]
         public int Email { get; set; }
 
-        [Display(Name = "Certificación ISO 27001")]
-        public string IsoCertificate { get; set; }
-
-        [Display(Name = "Certificado Sarlaf")]
-        public string SarlafCertificate { get; set; }
-
         public List<RadianContributorFileTypeTableViewModel> RadianFileList { get; set; }
+
         public List<RadianContributorFile> Files { get; set; }
+
         public List<RadianCustomerViewModel> Customers { get; set; }
 
     }

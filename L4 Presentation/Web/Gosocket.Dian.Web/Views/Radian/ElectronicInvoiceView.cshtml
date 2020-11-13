@@ -59,15 +59,13 @@
         var contributorId = '@ViewBag.ContributorId';
 
         $('.RadianCardContainer').click(function () {
-            window.location.href = '@Url.Action("Index", "RadianApproved")';
-            @*var RegistrationDataViewModel = {
+            var RegistrationDataViewModel = {
                 ContributorId: '@ViewBag.ContributorId',
                 RadianContributorType: $(this).attr('contributorType'),
                 RadianOperationMode: $(this).attr('operationMode'),
             };
-            CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")');*@
 
-            @*CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
+            CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
                 function (param) {
                     CallExecution("POST", '@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel,
                         function (param) {
@@ -75,7 +73,7 @@
                         },false
                     );
                 },true
-            );*@
+            );
 
         });
 
