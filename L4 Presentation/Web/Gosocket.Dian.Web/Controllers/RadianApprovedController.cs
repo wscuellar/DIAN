@@ -13,9 +13,9 @@ namespace Gosocket.Dian.Web.Controllers
 
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianTestSetService _radianTestSetService;
-        private readonly IRadianAprovedService _radianAprovedService;
+        private readonly IRadianApprovedService _radianAprovedService;
 
-        public RadianApprovedController(IRadianContributorService radianContributorService, IRadianTestSetService radianTestSetService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianAprovedService radianAprovedService)
+        public RadianApprovedController(IRadianContributorService radianContributorService, IRadianTestSetService radianTestSetService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianApprovedService radianAprovedService)
         {
             _radianContributorService = radianContributorService;
             _radianTestSetService = radianTestSetService;
