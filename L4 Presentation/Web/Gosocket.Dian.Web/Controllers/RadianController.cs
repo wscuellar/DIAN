@@ -28,27 +28,19 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
+        #region Registro de participantes
+        
         // GET: Radian
         public ActionResult Index()
         {
             NameValueCollection result = _radianContributorService.Summary(User.UserCode());
             ViewBag.ContributorId = result["ContributorId"];
-            ViewBag.ContributorTypeId = result["ContributorTypeId"];
-            ViewBag.Active = result["Active"];
-            ViewBag.WithSoft = result["WithSoft"];
-            ViewBag.ExistInRadian = result["ExistInRadian"];
             return View();
         }
 
         public ActionResult ElectronicInvoiceView()
         {
-            NameValueCollection result = _radianContributorService.Summary(User.UserCode());
-            ViewBag.ContributorId = result["ContributorId"];
-            ViewBag.ContributorTypeId = result["ContributorTypeId"];
-            ViewBag.Active = result["Active"];
-            ViewBag.WithSoft = result["WithSoft"];
-            ViewBag.ExistInRadian = result["ExistInRadian"];
-            return View();
+            return Index();
         }
 
         [HttpPost]
@@ -56,8 +48,9 @@ namespace Gosocket.Dian.Web.Controllers
         {
             RadianRegistrationValidation validation = _radianContributorService.RegistrationValidation(User.UserCode(), registrationData.RadianContributorType, registrationData.RadianOperationMode);
             return Json(validation, JsonRequestBehavior.AllowGet);
-        }
+        } 
 
+        #endregion
 
 
         public ActionResult AdminRadianView()

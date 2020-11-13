@@ -327,6 +327,7 @@
     <Compile Include="Controllers\BigContributorController.cs" />
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\ExternalUsersController.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
     <Compile Include="Controllers\ContributorFileTypeController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
@@ -530,6 +531,7 @@
     <Content Include="Content\images\LogoAnticipos.png" />
     <Content Include="Content\images\payment-design.jpg" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\StepOneOk.svg" />
     <Content Include="Content\images\Svg\Factor.svg" />
     <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
     <Content Include="Content\images\Svg\OperacionDirecta.svg" />
@@ -2732,6 +2734,8 @@
     <Content Include="Views\RadianContributorFileType\_Items.cshtml" />
     <Content Include="Views\RadianApproved\Index.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
+    <Content Include="Views\RadianApproved\_personalInfo.cshtml" />
+    <Content Include="Views\RadianApproved\_certificates.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

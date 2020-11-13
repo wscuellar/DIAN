@@ -95,7 +95,7 @@ namespace Gosocket.Dian.Web.Common
 
         public static string UserName(this IPrincipal principal)
         {
-            return principal.Identity.Name;
+            return principal ==  null ? string.Empty : principal.Identity.Name;
         }
 
         public static string UserCode(this IPrincipal principal)
