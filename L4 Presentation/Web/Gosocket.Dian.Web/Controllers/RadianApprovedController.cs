@@ -16,7 +16,10 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianTestSetService _radianTestSetService;
         private readonly IRadianApprovedService _radianAprovedService;
 
-        public RadianApprovedController(IRadianContributorService radianContributorService, IRadianTestSetService radianTestSetService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianApprovedService radianAprovedService)
+        public RadianApprovedController(IRadianContributorService radianContributorService,
+                                        IRadianTestSetService radianTestSetService,
+                                        IRadianContributorFileTypeService radianContributorFileTypeService,
+                                        IRadianApprovedService radianAprovedService)
         {
             _radianContributorService = radianContributorService;
             _radianTestSetService = radianTestSetService;
@@ -43,7 +46,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             // Lista de Software Modo de Operacion 
             // CA 2.3
-           // LoadSoftwareModeOperation();
+            // LoadSoftwareModeOperation();
 
             // CA 2.4 
             // Software de un Proveedor Electronico
