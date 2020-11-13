@@ -70,7 +70,6 @@ namespace Gosocket.Dian.Application
                 return new RadianRegistrationValidation(TextResources.TechnologyProvider_Confirm, TextResources.confirmType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.TradingSystem)
-
                 return new RadianRegistrationValidation(TextResources.TradingSystem_Confirm, TextResources.confirmType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.Factor)

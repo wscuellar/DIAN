@@ -81,18 +81,21 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult Add(RadianContributorFileTypeViewModel model)
         {
-            var fileType = new RadianContributorFileType
+            if (ModelState.IsValid)
             {
-                Mandatory = model.Mandatory,
-                Name = model.Name,
-                CreatedBy = User.Identity.Name,
-                Timestamp = DateTime.Now,
-                RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
-            };
+                var fileType = new RadianContributorFileType
+                {
+                    Mandatory = model.Mandatory,
+                    Name = model.Name,
+                    CreatedBy = User.Identity.Name,
+                    Timestamp = DateTime.Now,
+                    RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
+                };
 
-            _ = _radianContributorFileTypeService.Update(fileType);
+                _ = _radianContributorFileTypeService.Update(fileType);
 
-            ViewBag.CurrentPage = Navigation.NavigationEnum.ContributorFileType;
+                ViewBag.CurrentPage = Navigation.NavigationEnum.ContributorFileType;
+            }
             return RedirectToAction("List");
         }
 
@@ -129,19 +132,23 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult Edit(RadianContributorFileTypeViewModel model)
         {
-            var fileType = new RadianContributorFileType
+            if (ModelState.IsValid)
             {
-                Id = model.Id,
-                Mandatory = model.Mandatory,
-                Name = model.Name,
-                CreatedBy = User.Identity.Name,
-                Updated = DateTime.Now,
-                RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
-                RadianContributorType = model.RadianContributorType
-            };
-            _ = _radianContributorFileTypeService.Update(fileType);
-            ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
+                var fileType = new RadianContributorFileType
+                {
+                    Id = model.Id,
+                    Mandatory = model.Mandatory,
+                    Name = model.Name,
+                    CreatedBy = User.Identity.Name,
+                    Updated = DateTime.Now,
+                    RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
+                    RadianContributorType = model.RadianContributorType
+                };
+                _ = _radianContributorFileTypeService.Update(fileType);
+                ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
 
+                
+            }
             return RedirectToAction("List");
         }
 
