@@ -4,6 +4,6 @@
     {
         public string Message { get; set; }
         public string MessageType { get; set; }
-        public string UrlRedirect { get; set; }
+
     }
 }
