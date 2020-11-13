@@ -1,27 +1,32 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 
 namespace Gosocket.Dian.Application
 {
-    public class RadianAprovedService : IRadianAprovedService
+    public class RadianAprovedService : IRadianApprovedService
     {
+        private readonly IRadianContributorRepository _contributorRepository;
 
-        public RadianAprovedService()
+        public RadianAprovedService(IRadianContributorRepository contributorRepository)
         {
-                
+            _contributorRepository = contributorRepository;
         }
+
+
         // Manquip
         public Tuple<string, string> FindNamesContributorAndSoftware(int contributorId, int softwareId)
         {
             throw new NotImplementedException();
         }
 
-        public List<Contributor> ListContributorByType(int RadianContributorTypeId)
+        public List<RadianContributor> ListContributorByType(int radianContributorTypeId)
         {
-            throw new NotImplementedException();
+          return   _contributorRepository.List(t => t.RadianContributorTypeId == radianContributorTypeId);
         }
+
         // Manquip
         public List<Software> ListSoftwareByContributor(int RadianContributorId)
         {
