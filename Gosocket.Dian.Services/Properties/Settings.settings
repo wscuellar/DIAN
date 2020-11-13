@@ -111,8 +111,7 @@
       <Value Profile="(Default)">ValidateDocumentReferenceIdUrl</Value>
     </Setting>
     <Setting Name="Param_EventApproveCufe" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidateEventApproveCufeUrl
-</Value>
+      <Value Profile="(Default)">ValidateEventApproveCufeUrl</Value>
     </Setting>
   </Settings>
 </SettingsFile>
