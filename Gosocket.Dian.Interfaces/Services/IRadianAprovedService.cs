@@ -8,8 +8,7 @@ namespace Gosocket.Dian.Interfaces.Services
     {
         List<Domain.RadianOperationMode> ListSoftwareModeOperation();
 
-        List<Contributor> ListContributorByType(int radianContributorTypeId);
-        List<RadianContributor> ListContributorByType(int RadianContributorTypeId);
+        List<RadianContributor> ListContributorByType(int radianContributorTypeId);
 
         List<Software> ListSoftwareByContributor(int radianContributorId);
 

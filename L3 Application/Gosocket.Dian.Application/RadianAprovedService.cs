@@ -9,14 +9,7 @@ namespace Gosocket.Dian.Application
 {
     public class RadianAprovedService : IRadianApprovedService
     {
-        private readonly IRadianContributorRepository _contributorRepository;
-
-        public RadianAprovedService(IRadianContributorRepository contributorRepository)
-        {
-            _contributorRepository = contributorRepository;
-        }
-
-
+        private readonly IRadianContributorRepository _radianContributorRepository;
 
         public RadianAprovedService(IRadianContributorRepository radianContributorRepository)
         {
@@ -40,7 +33,7 @@ namespace Gosocket.Dian.Application
 
         public List<RadianContributor> ListContributorByType(int radianContributorTypeId)
         {
-          return   _contributorRepository.List(t => t.RadianContributorTypeId == radianContributorTypeId);
+            return _radianContributorRepository.List(t => t.RadianContributorTypeId == radianContributorTypeId);
         }
 
         // Manquip
