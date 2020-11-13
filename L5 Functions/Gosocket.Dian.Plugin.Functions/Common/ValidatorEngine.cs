@@ -419,6 +419,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return xmlBytes;
         }
+        public async Task<byte[]> GetXmlPayrollDocumentAsync(string file)
+        {
+            var fileManager = new FileManager();
+            var container = "global";
+            var fileName = $"schemes/schemes/new-nomina-1.0/01/{file}.xml";
+            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+
+            return xmlBytes;
+        }
         #endregion
     }
 }
