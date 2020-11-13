@@ -78,12 +78,10 @@ namespace Gosocket.Dian.Services.Utils.Common
                     XmlDocument.XmlResolver = null;
                     XmlDocument.Load(sr);
                     var node = XmlDocument.GetElementsByTagName("xades:SigningTime")[0];
-                    var nodeCustomizationID = XmlDocument.GetElementsByTagName("cbc:CustomizationID")[0];
                     var nodePaymentMeansValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='ID']";                    
                     var nodePaymentDueDateValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='PaymentDueDate']";
                     var listIDValueXpath = XmlDocument.GetElementsByTagName("cbc:ResponseCode")[0];
                     var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";
-                    //var valueDiscountRateEndoso = "//*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value[3]']";
                     var valueDiscountRateEndoso = XmlDocument.GetElementsByTagName("InformacionNegociacion")[0];
                     var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
 
@@ -93,12 +91,10 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var nodeTotalInvoice = XmlDocument.SelectSingleNode(valueTotalInvoice)?.InnerText;
 
                     SigningTime = node?.InnerText;
-                    CustomizationID = nodeCustomizationID?.InnerText;
                     PaymentMeansID = nodePaymentMeans;
                     DocumentReferenceId = documentReferenceId;
                     PaymentDueDate = nodePaymentDueDate;
                     DiscountRateEndoso = valueDiscountRateEndoso?.InnerText;
-                    ListID = listIDValueXpath?.OuterXml.Substring(26,4).Replace("\" n", "");
 
                     if(DiscountRateEndoso != null)
                     {

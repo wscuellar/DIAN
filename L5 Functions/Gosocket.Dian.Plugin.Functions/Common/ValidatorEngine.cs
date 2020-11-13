@@ -130,15 +130,25 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case "044":  //Terminacion del mandato
                     code = "043"; //Mandato
                     break;
+                case "039":  //Endoso en procuracion
+                    code = "036"; //disponibilización
+                    break;
                 case "036": //Solicitud de Dsiponibilizacion 
                     code = "033"; //Aceptacion Expresa
+                    break;
+                case "042": //Terminación Circulacion  
+                    code = "041"; //Limitación Circulacion
+                    break;
+                case "045"://Notificación Pago Total Parcial 
+                case "041"://Limitación Circulacion
+                    code = "036"; //disponibilización
                     break;
                 default:
                     code = "032"; //Constancia de recibo del bien
                     break;
             }
 
-            if (data.EventCode == "031" || data.EventCode == "032" || data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044" || data.EventCode == "036")
+            if (data.EventCode == "031" || data.EventCode == "032" || data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044" || data.EventCode == "036" || data.EventCode == "039" || data.EventCode == "042")
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
                 if (documentMeta != null)
@@ -177,7 +187,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return validateResponses;
                 }
             }
-            
+            else if(data.EventCode == "041" || data.EventCode == "045")
+            {
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code, data.CustomizationID).FirstOrDefault();
+                if (documentMeta != null)
+                {
+                    data.TrackId = documentMeta.PartitionKey;
+                }
+                else
+                {
+                    ValidateListResponse response = new ValidateListResponse();
+                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE/CUFE {data.TrackId}";
+                    response.IsValid = false;
+                    response.ErrorCode = "89";
+                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                    validateResponses.Add(response);
+                    return validateResponses;
+                }
+            }
             var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())

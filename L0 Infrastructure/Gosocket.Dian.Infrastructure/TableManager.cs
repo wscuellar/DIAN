@@ -470,6 +470,29 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+        public List<T> FindDocumentReferenced_EventCode_TypeId_CustomizationID<T>(string documentReferencedKey, string documentTypeId, string eventCode, string customizationId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                    QueryComparisons.Equal,
+                    documentReferencedKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
+                QueryComparisons.Equal,
+                eventCode));
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("CustomizationID",
+                QueryComparisons.Equal,
+                customizationId));
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
         public List<T> FindDocumentReferenceAttorney<T>(string partitionKey, string rowKey, string issueAtorney, string senderCode) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();

@@ -351,7 +351,7 @@ namespace Gosocket.Dian.Services.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ValidateEventApproveCufeUrl\r\n")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidateEventApproveCufeUrl")]
         public string Param_EventApproveCufe {
             get {
                 return ((string)(this["Param_EventApproveCufe"]));

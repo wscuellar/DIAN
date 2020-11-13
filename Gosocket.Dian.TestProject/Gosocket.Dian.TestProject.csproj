@@ -199,10 +199,6 @@
       <Project>{2f8875c4-bdb5-4bf7-a667-c78ccd254343}</Project>
       <Name>Gosocket.Dian.Services</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Gosocket.Dian.Web.Services\Gosocket.Dian.Web.Services.csproj">
-      <Project>{1996bc3c-8d29-453f-aaac-89bfc71b5a32}</Project>
-      <Name>Gosocket.Dian.Web.Services</Name>
-    </ProjectReference>
     <ProjectReference Include="..\L0 Infrastructure\Gosocket.Dian.Infrastructure\Gosocket.Dian.Infrastructure.csproj">
       <Project>{72e3852a-75d8-4007-93a5-8ee16bdfb5d7}</Project>
       <Name>Gosocket.Dian.Infrastructure</Name>
