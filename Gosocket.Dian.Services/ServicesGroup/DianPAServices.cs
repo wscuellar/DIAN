@@ -741,9 +741,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 return dianResponse;
             }
 
-            //validation if is an endoso of endorsement (Code 038)
+            //validation if is an endoso of endorsement (Code 037-038-039)
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (eventCode == "038")
+            if (eventCode == "037" || eventCode == "038" || eventCode == "039")
             {
                 if (!validatorDocumentMeta.InTransaction)
                 {
@@ -1477,8 +1477,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var SenderParty = senderCode;
             var ReceiverParty = receiverCode;
             var ResponseCode = eventCode;
-            var ListID = listID;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateParty", new { trackId, cudeId, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
+            var ListID = listID;            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, cudeId, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1590,7 +1590,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var arrayTasks = new List<Task>();
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (eventCode == "038")
+            if (eventCode == "037" || eventCode == "038" || eventCode == "039")
             {
                 validatorDocumentMeta.InTransaction = false;
                 arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
