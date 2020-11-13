@@ -205,6 +205,10 @@
     <Compile Include="Managers\DocumentTypeManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Gosocket.Dian.Common\Gosocket.Dian.Common.csproj">
+      <Project>{61f42a77-9c41-446b-9c1f-d3d84241bb6c}</Project>
+      <Name>Gosocket.Dian.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Gosocket.Dian.Interfaces\Gosocket.Dian.Interfaces.csproj">
       <Project>{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1}</Project>
       <Name>Gosocket.Dian.Interfaces</Name>
