@@ -95,8 +95,13 @@ namespace Gosocket.Dian.Web.Controllers
                 _ = _radianContributorFileTypeService.Update(fileType);
 
                 ViewBag.CurrentPage = Navigation.NavigationEnum.ContributorFileType;
+                return RedirectToAction("List");
             }
-            return RedirectToAction("List");
+            else
+            {
+                return RedirectToAction("List", model);
+            }
+
         }
 
         public PartialViewResult GetEditRadianContributorFileTypePartialView(int id)
@@ -146,10 +151,12 @@ namespace Gosocket.Dian.Web.Controllers
                 };
                 _ = _radianContributorFileTypeService.Update(fileType);
                 ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
-
-                
+                return RedirectToAction("List");
             }
-            return RedirectToAction("List");
+            else
+            {
+                return RedirectToAction("List", model);
+            }
         }
 
         public PartialViewResult GetDeleteRadianContributorFileTypePartialView(int id)
