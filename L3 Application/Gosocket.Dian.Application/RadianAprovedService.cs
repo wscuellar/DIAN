@@ -16,9 +16,18 @@ namespace Gosocket.Dian.Application
         {
                 
         }
-
+        // Manquip
+        public Tuple<string, string> FindContributorAndSoftware(int contributorId, int softwareId)
+        {
+            throw new NotImplementedException();
+        }
 
         public List<Contributor> ListContributorByType(int RadianContributorTypeId)
+        {
+            throw new NotImplementedException();
+        }
+        // Manquip
+        public List<Software> ListSoftwareByContributor(int RadianContributorId)
         {
             throw new NotImplementedException();
         }
