@@ -7,10 +7,9 @@ using System.Linq;
 
 namespace Gosocket.Dian.Application
 {
-    public class RadianAprovedService : IRadianAprovedService
+    public class RadianAprovedService : IRadianApprovedService
     {
         private readonly IRadianContributorRepository _radianContributorRepository;
-
 
         public RadianAprovedService(IRadianContributorRepository radianContributorRepository)
         {
@@ -34,9 +33,9 @@ namespace Gosocket.Dian.Application
             return data;
         }
 
-        public List<Contributor> ListContributorByType(int radianContributorTypeId)
+        public List<RadianContributor> ListContributorByType(int radianContributorTypeId)
         {
-            throw new NotImplementedException();
+            return _radianContributorRepository.List(t => t.RadianContributorTypeId == radianContributorTypeId);
         }
 
         // Manquip
