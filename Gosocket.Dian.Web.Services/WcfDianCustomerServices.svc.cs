@@ -511,6 +511,56 @@ namespace Gosocket.Dian.Web.Services
         }
 
         /// <summary>
+        /// Process document event
+        /// </summary>
+        /// <param name="contentFile"></param>
+        /// <returns></returns>
+        public DianResponse SendNominaSync(byte[] contentFile)
+        {
+            try
+            {
+                var authCode = GetAuthCode();
+                var email = GetAuthEmail();
+
+                if (contentFile == null)
+                {
+                    Log($"{authCode} {email} SendEventUpdateStatus", (int)InsightsLogType.Error, "Archivo no enviado.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "Archivo no enviado." };
+                }
+
+                var mimeType = GetMimeFromBytes(contentFile);
+                if (mimeType != zipMimeType)
+                {
+                    Log($"{authCode} {email} SendEventUpdateStatus", (int)InsightsLogType.Error, $"MIMEType del archivo inválido ({mimeType}).");
+                    return new DianResponse { StatusCode = "89", StatusDescription = $"MIMEType del archivo inválido ({mimeType})." };
+                }
+
+                if (!contentFile.ZipContainsXmlFiles())
+                {
+                    Log($"{authCode} {email} SendEventUpdateStatus", (int)InsightsLogType.Error, $"Archivo ZIP no contiene XML's.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML válido." };
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Log("SendEventUpdateStatus", (int)InsightsLogType.Error, ex.Message);
+                var exception = new GlobalLogger($"SendEventUpdateStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString())
+                { Action = $"SendEventUpdateStatus", Message = ex.Message, StackTrace = ex.StackTrace };
+                tableManagerGlobalLogger.InsertOrUpdate(exception);
+
+                return new DianResponse
+                {
+                    StatusCode = "500",
+                    StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.",
+                    XmlFileName = "SendEventUpdateStatus",
+                    IsValid = false,
+                    StatusMessage = "Documento XML ApplicationResponse"
+                };
+            }
+        }
+        /// <summary>
         /// Get number ranges
         /// </summary>
         /// <param name="accountCode"></param>
