@@ -615,6 +615,7 @@
     <Content Include="Content\img\video_advance.png" />
     <Content Include="Content\img\visa.png" />
     <Content Include="Content\img\walmart.png" />
+    <Content Include="Content\jquery.steps.css" />
     <Content Include="Content\js\bootstrap-datepicker.es.min.js" />
     <Content Include="Content\js\bootstrap-filestyle.js" />
     <Content Include="Content\js\bootstrap-filestyle.min.js" />
@@ -2537,6 +2538,8 @@
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.steps.js" />
+    <Content Include="Scripts\jquery.steps.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />

@@ -1,11 +1,6 @@
-﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
-@{ 
-    @ViewBag.title = "";
-
-//    switch (Model.RadianContributorTypeId)
-//    {
-//        case 
-//    }
+﻿
+@{
+    ViewBag.title = "Titulo";
 }
 <div class="page-content">
     <div class="row title-container">
@@ -17,44 +12,34 @@
     <div class="row margin-horizontal-0">
         <div class="panel">
             <div class="panel-body padding-top-20">
-                <ul class="stepper horizontal" id="horizontal-stepper">
-                <li class="step active">
-                    <div class="step-title waves-effect waves-dark">Step 1</div>
-                    <div class="step-new-content">
-                        <div class="row">
-                            @* Vista parcial 1 *@
-                        </div>
-                        <div class="step-actions">
-                            <button class="waves-effect waves-dark btn btn-sm btn-primary next-step" data-feedback="someFunction21">CONTINUE</button>
-                        </div>
-                    </div>
-                </li>
-                <li class="step">
-                    <div class="step-title waves-effect waves-dark">Step 2</div>
-                    <div class="step-new-content">
-                        <div class="row">
-                            <div class="md-form col-12 ml-auto">
-                                <input id="password-horizontal" type="password" class="validate form-control" required>
-                                <label for="password-horizontal">Your password</label>
-                            </div>
-                        </div>
-                        <div class="step-actions">
-                            <button class="waves-effect waves-dark btn btn-sm btn-primary next-step" data-feedback="someFunction21">CONTINUE</button>
-                            <button class="waves-effect waves-dark btn btn-sm btn-secondary previous-step">BACK</button>
-                        </div>
-                    </div>
-                </li>
-                <li class="step">
-                    <div class="step-title waves-effect waves-dark">Step 3</div>
-                    <div class="step-new-content">
-                        Finish!
-                        <div class="step-actions">
-                            <button class="waves-effect waves-dark btn-sm btn btn-primary m-0 mt-4" type="button">SUBMIT</button>
-                        </div>
-                    </div>
-                </li>
-                </ul>
+                <div id="example-basic">
+                    <h3 styles="display:none">Keyboard</h3>
+                    <section>
+                        <p>Try the keyboard navigation by clicking arrow left or right!</p>
+                    </section>
+                    <h3 styles="display:none">Effects</h3>
+                    <section>
+                        <p>Wonderful transition effects.</p>
+                    </section>
+                    <h3 styles="display:none">Pager</h3>
+                    <section>
+                        <p>The next and previous buttons help you to navigate through your content.</p>
+                    </section>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $("#example-basic").steps({
+                headerTag: "h3",
+                bodyTag: "section",
+                transitionEffect: "slideLeft",
+                autoFocus: true
+            });
+        })
+    </script>
+}
