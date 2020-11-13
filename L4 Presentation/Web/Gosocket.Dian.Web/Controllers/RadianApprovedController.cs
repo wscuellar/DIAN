@@ -13,20 +13,20 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianTestSetService _radianTestSetService;
 
-        public RadianApprovedController(IRadianContributorService radianContributorService, IRadianTestSetService radianTestSetService, IRadianContributorFileTypeService radianContributorFileTypeService )
+        public RadianApprovedController(IRadianContributorService radianContributorService, IRadianTestSetService radianTestSetService, IRadianContributorFileTypeService radianContributorFileTypeService)
         {
             _radianContributorService = radianContributorService;
             _radianTestSetService = radianTestSetService;
         }
 
-
+        [HttpGet]
         public ActionResult Index()
         {
+            LoadSoftwareModeOperation();
             return View();
         }
 
         // GET: RadianFactor
-        public IRadianTestSetService RadianTestSetService { get; }
 
         [HttpPost]
         public ActionResult Index(RegistrationDataViewModel registrationData)
@@ -39,8 +39,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             // Lista de Software Modo de Operacion 
             // CA 2.3
-            List<Domain.RadianOperationMode> list = _radianTestSetService.OperationModeList();
-            ViewBag.RadianSoftwareOperationMode = list;
+            LoadSoftwareModeOperation();
 
             // CA 2.4 
             // Software de un Proveedor Electronico
@@ -50,5 +49,10 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
+        private void LoadSoftwareModeOperation()
+        {
+            List<Domain.RadianOperationMode> list = _radianTestSetService.OperationModeList();
+            ViewBag.RadianSoftwareOperationMode = list;
+        }
     }
 }
