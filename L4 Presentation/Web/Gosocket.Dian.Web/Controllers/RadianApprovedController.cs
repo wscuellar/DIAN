@@ -22,6 +22,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult Index()
         {
+            LoadSoftwareModeOperation();
             return View();
         }
 
@@ -39,8 +40,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             // Lista de Software Modo de Operacion 
             // CA 2.3
-            List<Domain.RadianOperationMode> list = _radianTestSetService.OperationModeList();
-            ViewBag.RadianSoftwareOperationMode = list;
+            LoadSoftwareModeOperation();
 
             // CA 2.4 
             // Software de un Proveedor Electronico
@@ -50,5 +50,10 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
+        private void LoadSoftwareModeOperation()
+        {
+            List<Domain.RadianOperationMode> list = _radianTestSetService.OperationModeList();
+            ViewBag.RadianSoftwareOperationMode = list;
+        }
     }
 }
