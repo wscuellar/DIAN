@@ -12,6 +12,6 @@ namespace Gosocket.Dian.Interfaces.Services
 
         List<Software> ListSoftwareByContributor(int RadianContributorId);
 
-       Tuple<string,string> FindContributorAndSoftware(int contributorId, int softwareId);
+       Tuple<string,string> FindNamesContributorAndSoftware(int contributorId, int softwareId);
     }
 }

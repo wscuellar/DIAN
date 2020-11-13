@@ -19,7 +19,7 @@ namespace Gosocket.Dian.Web.Controllers
             _radianTestSetService = radianTestSetService;
         }
 
-
+        [HttpGet]
         public ActionResult Index()
         {
             LoadSoftwareModeOperation();
@@ -27,7 +27,6 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         // GET: RadianFactor
-        public IRadianTestSetService RadianTestSetService { get; }
 
         [HttpPost]
         public ActionResult Index(RegistrationDataViewModel registrationData)
