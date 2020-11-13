@@ -18,5 +18,6 @@ public class GlobalDocReferenceAttorney : TableEntity
     public string IssuerAttorney { get; set; }
     public string SenderCode { get; set; }
     public string StartDate { get; set; }
+    public string DocReferencedEndAthorney { get; set; }
 }
 

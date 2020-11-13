@@ -38,6 +38,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
 
         private FileManager fileManager = new FileManager();
 
@@ -1015,12 +1016,27 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse.XmlDocumentKey = trackIdCude;
 
                 GlobalDocValidatorDocument validatorDocument = null;
+
+                if(eventCode == "043")
+                {
+                    var documentReferenceAttorney = ValidationReferenceAttorney(trackIdCude);
+                    if (!documentReferenceAttorney.IsValid)
+                    {
+                        dianResponse = documentReferenceAttorney;
+                        dianResponse.XmlDocumentKey = trackIdCude;
+                        dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                        dianResponse.IsValid = false;
+                        return dianResponse;
+                    }
+                }
+
                 if (dianResponse.IsValid)
                 {
                     dianResponse.StatusCode = Properties.Settings.Default.Code_00;
                     dianResponse.StatusMessage = message;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Procees_Sucessfull;
                     validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { DocumentKey = trackIdCude, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };
+                    UpdateFinishAttorney(trackIdCude, documentParsed.DocumentKey.ToLower(), eventCode);
 
                     var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode });
                     if (processEventResponse.Code != Properties.Settings.Default.Code_100)
@@ -1582,6 +1598,36 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             return response;
         }
+
+        private DianResponse ValidationReferenceAttorney(string trackId)
+        {
+
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateReferenceAttorney", new { trackId });
+
+            DianResponse response = new DianResponse();
+            if (validations.Count > 0)
+            {
+                response = new DianResponse
+                {
+                    StatusMessage = validations[0].ErrorMessage,
+                    StatusCode = validations[0].ErrorCode,
+                    IsValid = validations[0].IsValid,
+                    ErrorMessage = new List<string>()
+                };
+                response.ErrorMessage = new List<string>();
+                if (!response.IsValid)
+                {
+                    foreach (var item in validations)
+                    {
+                        response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                    }
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                }
+            }
+            return response;
+        }
+
         #endregion
 
         private void UpdateInTransactions(string trackId, string eventCode)
@@ -1596,5 +1642,23 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
             }
         }
+
+        private void UpdateFinishAttorney(string trackId, string trackIdAttorney, string eventCode)
+        {
+            //validation if is an anulacion de mandato (Code 044)
+
+            var arrayTasks = new List<Task>();            
+            if (eventCode == "044")
+            {
+                List<GlobalDocReferenceAttorney> documentsAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(trackIdAttorney).ToList();
+                foreach(var documentAttorney in documentsAttorney)
+                {
+                    documentAttorney.Active = false;
+                    documentAttorney.DocReferencedEndAthorney = trackId;
+                    arrayTasks.Add(TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(documentAttorney));
+                }
+            }
+        }
+
     }
 }
