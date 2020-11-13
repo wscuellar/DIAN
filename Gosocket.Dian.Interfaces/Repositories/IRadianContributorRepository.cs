@@ -15,7 +15,6 @@ namespace Gosocket.Dian.Interfaces.Repositories
         int AddOrUpdate(RadianContributor radianContributor);
         
         void RemoveRadianContributor(RadianContributor radianContributor);
-        
     }
 
 }
