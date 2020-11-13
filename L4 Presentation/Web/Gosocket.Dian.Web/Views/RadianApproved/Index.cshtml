@@ -13,7 +13,9 @@
         <div class="panel">
             <div class="panel-body padding-top-20">
                 <div id="steps-approved">
-                     @Html.Partial("_personalInfo")
+                    <div class="radian-personal-info">
+                        @Html.Partial("_personalInfo")
+                    </div>
                     <h3></h3>
                     <section>
                         @Html.Partial("_certificates")
@@ -47,7 +49,16 @@
                     headerTag: "h3",
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
-                    autoFocus: true
+                    autoFocus: true,
+                    labels: {
+                        cancel: "Cancel",
+                        current: "current step:",
+                        pagination: "Pagination",
+                        finish: "Finish",
+                        next: "Next",
+                        previous: "Can",
+                        loading: "Loading ..."
+                    }
                 });
             })
         </script>

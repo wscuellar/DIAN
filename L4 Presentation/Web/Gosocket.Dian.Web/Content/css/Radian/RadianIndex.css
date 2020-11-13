@@ -366,7 +366,7 @@ i.fa-info-circle {
 
 .title-container {
     width: max-content;
-    margin-bottom: 40px
+    margin-bottom: 40px;
 }
 
 .btn-radian-default {
@@ -447,8 +447,6 @@ h4.text-thin {
 #steps-approved .steps li {
     width: 86.01px;
     height: 86.15px;
-    left: 467px;
-    top: 278px;
     background: linear-gradient(136.21deg, #F2F6FB 8.03%, #FFFFFF 85.07%);
     opacity: 0.65;
     box-shadow: -4px -4px 10px #FFFFFF, 4px 4px 10px rgba(0, 0, 0, 0.25);
@@ -458,7 +456,6 @@ h4.text-thin {
 
 #steps-approved .steps a {
     background: none;
-    top: 11px;
     position: relative;
 }
 
@@ -475,10 +472,94 @@ h4.text-thin {
     border: #b7d3bc;
 }
 
-#steps-approved .steps li.current a {
-    background: url(../../images/pendiente-3.png);
+#steps-approved .steps li a {
     height: inherit;
+    top: -3px;
+    position: relative;
+}
+#steps-approved .steps li.done {
+    opacity: 1;
+    position: relative;
+}
+#steps-approved .steps li:nth-child(1).current a {
+    background: url(../../images/ingreso-3.png);
     background-repeat: no-repeat;
-    background-size: 73px;
+    background-size: 60%;
     background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+#steps-approved .steps li:nth-child(2).current a {
+    background: url(../../images/pendiente-3.png);
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+#steps-approved .steps li:nth-child(3).current a {
+    background: url(../../images/Validado-3.png);
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+#steps-approved .steps li:nth-child(4).current a {
+    background: url(../../images/pruebas-3.png);
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(1).done a {
+    background: url(../../images/ingreso-1.png);
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(2).done a {
+    background: url(../../images/pendiente-1.png);
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(3).done a {
+    background: url(../../images/Validado-1.png);
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(4).done a {
+    background: url(../../images/pruebas-1.png);
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li.done::before {
+    content: url(../../images/aproved.png);
+    position: absolute;
+    right: 0;
+}
+
+.radian-personal-info {
+    padding: 10px;
+}
+
+#steps-approved .content{
+    background:none;
 }
