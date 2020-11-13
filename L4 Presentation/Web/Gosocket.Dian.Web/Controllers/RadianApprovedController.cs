@@ -42,7 +42,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             // Lista de Software Modo de Operacion 
             // CA 2.3
-            LoadSoftwareModeOperation();
+           // LoadSoftwareModeOperation();
 
             // CA 2.4 
             // Software de un Proveedor Electronico
