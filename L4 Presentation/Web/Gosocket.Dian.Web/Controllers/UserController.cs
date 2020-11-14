@@ -786,6 +786,21 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [ExcludeFilter(typeof(Authorization))]
+        public ActionResult ExternalUserLogin(string returnUrl)
+        {
+            if (ConfigurationManager.GetValue("LoginType") == "Certificate")
+                return RedirectToAction(nameof(CertificateLogin));
+
+            ViewBag.ReturnUrl = returnUrl;
+            UserLoginViewModel model = new UserLoginViewModel
+            {
+                IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList(),
+                IdentificationType = (int)Domain.Common.IdentificationType.CC
+            };
+            return View("ExternalUserLogin", model); ;
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
         public ActionResult PersonLogin(string returnUrl)
         {
             if (ConfigurationManager.GetValue("LoginType") == "Certificate")
