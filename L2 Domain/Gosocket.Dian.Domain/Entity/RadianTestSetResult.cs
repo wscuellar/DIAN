@@ -134,5 +134,7 @@ namespace Gosocket.Dian.Domain.Entity
         public int Status { get; set; }
         public bool Deleted { get; set; }
         public string Id { get; set; }
+        // Estado: ENproceso, etc.
+        public string State { get; set; }
     }
 }
