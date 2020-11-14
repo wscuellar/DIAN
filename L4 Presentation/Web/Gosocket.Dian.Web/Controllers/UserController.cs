@@ -552,6 +552,14 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         [ExcludeFilter(typeof(Authorization))]
         [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ExternalUserAuthentication(UserLoginViewModel model, string returnUrl)
+        {
+            return View("LoginConfirmed", model);
+        }
+
+            [HttpPost]
+        [ExcludeFilter(typeof(Authorization))]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> PersonAuthentication(UserLoginViewModel model, string returnUrl)
         {
             model.IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList();

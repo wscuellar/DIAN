@@ -98,6 +98,9 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "NIT Representante Legal")]
         public string UserCode { get; set; }
 
+        [Required(ErrorMessage = "El documento del usuario registrado es requerido.")]
+        [Display(Name = "Documento Usuario Registrado")]
+        public string ExternalUserCode { get; set; }
 
         ////Para el login de persona natural
         [Display(Name = "Tipo de identificación")]
