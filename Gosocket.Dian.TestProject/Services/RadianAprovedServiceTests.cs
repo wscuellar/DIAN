@@ -45,7 +45,15 @@ namespace Gosocket.Dian.Application.Tests
         [TestMethod()]
         public void ListSoftwareModeOperationTest()
         {
-            Assert.IsTrue(true);
+            // Arrange 
+            _radianAprovedService.Setup(t => true);
+
+            // Act
+            var actual = _radianAprovedService.Setup(t => t.ListSoftwareModeOperation())
+                                            .Returns(new List<RadianOperationMode>);
+
+            // Assert
+            Assert.IsNotNull(actual);
         }
     }
 }
