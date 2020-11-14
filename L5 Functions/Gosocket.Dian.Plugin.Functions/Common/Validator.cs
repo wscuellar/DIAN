@@ -784,6 +784,42 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
                     return responses;
+                //NotificacionPagoTotalParcial
+                case 45:
+                    if (party.SenderParty != senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = receiver2DvErrorCode,
+                            ErrorMessage = "Emisor/Facturador Electrónico no coincide con la información de la factura referenciada",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else if (party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = sender2DvErrorCode,
+                            ErrorMessage = "El receptor del documento transmitido no coincide con el NIT DIAN",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    return responses;
             }
 
             foreach (var r in responses)
@@ -2035,6 +2071,33 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
                                 break;
+                            case "045":
+                                if (eventPrev.ListId != "2") {
+                                    if (documentMeta
+                                    .Where(t => t.EventCode == "041" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                    .Count > decimal.Zero)
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "89",
+                                            ErrorMessage = "Solo se pueda transmitir un evento AR de cada tipo para un CUFE - Es decir no se pueden repetir los eventos ApplicationResponse.",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }else
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }
+                                break;
                         }
                     }
                     if (validFor)
@@ -2216,7 +2279,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case "041":
                 case "042":
                 case "045"://Solicitud de Dsiponibilizacion
-                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                    if(dataModel.CustomizationID == "361" || dataModel.CustomizationID == "362" ||
+                       dataModel.CustomizationID == "363" || dataModel.CustomizationID == "364")
+                    {
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -2234,6 +2300,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE/CUDE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
+                    }
+                    else
+                    {
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                        ? new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Ok",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        }
+                        : new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage =
+                                "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE/CUDE",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }                    
                     break;
 
                 //Validación fecha emite evento AR menor a fecha de vencimiento factura
