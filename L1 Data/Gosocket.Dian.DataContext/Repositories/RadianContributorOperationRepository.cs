@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;

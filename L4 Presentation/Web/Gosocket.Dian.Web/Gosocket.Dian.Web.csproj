@@ -2762,6 +2762,7 @@
     <Content Include="Views\RadianApproved\_personalInfo.cshtml" />
     <Content Include="Views\RadianApproved\_certificates.cshtml" />
     <Content Include="Views\RadianApproved\_documentStates.cshtml" />
+    <Content Include="Views\Radian\_iconsState.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

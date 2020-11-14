@@ -30,7 +30,16 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Index()
         {
             // LoadSoftwareModeOperation();
-            return View();
+            RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(1704648);
+            RadianApprovedViewModel model = new RadianApprovedViewModel()
+            {
+                Name = radianAdmin.Contributor.TradeName,
+                Nit = radianAdmin.Contributor.Code,
+                BusinessName = radianAdmin.Contributor.BusinessName,
+                Email = radianAdmin.Contributor.Email,
+                Files = radianAdmin.Files
+            };
+            return View(model);
         }
 
         // GET: RadianFactor
@@ -50,16 +59,17 @@ namespace Gosocket.Dian.Web.Controllers
 
             // CA 2.4 
             // Software de un Proveedor Electronico
-
             RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(registrationData.ContributorId);
-            return View(new RadianApprovedViewModel()
+            RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
                 Name = radianAdmin.Contributor.TradeName,
                 Nit = radianAdmin.Contributor.Code,
                 BusinessName = radianAdmin.Contributor.BusinessName,
                 Email = radianAdmin.Contributor.Email,
                 Files = radianAdmin.Files
-            });
+            };
+            return View(model);
+
         }
 
         public List<Software> Software(int radianContributorId)
