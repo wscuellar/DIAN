@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using System;
 using System.Collections.Generic;
 
@@ -17,5 +18,9 @@ namespace Gosocket.Dian.Interfaces.Services
         RadianContributor GetRadianContributor(int radianContributorId);
 
         List<RadianContributorFile> ListContributorFiles(int radianContributorId);
+
+        RadianAdmin ContributorSummary(int contributorId);
+
+        List<RadianContributorType> ContributorTypeList(int typeId);
     }
 }
