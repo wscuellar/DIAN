@@ -21,6 +21,6 @@ namespace Gosocket.Dian.Interfaces.Services
 
         RadianAdmin ContributorSummary(int contributorId);
 
-        List<RadianContributorType> ContributorTypeList(int typeId);
+        List<RadianContributorFileType> ContributorFileTypeList(int typeId);
     }
 }
