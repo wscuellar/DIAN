@@ -99,7 +99,7 @@ namespace Gosocket.Dian.Application
             return _radianContributorService.ContributorSummary(contributorId);
         }
 
-        public List<RadianContributorFileType> ContributorTypeList(int typeId)
+        public List<RadianContributorFileType> ContributorFileTypeList(int typeId)
         {
             List<RadianContributorFileType> contributorTypeList = _radianContributorFileTypeService.FileTypeList()
                 .Where(ft => ft.Id == typeId).ToList();
