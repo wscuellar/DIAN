@@ -13,5 +13,9 @@ namespace Gosocket.Dian.Interfaces.Services
         List<Software> ListSoftwareByContributor(int radianContributorId);
 
        Tuple<string,string> FindNamesContributorAndSoftware(int radianContributorId, string softwareId);
+
+        RadianContributor GetRadianContributor(int radianContributorId);
+
+        List<RadianContributorFile> ListContributorFiles(int radianContributorId);
     }
 }
