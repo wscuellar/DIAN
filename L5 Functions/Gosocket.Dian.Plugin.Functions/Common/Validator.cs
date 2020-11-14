@@ -786,14 +786,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
                 //NotificacionPagoTotalParcial
                 case 45:
-                    if (party.SenderParty != senderCode)
+                    if (party.SenderParty != receiverCode)
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = receiver2DvErrorCode,
-                            ErrorMessage = "Emisor/Facturador Electrónico no coincide con la información de la factura referenciada",
+                            ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquirente/Deudor de la factura informada",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -2116,10 +2116,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
                                 break;
-                            case "045":
+                            case "045"://NotificacionPagoTotalParcial 
                                 if (eventPrev.ListId != "2") {
                                     if (documentMeta
-                                    .Where(t => t.EventCode == "041" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                    .Where(t => t.EventCode == "041" || t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
                                     .Count > decimal.Zero)
                                     {
                                         responses.Add(new ValidateListResponse
@@ -2320,11 +2320,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
-                case "036":
-                case "041":
-                case "042":
-                case "045"://Solicitud de Dsiponibilizacion
-                    if(dataModel.CustomizationID == "361" || dataModel.CustomizationID == "362" ||
+                case "036"://Solicitud de Dsiponibilizacion
+                case "041": //DocumentoLimitacionCirculacion
+                case "042": //DocumentoTerminacionCirculacion
+                    if (dataModel.CustomizationID == "361" || dataModel.CustomizationID == "362" ||
                        dataModel.CustomizationID == "363" || dataModel.CustomizationID == "364")
                     {
                         responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
@@ -2367,8 +2366,27 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }                    
+                    break;               
+                case "045": //NotificacionPagoTotalParcial
+                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                       ? new ValidateListResponse
+                       {
+                           IsValid = true,
+                           Mandatory = true,
+                           ErrorCode = "100",
+                           ErrorMessage = "Ok",
+                           ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                       }
+                       : new ValidateListResponse
+                       {
+                           IsValid = false,
+                           Mandatory = true,
+                           ErrorCode = "89",
+                           ErrorMessage =
+                               "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
+                           ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                       });                
                     break;
-
                 //Validación fecha emite evento AR menor a fecha de vencimiento factura
                 case "038": //Endoso en Garantía
                     responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModel.PaymentDueDate)
