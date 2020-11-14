@@ -18,22 +18,38 @@ namespace Gosocket.Dian.Application
             _radianTestSetService = radianTestSetService;
         }
 
-        // Manquip
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="radianContributorId"></param>
+        /// <param name="softwareId"></param>
+        /// <returns></returns>
         public Tuple<string, string> FindNamesContributorAndSoftware(int radianContributorId, string softwareId)
         {
+            string radianContributorName = "No se encontró el contribuyente";
+            string softwareName = "No hay software asociado al contribuyente";
+
             RadianContributor radianContributor = _radianContributorRepository
                 .Get(rc => rc.ContributorId == radianContributorId);
 
-            string radianContributorName = radianContributor.Contributor.Name;
-            string softwareName = radianContributor
-                .Contributor
-                .Softwares
-                .FirstOrDefault(s => s.Id.ToString() == softwareId).Name;
+            if (radianContributor != null)
+            {
+                radianContributorName = radianContributor.Contributor.Name;
+                Software software = radianContributor
+                    .Contributor
+                    .Softwares
+                    .FirstOrDefault(s => s.Id.ToString() == softwareId);
+
+                if (software != null)
+                {
+                    softwareName = software.Name;
+                }
+            }
 
             Tuple<string, string> data = Tuple.Create(radianContributorName, softwareName);
 
             return data;
-        }
+        }        
 
         public List<RadianContributor> ListContributorByType(int radianContributorTypeId)
         {
@@ -43,16 +59,35 @@ namespace Gosocket.Dian.Application
         // Manquip
         public List<Software> ListSoftwareByContributor(int radianContributorId)
         {
-            return _radianContributorRepository
+            List<Software> softwares = _radianContributorRepository
                 .Get(rc => rc.ContributorId == radianContributorId)
                 .Contributor
                 .Softwares.ToList();
+
+            return softwares;
         }
 
         public List<RadianOperationMode> ListSoftwareModeOperation()
         {
             List<RadianOperationMode> list = _radianTestSetService.OperationModeList();
             return list;
+        }
+
+        //Solicitado por Fernando
+        public RadianContributor GetRadianContributor(int radianContributorId)
+        {
+            RadianContributor radianContributor = _radianContributorRepository
+                .Get(rc => rc.ContributorId == radianContributorId);
+
+            return radianContributor;
+        }
+
+        public List<RadianContributorFile> ListContributorFiles(int radianContributorId)
+        {
+            RadianContributor radianContributor = _radianContributorRepository
+                .Get(rc => rc.ContributorId == radianContributorId);
+
+            return radianContributor.RadianContributorFile.ToList();
         }
     }
 }

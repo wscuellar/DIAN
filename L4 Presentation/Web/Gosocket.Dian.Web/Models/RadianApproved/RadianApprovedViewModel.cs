@@ -6,10 +6,6 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 {
     public class RadianApprovedViewModel
     {
-        public RadianApprovedViewModel()
-        {
-            RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
-        }
         public int Step { get; set; }
 
         public int CurrentlyStep { get; set; }
@@ -17,16 +13,16 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         public int RadianContributorTypeId { get; set; }
 
         [Display(Name = "NIT")]
-        public int Nit { get; set; }
+        public string Nit { get; set; }
 
         [Display(Name = "Nombre")]
-        public int Name { get; set; }
+        public string Name { get; set; }
 
         [Display(Name = "Razón Social")]
-        public int BusinessName { get; set; }
+        public string BusinessName { get; set; }
 
         [Display(Name = "Correo electrónico")]
-        public int Email { get; set; }
+        public string Email { get; set; }
 
         public List<RadianContributorFileTypeTableViewModel> RadianFileList { get; set; }
 
@@ -34,5 +30,9 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public List<RadianCustomerViewModel> Customers { get; set; }
 
+        public RadianApprovedViewModel()
+        {
+            RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
+        }
     }
 }
