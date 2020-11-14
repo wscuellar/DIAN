@@ -945,7 +945,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region IsBase64
         private bool IsBase64(String base64String)
         {
-            var rs = (!string.IsNullOrEmpty(base64String) && !string.IsNullOrWhiteSpace(base64String) && base64String.Length != 0 && base64String.Length % 4 == 0 && !base64String.Contains(" ") && !base64String.Contains("\t") && !base64String.Contains("\r") && !base64String.Contains("\n")) && (base64String.Length % 4 == 0 && _base64RegexPattern.Match(base64String, 0).Success);
+            var rs = !string.IsNullOrEmpty(base64String) && !string.IsNullOrWhiteSpace(base64String) && base64String.Length != 0 && base64String.Length % 4 == 0 && !base64String.Contains(" ");
             return rs;
         }
         #endregion
@@ -972,7 +972,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
             data.EventCode = "043";
             data.SigningTime = xmlParser.SigningTime;
-            string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
+            string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string factor = string.Empty;
             switch (factorTemp)
             {
@@ -986,6 +986,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     factor = "PT";
                     break;
             }
+            string actor = factor;
             //Valida existe Contrato del mandatos entre las partes
             if (AttachmentBase64 != null)
             {
@@ -1003,13 +1004,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            //Valida Mandato registra Ilimitado
-            if (customizationID == "432" && customizationID == "434")
+            //Valida Mandato si es Ilimitado o Limitado
+            if (customizationID == "432" || customizationID == "434")
             {
                 startDateAttorney = string.Empty;
                 endDate = string.Empty;
             }
-            else if(customizationID == "433" &&  customizationID == "431")
+            else if(customizationID == "433" || customizationID == "431")
             {
                 startDateAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='StartDate']").Item(0)?.InnerText.ToString();
                 endDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='EndDate']").Item(0)?.InnerText.ToString();
@@ -1038,15 +1039,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     string[] tempCodeAttorney = codeAttorney.Split('-');
                     if(factor == tempCodeAttorney[1])
                     {
-                        if (attorneyModel.facultityCode==string.Empty)
+                        if (attorneyModel.facultityCode == null)
                         {
                             attorneyModel.facultityCode += tempCodeAttorney[0];
-                            attorneyModel.actor += tempCodeAttorney[1];
                         }
                         else
                         {
                             attorneyModel.facultityCode += (";"+ tempCodeAttorney[0]);
-                            attorneyModel.actor += (";" + tempCodeAttorney[1]);
                         }
                     }
                     else
@@ -1111,7 +1110,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId, attorneyDocument.cufe)
                     {
                         Active = true,
-                        Actor = attorneyDocument.actor,
+                        Actor = actor,
                         EffectiveDate = effectiveDate,
                         EndDate = endDate,
                         FacultityCode = attorneyDocument.facultityCode,

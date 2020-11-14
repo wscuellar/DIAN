@@ -1017,7 +1017,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 GlobalDocValidatorDocument validatorDocument = null;
 
-                if(eventCode == "043")
+                if(!errors.Any() && eventCode == "043")
                 {
                     var documentReferenceAttorney = ValidationReferenceAttorney(trackIdCude);
                     if (!documentReferenceAttorney.IsValid)
