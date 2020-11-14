@@ -893,7 +893,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // upload xml
 
             // Validate EventCode
-            var eventCodeResponse = ValidateEventCode(documentParsed.DocumentKey.ToLower(), eventCode, docTypeCode, trackIdCude);
+            var eventCodeResponse = ValidateEventCode(documentParsed.DocumentKey.ToLower(), eventCode, docTypeCode, trackIdCude, customizationID, listId);
             if (!eventCodeResponse.IsValid)
             {
                 dianResponse = eventCodeResponse;
@@ -1518,9 +1518,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude)
+        private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string CustomizationID, string ListID)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, CustomizationID, ListID });
             //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId, trackIdCude });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
