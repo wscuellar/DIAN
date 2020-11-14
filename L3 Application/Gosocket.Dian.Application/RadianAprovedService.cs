@@ -10,10 +10,12 @@ namespace Gosocket.Dian.Application
     public class RadianAprovedService : IRadianApprovedService
     {
         private readonly IRadianContributorRepository _radianContributorRepository;
+        private readonly IRadianTestSetService _radianTestSetService;
 
-        public RadianAprovedService(IRadianContributorRepository radianContributorRepository)
+        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService)
         {
             _radianContributorRepository = radianContributorRepository;
+            _radianTestSetService = radianTestSetService;
         }
 
         // Manquip
@@ -49,7 +51,8 @@ namespace Gosocket.Dian.Application
 
         public List<RadianOperationMode> ListSoftwareModeOperation()
         {
-            throw new NotImplementedException();
+            List<RadianOperationMode> list = _radianTestSetService.OperationModeList();
+            return list;
         }
     }
 }
