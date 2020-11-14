@@ -1,21 +1,22 @@
 ﻿namespace Gosocket.Dian.Domain.Entity
 {
-    public class RadianRegistrationValidation
+    public class ResponseMessage
     {
-        public RadianRegistrationValidation()
+        public ResponseMessage()
         {
-
+            Code = 200;
         }
 
-        public RadianRegistrationValidation(string message, string messageType)
+        public ResponseMessage(string message, string messageType)
         {
             Message = message;
             MessageType = messageType;
+            Code = 200;
         }
-
 
         public string Message { get; set; }
         public string MessageType { get; set; }
-
+        public int Code { get; set; }
+        
     }
 }

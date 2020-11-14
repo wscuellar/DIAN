@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Application.Tests
             _contributorService.Setup(t => t.GetByCode(userCode)).Returns((Contributor)null);
 
             //add
-            Domain.Entity.RadianRegistrationValidation result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
+            Domain.Entity.ResponseMessage result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
 
             //assert
             Assert.AreEqual(expected, result.Message);
@@ -107,7 +107,7 @@ namespace Gosocket.Dian.Application.Tests
             }
 
             //add
-            Domain.Entity.RadianRegistrationValidation result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
+            Domain.Entity.ResponseMessage result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
 
             //assert
             Assert.AreEqual(expected, result.Message);
@@ -146,7 +146,7 @@ namespace Gosocket.Dian.Application.Tests
             }
 
             //add
-            Domain.Entity.RadianRegistrationValidation result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
+            Domain.Entity.ResponseMessage result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
 
             //assert
             Assert.AreEqual(expected, result.Message);
@@ -220,7 +220,7 @@ namespace Gosocket.Dian.Application.Tests
 
 
             //add
-            Domain.Entity.RadianRegistrationValidation result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
+            Domain.Entity.ResponseMessage result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
 
             //assert
             Assert.AreEqual(expected, result.Message);
@@ -278,7 +278,7 @@ namespace Gosocket.Dian.Application.Tests
             }
 
             //add
-            Domain.Entity.RadianRegistrationValidation result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
+            Domain.Entity.ResponseMessage result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
 
             //assert
             Assert.AreEqual(expected, result.Message);
@@ -336,7 +336,7 @@ namespace Gosocket.Dian.Application.Tests
             }
 
             //add
-            Domain.Entity.RadianRegistrationValidation result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
+            Domain.Entity.ResponseMessage result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
 
             //assert
             Assert.AreEqual(expected, result.Message);
