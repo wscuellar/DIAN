@@ -1005,9 +1005,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0)?.InnerText.ToString();
             XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
-            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
+            //string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
             data.EventCode = "043";
             data.SigningTime = xmlParser.SigningTime;
+            string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
+            string factor = string.Empty;
+            switch (factorTemp)
+            {
+                case "M-SN-e":
+                    factor = "SNE";
+                    break;
+                case "M-Factor":
+                    factor = "F";
+                    break;
+                case "M-PT":
+                    factor = "PT";
+                    break;
+            }
             //Valida existe Contrato del mandatos entre las partes
             if (AttachmentBase64 != null)
             {
@@ -1026,10 +1040,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //Valida Mandato registra Ilimitado
-            if (customizationID == "432" && listID == "2")
+            if (customizationID == "432" && customizationID == "434")
             {
                 startDateAttorney = string.Empty;
                 endDate = string.Empty;
+            }
+            else if(customizationID == "433" &&  customizationID == "431")
+            {
+                startDateAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='StartDate']").Item(0)?.InnerText.ToString();
+                endDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='EndDate']").Item(0)?.InnerText.ToString();
             }
             else
             {
@@ -1049,10 +1068,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 AttorneyModel attorneyModel = new AttorneyModel();
                 string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
-                string[] tempCode = new string[2];
-                tempCode = code.Split('-');
-                attorneyModel.facultityCode = tempCode[0];
-                attorneyModel.actor = tempCode[1];
+                string[] tempCode = code.Split(';');
+                foreach(string codeAttorney in tempCode)
+                {
+                    string[] tempCodeAttorney = codeAttorney.Split('-');
+                    if(factor == tempCodeAttorney[1])
+                    {
+                        if (attorneyModel.facultityCode==string.Empty)
+                        {
+                            attorneyModel.facultityCode += tempCodeAttorney[0];
+                            attorneyModel.actor += tempCodeAttorney[1];
+                        }
+                        else
+                        {
+                            attorneyModel.facultityCode += (";"+ tempCodeAttorney[0]);
+                            attorneyModel.actor += (";" + tempCodeAttorney[1]);
+                        }
+                    }
+                    else
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "089",
+                            ErrorMessage = "Error en el tipo de mandatario",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                }
                 attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                 attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 //Valida CUFE referenciado existe en sistema DIAN

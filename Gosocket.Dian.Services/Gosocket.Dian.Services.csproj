@@ -75,6 +75,7 @@
     </Compile>
     <Compile Include="ServicesGroup\DianPAServices.cs" />
     <Compile Include="ServicesGroup\LogicalARService.cs" />
+    <Compile Include="ServicesGroup\LogicalNMService.cs" />
     <Compile Include="Utils\BatchInsertionUtils.cs" />
     <Compile Include="Utils\Common\DianResponse.cs" />
     <Compile Include="Utils\Common\DocumentParsed.cs" />
