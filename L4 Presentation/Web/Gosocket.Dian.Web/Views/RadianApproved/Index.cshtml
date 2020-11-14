@@ -1,28 +1,54 @@
-﻿@*
-
-    Desarrolo Stepper
-
-
-*@
-
-
-<div style="padding:10px;">
-    <h1>RADIAN Approved</h1>
-
-    <div class="row">
-        <div class="col-md-4">
-            <p>Seleccione el modo de operacion </p>
-        </div>
-        <div class="col-md-4">
-            <select class="form-control">
-                @foreach (var item in ViewBag.RadianSoftwareOperationMode)
-                {
-                    <option value="@item.Id">@item.Name</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-4">
-
+﻿
+@{
+    ViewBag.title = "Titulo";
+}
+<div class="page-content radian-view margin-15">
+    <div class="row title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-body padding-top-20">
+                <div id="steps-approved">
+                     @Html.Partial("_personalInfo")
+                    <h3></h3>
+                    <section>
+                        @Html.Partial("_certificates")
+                    </section>
+                    <h3></h3>
+                    <section>
+                        @Html.Partial("_documentStates");
+                    </section>
+                    <h3></h3>
+                    <section>
+                        <p>The next and previous buttons help you to navigate through your content.</p>
+                    </section>
+                    <h3></h3>
+                    <section>
+                        <p>The next and previous buttons help you to navigate through your content.</p>
+                    </section>
+                    <h3></h3>
+                    <section>
+                        <p>The next and previous buttons help you to navigate through your content.</p>
+                    </section>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+    @section scripts{
+        <script>
+            $(document).ready(function () {
+                $("#steps-approved").steps({
+                    headerTag: "h3",
+                    bodyTag: "section",
+                    transitionEffect: "slideLeft",
+                    autoFocus: true
+                });
+            })
+        </script>
+    }

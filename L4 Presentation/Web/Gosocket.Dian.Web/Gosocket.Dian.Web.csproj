@@ -375,6 +375,7 @@
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\ContributorCategoryViewModel.cs" />
+    <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedViewModel.cs" />
     <Compile Include="Models\RadianContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorFileTypeViewModel.cs" />
@@ -525,11 +526,29 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\fonts\glyphicons.css" />
     <Content Include="Content\fonts\glyphicons.min.css" />
+    <Content Include="Content\images\aproved.png" />
+    <Content Include="Content\images\bandera-1.png" />
+    <Content Include="Content\images\Bandera-2.png" />
     <Content Include="Content\images\cedulacr.jpeg" />
     <Content Include="Content\images\CUPONANTICIPOS.jpg" />
+    <Content Include="Content\images\download.png" />
+    <Content Include="Content\images\edit.png" />
+    <Content Include="Content\images\exclamation-circle.png" />
+    <Content Include="Content\images\ingreso-1.png" />
+    <Content Include="Content\images\ingreso-2.png" />
+    <Content Include="Content\images\ingreso-3.png" />
+    <Content Include="Content\images\loaded.png" />
     <Content Include="Content\images\logo.png" />
     <Content Include="Content\images\LogoAnticipos.png" />
+    <Content Include="Content\images\observations.png" />
     <Content Include="Content\images\payment-design.jpg" />
+    <Content Include="Content\images\pendiente-1.png" />
+    <Content Include="Content\images\pendiente-2.png" />
+    <Content Include="Content\images\pendiente-3.png" />
+    <Content Include="Content\images\pruebas-1.png" />
+    <Content Include="Content\images\pruebas-3.png" />
+    <Content Include="Content\images\puerbas-2.png" />
+    <Content Include="Content\images\reject.png" />
     <Content Include="Content\images\spinner.gif" />
     <Content Include="Content\images\Svg\StepOneOk.svg" />
     <Content Include="Content\images\Svg\Factor.svg" />
@@ -540,6 +559,10 @@
     <Content Include="Content\images\Svg\FacturadorElectronico.svg" />
     <Content Include="Content\images\thumb-200x100.jpg" />
     <Content Include="Content\images\thumb-200x100.png" />
+    <Content Include="Content\images\trash-alt.png" />
+    <Content Include="Content\images\Validado-1.png" />
+    <Content Include="Content\images\Validado-2.png" />
+    <Content Include="Content\images\Validado-3.png" />
     <Content Include="Content\img\aeb50edc3bccd9a6170a88d5e0f14909_xl.jpg" />
     <Content Include="Content\img\av1.png" />
     <Content Include="Content\img\av2.png" />
@@ -614,6 +637,7 @@
     <Content Include="Content\img\video_advance.png" />
     <Content Include="Content\img\visa.png" />
     <Content Include="Content\img\walmart.png" />
+    <Content Include="Content\jquery.steps.css" />
     <Content Include="Content\js\bootstrap-datepicker.es.min.js" />
     <Content Include="Content\js\bootstrap-filestyle.js" />
     <Content Include="Content\js\bootstrap-filestyle.min.js" />
@@ -2536,6 +2560,8 @@
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.steps.js" />
+    <Content Include="Scripts\jquery.steps.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -2736,6 +2762,7 @@
     <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
     <Content Include="Views\RadianApproved\_personalInfo.cshtml" />
     <Content Include="Views\RadianApproved\_certificates.cshtml" />
+    <Content Include="Views\RadianApproved\_documentStates.cshtml" />
     <Content Include="Views\ExternalUsers\Login.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

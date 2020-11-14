@@ -15,10 +15,11 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         private readonly Mock<IRadianContributorService> _radianContributorService = new Mock<IRadianContributorService>();
         private readonly Mock<IRadianTestSetService> _radianTestSetService = new Mock<IRadianTestSetService>();
         private readonly Mock<IRadianContributorFileTypeService> _radianContributorFileTypeService = new Mock<IRadianContributorFileTypeService>();
+        private readonly Mock<IRadianApprovedService> _radianApprovedService = new Mock<IRadianApprovedService>();
 
         public RadianApprovedControllerTests()
         {
-            _current = new RadianApprovedController(_radianContributorService.Object, _radianTestSetService.Object, _radianContributorFileTypeService.Object );
+            _current = new RadianApprovedController(_radianContributorService.Object, _radianTestSetService.Object, _radianContributorFileTypeService.Object, _radianApprovedService.Object);
         }
 
 

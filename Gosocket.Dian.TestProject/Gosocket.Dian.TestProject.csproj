@@ -179,6 +179,7 @@
     <Compile Include="Functions\Plugins\AllTest.cs" />
     <Compile Include="Functions\Validator\AllTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\RadianContributorServiceTests.cs" />
     <Compile Include="Utils\StringUtilTest.cs" />
     <Compile Include="WebServices\AllTest.cs" />
   </ItemGroup>

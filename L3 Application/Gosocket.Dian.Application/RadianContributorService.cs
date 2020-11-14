@@ -1,4 +1,4 @@
-﻿using Gosocket.Dian.Application.Managers;
+﻿using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
@@ -40,44 +40,43 @@ namespace Gosocket.Dian.Application
             NameValueCollection collection = new NameValueCollection();
             Domain.Contributor contributor = _contributorService.GetByCode(userCode);
             if (contributor == null) return collection;
-
-            List<Domain.RadianContributor> radianContributor = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
-            string rcontributorTypes = radianContributor?.Aggregate("", (current, next) => current + ", " + next.RadianContributorTypeId.ToString());
             collection.Add("ContributorId", contributor.Id.ToString());
             collection.Add("ContributorTypeId", contributor.ContributorTypeId.ToString());
             collection.Add("Active", contributor.Status.ToString());
-            collection.Add("WithSoft", (contributor.Softwares?.Count > 0).ToString());
-            collection.Add("ExistInRadian", rcontributorTypes);
             return collection;
         }
 
         public RadianRegistrationValidation RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode)
         {
+
             Contributor contributor = _contributorService.GetByCode(userCode);
             if (contributor == null)
-                return new RadianRegistrationValidation() { Message = "El usuario no existe en el sistema!!!", MessageType = "alert" };
-            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id &&
-                                                                                               t.RadianContributorTypeId == (int)radianContributorType);
+                return new RadianRegistrationValidation(TextResources.NonExistentParticipant, TextResources.alertType);
 
+            if (!(radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect) && (contributor.Softwares == null || !contributor.Softwares.Any(t => t.Status)))
+                return new RadianRegistrationValidation(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
+
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType);
             if (radianContributor != null && radianContributor.RadianState != RadianState.Cancelado.GetDescription())
-                return new RadianRegistrationValidation() { Message = "El participante ya se encuentra registrado en RADIAN", MessageType = "alert" };
-            if (!contributor.Softwares.Any(t => t.Status))
-                return new RadianRegistrationValidation() { Message = "El participante no cuenta con un software propio activo en el sistema", MessageType = "alert" };
+                return new RadianRegistrationValidation(TextResources.RegisteredParticipant, TextResources.alertType);
 
-            switch (radianContributorType)
-            {
-                case Domain.Common.RadianContributorType.ElectronicInvoice:
-                    return new RadianRegistrationValidation() { Message = "¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico ? ", MessageType = "confirm" };
-                case Domain.Common.RadianContributorType.TechnologyProvider:
-                    if (contributor.ContributorTypeId != (int)Domain.Common.RadianContributorType.TechnologyProvider && contributor.Status)
-                        return new RadianRegistrationValidation() { Message = "El participante no es un proveedor tecnológico habilitado", MessageType = "alert" };
-                    return new RadianRegistrationValidation() { Message = "¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?", MessageType = "confirm" };
-                case Domain.Common.RadianContributorType.TradingSystem: 
-                    return new RadianRegistrationValidation() { Message = "¿Está seguro que desea operar como Sistema de Negociación?", MessageType = "confirm" };
-                case Domain.Common.RadianContributorType.Factor:
-                    return new RadianRegistrationValidation() { Message = "¿Está seguro que desea operar como Factor?", MessageType = "confirm" };
-            }
-            return new RadianRegistrationValidation() { Message = "Se logro realizar la validación del usuario a Registrar!!!", MessageType = "alert" };
+            if (radianContributorType == Domain.Common.RadianContributorType.TechnologyProvider && (contributor.ContributorTypeId != (int)Domain.Common.ContributorType.Provider || !contributor.Status))
+                return new RadianRegistrationValidation(TextResources.TechnologProviderDisabled, TextResources.alertType);
+
+            if (radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice)
+                return new RadianRegistrationValidation(TextResources.ElectronicInvoice_Confirm, TextResources.confirmType);
+
+            if (radianContributorType == Domain.Common.RadianContributorType.TechnologyProvider)
+                return new RadianRegistrationValidation(TextResources.TechnologyProvider_Confirm, TextResources.confirmType);
+
+            if (radianContributorType == Domain.Common.RadianContributorType.TradingSystem)
+                return new RadianRegistrationValidation(TextResources.TradingSystem_Confirm, TextResources.confirmType);
+
+            if (radianContributorType == Domain.Common.RadianContributorType.Factor)
+                return new RadianRegistrationValidation(TextResources.Factor_Confirm, TextResources.confirmType);
+
+            return new RadianRegistrationValidation() { Message = TextResources.FailedValidation, MessageType = TextResources.alertType };
+
         }
 
         #endregion
