@@ -13,7 +13,7 @@ namespace Gosocket.Dian.Application.Tests
     public class RadianTestSetAppliedServiceTests
     {
 
-        private readonly Mock<IRadianTestSetAppliedService> _contributorService = new Mock<IRadianTestSetAppliedService>();
+        private readonly Mock<IRadianLoggerService> _contributorService = new Mock<IRadianLoggerService>();
 
 
         [TestMethod()]
