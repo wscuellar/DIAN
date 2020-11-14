@@ -2117,9 +2117,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             case "045"://NotificacionPagoTotalParcial 
-                                if (eventPrev.ListId != "2") {
+                                if (eventPrev.ListId != "2")
+                                {
                                     if (documentMeta
-                                    .Where(t => t.EventCode == "041" || t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                    .Where(t => t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
                                     .Count > decimal.Zero)
                                     {
                                         responses.Add(new ValidateListResponse
@@ -2130,7 +2131,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             ErrorMessage = "Solo se pueda transmitir un evento AR de cada tipo para un CUFE - Es decir no se pueden repetir los eventos ApplicationResponse.",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
-                                    }else
+                                    }
+                                    else
                                     {
                                         responses.Add(new ValidateListResponse
                                         {
@@ -2141,6 +2143,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
+                                }
+                                else if (documentMeta
+                                  .Where(t => t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                  .Count > decimal.Zero)
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "89",
+                                        ErrorMessage = "Error en el sistema",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
                                 }
                                 break;
                         }
