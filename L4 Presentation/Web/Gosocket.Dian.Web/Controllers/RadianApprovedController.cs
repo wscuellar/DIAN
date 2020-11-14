@@ -27,17 +27,20 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Index()
+        public ActionResult Index(int Id)
         {
             // LoadSoftwareModeOperation();
-            RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(1704648);
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(Id);
+            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(radianAdmin.Type.Id);
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
                 Name = radianAdmin.Contributor.TradeName,
                 Nit = radianAdmin.Contributor.Code,
                 BusinessName = radianAdmin.Contributor.BusinessName,
                 Email = radianAdmin.Contributor.Email,
-                Files = radianAdmin.Files
+                Files = radianAdmin.Files,
+                FilesRequires = listFileType
+
             };
             return View(model);
         }

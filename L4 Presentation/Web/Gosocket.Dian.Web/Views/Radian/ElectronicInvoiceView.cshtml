@@ -64,8 +64,8 @@
                 RadianContributorType: $(this).attr('contributorType'),
                 RadianOperationMode: $(this).attr('operationMode'),
             };
-            
-            CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
+             window.location.href = '@Url.Action("Index", "RadianApproved", new { id = ViewBag.ContributorId })';
+            @*CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
                 function (param) {
                     CallExecution("POST", '@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel,
                         function (param) {
@@ -73,7 +73,7 @@
                         },false
                     );
                 },true
-            );
+            );*@
 
         });
 
