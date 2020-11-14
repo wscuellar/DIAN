@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Web
 
             container.RegisterType<IRadianTestSetResultManager, RadianTestSetResultManager>();
             container.RegisterType<IRadianTestSetManager, RadianTestSetManager>();
-            container.RegisterType<IRadianTesSetAppliedManager, RadianTestSetAppliedService>();
+            container.RegisterType<IRadianTestSetAppliedService, RadianTestSetAppliedService>();
 
             #endregion
 

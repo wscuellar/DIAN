@@ -46,36 +46,36 @@ namespace Gosocket.Dian.Application
             return collection;
         }
 
-        public RadianRegistrationValidation RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode)
+        public ResponseMessage RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode)
         {
 
             Contributor contributor = _contributorService.GetByCode(userCode);
             if (contributor == null)
-                return new RadianRegistrationValidation(TextResources.NonExistentParticipant, TextResources.alertType);
+                return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
 
             if (!(radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect) && (contributor.Softwares == null || !contributor.Softwares.Any(t => t.Status)))
-                return new RadianRegistrationValidation(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
+                return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
 
             RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType);
             if (radianContributor != null && radianContributor.RadianState != RadianState.Cancelado.GetDescription())
-                return new RadianRegistrationValidation(TextResources.RegisteredParticipant, TextResources.alertType);
+                return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.alertType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.TechnologyProvider && (contributor.ContributorTypeId != (int)Domain.Common.ContributorType.Provider || !contributor.Status))
-                return new RadianRegistrationValidation(TextResources.TechnologProviderDisabled, TextResources.alertType);
+                return new ResponseMessage(TextResources.TechnologProviderDisabled, TextResources.alertType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice)
-                return new RadianRegistrationValidation(TextResources.ElectronicInvoice_Confirm, TextResources.confirmType);
+                return new ResponseMessage(TextResources.ElectronicInvoice_Confirm, TextResources.confirmType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.TechnologyProvider)
-                return new RadianRegistrationValidation(TextResources.TechnologyProvider_Confirm, TextResources.confirmType);
+                return new ResponseMessage(TextResources.TechnologyProvider_Confirm, TextResources.confirmType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.TradingSystem)
-                return new RadianRegistrationValidation(TextResources.TradingSystem_Confirm, TextResources.confirmType);
+                return new ResponseMessage(TextResources.TradingSystem_Confirm, TextResources.confirmType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.Factor)
-                return new RadianRegistrationValidation(TextResources.Factor_Confirm, TextResources.confirmType);
+                return new ResponseMessage(TextResources.Factor_Confirm, TextResources.confirmType);
 
-            return new RadianRegistrationValidation() { Message = TextResources.FailedValidation, MessageType = TextResources.alertType };
+            return new ResponseMessage() { Message = TextResources.FailedValidation, MessageType = TextResources.alertType };
 
         }
 

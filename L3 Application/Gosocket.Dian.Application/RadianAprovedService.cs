@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System;
@@ -11,11 +12,17 @@ namespace Gosocket.Dian.Application
     {
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianTestSetService _radianTestSetService;
+        private readonly IRadianContributorService _radianContributorService;
+        private readonly IRadianContributorFileTypeService _radianContributorFileTypeService;
+        private readonly IRadianContributorOperationRepository _radianContributorOperationRepository;
 
-        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService)
+        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
+            _radianContributorService = radianContributorService;
+            _radianContributorFileTypeService = radianContributorFileTypeService;
+            _radianContributorOperationRepository = radianContributorOperationRepository;
         }
 
         /// <summary>
@@ -49,7 +56,7 @@ namespace Gosocket.Dian.Application
             Tuple<string, string> data = Tuple.Create(radianContributorName, softwareName);
 
             return data;
-        }        
+        }
 
         public List<RadianContributor> ListContributorByType(int radianContributorTypeId)
         {
@@ -73,7 +80,6 @@ namespace Gosocket.Dian.Application
             return list;
         }
 
-        //Solicitado por Fernando
         public RadianContributor GetRadianContributor(int radianContributorId)
         {
             RadianContributor radianContributor = _radianContributorRepository
@@ -88,6 +94,25 @@ namespace Gosocket.Dian.Application
                 .Get(rc => rc.ContributorId == radianContributorId);
 
             return radianContributor.RadianContributorFile.ToList();
+        }
+
+        public RadianAdmin ContributorSummary(int contributorId)
+        {
+            return _radianContributorService.ContributorSummary(contributorId);
+        }
+
+        public List<RadianContributorFileType> ContributorFileTypeList(int typeId)
+        {
+            List<RadianContributorFileType> contributorTypeList = _radianContributorFileTypeService.FileTypeList()
+                .Where(ft => ft.Id == typeId).ToList();
+
+
+            return contributorTypeList;
+        }
+
+        public ResponseMessage Update(int radianContributorOperationId)
+        {
+            return _radianContributorOperationRepository.Update(radianContributorOperationId);
         }
     }
 }

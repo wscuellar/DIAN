@@ -511,7 +511,7 @@
       <Name>Gosocket.Dian.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\L2 Domain\Gosocket.Dian.Domain\Gosocket.Dian.Domain.csproj">
-      <Project>{fba40283-71df-4b48-8e64-663468e6e0c6}</Project>
+      <Project>{FBA40283-71DF-4B48-8E64-663468E6E0C6}</Project>
       <Name>Gosocket.Dian.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\L3 Application\Gosocket.Dian.Logger\Gosocket.Dian.Logger.csproj">
