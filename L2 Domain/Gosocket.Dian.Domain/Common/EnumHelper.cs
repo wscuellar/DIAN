@@ -261,6 +261,8 @@ namespace Gosocket.Dian.Domain.Common
         Company = 2,
         [Description("Persona")]
         Person = 3,
+        [Description("Usuario Registrado")]
+        ExternalUser = 4,
     }
 
     public enum NumberRangeState

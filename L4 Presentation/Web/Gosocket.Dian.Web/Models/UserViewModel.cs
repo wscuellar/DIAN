@@ -67,6 +67,7 @@ namespace Gosocket.Dian.Web.Models
         public string CertificateLoginFailed { get; set; }
         public string CompanyLoginFailed { get; set; }
         public string PersonLoginFailed { get; set; }
+        public string ExternalUserLoginFailed { get; set; }
 
         [Required(ErrorMessage = "El NIT de empresa es requerido.")]
         [Display(Name = "NIT Empresa")]
