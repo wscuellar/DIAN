@@ -13,6 +13,7 @@
         public string SerieAndNumber { get; set; }
         public string CustomizationId { get; set; }
         public string listID { get; set; }
+        public string DocumentID { get; set; }
 
         public static void SetValues(ref DocumentParsed documentParsed)
         {
@@ -20,6 +21,7 @@
             documentParsed.DocumentKey = documentParsed?.DocumentKey?.ToString()?.ToLower();
             documentParsed.CustomizationId = documentParsed?.CustomizationId;
             documentParsed.listID = documentParsed?.listID;
+            documentParsed.DocumentID = documentParsed?.DocumentID;
         }
     }
 }
