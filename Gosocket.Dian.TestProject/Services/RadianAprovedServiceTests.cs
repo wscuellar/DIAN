@@ -8,12 +8,10 @@ namespace Gosocket.Dian.Application.Tests
     [TestClass()]
     public class RadianAprovedServiceTests
     {
-        private readonly Mock<IRadianAprovedService> _radianAprovedService = new Mock<IRadianAprovedService>();
+        private readonly Mock<IRadianApprovedService> _radianAprovedService = new Mock<IRadianApprovedService>();
 
 
-        public void RadianAprovedServiceTest()
-        {
-        }
+        
 
         [TestMethod()]
         public void FindContributorAndSoftwareTest()
@@ -29,11 +27,13 @@ namespace Gosocket.Dian.Application.Tests
             int radianContributorTypeId = 1;
 
             //ACT
-            var actual = _radianAprovedService.Setup(t => t.ListContributorByType(radianContributorTypeId))
-                                                .Returns(new List<Domain.Contributor>());
+            //var actual = _radianAprovedService.Setup(t => t.ListContributorByType(radianContributorTypeId))
+            //                                    .Returns(new List<Domain.Contributor>());
 
             // ASsert
-            Assert.IsNotNull(actual);
+            //Assert.IsNotNull(actual);
+
+            Assert.Fail();
         }
 
         [TestMethod()]
@@ -49,11 +49,12 @@ namespace Gosocket.Dian.Application.Tests
             _radianAprovedService.Setup(t => true);
 
             // Act
-            var actual = _radianAprovedService.Setup(t => t.ListSoftwareModeOperation())
-                                            .Returns(new List<RadianOperationMode>);
+            //var actual = _radianAprovedService.Setup(t => t.ListSoftwareModeOperation())
+            //                                .Returns(new List<RadianOperationMode>);
 
             // Assert
-            Assert.IsNotNull(actual);
+            //Assert.IsNotNull(actual);
+            Assert.Fail();
         }
     }
 }

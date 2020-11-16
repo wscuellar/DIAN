@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Application
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianContributorFileTypeService _radianContributorFileTypeService;
         private readonly IRadianContributorOperationRepository _radianContributorOperationRepository;
+        private ResponseMessage responseMessage;
 
         public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository)
         {
@@ -104,7 +105,7 @@ namespace Gosocket.Dian.Application
         public List<RadianContributorFileType> ContributorFileTypeList(int typeId)
         {
             List<RadianContributorFileType> contributorTypeList = _radianContributorFileTypeService.FileTypeList()
-                .Where(ft => ft.Id == typeId).ToList();
+                .Where(ft => ft.Id == typeId && !ft.Deleted).ToList();
 
 
             return contributorTypeList;
@@ -112,7 +113,35 @@ namespace Gosocket.Dian.Application
 
         public ResponseMessage Update(int radianContributorOperationId)
         {
-            return _radianContributorOperationRepository.Update(radianContributorOperationId);
+            bool updateResponse = _radianContributorOperationRepository.Update(radianContributorOperationId);
+
+            if (updateResponse)
+            {
+                responseMessage = new ResponseMessage("Datos actuzalizados corresctamente", "Actualizado");
+            }
+            else
+            {
+                responseMessage = new ResponseMessage("Registro no encontrado en la base de datos", "Nulo");
+            }
+
+            return responseMessage;
+        }
+
+        public ResponseMessage UploadFile()
+        {
+
+
+            //ViewBag.CurrentPage = Navigation.NavigationEnum.Provider;
+            //var model = new ContributorUploadFileViewModel
+            //{
+            //    Id = id,
+            //    Code = code,
+            //    FileId = fileId,
+            //    FileTypeId = fileTypeId,
+            //    FileTypeName = fileTypeName
+            //};
+
+            return responseMessage = new ResponseMessage("Archivo guardado correctamente", "Nulo");
         }
     }
 }
