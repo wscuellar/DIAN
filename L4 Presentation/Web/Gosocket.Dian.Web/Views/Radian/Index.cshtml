@@ -13,7 +13,7 @@
     </svg>
 </div>
 
-<div class="container-fluid RadianContainerBegin">
+<div class="container-fluid">
 
     <p class="RadianTextSelected">Seleccione el tipo de participante:</p>
     <svg width="100%" height="2" viewBox="0 0 1110 2" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -26,7 +26,7 @@
             <a href="@Url.Action("ElectronicInvoiceView", "Radian")">
                 <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
                     <div class="RadianImgContainer">
-                        <img  class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
+                        <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
                     </div>
                     <div class="card-body">
                         <p class="RadianTittleCard">Facturador Electrónico</p>
@@ -40,7 +40,7 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
                 <div class="RadianImgContainer">
-                    <img  class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
+                    <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
                 </div>
                 <div class="card-body">
                     <p class="RadianTittleCard">Proveedor Tecnológico</p>
@@ -66,7 +66,7 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <div class="card RadianCardContainer" contributorType="4" operationMode="1" id="4">
                 <div class="RadianImgContainer">
-                    <img  class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
+                    <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
                 </div>
                 <div class="card-body">
                     <p class="RadianTittleCard">Factor</p>
@@ -87,26 +87,34 @@
     <script>
 
         var contributorId = '@ViewBag.ContributorId';
+        var operationClick = false;
 
         $('.RadianCardContainer').click(function () {
 
             if ($(this).attr('operationMode') === "1") {
+                if (!operationClick) {
 
-                var RegistrationDataViewModel = {
-                    ContributorId: '@ViewBag.ContributorId',
-                    RadianContributorType: $(this).attr('contributorType'),
-                    RadianOperationMode: $(this).attr('operationMode'),
-                };
+                    operationClick = true;
 
-                CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
-                    function (param) {
-                        CallExecution("POST", '@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel,
-                            function (param) {
-                                window.location.href = '@Url.Action("Index", "RadianApproved")';
-                            },false
-                        );
-                    },true
-                );
+                    var RegistrationDataViewModel = {
+                        ContributorId: '@ViewBag.ContributorId',
+                        RadianContributorType: $(this).attr('contributorType'),
+                        RadianOperationMode: $(this).attr('operationMode'),
+                    };
+
+                    CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
+                        function (param) {
+                            CallExecution("POST", '@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel,
+                                function (param) {
+                                    window.location.href = '@Url.Action("Index", "RadianApproved")';
+                                },false
+                            );
+                        },true
+                    );
+
+                    operationClick = false;
+
+                }
 
             }
         });

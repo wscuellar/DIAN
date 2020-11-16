@@ -1,0 +1,60 @@
+﻿@model Gosocket.Dian.Web.Models.DocValidatorModel
+
+
+<div id="container1">
+    <div class="row mar-no" style="border-bottom: 2px solid #348441;">
+        <div class="col-sm-6 pad-no">
+            <h4 class="margin-top-10">Eventos de la factura electronica</h4>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+            @if (Model.Events == null || Model.Events.Count == 0)
+            {
+                <tr style="background-color: transparent !important;">
+                    <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
+                        <div class="alert panel-footer-grey">
+                            No tiene eventos asociados.
+                        </div>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <thead>
+                    <tr>
+                        <th>Código del evento</th>
+                        <th>Descripción</th>
+                        <th>Fecha de evento</th>
+                        <th>Nit Emisor</th>
+                        <th>Emisor</th>
+                        <th>Nit Receptor</th>
+                        <th>Receptor</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var set in Model.Events)
+                    {
+                        <tr>
+                            <td>@set.EventCode</td>
+                            <td>@set.Description</td>
+                            <td>@set.EventDate.ToString("yyyy-MM-dd")</td>
+                            <td>@set.SenderCode</td>
+                            <td>@set.Sender</td>
+                            <td>@set.ReceiverCode</td>
+                            <td>@set.Receiver</td>
+                            <td>
+                                <a class="eventView"><i class="fa fa-eye"></i>Ver detalle</a>
+                                <input type="hidden" id="PartitionKey" value="@set.PartitionKey" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            }
+        </table>
+    </div>
+</div>
+<div id="modifyWrapper">
+
+</div>

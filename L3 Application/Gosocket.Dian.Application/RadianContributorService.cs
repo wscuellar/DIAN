@@ -17,15 +17,19 @@ namespace Gosocket.Dian.Application
     public class RadianContributorService : IRadianContributorService
     {
         private readonly IContributorService _contributorService;
+        private readonly IContributorOperationsService _contributorOperationsService;
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
         private readonly IRadianContributorFileRepository _radianContributorFileRepository;
         private readonly IRadianTestSetResultManager _radianTestSetResultManager;
         private readonly IRadianOperationModeRepository _radianOperationModeRepository;
 
-        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianTestSetResultManager radianTestSetResultManager, IRadianOperationModeRepository radianOperationModeRepository)
+        public RadianContributorService(IContributorService contributorService,
+            IContributorOperationsService contributorOperationsService,
+            IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianTestSetResultManager radianTestSetResultManager, IRadianOperationModeRepository radianOperationModeRepository)
         {
             _contributorService = contributorService;
+            _contributorOperationsService = contributorOperationsService;
             _radianContributorRepository = radianContributorRepository;
             _radianContributorTypeRepository = radianContributorTypeRepository;
             _radianContributorFileRepository = radianContributorFileRepository;
@@ -53,7 +57,10 @@ namespace Gosocket.Dian.Application
             if (contributor == null)
                 return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
 
-            if (!(radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect) && (contributor.Softwares == null || !contributor.Softwares.Any(t => t.Status)))
+            List<ContributorOperations> contributorOperations = _contributorOperationsService.GetContributorOperations(contributor.Id);
+            bool ownSoftware = contributorOperations.Any(t => !t.Deleted  && t.OperationModeId == (int)Domain.Common.OperationMode.Own  && t.Software != null && t.Software.Status);
+            bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
+            if (!indirectElectronicBiller && !ownSoftware)
                 return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
 
             RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType);

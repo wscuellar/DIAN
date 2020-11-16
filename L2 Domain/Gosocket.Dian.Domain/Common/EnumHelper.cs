@@ -203,6 +203,42 @@ namespace Gosocket.Dian.Domain.Common
         NegotiatedInvoice = 041,
     }
 
+    public enum EventFlowStatus
+    {
+        [Description("Acuse de recibo")]
+        AcusedeRecibo = 030,
+        [Description("Rechazo de la Factura Electrónica")]
+        RechazoFactura = 031,
+        [Description("Constancia de recibo del bien o aceptación de la prestación del servicio")]
+        ReciboBienServicio = 032,
+        [Description("Aceptación Expresa")]
+        AceptacionExpresa = 033,
+        [Description("Aceptación Tácita")]
+        AceptacionTacita = 034,
+        [Description("Avales")]
+        Avales = 035,
+        [Description("Solicitud de Disponibilizacion")]
+        SolicitudDisponibilizacion = 036,
+        [Description("Endoso en Propiedad")]
+        EndosoPropiedad = 037,
+        [Description("Endoso en Garantía")]
+        EndosoGarantia = 038,
+        [Description("Endoso en Procuración")]
+        EndosoProcuracion = 039,
+        [Description("Anulacion de endoso electrónico")]
+        AnulacionEndoso = 040,
+        [Description("Limitación de circulación")]
+        LimitacionCirculacion = 041,
+        [Description("Anulación de limitación de circulación")]
+        AnulacionLimitacionCirculacion = 042,
+        [Description("Mandato")]
+        Mandato = 043,
+        [Description("Terminación del mandato")]
+        TerminacionMandato = 044,
+        [Description("Notificación del pago total o parcial")]
+        NotificacionPagoTotalParcial = 045
+    }
+
     public enum ExportStatus
     {
         [Description("Procesando")]
@@ -343,19 +379,19 @@ namespace Gosocket.Dian.Domain.Common
     {
         [Display(Name = "Registrado")]
         [Description("Registrado")]
-        Registrado =1,
+        Registrado = 1,
         [Display(Name = "En pruebas")]
         [Description("En pruebas")]
         Test = 2,
         [Display(Name = "Habilitado")]
         [Description("Habilitado")]
-        Habilitado  = 3,
+        Habilitado = 3,
         [Display(Name = "Cancelado")]
         [Description("Cancelado")]
         Cancelado = 4
     }
 
-  
+
     public enum RadianOperationModeTestSet
     {
         [Display(Name = "Software Propio")]
@@ -363,7 +399,7 @@ namespace Gosocket.Dian.Domain.Common
         OwnSoftware = 1,
         [Display(Name = "Software Proveedor Tecnológico")]
         [Description("Software Proveedor Tecnológico")]
-        SoftwareTechnologyProvider=2,
+        SoftwareTechnologyProvider = 2,
         [Display(Name = "Software Sistema de Negociacion")]
         [Description("Software Sistema de Negociacion")]
         SoftwareTradingSystem = 3,
