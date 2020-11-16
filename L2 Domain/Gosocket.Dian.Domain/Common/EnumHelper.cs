@@ -238,7 +238,25 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Cédula de ciudadanía")]
         CC = 10910094,
         [Description("Cédula de extranjería")]
-        CE = 10910096
+        CE = 10910096,
+        [Description("Registro civil")]
+        RC = 10910097,
+        [Description("Tarjeta de identidad")]
+        TI =10910098,
+        [Description("Tarjeta de extranjería")]
+        TE=10910099,
+        [Description("Nit")]
+        Nit=10910100,
+        [Description("Pasaporte")]
+        Pasaporte=10910101	,
+        [Description("Documento de identificación de extranjero")]
+        DIE=10910102,
+        [Description("PEP")]
+        PEP=10910103,
+        [Description("Nit de otro país")]
+        NitOP=10910104,
+        [Description("NIUP")]
+        NIUP=10910105
     }
 
     public enum OperationMode

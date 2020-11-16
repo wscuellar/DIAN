@@ -1,0 +1,138 @@
+﻿@model Gosocket.Dian.Web.Models.ExternalUserViewModel
+
+@{
+    ViewBag.Title = "Agregar usuarios Externos";
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("AddUser", "ExternalUsers", FormMethod.Post, new { id = "add-user-form" }))
+                        {
+                            <input type="hidden" id="listMenu" value="@Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Menu)" />
+                            <input type="hidden" id="hddPermissions" name="hddPermissions" />
+                            @Html.Partial("_userForm")
+                            <br />
+
+                            @*@Html.Partial("_userPermission")*@
+                            foreach (Gosocket.Dian.Web.Models.MenuViewModel menu in ((List<Gosocket.Dian.Web.Models.MenuViewModel>)ViewBag.Menu))
+                            {
+                                <div class="btn-group" id="controlMenu">
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        @menu.Name &nbsp;<span class="badge badge-light" style="color: #074fbb;">@(menu.Options != null ? (((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options).Count() : 0)</span>
+                                    </button>
+                                    <div class="dropdown-menu" style="padding-left: 8px; padding-right: 8px; }">
+                                        <div class="custom-control custom-checkbox dropdown-item">
+                                            <input type="checkbox" class="custom-control-input" id="@("menu" + menu.Id)" onchange="changeAllMenu(@menu.Id)">
+                                            <label class="custom-control-label" for="@("menu" + menu.Id)">Todos...</label>
+                                        </div>
+                                        @if (menu.Options != null)
+                                        {
+                                            foreach (Gosocket.Dian.Web.Models.SubMenuViewModel subMenu in ((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options)
+                                            {
+                                                <div class="custom-control custom-checkbox dropdown-item">
+                                                    <input type="checkbox" class="custom-control-input" id="@("submenu" + menu.Id + "_" + subMenu.Id)">
+                                                    <label class="custom-control-label" for="@("submenu" + menu.Id + "_" + subMenu.Id)">@subMenu.Name</label>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            @Html.ValidationMessage("no_permissions", new { @class = "text-center text-danger" })
+                            <br />
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("Index", "ExternalUsers")" class="btn btn-default">Volver</a>
+                                <button type="submit" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        var listMenu;
+        $(document).ready(function ($) {
+
+            listMenu = JSON.parse($("#listMenu").val());
+
+            $('.btn-save').click(function () {
+                var form = $('#add-user-form');
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+
+                    var permissions = getPermissions();
+
+                    $('#hddPermissions').val(permissions);
+
+                    //form.submit();
+                }
+            });
+        });
+
+        function changeAllMenu(menuId) {
+
+            var checked = $("#menu" + menuId).prop("checked");
+
+            for (i = 0; i < listMenu.length; i++) {
+                
+                if (listMenu[i].Id == menuId && listMenu[i].Options != null) {
+                    for (j = 0; j < listMenu[i].Options.length; j++) {
+                        $("#submenu" + menuId + "_" + listMenu[i].Options[j].Id).prop("checked", checked);
+                    }
+                }
+            }
+
+        }
+
+        function getPermissions() {
+
+            var arrPermissions = [];
+
+            $.each(listMenu, function (index, value) {
+                if (value.Options != null) {
+                    for (j = 0; j < listMenu[index].Options.length; j++) {
+
+                        if ($("#submenu" + listMenu[index].Id + "_" + listMenu[index].Options[j].Id).prop("checked")) {
+
+                            if (j == 0) {
+                                arrPermissions.push({
+                                    Id: value.Id,
+                                    Name: value.Name,
+                                    Options: []
+                                });
+                            }
+
+                            arrPermissions[arrPermissions.length - 1].Options.push({
+                                Id: listMenu[index].Options[j].Id,
+                                MenuId: listMenu[index].Id,
+                                Name: listMenu[index].Options[j].Name
+                            });
+
+                        }
+                    }
+                }
+
+            });
+
+            return JSON.stringify(arrPermissions);
+        }
+
+    </script>
+}

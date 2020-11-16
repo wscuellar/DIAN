@@ -1,0 +1,58 @@
+﻿@model Gosocket.Dian.Web.Models.ExternalUserViewModel
+@Html.HiddenFor(x => x.Id)
+
+<div class="panel-body padding-20 padding-bottom-10">
+    <div class="row">
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Names, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Names, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Names, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.IdentificationType, new { @class = "control-label" })
+                @Html.DropDownListFor(m => m.IdentificationType, new SelectList(Model.IdentificationTypes, "Id", "Description", Model.IdentificationType), new { @class = "form-control selectpicker" })
+            </div>
+        </div>
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Identification, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Identification, new { @class="form-control", autocomplete = "off" })
+                @Html.ValidationMessageFor(m => m.Identification, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", autocomplete = "off" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
+                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", autocomplete = "off" })
+                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    @*<div class="row">
+            <div class="col-sm-3 padding-xs-0">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+</div>
+
