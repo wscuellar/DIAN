@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain.Entity;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
@@ -24,5 +25,7 @@ namespace Gosocket.Dian.Interfaces.Services
         List<RadianContributorFileType> ContributorFileTypeList(int typeId);
 
         ResponseMessage Update(int radianContributorOperationId);
+
+        ResponseMessage UploadFile(Stream fileStream);
     }
 }

@@ -4,6 +4,7 @@ using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Gosocket.Dian.Application
@@ -15,6 +16,7 @@ namespace Gosocket.Dian.Application
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianContributorFileTypeService _radianContributorFileTypeService;
         private readonly IRadianContributorOperationRepository _radianContributorOperationRepository;
+        private ResponseMessage responseMessage;
 
         public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository)
         {
@@ -104,7 +106,10 @@ namespace Gosocket.Dian.Application
         public List<RadianContributorFileType> ContributorFileTypeList(int typeId)
         {
             List<RadianContributorFileType> contributorTypeList = _radianContributorFileTypeService.FileTypeList()
-                .Where(ft => ft.RadianContributorTypeId == 2).ToList();
+                .Where(ft => ft.RadianContributorTypeId == 2 && !ft.Deleted).ToList();
+
+            //Preguntar: es necesario el id del contribuyente?
+            //.Where(ft => ft.Id == typeId && !ft.Deleted).ToList();
 
             return contributorTypeList;
         }
@@ -112,6 +117,23 @@ namespace Gosocket.Dian.Application
         public ResponseMessage Update(int radianContributorOperationId)
         {
             return _radianContributorOperationRepository.Update(radianContributorOperationId);
+        }
+
+        public ResponseMessage UploadFile(Stream fileStream)
+        {
+
+
+            //ViewBag.CurrentPage = Navigation.NavigationEnum.Provider;
+            //var model = new ContributorUploadFileViewModel
+            //{
+            //    Id = id,
+            //    Code = code,
+            //    FileId = fileId,
+            //    FileTypeId = fileTypeId,
+            //    FileTypeName = fileTypeName
+            //};
+
+            return responseMessage = new ResponseMessage("Archivo guardado correctamente", "Nulo");
         }
     }
 }
