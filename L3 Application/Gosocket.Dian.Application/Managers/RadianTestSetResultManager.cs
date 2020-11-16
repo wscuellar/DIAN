@@ -12,7 +12,7 @@ namespace Gosocket.Dian.Application.Managers
     {
         private static readonly TableManager testSetManager = new TableManager("RadianTestSetResult");
 
-        public bool InsertTestSet(RadianTestSetResult testSetResult)
+        public bool InsertOrUpdateTestSet(RadianTestSetResult testSetResult)
         {
             return testSetManager.InsertOrUpdate(testSetResult);
         }

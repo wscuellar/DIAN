@@ -14,13 +14,15 @@ namespace Gosocket.Dian.Application
         private readonly IRadianTestSetService _radianTestSetService;
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianContributorFileTypeService _radianContributorFileTypeService;
+        private readonly IRadianContributorOperationRepository _radianContributorOperationRepository;
 
-        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService)
+        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
             _radianContributorService = radianContributorService;
             _radianContributorFileTypeService = radianContributorFileTypeService;
+            _radianContributorOperationRepository = radianContributorOperationRepository;
         }
 
         /// <summary>
@@ -105,6 +107,11 @@ namespace Gosocket.Dian.Application
                 .Where(ft => ft.RadianContributorTypeId == 2).ToList();
 
             return contributorTypeList;
+        }
+
+        public ResponseMessage Update(int radianContributorOperationId)
+        {
+            return _radianContributorOperationRepository.Update(radianContributorOperationId);
         }
     }
 }

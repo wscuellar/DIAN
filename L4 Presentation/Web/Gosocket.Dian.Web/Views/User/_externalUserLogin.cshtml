@@ -1,0 +1,50 @@
+﻿@using Gosocket.Dian.Web.Models
+@model UserLoginViewModel
+
+<div class="bhoechie-tab-content active">
+    <center>
+        <a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
+        <form method="post" action="@Url.Action("ExternalUserAuthentication","User")" style="margin-top: 20px;">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(x => x.RecaptchaToken, new { id = "ExternalUserRecaptchaToken", @class = "RecaptchaToken" })
+
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-briefcase"></i>
+                    </div>
+                    @Html.TextBoxFor(m => m.CompanyCode, new { @class = "form-control", placeholder = "NIT empresa", autocomplete = "off" })
+                </div>
+                @Html.ValidationMessageFor(m => m.CompanyCode, "", new { @class = "text-danger text-left" })
+                @Html.ValidationMessageFor(m => m.CompanyLoginFailed, "", new { @class = "text-danger text-left" })
+            </div>
+
+            <div class="form-group">
+                @Html.DropDownListFor(m => m.IdentificationType, new SelectList(Model.IdentificationTypes, "Id", "Description", Model.IdentificationType), new { id = "ExternalUserIdentificationType", @class = "form-control selectpicker" })
+            </div>
+
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-user-circle-o"></i>
+                    </div>
+                    @Html.TextBoxFor(m => m.ExternalUserCode, new { @class = "form-control", placeholder = "Nº documento usuario registrado", autocomplete = "off" })
+                </div>
+                @Html.ValidationMessageFor(m => m.ExternalUserCode, "", new { @class = "text-danger text-left" })
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-lock"></i>
+                    </div>
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Contraseña", autocomplete = "off" })
+                </div>
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger text-left" })
+                @Html.ValidationMessageFor(m => m.ExternalUserLoginFailed, "", new { @class = "text-danger text-left" })
+            </div>
+            <button class="btn btn-gosocket btn-lg btn-block" style="margin-top: 10px;">
+                <i class=""></i> Entrar
+            </button>
+        </form>
+    </center>
+</div>
