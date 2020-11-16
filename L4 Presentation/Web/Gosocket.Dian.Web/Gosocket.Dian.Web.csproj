@@ -388,7 +388,6 @@
     <Compile Include="Models\NumberRangeViewModel.cs" />
     <Compile Include="Models\OperationModeViewModel.cs" />
     <Compile Include="Models\ProviderViewModel.cs" />
-    <Compile Include="Models\RadianContributorUploadFileViewModel.cs" />
     <Compile Include="Models\RadianTestSetResultViewModel.cs" />
     <Compile Include="Models\RadianTestSetTableViewModel.cs" />
     <Compile Include="Models\RadianTestSetTrackingViewModel.cs" />

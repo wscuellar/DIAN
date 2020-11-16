@@ -31,7 +31,7 @@ namespace Gosocket.Dian.DataContext.Repositories
             return query.FirstOrDefault();
         }
 
-        public bool Update(int radianContributorOperationId)
+        public ResponseMessage Update(int radianContributorOperationId)
         {
             using (var context = new SqlDBContext())
             {
@@ -44,10 +44,14 @@ namespace Gosocket.Dian.DataContext.Repositories
                     context.Entry(radianContributorOperationInstance).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();
 
-                    return true;
+                    responseMessage = new ResponseMessage("Datos actuzalizados corresctamente", "Actualizado");
+                }
+                else
+                {
+                    responseMessage = new ResponseMessage("Registro no encontrado en la base de datos", "Nulo");
                 }
 
-                return false;
+                return responseMessage;
             }
         }
     }
