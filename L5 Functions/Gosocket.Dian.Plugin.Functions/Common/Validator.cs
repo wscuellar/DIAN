@@ -2556,8 +2556,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = "89",
-                                ErrorMessage = " El Identificador (" + number + ") ApplicationResponse ya existe para este CUFE",
+                                ErrorCode = "AAD05b",
+                                ErrorMessage = "No se puede repetir el numero para el tipo de evento.",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
