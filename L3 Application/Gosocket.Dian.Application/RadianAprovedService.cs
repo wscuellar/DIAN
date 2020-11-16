@@ -102,8 +102,7 @@ namespace Gosocket.Dian.Application
         public List<RadianContributorFileType> ContributorFileTypeList(int typeId)
         {
             List<RadianContributorFileType> contributorTypeList = _radianContributorFileTypeService.FileTypeList()
-                .Where(ft => ft.Id == typeId).ToList();
-
+                .Where(ft => ft.RadianContributorTypeId == 2).ToList();
 
             return contributorTypeList;
         }

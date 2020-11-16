@@ -11,7 +11,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         public int CurrentlyStep { get; set; }
 
         public int RadianContributorTypeId { get; set; }
-        public List<RadianContributorType> FilesRequires { get; set; }
+        public List<RadianContributorFileType> FilesRequires { get; set; }
 
         [Display(Name = "NIT")]
         public string Nit { get; set; }

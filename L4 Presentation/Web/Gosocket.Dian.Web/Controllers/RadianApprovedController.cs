@@ -6,6 +6,8 @@ using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
 using System.Collections.Generic;
+using System.Threading;
+using System.Web;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
@@ -30,7 +32,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Index(int Id)
         {
             // LoadSoftwareModeOperation();
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(Id);
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(1704648);
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(radianAdmin.Type.Id);
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
@@ -88,6 +90,21 @@ namespace Gosocket.Dian.Web.Controllers
         {
             List<Domain.RadianOperationMode> list = _radianTestSetService.OperationModeList();
             ViewBag.RadianSoftwareOperationMode = list;
+        }
+
+        [HttpPost]
+        public JsonResult UploadFiles()
+        {
+           for (int i = 0; i < Request.Files.Count; i++)
+            {
+                var file = Request.Files[i];
+            }
+            Thread.Sleep(3000);
+            return Json(new
+            {
+                messasge = "Datos actualizados correctamente.",
+                success = true,
+            }, JsonRequestBehavior.AllowGet);
         }
     }
 }
