@@ -726,7 +726,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var receiverCode = documentParsed.ReceiverCode;
             var signingTime = xmlParser.SigningTime;
             var customizationID = documentParsed.CustomizationId;
-            var listId = documentParsed.listID;
+            var listId = documentParsed.listID == "" ? "1": documentParsed.listID;
 
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -1518,10 +1518,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string CustomizationID, string ListID)
+        private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, CustomizationID, ListID });
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId, trackIdCude });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1532,13 +1531,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     IsValid = validations[0].IsValid
                 };
                 response.ErrorMessage = new List<string>();
-                if (!response.IsValid)
+                foreach (var item in validations)
                 {
-                    foreach (var item in validations)
+                    if (!item.IsValid)
                     {
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
-                    }
-                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                        response.IsValid = item.IsValid;
+                        response.StatusCode = item.ErrorCode;
+                        response.StatusMessage = item.ErrorMessage;
+                        response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                        return response;
+                    }                   
                 }
             }
             return response;
@@ -1602,8 +1605,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidationReferenceAttorney(string trackId)
         {
 
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId });
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateReferenceAttorney", new { trackId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId });           
 
             DianResponse response = new DianResponse();
             if (validations.Count > 0)

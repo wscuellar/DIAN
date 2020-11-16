@@ -40,9 +40,9 @@ namespace Gosocket.Dian.Plugin.Functions.Event
             if (string.IsNullOrEmpty(data.TrackIdCude))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a TrackIdCude in the request body");
             if (string.IsNullOrEmpty(data.CustomizationID))
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a TrackIdCude in the request body");
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a CustomizationID in the request body");
             if (string.IsNullOrEmpty(data.ListId))
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a TrackIdCude in the request body");
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ListId in the request body");
 
             try
             {
@@ -73,15 +73,15 @@ namespace Gosocket.Dian.Plugin.Functions.Event
         {
             [JsonProperty(PropertyName = "trackId")]
             public string TrackId { get; set; }
-            [JsonProperty(PropertyName = "EventCode")]
+            [JsonProperty(PropertyName = "eventCode")]
             public string EventCode { get; set; }
-            [JsonProperty(PropertyName = "DocumentTypeId")]
+            [JsonProperty(PropertyName = "documentTypeId")]
             public string DocumentTypeId { get; set; }
             [JsonProperty(PropertyName = "trackIdCude")]
             public string TrackIdCude { get; set; }
-            [JsonProperty(PropertyName = "ListID")]
+            [JsonProperty(PropertyName = "listID")]
             public string ListId { get; set; }
-            [JsonProperty(PropertyName = "CustomizationID")]
+            [JsonProperty(PropertyName = "customizationID")]
             public string CustomizationID { get; set; }
         }
     }
