@@ -1,4 +1,4 @@
-﻿
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
 @{
     ViewBag.title = "Titulo";
 }
@@ -16,19 +16,18 @@
                     <div class="radian-personal-info">
                         @Html.Partial("_personalInfo")
                     </div>
-                    <h3></h3>
+                    <h3><span class="name-state">Ingreso de solicitud</span></h3>
+                    <section>
+                    </section>
+                    <h3><span class="name-state">Pendiente</span></h3>
                     <section>
                         @Html.Partial("_certificates")
                     </section>
-                    <h3></h3>
+                    <h3><span class="name-state">Validando documentos</span></h3>
                     <section>
                         @Html.Partial("_documentStates");
                     </section>
-                    <h3></h3>
-                    <section>
-                        <p>The next and previous buttons help you to navigate through your content.</p>
-                    </section>
-                    <h3></h3>
+                    <h3><span class="name-state">Pruebas de aceptación</span></h3>
                     <section>
                         <p>The next and previous buttons help you to navigate through your content.</p>
                     </section>
@@ -50,16 +49,67 @@
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
                     autoFocus: true,
+                    startIndex: 1,
                     labels: {
                         cancel: "Cancel",
                         current: "current step:",
                         pagination: "Pagination",
                         finish: "Finish",
-                        next: "Next",
-                        previous: "Can",
+                        next: "Siguiente",
+                        previous: "Cancelar",
                         loading: "Loading ..."
                     }
                 });
-            })
+
+                $(".radian-file").click(function (file) {
+                    $(this).val("");
+                });
+                $(".radian-file").change(function (file) { 
+                    var fileObj = file.target.files[0];
+                    var fileSize = Math.round(fileObj.size/10000) / 100;
+                    $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
+                });
+
+                @*$('#submit-button').click(function (e) {
+                    e.preventDefault();
+                    debugger;
+                    var formData = new FormData($("#uploadForm")[0]);
+                    $.ajax({
+                        url: "@Url.Action("UploadFiles","RadianApproved")",
+                        type: 'POST',
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        enctype: 'multipart/form-data',
+                        xhr: function () {
+                            //upload Progress
+                            var xhr = $.ajaxSettings.xhr();
+                            if (xhr.upload) {
+                                xhr.upload.addEventListener('progress', function (event) {
+                                    debugger
+                                    var percent = 0;
+                                    var position = event.loaded || event.position;
+                                    var total = event.total;
+                                    if (event.lengthComputable) {
+                                        percent = Math.ceil(position / total * 100);
+                                    }
+                                    //update progressbar
+                                    $(".progress-bar").css("width", + percent + "%");
+                                    $(".status").text(percent + "%");
+                                }, true);
+                            }
+                            return xhr;
+                        },
+                        success: function (mdata) {
+                            debugger
+                            if (mdata == 0) {
+                                alert("Done");
+                            }
+
+                        },
+                    });
+                });*@
+            });
         </script>
     }

@@ -376,6 +376,7 @@
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\ContributorCategoryViewModel.cs" />
+    <Compile Include="Models\ExternalUserViewModel.cs" />
     <Compile Include="Models\QueryEventViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedViewModel.cs" />
@@ -428,9 +429,14 @@
     <Content Include="Content\crush-page\img\city-img.png" />
     <Content Include="Content\crush-page\img\crush-bg.png" />
     <Content Include="Content\crush-page\img\gosign-img.png" />
+    <Content Include="Content\css\bootstrap-grid.css" />
+    <Content Include="Content\css\bootstrap-grid.min.css" />
+    <Content Include="Content\css\bootstrap-reboot.css" />
+    <Content Include="Content\css\bootstrap-reboot.min.css" />
     <Content Include="Content\css\bootstrap-tokenfield.min.css" />
     <Content Include="Content\css\bootstrap.css" />
     <Content Include="Content\css\bootstrap.min.css" />
+    <Content Include="Content\css\custom-form.css" />
     <Content Include="Content\css\daterangepicker.min.css" />
     <Content Include="Content\css\demo\nifty-demo.css" />
     <Content Include="Content\css\demo\nifty-demo.min.css" />
@@ -547,11 +553,23 @@
     <Content Include="Content\images\pendiente-1.png" />
     <Content Include="Content\images\pendiente-2.png" />
     <Content Include="Content\images\pendiente-3.png" />
+    <Content Include="Content\images\png\done.png" />
+    <Content Include="Content\images\png\flagFinish.png" />
+    <Content Include="Content\images\png\ingreso1.png" />
+    <Content Include="Content\images\png\pendiente1.png" />
+    <Content Include="Content\images\png\pendiente2.png" />
+    <Content Include="Content\images\png\pruebas1.png" />
+    <Content Include="Content\images\png\pruebas2.png" />
+    <Content Include="Content\images\png\pruebas3.png" />
+    <Content Include="Content\images\png\validado1.png" />
+    <Content Include="Content\images\png\validado2.png" />
+    <Content Include="Content\images\png\validado3.png" />
     <Content Include="Content\images\pruebas-1.png" />
     <Content Include="Content\images\pruebas-3.png" />
     <Content Include="Content\images\puerbas-2.png" />
     <Content Include="Content\images\reject.png" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\Loaded.svg" />
     <Content Include="Content\images\Svg\Factor.svg" />
     <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
     <Content Include="Content\images\Svg\OperacionDirecta.svg" />
@@ -643,6 +661,8 @@
     <Content Include="Content\js\bootstrap-filestyle.js" />
     <Content Include="Content\js\bootstrap-filestyle.min.js" />
     <Content Include="Content\js\bootstrap-tokenfield.min.js" />
+    <Content Include="Content\js\bootstrap.bundle.js" />
+    <Content Include="Content\js\bootstrap.bundle.min.js" />
     <Content Include="Content\js\bootstrap.js" />
     <Content Include="Content\js\bootstrap.min.js" />
     <Content Include="Content\js\common\common.js" />
@@ -2766,6 +2786,9 @@
     <Content Include="Views\RadianApproved\_documentStates.cshtml" />
     <Content Include="Views\Document\QueryEventsList.cshtml" />
     <Content Include="Views\QueryAssociatedEvents\EventsView.cshtml" />
+    <Content Include="Views\Radian\_iconsState.cshtml" />
+    <Content Include="Views\User\_externalUserLogin.cshtml" />
+    <Content Include="Views\User\ExternalUserLogin.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2790,6 +2813,7 @@
     <Folder Include="Content\js\NewFolder1\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
+    <Folder Include="Views\ExternalUsers\" />
     <Folder Include="Views\RadianSetTest\" />
   </ItemGroup>
   <ItemGroup>

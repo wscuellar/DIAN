@@ -6,6 +6,8 @@ using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
 using System.Collections.Generic;
+using System.Threading;
+using System.Web;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
@@ -27,10 +29,22 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Index()
+        public ActionResult Index(int Id)
         {
             // LoadSoftwareModeOperation();
-            return View();
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(1704648);
+            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(radianAdmin.Type.Id);
+            RadianApprovedViewModel model = new RadianApprovedViewModel()
+            {
+                Name = radianAdmin.Contributor.TradeName,
+                Nit = radianAdmin.Contributor.Code,
+                BusinessName = radianAdmin.Contributor.BusinessName,
+                Email = radianAdmin.Contributor.Email,
+                Files = radianAdmin.Files,
+                FilesRequires = listFileType
+
+            };
+            return View(model);
         }
 
         // GET: RadianFactor
@@ -50,31 +64,38 @@ namespace Gosocket.Dian.Web.Controllers
 
             // CA 2.4 
             // Software de un Proveedor Electronico
-
             RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(registrationData.ContributorId);
-            return View(new RadianApprovedViewModel()
+            RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
                 Name = radianAdmin.Contributor.TradeName,
                 Nit = radianAdmin.Contributor.Code,
                 BusinessName = radianAdmin.Contributor.BusinessName,
                 Email = radianAdmin.Contributor.Email,
                 Files = radianAdmin.Files
-            });
-        }
+            };
+            return View(model);
 
-        public List<Software> Software(int radianContributorId)
-        {
-            var softwares = _radianAprovedService.ListSoftwareByContributor(radianContributorId);
-
-            return null;
-
-            //foreach(var software in softwares)
         }
 
         private void LoadSoftwareModeOperation()
         {
             List<Domain.RadianOperationMode> list = _radianTestSetService.OperationModeList();
             ViewBag.RadianSoftwareOperationMode = list;
+        }
+
+        [HttpPost]
+        public JsonResult UploadFiles()
+        {
+           for (int i = 0; i < Request.Files.Count; i++)
+            {
+                var file = Request.Files[i];
+            }
+            Thread.Sleep(3000);
+            return Json(new
+            {
+                messasge = "Datos actualizados correctamente.",
+                success = true,
+            }, JsonRequestBehavior.AllowGet);
         }
     }
 }

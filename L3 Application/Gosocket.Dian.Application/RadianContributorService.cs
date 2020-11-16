@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Application
                 return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
 
             List<ContributorOperations> contributorOperations = _contributorOperationsService.GetContributorOperations(contributor.Id);
-            bool ownSoftware = contributorOperations.Any(t => !t.Deleted  && t.OperationModeId == (int)Domain.Common.OperationMode.Own  && t.Software != null && t.Software.Status);
+            bool ownSoftware = contributorOperations !=null && contributorOperations.Any(t => !t.Deleted  && t.OperationModeId == (int)Domain.Common.OperationMode.Own  && t.Software != null && t.Software.Status);
             bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
             if (!indirectElectronicBiller && !ownSoftware)
                 return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
@@ -82,7 +82,7 @@ namespace Gosocket.Dian.Application
             if (radianContributorType == Domain.Common.RadianContributorType.Factor)
                 return new ResponseMessage(TextResources.Factor_Confirm, TextResources.confirmType);
 
-            return new ResponseMessage() { Message = TextResources.FailedValidation, MessageType = TextResources.alertType };
+            return new ResponseMessage(TextResources.FailedValidation, TextResources.alertType);
 
         }
 
