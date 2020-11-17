@@ -541,7 +541,39 @@ namespace Gosocket.Dian.Web.Services
                     return new DianResponse { StatusCode = "89", StatusDescription = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML válido." };
                 }
 
-                return null;
+                LogicalNMService customerNomina = new LogicalNMService();
+                {
+                    Stopwatch stopwatch = new Stopwatch();
+                    stopwatch.Start();
+                    var result = customerNomina.SendNominaUpdateStatus(contentFile, authCode);
+
+                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
+                    if (!exist && result.IsValid && result.XmlBase64Bytes != null)
+                        fileManager.Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+
+                    customerNomina = null;
+
+                    stopwatch.Stop();
+                    double ms = stopwatch.ElapsedMilliseconds;
+                    double seconds = ms / 1000;
+                    stopwatch = null;
+                    Log($"{authCode} {email}", (int)InsightsLogType.Info, "SendEventUpdateStatus " + seconds);
+                    if (seconds >= 10)
+                    {
+                        var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "SendEventUpdateStatus" };
+                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                    }
+
+                    //Logged if response do not have AR
+                    if (result?.XmlBase64Bytes == null)
+                    {
+                        var logger = new GlobalLogger($"RESPONSEWITHOUTAR-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = "Response without AR", Action = "SendEventUpdateStatus" };
+                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                    }
+
+                    return result;
+
+                }
             }
             catch (Exception ex)
             {

@@ -92,6 +92,15 @@ namespace Gosocket.Dian.Web.Services
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="contentFile"></param>
+        /// <returns></returns>
+        [OperationContract]
+        [CustomOperation]
+        DianResponse SendNominaSync(byte[] contentFile);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="accountCode"></param>
         /// <param name="docType"></param>
         /// <returns></returns>
