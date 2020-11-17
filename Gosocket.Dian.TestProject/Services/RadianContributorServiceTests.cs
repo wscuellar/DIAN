@@ -22,13 +22,14 @@ namespace Gosocket.Dian.Application.Tests
         private readonly Mock<IRadianContributorFileRepository> _radianContributorFileRepository = new Mock<IRadianContributorFileRepository>();
         private readonly Mock<IRadianTestSetResultManager> _radianTestSetResultManager = new Mock<IRadianTestSetResultManager>();
         private readonly Mock<IRadianOperationModeRepository> _radianOperationModeRepository = new Mock<IRadianOperationModeRepository>();
+        private readonly Mock<IContributorOperationsService> _contributorOperationService = new Mock<IContributorOperationsService>();
         private RadianContributorService _current;
 
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _current = new RadianContributorService(_contributorService.Object, _radianContributorRepository.Object, _radianContributorTypeRepository.Object, _radianContributorFileRepository.Object, _radianTestSetResultManager.Object, _radianOperationModeRepository.Object);
+            _current = new RadianContributorService(_contributorService.Object, _contributorOperationService.Object, _radianContributorRepository.Object, _radianContributorTypeRepository.Object, _radianContributorFileRepository.Object, _radianTestSetResultManager.Object, _radianOperationModeRepository.Object);
         }
 
 
@@ -66,20 +67,27 @@ namespace Gosocket.Dian.Application.Tests
             {
                 case 1:
                     Contributor contributor = new Contributor();
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor.Id)).Returns(new List<ContributorOperations>());
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor);
                     break;
                 case 2:
                     Contributor contributor2 = new Contributor();
-                    List<Software> list = new List<Software>();
-                    contributor2.Softwares = list;
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor2.Id)).Returns((List<ContributorOperations>)null);
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor2);
                     break;
                 case 3:
                     //tiene software con estatus activo
                     Contributor contributor3 = new Contributor();
-                    List<Software> list3 = new List<Software>() { new Software() { Status = true } };
-                    contributor3.Softwares = list3;
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor3);
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor3.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
+
                     //usuario registrado
                     RadianContributor radianContributor = new RadianContributor() { RadianState = "Registrado" };
                     _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor);
@@ -87,9 +95,15 @@ namespace Gosocket.Dian.Application.Tests
                 case 4:
                     //tiene software con estatus activo
                     Contributor contributor4 = new Contributor();
-                    List<Software> list4 = new List<Software>() { new Software() { Status = true } };
-                    contributor4.Softwares = list4;
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor4);
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor4.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
                     //usuario no registrado
                     RadianContributor radianContributor4 = null;
                     _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor4);
@@ -97,9 +111,15 @@ namespace Gosocket.Dian.Application.Tests
                 case 5:
                     //tiene software con estatus activo
                     Contributor contributor5 = new Contributor();
-                    List<Software> list5 = new List<Software>() { new Software() { Status = true } };
-                    contributor5.Softwares = list5;
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor5);
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor5.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
                     //usuario no registrado
                     RadianContributor radianContributor5 = new RadianContributor() { RadianState = RadianState.Cancelado.GetDescription() };
                     _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor5);
@@ -176,43 +196,62 @@ namespace Gosocket.Dian.Application.Tests
                     break;
                 case 2:
                     //Provedor activo con software activo
-                    List<Software> list2 = new List<Software>() { new Software() { Status = true } };
                     Contributor contributor2 = new Contributor()
                     {
                         ContributorTypeId = (int)Domain.Common.ContributorType.Provider,
-                        Softwares = list2,
                         Status = true
                     };
                     //ya registrado en radian
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor2);
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor2.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
                     RadianContributor radianContributor = new RadianContributor() { RadianState = "Registrado" };
                     _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor);
                     break;
                 case 3:
                     //Provedor activo con software inactivo
-                    List<Software> list3 = new List<Software>() { new Software() { Status = true } };
                     Contributor contributor3 = new Contributor()
                     {
                         ContributorTypeId = (int)Domain.Common.ContributorType.Provider,
-                        Softwares = list3,
                         Status = false
                     };
                     //ya registrado en radian pero cancelado
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor3);
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor3.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
                     RadianContributor radianContributor3 = new RadianContributor() { RadianState = "Cancelado" };
                     _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor3);
                     break;
                 case 4:
                     //Provedor activo con software activo
-                    List<Software> list4 = new List<Software>() { new Software() { Status = true } };
                     Contributor contributor4 = new Contributor()
                     {
                         ContributorTypeId = (int)Domain.Common.ContributorType.Provider,
-                        Softwares = list4,
                         Status = true
                     };
                     //ya registrado en radian pero cancelado
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor4);
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor4.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
+
                     RadianContributor radianContributor4 = new RadianContributor() { RadianState = "Cancelado" };
                     _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor4);
                     break;
@@ -237,7 +276,7 @@ namespace Gosocket.Dian.Application.Tests
             string userCode = string.Empty;
             Domain.Common.RadianContributorType radianContributorType = Domain.Common.RadianContributorType.TradingSystem;
             Domain.Common.RadianOperationMode radianOperationMode = Domain.Common.RadianOperationMode.Direct;
-            switch(input)
+            switch (input)
             {
                 case 1:
                     Contributor contributor = new Contributor()
@@ -248,29 +287,41 @@ namespace Gosocket.Dian.Application.Tests
                     break;
                 case 2:
                     //Provedor activo con software activo
-                    List<Software> list2 = new List<Software>() { new Software() { Status = true } };
                     Contributor contributor2 = new Contributor()
                     {
                         ContributorTypeId = (int)Domain.Common.ContributorType.Provider,
-                        Softwares = list2,
                         Status = true
                     };
                     //ya registrado en radian
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor2);
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor2.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
                     RadianContributor radianContributor = new RadianContributor() { RadianState = "Registrado" };
                     _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor);
                     break;
                 case 3:
                     //Provedor activo con software activo
-                    List<Software> list4 = new List<Software>() { new Software() { Status = true } };
                     Contributor contributor4 = new Contributor()
                     {
                         ContributorTypeId = (int)Domain.Common.ContributorType.Provider,
-                        Softwares = list4,
                         Status = true
                     };
                     //ya registrado en radian pero cancelado
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor4);
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor4.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
                     RadianContributor radianContributor4 = new RadianContributor() { RadianState = "Cancelado" };
                     _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor4);
                     break;
@@ -306,29 +357,41 @@ namespace Gosocket.Dian.Application.Tests
                     break;
                 case 2:
                     //Provedor activo con software activo
-                    List<Software> list2 = new List<Software>() { new Software() { Status = true } };
                     Contributor contributor2 = new Contributor()
                     {
                         ContributorTypeId = (int)Domain.Common.ContributorType.Provider,
-                        Softwares = list2,
                         Status = true
                     };
                     //ya registrado en radian
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor2);
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor2.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
                     RadianContributor radianContributor = new RadianContributor() { RadianState = "Registrado" };
                     _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor);
                     break;
                 case 3:
                     //Provedor activo con software activo
-                    List<Software> list4 = new List<Software>() { new Software() { Status = true } };
                     Contributor contributor4 = new Contributor()
                     {
                         ContributorTypeId = (int)Domain.Common.ContributorType.Provider,
-                        Softwares = list4,
                         Status = true
                     };
                     //ya registrado en radian pero cancelado
                     _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor4);
+                    _contributorOperationService.Setup(t => t.GetContributorOperations(contributor4.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
                     RadianContributor radianContributor4 = new RadianContributor() { RadianState = "Cancelado" };
                     _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor4);
                     break;
@@ -341,6 +404,36 @@ namespace Gosocket.Dian.Application.Tests
             //assert
             Assert.AreEqual(expected, result.Message);
         }
+
+        [TestMethod]
+        public void RegistrationValidation_Fail_Test()
+        {
+            //arrange 
+            string userCode = string.Empty;
+            Domain.Common.RadianContributorType radianContributorType = Domain.Common.RadianContributorType.Zero;
+            Domain.Common.RadianOperationMode radianOperationMode = Domain.Common.RadianOperationMode.Direct;
+            Contributor contributor = new Contributor()
+            {
+                ContributorTypeId = (int)Domain.Common.ContributorType.Biller
+            };
+            _contributorService.Setup(t => t.GetByCode(userCode)).Returns(contributor);
+            _contributorOperationService.Setup(t => t.GetContributorOperations(contributor.Id)).Returns(new List<ContributorOperations>()
+                    {
+                        new ContributorOperations()
+                        {
+                            OperationModeId = (int)Domain.Common.OperationMode.Own,
+                            Software = new Software(){ Status = true}
+                        }
+                    });
+
+            //add
+            Domain.Entity.ResponseMessage result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
+
+            //assert
+            Assert.AreEqual("No se logro realizar la validación del participante a Registrar!!!", result.Message);
+
+        }
+
 
     }
 }

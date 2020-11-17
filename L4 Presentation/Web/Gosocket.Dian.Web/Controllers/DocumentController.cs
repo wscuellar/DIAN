@@ -163,6 +163,39 @@ namespace Gosocket.Dian.Web.Controllers
             };
 
 
+            string documentKey = model.Document.DocumentKey.ToLower();
+            model.Events = new List<EventsViewModel>();
+            List<GlobalDocValidatorDocumentMeta> globalDocValidatorDocumentMetax = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(documentKey, "96");
+            if (globalDocValidatorDocumentMetax.Any())
+            {
+
+                foreach (var item in globalDocValidatorDocumentMetax)
+                {
+                    if (!string.IsNullOrEmpty(item.EventCode))
+                    {
+                        GlobalDocValidatorDocument globalDocValidatorDocumentx = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(item.Identifier, item.Identifier);
+                        if (globalDocValidatorDocumentx != null && (globalDocValidatorDocumentx.ValidationStatus == 1 || globalDocValidatorDocumentx.ValidationStatus == 10))
+                        {
+                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventFlowStatus), item.EventCode)));
+                            model.Events.Add(new EventsViewModel()
+                            {
+                                PartitionKey = item.PartitionKey,
+                                RowKey = item.RowKey,
+                                EventCode = item.EventCode,
+                                Description = eventcodetext,
+                                EventDate = item.EmissionDate,
+                                SenderCode = item.SenderCode,
+                                Sender = item.SenderName,
+                                ReceiverCode = item.ReceiverCode,
+                                Receiver = item.ReceiverName
+                            });
+                        }
+
+                    }
+                }
+            }
+
+
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
             return View(model);
         }
@@ -420,6 +453,20 @@ namespace Gosocket.Dian.Web.Controllers
         {
             return View();
         }
+
+        #region MyRegion
+
+        public ActionResult QueryEventsList(DocValidatorModel model)
+        {
+            if (model.Document == null)
+                return View(model);
+
+
+
+            return View(model);
+        }
+
+        #endregion
 
         #region Private methods
 

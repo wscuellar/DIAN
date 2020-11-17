@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Web.Models
         public DocumentViewModel Document { get; set; }
         public List<DocValidatorTrackingModel> Validations { get; set; }
         public List<ReferenceViewModel> References { get; set; }
+        public List<EventsViewModel> Events { get; set; }
     }
 
     public class DocValidatorTrackingModel

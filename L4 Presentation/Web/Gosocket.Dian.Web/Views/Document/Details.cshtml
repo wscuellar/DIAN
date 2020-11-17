@@ -14,8 +14,6 @@
         .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
             width: 135px !important;
         }
-
-        
     </style>
 }
 
@@ -41,11 +39,14 @@
             <div class="tab-content">
                 <div class="panel-body padding-top-20">
                     @Html.Partial("_ViewerPartial")
+                    @Html.Partial("QueryEventsList", Model)
                 </div>
             </div>
         </div>
+        
     </div>
 </div>
+
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
@@ -67,7 +68,29 @@
                 else
                     $(this).removeClass('not-redirect')
             });
+
+            $(".eventView").click(function () {
+                var documentKey = $(this).parent().find("#PartitionKey").val()
+                GetEventsPartialView(documentKey);
+            })
         });
+
+        function GetEventsPartialView(id) {
+            $.ajax({
+                url: '/QueryAssociatedEvents/EventsView/' + id,
+                success: function (data, status, xhr) {
+                    var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
+                    if (injectingPartialView == "true") {
+                        $('#modifyWrapper').html(data);
+                        $('#modifyWrapper').show();
+                        $('#container1').hide();
+                    }
+                    else {
+                        window.location.href = '/User/Login';
+                    }
+                }
+            });
+        };
 
         function changeTab(id) {
             window.location.href = "/Document/Details?trackId=" + id;
