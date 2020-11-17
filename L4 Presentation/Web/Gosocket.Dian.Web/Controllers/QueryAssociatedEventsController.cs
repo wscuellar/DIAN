@@ -14,11 +14,10 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
-        public PartialViewResult EventsView(string id)
+        public ActionResult EventsView()
         {
-            
-            Response.Headers["InjectingPartialView"] = "true";
-            return PartialView();
+            //Response.Headers["InjectingPartialView"] = "true";
+            return View();
         }
     }
 }

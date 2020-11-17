@@ -1,4 +1,5 @@
 ﻿@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Web.Common;
 @using Gosocket.Dian.Web.Utils
 @using Gosocket.Dian.Domain.Common
 @using Gosocket.Dian.Infrastructure
@@ -268,7 +269,7 @@
                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                         {
                                             <ul class="collapse">
-                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Consultar</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("EventsView", "QueryAssociatedEvents")">Consultar</a></li>
                                                 <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
                                                 <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Exportar</a></li>
                                             </ul>
@@ -558,12 +559,6 @@
 
     <script type="text/javascript" src="~/Content/plugins/masked-input/jquery.maskedinput.js"></script>
     @*<script type="text/javascript" src="~/Content/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js"></script>*@
-
-    <!-- upload progress-->
-    <script src="~/Content/plugins/file-upload-progress/js/vendor/jquery.ui.widget.js"></script>
-    <script src="~/Content/plugins/file-upload-progress/js/jquery.iframe-transport.js"></script>
-    <script src="~/Content/plugins/file-upload-progress/js/jquery.fileupload.js"></script>
-
 
     <script src="~/Content/plugins/switchery/switchery.min.js"></script>
     <script src="~/Content/plugins/data-tables/datatables.min.js"></script>

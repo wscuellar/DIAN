@@ -563,3 +563,22 @@ h4.text-thin {
 #steps-approved .content{
     background:none;
 }
+
+.event-section .cude-section span {
+    display: block;
+}
+.event-section .cude-text {
+    overflow-wrap: break-word;
+    width: auto;
+}
+
+.event-section .title-container {
+    margin-bottom: 10px;
+}
+
+.panel > .panel-heading:after{
+    display: none;
+}
+.event-section .aditional-data-section h5, .event-section .aditional-data-section p {
+    margin-bottom: 5px;
+}
