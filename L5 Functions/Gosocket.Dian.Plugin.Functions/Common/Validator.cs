@@ -499,6 +499,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case 33: //Aceptacion Expresa
                     if (party.SenderParty != receiverCode)
                     {
+
+                        //valida si existe los permisos del mandatario 
+                        var response = ValidateFacultityAttorney(party.CudeId, party.TrackId, party.SenderParty, senderCode,
+                            party.ResponseCode);
+                        if (response != null)
+                        {
+                            responses.Add(response);
+                        }
+
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
