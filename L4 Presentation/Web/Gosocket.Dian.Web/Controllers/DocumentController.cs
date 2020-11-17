@@ -180,8 +180,7 @@ namespace Gosocket.Dian.Web.Controllers
                             string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
                             model.Events.Add(new EventsViewModel()
                             {
-                                PartitionKey = eventItem.PartitionKey,
-                                RowKey = eventItem.RowKey,
+                                DocumentKey = eventItem.DocumentKey,
                                 EventCode = eventItem.EventCode,
                                 Description = eventcodetext,
                                 EventDate = eventItem.SigningTimeStamp,
@@ -190,7 +189,7 @@ namespace Gosocket.Dian.Web.Controllers
                                 ReceiverCode = eventItem.SenderCode,
                                 Receiver = eventItem.SenderName
                             });
-                            model.Events= model.Events.OrderBy(t => t.EventCode).ToList();
+                            model.Events = model.Events.OrderBy(t => t.EventCode).ToList();
                         }
 
                     }
@@ -456,20 +455,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
-        #region MyRegion
-
-        public ActionResult QueryEventsList(DocValidatorModel model)
-        {
-            if (model.Document == null)
-                return View(model);
-
-
-
-            return View(model);
-        }
-
-        #endregion
-
+        
         #region Private methods
 
         private bool IsValidCaptcha(string token)
