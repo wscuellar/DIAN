@@ -2841,6 +2841,7 @@
     <Content Include="Views\Radian\_iconsState.cshtml" />
     <Content Include="Views\User\_externalUserLogin.cshtml" />
     <Content Include="Views\User\ExternalUserLogin.cshtml" />
+    <Content Include="Views\RadianApproved\_setTestRedirect.cshtml" />
     <Content Include="Views\RadianApproved\_fileHistory.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -2867,7 +2868,6 @@
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
     <Folder Include="Views\ExternalUsers\" />
-    <Folder Include="Views\RadianSetTest\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
