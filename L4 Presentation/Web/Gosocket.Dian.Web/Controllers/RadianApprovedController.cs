@@ -89,15 +89,6 @@ namespace Gosocket.Dian.Web.Controllers
 
         }
 
-        public List<Software> Software(int radianContributorId)
-        {
-            var softwares = _radianAprovedService.ListSoftwareByContributor(radianContributorId);
-
-            return null;
-
-            //foreach(var software in softwares)
-        }
-
         private void LoadSoftwareModeOperation()
         {
             List<Domain.RadianOperationMode> list = _radianTestSetService.OperationModeList();

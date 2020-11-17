@@ -121,6 +121,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             document.DocumentTags = globalDataDocument.DocumentTags.Select(t => new DocumentTagViewModel()
             {
+
                 Code = t.Value,
                 Description = t.Description,
                 Value = t.Value,
@@ -129,6 +130,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             document.Events = globalDataDocument.Events.Select(e => new EventViewModel()
             {
+                DocumentKey = e.DocumentKey,
                 Code = e.Code,
                 Date = e.Date,
                 DateNumber = e.DateNumber,
@@ -161,6 +163,39 @@ namespace Gosocket.Dian.Web.Controllers
                 Document = document,
                 Validations = validations
             };
+
+
+            model.Events = new List<EventsViewModel>();
+            List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
+            if (eventsByInvoice.Any())
+            {
+
+                foreach (var eventItem in eventsByInvoice)
+                {
+                    if (!string.IsNullOrEmpty(eventItem.EventCode))
+                    {
+                        GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
+                        if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
+                        {
+                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                            model.Events.Add(new EventsViewModel()
+                            {
+                                PartitionKey = eventItem.PartitionKey,
+                                RowKey = eventItem.RowKey,
+                                EventCode = eventItem.EventCode,
+                                Description = eventcodetext,
+                                EventDate = eventItem.SigningTimeStamp,
+                                SenderCode = eventItem.ReceiverCode,
+                                Sender = eventItem.ReceiverName,
+                                ReceiverCode = eventItem.SenderCode,
+                                Receiver = eventItem.SenderName
+                            });
+                            model.Events= model.Events.OrderBy(t => t.EventCode).ToList();
+                        }
+
+                    }
+                }
+            }
 
 
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
@@ -420,6 +455,20 @@ namespace Gosocket.Dian.Web.Controllers
         {
             return View();
         }
+
+        #region MyRegion
+
+        public ActionResult QueryEventsList(DocValidatorModel model)
+        {
+            if (model.Document == null)
+                return View(model);
+
+
+
+            return View(model);
+        }
+
+        #endregion
 
         #region Private methods
 

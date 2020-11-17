@@ -48,6 +48,18 @@ namespace Gosocket.Dian.Functions.Events
                         ((int)EventStatus.Rejected).ToString().PadLeft(3, '0'),
                         ((int)EventStatus.Receipt).ToString().PadLeft(3, '0'),
                         ((int)EventStatus.Accepted).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.AceptacionTacita).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.Avales).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.SolicitudDisponibilizacion).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.EndosoPropiedad).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.EndosoGarantia).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.EndosoProcuracion).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.InvoiceOfferedForNegotiation).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.NegotiatedInvoice).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.AnulacionLimitacionCirculacion).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.Mandato).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.TerminacionMandato).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.NotificacionPagoTotalParcial).ToString().PadLeft(3, '0'),
                     };
             //Validate response code is implemented
             if (!eventCodesImplemented.Contains(responseCode))
@@ -103,6 +115,7 @@ namespace Gosocket.Dian.Functions.Events
             return new Event
             {
                 Date = DateTime.UtcNow,
+                DocumentKey = globalDataDocument.DocumentKey,
                 DateNumber = int.Parse(DateTime.UtcNow.ToString("yyyyMMdd")),
                 TimeStamp = DateTime.UtcNow,
                 Code = code,

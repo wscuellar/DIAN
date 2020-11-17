@@ -1,13 +1,14 @@
 ﻿
 using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
+using Gosocket.Dian.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Gosocket.Dian.Application
 {
-    public class ContributorOperationsService
+    public class ContributorOperationsService : IContributorOperationsService
     {
         public ContributorOperationsService()
         {

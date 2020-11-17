@@ -1,9 +1,11 @@
 ﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Gosocket.Dian.Application
@@ -15,14 +17,17 @@ namespace Gosocket.Dian.Application
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianContributorFileTypeService _radianContributorFileTypeService;
         private readonly IRadianContributorOperationRepository _radianContributorOperationRepository;
+        private readonly IRadianContributorFileRepository _radianContributorFileRepository;
+        private ResponseMessage responseMessage;
 
-        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository)
+        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository, IRadianContributorFileRepository radianContributorFileRepository)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
             _radianContributorService = radianContributorService;
             _radianContributorFileTypeService = radianContributorFileTypeService;
             _radianContributorOperationRepository = radianContributorOperationRepository;
+            _radianContributorFileRepository = radianContributorFileRepository;
         }
 
         /// <summary>
@@ -104,7 +109,7 @@ namespace Gosocket.Dian.Application
         public List<RadianContributorFileType> ContributorFileTypeList(int radianContributorTypeId)
         {
             List<RadianContributorFileType> contributorTypeList = _radianContributorFileTypeService.FileTypeList()
-                .Where(ft => ft.RadianContributorTypeId == radianContributorTypeId).ToList();
+                .Where(ft => ft.RadianContributorTypeId == radianContributorTypeId && !ft.Deleted).ToList();
 
             return contributorTypeList;
         }
@@ -112,6 +117,25 @@ namespace Gosocket.Dian.Application
         public ResponseMessage Update(int radianContributorOperationId)
         {
             return _radianContributorOperationRepository.Update(radianContributorOperationId);
+        }
+
+        public ResponseMessage UploadFile(Stream fileStream, string code, RadianContributorFile radianContributorFile)
+        {
+            var fileName = "";
+            var result = false;
+
+            fileName = StringTools.MakeValidFileName(radianContributorFile.FileName);
+            var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+            result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
+
+            if (result)
+            {
+                _radianContributorFileRepository.Update(radianContributorFile);
+
+                return new ResponseMessage($"Archivo {radianContributorFile.FileName} guardado", "Guardado");
+            }            
+
+           return new ResponseMessage($"No se guardó el archivo {radianContributorFile.FileName}", "Nulo");
         }
     }
 }

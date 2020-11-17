@@ -24,7 +24,7 @@ namespace Gosocket.Dian.Application
             return _radianLoggerManager.GetRadianLogger(partitionKey, rowKey);
         }
 
-        public List<RadianLogger> GetAllTestSet()
+        public List<RadianLogger> GetAllLogger()
         {
             return _radianLoggerManager.GetAllRadianLogger().ToList();
         }

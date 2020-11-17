@@ -200,6 +200,7 @@
     <Compile Include="RadianContributorService.cs" />
     <Compile Include="RadianLoggerService.cs" />
     <Compile Include="RadianTestSetAppliedService.cs" />
+    <Compile Include="RadianTestSetResultService.cs" />
     <Compile Include="RadianTestSetService.cs" />
     <Compile Include="RadianValidationService.cs" />
     <Compile Include="SoftwareService.cs" />
