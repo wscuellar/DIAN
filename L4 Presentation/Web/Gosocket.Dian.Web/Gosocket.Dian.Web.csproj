@@ -2814,7 +2814,6 @@
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
     <Folder Include="Views\ExternalUsers\" />
-    <Folder Include="Views\RadianSetTest\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
