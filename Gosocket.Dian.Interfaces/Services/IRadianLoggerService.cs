@@ -5,7 +5,7 @@ namespace Gosocket.Dian.Application
 {
     public interface IRadianLoggerService
     {
-        List<RadianLogger> GetAllTestSet();
+        List<RadianLogger> GetAllLogger();
         RadianLogger GetRadianLogger(string partitionKey, string rowKey);
         bool InsertOrUpdateRadianLogger(RadianLogger logger);
     }
