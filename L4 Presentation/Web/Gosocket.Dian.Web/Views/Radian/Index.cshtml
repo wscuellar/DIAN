@@ -93,11 +93,13 @@
             if ($(this).attr('operationMode') === "1") {
                 if (!operationClick) {
                     operationClick = true;
+
                     var RegistrationDataViewModel = {
                         ContributorId: '@ViewBag.ContributorId',
                         RadianContributorType: $(this).attr('contributorType'),
                         RadianOperationMode: $(this).attr('operationMode'),
                     };
+
                     CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
                         function (param) {
                             CallExecution("POST", '@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel,

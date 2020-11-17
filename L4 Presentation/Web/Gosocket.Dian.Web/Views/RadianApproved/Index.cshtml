@@ -1,4 +1,5 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@using Newtonsoft.Json
 @{
     ViewBag.title = "Titulo";
 }
@@ -41,8 +42,8 @@
     </div>
 </div>
 
-    @section scripts{
-        <script>
+@section scripts{
+    <script>
             $(document).ready(function () {
                 $("#steps-approved").steps({
                     headerTag: "h3",
@@ -64,20 +65,54 @@
                 $(".radian-file").click(function (file) {
                     $(this).val("");
                 });
-                $(".radian-file").change(function (file) { 
+                $(".radian-file").change(function (file) {
                     var fileObj = file.target.files[0];
                     var fileSize = Math.round(fileObj.size/10000) / 100;
                     $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
                 });
 
-                @*$('#submit-button').click(function (e) {
+                $(".show-history").click(function () {
+                    var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
+                    var dialog = bootbox.dialog({
+                        message: htmlPartial,
+                        className: "table-data",
+                        size: 'large'
+                    });
+                    dialog.init(function (e) {
+                        $('#table-history').DataTable();
+                    } )
+                });
+
+                //$('#fileupload').fileupload({
+                //    dataType: 'json',
+                //    done: function (e, data) {debugger
+                //        console.log("all loaded");
+                //    },
+                //    progressall: function (e, data) {debugger
+                //        var progress = parseInt(data.loaded / data.total * 100, 10);
+                //        $('#progress .bar').css(
+                //            'width',
+                //            progress + '%'
+                //        );
+                //    }
+                //});
+
+                $('#submit-button').click(function (e) {
                     e.preventDefault();
                     debugger;
-                    var formData = new FormData($("#uploadForm")[0]);
+                    var files = $("#uploadForm")[0];
+                    var formdata = new FormData();
+                    for (var i = 0 ; i < files.length - 1 ; i++) {
+                        debugger
+                        files[i].files.length > 0 &&
+                        formdata.append(files[i].files[0].name, files[i].files[i]);
+                    }
+
+
                     $.ajax({
-                        url: "@Url.Action("UploadFiles","RadianApproved")",
+                        url: "@Url.Action("UploadFiles", "RadianApproved")",
                         type: 'POST',
-                        data: formData,
+                        data: formdata,
                         cache: false,
                         contentType: false,
                         processData: false,
@@ -109,7 +144,7 @@
 
                         },
                     });
-                });*@
+                });
             });
-        </script>
-    }
+    </script>
+}

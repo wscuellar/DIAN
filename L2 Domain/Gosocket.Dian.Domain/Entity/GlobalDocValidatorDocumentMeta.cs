@@ -44,4 +44,5 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string ZipKey { get; set; }
     public string EventCode { get; set; }
     public bool InTransaction { get; set; }
+    public DateTime SigningTimeStamp { get; set; }
 }

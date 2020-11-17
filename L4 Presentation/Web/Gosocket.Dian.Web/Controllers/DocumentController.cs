@@ -121,6 +121,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             document.DocumentTags = globalDataDocument.DocumentTags.Select(t => new DocumentTagViewModel()
             {
+
                 Code = t.Value,
                 Description = t.Description,
                 Value = t.Value,
@@ -129,6 +130,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             document.Events = globalDataDocument.Events.Select(e => new EventViewModel()
             {
+                DocumentKey = e.DocumentKey,
                 Code = e.Code,
                 Date = e.Date,
                 DateNumber = e.DateNumber,
@@ -163,32 +165,32 @@ namespace Gosocket.Dian.Web.Controllers
             };
 
 
-            string documentKey = model.Document.DocumentKey.ToLower();
             model.Events = new List<EventsViewModel>();
-            List<GlobalDocValidatorDocumentMeta> globalDocValidatorDocumentMetax = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(documentKey, "96");
-            if (globalDocValidatorDocumentMetax.Any())
+            List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
+            if (eventsByInvoice.Any())
             {
 
-                foreach (var item in globalDocValidatorDocumentMetax)
+                foreach (var eventItem in eventsByInvoice)
                 {
-                    if (!string.IsNullOrEmpty(item.EventCode))
+                    if (!string.IsNullOrEmpty(eventItem.EventCode))
                     {
-                        GlobalDocValidatorDocument globalDocValidatorDocumentx = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(item.Identifier, item.Identifier);
-                        if (globalDocValidatorDocumentx != null && (globalDocValidatorDocumentx.ValidationStatus == 1 || globalDocValidatorDocumentx.ValidationStatus == 10))
+                        GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
+                        if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
                         {
-                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventFlowStatus), item.EventCode)));
+                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
                             model.Events.Add(new EventsViewModel()
                             {
-                                PartitionKey = item.PartitionKey,
-                                RowKey = item.RowKey,
-                                EventCode = item.EventCode,
+                                PartitionKey = eventItem.PartitionKey,
+                                RowKey = eventItem.RowKey,
+                                EventCode = eventItem.EventCode,
                                 Description = eventcodetext,
-                                EventDate = item.EmissionDate,
-                                SenderCode = item.SenderCode,
-                                Sender = item.SenderName,
-                                ReceiverCode = item.ReceiverCode,
-                                Receiver = item.ReceiverName
+                                EventDate = eventItem.SigningTimeStamp,
+                                SenderCode = eventItem.ReceiverCode,
+                                Sender = eventItem.ReceiverName,
+                                ReceiverCode = eventItem.SenderCode,
+                                Receiver = eventItem.SenderName
                             });
+                            model.Events= model.Events.OrderBy(t => t.EventCode).ToList();
                         }
 
                     }

@@ -1,6 +1,25 @@
 ﻿@model Gosocket.Dian.Web.Models.DocValidatorModel
 
+<style>
+    /*eventlink {*/
+        /* Ver detalle */
+        /*font-family: Arial;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 12px;
+        line-height: 14px;*/
+        /* identical to box height */
+        /*text-decoration-line: underline;
+        color: #348441;
+    }*/
 
+    a {
+        text-decoration: none;
+        color: #348441;
+        outline: 0;
+    }
+
+   </style>
 <div id="container1">
     <div class="row mar-no" style="border-bottom: 2px solid #348441;">
         <div class="col-sm-6 pad-no">
@@ -23,9 +42,9 @@
             {
                 <thead>
                     <tr>
-                        <th>Código del evento</th>
+                        <th>Código</th>
                         <th>Descripción</th>
-                        <th>Fecha de evento</th>
+                        <th>Fecha</th>
                         <th>Nit Emisor</th>
                         <th>Emisor</th>
                         <th>Nit Receptor</th>
@@ -39,12 +58,12 @@
                         <tr>
                             <td>@set.EventCode</td>
                             <td>@set.Description</td>
-                            <td>@set.EventDate.ToString("yyyy-MM-dd")</td>
-                            <td>@set.SenderCode</td>
+                            <td style="width:100px;">@set.EventDate.ToString("yyyy-MM-dd")</td>
+                            <td style="width:100px;">@set.SenderCode</td>
                             <td>@set.Sender</td>
-                            <td>@set.ReceiverCode</td>
+                            <td style="width:100px;">@set.ReceiverCode</td>
                             <td>@set.Receiver</td>
-                            <td>
+                            <td style="width:100px;" class="eventlink">
                                 <a class="eventView"><i class="fa fa-eye"></i>Ver detalle</a>
                                 <input type="hidden" id="PartitionKey" value="@set.PartitionKey" />
                             </td>
@@ -55,6 +74,4 @@
         </table>
     </div>
 </div>
-<div id="modifyWrapper">
 
-</div>

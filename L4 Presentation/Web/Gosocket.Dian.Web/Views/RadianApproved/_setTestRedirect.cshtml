@@ -1,0 +1,10 @@
+﻿<div class="panel-body">
+    <div class="row">
+        @using (Html.BeginForm("RequestAuthorization", "BigContributor", FormMethod.Post, new { id = "request-authorization-form" }))
+        {
+            <div class="panel-footer text-right">
+                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Enviar</button>
+            </div>
+        }
+    </div>
+</div>

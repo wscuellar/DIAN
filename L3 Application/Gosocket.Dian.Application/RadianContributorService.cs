@@ -52,17 +52,19 @@ namespace Gosocket.Dian.Application
 
         public ResponseMessage RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode)
         {
-
             Contributor contributor = _contributorService.GetByCode(userCode);
             if (contributor == null)
                 return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
-
-            List<ContributorOperations> contributorOperations = _contributorOperationsService.GetContributorOperations(contributor.Id);
-            bool ownSoftware = contributorOperations !=null && contributorOperations.Any(t => !t.Deleted  && t.OperationModeId == (int)Domain.Common.OperationMode.Own  && t.Software != null && t.Software.Status);
+            
             bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
-            if (!indirectElectronicBiller && !ownSoftware)
-                return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
-
+            if (!indirectElectronicBiller)
+            {
+                List<ContributorOperations> contributorOperations = _contributorOperationsService.GetContributorOperations(contributor.Id);
+                bool ownSoftware = contributorOperations != null && contributorOperations.Any(t => !t.Deleted && t.OperationModeId == (int)Domain.Common.OperationMode.Own && t.Software != null && t.Software.Status);
+                if (!ownSoftware)
+                    return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
+            }
+            
             RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType);
             if (radianContributor != null && radianContributor.RadianState != RadianState.Cancelado.GetDescription())
                 return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.alertType);
@@ -83,7 +85,6 @@ namespace Gosocket.Dian.Application
                 return new ResponseMessage(TextResources.Factor_Confirm, TextResources.confirmType);
 
             return new ResponseMessage(TextResources.FailedValidation, TextResources.alertType);
-
         }
 
         #endregion
