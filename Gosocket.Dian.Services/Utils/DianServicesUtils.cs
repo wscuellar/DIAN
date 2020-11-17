@@ -691,6 +691,7 @@ namespace Gosocket.Dian.Services.Utils
             var eventCode = documentParsed.ResponseCode;
             var documentCude = documentParsed.Cude;
             var customizationId = documentParsed.CustomizationId;
+            var documentID = documentParsed.DocumentID;
 
             switch (docTypeCode)
             {
@@ -733,6 +734,22 @@ namespace Gosocket.Dian.Services.Utils
 
             if(docTypeCode == "96")
             {
+                if (string.IsNullOrEmpty(documentID))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}H06-(R) El número de documento electrónico referenciado no coinciden con reportado..");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
+                if (string.IsNullOrEmpty(documentKey))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}H07-(R) esta UUID no existe en la base de datos de la DIAN.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
                 if (string.IsNullOrEmpty(eventCode.Trim()))
                 {
                     stringBuilder.AppendLine($"{codeMessage}H03-(R) Código tipo de evento no puede estar vacío.");
@@ -764,30 +781,40 @@ namespace Gosocket.Dian.Services.Utils
                     stringBuilder.Clear();
                     isValid = false;
                 }
-            }
 
-            if (string.IsNullOrEmpty(documentKey))
-            {
-                stringBuilder.AppendLine($"{codeMessage}D06-(R) CUFE del UBL no puede estar vacío.");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
+                if (string.IsNullOrEmpty(senderCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}F04-(R) No fue informado el Nit.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
             }
-
-            if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
+            else
             {
-                stringBuilder.AppendLine($"{codeMessage}D05-(R) El ID del Documento no puede estar vacío.");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
-            }
+                if (string.IsNullOrEmpty(documentKey))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}D06-(R) CUFE del UBL no puede estar vacío.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
 
-            if (string.IsNullOrEmpty(senderCode))
-            {
-                stringBuilder.AppendLine($"{codeMessage}J21-(R) El NIT del Emisor no puede estar vacío.");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
+                if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}D05-(R) El ID del Documento no puede estar vacío.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
+                if (string.IsNullOrEmpty(senderCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}J21-(R) El NIT del Emisor no puede estar vacío.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
             }
 
             if (string.IsNullOrEmpty(docTypeCode))

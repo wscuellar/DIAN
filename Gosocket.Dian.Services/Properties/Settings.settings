@@ -113,5 +113,8 @@
     <Setting Name="Param_EventApproveCufe" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ValidateEventApproveCufeUrl</Value>
     </Setting>
+    <Setting Name="Param_ValidateReferenceAttorney" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateReferenceAttorneyUrl</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

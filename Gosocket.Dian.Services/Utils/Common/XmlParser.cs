@@ -35,6 +35,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string TotalEndoso { get; set; }
         public string TotalInvoice { get; set; }
         public string ListID { get; set; }
+        public string DocumentID { get; set; }
 
         public XmlParser()
         {

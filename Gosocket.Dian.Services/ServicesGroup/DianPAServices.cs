@@ -1605,7 +1605,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidationReferenceAttorney(string trackId)
         {
 
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId });           
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });           
 
             DianResponse response = new DianResponse();
             if (validations.Count > 0)

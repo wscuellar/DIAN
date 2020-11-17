@@ -357,5 +357,14 @@ namespace Gosocket.Dian.Services.Properties {
                 return ((string)(this["Param_EventApproveCufe"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidateReferenceAttorneyUrl")]
+        public string Param_ValidateReferenceAttorney {
+            get {
+                return ((string)(this["Param_ValidateReferenceAttorney"]));
+            }
+        }
     }
 }
