@@ -269,7 +269,7 @@
                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                         {
                                             <ul class="collapse">
-                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("EventsView", "QueryAssociatedEvents")">Consultar</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Consultar</a></li>
                                                 <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
                                                 <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Exportar</a></li>
                                             </ul>
