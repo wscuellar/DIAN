@@ -16,9 +16,7 @@ namespace Gosocket.Dian.Web.Models
             
         }
 
-        public string PartitionKey { get; set; }
-        public string RowKey { get; set; }
-
+        public string DocumentKey { get; set; }
         public string EventCode { get; internal set; }
         public string Description { get; internal set; }
         public DateTime EventDate { get; internal set; }
