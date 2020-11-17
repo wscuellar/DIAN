@@ -5,6 +5,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
     color: #2C323C;
 }
+
 label {
     font-family: Arial;
     font-style: normal;
@@ -13,13 +14,14 @@ label {
     line-height: 14px;
 }
 
-li.list-inline-item{
+li.list-inline-item {
     font-family: Arial;
     font-style: normal;
     font-weight: normal;
     font-size: 14px;
     line-height: 16px;
     color: #2C323C;
+    display: inline-table !important;
 }
 
 th {
@@ -31,6 +33,7 @@ th {
     color: #2C323C;
     padding: 6px 10px;
 }
+
 .button-top-left-radian {
     margin: 25px 0px;
     cursor: pointer;
@@ -108,7 +111,7 @@ th {
         margin-top: -10px;
     }
 
-   .RadianCardContainer:hover .RadianTittleCard {
+    .RadianCardContainer:hover .RadianTittleCard {
         font-family: Arial;
         font-style: normal;
         font-weight: bold;
@@ -275,33 +278,39 @@ th {
     border-radius: 4px;
 }
 
-.radian-conventions i, #table-contributor-files i{
+.radian-conventions i, #table-contributor-files i {
     margin: 0px 7px;
     font-style: normal;
     font-weight: 900;
     font-size: 16px;
     line-height: 16px;
 }
-.radian-convention li{
+
+.radian-convention li {
     font-family: Arial;
     font-style: normal;
     font-weight: normal;
     font-size: 14px;
     line-height: 16px;
+    display: inline-table !important;
 }
 
 i.fa-exclamation-circle {
     color: #F3A632;
 }
+
 i.fa-check-circle {
     color: #348441;
 }
+
 i.fa-times-circle {
     color: #B81818;
 }
+
 i.fa-info-circle {
     color: #62C7AB;
 }
+
 #table-contributor-files .download-contributor-files {
     font-style: normal;
     font-weight: 900;
@@ -309,6 +318,7 @@ i.fa-info-circle {
     line-height: 14px;
     align-items: center;
 }
+
 #table-contributor-files td {
     font-family: Arial;
     font-style: normal;
@@ -319,7 +329,7 @@ i.fa-info-circle {
     padding: 6px 10px;
 }
 
-.fa-pencil{
+.fa-pencil {
     font-style: normal;
     font-weight: 900;
     font-size: 14px;
@@ -327,6 +337,7 @@ i.fa-info-circle {
     color: #348441;
     cursor: pointer;
 }
+
 .download-contributor-files {
     color: #348441;
     margin: 0px 6px;
@@ -342,19 +353,22 @@ i.fa-info-circle {
     color: #348441;
     padding: 0px 10px;
 }
+
 .radian-view {
     text-align: left;
     margin-left: 25px;
 }
+
 .title-view {
-     height: 34px; 
-     font-family: Arial; 
-     font-style: normal; 
-     font-weight: normal; 
-     font-size: 30px; 
-     line-height: 34px; 
-     color: #000000;
+    height: 34px;
+    font-family: Arial;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 30px;
+    line-height: 34px;
+    color: #000000;
 }
+
 .underline-title {
     width: calc(100% + 5%);
     height: 3px;
@@ -392,7 +406,7 @@ i.fa-info-circle {
     width: auto;
 }
 
-.panel-title-radian{
+.panel-title-radian {
     font-size: 18px;
 }
 
@@ -400,7 +414,8 @@ i.fa-info-circle {
     cursor: pointer;
     font-size: 11px;
 }
-.init-hide{
+
+.init-hide {
     display: none;
 }
 
@@ -440,18 +455,16 @@ h4.text-thin {
 .modal-dialog .media-body {
     padding: 30px 30px 0px 30px;
 }
-.RadianImgContainer{
+
+.RadianImgContainer {
     text-align: center;
 }
 
 #steps-approved .steps li {
-    width: 86.01px;
-    height: 86.15px;
-    background: linear-gradient(136.21deg, #F2F6FB 8.03%, #FFFFFF 85.07%);
-    opacity: 0.65;
-    box-shadow: -4px -4px 10px #FFFFFF, 4px 4px 10px rgba(0, 0, 0, 0.25);
+    width: 107.01px;
+    height: 108.15px;
     border-radius: 50%;
-    border: solid #b7d3bc;
+    margin: 0px 20px;
 }
 
 #steps-approved .steps a {
@@ -467,99 +480,292 @@ h4.text-thin {
     width: 100%;
 }
 
-#steps-approved .steps li.current {
-    background: linear-gradient(142.43deg, #348441 26.48%, #255F2E 78.19%);
-    border: #b7d3bc;
-}
-
 #steps-approved .steps li a {
     height: inherit;
     top: -3px;
     position: relative;
 }
+
 #steps-approved .steps li.done {
     opacity: 1;
     position: relative;
 }
+
+#steps-approved .steps li:nth-child(3).disabled a {
+    background: url(../../images/png/validado3.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(4).disabled a {
+    background: url(../../images/png/pruebas3.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
 #steps-approved .steps li:nth-child(1).current a {
-    background: url(../../images/ingreso-3.png);
+    background: url(../../images/png/ingreso2.png);
     background-repeat: no-repeat;
-    background-size: 60%;
     background-position: center;
     margin: 0px;
     padding: 0px;
 }
+
 #steps-approved .steps li:nth-child(2).current a {
-    background: url(../../images/pendiente-3.png);
+    background: url(../../images/png/pendiente2.png);
     background-repeat: no-repeat;
-    background-size: 60%;
     background-position: center;
     margin: 0px;
     padding: 0px;
 }
+
 #steps-approved .steps li:nth-child(3).current a {
-    background: url(../../images/Validado-3.png);
+    background: url(../../images/png/validado2.png);
     background-repeat: no-repeat;
-    background-size: 60%;
     background-position: center;
     margin: 0px;
     padding: 0px;
 }
+
 #steps-approved .steps li:nth-child(4).current a {
-    background: url(../../images/pruebas-3.png);
+    background: url(../../images/png/pruebas2.png);
     background-repeat: no-repeat;
-    background-size: 60%;
     background-position: center;
     margin: 0px;
     padding: 0px;
 }
 
 #steps-approved .steps li:nth-child(1).done a {
-    background: url(../../images/ingreso-1.png);
+    background: url(../../images/png/ingreso1.png);
     background-repeat: no-repeat;
-    background-size: 60%;
     background-position: center;
     margin: 0px;
     padding: 0px;
 }
 
 #steps-approved .steps li:nth-child(2).done a {
-    background: url(../../images/pendiente-1.png);
+    background: url(../../images/png/pendiente1.png);
     background-repeat: no-repeat;
-    background-size: 60%;
     background-position: center;
     margin: 0px;
     padding: 0px;
 }
 
 #steps-approved .steps li:nth-child(3).done a {
-    background: url(../../images/Validado-1.png);
+    background: url(../../images/png/validado1.png);
     background-repeat: no-repeat;
-    background-size: 60%;
     background-position: center;
     margin: 0px;
     padding: 0px;
 }
 
 #steps-approved .steps li:nth-child(4).done a {
-    background: url(../../images/pruebas-1.png);
+    background: url(../../images/png/pruebas1.png);
     background-repeat: no-repeat;
-    background-size: 60%;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li.last a {
+    background: url(../../images/png/flagFinish.png);
+    background-repeat: no-repeat;
     background-position: center;
     margin: 0px;
     padding: 0px;
 }
 
 #steps-approved .steps li.done::before {
-    content: url(../../images/aproved.png);
+    content: "";
     position: absolute;
-    right: 0;
+    right: 4px;
+    top: 1px;
+    width: 35px;
+    height: 35px;
+    background-repeat: no-repeat;
+    background-image: url(../../images/png/done.png);
+    z-index: 1;
 }
 
 .radian-personal-info {
     padding: 10px;
 }
 
-#steps-approved .content{
-    background:none;
+#steps-approved .content {
+    background: none;
+}
+
+.radian-upload::-webkit-file-upload-button {
+    visibility: hidden;
+}
+
+.radian-upload::before {
+    content: 'Adjuntar';
+    display: inline-block;
+    background: linear-gradient(top, #f9f9f9, #e3e3e3);
+    border: 1px solid #999;
+    border-radius: 3px;
+    padding: 5px 8px;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    cursor: pointer;
+    text-shadow: 1px 1px #fff;
+    font-weight: 700;
+    font-size: 10pt;
+}
+
+.radian-sub-title-container p {
+    font-family: Arial;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 21px;
+}
+
+.radian-subtitle-container {
+    width: 100%;
+}
+
+.radian-subtitle-line {
+    background: #E9E8E8;
+    border-radius: 2px;
+    height: 1.98px;
+}
+
+.subtitle-view {
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 21px;
+    margin: 0;
+    color: #2C323C;
+    padding: 2px;
+}
+
+#steps-approved section {
+    border: 1px solid #348441;
+    padding: 0;
+    width: 100%;
+    height: auto;
+    position: relative;
+}
+
+.radian-personal-form {
+    padding: 20px 0;
+}
+
+#steps-approved .radian-conventions {
+    margin: 20px 0;
+}
+
+.radian-file-label {
+    background: #FFFFFF;
+    border: 1px solid #348441;
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+
+.custom-file-label::after {
+    content: "Adjuntar";
+    color: white;
+    background: #348441;
+}
+
+#steps-approved .steps {
+    padding: 60px 15%;
+}
+
+#steps-approved li.done .name-state {
+    position: absolute;
+    bottom: -29px;
+    color: black;
+    text-align: center;
+    width: 100%;
+    padding: 0px 2px;
+}
+
+#steps-approved li.current .name-state {
+    position: absolute;
+    bottom: -22px;
+    text-align: center;
+    color: #348441;
+    width: 100%;
+    font-weight: bold;
+}
+
+#steps-approved li.disabled .name-state {
+    position: absolute;
+    bottom: -29px;
+    text-align: center;
+    color: #B0B0B0;
+    width: 100%;
+}
+
+.show-history {
+    text-align: right;
+    float: right;
+    font-size: 18px;
+    color: #348441;
+}
+
+#progress-wrp {
+    border: 1px solid #0099CC;
+    padding: 1px;
+    position: relative;
+    border-radius: 3px;
+    margin: 10px;
+    text-align: left;
+    background: #fff;
+    box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.12);
+}
+
+#progress-wrp .progress-bar {
+    height: 20px;
+    border-radius: 3px;
+    background-color: #79f763;
+    width: 0;
+    box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.11);
+}
+
+#progress-wrp .status {
+    top: 3px;
+    left: 50%;
+    position: absolute;
+    display: inline-block;
+    color: #000000;
+}
+
+.event-section .cude-section span {
+    display: block;
+}
+
+.event-section .cude-text {
+    overflow-wrap: break-word;
+    width: auto;
+}
+
+.event-section .title-container {
+    margin-bottom: 10px;
+}
+
+.panel > .panel-heading:after {
+    display: none;
+}
+
+.event-section .aditional-data-section h5, .event-section .aditional-data-section p {
+    margin-bottom: 5px;
+}
+.event-section .aditional-data-section span {
+    text-align: left;
+    display: block;
+}
+
+.event-section .aditional-data-section .second-section {
+    float: right;
+    padding: 0px 7px;
+    margin-top: 10px;
 }

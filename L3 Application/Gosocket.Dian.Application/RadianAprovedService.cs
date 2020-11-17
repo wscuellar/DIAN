@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System;
@@ -16,15 +17,18 @@ namespace Gosocket.Dian.Application
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianContributorFileTypeService _radianContributorFileTypeService;
         private readonly IRadianContributorOperationRepository _radianContributorOperationRepository;
-        private ResponseMessage responseMessage;
+        private readonly IRadianContributorFileRepository _radianContributorFileRepository;
+        private readonly IRadianContributorFileHistoryRepository _radianContributorFileHistoryRepository;
 
-        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository)
+        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
             _radianContributorService = radianContributorService;
             _radianContributorFileTypeService = radianContributorFileTypeService;
             _radianContributorOperationRepository = radianContributorOperationRepository;
+            _radianContributorFileRepository = radianContributorFileRepository;
+            _radianContributorFileHistoryRepository = radianContributorFileHistoryRepository;
         }
 
         /// <summary>
@@ -103,13 +107,10 @@ namespace Gosocket.Dian.Application
             return _radianContributorService.ContributorSummary(contributorId);
         }
 
-        public List<RadianContributorFileType> ContributorFileTypeList(int typeId)
+        public List<RadianContributorFileType> ContributorFileTypeList(int radianContributorTypeId)
         {
             List<RadianContributorFileType> contributorTypeList = _radianContributorFileTypeService.FileTypeList()
-                .Where(ft => ft.RadianContributorTypeId == 2 && !ft.Deleted).ToList();
-
-            //Preguntar: es necesario el id del contribuyente?
-            //.Where(ft => ft.Id == typeId && !ft.Deleted).ToList();
+                .Where(ft => ft.RadianContributorTypeId == radianContributorTypeId && !ft.Deleted).ToList();
 
             return contributorTypeList;
         }
@@ -119,21 +120,35 @@ namespace Gosocket.Dian.Application
             return _radianContributorOperationRepository.Update(radianContributorOperationId);
         }
 
-        public ResponseMessage UploadFile(Stream fileStream)
+        public ResponseMessage UploadFile(Stream fileStream, string code, RadianContributorFile radianContributorFile)
         {
+            string fileName = StringTools.MakeValidFileName(radianContributorFile.FileName);
+            var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+            bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
 
+            if (result)
+            {
+                Guid idFile = _radianContributorFileRepository.Update(radianContributorFile);
 
-            //ViewBag.CurrentPage = Navigation.NavigationEnum.Provider;
-            //var model = new ContributorUploadFileViewModel
-            //{
-            //    Id = id,
-            //    Code = code,
-            //    FileId = fileId,
-            //    FileTypeId = fileTypeId,
-            //    FileTypeName = fileTypeName
-            //};
+                return new ResponseMessage($"Archivo {radianContributorFile.FileName} con el id {idFile} guardado", "Guardado");
+            }            
 
-            return responseMessage = new ResponseMessage("Archivo guardado correctamente", "Nulo");
+           return new ResponseMessage($"No se guardó el archivo {radianContributorFile.FileName}", "Nulo");
+        }
+
+        public ResponseMessage AddFileHistory(RadianContributorFileHistory radianContributorFileHistory)
+        {
+            radianContributorFileHistory.Timestamp = DateTime.Now;
+            string idHistoryRegister = string.Empty;
+
+            idHistoryRegister = _radianContributorFileHistoryRepository.AddRegisterHistory(radianContributorFileHistory).ToString();
+
+            if (!string.IsNullOrEmpty(idHistoryRegister))
+            {
+                return new ResponseMessage($"Información registrada id: {idHistoryRegister}", "Guardado");
+            }
+
+            return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
         }
     }
 }

@@ -65,9 +65,9 @@
 
             $("#ReceiptNoticeTotalRequired").change(function () {
                 var noticeTotal = parseInt($("#ReceiptNoticeTotalRequired").val());
-                if (noticeTotal < 2) {
-                    showErrorMessage(2);
-                    $("#ReceiptNoticeTotalRequired").val(2);
+                if (noticeTotal < 0) {
+                    showErrorMessage(0);
+                    $("#ReceiptNoticeTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -75,9 +75,9 @@
             });
             $("#ReceiptServiceTotalRequired").change(function () {
                 var receiptServiceTotal = parseInt($("#ReceiptServiceTotalRequired").val());
-                if (receiptServiceTotal < 1) {
-                    showErrorMessage(1);
-                    $("#ReceiptServiceTotalRequired").val(1);
+                if (receiptServiceTotal < 0) {
+                    showErrorMessage(0);
+                    $("#ReceiptServiceTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -85,9 +85,9 @@
             });
             $("#ExpressAcceptanceTotalRequired").change(function () {
                 var expressAcceptanceTotal = parseInt($("#ExpressAcceptanceTotalRequired").val());
-                if (expressAcceptanceTotal < 1) {
-                    showErrorMessage(1);
-                    $("#ExpressAcceptanceTotalRequired").val(1);
+                if (expressAcceptanceTotal < 0) {
+                    showErrorMessage(0);
+                    $("#ExpressAcceptanceTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -95,9 +95,9 @@
             });
             $("#AutomaticAcceptanceTotalRequired").change(function () {
                 var automaticAcceptanceTotal = parseInt($("#AutomaticAcceptanceTotalRequired").val());
-                if (automaticAcceptanceTotal < 1) {
-                    showErrorMessage(1);
-                    $("#AutomaticAcceptanceTotalRequired").val(1);
+                if (automaticAcceptanceTotal < 0) {
+                    showErrorMessage(0);
+                    $("#AutomaticAcceptanceTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -105,9 +105,9 @@
             });
             $("#RejectInvoiceTotalRequired").change(function () {
                 var rejectInvoiceTotal = parseInt($("#RejectInvoiceTotalRequired").val());
-                if (rejectInvoiceTotal < 1) {
-                    showErrorMessage(1);
-                    $("#RejectInvoiceTotalRequired").val(1);
+                if (rejectInvoiceTotal < 0) {
+                    showErrorMessage(0);
+                    $("#RejectInvoiceTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -115,9 +115,9 @@
             });
             $("#ApplicationAvailableTotalRequired").change(function () {
                 var appAvailableTotal = parseInt($("#ApplicationAvailableTotalRequired").val());
-                if (appAvailableTotal < 1) {
-                    showErrorMessage(1);
-                    $("#ApplicationAvailableTotalRequired").val(1);
+                if (appAvailableTotal < 0) {
+                    showErrorMessage(0);
+                    $("#ApplicationAvailableTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -125,9 +125,9 @@
             });
             $("#EndorsementTotalRequired").change(function () {
                 var endorsementTotal = parseInt($("#EndorsementTotalRequired").val());
-                if (endorsementTotal < 1) {
-                    showErrorMessage(1);
-                    $("#EndorsementTotalRequired").val(1);
+                if (endorsementTotal < 0) {
+                    showErrorMessage(0);
+                    $("#EndorsementTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -135,9 +135,9 @@
             });
             $("#EndorsementCancellationTotalRequired").change(function () {
                 var endorsementcancelTotal = parseInt($("#EndorsementCancellationTotalRequired").val());
-                if (endorsementcancelTotal < 1) {
-                    showErrorMessage(1);
-                    $("#EndorsementCancellationTotalRequired").val(1);
+                if (endorsementcancelTotal < 0) {
+                    showErrorMessage(0);
+                    $("#EndorsementCancellationTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -145,9 +145,9 @@
             });
             $("#GuaranteeTotalRequired").change(function () {
                 var garanteeTotal = parseInt($("#GuaranteeTotalRequired").val());
-                if (garanteeTotal < 1) {
-                    showErrorMessage(1);
-                    $("#GuaranteeTotalRequired").val(1);
+                if (garanteeTotal < 0) {
+                    showErrorMessage(0);
+                    $("#GuaranteeTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -155,9 +155,9 @@
             });
             $("#EndMandateTotalRequired").change(function () {
                 var endMandateTotal = parseInt($("#EndMandateTotalRequired").val());
-                if (endMandateTotal < 1) {
-                    showErrorMessage(1);
-                    $("#EndMandateTotalRequired").val(1);
+                if (endMandateTotal < 0) {
+                    showErrorMessage(0);
+                    $("#EndMandateTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -165,9 +165,9 @@
             });
             $("#ElectronicMandateTotalRequired").change(function () {
                 var electronicMandateTotal = parseInt($("#ElectronicMandateTotalRequired").val());
-                if (electronicMandateTotal < 1) {
-                    showErrorMessage(1);
-                    $("#ElectronicMandateTotalRequired").val(1);
+                if (electronicMandateTotal < 0) {
+                    showErrorMessage(0);
+                    $("#ElectronicMandateTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -175,9 +175,9 @@
             });
             $("#PaymentNotificationTotalRequired").change(function () {
                 var paymentNotificationTotal = parseInt($("#PaymentNotificationTotalRequired").val());
-                if (paymentNotificationTotal < 1) {
-                    showErrorMessage(1);
-                    $("#PaymentNotificationTotalRequired").val(1);
+                if (paymentNotificationTotal < 0) {
+                    showErrorMessage(0);
+                    $("#PaymentNotificationTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -185,9 +185,9 @@
             });
             $("#CirculationLimitationTotalRequired").change(function () {
                 var circulationNotificationTotal = parseInt($("#CirculationLimitationTotalRequired").val());
-                if (circulationNotificationTotal < 1) {
-                    showErrorMessage(1);
-                    $("#CirculationLimitationTotalRequired").val(1);
+                if (circulationNotificationTotal < 0) {
+                    showErrorMessage(0);
+                    $("#CirculationLimitationTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -195,9 +195,9 @@
             });
             $("#EndCirculationLimitationTotalRequired").change(function () {
                 var endcirculationNotificationTotal = parseInt($("#EndCirculationLimitationTotalRequired").val());
-                if (endcirculationNotificationTotal < 1) {
-                    showErrorMessage(1);
-                    $("#EndCirculationLimitationTotalRequired").val(1);
+                if (endcirculationNotificationTotal < 0) {
+                    showErrorMessage(0);
+                    $("#EndCirculationLimitationTotalRequired").val(0);
                 }
                 else {
                     updateTotal();
@@ -280,6 +280,7 @@
                 + rejectInvoiceTotal + appAvailableTotal + endorsementTotal + endorsementCancelTotal + garanteeTotal +
                 electronicMandateTotal + endMandateTotal + paymentNotificationTotal + circulationNotificationTotal +
                 endcirculationNotificationTotal);
+
         }
 
         function updateTotalRequired() {
