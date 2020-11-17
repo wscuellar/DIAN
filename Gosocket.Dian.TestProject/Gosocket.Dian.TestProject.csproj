@@ -223,10 +223,6 @@
       <Project>{319e3a78-ed5c-463a-a323-fe1037f38aea}</Project>
       <Name>Gosocket.Dian.Application</Name>
     </ProjectReference>
-    <ProjectReference Include="..\L4 Presentation\Web\Gosocket.Dian.Web\Gosocket.Dian.Web.csproj">
-      <Project>{A9E54CF2-ED1D-4844-B21C-10CFBF8EDB40}</Project>
-      <Name>Gosocket.Dian.Web</Name>
-    </ProjectReference>
     <ProjectReference Include="..\L5 Functions\Gosocket.Dian.Functions\Gosocket.Dian.Functions.csproj">
       <Project>{6894d337-e518-4100-a583-9c3faed6feda}</Project>
       <Name>Gosocket.Dian.Functions</Name>
