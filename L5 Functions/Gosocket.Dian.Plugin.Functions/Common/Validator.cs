@@ -501,7 +501,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
 
                         //valida si existe los permisos del mandatario 
-                        var response = ValidateFacultityAttorney(party.CudeId, party.TrackId, party.SenderParty, senderCode,
+                        var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
                             party.ResponseCode, nitModel.NoteMandato);
                         if (response != null)
                         {
@@ -897,7 +897,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateFacultityAttorney
-        private ValidateListResponse ValidateFacultityAttorney(string partitionKey, string rowKey, string issueAtorney, string senderCode, string eventCode, string noteMandato)
+        private ValidateListResponse ValidateFacultityAttorney(string cude, string cufe, string issueAtorney, string senderCode, string eventCode, string noteMandato)
         {
             DateTime startDate = DateTime.UtcNow;
 
@@ -908,7 +908,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 if (sender != null)
                 {
-                    if (sender.StatusId != 3 || sender.StatusId != 4)
+                    if (sender.StatusId != 3 && sender.StatusId != 4)
                     {
                         return new ValidateListResponse
                         {
@@ -951,7 +951,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            var docReferenceAttorney = documentMetaTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(partitionKey, rowKey, issueAtorney, senderCode).FirstOrDefault();
+            var docReferenceAttorney = documentMetaTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cude, cufe, issueAtorney, senderCode).FirstOrDefault();
             if (docReferenceAttorney == null)
             {
                 return new ValidateListResponse

@@ -50,8 +50,11 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
             if (string.IsNullOrEmpty(data.CustomizationID))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a CustomizationID in the request body");
 
-            if (string.IsNullOrEmpty(data.CudeId))
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a CudeId in the request body");
+            if (string.IsNullOrEmpty(data.TrackIdCude))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackIdCude in the request body");
+
+            if (string.IsNullOrEmpty(data.ListId))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ListID in the request body");
 
             try
             {
@@ -91,8 +94,8 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
         public string ResponseCode { get; set; }
         [JsonProperty(PropertyName = "CustomizationID")]
         public string CustomizationID { get; set; }
-        [JsonProperty(PropertyName = "UUID")]
-        public string CudeId { get; set; }
+        [JsonProperty(PropertyName = "trackIdCude")]
+        public string TrackIdCude { get; set; }
         [JsonProperty(PropertyName = "ListID")]
         public string ListId { get; set; }
     }

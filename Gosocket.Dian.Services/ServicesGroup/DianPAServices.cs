@@ -1488,13 +1488,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidateParty(string trackId, string cudeId, string senderCode, string receiverCode, string eventCode, string customizationID, string listID)
+        private DianResponse ValidateParty(string trackId, string trackIdCude, string senderCode, string receiverCode, string eventCode, string customizationID, string listID)
         {
             var SenderParty = senderCode;
             var ReceiverParty = receiverCode;
             var ResponseCode = eventCode;
             var ListID = listID;            
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, cudeId, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, trackIdCude, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
