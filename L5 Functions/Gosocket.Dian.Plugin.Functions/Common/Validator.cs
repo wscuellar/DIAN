@@ -47,6 +47,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
         static readonly TableManager typeListTableManager = new TableManager("GlobalTypeList");
         private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+        private TableManager TableManagerGlobalAttorneyFacultity = new TableManager("GlobalAttorneyFacultity");
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -951,7 +952,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            var docReferenceAttorney = documentMetaTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cude, cufe, issueAtorney, senderCode).FirstOrDefault();
+            var docReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cude, cufe, issueAtorney, senderCode).FirstOrDefault();
             if (docReferenceAttorney == null)
             {
                 return new ValidateListResponse
@@ -967,7 +968,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var filter = $"{docReferenceAttorney.FacultityCode}-{docReferenceAttorney.Actor}";
 
-            var attorneyFacultity = documentMetaTableManager.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
+            var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
             if (attorneyFacultity != null)
             {
                 if (attorneyFacultity.RowKey != eventCode)
@@ -983,7 +984,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     };
                 }
             }
-            if (!noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+            if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
             {
                 return new ValidateListResponse
                 {
