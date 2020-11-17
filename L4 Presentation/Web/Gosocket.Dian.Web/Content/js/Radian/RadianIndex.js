@@ -43,6 +43,7 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage) {
             else {
                 method(jsonvalue);
             }
+            
         }
     });
 }
@@ -61,11 +62,15 @@ function ConfirmExec(operation, param) {
             className: "btn-radian-default btn-radian-success",
             callback: function () {
                 operation(param);
+                operationClick = false;
             }
         },
         del1: {
             label: "Cancelar",
             className: "btn-radian-default",
+            callback: function () {
+                operationClick = false;
+            }
         }
     }
 }
@@ -75,6 +80,9 @@ function AlertExec() {
         del: {
             label: "Aceptar",
             className: "btn-radian-default",
+            callback: function () {
+                operationClick = false;
+            }
         }
     }
 }

@@ -17,15 +17,19 @@ namespace Gosocket.Dian.Application
     public class RadianContributorService : IRadianContributorService
     {
         private readonly IContributorService _contributorService;
+        private readonly IContributorOperationsService _contributorOperationsService;
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
         private readonly IRadianContributorFileRepository _radianContributorFileRepository;
         private readonly IRadianTestSetResultManager _radianTestSetResultManager;
         private readonly IRadianOperationModeRepository _radianOperationModeRepository;
 
-        public RadianContributorService(IContributorService contributorService, IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianTestSetResultManager radianTestSetResultManager, IRadianOperationModeRepository radianOperationModeRepository)
+        public RadianContributorService(IContributorService contributorService,
+            IContributorOperationsService contributorOperationsService,
+            IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianTestSetResultManager radianTestSetResultManager, IRadianOperationModeRepository radianOperationModeRepository)
         {
             _contributorService = contributorService;
+            _contributorOperationsService = contributorOperationsService;
             _radianContributorRepository = radianContributorRepository;
             _radianContributorTypeRepository = radianContributorTypeRepository;
             _radianContributorFileRepository = radianContributorFileRepository;
@@ -48,14 +52,19 @@ namespace Gosocket.Dian.Application
 
         public ResponseMessage RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode)
         {
-
             Contributor contributor = _contributorService.GetByCode(userCode);
             if (contributor == null)
                 return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
-
-            if (!(radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect) && (contributor.Softwares == null || !contributor.Softwares.Any(t => t.Status)))
-                return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
-
+            
+            bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
+            if (!indirectElectronicBiller)
+            {
+                List<ContributorOperations> contributorOperations = _contributorOperationsService.GetContributorOperations(contributor.Id);
+                bool ownSoftware = contributorOperations != null && contributorOperations.Any(t => !t.Deleted && t.OperationModeId == (int)Domain.Common.OperationMode.Own && t.Software != null && t.Software.Status);
+                if (!ownSoftware)
+                    return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
+            }
+            
             RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType);
             if (radianContributor != null && radianContributor.RadianState != RadianState.Cancelado.GetDescription())
                 return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.alertType);
@@ -75,8 +84,7 @@ namespace Gosocket.Dian.Application
             if (radianContributorType == Domain.Common.RadianContributorType.Factor)
                 return new ResponseMessage(TextResources.Factor_Confirm, TextResources.confirmType);
 
-            return new ResponseMessage() { Message = TextResources.FailedValidation, MessageType = TextResources.alertType };
-
+            return new ResponseMessage(TextResources.FailedValidation, TextResources.alertType);
         }
 
         #endregion
