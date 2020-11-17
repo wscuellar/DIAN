@@ -36,7 +36,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string TotalInvoice { get; set; }
         public string ListID { get; set; }
         public string DocumentID { get; set; }
-        public int NoteMandato { get; set; }
+        public string NoteMandato { get; set; }
 
         public XmlParser()
         {
@@ -93,7 +93,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var nodePaymentDueDate = XmlDocument.SelectSingleNode(nodePaymentDueDateValuesXpath)?.InnerText;
                     var nodeTotalInvoice = XmlDocument.SelectSingleNode(valueTotalInvoice)?.InnerText;
                     var valueNoteMandato = XmlDocument.SelectSingleNode(valueNote)?.InnerText;
-
+                    NoteMandato = valueNoteMandato;
 
                     SigningTime = node?.InnerText;
                     PaymentMeansID = nodePaymentMeans;
