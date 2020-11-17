@@ -36,7 +36,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string TotalInvoice { get; set; }
         public string ListID { get; set; }
         public string DocumentID { get; set; }
-        public int NoteMandato { get; set; }
+        public string NoteMandato { get; set; }
 
         public XmlParser()
         {
@@ -113,6 +113,10 @@ namespace Gosocket.Dian.Services.Utils.Common
                     if(nodeTotalInvoice != null)
                     {
                         TotalInvoice = nodeTotalInvoice;
+                    }
+                    if (valueNoteMandato != null)
+                    {
+                        NoteMandato = valueNoteMandato;
                     }
                 }
             }

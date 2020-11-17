@@ -502,20 +502,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                         //valida si existe los permisos del mandatario 
                         var response = ValidateFacultityAttorney(party.CudeId, party.TrackId, party.SenderParty, senderCode,
-                            party.ResponseCode);
+                            party.ResponseCode, nitModel.NoteMandato);
                         if (response != null)
                         {
                             responses.Add(response);
                         }
-
-                        responses.Add(new ValidateListResponse
+                        else
                         {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = receiver2DvErrorCode,
-                            ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquiriente/Deudor de la factura informada",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = receiver2DvErrorCode,
+                                ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquiriente/Deudor de la factura informada",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
                     }
                     else if (party.ReceiverParty != senderCode)
                     {
@@ -895,7 +897,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateFacultityAttorney
-        private ValidateListResponse ValidateFacultityAttorney(string partitionKey, string rowKey, string issueAtorney, string senderCode, string eventCode)
+        private ValidateListResponse ValidateFacultityAttorney(string partitionKey, string rowKey, string issueAtorney, string senderCode, string eventCode, string noteMandato)
         {
             DateTime startDate = DateTime.UtcNow;
 
@@ -981,6 +983,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     };
                 }
             }
+            if (!noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+            {
+                return new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "89",
+                    ErrorMessage = "falta la nota OBRANDO EN NOMBRE Y REPRESENTACION DE en el documento",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
+            }
+
 
             return null;
         }
