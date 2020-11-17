@@ -191,28 +191,12 @@ namespace Gosocket.Dian.Domain.Common
     {
         [Description("Acuse de recibo")]
         Received = 030,
-        [Description("Rechazo de documento")]
-        Rejected = 031,
-        [Description("Recibimiento de los bienes")]
-        Receipt = 032,
-        [Description("Aceptación de documento")]
-        Accepted = 033,
-        [Description("Factura ofrecida para negociación como título valor")]
-        InvoiceOfferedForNegotiation = 040,
-        [Description("Factura negociada como título valor")]
-        NegotiatedInvoice = 041,
-    }
-
-    public enum EventFlowStatus
-    {
-        [Description("Acuse de recibo")]
-        AcusedeRecibo = 030,
         [Description("Rechazo de la Factura Electrónica")]
-        RechazoFactura = 031,
+        Rejected = 031,
         [Description("Constancia de recibo del bien o aceptación de la prestación del servicio")]
-        ReciboBienServicio = 032,
+        Receipt = 032,
         [Description("Aceptación Expresa")]
-        AceptacionExpresa = 033,
+        Accepted = 033,
         [Description("Aceptación Tácita")]
         AceptacionTacita = 034,
         [Description("Avales")]
@@ -226,9 +210,9 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Endoso en Procuración")]
         EndosoProcuracion = 039,
         [Description("Anulacion de endoso electrónico")]
-        AnulacionEndoso = 040,
+        InvoiceOfferedForNegotiation = 040,
         [Description("Limitación de circulación")]
-        LimitacionCirculacion = 041,
+        NegotiatedInvoice = 041,
         [Description("Anulación de limitación de circulación")]
         AnulacionLimitacionCirculacion = 042,
         [Description("Mandato")]
@@ -238,6 +222,7 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Notificación del pago total o parcial")]
         NotificacionPagoTotalParcial = 045
     }
+
 
     public enum ExportStatus
     {

@@ -46,55 +46,59 @@
         
     </div>
 </div>
+<div class="tab-content">
+    <div id="modifyWrapper">
+
+    </div>
+</div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+
+        <!--Bootstrap Select [ OPTIONAL ]-->
+        <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+        <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+        <script src="~/Content/js/file-validator.js"></script>
 
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
+        <script>
+            $(document).ready(function () {
+                $('.document-row').click('onClick', function () {
+                    if (!$(this).hasClass('not-redirect')) {
+                        var id = $(this).context.getAttribute('data-id');
+                        var partitionKey = $(this).context.getAttribute('data-partitionKey');
+                        window.location.href = "/Document/Details?trackId=" + id + "&partitionKey=" + partitionKey;
+                    }
+                    else
+                        $(this).removeClass('not-redirect')
+                });
 
-    <!--Bootstrap Select [ OPTIONAL ]-->
-    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
-    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
-    <script src="~/Content/js/file-validator.js"></script>
-
-
-    <script>
-        $(document).ready(function () {
-            $('.document-row').click('onClick', function () {
-                if (!$(this).hasClass('not-redirect')) {
-                    var id = $(this).context.getAttribute('data-id');
-                    var partitionKey = $(this).context.getAttribute('data-partitionKey');
-                    window.location.href = "/Document/Details?trackId=" + id + "&partitionKey=" + partitionKey;
-                }
-                else
-                    $(this).removeClass('not-redirect')
+                $(".eventView").click(function () {
+                    var documentKey = $(this).parent().find("#PartitionKey").val()
+                    GetEventsPartialView(documentKey);
+                })
             });
 
-            $(".eventView").click(function () {
-                var documentKey = $(this).parent().find("#PartitionKey").val()
-                GetEventsPartialView(documentKey);
-            })
-        });
-
-        function GetEventsPartialView(id) {
-            $.ajax({
-                url: '/QueryAssociatedEvents/EventsView/' + id,
-                success: function (data, status, xhr) {
-                    var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
-                    if (injectingPartialView == "true") {
-                        $('#modifyWrapper').html(data);
-                        $('#modifyWrapper').show();
-                        $('#container1').hide();
+            function GetEventsPartialView(id) {
+                $.ajax({
+                    url: '/QueryAssociatedEvents/EventsView/' + id,
+                    success: function (data, status, xhr) {
+                        var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
+                        if (injectingPartialView == "true") {
+                            $('#modifyWrapper').html(data);
+                            $('#modifyWrapper').show();
+                            $('#container1').hide();
+                        }
+                        else {
+                            window.location.href = '/User/Login';
+                        }
                     }
-                    else {
-                        window.location.href = '/User/Login';
-                    }
-                }
-            });
-        };
+                });
+            };
 
-        function changeTab(id) {
-            window.location.href = "/Document/Details?trackId=" + id;
-        }
-    </script>
+            function changeTab(id) {
+                window.location.href = "/Document/Details?trackId=" + id;
+            }
+        </script>
 
-}
+    }

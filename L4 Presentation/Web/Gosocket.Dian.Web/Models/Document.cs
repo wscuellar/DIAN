@@ -123,6 +123,7 @@ namespace Gosocket.Dian.Web.Models
 
     public class EventViewModel
     {
+        public string DocumentKey { get; set; }
         public DateTime Date { get; set; }
         public int DateNumber { get; set; }
         public DateTime TimeStamp { get; set; }
