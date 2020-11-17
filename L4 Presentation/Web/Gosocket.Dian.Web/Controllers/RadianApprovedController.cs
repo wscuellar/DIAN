@@ -5,6 +5,7 @@ using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Web;
@@ -48,6 +49,7 @@ namespace Gosocket.Dian.Web.Controllers
             //}
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
+                ContributorId = radianAdmin.Contributor.Id,
                 Name = radianAdmin.Contributor.TradeName,
                 Nit = radianAdmin.Contributor.Code,
                 BusinessName = radianAdmin.Contributor.BusinessName,
@@ -100,7 +102,24 @@ namespace Gosocket.Dian.Web.Controllers
         {
            for (int i = 0; i < Request.Files.Count; i++)
             {
+                RadianContributorFile radianContributorFile = new RadianContributorFile();
+                string nit = Request.Form.Get("nit");
+                string email = Request.Form.Get("email");
+                string ContributorId = Request.Form.Get("contributorId");
                 var file = Request.Files[i];
+
+
+                radianContributorFile.FileName = file.FileName;
+                radianContributorFile.Timestamp = new System.DateTime();
+                radianContributorFile.Updated = new System.DateTime();
+                radianContributorFile.CreatedBy = email;
+                radianContributorFile.RadianContributorId = Convert.ToInt32(ContributorId);
+                radianContributorFile.Deleted = false;
+                radianContributorFile.FileType = 2;
+                radianContributorFile.Status = 31;
+
+                ResponseMessage responseUpload = _radianAprovedService.UploadFile(file.InputStream, nit, radianContributorFile);
+
             }
             Thread.Sleep(3000);
             return Json(new

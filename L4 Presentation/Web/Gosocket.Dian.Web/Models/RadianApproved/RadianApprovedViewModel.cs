@@ -8,6 +8,8 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
     {
         public int Step { get; set; }
 
+        public int ContributorId { get; set; }
+
         public int CurrentlyStep { get; set; }
 
         public int RadianContributorTypeId { get; set; }
