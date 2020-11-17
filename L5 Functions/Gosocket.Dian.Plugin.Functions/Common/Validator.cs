@@ -2145,6 +2145,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
                                 break;
+                            case "043": //Mandato                               
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = true,
+                                    Mandatory = true,
+                                    ErrorCode = "100",
+                                    ErrorMessage = "Evento referenciado correctamente",
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                                break;
                             case "045"://NotificacionPagoTotalParcial
                                 //Si el titulo valor tiene una limitación previa (041)
                                 if (documentMeta
