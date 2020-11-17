@@ -36,7 +36,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string TotalInvoice { get; set; }
         public string ListID { get; set; }
         public string DocumentID { get; set; }
-        public string NoteMandato { get; set; }
+
 
         public XmlParser()
         {
@@ -85,16 +85,13 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var listIDValueXpath = XmlDocument.GetElementsByTagName("cbc:ResponseCode")[0];
                     var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";
                     var valueDiscountRateEndoso = XmlDocument.GetElementsByTagName("InformacionNegociacion")[0];
-                    var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
-                    var valueNote = "//*[local-name()='Note']";
+                    var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";                    
 
                     var documentReferenceId = XmlDocument.SelectSingleNode(documentReferenceIdValueXpath)?.InnerText;
                     var nodePaymentMeans = XmlDocument.SelectSingleNode(nodePaymentMeansValuesXpath)?.InnerText;
                     var nodePaymentDueDate = XmlDocument.SelectSingleNode(nodePaymentDueDateValuesXpath)?.InnerText;
                     var nodeTotalInvoice = XmlDocument.SelectSingleNode(valueTotalInvoice)?.InnerText;
-                    var valueNoteMandato = XmlDocument.SelectSingleNode(valueNote)?.InnerText;
-                    NoteMandato = valueNoteMandato;
-
+                    
                     SigningTime = node?.InnerText;
                     PaymentMeansID = nodePaymentMeans;
                     DocumentReferenceId = documentReferenceId;
