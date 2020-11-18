@@ -37,6 +37,8 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public RadianTestSetResult RadianTestSetResult { get; set; }
 
+        public Software Software { get; set; }
+
         public RadianApprovedViewModel()
         {
             RadianFileList = new List<RadianContributorFileTypeTableViewModel>();

@@ -34,11 +34,8 @@
                         </div>
                         <div class="col-sm-9 padding-xs-0">
                             <div class="form-group">
-                                @*
-                        //todo fer: campo desconocido
-                        @Html.Label(m => m.RadianTestSetResult.Description, new { @class = "control-label" })
-                        @Html.TextBoxFor(m => m.RadianTestSetResult.Description, defaultHtmlAttr)
-                                *@
+                                @Html.Label("Descripción", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.StatusDescription, defaultHtmlAttr)
                             </div>
                         </div>
                     </div>
@@ -49,23 +46,20 @@
 
                         <div class="col-sm-2 padding-xs-0">
                             <div class="form-group">
-                                @*//todo fer: campo desconocido*@
                                 @Html.Label("Identificación", new { @class = "control-label" })
-                                @Html.TextBox(string.Empty, null, defaultHtmlAttr)
+                                @Html.TextBoxFor(m => m.Software.Id, defaultHtmlAttr)
                             </div>
                         </div>
                         <div class="col-sm-2 padding-xs-0">
                             <div class="form-group">
-                                @*//todo fer: campo desconocido*@
                                 @Html.Label("Nombre", new { @class = "control-label" })
-                                @Html.TextBox(string.Empty, null, defaultHtmlAttr)
+                                @Html.TextBoxFor(m => m.Software.Name, defaultHtmlAttr)
                             </div>
                         </div>
                         <div class="col-sm-8 padding-xs-0">
                             <div class="form-group">
-                                @*//todo fer: campo desconocido*@
                                 @Html.Label("PIN", new { @class = "control-label" })
-                                @Html.TextBox(string.Empty, null, defaultHtmlAttr)
+                                @Html.TextBoxFor(m => m.Software.Pin, defaultHtmlAttr)
                             </div>
                         </div>
                     </div>
@@ -101,9 +95,8 @@
                         </div>
                         <div class="col-sm-2 padding-xs-0">
                             <div class="form-group">
-                                @* //todo fer: campo desconocido *@
                                 @Html.Label("Aceptación tácita", new { @class = "control-label" })
-                                @Html.TextBox(string.Empty, null, defaultHtmlAttr)
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalRequired, defaultHtmlAttr)
                             </div>
                         </div>
                         <div class="col-sm-2 padding-xs-0">
@@ -135,13 +128,6 @@
                         </div>
                         <div class="col-sm-2 padding-xs-0">
                             <div class="form-group">
-                                @* //todo fer: campo desconocido *@
-                                @Html.Label("Autorización para circulación", new { @class = "control-label" })
-                                @Html.TextBox(string.Empty, null, defaultHtmlAttr)
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
                                 @Html.Label("Endoso electrónico", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementTotalRequired, defaultHtmlAttr)
                             </div>
@@ -152,22 +138,22 @@
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementCancellationTotalRequired, defaultHtmlAttr)
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-sm-2 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("Notificación de pago parcial o total", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired, defaultHtmlAttr)
                             </div>
                         </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-sm-2 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("Limitación de circulación", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired, defaultHtmlAttr)
                             </div>
                         </div>
-                        <div class="col-sm-2 padding-xs-0">
+                        <div class="col-sm-10 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("Terminación de la limitación de circulación", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
@@ -206,9 +192,8 @@
                         </div>
                         <div class="col-sm-2 padding-xs-0">
                             <div class="form-group">
-                                @* //todo fer: campo desconocido *@
                                 @Html.Label("Aceptación tácita", new { @class = "control-label" })
-                                @Html.TextBox(string.Empty, null, defaultHtmlAttr)
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalAcceptedRequired, defaultHtmlAttr)
                             </div>
                         </div>
                         <div class="col-sm-2 padding-xs-0">
@@ -240,13 +225,6 @@
                         </div>
                         <div class="col-sm-2 padding-xs-0">
                             <div class="form-group">
-                                @* //todo fer: campo desconocido *@
-                                @Html.Label("Autorización para circulación", new { @class = "control-label" })
-                                @Html.TextBox(string.Empty, null, defaultHtmlAttr)
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
                                 @Html.Label("Endoso electrónico", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementTotalAcceptedRequired, defaultHtmlAttr)
                             </div>
@@ -257,22 +235,22 @@
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementCancellationTotalAcceptedRequired, defaultHtmlAttr)
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-sm-2 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("Notificación de pago parcial o total", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired, defaultHtmlAttr)
                             </div>
                         </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-sm-2 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("Limitación de circulación", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
                             </div>
                         </div>
-                        <div class="col-sm-2 padding-xs-0">
+                        <div class="col-sm-10 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("Terminación de la limitación de circulación", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
