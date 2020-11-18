@@ -220,14 +220,19 @@ namespace Gosocket.Dian.Web.Controllers
                 if (data != null)
                 {
                     RadianContributorFile radianContributorFileInstance = null;
-                    RadianContributorFileHistory radianContributorFileHistory = new RadianContributorFileHistory();
-
                     foreach (var n in data)
                     {
+                        RadianContributorFileHistory radianFileHistory = new RadianContributorFileHistory();
                         radianContributorFileInstance = _radianContributorService.RadianContributorFileList(n.Id).FirstOrDefault();
                         radianContributorFileInstance.Status = n.NewState;
                         _ = _radianContributorService.UpdateRadianContributorFile(radianContributorFileInstance).ToString();
-                        _ = _radianContributorService.AddFileHistory(radianContributorFileHistory);
+
+                        radianFileHistory.FileName = radianContributorFileInstance.FileName;
+                        radianFileHistory.Comments = "Cambio de estado por Admin";
+                        radianFileHistory.CreatedBy = radianContributorFileInstance.CreatedBy;
+                        radianFileHistory.Status = n.NewState;
+                        radianFileHistory.RadianContributorFileId = radianContributorFileInstance.Id;
+                        _ = _radianContributorService.AddFileHistory(radianFileHistory);
                     }
                 }
 
