@@ -2829,6 +2829,7 @@
     <Content Include="Views\RadianApproved\_setTestResult.cshtml" />
     <Content Include="Views\ExternalUsers\AddUser.cshtml" />
     <Content Include="Views\ExternalUsers\_userForm.cshtml" />
+    <Content Include="Views\RadianApproved\_factorOperationMode.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2853,7 +2854,6 @@
     <Folder Include="Content\js\NewFolder1\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
-    <Folder Include="Views\ExternalUsers\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
