@@ -360,13 +360,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201810031323318_InitialCreate.cs" />
-    <Compile Include="Migrations\201810031323318_InitialCreate.Designer.cs">
-      <DependentUpon>201810031323318_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202010282054253_AddTableRadianContributor.cs" />
-    <Compile Include="Migrations\202010282054253_AddTableRadianContributor.Designer.cs">
-      <DependentUpon>202010282054253_AddTableRadianContributor.cs</DependentUpon>
+    <Compile Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.cs" />
+    <Compile Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.Designer.cs">
+      <DependentUpon>202011171731077_NewTables-Menu-SubMenu-Permission.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountTwoFactorViewModels.cs" />
@@ -2809,11 +2805,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201810031323318_InitialCreate.resx">
-      <DependentUpon>201810031323318_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202010282054253_AddTableRadianContributor.resx">
-      <DependentUpon>202010282054253_AddTableRadianContributor.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.resx">
+      <DependentUpon>202011171731077_NewTables-Menu-SubMenu-Permission.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

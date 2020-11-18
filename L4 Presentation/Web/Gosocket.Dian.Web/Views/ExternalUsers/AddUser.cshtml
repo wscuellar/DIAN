@@ -20,13 +20,15 @@
                             <input type="hidden" id="hddPermissions" name="hddPermissions" />
                             @Html.Partial("_userForm")
                             <br />
-
-                            @*@Html.Partial("_userPermission")*@
+                            @Html.ValidationSummary("", new { @class = "text-center text-danger" })
+                            @Html.ValidationMessage("no_permissions", new { @class = "text-center text-danger" })
+                            <br />
                             foreach (Gosocket.Dian.Web.Models.MenuViewModel menu in ((List<Gosocket.Dian.Web.Models.MenuViewModel>)ViewBag.Menu))
                             {
                                 <div class="btn-group" id="controlMenu">
                                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         @menu.Name &nbsp;<span class="badge badge-light" style="color: #074fbb;">@(menu.Options != null ? (((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options).Count() : 0)</span>
+                                        &nbsp;<span class="caret"></span>
                                     </button>
                                     <div class="dropdown-menu" style="padding-left: 8px; padding-right: 8px; }">
                                         <div class="custom-control custom-checkbox dropdown-item">
@@ -46,16 +48,45 @@
                                     </div>
                                 </div>
                             }
-                            @Html.ValidationMessage("no_permissions", new { @class = "text-center text-danger" })
+                            <br />
+                            <br />
+                            <table class="table table-sm table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Documento</th>
+                                        <th>Nombres</th>
+                                        <th>Email</th>
+                                        <th>Active</th>
+                                        <th>Editar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.ExternalUsersList != null)
+                                    {
+                                        foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
+                                        {
+                                            <tr>
+                                                <td>@item.Identification</td>
+                                                <td>@item.Names</td>
+                                                <td>@item.Email</td>
+                                                <td>@item.Active</td>
+                                                <td>
+                                                    @Html.ActionLink("Editar", "AddUser", new { id= item.Id}, new { @class="btn btn-primary"})
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
                             <br />
                             <div class="panel-footer text-right">
-                                <a href="@Url.Action("Index", "ExternalUsers")" class="btn btn-default">Volver</a>
+                                @*<a href="@Url.Action("Index", "ExternalUsers")" class="btn btn-default">Volver</a>*@
                                 <button type="submit" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
                             </div>
                         }
                     </div>
                 </div>
-                
+
             </div>
 
         </div>
@@ -91,7 +122,7 @@
             var checked = $("#menu" + menuId).prop("checked");
 
             for (i = 0; i < listMenu.length; i++) {
-                
+
                 if (listMenu[i].Id == menuId && listMenu[i].Options != null) {
                     for (j = 0; j < listMenu[i].Options.length; j++) {
                         $("#submenu" + menuId + "_" + listMenu[i].Options[j].Id).prop("checked", checked);
@@ -111,18 +142,23 @@
 
                         if ($("#submenu" + listMenu[index].Id + "_" + listMenu[index].Options[j].Id).prop("checked")) {
 
-                            if (j == 0) {
-                                arrPermissions.push({
-                                    Id: value.Id,
-                                    Name: value.Name,
-                                    Options: []
-                                });
-                            }
+                            //if (j == 0) {
+                            //    arrPermissions.push({
+                            //        Id: value.Id,
+                            //        Name: value.Name,
+                            //        Options: []
+                            //    });
+                            //}
 
-                            arrPermissions[arrPermissions.length - 1].Options.push({
-                                Id: listMenu[index].Options[j].Id,
-                                MenuId: listMenu[index].Id,
-                                Name: listMenu[index].Options[j].Name
+                            //arrPermissions[arrPermissions.length - 1].Options.push({
+                            //    Id: listMenu[index].Options[j].Id,
+                            //    MenuId: listMenu[index].Id,
+                            //    Name: listMenu[index].Options[j].Name
+                            //});
+
+                            arrPermissions.push({
+                                //MenuId: listMenu[index].Id,
+                                SubMenuId: listMenu[index].Options[j].Id
                             });
 
                         }

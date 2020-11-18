@@ -209,6 +209,7 @@
     <Compile Include="KeyVault\ImportCertificateResult.cs" />
     <Compile Include="Sql\Menu.cs" />
     <Compile Include="Sql\OperationMode.cs" />
+    <Compile Include="Sql\Permission.cs" />
     <Compile Include="Sql\RadianContributorType.cs" />
     <Compile Include="Sql\RadianContributor.cs" />
     <Compile Include="Sql\IdentificationType.cs" />
