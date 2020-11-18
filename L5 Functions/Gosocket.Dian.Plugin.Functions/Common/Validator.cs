@@ -502,7 +502,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (party.SenderParty != receiverCode)
                     {
                         //valida si existe los permisos del mandatario 
-                        var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
+                        var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
                             party.ResponseCode, xmlParserCude.NoteMandato);
                         if (response != null)
                         {
@@ -561,7 +561,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         if (party.SenderParty != senderCode)
                         {                           
                             //valida si existe los permisos del mandatario 
-                            var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
+                            var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
                                 party.ResponseCode, xmlParserCude.NoteMandato);
                             if (response != null)
                             {
@@ -608,7 +608,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (party.SenderParty != senderCode)
                     {
                         //valida si existe los permisos del mandatario 
-                        var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
+                        var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
                             party.ResponseCode, xmlParserCude.NoteMandato);
                         if (response != null)
                         {
@@ -668,7 +668,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         if (party.SenderParty != senderCode)
                         {
                             //valida si existe los permisos del mandatario 
-                            var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
+                            var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
                                 party.ResponseCode, xmlParserCude.NoteMandato);
                             if (response != null)
                             {
@@ -728,7 +728,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (party.SenderParty != senderCode)
                     {
                         //valida si existe los permisos del mandatario 
-                        var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
+                        var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
                             party.ResponseCode, xmlParserCude.NoteMandato);
                         if (response != null)
                         {
@@ -876,7 +876,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (party.SenderParty != receiverCode)
                     {
                         //valida si existe los permisos del mandatario 
-                        var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, receiverCode,
+                        var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, receiverCode,
                             party.ResponseCode, xmlParserCude.NoteMandato);
                         if (response != null)
                         {
@@ -995,7 +995,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateFacultityAttorney
-        private ValidateListResponse ValidateFacultityAttorney(string cude, string cufe, string issueAtorney, string senderCode, string eventCode, string noteMandato)
+        private ValidateListResponse ValidateFacultityAttorney(string cufe, string issueAtorney, string senderCode, string eventCode, string noteMandato)
         {
             DateTime startDate = DateTime.UtcNow;
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
