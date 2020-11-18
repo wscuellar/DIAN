@@ -149,5 +149,17 @@ namespace Gosocket.Dian.Application
 
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
         }
+
+        public ResponseMessage UpdateRadianContributorStep(int radianContributorId, int radianContributorStep)
+        {
+            bool updated = _radianContributorService.ChangeContributorStep(radianContributorId, radianContributorStep);
+
+            if (updated)
+            {
+                return new ResponseMessage($"Paso actualizado", "Actualizado");
+            }
+
+            return new ResponseMessage($"El registro no pudo ser actualizado", "Nulo");
+        }
     }
 }
