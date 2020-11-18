@@ -10,6 +10,8 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
 
     }
 
+    public string CustomizationID { get; set; }
+
     public string FileName { get; set; }
     public DateTime EmissionDate { get; set; }
     public string DocumentTypeId { get; set; }

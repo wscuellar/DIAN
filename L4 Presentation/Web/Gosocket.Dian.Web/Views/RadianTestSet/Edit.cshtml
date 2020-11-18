@@ -15,7 +15,7 @@
     </div>
     <div class="row margin-horizontal-0">
         <div class="panel">
-          
+
             <div class="panel-body padding-top-20">
                 <div class="row margin-horizontal-0">
                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
@@ -41,14 +41,18 @@
     @Scripts.Render("~/bundles/jqueryval")
 
     <script>
+        $('#OperationModeId').change(function () {
+            $('.captureFields').val('0');
+        });
+
         $('#TotalDocumentRequired').attr('readonly', true);
         $('#TotalDocumentAcceptedRequired').attr('redonly', true);
 
         $("#ReceiptNoticeTotalRequired").change(function () {
             var noticeTotal = parseInt($("#ReceiptNoticeTotalRequired").val());
-            if (noticeTotal < 2) {
-                showErrorMessage(2);
-                $("#ReceiptNoticeTotalRequired").val(2);
+            if (noticeTotal < 0) {
+                showErrorMessage(0);
+                $("#ReceiptNoticeTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -56,9 +60,9 @@
         });
         $("#ReceiptServiceTotalRequired").change(function () {
             var receiptServiceTotal = parseInt($("#ReceiptServiceTotalRequired").val());
-            if (receiptServiceTotal < 1) {
-                showErrorMessage(1);
-                $("#ReceiptServiceTotalRequired").val(1);
+            if (receiptServiceTotal < 0) {
+                showErrorMessage(0);
+                $("#ReceiptServiceTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -66,9 +70,9 @@
         });
         $("#ExpressAcceptanceTotalRequired").change(function () {
             var expressAcceptanceTotal = parseInt($("#ExpressAcceptanceTotalRequired").val());
-            if (expressAcceptanceTotal < 1) {
-                showErrorMessage(1);
-                $("#ExpressAcceptanceTotalRequired").val(1);
+            if (expressAcceptanceTotal < 0) {
+                showErrorMessage(0);
+                $("#ExpressAcceptanceTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -76,9 +80,9 @@
         });
         $("#AutomaticAcceptanceTotalRequired").change(function () {
             var automaticAcceptanceTotal = parseInt($("#AutomaticAcceptanceTotalRequired").val());
-            if (automaticAcceptanceTotal < 1) {
-                showErrorMessage(1);
-                $("#AutomaticAcceptanceTotalRequired").val(1);
+            if (automaticAcceptanceTotal < 0) {
+                showErrorMessage(0);
+                $("#AutomaticAcceptanceTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -86,9 +90,9 @@
         });
         $("#RejectInvoiceTotalRequired").change(function () {
             var rejectInvoiceTotal = parseInt($("#RejectInvoiceTotalRequired").val());
-            if (rejectInvoiceTotal < 1) {
-                showErrorMessage(1);
-                $("#RejectInvoiceTotalRequired").val(1);
+            if (rejectInvoiceTotal < 0) {
+                showErrorMessage(0);
+                $("#RejectInvoiceTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -96,9 +100,9 @@
         });
         $("#ApplicationAvailableTotalRequired").change(function () {
             var appAvailableTotal = parseInt($("#ApplicationAvailableTotalRequired").val());
-            if (appAvailableTotal < 1) {
-                showErrorMessage(1);
-                $("#ApplicationAvailableTotalRequired").val(1);
+            if (appAvailableTotal < 0) {
+                showErrorMessage(0);
+                $("#ApplicationAvailableTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -106,19 +110,19 @@
         });
         $("#EndorsementTotalRequired").change(function () {
             var endorsementTotal = parseInt($("#EndorsementTotalRequired").val());
-            if (endorsementTotal < 1) {
-                showErrorMessage(1);
-                $("#EndorsementTotalRequired").val(1);
+            if (endorsementTotal < 0) {
+                showErrorMessage(0);
+                $("#EndorsementTotalRequired").val(0);
             }
             else {
                 updateTotal();
             }
-        }); 
+        });
         $("#EndorsementCancellationTotalRequired").change(function () {
             var endorsementcancelTotal = parseInt($("#EndorsementCancellationTotalRequired").val());
-            if (endorsementcancelTotal < 1) {
-                showErrorMessage(1);
-                $("#EndorsementCancellationTotalRequired").val(1);
+            if (endorsementcancelTotal < 0) {
+                showErrorMessage(0);
+                $("#EndorsementCancellationTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -126,9 +130,9 @@
         });
         $("#GuaranteeTotalRequired").change(function () {
             var garanteeTotal = parseInt($("#GuaranteeTotalRequired").val());
-            if (garanteeTotal < 1) {
-                showErrorMessage(1);
-                $("#GuaranteeTotalRequired").val(1);
+            if (garanteeTotal < 0) {
+                showErrorMessage(0);
+                $("#GuaranteeTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -136,9 +140,9 @@
         });
         $("#EndMandateTotalRequired").change(function () {
             var endMandateTotal = parseInt($("#EndMandateTotalRequired").val());
-            if (endMandateTotal < 1) {
-                showErrorMessage(1);
-                $("#EndMandateTotalRequired").val(1);
+            if (endMandateTotal < 0) {
+                showErrorMessage(0);
+                $("#EndMandateTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -146,9 +150,9 @@
         });
         $("#ElectronicMandateTotalRequired").change(function () {
             var electronicMandateTotal = parseInt($("#ElectronicMandateTotalRequired").val());
-            if (electronicMandateTotal < 1) {
-                showErrorMessage(1);
-                $("#ElectronicMandateTotalRequired").val(1);
+            if (electronicMandateTotal < 0) {
+                showErrorMessage(0);
+                $("#ElectronicMandateTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -156,9 +160,9 @@
         });
         $("#PaymentNotificationTotalRequired").change(function () {
             var paymentNotificationTotal = parseInt($("#PaymentNotificationTotalRequired").val());
-            if (paymentNotificationTotal < 1) {
-                showErrorMessage(1);
-                $("#PaymentNotificationTotalRequired").val(1);
+            if (paymentNotificationTotal < 0) {
+                showErrorMessage(0);
+                $("#PaymentNotificationTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -166,9 +170,9 @@
         });
         $("#CirculationLimitationTotalRequired").change(function () {
             var circulationNotificationTotal = parseInt($("#CirculationLimitationTotalRequired").val());
-            if (circulationNotificationTotal < 1) {
-                showErrorMessage(1);
-                $("#CirculationLimitationTotalRequired").val(1);
+            if (circulationNotificationTotal < 0) {
+                showErrorMessage(0);
+                $("#CirculationLimitationTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -176,9 +180,9 @@
         });
         $("#EndCirculationLimitationTotalRequired").change(function () {
             var endcirculationNotificationTotal = parseInt($("#EndCirculationLimitationTotalRequired").val());
-            if (endcirculationNotificationTotal < 1) {
-                showErrorMessage(1);
-                $("#EndCirculationLimitationTotalRequired").val(1);
+            if (endcirculationNotificationTotal < 0) {
+                showErrorMessage(0);
+                $("#EndCirculationLimitationTotalRequired").val(0);
             }
             else {
                 updateTotal();
@@ -189,9 +193,9 @@
 
         $("#ReceiptNoticeTotalAcceptedRequired").change(function () {
             var noticeTotal0 = parseInt($("#ReceiptNoticeTotalAcceptedRequired").val());
-            if (noticeTotal0 < 2) {
-                showErrorMessage(2);
-                $("#ReceiptNoticeTotalAcceptedRequired").val(2);
+            if (noticeTotal0 < 0) {
+                showErrorMessage(0);
+                $("#ReceiptNoticeTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -199,9 +203,9 @@
         });
         $("#ReceiptServiceTotalAcceptedRequired").change(function () {
             var receiptServiceTotal0 = parseInt($("#ReceiptServiceTotalAcceptedRequired").val());
-            if (receiptServiceTotal0 < 1) {
-                showErrorMessage(1);
-                $("#ReceiptServiceTotalAcceptedRequired").val(1);
+            if (receiptServiceTotal0 < 0) {
+                showErrorMessage(0);
+                $("#ReceiptServiceTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -209,9 +213,9 @@
         });
         $("#ExpressAcceptanceTotalAcceptedRequired").change(function () {
             var expressAcceptanceTotal0 = parseInt($("#ExpressAcceptanceTotalAcceptedRequired").val());
-            if (expressAcceptanceTotal0 < 1) {
-                showErrorMessage(1);
-                $("#ExpressAcceptanceTotalAcceptedRequired").val(1);
+            if (expressAcceptanceTotal0 < 0) {
+                showErrorMessage(0);
+                $("#ExpressAcceptanceTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -219,9 +223,9 @@
         });
         $("#AutomaticAcceptanceTotalAcceptedRequired").change(function () {
             var automaticAcceptanceTotal0 = parseInt($("#AutomaticAcceptanceTotalAcceptedRequired").val());
-            if (automaticAcceptanceTotal0 < 1) {
-                showErrorMessage(1);
-                $("#AutomaticAcceptanceTotalAcceptedRequired").val(1);
+            if (automaticAcceptanceTotal0 < 0) {
+                showErrorMessage(0);
+                $("#AutomaticAcceptanceTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -229,9 +233,9 @@
         });
         $("#RejectInvoiceTotalAcceptedRequired").change(function () {
             var rejectInvoiceTotal0 = parseInt($("#RejectInvoiceTotalAcceptedRequired").val());
-            if (rejectInvoiceTotal0 < 1) {
-                showErrorMessage(1);
-                $("#RejectInvoiceTotalAcceptedRequired").val(1);
+            if (rejectInvoiceTotal0 < 0) {
+                showErrorMessage(0);
+                $("#RejectInvoiceTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -239,9 +243,9 @@
         });
         $("#ApplicationAvailableTotalAcceptedRequired").change(function () {
             var appAvailableTotal0 = parseInt($("#ApplicationAvailableTotalAcceptedRequired").val());
-            if (appAvailableTotal0 < 1) {
-                showErrorMessage(1);
-                $("#ApplicationAvailableTotalAcceptedRequired").val(1);
+            if (appAvailableTotal0 < 0) {
+                showErrorMessage(0);
+                $("#ApplicationAvailableTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -249,19 +253,19 @@
         });
         $("#EndorsementTotalAcceptedRequired").change(function () {
             var endorsementTotal0 = parseInt($("#EndorsementTotalAcceptedRequired").val());
-            if (endorsementTotal0 < 1) {
-                showErrorMessage(1);
-                $("#EndorsementTotalAcceptedRequired").val(1);
+            if (endorsementTotal0 < 0) {
+                showErrorMessage(0);
+                $("#EndorsementTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
             }
-        }); 
+        });
         $("#EndorsementCancellationTotalAcceptedRequired").change(function () {
             var endorsementcancelTotal0 = parseInt($("#EndorsementCancellationTotalAcceptedRequired").val());
-            if (endorsementcancelTotal0 < 1) {
-                showErrorMessage(1);
-                $("#EndorsementCancellationTotalAcceptedRequired").val(1);
+            if (endorsementcancelTotal0 < 0) {
+                showErrorMessage(0);
+                $("#EndorsementCancellationTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -269,9 +273,9 @@
         });
         $("#GuaranteeTotalAcceptedRequired").change(function () {
             var garanteeTotal0 = parseInt($("#GuaranteeTotalAcceptedRequired").val());
-            if (garanteeTotal0 < 1) {
-                showErrorMessage(1);
-                $("#GuaranteeTotalAcceptedRequired").val(1);
+            if (garanteeTotal0 < 0) {
+                showErrorMessage(0);
+                $("#GuaranteeTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -279,9 +283,9 @@
         });
         $("#EndMandateTotalAcceptedRequired").change(function () {
             var endMandateTotal0 = parseInt($("#EndMandateTotalAcceptedRequired").val());
-            if (endMandateTotal0 < 1) {
-                showErrorMessage(1);
-                $("#EndMandateTotalAcceptedRequired").val(1);
+            if (endMandateTotal0 < 0) {
+                showErrorMessage(0);
+                $("#EndMandateTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -289,9 +293,9 @@
         });
         $("#ElectronicMandateTotalAcceptedRequired").change(function () {
             var electronicMandateTotal0 = parseInt($("#ElectronicMandateTotalAcceptedRequired").val());
-            if (electronicMandateTotal0 < 1) {
-                showErrorMessage(1);
-                $("#ElectronicMandateTotalAcceptedRequired").val(1);
+            if (electronicMandateTotal0 < 0) {
+                showErrorMessage(0);
+                $("#ElectronicMandateTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -299,9 +303,9 @@
         });
         $("#PaymentNotificationTotalAcceptedRequired").change(function () {
             var paymentNotificationTotal0 = parseInt($("#PaymentNotificationTotalAcceptedRequired").val());
-            if (paymentNotificationTotal0 < 1) {
-                showErrorMessage(1);
-                $("#PaymentNotificationTotalAcceptedRequired").val(1);
+            if (paymentNotificationTotal0 < 0) {
+                showErrorMessage(0);
+                $("#PaymentNotificationTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -309,9 +313,9 @@
         });
         $("#CirculationLimitationTotalAcceptedRequired").change(function () {
             var circulationNotificationTotal0 = parseInt($("#CirculationLimitationTotalAcceptedRequired").val());
-            if (circulationNotificationTotal0 < 1) {
-                showErrorMessage(1);
-                $("#CirculationLimitationTotalAcceptedRequired").val(1);
+            if (circulationNotificationTotal0 < 0) {
+                showErrorMessage(0);
+                $("#CirculationLimitationTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -319,9 +323,9 @@
         });
         $("#EndCirculationLimitationTotalAcceptedRequired").change(function () {
             var endcirculationNotificationTotal0 = parseInt($("#EndCirculationLimitationTotalAcceptedRequired").val());
-            if (endcirculationNotificationTotal0 < 1) {
-                showErrorMessage(1);
-                $("#EndCirculationLimitationTotalAcceptedRequired").val(1);
+            if (endcirculationNotificationTotal0 < 0) {
+                showErrorMessage(0);
+                $("#EndCirculationLimitationTotalAcceptedRequired").val(0);
             }
             else {
                 updateTotalRequired();
@@ -386,4 +390,11 @@
             showNotification('warning', 'fa fa-check fa-2x', 'floating', 'Aviso.', 'El valor no puede ser inferior a ' + total);
         }
     </script>
+    <style type="text/css">
+        .claseLabel {
+            /* top: 10px;  */
+            position: relative;
+            height: 24px;
+        }
+    </style>
 }

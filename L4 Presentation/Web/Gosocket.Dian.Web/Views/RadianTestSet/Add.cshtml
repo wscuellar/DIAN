@@ -16,7 +16,7 @@
     </div>
     <div class="row margin-horizontal-0">
         <div class="panel">
-           
+
 
             <div class="panel-body padding-top-20">
                 <div class="row margin-horizontal-0">
@@ -60,6 +60,10 @@
                 showDropdowns: true,
                 minYear: 1901
             });
+            $('#OperationModeId').change(function () {
+                $('.captureFields').val('0');
+            });
+
             $('#TotalDocumentRequired').attr('readonly', true);
 
 
@@ -309,4 +313,11 @@
             showNotification('warning', 'fa fa-check fa-2x', 'floating', 'Aviso.', 'El valor no puede ser inferior a '+total);
         }
     </script>
+    <style type="text/css">
+        .claseLabel{
+        /* top: 10px;  */
+        position: relative;
+        height: 24px;
+        }
+    </style>
 }
