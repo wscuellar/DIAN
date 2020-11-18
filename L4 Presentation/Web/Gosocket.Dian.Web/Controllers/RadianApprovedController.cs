@@ -34,7 +34,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             // LoadSoftwareModeOperation();
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(1704648);
-            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(2);
+            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(radianAdmin.Type.Id);
             //List<RadianContributorFile> mockData = new List<RadianContributorFile>();
             
             //for(int i = 0 ; i < 20 ; i++)
@@ -103,20 +103,22 @@ namespace Gosocket.Dian.Web.Controllers
            for (int i = 0; i < Request.Files.Count; i++)
             {
                 RadianContributorFile radianContributorFile = new RadianContributorFile();
+                string typeId = Request.Form.Get("TypeId_" + i);
                 string nit = Request.Form.Get("nit");
                 string email = Request.Form.Get("email");
                 string ContributorId = Request.Form.Get("contributorId");
                 var file = Request.Files[i];
 
-
+                //radianContributorFile.Id = Guid.NewGuid();
                 radianContributorFile.FileName = file.FileName;
-                radianContributorFile.Timestamp = new System.DateTime();
-                radianContributorFile.Updated = new System.DateTime();
+                radianContributorFile.Timestamp = DateTime.Now;
+                radianContributorFile.Updated = DateTime.Now;
                 radianContributorFile.CreatedBy = email;
                 radianContributorFile.RadianContributorId = Convert.ToInt32(ContributorId);
                 radianContributorFile.Deleted = false;
-                radianContributorFile.FileType = 2;
-                radianContributorFile.Status = 31;
+                radianContributorFile.FileType = Convert.ToInt32(typeId);
+                radianContributorFile.Status = 1;
+                radianContributorFile.Comments = "Comentario";
 
                 ResponseMessage responseUpload = _radianAprovedService.UploadFile(file.InputStream, nit, radianContributorFile);
 
