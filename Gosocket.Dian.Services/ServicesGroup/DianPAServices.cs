@@ -880,7 +880,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // upload xml
 
             //Validate Sendercode and ReceiverCode
-            var sender_receiver_response = ValidateParty(trackId, trackIdCude, senderCode, receiverCode, eventCode, customizationID, listId);
+            var sender_receiver_response = ValidateParty(documentParsed.DocumentKey.ToLower(), trackIdCude, senderCode, receiverCode, eventCode, customizationID, listId);
             if (!sender_receiver_response.IsValid)
             {
                 dianResponse = sender_receiver_response;
