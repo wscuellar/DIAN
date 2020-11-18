@@ -115,23 +115,11 @@ namespace Gosocket.Dian.Web.Controllers
 
 
         [HttpPost]
-        public ActionResult GetSetTestResult()
+        public ActionResult GetSetTestResult(RadianApprovedViewModel radianApprovedViewModel)
         {
-            //todo fer: validar contributorid pre cargado
-
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ViewBag.ContributorId);
-            RadianApprovedViewModel model = new RadianApprovedViewModel()
-            {
-                Name = radianAdmin.Contributor.TradeName,
-                Nit = radianAdmin.Contributor.Code,
-                BusinessName = radianAdmin.Contributor.BusinessName,
-                Email = radianAdmin.Contributor.Email,
-                Files = radianAdmin.Files,
-                FilesRequires = _radianAprovedService.ContributorFileTypeList(2),
-                RadianTestSetResult = _radianTestSetResultService.GetTestSetResultByNit(radianAdmin.Contributor.Code).FirstOrDefault()
-            };
-
-            return PartialView("_setTestResult", model);
+            radianApprovedViewModel.RadianTestSetResult =
+                _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
+            return PartialView("_setTestResult", radianApprovedViewModel);
         }
     }
 }
