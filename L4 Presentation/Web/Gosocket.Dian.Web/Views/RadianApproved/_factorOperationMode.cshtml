@@ -1,0 +1,184 @@
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+
+@{ ViewBag.title = "Listado de Participantes RADIAN"; }
+
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" } };}
+
+<div class="page-content radian-view margin-15">
+    <div class="row title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-body padding-top-20">
+                <div class="pad-btm padding-bottom-0">
+                    <div class="row margin-horizontal-0">
+                        @using (Html.BeginForm("AdminRadianView", "Radian", FormMethod.Post, new { id = "radian-contributors-form" }))
+                        {
+                            @Html.HiddenFor(m => m.Page)
+                            @Html.HiddenFor(m => m.Length)
+                            @Html.HiddenFor(m => m.Type)
+                            @Html.HiddenFor(m => m.StartDate)
+                            @Html.HiddenFor(m => m.EndDate)
+
+                            <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                <div class="col-md-12 padding-horizontal-0">
+                                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
+
+                                        <div class="panel-body padding-20 padding-bottom-0">
+                                            <div class="row">
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.Code, new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.Code, defaultHtmlAttr)
+                                                        @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.DateInterval, new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.DateInterval, new { @class = "form-control input-general", @readonly = true })
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.RadianType, new { @class = "control-label" })
+                                                        @Html.DropDownListFor(m => m.RadianType, Model.RadianType, "", defaultHtmlAttr)
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.RadianState, new { @class = "control-label" })
+                                                        @Html.EnumDropDownListFor(m => m.RadianState, defaultHtmlAttr)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-footer-grey text-right">
+                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Buscar</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @Html.Partial("_Items")
+
+                <div class="row margin-horizontal-0">
+                    <div class="col-md-9 table-toolbar-left padding-left-0">
+                    </div>
+                    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+                        @if (Model.RadianContributors.Count > 0)
+                        {
+                            <span class="text-muted">
+                                <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.RadianContributors.Count ? (Model.Page) * Model.Length + Model.RadianContributors.Count : (Model.Page + 1) * Model.Length)</strong>
+                            </span>
+                            <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
+                                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                                    <span class="fa fa-chevron-left"></span>
+                                </a>
+                                <a class="btn btn-default paginate-btn next-page" @(Model.RadianContributors.Count < Model.Length ? "disabled=\"disabled\"" : "")>
+                                    <span class="fa fa-chevron-right"></span>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (Model.RadianContributors.Count == 0)
+                {
+                    <div class="alert panel-footer-grey text-center contributor-alert">
+                        Ningún resultado disponible para mostrar.
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+
+    <script>
+        $(document).ready(function () {
+            var form = $('#radian-contributors-form');
+            $('#DateInterval').daterangepicker({
+                locale: {
+                    applyLabel: "Aplicar",
+                    cancelLabel: "Cancelar",
+                    format: 'DD-MMMM-yyyy',
+                    monthNames: [
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre"
+                    ],
+                    separator: " al ",
+                }
+
+            });
+
+
+             $("#Code").focus();
+
+            if (@Model.RadianContributors.Count == 0) {
+                $('.table-responsive').css('display', 'none');
+            }
+
+            $('.btn-search').click(function () {
+                var dateRange = $("#DateInterval").val();
+                $('#StartDate').val(dateRange.split("al")[0]);
+                $('#EndDate').val(dateRange.split("al")[1]);
+                $('#Page').val(0);
+
+                $('#Type').val($("#RadianType").val());
+                showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
+                $(this).attr('disabled', 'disabled');
+                $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
+                $('.table-pagination').css('display', 'none');
+                $('.table-responsive').css('display', 'none');
+                form.submit();
+            });
+
+            //Pagination
+            $(".next-page").click(function () {
+                $("#Page").val(@Model.Page + 1);
+                form.submit();
+            })
+
+            $(".prev-page").click(function () {
+                $("#Page").val(@Model.Page - 1);
+                form.submit();
+            })
+
+        })
+
+        //$(document).on('mouseenter', ".iffyTip", function () {
+        //    var $this = $(this);
+        //    if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+        //        $this.tooltip({
+        //            title: $this.text(),
+        //            placement: "bottom",
+        //            container: "body"
+        //        });
+        //        $this.tooltip('show');
+        //    }
+        //});
+    </script>
+

@@ -93,20 +93,24 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult UploadFiles()
         {
+            string nit = Request.Form.Get("nit");
+            string email = Request.Form.Get("email");
+            string ContributorId = Request.Form.Get("contributorId");
+            string filesNumber = Request.Form.Get("filesNumber");
+            string step = Request.Form.Get("step");
+
             for (int i = 0; i < Request.Files.Count; i++)
             {
                 RadianContributorFile radianContributorFile = new RadianContributorFile();
                 RadianContributorFileHistory radianFileHistory = new RadianContributorFileHistory();
                 string typeId = Request.Form.Get("TypeId_" + i);
-                string nit = Request.Form.Get("nit");
-                string email = Request.Form.Get("email");
-                string ContributorId = Request.Form.Get("contributorId");
+                
                 var file = Request.Files[i];
                 radianContributorFile.FileName = file.FileName;
                 radianContributorFile.Timestamp = DateTime.Now;
                 radianContributorFile.Updated = DateTime.Now;
                 radianContributorFile.CreatedBy = email;
-                radianContributorFile.RadianContributorId = Convert.ToInt32(ContributorId);
+                radianContributorFile.RadianContributorId = 26;
                 radianContributorFile.Deleted = false;
                 radianContributorFile.FileType = Convert.ToInt32(typeId);
                 radianContributorFile.Status = 1;
@@ -122,10 +126,14 @@ namespace Gosocket.Dian.Web.Controllers
                     radianFileHistory.Status = 1;
                     radianFileHistory.RadianContributorFileId = Guid.Parse(responseUpload.Message);
                     ResponseMessage responseUpdateFileHistory = _radianAprovedService.AddFileHistory(radianFileHistory);
-
                 }
             }
-            Thread.Sleep(3000);
+            if(Convert.ToInt32(filesNumber) == Request.Files.Count)
+            {
+                int newStep = Convert.ToInt32(step) + 1;
+                int contributorId = Convert.ToInt32(ContributorId);
+                ResponseMessage responseUpdateStep = _radianAprovedService.UpdateRadianContributorStep(contributorId, newStep);
+            }
             return Json(new
             {
                 messasge = "Datos actualizados correctamente.",

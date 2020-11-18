@@ -26,11 +26,11 @@
                     </section>
                     <h3><span class="name-state">Validando documentos</span></h3>
                     <section>
-                        @Html.Partial("_documentStates");
+                        @Html.Partial("_certificates")
                     </section>
                     <h3><span class="name-state">Pruebas de aceptación</span></h3>
                     <section>
-                        @Html.Partial("_setTestRedirect");
+                        @Html.Partial("_setTestRedirect")
                     </section>
                     <h3></h3>
                     <section>
@@ -44,22 +44,15 @@
 
 @section scripts{
     <script>
-            $(document).ready(function () {
+            $(document).ready(function () {debugger 
                 $("#steps-approved").steps({
                     headerTag: "h3",
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
                     autoFocus: true,
                     startIndex: @Model.Step,
-                    labels: {
-                        cancel: "Cancel",
-                        current: "current step:",
-                        pagination: "Pagination",
-                        finish: "Finish",
-                        next: "Siguiente",
-                        previous: "Cancelar",
-                        loading: "Loading ..."
-                    }
+                    enablePagination: false,
+                    enableKeyNavigation: false
                 });
 
                 $(".radian-file").click(function (file) {
@@ -113,6 +106,8 @@
                     formdata.append("nit", "@Model.Nit");
                     formdata.append("email", "@Model.Email");
                     formdata.append("contributorId", "@Model.ContributorId");
+                    formdata.append("filesNumber", files.length - 2);
+                    formdata.append("step", @Model.Step);
 
 
                     $.ajax({
