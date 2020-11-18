@@ -98,15 +98,21 @@
                 //});
 
                 $('#submit-button').click(function (e) {
+                    debugger
                     e.preventDefault();
-                    debugger;
                     var files = $("#uploadForm")[0];
                     var formdata = new FormData();
+                    var numberFiles = 0;
                     for (var i = 0 ; i < files.length - 1 ; i++) {
-                        debugger
-                        files[i].files.length > 0 &&
-                        formdata.append(files[i].files[0].name, files[i].files[i]);
-                    }
+                        if (files[i].files.length > 0) {
+                            formdata.append(files[i].files[0].name, files[i].files[i]);
+                            formdata.append("TypeId_" + numberFiles, files[i].dataset.typeid);
+                            numberFiles++;
+                        }
+                    };
+                    formdata.append("nit", "@Model.Nit");
+                    formdata.append("email", "@Model.Email");
+                    formdata.append("contributorId", "@Model.ContributorId");
 
 
                     $.ajax({
@@ -122,7 +128,6 @@
                             var xhr = $.ajaxSettings.xhr();
                             if (xhr.upload) {
                                 xhr.upload.addEventListener('progress', function (event) {
-                                    debugger
                                     var percent = 0;
                                     var position = event.loaded || event.position;
                                     var total = event.total;
@@ -137,7 +142,6 @@
                             return xhr;
                         },
                         success: function (mdata) {
-                            debugger
                             if (mdata == 0) {
                                 alert("Done");
                             }
