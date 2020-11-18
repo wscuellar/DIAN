@@ -33,6 +33,5 @@ namespace Gosocket.Dian.Interfaces.Services
         ResponseMessage UpdateRadianContributorStep(int radianContributorId, int radianContributorStep);
 
         int RadianContributorId(int contributorId);
-
     }
 }
