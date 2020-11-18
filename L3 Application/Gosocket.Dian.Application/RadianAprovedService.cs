@@ -124,19 +124,15 @@ namespace Gosocket.Dian.Application
         {
             string fileName = StringTools.MakeValidFileName(radianContributorFile.FileName);
             var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
-            Guid idFile = _radianContributorFileRepository.Update(radianContributorFile);            
+            bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
 
-            if (!string.IsNullOrEmpty(idFile.ToString()))
+            if (result)
             {
-                bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
+                _radianContributorFileRepository.Add(radianContributorFile);
+                return new ResponseMessage($"Archivo {radianContributorFile.FileName} guardado", "Guardado");
+            }
 
-                if(result)
-                    return new ResponseMessage($"Archivo {radianContributorFile.FileName} con el id {idFile} guardado", "Guardado");
-
-                return new ResponseMessage($"Se almacenó en Base de datos {radianContributorFile.FileName} peno no en el Storagecon el id {idFile} guardado", "Registrado con ");
-            }            
-
-           return new ResponseMessage($"No se guardó el archivo {radianContributorFile.FileName}", "Nulo");
+            return new ResponseMessage($"No se guardó el archivo {radianContributorFile.FileName}", "Nulo");
         }
 
         public ResponseMessage AddFileHistory(RadianContributorFileHistory radianContributorFileHistory)
