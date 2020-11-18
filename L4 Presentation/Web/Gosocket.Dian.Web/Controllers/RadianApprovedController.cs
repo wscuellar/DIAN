@@ -38,18 +38,7 @@ namespace Gosocket.Dian.Web.Controllers
             // LoadSoftwareModeOperation();
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(1704648);
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(radianAdmin.Type.Id);
-            //List<RadianContributorFile> mockData = new List<RadianContributorFile>();
 
-            //for(int i = 0 ; i < 20 ; i++)
-            //{
-            //    RadianContributorFile item = new RadianContributorFile();
-            //    item.FileName = "fileName"+ i + ".pdf";
-            //    item.Updated = new System.DateTime();
-            //    item.CreatedBy = i + "alguien";
-            //    item.Status = 2;
-            //    item.Comments = "Hola mundo";
-            //    mockData.Add(item);
-            //}
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
                 ContributorId = radianAdmin.Contributor.Id,
