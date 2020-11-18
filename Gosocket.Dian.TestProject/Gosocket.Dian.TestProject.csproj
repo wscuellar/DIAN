@@ -179,7 +179,11 @@
     <Compile Include="Functions\Plugins\AllTest.cs" />
     <Compile Include="Functions\Validator\AllTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RadianContributorServiceTests.cs" />
+    <Compile Include="Services\RadianAprovedServiceTests.cs" />
+    <Compile Include="Services\RadianTestSetResultServiceTests.cs" />
+    <Compile Include="Services\RadianLoggerServiceTests.cs" />
+    <Compile Include="Services\RadianTestSetAppliedServiceTests.cs" />
+    <Compile Include="Services\RadianContributorServiceTests.cs" />
     <Compile Include="Utils\StringUtilTest.cs" />
     <Compile Include="WebServices\AllTest.cs" />
   </ItemGroup>
@@ -221,7 +225,7 @@
       <Name>Gosocket.Dian.Application</Name>
     </ProjectReference>
     <ProjectReference Include="..\L4 Presentation\Web\Gosocket.Dian.Web\Gosocket.Dian.Web.csproj">
-      <Project>{a9e54cf2-ed1d-4844-b21c-10cfbf8edb40}</Project>
+      <Project>{A9E54CF2-ED1D-4844-B21C-10CFBF8EDB40}</Project>
       <Name>Gosocket.Dian.Web</Name>
     </ProjectReference>
     <ProjectReference Include="..\L5 Functions\Gosocket.Dian.Functions\Gosocket.Dian.Functions.csproj">

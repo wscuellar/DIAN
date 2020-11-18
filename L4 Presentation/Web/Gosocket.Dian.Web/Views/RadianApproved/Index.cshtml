@@ -1,28 +1,150 @@
-﻿@*
-
-    Desarrolo Stepper
-
-
-*@
-
-
-<div style="padding:10px;">
-    <h1>RADIAN Approved</h1>
-
-    <div class="row">
-        <div class="col-md-4">
-            <p>Seleccione el modo de operacion </p>
-        </div>
-        <div class="col-md-4">
-            <select class="form-control">
-                @foreach (var item in ViewBag.RadianSoftwareOperationMode)
-                {
-                    <option value="@item.Id">@item.Name</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-4">
-
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@using Newtonsoft.Json
+@{
+    ViewBag.title = "Titulo";
+}
+<div class="page-content radian-view margin-15">
+    <div class="row title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-body padding-top-20">
+                <div id="steps-approved">
+                    <div class="radian-personal-info">
+                        @Html.Partial("_personalInfo")
+                    </div>
+                    <h3><span class="name-state">Ingreso de solicitud</span></h3>
+                    <section>
+                    </section>
+                    <h3><span class="name-state">Pendiente</span></h3>
+                    <section>
+                        @Html.Partial("_certificates")
+                    </section>
+                    <h3><span class="name-state">Validando documentos</span></h3>
+                    <section>
+                        @Html.Partial("_documentStates");
+                    </section>
+                    <h3><span class="name-state">Pruebas de aceptación</span></h3>
+                    <section>
+                        @Html.Partial("_setTestRedirect");
+                    </section>
+                    <h3></h3>
+                    <section>
+                        <p>The next and previous buttons help you to navigate through your content.</p>
+                    </section>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+@section scripts{
+    <script>
+            $(document).ready(function () {
+                $("#steps-approved").steps({
+                    headerTag: "h3",
+                    bodyTag: "section",
+                    transitionEffect: "slideLeft",
+                    autoFocus: true,
+                    startIndex: 1,
+                    labels: {
+                        cancel: "Cancel",
+                        current: "current step:",
+                        pagination: "Pagination",
+                        finish: "Finish",
+                        next: "Siguiente",
+                        previous: "Cancelar",
+                        loading: "Loading ..."
+                    }
+                });
+
+                $(".radian-file").click(function (file) {
+                    $(this).val("");
+                });
+                $(".radian-file").change(function (file) {
+                    var fileObj = file.target.files[0];
+                    var fileSize = Math.round(fileObj.size/10000) / 100;
+                    $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
+                });
+
+                $(".show-history").click(function () {
+                    var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
+                    var dialog = bootbox.dialog({
+                        message: htmlPartial,
+                        className: "table-data",
+                        size: 'large'
+                    });
+                    dialog.init(function (e) {
+                        $('#table-history').DataTable();
+                    } )
+                });
+
+                //$('#fileupload').fileupload({
+                //    dataType: 'json',
+                //    done: function (e, data) {debugger
+                //        console.log("all loaded");
+                //    },
+                //    progressall: function (e, data) {debugger
+                //        var progress = parseInt(data.loaded / data.total * 100, 10);
+                //        $('#progress .bar').css(
+                //            'width',
+                //            progress + '%'
+                //        );
+                //    }
+                //});
+
+                $('#submit-button').click(function (e) {
+                    e.preventDefault();
+                    debugger;
+                    var files = $("#uploadForm")[0];
+                    var formdata = new FormData();
+                    for (var i = 0 ; i < files.length - 1 ; i++) {
+                        debugger
+                        files[i].files.length > 0 &&
+                        formdata.append(files[i].files[0].name, files[i].files[i]);
+                    }
+
+
+                    $.ajax({
+                        url: "@Url.Action("UploadFiles", "RadianApproved")",
+                        type: 'POST',
+                        data: formdata,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        enctype: 'multipart/form-data',
+                        xhr: function () {
+                            //upload Progress
+                            var xhr = $.ajaxSettings.xhr();
+                            if (xhr.upload) {
+                                xhr.upload.addEventListener('progress', function (event) {
+                                    debugger
+                                    var percent = 0;
+                                    var position = event.loaded || event.position;
+                                    var total = event.total;
+                                    if (event.lengthComputable) {
+                                        percent = Math.ceil(position / total * 100);
+                                    }
+                                    //update progressbar
+                                    $(".progress-bar").css("width", + percent + "%");
+                                    $(".status").text(percent + "%");
+                                }, true);
+                            }
+                            return xhr;
+                        },
+                        success: function (mdata) {
+                            debugger
+                            if (mdata == 0) {
+                                alert("Done");
+                            }
+
+                        },
+                    });
+                });
+            });
+    </script>
+}

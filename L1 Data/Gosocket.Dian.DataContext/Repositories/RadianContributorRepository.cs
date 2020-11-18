@@ -88,6 +88,5 @@ namespace Gosocket.Dian.DataContext.Repositories
                 sqlDBContext.SaveChanges();
             }
         }
-
     }
 }

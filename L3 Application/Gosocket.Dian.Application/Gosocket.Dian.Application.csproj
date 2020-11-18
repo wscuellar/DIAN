@@ -177,6 +177,8 @@
   <ItemGroup>
     <Compile Include="Common\CertificateExtensions.cs" />
     <Compile Include="Common\RedisExtensions.cs" />
+    <Compile Include="IdentificationTypeService.cs" />
+    <Compile Include="Managers\RadianLoggerManager.cs" />
     <Compile Include="Managers\RadianTestSetResultManager.cs" />
     <Compile Include="EmailService.cs" />
     <Compile Include="RadianAprovedService.cs" />
@@ -186,7 +188,6 @@
     <Compile Include="Cosmos\CosmosDBService.cs" />
     <Compile Include="Cosmos\DocumentClientHelper.cs" />
     <Compile Include="Cosmos\DocumentCollectionSpec.cs" />
-    <Compile Include="IdentificationTypeService.cs" />
     <Compile Include="logger\LoggerService.cs" />
     <Compile Include="Managers\CategoryManager.cs" />
     <Compile Include="Managers\CertificateManager.cs" />
@@ -197,7 +198,9 @@
     <Compile Include="ContributorFileTypeService.cs" />
     <Compile Include="GlobalDocumentService.cs" />
     <Compile Include="RadianContributorService.cs" />
+    <Compile Include="RadianLoggerService.cs" />
     <Compile Include="RadianTestSetAppliedService.cs" />
+    <Compile Include="RadianTestSetResultService.cs" />
     <Compile Include="RadianTestSetService.cs" />
     <Compile Include="RadianValidationService.cs" />
     <Compile Include="SoftwareService.cs" />
@@ -205,6 +208,10 @@
     <Compile Include="Managers\DocumentTypeManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Gosocket.Dian.Common\Gosocket.Dian.Common.csproj">
+      <Project>{61f42a77-9c41-446b-9c1f-d3d84241bb6c}</Project>
+      <Name>Gosocket.Dian.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Gosocket.Dian.Interfaces\Gosocket.Dian.Interfaces.csproj">
       <Project>{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1}</Project>
       <Name>Gosocket.Dian.Interfaces</Name>

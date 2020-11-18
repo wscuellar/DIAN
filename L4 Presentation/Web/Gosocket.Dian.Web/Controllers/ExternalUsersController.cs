@@ -22,6 +22,7 @@ namespace Gosocket.Dian.Web.Controllers
     /// Quiero configurar usuarios
     /// Para que puedan ingresar al catalogo de validación sin necesidad(Facturando electrónicamente) de usar token
     /// </summary>
+    [AllowAnonymous]
     [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
     public class ExternalUsersController : Controller
     {
@@ -52,7 +53,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         // GET: ExternalUsers
-        public ActionResult Index()
+        public ActionResult Login()
         {
             return View();
         }

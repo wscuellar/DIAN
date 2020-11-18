@@ -2,38 +2,35 @@
 @{
     ViewBag.Title = "Datos";
 }
-
-<div class="container">
-    <div class="row title-container">
-        <p class="title-view">
+    <div class="row radian-subtitle-container">
+        <p class="subtitle-view">
             @ViewBag.title
         </p>
-        <div class="underline-title"></div>
+        <div class="radian-subtitle-line"></div>
     </div>
-    <div class="row">
-        <div class="col-sm">
+    <div class="row radian-personal-info">
+        <div class="col-sm-3">
             <div class="form-group">
                 @Html.LabelFor(m => m.Nit, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Nit, new { @class = "form-control contributorFileType-props" })
+                @Html.TextBoxFor(m => m.Nit, new { @class = "form-control contributorFileType-props input-general" })
             </div>
         </div>
-        <div class="col-sm">
+        <div class="col-sm-3">
             <div class="form-group">
                 @Html.LabelFor(m => m.Name, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Name, new { @class = "form-control contributorFileType-props" })
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control contributorFileType-props input-general" })
             </div>
         </div>
-        <div class="col-sm">
+        <div class="col-sm-3">
             <div class="form-group">
                 @Html.LabelFor(m => m.BusinessName, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.BusinessName, new { @class = "form-control contributorFileType-props" })
+                @Html.TextBoxFor(m => m.BusinessName, new { @class = "form-control contributorFileType-props input-general" })
             </div>
         </div>
-        <div class="col-sm">
+        <div class="col-sm-3">
             <div class="form-group">
                 @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control contributorFileType-props" })
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control contributorFileType-props input-general" })
             </div>
         </div>
     </div>
-</div>
