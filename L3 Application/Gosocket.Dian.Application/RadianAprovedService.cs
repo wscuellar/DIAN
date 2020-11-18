@@ -162,5 +162,10 @@ namespace Gosocket.Dian.Application
 
             return new ResponseMessage($"El registro no pudo ser actualizado", "Nulo");
         }
+
+        public int RadianContributorId(int contributorId)
+        {
+            return _radianContributorRepository.Get(c => c.ContributorId == contributorId).Id;
+        }
     }
 }
