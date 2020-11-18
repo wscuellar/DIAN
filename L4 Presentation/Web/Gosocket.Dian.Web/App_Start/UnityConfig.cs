@@ -42,6 +42,7 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IRadianLoggerService, RadianLoggerService>();
             container.RegisterType<IContributorOperationsService, ContributorOperationsService>();
             container.RegisterType<IPermissionService, PermissionService>();
+            container.RegisterType<IRadianTestSetResultService, RadianTestSetResultService>();
 
             #endregion
 
