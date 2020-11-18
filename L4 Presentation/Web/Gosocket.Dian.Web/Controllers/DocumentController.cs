@@ -184,10 +184,10 @@ namespace Gosocket.Dian.Web.Controllers
                                 EventCode = eventItem.EventCode,
                                 Description = eventcodetext,
                                 EventDate = eventItem.SigningTimeStamp,
-                                SenderCode = eventItem.ReceiverCode,
-                                Sender = eventItem.ReceiverName,
-                                ReceiverCode = eventItem.SenderCode,
-                                Receiver = eventItem.SenderName
+                                SenderCode = eventItem.SenderCode,
+                                Sender = eventItem.SenderName,
+                                ReceiverCode = eventItem.ReceiverCode,
+                                Receiver = eventItem.ReceiverName
                             });
                             model.Events = model.Events.OrderBy(t => t.EventCode).ToList();
                         }
