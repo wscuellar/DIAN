@@ -99,6 +99,8 @@ namespace Gosocket.Dian.Web.Controllers
             string filesNumber = Request.Form.Get("filesNumber");
             string step = Request.Form.Get("step");
 
+            int idRadianContributor = _radianAprovedService.RadianContributorId(Convert.ToInt32(ContributorId));
+
             for (int i = 0; i < Request.Files.Count; i++)
             {
                 RadianContributorFile radianContributorFile = new RadianContributorFile();
@@ -110,7 +112,7 @@ namespace Gosocket.Dian.Web.Controllers
                 radianContributorFile.Timestamp = DateTime.Now;
                 radianContributorFile.Updated = DateTime.Now;
                 radianContributorFile.CreatedBy = email;
-                radianContributorFile.RadianContributorId = 26;
+                radianContributorFile.RadianContributorId = idRadianContributor;
                 radianContributorFile.Deleted = false;
                 radianContributorFile.FileType = Convert.ToInt32(typeId);
                 radianContributorFile.Status = 1;

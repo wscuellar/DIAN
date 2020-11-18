@@ -91,12 +91,11 @@
                 //});
 
                 $('#submit-button').click(function (e) {
-                    debugger
                     e.preventDefault();
                     var files = $("#uploadForm")[0];
                     var formdata = new FormData();
                     var numberFiles = 0;
-                    for (var i = 0 ; i < files.length - 1 ; i++) {
+                    for (var i = 0 ; i < files.length - 2 ; i++) {
                         if (files[i].files.length > 0) {
                             formdata.append(files[i].files[0].name, files[i].files[i]);
                             formdata.append("TypeId_" + numberFiles, files[i].dataset.typeid);
