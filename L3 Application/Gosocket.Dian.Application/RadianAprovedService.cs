@@ -128,11 +128,11 @@ namespace Gosocket.Dian.Application
 
             if (result)
             {
-                Guid idFile = _radianContributorFileRepository.Update(radianContributorFile);
-                return new ResponseMessage($"Archivo {radianContributorFile.FileName} con el id {idFile} guardado", "Guardado");
-            }            
+                _radianContributorFileRepository.Add(radianContributorFile);
+                return new ResponseMessage($"Archivo {radianContributorFile.FileName} guardado", "Guardado");
+            }
 
-           return new ResponseMessage($"No se guardó el archivo {radianContributorFile.FileName}", "Nulo");
+            return new ResponseMessage($"No se guardó el archivo {radianContributorFile.FileName}", "Nulo");
         }
 
         public ResponseMessage AddFileHistory(RadianContributorFileHistory radianContributorFileHistory)

@@ -7,6 +7,7 @@ using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
@@ -18,15 +19,17 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianTestSetService _radianTestSetService;
         private readonly IRadianApprovedService _radianAprovedService;
+        private readonly IRadianTestSetResultService _radianTestSetResultService;
 
         public RadianApprovedController(IRadianContributorService radianContributorService,
                                         IRadianTestSetService radianTestSetService,
-                                        IRadianContributorFileTypeService radianContributorFileTypeService,
-                                        IRadianApprovedService radianAprovedService)
+                                        IRadianApprovedService radianAprovedService,
+                                        IRadianTestSetResultService radianTestSetResultService)
         {
             _radianContributorService = radianContributorService;
             _radianTestSetService = radianTestSetService;
             _radianAprovedService = radianAprovedService;
+            _radianTestSetResultService = radianTestSetResultService;
         }
 
         [HttpGet]
@@ -36,7 +39,7 @@ namespace Gosocket.Dian.Web.Controllers
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(1704648);
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(radianAdmin.Type.Id);
             //List<RadianContributorFile> mockData = new List<RadianContributorFile>();
-            
+
             //for(int i = 0 ; i < 20 ; i++)
             //{
             //    RadianContributorFile item = new RadianContributorFile();
@@ -100,7 +103,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult UploadFiles()
         {
-           for (int i = 0; i < Request.Files.Count; i++)
+            for (int i = 0; i < Request.Files.Count; i++)
             {
                 RadianContributorFile radianContributorFile = new RadianContributorFile();
                 string typeId = Request.Form.Get("TypeId_" + i);
@@ -129,6 +132,15 @@ namespace Gosocket.Dian.Web.Controllers
                 messasge = "Datos actualizados correctamente.",
                 success = true,
             }, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpPost]
+        public ActionResult GetSetTestResult(RadianApprovedViewModel radianApprovedViewModel)
+        {
+            radianApprovedViewModel.RadianTestSetResult =
+                _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
+            return PartialView("_setTestResult", radianApprovedViewModel);
         }
     }
 }
