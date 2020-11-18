@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Gosocket.Dian.Web.Models
@@ -8,14 +9,15 @@ namespace Gosocket.Dian.Web.Models
         public ExternalUserViewModel()
         {
             IdentificationTypes = new List<IdentificationTypeListViewModel>();
+            Roles = new List<IdentityUserRole>();
         }
 
         public string Id { get; set; }
 
-        [DataType(DataType.Text)]
-        [Display(Name = "Nombre de Usuario")]
-        //[Required(ErrorMessage = "{0} es requerido.")]
-        public string UserName { get; set; }
+        //[DataType(DataType.Text)]
+        //[Display(Name = "Nombre de Usuario")]
+        ////[Required(ErrorMessage = "{0} es requerido.")]
+        //public string UserName { get; set; }
 
         [DataType(DataType.Text)]
         [Display(Name = "Nombres")]
@@ -46,7 +48,11 @@ namespace Gosocket.Dian.Web.Models
         [Compare("Password", ErrorMessage = "La contraseña y la confirmación no coinciden.")]
         public string ConfirmPassword { get; set; }
 
+        public byte Active { get; set; }
+
         public List<IdentificationTypeListViewModel> IdentificationTypes { get; set; }
+        
+        public List<IdentityUserRole> Roles { get; set; }
 
     }
 }

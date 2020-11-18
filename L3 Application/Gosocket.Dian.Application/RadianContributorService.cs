@@ -55,7 +55,7 @@ namespace Gosocket.Dian.Application
             Contributor contributor = _contributorService.GetByCode(userCode);
             if (contributor == null)
                 return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
-            
+
             bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
             if (!indirectElectronicBiller)
             {
@@ -64,7 +64,7 @@ namespace Gosocket.Dian.Application
                 if (!ownSoftware)
                     return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
             }
-            
+
             RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType);
             if (radianContributor != null && radianContributor.RadianState != RadianState.Cancelado.GetDescription())
                 return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.alertType);
@@ -163,7 +163,8 @@ namespace Gosocket.Dian.Application
                         Update = c.Update,
                         RadianState = c.RadianState,
                         AcceptanceStatusId = c.Contributor.AcceptanceStatus.Id,
-                        CreatedDate = c.CreatedDate
+                        CreatedDate = c.CreatedDate,
+                        Step = c.Step
                     },
                     Files = c.RadianContributorFile.ToList(),
                     Tests = testSet,
@@ -185,6 +186,22 @@ namespace Gosocket.Dian.Application
 
                 if (approveState != "")
                     radianContributor.RadianState = approveState == "0" ? RadianState.Test.GetDescription() : RadianState.Cancelado.GetDescription();
+
+                _radianContributorRepository.AddOrUpdate(radianContributor);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool ChangeContributorStep(int radianContributorId, int step)
+        {
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == radianContributorId);
+
+            if (radianContributor != null)
+            {
+                radianContributor.Step = step;
+                radianContributor.Update = DateTime.Now;
 
                 _radianContributorRepository.AddOrUpdate(radianContributor);
                 return true;

@@ -131,6 +131,7 @@
   <ItemGroup>
     <Compile Include="CosmosDbManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\PermissionRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileHistoryRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileStatusRepository.cs" />

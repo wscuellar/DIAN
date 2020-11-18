@@ -124,19 +124,16 @@ namespace Gosocket.Dian.Application
         {
             string fileName = StringTools.MakeValidFileName(radianContributorFile.FileName);
             var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
-            Guid idFile = _radianContributorFileRepository.Update(radianContributorFile);            
+            bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
 
-            if (!string.IsNullOrEmpty(idFile.ToString()))
+            if (result)
             {
-                bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
+                radianContributorFile.Id = Guid.NewGuid();
+                _radianContributorFileRepository.Add(radianContributorFile);
+                return new ResponseMessage($"{radianContributorFile.Id}", "Guardado");
+            }
 
-                if(result)
-                    return new ResponseMessage($"Archivo {radianContributorFile.FileName} con el id {idFile} guardado", "Guardado");
-
-                return new ResponseMessage($"Se almacenó en Base de datos {radianContributorFile.FileName} peno no en el Storagecon el id {idFile} guardado", "Registrado con ");
-            }            
-
-           return new ResponseMessage($"No se guardó el archivo {radianContributorFile.FileName}", "Nulo");
+            return new ResponseMessage($"{string.Empty}", "Nulo");
         }
 
         public ResponseMessage AddFileHistory(RadianContributorFileHistory radianContributorFileHistory)
@@ -152,6 +149,18 @@ namespace Gosocket.Dian.Application
             }
 
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
+        }
+
+        public ResponseMessage UpdateRadianContributorStep(int radianContributorId, int radianContributorStep)
+        {
+            bool updated = _radianContributorService.ChangeContributorStep(radianContributorId, radianContributorStep);
+
+            if (updated)
+            {
+                return new ResponseMessage($"Paso actualizado", "Actualizado");
+            }
+
+            return new ResponseMessage($"El registro no pudo ser actualizado", "Nulo");
         }
     }
 }

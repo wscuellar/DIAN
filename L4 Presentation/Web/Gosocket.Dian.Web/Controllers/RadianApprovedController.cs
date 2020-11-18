@@ -5,6 +5,7 @@ using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -36,27 +37,18 @@ namespace Gosocket.Dian.Web.Controllers
         {
             // LoadSoftwareModeOperation();
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(1704648);
-            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(2);
-            //List<RadianContributorFile> mockData = new List<RadianContributorFile>();
+            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(radianAdmin.Type.Id);
 
-            //for(int i = 0 ; i < 20 ; i++)
-            //{
-            //    RadianContributorFile item = new RadianContributorFile();
-            //    item.FileName = "fileName"+ i + ".pdf";
-            //    item.Updated = new System.DateTime();
-            //    item.CreatedBy = i + "alguien";
-            //    item.Status = 2;
-            //    item.Comments = "Hola mundo";
-            //    mockData.Add(item);
-            //}
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
+                ContributorId = radianAdmin.Contributor.Id,
                 Name = radianAdmin.Contributor.TradeName,
                 Nit = radianAdmin.Contributor.Code,
                 BusinessName = radianAdmin.Contributor.BusinessName,
                 Email = radianAdmin.Contributor.Email,
                 Files = radianAdmin.Files,
-                FilesRequires = listFileType
+                FilesRequires = listFileType,
+                Step = radianAdmin.Contributor.Step
 
             };
             return View(model);
@@ -103,7 +95,35 @@ namespace Gosocket.Dian.Web.Controllers
         {
             for (int i = 0; i < Request.Files.Count; i++)
             {
+                RadianContributorFile radianContributorFile = new RadianContributorFile();
+                RadianContributorFileHistory radianFileHistory = new RadianContributorFileHistory();
+                string typeId = Request.Form.Get("TypeId_" + i);
+                string nit = Request.Form.Get("nit");
+                string email = Request.Form.Get("email");
+                string ContributorId = Request.Form.Get("contributorId");
                 var file = Request.Files[i];
+                radianContributorFile.FileName = file.FileName;
+                radianContributorFile.Timestamp = DateTime.Now;
+                radianContributorFile.Updated = DateTime.Now;
+                radianContributorFile.CreatedBy = email;
+                radianContributorFile.RadianContributorId = Convert.ToInt32(ContributorId);
+                radianContributorFile.Deleted = false;
+                radianContributorFile.FileType = Convert.ToInt32(typeId);
+                radianContributorFile.Status = 1;
+                radianContributorFile.Comments = "Comentario";
+               
+                ResponseMessage responseUpload = _radianAprovedService.UploadFile(file.InputStream, nit, radianContributorFile);
+
+                if(responseUpload.Message != ""){
+                    radianFileHistory.FileName = file.FileName;
+                    radianFileHistory.Comments = "";
+                    radianFileHistory.Timestamp = DateTime.Now;
+                    radianFileHistory.CreatedBy = email;
+                    radianFileHistory.Status = 1;
+                    radianFileHistory.RadianContributorFileId = Guid.Parse(responseUpload.Message);
+                    ResponseMessage responseUpdateFileHistory = _radianAprovedService.AddFileHistory(radianFileHistory);
+
+                }
             }
             Thread.Sleep(3000);
             return Json(new

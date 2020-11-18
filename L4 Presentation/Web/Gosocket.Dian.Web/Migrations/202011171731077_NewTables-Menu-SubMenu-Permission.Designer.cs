@@ -7,13 +7,13 @@ namespace Gosocket.Dian.Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class InitialCreate : IMigrationMetadata
+    public sealed partial class NewTablesMenuSubMenuPermission : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialCreate));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(NewTablesMenuSubMenuPermission));
         
         string IMigrationMetadata.Id
         {
-            get { return "201810031323318_InitialCreate"; }
+            get { return "202011171731077_NewTables-Menu-SubMenu-Permission"; }
         }
         
         string IMigrationMetadata.Source
