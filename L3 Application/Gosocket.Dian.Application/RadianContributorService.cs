@@ -23,11 +23,10 @@ namespace Gosocket.Dian.Application
         private readonly IRadianContributorFileRepository _radianContributorFileRepository;
         private readonly IRadianTestSetResultManager _radianTestSetResultManager;
         private readonly IRadianOperationModeRepository _radianOperationModeRepository;
-        private readonly IRadianApprovedService _radianApprovedService;
 
         public RadianContributorService(IContributorService contributorService,
             IContributorOperationsService contributorOperationsService,
-            IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianTestSetResultManager radianTestSetResultManager, IRadianOperationModeRepository radianOperationModeRepository, IRadianApprovedService radianApprovedService)
+            IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianTestSetResultManager radianTestSetResultManager, IRadianOperationModeRepository radianOperationModeRepository)
         {
             _contributorService = contributorService;
             _contributorOperationsService = contributorOperationsService;
@@ -36,7 +35,6 @@ namespace Gosocket.Dian.Application
             _radianContributorFileRepository = radianContributorFileRepository;
             _radianTestSetResultManager = radianTestSetResultManager;
             _radianOperationModeRepository = radianOperationModeRepository;
-            _radianApprovedService = radianApprovedService;
         }
 
         #region Registro de participantes
@@ -254,9 +252,6 @@ namespace Gosocket.Dian.Application
             return _radianOperationModeRepository.List(t => true);
         }
 
-        public ResponseMessage AddFileHistory(RadianContributorFileHistory radianContributorFileHistory)
-        {
-            return _radianApprovedService.AddFileHistory(radianContributorFileHistory);
-        }
+
     }
 }
