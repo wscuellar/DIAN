@@ -128,12 +128,11 @@ namespace Gosocket.Dian.Application
 
             if (result)
             {
-                Guid idFile = _radianContributorFileRepository.Update(radianContributorFile);
+                _radianContributorFileRepository.Add(radianContributorFile);
+                return new ResponseMessage($"Archivo {radianContributorFile.FileName} guardado", "Guardado");
+            }
 
-                return new ResponseMessage($"Archivo {radianContributorFile.FileName} con el id {idFile} guardado", "Guardado");
-            }            
-
-           return new ResponseMessage($"No se guardó el archivo {radianContributorFile.FileName}", "Nulo");
+            return new ResponseMessage($"No se guardó el archivo {radianContributorFile.FileName}", "Nulo");
         }
 
         public ResponseMessage AddFileHistory(RadianContributorFileHistory radianContributorFileHistory)
@@ -149,6 +148,18 @@ namespace Gosocket.Dian.Application
             }
 
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
+        }
+
+        public ResponseMessage UpdateRadianContributorStep(int radianContributorId, int radianContributorStep)
+        {
+            bool updated = _radianContributorService.ChangeContributorStep(radianContributorId, radianContributorStep);
+
+            if (updated)
+            {
+                return new ResponseMessage($"Paso actualizado", "Actualizado");
+            }
+
+            return new ResponseMessage($"El registro no pudo ser actualizado", "Nulo");
         }
     }
 }

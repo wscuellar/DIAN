@@ -1,9 +1,12 @@
-﻿using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Gosocket.Dian.Application.Tests
 {
@@ -77,6 +80,134 @@ namespace Gosocket.Dian.Application.Tests
 
             //ACT
             var actual = _current.Object.ListSoftwareModeOperation();
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void GetRadianContributorTest()
+        {
+            // Arrange
+            int radianContributorId = 0;
+
+            _current.Setup(t => t.GetRadianContributor(radianContributorId))
+                .Returns(It.IsAny<RadianContributor>());
+
+            RadianContributor expected = null;
+
+            //ACT
+            var actual = _current.Object.GetRadianContributor(radianContributorId);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void ListContributorFilesTest()
+        {
+            // Arrange
+            int radianContributorId = 0;
+
+            _current.Setup(t => t.ListContributorFiles(radianContributorId))
+                .Returns(It.IsAny<List<RadianContributorFile>>());
+
+            List<RadianContributorFile> expected = null;
+
+            //ACT
+            var actual = _current.Object.ListContributorFiles(radianContributorId);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void ContributorSummaryTest()
+        {
+            // Arrange
+            int contributorId = 0;
+
+            _current.Setup(t => t.ContributorSummary(contributorId))
+                .Returns(It.IsAny<RadianAdmin>());
+
+            RadianAdmin expected = null;
+
+            //ACT
+            var actual = _current.Object.ContributorSummary(contributorId);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void ContributorFileTypeListTest()
+        {
+            // Arrange
+            int typeId = 0;
+
+            _current.Setup(t => t.ContributorFileTypeList(typeId))
+                .Returns(It.IsAny<List<RadianContributorFileType>>());
+
+            List<RadianContributorFileType> expected = null;
+
+            //ACT
+            var actual = _current.Object.ContributorFileTypeList(typeId);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void UpdateTest()
+        {
+            // Arrange
+            int radianContributorOperatorId = 0;
+
+            _current.Setup(t => t.Update(radianContributorOperatorId))
+                .Returns(It.IsAny<ResponseMessage>());
+
+            ResponseMessage expected = null;
+
+            //ACT
+            var actual = _current.Object.Update(radianContributorOperatorId);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void UploadFileTest()
+        {
+            // Arrange
+            Stream fileStream = null;
+            string code = "";
+            RadianContributorFile radianContributorFile = null;
+
+            _current.Setup(t => t.UploadFile(fileStream, code, radianContributorFile))
+                .Returns(It.IsAny<ResponseMessage>());
+
+            ResponseMessage expected = null;
+
+            //ACT
+            var actual = _current.Object.UploadFile(fileStream, code, radianContributorFile);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void AddFileHistoryTest()
+        {
+            // Arrange
+            RadianContributorFileHistory radianContributorFileHistory = null;
+
+            _current.Setup(t => t.AddFileHistory(radianContributorFileHistory))
+                .Returns(It.IsAny<ResponseMessage>());
+
+            ResponseMessage expected = null;
+
+            //ACT
+            var actual = _current.Object.AddFileHistory(radianContributorFileHistory);
 
             // Assert
             Assert.AreEqual(expected, actual);

@@ -29,5 +29,7 @@ namespace Gosocket.Dian.Interfaces.Services
         ResponseMessage UploadFile(Stream fileStream, string code, RadianContributorFile radianContributorFile);
 
         ResponseMessage AddFileHistory(RadianContributorFileHistory radianContributorFileHistory);
+
+        ResponseMessage UpdateRadianContributorStep(int radianContributorId, int radianContributorStep);
     }
 }

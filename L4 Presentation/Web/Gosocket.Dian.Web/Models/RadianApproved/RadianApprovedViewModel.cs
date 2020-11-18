@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,9 +9,12 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
     {
         public int Step { get; set; }
 
+        public int ContributorId { get; set; }
+
         public int CurrentlyStep { get; set; }
 
         public int RadianContributorTypeId { get; set; }
+
         public List<RadianContributorFileType> FilesRequires { get; set; }
 
         [Display(Name = "NIT")]
@@ -30,6 +34,8 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         public List<RadianContributorFile> Files { get; set; }
 
         public List<RadianCustomerViewModel> Customers { get; set; }
+
+        public RadianTestSetResult RadianTestSetResult { get; set; }
 
         public RadianApprovedViewModel()
         {

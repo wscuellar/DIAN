@@ -130,7 +130,8 @@ else
 }
 <br />
 <br />
-<div class="row mar-no" style="border-bottom: 2px solid #348441;">
+@Html.Partial("QueryEventsList", Model)
+@*<div class="row mar-no" style="border-bottom: 2px solid #348441;">
     <div class="col-sm-6 pad-no">
         <h4 class="margin-top-10">Eventos del documento</h4>
     </div>
@@ -158,20 +159,20 @@ else
             <tbody>
                 @foreach (var item in Model.Document.Events)
                 {
-                <tr>
-                    <td>@item.Code</td>
-                    <td>@item.Description</td>
-                    <td>@item.Date.ToString("yyyy-MM-dd")</td>
-                    <td>@item.SenderCode</td>
-                    <td>@item.SenderName</td>
-                    <td>@item.ReceiverCode</td>
-                    <td>@item.ReceiverName</td>
-                </tr>
+                    <tr>
+                        <td>@item.Code</td>
+                        <td>@item.Description</td>
+                        <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                        <td>@item.SenderCode</td>
+                        <td>@item.SenderName</td>
+                        <td>@item.ReceiverCode</td>
+                        <td>@item.ReceiverName</td>
+                    </tr>
                 }
             </tbody>
         </table>
     </div>
-}
+}*@
 <br />
 <br />
 @if (Model.Document.References.Where(x => x.ShowAsReference).Count() > 0)
