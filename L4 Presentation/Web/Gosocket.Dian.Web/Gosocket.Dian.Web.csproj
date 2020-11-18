@@ -2830,6 +2830,7 @@
     <Content Include="Views\ExternalUsers\AddUser.cshtml" />
     <Content Include="Views\ExternalUsers\_userForm.cshtml" />
     <Content Include="Views\RadianApproved\_factorOperationMode.cshtml" />
+    <Content Include="Views\RadianApproved\GetSetTestResult.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -41,7 +41,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
-                ContributorId = _radianAprovedService.RadianContributorId(radianAdmin.Contributor.Id),
+                ContributorId = radianAdmin.Contributor.Id,
                 Name = radianAdmin.Contributor.TradeName,
                 Nit = radianAdmin.Contributor.Code,
                 BusinessName = radianAdmin.Contributor.BusinessName,
@@ -149,7 +149,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             radianApprovedViewModel.RadianTestSetResult =
                 _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
-            return PartialView("_setTestResult", radianApprovedViewModel);
+            return View(radianApprovedViewModel);
         }
     }
 }

@@ -34,7 +34,7 @@
                     </section>
                     <h3></h3>
                     <section>
-                        <p>The next and previous buttons help you to navigate through your content.</p>
+                        @Html.Partial("_certificates")
                     </section>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
                     autoFocus: true,
-                    startIndex: @Model.Step,
+                    startIndex: 3,
                     enablePagination: false,
                     enableKeyNavigation: false
                 });
