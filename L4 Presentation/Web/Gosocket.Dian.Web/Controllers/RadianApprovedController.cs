@@ -8,8 +8,6 @@ using Gosocket.Dian.Web.Models.RadianApproved;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
@@ -65,6 +63,8 @@ namespace Gosocket.Dian.Web.Controllers
                                                         registrationData.RadianOperationMode,
                                                         User.UserName());
 
+
+
             // Lista de Software Modo de Operacion 
             // CA 2.3
             // LoadSoftwareModeOperation();
@@ -106,7 +106,7 @@ namespace Gosocket.Dian.Web.Controllers
                 RadianContributorFile radianContributorFile = new RadianContributorFile();
                 RadianContributorFileHistory radianFileHistory = new RadianContributorFileHistory();
                 string typeId = Request.Form.Get("TypeId_" + i);
-                
+
                 var file = Request.Files[i];
                 radianContributorFile.FileName = file.FileName;
                 radianContributorFile.Timestamp = DateTime.Now;
@@ -117,10 +117,11 @@ namespace Gosocket.Dian.Web.Controllers
                 radianContributorFile.FileType = Convert.ToInt32(typeId);
                 radianContributorFile.Status = 1;
                 radianContributorFile.Comments = "Comentario";
-               
+
                 ResponseMessage responseUpload = _radianAprovedService.UploadFile(file.InputStream, nit, radianContributorFile);
 
-                if(responseUpload.Message != ""){
+                if (responseUpload.Message != "")
+                {
                     radianFileHistory.FileName = file.FileName;
                     radianFileHistory.Comments = "";
                     radianFileHistory.Timestamp = DateTime.Now;
@@ -130,7 +131,7 @@ namespace Gosocket.Dian.Web.Controllers
                     ResponseMessage responseUpdateFileHistory = _radianAprovedService.AddFileHistory(radianFileHistory);
                 }
             }
-            if(Convert.ToInt32(filesNumber) == Request.Files.Count)
+            if (Convert.ToInt32(filesNumber) == Request.Files.Count)
             {
                 int newStep = Convert.ToInt32(step) + 1;
                 int contributorId = Convert.ToInt32(ContributorId);
@@ -150,6 +151,29 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.RadianTestSetResult =
                 _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
             return View(radianApprovedViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult GetFactorOperationMode(RadianApprovedViewModel radianApprovedViewModel)
+        {
+            radianApprovedViewModel.SoftwareOwnerName =
+                _radianAprovedService.FindNamesContributorAndSoftware(radianApprovedViewModel.ContributorId, radianApprovedViewModel.Software.Id.ToString());
+            radianApprovedViewModel.OperationModeList = _radianTestSetService.OperationModeList();
+
+            return PartialView("_factorOperationMode", radianApprovedViewModel);
+        }
+
+        [HttpPost]
+        public JsonResult UploadFactorOperationMode(dynamic tempObjectRequest)
+        {
+
+
+            return Json(
+                new
+                {
+                    messasge = "Datos actualizados correctamente.",
+                    success = true,
+                }, JsonRequestBehavior.AllowGet);
         }
     }
 }
