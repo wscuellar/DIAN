@@ -998,7 +998,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private ValidateListResponse ValidateFacultityAttorney(string cude, string cufe, string issueAtorney, string senderCode, string eventCode, string noteMandato)
         {
             DateTime startDate = DateTime.UtcNow;
-
+            ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
             var sender = GetContributorInstanceCache(issueAtorney);
             //Valida exista contributor en ambiente Habilitacion y Test
             if (ConfigurationManager.GetValue("Environment") == "Hab" ||
@@ -1050,8 +1050,68 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
             //Valida exista informacion mandato - Mandatario - CUFE
-            var docReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cude, cufe, issueAtorney, senderCode).FirstOrDefault();
-            if (docReferenceAttorney == null)
+            var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cufe, senderCode);
+            bool valid = false;
+            if (docsReferenceAttorney == null)
+            {
+                return new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = errorCodeMessage.errorCode,
+                    ErrorMessage = errorCodeMessage.errorMessage,
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
+            }
+            bool validError = false;
+            foreach(var docReferenceAttorney in docsReferenceAttorney)
+            {
+                if (docReferenceAttorney.IssuerAttorney == issueAtorney)
+                {
+                    var filter = $"{docReferenceAttorney.FacultityCode}-{docReferenceAttorney.Actor}";
+                    //Valida permisos firma para el evento emitido
+                    var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
+                    if (attorneyFacultity != null)
+                    {
+                        if (attorneyFacultity.RowKey == eventCode)
+                        {
+                        //Valida exista note mandatario
+                        if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                        {
+                            return new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "89",
+                                ErrorMessage = "falta la nota OBRANDO EN NOMBRE Y REPRESENTACION DE en el documento",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            };
+                        }
+                        else
+                            valid = true;
+                        }
+                    }
+                    validError = false;
+                    continue;
+                }
+                else
+                {
+                    validError = true;
+                }
+
+            }
+            if(validError)
+            {
+                return new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = errorCodeMessage.errorCodeB,
+                    ErrorMessage = errorCodeMessage.errorMessageB,
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
+            }
+            if (!valid)
             {
                 return new ValidateListResponse
                 {
@@ -1064,36 +1124,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 };
             }
 
-            var filter = $"{docReferenceAttorney.FacultityCode}-{docReferenceAttorney.Actor}";
-            //Valida permisos firma para el evento emitido
-            var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
-            if (attorneyFacultity != null)
-            {
-                if (attorneyFacultity.RowKey != eventCode)
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "89",
-                        ErrorMessage =
-                            $"Mandatario de servicio AR no autorizado para firma de documento, evento: {eventCode}",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
-                //Valida exista note mandatario
-                else if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "89",
-                        ErrorMessage = "falta la nota OBRANDO EN NOMBRE Y REPRESENTACION DE en el documento",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
-            }
 
             return null;
         }
@@ -2735,6 +2765,77 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             return responses;
+        }
+        #endregion
+
+        #region Error Code Message
+        private class ErrorCodeMessage
+        {
+            public string errorCode = string.Empty;
+            public string errorMessage = string.Empty;
+            public string errorCodeB = string.Empty;
+            public string errorMessageB = string.Empty;
+        }
+
+        private ErrorCodeMessage getErrorCodeMessage(string eventCode)
+        {
+            ErrorCodeMessage response = new ErrorCodeMessage()
+            {
+                errorCodeB = string.Empty,
+                errorMessageB = string.Empty,
+                errorCode = string.Empty,
+                errorMessage = string.Empty
+            };
+            if (eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034")
+            {
+                response.errorCodeB = "AAF01b";
+                response.errorMessageB = "No corresponde a la información del Tenedor Legítimo";
+                response.errorCode = "AAF01a";
+                response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico";
+            }
+            else if (eventCode == "036")
+            {
+                response.errorCodeB = "AAF01b";
+                response.errorMessageB = "No corresponde a la información del Tenedor Legítimo";
+                response.errorCode = "AAF01a";
+                response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico";
+            }
+            else if (eventCode == "035")
+            {
+                response.errorCode = "AAF01";
+                response.errorMessage = "No fue informado el avalista";
+            }
+            else if (eventCode == "037")
+            {
+                response.errorCode = "AAF01";
+                response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo";
+            }
+            else if (eventCode == "040" || eventCode == "039" || eventCode == "038")
+            {
+                response.errorCode = "AAF01";
+                response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo en su disponibización";
+            }
+            else if (eventCode == "041")
+            {
+                response.errorCode = "AAF01";
+                response.errorMessage = "No fue referenciado la información del Juez o Juzgado";
+            }
+            else if (eventCode == "043")
+            {
+                response.errorCode = "AAF01";
+                response.errorMessage = "No es informado el grupo del Mandante";
+            }
+            else if (eventCode == "044")
+            {
+                response.errorCode = "AAF01";
+                response.errorMessage = "No coincide con la Mandante o Mandatario del mandato";
+            }
+            else if (eventCode == "045")
+            {
+                response.errorCode = "AAF01";
+                response.errorMessage = "No fue informado el Adquirente/Deudor/Aceptante o Tenedor Legítimo";
+            }
+            return response;
         }
         #endregion
 
