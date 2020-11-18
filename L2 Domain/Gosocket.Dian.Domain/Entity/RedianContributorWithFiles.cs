@@ -69,5 +69,6 @@ namespace Gosocket.Dian.Domain.Entity
 
         public string RadianState { get; set; }
         public int RadianContributorTypeId { get; set; }
+        public int Step { get; set; }
     }
 }

@@ -58,7 +58,8 @@ namespace Gosocket.Dian.Web.Controllers
                 BusinessName = radianAdmin.Contributor.BusinessName,
                 Email = radianAdmin.Contributor.Email,
                 Files = radianAdmin.Files,
-                FilesRequires = listFileType
+                FilesRequires = listFileType,
+                Step = radianAdmin.Contributor.Step
 
             };
             return View(model);
@@ -106,13 +107,12 @@ namespace Gosocket.Dian.Web.Controllers
             for (int i = 0; i < Request.Files.Count; i++)
             {
                 RadianContributorFile radianContributorFile = new RadianContributorFile();
+                RadianContributorFileHistory radianFileHistory = new RadianContributorFileHistory();
                 string typeId = Request.Form.Get("TypeId_" + i);
                 string nit = Request.Form.Get("nit");
                 string email = Request.Form.Get("email");
                 string ContributorId = Request.Form.Get("contributorId");
                 var file = Request.Files[i];
-
-                //radianContributorFile.Id = Guid.NewGuid();
                 radianContributorFile.FileName = file.FileName;
                 radianContributorFile.Timestamp = DateTime.Now;
                 radianContributorFile.Updated = DateTime.Now;
@@ -122,9 +122,19 @@ namespace Gosocket.Dian.Web.Controllers
                 radianContributorFile.FileType = Convert.ToInt32(typeId);
                 radianContributorFile.Status = 1;
                 radianContributorFile.Comments = "Comentario";
-
+               
                 ResponseMessage responseUpload = _radianAprovedService.UploadFile(file.InputStream, nit, radianContributorFile);
 
+                if(responseUpload.Message != ""){
+                    radianFileHistory.FileName = file.FileName;
+                    radianFileHistory.Comments = "";
+                    radianFileHistory.Timestamp = DateTime.Now;
+                    radianFileHistory.CreatedBy = email;
+                    radianFileHistory.Status = 1;
+                    radianFileHistory.RadianContributorFileId = Guid.Parse(responseUpload.Message);
+                    ResponseMessage responseUpdateFileHistory = _radianAprovedService.AddFileHistory(radianFileHistory);
+
+                }
             }
             Thread.Sleep(3000);
             return Json(new
