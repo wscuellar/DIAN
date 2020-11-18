@@ -1064,6 +1064,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 };
             }
             bool validError = false;
+            //Valida existan permisos para firmar evento mandatario
             foreach(var docReferenceAttorney in docsReferenceAttorney)
             {
                 if (docReferenceAttorney.IssuerAttorney == issueAtorney)
@@ -1075,20 +1076,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if (attorneyFacultity.RowKey == eventCode)
                         {
-                        //Valida exista note mandatario
-                        if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
-                        {
-                            return new ValidateListResponse
+                            //Valida exista note mandatario
+                            if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                             {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "89",
-                                ErrorMessage = "falta la nota OBRANDO EN NOMBRE Y REPRESENTACION DE en el documento",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            };
-                        }
-                        else
-                            valid = true;
+                                return new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                    ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                };
+                            }
+                            else
+                                valid = true;
+                                
                         }
                     }
                     validError = false;
@@ -1117,9 +1119,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "89",
-                    ErrorMessage =
-                        "Mandatario de servicio AR no autorizado para firma de documento",
+                    ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                    ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 };
             }
@@ -2775,6 +2776,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             public string errorMessage = string.Empty;
             public string errorCodeB = string.Empty;
             public string errorMessageB = string.Empty;
+            public string errorCodeNoteA = string.Empty;
+            public string errorMessageNoteA = string.Empty;
+            public string errorCodeNote = string.Empty;
+            public string errorMessageNote = string.Empty;
+
         }
 
         private ErrorCodeMessage getErrorCodeMessage(string eventCode)
@@ -2784,8 +2790,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCodeB = string.Empty,
                 errorMessageB = string.Empty,
                 errorCode = string.Empty,
-                errorMessage = string.Empty
+                errorMessage = string.Empty,
+                errorCodeNoteA = string.Empty,
+                errorMessageNoteA = string.Empty,
+                errorCodeNote = string.Empty,
+                errorMessageNote = string.Empty
             };
+
+            response.errorCodeNote = "AAD11";
+            response.errorMessageNote = "No fue informada la nota cuando el evento fue generado por un mandato. ";
+
             if (eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034")
             {
                 response.errorCodeB = "AAF01b";
@@ -2804,6 +2818,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 response.errorCode = "AAF01";
                 response.errorMessage = "No fue informado el avalista";
+                response.errorCodeNoteA = "AAD11a";
+                response.errorMessageNoteA = "No fue informada la nota cuando el evento fue generado por un mandato. ";
             }
             else if (eventCode == "037")
             {
