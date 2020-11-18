@@ -220,11 +220,14 @@ namespace Gosocket.Dian.Web.Controllers
                 if (data != null)
                 {
                     RadianContributorFile radianContributorFileInstance = null;
+                    RadianContributorFileHistory radianContributorFileHistory = new RadianContributorFileHistory();
+
                     foreach (var n in data)
                     {
                         radianContributorFileInstance = _radianContributorService.RadianContributorFileList(n.Id).FirstOrDefault();
                         radianContributorFileInstance.Status = n.NewState;
                         _ = _radianContributorService.UpdateRadianContributorFile(radianContributorFileInstance).ToString();
+                        _ = _radianContributorService.AddFileHistory(radianContributorFileHistory);
                     }
                 }
 
