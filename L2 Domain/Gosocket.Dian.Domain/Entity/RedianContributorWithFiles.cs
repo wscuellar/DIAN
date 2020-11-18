@@ -44,6 +44,8 @@ namespace Gosocket.Dian.Domain.Entity
         public List<RadianTestSetResult> Tests { get; set; }
 
         public List<string> LegalRepresentativeIds { get; set; }
+
+        public int Step { get; set; }
     }
 
     public class RedianContributorWithTypes
