@@ -41,7 +41,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
-                ContributorId = radianAdmin.Contributor.Id,
+                ContributorId = _radianAprovedService.RadianContributorId(radianAdmin.Contributor.Id),
                 Name = radianAdmin.Contributor.TradeName,
                 Nit = radianAdmin.Contributor.Code,
                 BusinessName = radianAdmin.Contributor.BusinessName,
