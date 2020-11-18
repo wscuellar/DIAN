@@ -142,6 +142,7 @@ namespace Gosocket.Dian.Application
             radianContributorFileHistory.Timestamp = DateTime.Now;
             string idHistoryRegister = string.Empty;
 
+            radianContributorFileHistory.Id = Guid.NewGuid();
             idHistoryRegister = _radianContributorFileHistoryRepository.AddRegisterHistory(radianContributorFileHistory).ToString();
 
             if (!string.IsNullOrEmpty(idHistoryRegister))
