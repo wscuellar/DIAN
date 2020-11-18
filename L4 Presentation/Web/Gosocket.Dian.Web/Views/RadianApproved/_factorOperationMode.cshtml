@@ -16,169 +16,192 @@
             <div class="panel-body padding-top-20">
                 <div class="pad-btm padding-bottom-0">
                     <div class="row margin-horizontal-0">
-                        @using (Html.BeginForm("AdminRadianView", "Radian", FormMethod.Post, new { id = "radian-contributors-form" }))
+                        @using (Html.BeginForm("UploadFactorOperationMode", "RadianApprovedController", FormMethod.Post, new { id = "radian-contributors-form" }))
                         {
-                            @Html.HiddenFor(m => m.Page)
-                            @Html.HiddenFor(m => m.Length)
-                            @Html.HiddenFor(m => m.Type)
-                            @Html.HiddenFor(m => m.StartDate)
-                            @Html.HiddenFor(m => m.EndDate)
-
                             <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                 <div class="col-md-12 padding-horizontal-0">
                                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
-
                                         <div class="panel-body padding-20 padding-bottom-0">
+
                                             <div class="row">
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.Code, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.Code, defaultHtmlAttr)
-                                                        @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                                                        @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new { @class = "control-label" })
+                                                        @Html.DropDownListFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new SelectList(Model.OperationModeList, "Id", "Name", Model.RadianApprovedOperationModeViewModel.OperationModeSelected), new { @class = "form-control selectpicker" })
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-9 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.Url, new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.RadianApprovedOperationModeViewModel.Url, defaultHtmlAttr)
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <h4 class="panel-title-radian padding-0"><strong>Datos de la Empresa y Software</strong></h4>
+                                                <hr class="margin-5" />
+
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.SoftwareOwnerName.Item1, defaultHtmlAttr)
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-9 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.SoftwareName, new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.RadianApprovedOperationModeViewModel.SoftwareName, defaultHtmlAttr)
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-9 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.SoftwarePin, new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.RadianApprovedOperationModeViewModel.SoftwarePin, defaultHtmlAttr)
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.DateInterval, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.DateInterval, new { @class = "form-control input-general", @readonly = true })
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        @Html.LabelFor(m => m.RadianType, new { @class = "control-label" })
-                                                        @Html.DropDownListFor(m => m.RadianType, Model.RadianType, "", defaultHtmlAttr)
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        @Html.LabelFor(m => m.RadianState, new { @class = "control-label" })
-                                                        @Html.EnumDropDownListFor(m => m.RadianState, defaultHtmlAttr)
+                                                        @Html.Label("ID del SW", new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.Software.Id, defaultHtmlAttr)
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="panel-footer-grey text-right">
-                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Buscar</button>
+                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Adicionar</button>
                                         </div>
 
                                     </div>
                                 </div>
                             </div>
                         }
-                    </div>
-                </div>
 
-                @Html.Partial("_Items")
-
-                <div class="row margin-horizontal-0">
-                    <div class="col-md-9 table-toolbar-left padding-left-0">
-                    </div>
-                    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
-                        @if (Model.RadianContributors.Count > 0)
-                        {
-                            <span class="text-muted">
-                                <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.RadianContributors.Count ? (Model.Page) * Model.Length + Model.RadianContributors.Count : (Model.Page + 1) * Model.Length)</strong>
-                            </span>
-                            <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
-                                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
-                                    <span class="fa fa-chevron-left"></span>
-                                </a>
-                                <a class="btn btn-default paginate-btn next-page" @(Model.RadianContributors.Count < Model.Length ? "disabled=\"disabled\"" : "")>
-                                    <span class="fa fa-chevron-right"></span>
-                                </a>
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Listado de modos de operación asociados</h3>
                             </div>
-                        }
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Modo de Operación</th>
+                                                <th>Registro</th>
+                                                <th>Estado</th>
+                                                <th>Software</th>
+                                                <th>ID</th>
+                                                <th>PIN</th>
+                                                <th>URL</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @*@foreach (var RadianContributor in Model.)
+                                            {
+                                                //var textClass = DataUtils.GetProviderStatusStyle(RadianContributor.AcceptanceStatusId);
+                                                //var isClickableRow = User.IsInAnyRole("Administrador", "Super") ? "clickable-row" : "";
+                                                //var urlView = User.IsInAnyRole("Administrador", "Super") ? Url.Action("ViewDetails", "Radian", new { id = RadianContributor.Id }) : "";
+                                                <tr class='@isClickableRow' data-href="@urlView">
+                                                    <td class="smallText iffyTip"><a>@RadianContributor.Code</a></td>
+                                                    <td class="largeText iffyTip"><a>@RadianContributor.BusinessName</a></td>
+                                                    <td class="largeText iffyTip"><a>@RadianContributor.TradeName</a></td>
+                                                    <td class="largeText iffyTip">
+                                                        <a><i class="fa fa-circle @textClass"></i>&nbsp;@RadianContributor.AcceptanceStatusName</a>
+                                                    </td>
+                                                </tr>
+                                            }*@
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                @if (Model.RadianContributors.Count == 0)
-                {
-                    <div class="alert panel-footer-grey text-center contributor-alert">
-                        Ningún resultado disponible para mostrar.
-                    </div>
-                }
+
 
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts
-{
+@*@section Scripts
+    {
 
-    <script>
-        $(document).ready(function () {
-            var form = $('#radian-contributors-form');
-            $('#DateInterval').daterangepicker({
-                locale: {
-                    applyLabel: "Aplicar",
-                    cancelLabel: "Cancelar",
-                    format: 'DD-MMMM-yyyy',
-                    monthNames: [
-                        "Enero",
-                        "Febrero",
-                        "Marzo",
-                        "Abril",
-                        "Mayo",
-                        "Junio",
-                        "Julio",
-                        "Agosto",
-                        "Septiembre",
-                        "Octubre",
-                        "Noviembre",
-                        "Diciembre"
-                    ],
-                    separator: " al ",
+        <script>
+            $(document).ready(function () {
+                var form = $('#radian-contributors-form');
+                $('#DateInterval').daterangepicker({
+                    locale: {
+                        applyLabel: "Aplicar",
+                        cancelLabel: "Cancelar",
+                        format: 'DD-MMMM-yyyy',
+                        monthNames: [
+                            "Enero",
+                            "Febrero",
+                            "Marzo",
+                            "Abril",
+                            "Mayo",
+                            "Junio",
+                            "Julio",
+                            "Agosto",
+                            "Septiembre",
+                            "Octubre",
+                            "Noviembre",
+                            "Diciembre"
+                        ],
+                        separator: " al ",
+                    }
+
+                });
+
+
+                 $("#Code").focus();
+
+                if (@Model.RadianContributors.Count == 0) {
+                    $('.table-responsive').css('display', 'none');
                 }
 
-            });
+                $('.btn-search').click(function () {
+                    var dateRange = $("#DateInterval").val();
+                    $('#StartDate').val(dateRange.split("al")[0]);
+                    $('#EndDate').val(dateRange.split("al")[1]);
+                    $('#Page').val(0);
 
+                    $('#Type').val($("#RadianType").val());
+                    showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
+                    $(this).attr('disabled', 'disabled');
+                    $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
+                    $('.table-pagination').css('display', 'none');
+                    $('.table-responsive').css('display', 'none');
+                    form.submit();
+                });
 
-             $("#Code").focus();
+                //Pagination
+                $(".next-page").click(function () {
+                    $("#Page").val(@Model.Page + 1);
+                    form.submit();
+                })
 
-            if (@Model.RadianContributors.Count == 0) {
-                $('.table-responsive').css('display', 'none');
-            }
+                $(".prev-page").click(function () {
+                    $("#Page").val(@Model.Page - 1);
+                    form.submit();
+                })
 
-            $('.btn-search').click(function () {
-                var dateRange = $("#DateInterval").val();
-                $('#StartDate').val(dateRange.split("al")[0]);
-                $('#EndDate').val(dateRange.split("al")[1]);
-                $('#Page').val(0);
-
-                $('#Type').val($("#RadianType").val());
-                showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
-                $(this).attr('disabled', 'disabled');
-                $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
-                $('.table-pagination').css('display', 'none');
-                $('.table-responsive').css('display', 'none');
-                form.submit();
-            });
-
-            //Pagination
-            $(".next-page").click(function () {
-                $("#Page").val(@Model.Page + 1);
-                form.submit();
             })
 
-            $(".prev-page").click(function () {
-                $("#Page").val(@Model.Page - 1);
-                form.submit();
-            })
-
-        })
-
-        //$(document).on('mouseenter', ".iffyTip", function () {
-        //    var $this = $(this);
-        //    if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
-        //        $this.tooltip({
-        //            title: $this.text(),
-        //            placement: "bottom",
-        //            container: "body"
-        //        });
-        //        $this.tooltip('show');
-        //    }
-        //});
-    </script>
+            //$(document).on('mouseenter', ".iffyTip", function () {
+            //    var $this = $(this);
+            //    if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+            //        $this.tooltip({
+            //            title: $this.text(),
+            //            placement: "bottom",
+            //            container: "body"
+            //        });
+            //        $this.tooltip('show');
+            //    }
+            //});
+        </script>*@
 
