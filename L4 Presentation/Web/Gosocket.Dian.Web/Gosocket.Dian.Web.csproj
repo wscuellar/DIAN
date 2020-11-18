@@ -2826,6 +2826,7 @@
     <Content Include="Views\User\ExternalUserLogin.cshtml" />
     <Content Include="Views\RadianApproved\_setTestRedirect.cshtml" />
     <Content Include="Views\RadianApproved\_fileHistory.cshtml" />
+    <Content Include="Views\RadianApproved\_setTestResult.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

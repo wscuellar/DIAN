@@ -769,3 +769,11 @@ h4.text-thin {
     padding: 0px 7px;
     margin-top: 10px;
 }
+#steps-approved .content {
+    background: none;
+}
+
+.radian-vertical-line {
+    border-left: 6px solid #FD7E14;
+    height: 200px;
+}
