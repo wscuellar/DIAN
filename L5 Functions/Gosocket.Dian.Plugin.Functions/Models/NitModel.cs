@@ -20,6 +20,6 @@
         public string CustomizationId { get; set; }
         public string IssuerPartySchemeID { get; set; }
         public string IssuerPartyID { get; set; }
-        public string NoteMandato { get; set; }
+ 
     }
 }

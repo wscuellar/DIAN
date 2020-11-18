@@ -1493,8 +1493,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var SenderParty = senderCode;
             var ReceiverParty = receiverCode;
             var ResponseCode = eventCode;
-            var ListID = listID;            
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, trackIdCude, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
+            var ListID = listID;
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, trackIdCude, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });           
+       
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1505,13 +1506,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     IsValid = validations[0].IsValid
                 };
                 response.ErrorMessage = new List<string>();
-                if (!response.IsValid)
+                foreach (var item in validations)
                 {
-                    foreach (var item in validations)
+                    if (!item.IsValid)
                     {
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                        response.IsValid = item.IsValid;
+                        response.StatusCode = item.ErrorCode;
+                        response.StatusMessage = item.ErrorMessage;
+                        response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                        return response;
                     }
-                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
                 }
 
             }
@@ -1520,7 +1525,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
+   
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

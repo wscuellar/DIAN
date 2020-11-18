@@ -481,7 +481,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude)
         {
             DateTime startDate = DateTime.UtcNow;
             party.TrackId = party.TrackId.ToLower();
@@ -498,12 +498,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case 31: //Rechazo de la FEV
                 case 32: //Constancia de recibo del bien
                 case 33: //Aceptacion Expresa
+                    //Valida emeisor documento 
                     if (party.SenderParty != receiverCode)
                     {
-
                         //valida si existe los permisos del mandatario 
                         var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
-                            party.ResponseCode, nitModel.NoteMandato);
+                            party.ResponseCode, xmlParserCude.NoteMandato);
                         if (response != null)
                         {
                             responses.Add(response);
@@ -512,15 +512,27 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             responses.Add(new ValidateListResponse
                             {
-                                IsValid = false,
+                                IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = receiver2DvErrorCode,
-                                ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquiriente/Deudor de la factura informada",
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty referenciado correctamente",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
                     }
-                    else if (party.ReceiverParty != senderCode)
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    //Valida receptor documento AR coincida con el Emisor/Facturador
+                    if (party.ReceiverParty != senderCode)
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -538,7 +550,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = true,
                             Mandatory = true,
                             ErrorCode = "100",
-                            ErrorMessage = "Evento senderParty / receiverParty referenciado correctamente",
+                            ErrorMessage = "Evento receiverParty referenciado correctamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -547,24 +559,25 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (party.ListId != "2") // No informa SenderParty es un endoso en blanco entonces no valida emisor documento
                     {
                         if (party.SenderParty != senderCode)
-                        {
-                            responses.Add(new ValidateListResponse
+                        {                           
+                            //valida si existe los permisos del mandatario 
+                            var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
+                                party.ResponseCode, xmlParserCude.NoteMandato);
+                            if (response != null)
                             {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = receiver2DvErrorCode,
-                                ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-
-
-                            ////valida si existe los permisos del mandatario 
-                            //var response = ValidateFacultityAttorney(party.CudeId, party.TrackId, party.SenderParty, senderCode,
-                            //    party.ResponseCode);
-                            //if (response != null)
-                            //{
-                            //    responses.Add(response);
-                            //}
+                                responses.Add(response);
+                            }
+                            else
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = true,
+                                    Mandatory = true,
+                                    ErrorCode = "100",
+                                    ErrorMessage = "Evento senderParty referenciado correctamente",
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                         else
                         {
@@ -594,17 +607,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case 43: //Mandato
                     if (party.SenderParty != senderCode)
                     {
+                        //valida si existe los permisos del mandatario 
+                        var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
+                            party.ResponseCode, xmlParserCude.NoteMandato);
+                        if (response != null)
+                        {
+                            responses.Add(response);
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty referenciado correctamente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    else
+                    {
                         responses.Add(new ValidateListResponse
                         {
-                            IsValid = false,
+                            IsValid = true,
                             Mandatory = true,
-                            ErrorCode = receiver2DvErrorCode,
-                            ErrorMessage = "Emisor del documento trasmitido no coincide con el Emisor/Facturador de la factura informada",
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty referenciado correctamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
-
                     }
-                    else if (party.ReceiverParty != "800197268")
+
+                    //Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != "800197268")
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -632,16 +667,38 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if (party.SenderParty != senderCode)
                         {
+                            //valida si existe los permisos del mandatario 
+                            var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
+                                party.ResponseCode, xmlParserCude.NoteMandato);
+                            if (response != null)
+                            {
+                                responses.Add(response);
+                            }
+                            else
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = true,
+                                    Mandatory = true,
+                                    ErrorCode = "100",
+                                    ErrorMessage = "Evento senderParty referenciado correctamente",
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }                          
+                        }
+                        else
+                        {
                             responses.Add(new ValidateListResponse
                             {
-                                IsValid = false,
+                                IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = receiver2DvErrorCode,
-                                ErrorMessage = "Emisor/Facturador Electrónico no coincide con la información de la factura  referenciada",
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty referenciado correctamente",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-                        else if (party.ReceiverParty != "800197268")
+                        //Valida receptor documento AR coincida con DIAN
+                        if (party.ReceiverParty != "800197268")
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -662,22 +719,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
-                        }
-                        //}else  if (party.CustomizationID == "363" || party.CustomizationID == "364")
-                        //{
-                        //    //Tener encuenta la validacion puesto que se va a realizar como una funcion con el mandato
-                        //    if (party.SenderParty != nitModel.ProviderCode)
-                        //    {
-                        //        responses.Add(new ValidateListResponse
-                        //        {
-                        //            IsValid = false,
-                        //            Mandatory = true,
-                        //            ErrorCode = receiver2DvErrorCode,
-                        //            ErrorMessage = "Información del Mandatario/Representante no se encuentra registrada en RADIAN",
-                        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        //        });
-                        //    }
-                        //}
+                        }                       
                     }
 
                     return responses;
@@ -685,17 +727,38 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case 40: //Anulacion de endoso electronico
                     if (party.SenderParty != senderCode)
                     {
+                        //valida si existe los permisos del mandatario 
+                        var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, senderCode,
+                            party.ResponseCode, xmlParserCude.NoteMandato);
+                        if (response != null)
+                        {
+                            responses.Add(response);
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty referenciado correctamente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    else
+                    {
                         responses.Add(new ValidateListResponse
                         {
-                            IsValid = false,
+                            IsValid = true,
                             Mandatory = true,
-                            ErrorCode = receiver2DvErrorCode,
-                            ErrorMessage = "El Endosante no coincide con el titular del evento",
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty referenciado correctamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
-
                     }
-                    else if (party.ReceiverParty != receiverCode)
+                    //Valida receptor documento AR coincida con el Endosatario
+                    if (party.ReceiverParty != receiverCode)
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -734,7 +797,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-                        else if (party.ReceiverParty != "800197268")
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty referenciado correctamente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        // Valida receptor documento AR coincida con DIAN
+                        if (party.ReceiverParty != "800197268")
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -752,7 +827,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "100",
-                                ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                                ErrorMessage = "Evento receiverParty referenciado correctamente",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -800,16 +875,38 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case 45:
                     if (party.SenderParty != receiverCode)
                     {
+                        //valida si existe los permisos del mandatario 
+                        var response = ValidateFacultityAttorney(party.TrackIdCude, party.TrackId, party.SenderParty, receiverCode,
+                            party.ResponseCode, xmlParserCude.NoteMandato);
+                        if (response != null)
+                        {
+                            responses.Add(response);
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty referenciado correctamente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }                       
+                    }
+                    else
+                    {
                         responses.Add(new ValidateListResponse
                         {
-                            IsValid = false,
+                            IsValid = true,
                             Mandatory = true,
-                            ErrorCode = receiver2DvErrorCode,
-                            ErrorMessage = "Emisor del documento trasmitido no coincide con el Adquirente/Deudor de la factura informada",
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty referenciado correctamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                    else if (party.ReceiverParty != "800197268")
+                    // Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != "800197268")
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -827,7 +924,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = true,
                             Mandatory = true,
                             ErrorCode = "100",
-                            ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                            ErrorMessage = "Evento receiverParty referenciado correctamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -903,7 +1000,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
 
             var sender = GetContributorInstanceCache(issueAtorney);
-
+            //Valida exista contributor en ambiente Habilitacion y Test
             if (ConfigurationManager.GetValue("Environment") == "Hab" ||
                 ConfigurationManager.GetValue("Environment") == "Test")
             {
@@ -934,6 +1031,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
             }
+            //Valida exista contributor en ambiente Productivo
             else if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
                 if (sender != null)
@@ -951,7 +1049,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
             }
-
+            //Valida exista informacion mandato - Mandatario - CUFE
             var docReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cude, cufe, issueAtorney, senderCode).FirstOrDefault();
             if (docReferenceAttorney == null)
             {
@@ -967,7 +1065,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             var filter = $"{docReferenceAttorney.FacultityCode}-{docReferenceAttorney.Actor}";
-
+            //Valida permisos firma para el evento emitido
             var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
             if (attorneyFacultity != null)
             {
@@ -983,19 +1081,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
                 }
-            }
-            if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
-            {
-                return new ValidateListResponse
+                //Valida exista note mandatario
+                else if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                 {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "89",
-                    ErrorMessage = "falta la nota OBRANDO EN NOMBRE Y REPRESENTACION DE en el documento",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "89",
+                        ErrorMessage = "falta la nota OBRANDO EN NOMBRE Y REPRESENTACION DE en el documento",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
             }
-
 
             return null;
         }
@@ -1990,7 +2088,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
                                 //Solicitud de Disponibilización
-                                else if (documentMeta.Where(t => t.EventCode == "036" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
+                                else if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
                                 {
                                     var response = ValidateEndoso(xmlParserCufe, xmlParserCude, eventCode);
                                     if (response != null)

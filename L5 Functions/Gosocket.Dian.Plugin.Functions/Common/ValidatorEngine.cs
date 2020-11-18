@@ -257,16 +257,25 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateParty(RequestObjectParty party)
         {
             var validateResponses = new List<ValidateListResponse>();
+            XmlParser xmlParserCufe = null;
+            XmlParser xmlParserCude = null;
 
+            //Obtiene XML Factura Electornica CUFE
             var xmlBytes = await GetXmlFromStorageAsync(party.TrackId);
-            var xmlParser = new XmlParser(xmlBytes);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
+            xmlParserCufe = new XmlParser(xmlBytes);
+            if (!xmlParserCufe.Parser())
+                throw new Exception(xmlParserCufe.ParserError);
 
-            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+            //Obtiene XML ApplicationResponse CUDE
+            var xmlBytesCude = await GetXmlFromStorageAsync(party.TrackIdCude);
+            xmlParserCude = new XmlParser(xmlBytesCude);
+            if (!xmlParserCude.Parser())
+                throw new Exception(xmlParserCude.ParserError);
+
+            var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateParty(nitModel, party));
+            validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude));
 
             return validateResponses;
         }
