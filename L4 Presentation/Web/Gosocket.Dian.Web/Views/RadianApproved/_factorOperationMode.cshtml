@@ -32,8 +32,8 @@
                                                 </div>
                                                 <div class="col-sm-9 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.Url, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.RadianApprovedOperationModeViewModel.Url, defaultHtmlAttr)
+                                                        @Html.Label("Url de recepción de eventos", new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.Software.Url, defaultHtmlAttr)
                                                     </div>
                                                 </div>
                                             </div>
@@ -45,7 +45,7 @@
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.SoftwareOwnerName.Item1, defaultHtmlAttr)
+                                                        @Html.TextBoxFor(m => m.Software.CreatedBy, defaultHtmlAttr)
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-9 padding-xs-0">
@@ -62,7 +62,7 @@
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.Label("ID del SW", new { @class = "control-label" })
+                                                        @Html.Label("ID del Software", new { @class = "control-label" })
                                                         @Html.TextBoxFor(m => m.Software.Id, defaultHtmlAttr)
                                                     </div>
                                                 </div>
@@ -94,23 +94,24 @@
                                                 <th>ID</th>
                                                 <th>PIN</th>
                                                 <th>URL</th>
+                                                <th>Acciones</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @*@foreach (var RadianContributor in Model.)
-                                            {
-                                                //var textClass = DataUtils.GetProviderStatusStyle(RadianContributor.AcceptanceStatusId);
-                                                //var isClickableRow = User.IsInAnyRole("Administrador", "Super") ? "clickable-row" : "";
-                                                //var urlView = User.IsInAnyRole("Administrador", "Super") ? Url.Action("ViewDetails", "Radian", new { id = RadianContributor.Id }) : "";
-                                                <tr class='@isClickableRow' data-href="@urlView">
-                                                    <td class="smallText iffyTip"><a>@RadianContributor.Code</a></td>
-                                                    <td class="largeText iffyTip"><a>@RadianContributor.BusinessName</a></td>
-                                                    <td class="largeText iffyTip"><a>@RadianContributor.TradeName</a></td>
-                                                    <td class="largeText iffyTip">
-                                                        <a><i class="fa fa-circle @textClass"></i>&nbsp;@RadianContributor.AcceptanceStatusName</a>
-                                                    </td>
-                                                </tr>
-                                            }*@
+                                                {
+                                                    //var textClass = DataUtils.GetProviderStatusStyle(RadianContributor.AcceptanceStatusId);
+                                                    //var isClickableRow = User.IsInAnyRole("Administrador", "Super") ? "clickable-row" : "";
+                                                    //var urlView = User.IsInAnyRole("Administrador", "Super") ? Url.Action("ViewDetails", "Radian", new { id = RadianContributor.Id }) : "";
+                                                    <tr class='@isClickableRow' data-href="@urlView">
+                                                        <td class="smallText iffyTip"><a>@RadianContributor.Code</a></td>
+                                                        <td class="largeText iffyTip"><a>@RadianContributor.BusinessName</a></td>
+                                                        <td class="largeText iffyTip"><a>@RadianContributor.TradeName</a></td>
+                                                        <td class="largeText iffyTip">
+                                                            <a><i class="fa fa-circle @textClass"></i>&nbsp;@RadianContributor.AcceptanceStatusName</a>
+                                                        </td>
+                                                    </tr>
+                                                }*@
                                         </tbody>
                                     </table>
                                 </div>

@@ -8,13 +8,10 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         [Display(Name = "Configuración modo de Operación")]
         public RadianOperationMode OperationModeSelected { get; set; }
 
-        [Display(Name = "URL de recepción de eventos")]
-        public string Url { get; set; }
-
         [Display(Name = "Nombre de software")]
         public string SoftwareName { get; set; }
 
-        [Display(Name = "PIN del SW")]
+        [Display(Name = "PIN del Software")]
         public string SoftwarePin { get; set; }
     }
 }
