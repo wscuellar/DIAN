@@ -1,8 +1,24 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
 @using Newtonsoft.Json
 @{
-    ViewBag.title = "Titulo";
-}
+    ViewBag.title = "";
+
+    switch (Request.Params["RadianContributorType"])
+    {
+        case "1":
+            ViewBag.Title = "Facturador Electrónico";
+            break;
+        case "2":
+            ViewBag.Title = "Proveedor Tecnológico";
+            break;
+        case "3":
+            ViewBag.Title = "Sistema de negociación";
+            break;
+        case "Factor":
+            ViewBag.Title = "Factor";
+            break;
+    }
+    }
 <div class="page-content radian-view margin-15">
     <div class="row title-container">
         <p class="title-view">
@@ -51,7 +67,7 @@
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
                     autoFocus: true,
-                    startIndex: 4,
+                    startIndex: index,
                     enablePagination: false,
                     enableKeyNavigation: false
                 });

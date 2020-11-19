@@ -813,10 +813,6 @@ span.state-file.status-4 {
     margin: 1em auto;
 }
 
-#container {
-    height: 400px;
-}
-
 .highcharts-data-table table {
     font-family: Verdana, sans-serif;
     border-collapse: collapse;
