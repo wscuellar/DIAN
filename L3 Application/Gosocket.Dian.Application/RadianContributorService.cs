@@ -67,8 +67,9 @@ namespace Gosocket.Dian.Application
                     return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
             }
 
-            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType);
-            if (radianContributor != null && radianContributor.RadianState != RadianState.Cancelado.GetDescription())
+            string cancelEvent = RadianState.Cancelado.GetDescription();
+            List<RadianContributor> radianContributor = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType && t.RadianState !=  cancelEvent);
+            if (radianContributor.Any())
                 return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.redirectType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.TechnologyProvider && (contributor.ContributorTypeId != (int)Domain.Common.ContributorType.Provider || !contributor.Status))
