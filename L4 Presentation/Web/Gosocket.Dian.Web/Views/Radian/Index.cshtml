@@ -23,17 +23,15 @@
     <div class="row-fluid">
 
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-            <a href="@Url.Action("ElectronicInvoiceView", "Radian")">
-                <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
-                    <div class="RadianImgContainer">
-                        <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
-                    </div>
-                    <div class="card-body">
-                        <p class="RadianTittleCard">Facturador Electrónico</p>
-                        <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
-                    </div>
+            <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
+                <div class="RadianImgContainer">
+                    <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
                 </div>
-            </a>
+                <div class="card-body">
+                    <p class="RadianTittleCard">Facturador Electrónico</p>
+                    <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
+                </div>
+            </div>
         </div>
 
 
@@ -104,14 +102,18 @@
                         function (param) {
                             CallExecution("POST", '@Url.Action("Add", "RadianApproved")', RegistrationDataViewModel,
                                 function (param) {
-                                    var url = "@Url.Action("Index", "RadianApproved")"+ "?ContributorId=" + param.ContributorId + "&RadianContributorType=" + param.RadianContributorType + "&RadianOperationMode=" + param.RadianOperationMode;
-                                    alert(url);
+                                    var url = "@Url.Action("Index", "RadianApproved")" + "?ContributorId=" + param.ContributorId + "&RadianContributorType=" + param.RadianContributorType + "&RadianOperationMode=" + param.RadianOperationMode;
                                     window.location.href = url;
                                 }, false
                             );
                         }, true
                     );
                 }
+            }
+            else {
+                var url = ('@ViewBag.RadianContributorTypeId' !== '') ? "@Url.Action("Index", "RadianApproved")" + "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.RadianOperationModeId' : '@Url.Action("ElectronicInvoiceView", "Radian")';
+                alert(url);
+                window.location.href = url;
             }
         });
 
