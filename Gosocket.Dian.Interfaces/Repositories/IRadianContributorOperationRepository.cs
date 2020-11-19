@@ -8,11 +8,10 @@ namespace Gosocket.Dian.Interfaces.Repositories
 {
     public interface IRadianContributorOperationRepository
     {
+        int Add(RadianContributorOperation contributorOperation);
         RadianContributorOperation Get(Expression<Func<RadianContributorOperation, bool>> expression);
         List<RadianContributorOperation> List(Expression<Func<RadianContributorOperation, bool>> expression);
 
         ResponseMessage Update(int radianContributorOperationId);
-
-        int Add(RadianContributorOperation contributorOperation);
     }
 }
