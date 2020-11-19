@@ -36,6 +36,9 @@ namespace Gosocket.Dian.Functions.Events
             if (string.IsNullOrEmpty(data.TrackId))
                 return new EventResponse { Code = "400", Message = "Please pass a trackId in the request body." };
 
+            if (string.IsNullOrEmpty(data.TrackIdCude))
+                return new EventResponse { Code = "400", Message = "Please pass a trackIdTrackIdCude in the request body." };
+
             var trackId = data.TrackId;
             var responseCode = data.ResponseCode;
 
@@ -95,11 +98,11 @@ namespace Gosocket.Dian.Functions.Events
             {
                 globalDataDocument.Events = new List<Event>()
                 {
-                    InstanceEventObject(globalDataDocument, data.Cude)
+                    InstanceEventObject(globalDataDocument, data.TrackIdCude)
                 };
             }
             else
-                globalDataDocument.Events.Add(InstanceEventObject(globalDataDocument, data.Cude));
+                globalDataDocument.Events.Add(InstanceEventObject(globalDataDocument, data.TrackIdCude));
 
             // upsert document in cosmos
             var result = CosmosDBService.Instance(documentMeta.EmissionDate).UpdateDocument(globalDataDocument);
@@ -133,8 +136,8 @@ namespace Gosocket.Dian.Functions.Events
             public string ResponseCode { get; set; }
             [JsonProperty(PropertyName = "trackId")]
             public string TrackId { get; set; }
-            [JsonProperty(PropertyName = "cude")]
-            public string Cude { get; set; }
+            [JsonProperty(PropertyName = "trackIdCude")]
+            public string TrackIdCude { get; set; }
         }
     }
 }
