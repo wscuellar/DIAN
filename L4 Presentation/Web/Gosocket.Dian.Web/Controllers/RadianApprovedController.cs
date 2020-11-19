@@ -33,7 +33,6 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpGet]
         public ActionResult Index(RegistrationDataViewModel registrationData)
         {
-
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId);
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
             var mode = registrationData.RadianOperationMode;
@@ -67,7 +66,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 
 
-        
+
         }
 
         private void LoadSoftwareModeOperation()
@@ -144,6 +143,8 @@ namespace Gosocket.Dian.Web.Controllers
         {
             radianApprovedViewModel.OperationModeList = _radianTestSetService.OperationModeList();
             radianApprovedViewModel.Software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
+            radianApprovedViewModel.RadianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel();
+            radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
 
             return View(radianApprovedViewModel);
         }
