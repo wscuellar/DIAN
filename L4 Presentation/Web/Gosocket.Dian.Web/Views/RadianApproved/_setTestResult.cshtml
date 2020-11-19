@@ -20,8 +20,9 @@
     <div class="panel-body padding-top-20">
         <div class="row margin-horizontal-0">
             <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
-                @using (Html.BeginForm("ShowSetTestDetails", "RadianApproved", FormMethod.Post))
+                @using (Html.BeginForm("SetTestDetails", "RadianApproved", FormMethod.Post))
                 {
+                    @Html.HiddenFor(m => m.Nit)
                     <div class="row">
                         <h4 class="panel-title-radian padding-0"><strong>Datos del modo operación</strong></h4>
                         <hr class="margin-5" />

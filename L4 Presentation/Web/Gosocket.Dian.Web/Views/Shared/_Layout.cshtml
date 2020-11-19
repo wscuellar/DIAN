@@ -451,16 +451,16 @@
                                             </a>
                                         </li>
                                         @*if (ConfigurationManager.GetValue("Environment") == "Test")
-            {
-                <li id="@Navigation.NavigationEnum.Invoice">
-                    <a href="@Url.Action("RedirectToBiller2", "User")" target="_blank">
-                        <i class="fa fa-dollar"></i>
-                        <span class="menu-title">
-                            Facturador Gratuito 2
-                        </span>
-                    </a>
-                </li>
-            }*@
+                                            {
+                                                <li id="@Navigation.NavigationEnum.Invoice">
+                                                    <a href="@Url.Action("RedirectToBiller2", "User")" target="_blank">
+                                                        <i class="fa fa-dollar"></i>
+                                                        <span class="menu-title">
+                                                            Facturador Gratuito 2
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            }*@
                                     }
 
                                     @if (User.IsInAnyRole("Administrador", "Super"))
@@ -581,6 +581,12 @@
     <script src="~/Content/js/gosocket/typeahead.js"></script>
     <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
     <script src="~/Content/js/common/common.js?1.2.0"></script>
+
+    <!-- highchart-->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
     <script>
         $(function () {

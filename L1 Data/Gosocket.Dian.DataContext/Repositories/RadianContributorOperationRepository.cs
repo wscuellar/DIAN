@@ -3,6 +3,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -10,24 +11,26 @@ namespace Gosocket.Dian.DataContext.Repositories
 {
     public class RadianContributorOperationRepository : IRadianContributorOperationRepository
     {
-        private readonly SqlDBContext sqlDBContext;
+        private readonly SqlDBContext _sqlDBContext;
         private ResponseMessage responseMessage;
 
         public RadianContributorOperationRepository()
         {
-            if (sqlDBContext == null)
-                sqlDBContext = new SqlDBContext();
+            if (_sqlDBContext == null)
+                _sqlDBContext = new SqlDBContext();
         }
 
         public List<RadianContributorOperation> List(Expression<Func<RadianContributorOperation, bool>> expression)
         {
-            var query = sqlDBContext.RadianContributorOperations.Where(expression);
+            var query = _sqlDBContext.RadianContributorOperations
+                .Include(rc => rc.Software)
+                .Where(expression);
             return query.ToList();
         }
 
         public RadianContributorOperation Get(Expression<Func<RadianContributorOperation, bool>> expression)
         {
-            var query = sqlDBContext.RadianContributorOperations.Where(expression);
+            var query = _sqlDBContext.RadianContributorOperations.Where(expression);
             return query.FirstOrDefault();
         }
 

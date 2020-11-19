@@ -162,5 +162,17 @@ namespace Gosocket.Dian.Web.Controllers
                 }, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult SetTestDetails(RadianApprovedViewModel radianApprovedViewModel)
+        {
+            radianApprovedViewModel.RadianTestSetResult =
+               _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
+            return View(radianApprovedViewModel);
+        }
+        
+        public JsonResult RadianTestResultByNit(string nit)
+        {
+            RadianTestSetResult testSetResult = _radianAprovedService.RadianTestSetResultByNit(nit);
+            return Json(new { data = testSetResult }, JsonRequestBehavior.AllowGet);
+        }
     }
 }
