@@ -9,28 +9,47 @@
         <div class="radian-subtitle-line"></div>
     </div>
     <div class="row radian-personal-info">
-        <div class="col-sm-3">
-            <div class="form-group">
-                @Html.LabelFor(m => m.Nit, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Nit, new { @class = "form-control contributorFileType-props input-general" })
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Nit, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Nit, new { @class = "form-control contributorFileType-props input-general" })
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control contributorFileType-props input-general" })
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.BusinessName, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.BusinessName, new { @class = "form-control contributorFileType-props input-general" })
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control contributorFileType-props input-general" })
+                </div>
             </div>
         </div>
-        <div class="col-sm-3">
-            <div class="form-group">
-                @Html.LabelFor(m => m.Name, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Name, new { @class = "form-control contributorFileType-props input-general" })
+        @if (Model.Step == 4)
+        {
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianState, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.RadianState, new { @class = "form-control contributorFileType-props input-general" })
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianContributorTypeId, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.RadianContributorTypeId, new { @class = "form-control contributorFileType-props input-general" })
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="col-sm-3">
-            <div class="form-group">
-                @Html.LabelFor(m => m.BusinessName, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.BusinessName, new { @class = "form-control contributorFileType-props input-general" })
-            </div>
-        </div>
-        <div class="col-sm-3">
-            <div class="form-group">
-                @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control contributorFileType-props input-general" })
-            </div>
-        </div>
+        }
     </div>
