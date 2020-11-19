@@ -23,7 +23,15 @@ namespace Gosocket.Dian.Application
         private readonly IContributorOperationsService _contributorOperationsService;
         private readonly IRadianTestSetResultService _radianTestSetResultService;
 
-        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository, IContributorOperationsService contributorOperationsService, IRadianTestSetResultService radianTestSetResultService)
+        public RadianAprovedService(IRadianContributorRepository radianContributorRepository,
+                                    IRadianTestSetService radianTestSetService,
+                                    IRadianContributorService radianContributorService,
+                                    IRadianContributorFileTypeService radianContributorFileTypeService,
+                                    IRadianContributorOperationRepository radianContributorOperationRepository,
+                                    IRadianContributorFileRepository radianContributorFileRepository,
+                                    IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository,
+                                    IContributorOperationsService contributorOperationsService,
+                                    IRadianTestSetResultService radianTestSetResultService)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
