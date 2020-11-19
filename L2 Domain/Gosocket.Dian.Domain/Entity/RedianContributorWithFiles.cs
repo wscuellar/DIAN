@@ -44,6 +44,8 @@ namespace Gosocket.Dian.Domain.Entity
         public List<RadianTestSetResult> Tests { get; set; }
 
         public List<string> LegalRepresentativeIds { get; set; }
+
+        public int Step { get; set; }
     }
 
     public class RedianContributorWithTypes
@@ -68,5 +70,7 @@ namespace Gosocket.Dian.Domain.Entity
         public DateTime Update { get; set; }
 
         public string RadianState { get; set; }
+        public int RadianContributorTypeId { get; set; }
+        public int Step { get; set; }
     }
 }

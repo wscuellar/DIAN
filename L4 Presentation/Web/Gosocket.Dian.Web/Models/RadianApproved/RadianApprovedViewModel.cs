@@ -9,6 +9,10 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
     {
         public int Step { get; set; }
 
+        public int ContributorId { get; set; }
+
+        public Contributor Contributor { get; set; }
+
         public int CurrentlyStep { get; set; }
 
         public int RadianContributorTypeId { get; set; }
@@ -35,9 +39,12 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public RadianTestSetResult RadianTestSetResult { get; set; }
 
-        public RadianApprovedViewModel()
-        {
-            RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
-        }
+        public Software Software { get; set; }
+
+        public List<RadianOperationMode> OperationModeList { get; set; }
+
+        public RadianApprovedOperationModeViewModel RadianApprovedOperationModeViewModel { get; set; }
+
+        public RadianApprovedViewModel() => RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
     }
 }

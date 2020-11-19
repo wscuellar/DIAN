@@ -19,32 +19,33 @@
     </div>
     <div class="row radian-subtitle-line"></div>
     @Html.Partial("_documentStates")
-<div class="row">
-    @{ int i = 0;}
-    @foreach (var n in Model.FilesRequires)
-    {
-        <div class="col-sm-4 padding-xs-0">
-            <div class="form-group">
-                <p class="radian-file-top-label">@n.Name</p>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input radian-file" name="file-@i" />
-                    <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
+    <div class="row">
+        @{ int i = 0;}
+        @foreach (var n in Model.FilesRequires)
+        {
+            <div class="col-sm-4 padding-xs-0">
+                <div class="form-group">
+                    <p class="radian-file-top-label">@n.Name</p>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" />
+                        <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
+                    </div>
                 </div>
             </div>
-        </div>
-        i++;
-    }
-    <div class="form-group">
-        <input type="submit" name="Submit" id="submit-button" value="Upload" />
+            i++;
+        }
     </div>
     <div id="progress-wrp">
         <div class="progress-bar"></div>
         <div class="status">0%</div>
     </div>
 </div>
-    @*<input type="file" class="custom-file-input radian-file">
-    <input type="submit" name="Submit" id="Submit" value="Upload" />*@
-</div>
+    <div class="panel-footer text-right">
+        <div class="form-group">
+            <button type="button" class="btn btn-default btn-radian-default">Cancelar registro</button>
+            <button name="Submit" class="btn btn-radian-success " id="submit-button">Enviar</button>
+        </div>
+    </div>
 
 }
 

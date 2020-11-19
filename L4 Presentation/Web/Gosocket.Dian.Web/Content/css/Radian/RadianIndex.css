@@ -490,6 +490,10 @@ h4.text-thin {
     opacity: 1;
     position: relative;
 }
+#steps-approved .steps li.done::before {
+    width: 20px;
+    height: 20px;
+}
 
 #steps-approved .steps li:nth-child(3).disabled a {
     background: url(../../images/png/validado3.png);
@@ -507,13 +511,13 @@ h4.text-thin {
     padding: 0px;
 }
 
-#steps-approved .steps li:nth-child(1).current a {
+/*#steps-approved .steps li:nth-child(1).current a {
     background: url(../../images/png/ingreso2.png);
     background-repeat: no-repeat;
     background-position: center;
     margin: 0px;
     padding: 0px;
-}
+}*/
 
 #steps-approved .steps li:nth-child(2).current a {
     background: url(../../images/png/pendiente2.png);

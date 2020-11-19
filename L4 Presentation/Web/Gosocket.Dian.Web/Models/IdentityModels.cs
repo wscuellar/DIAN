@@ -33,6 +33,11 @@ namespace Gosocket.Dian.Web.Models
 
         public virtual ICollection<Contributor> Contributors { get; set; }
 
+        /// <summary>
+        /// Activar o descativar el Usuario. Por ahora solo aplica para Usuarios externos
+        /// </summary>
+        public byte Active { get; set; }
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType

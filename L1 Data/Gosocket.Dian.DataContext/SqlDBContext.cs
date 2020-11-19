@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using System;
 using System.Data.Entity;
@@ -107,6 +108,21 @@ namespace Gosocket.Dian.DataContext
               .HasOptional(co => co.Software)
               .WithMany()
               .HasForeignKey(co => co.SoftwareId);
+
+            //modelBuilder.Entity<Menu>()
+            //  .HasKey(c => c.Id)
+            //  .HasOptional(c => c.Options)
+            //  .WithMany()
+            //  .HasForeignKey(c => c.Id);
+
+            //modelBuilder.Entity<SubMenu>()
+            //  .ToTable("SubMenu")
+            //  .HasKey(c => c.Id);
+            
+            //modelBuilder.Entity<Permission>()
+            //  .ToTable("Permission")
+            //  .HasKey(c => c.Id);
+
             #endregion
         }
 
@@ -140,6 +156,10 @@ namespace Gosocket.Dian.DataContext
         public DbSet<RadianContributorType> RadianContributorTypes { set; get; }
         public DbSet<RadianOperationMode> RadianOperationModes { set; get; }
         public DbSet<RadianContributorOperation> RadianContributorOperations { get; set; }
+
+        public DbSet<Menu> Menus { set; get; }
+        public DbSet<SubMenu> SubMenus { set; get; }
+        public DbSet<Permission> Permissions { set; get; }
 
     }
 

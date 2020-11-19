@@ -5,10 +5,9 @@ using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
@@ -36,27 +35,18 @@ namespace Gosocket.Dian.Web.Controllers
         {
             // LoadSoftwareModeOperation();
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(1704648);
-            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(2);
-            //List<RadianContributorFile> mockData = new List<RadianContributorFile>();
+            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(radianAdmin.Type.Id);
 
-            //for(int i = 0 ; i < 20 ; i++)
-            //{
-            //    RadianContributorFile item = new RadianContributorFile();
-            //    item.FileName = "fileName"+ i + ".pdf";
-            //    item.Updated = new System.DateTime();
-            //    item.CreatedBy = i + "alguien";
-            //    item.Status = 2;
-            //    item.Comments = "Hola mundo";
-            //    mockData.Add(item);
-            //}
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
+                ContributorId = radianAdmin.Contributor.Id,
                 Name = radianAdmin.Contributor.TradeName,
                 Nit = radianAdmin.Contributor.Code,
                 BusinessName = radianAdmin.Contributor.BusinessName,
                 Email = radianAdmin.Contributor.Email,
                 Files = radianAdmin.Files,
-                FilesRequires = listFileType
+                FilesRequires = listFileType,
+                Step = radianAdmin.Contributor.Step
 
             };
             return View(model);
@@ -72,6 +62,8 @@ namespace Gosocket.Dian.Web.Controllers
                                                         registrationData.RadianContributorType,
                                                         registrationData.RadianOperationMode,
                                                         User.UserName());
+
+
 
             // Lista de Software Modo de Operacion 
             // CA 2.3
@@ -101,11 +93,50 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult UploadFiles()
         {
+            string nit = Request.Form.Get("nit");
+            string email = Request.Form.Get("email");
+            string ContributorId = Request.Form.Get("contributorId");
+            string filesNumber = Request.Form.Get("filesNumber");
+            string step = Request.Form.Get("step");
+
+            int idRadianContributor = _radianAprovedService.RadianContributorId(Convert.ToInt32(ContributorId));
+
             for (int i = 0; i < Request.Files.Count; i++)
             {
+                RadianContributorFile radianContributorFile = new RadianContributorFile();
+                RadianContributorFileHistory radianFileHistory = new RadianContributorFileHistory();
+                string typeId = Request.Form.Get("TypeId_" + i);
+
                 var file = Request.Files[i];
+                radianContributorFile.FileName = file.FileName;
+                radianContributorFile.Timestamp = DateTime.Now;
+                radianContributorFile.Updated = DateTime.Now;
+                radianContributorFile.CreatedBy = email;
+                radianContributorFile.RadianContributorId = idRadianContributor;
+                radianContributorFile.Deleted = false;
+                radianContributorFile.FileType = Convert.ToInt32(typeId);
+                radianContributorFile.Status = 1;
+                radianContributorFile.Comments = "Comentario";
+
+                ResponseMessage responseUpload = _radianAprovedService.UploadFile(file.InputStream, nit, radianContributorFile);
+
+                if (responseUpload.Message != "")
+                {
+                    radianFileHistory.FileName = file.FileName;
+                    radianFileHistory.Comments = "";
+                    radianFileHistory.Timestamp = DateTime.Now;
+                    radianFileHistory.CreatedBy = email;
+                    radianFileHistory.Status = 1;
+                    radianFileHistory.RadianContributorFileId = Guid.Parse(responseUpload.Message);
+                    ResponseMessage responseUpdateFileHistory = _radianAprovedService.AddFileHistory(radianFileHistory);
+                }
             }
-            Thread.Sleep(3000);
+            if (Convert.ToInt32(filesNumber) == Request.Files.Count)
+            {
+                int newStep = Convert.ToInt32(step) + 1;
+                int contributorId = Convert.ToInt32(ContributorId);
+                ResponseMessage responseUpdateStep = _radianAprovedService.UpdateRadianContributorStep(contributorId, newStep);
+            }
             return Json(new
             {
                 messasge = "Datos actualizados correctamente.",
@@ -119,7 +150,29 @@ namespace Gosocket.Dian.Web.Controllers
         {
             radianApprovedViewModel.RadianTestSetResult =
                 _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
-            return PartialView("_setTestResult", radianApprovedViewModel);
+            return View(radianApprovedViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult GetFactorOperationMode(RadianApprovedViewModel radianApprovedViewModel)
+        {
+            radianApprovedViewModel.OperationModeList = _radianTestSetService.OperationModeList();
+            radianApprovedViewModel.Software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
+
+            return PartialView("_factorOperationMode", radianApprovedViewModel);
+        }
+
+        [HttpPost]
+        public JsonResult UploadFactorOperationMode(dynamic tempObjectRequest)
+        {
+
+
+            return Json(
+                new
+                {
+                    messasge = "Datos actualizados correctamente.",
+                    success = true,
+                }, JsonRequestBehavior.AllowGet);
         }
     }
 }

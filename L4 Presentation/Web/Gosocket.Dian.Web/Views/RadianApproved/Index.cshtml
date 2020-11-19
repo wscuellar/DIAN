@@ -26,15 +26,15 @@
                     </section>
                     <h3><span class="name-state">Validando documentos</span></h3>
                     <section>
-                        @Html.Partial("_documentStates");
+                        @Html.Partial("_certificates")
                     </section>
                     <h3><span class="name-state">Pruebas de aceptación</span></h3>
                     <section>
-                        @Html.Partial("_setTestRedirect");
+                        @Html.Partial("_setTestRedirect")
                     </section>
                     <h3></h3>
                     <section>
-                        <p>The next and previous buttons help you to navigate through your content.</p>
+                        @Html.Partial("_certificates")
                     </section>
                 </div>
             </div>
@@ -44,22 +44,15 @@
 
 @section scripts{
     <script>
-            $(document).ready(function () {
+            $(document).ready(function () {debugger 
                 $("#steps-approved").steps({
                     headerTag: "h3",
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
                     autoFocus: true,
-                    startIndex: 1,
-                    labels: {
-                        cancel: "Cancel",
-                        current: "current step:",
-                        pagination: "Pagination",
-                        finish: "Finish",
-                        next: "Siguiente",
-                        previous: "Cancelar",
-                        loading: "Loading ..."
-                    }
+                    startIndex: @Model.Step,
+                    enablePagination: false,
+                    enableKeyNavigation: false
                 });
 
                 $(".radian-file").click(function (file) {
@@ -98,15 +91,23 @@
                 //});
 
                 $('#submit-button').click(function (e) {
+                    debugger
                     e.preventDefault();
-                    debugger;
                     var files = $("#uploadForm")[0];
                     var formdata = new FormData();
-                    for (var i = 0 ; i < files.length - 1 ; i++) {
-                        debugger
-                        files[i].files.length > 0 &&
-                        formdata.append(files[i].files[0].name, files[i].files[i]);
-                    }
+                    var numberFiles = 0;
+                    for (var i = 0 ; i < files.length - 2 ; i++) {
+                        if (files[i].files.length > 0) {
+                            formdata.append(files[i].files[0].name, files[i].files[i]);
+                            formdata.append("TypeId_" + numberFiles, files[i].dataset.typeid);
+                            numberFiles++;
+                        }
+                    };
+                    formdata.append("nit", "@Model.Nit");
+                    formdata.append("email", "@Model.Email");
+                    formdata.append("contributorId", "@Model.ContributorId");
+                    formdata.append("filesNumber", files.length - 2);
+                    formdata.append("step", @Model.Step);
 
 
                     $.ajax({
@@ -122,7 +123,6 @@
                             var xhr = $.ajaxSettings.xhr();
                             if (xhr.upload) {
                                 xhr.upload.addEventListener('progress', function (event) {
-                                    debugger
                                     var percent = 0;
                                     var position = event.loaded || event.position;
                                     var total = event.total;
@@ -137,7 +137,6 @@
                             return xhr;
                         },
                         success: function (mdata) {
-                            debugger
                             if (mdata == 0) {
                                 alert("Done");
                             }
