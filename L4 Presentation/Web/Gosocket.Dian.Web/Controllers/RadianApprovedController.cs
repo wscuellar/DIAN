@@ -156,9 +156,8 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult GetFactorOperationMode(RadianApprovedViewModel radianApprovedViewModel)
         {
-            radianApprovedViewModel.SoftwareOwnerName =
-                _radianAprovedService.FindNamesContributorAndSoftware(radianApprovedViewModel.ContributorId, radianApprovedViewModel.Software.Id.ToString());
             radianApprovedViewModel.OperationModeList = _radianTestSetService.OperationModeList();
+            radianApprovedViewModel.Software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
 
             return PartialView("_factorOperationMode", radianApprovedViewModel);
         }

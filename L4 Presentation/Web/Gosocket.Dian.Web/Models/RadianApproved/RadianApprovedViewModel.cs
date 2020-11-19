@@ -1,6 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -42,15 +41,10 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public Software Software { get; set; }
 
-        public Tuple<string, string> SoftwareOwnerName { get; set; }
-
         public List<RadianOperationMode> OperationModeList { get; set; }
 
         public RadianApprovedOperationModeViewModel RadianApprovedOperationModeViewModel { get; set; }
 
-        public RadianApprovedViewModel()
-        {
-            RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
-        }
+        public RadianApprovedViewModel() => RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
     }
 }
