@@ -143,7 +143,7 @@ namespace Gosocket.Dian.Application
             if (result)
             {
                 radianContributorFile.Id = Guid.NewGuid();
-                _radianContributorFileRepository.Add(radianContributorFile);
+                _radianContributorFileRepository.AddOrUpdate(radianContributorFile);
                 return new ResponseMessage($"{radianContributorFile.Id}", "Guardado");
             }
 
