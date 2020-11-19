@@ -19,7 +19,6 @@
                             <input type="hidden" id="listMenu" value="@Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Menu)" />
                             <input type="hidden" id="hddPermissions" name="hddPermissions" />
                             @Html.Partial("_userForm")
-                            <br />
                             @Html.ValidationSummary("", new { @class = "text-center text-danger" })
                             @Html.ValidationMessage("no_permissions", new { @class = "text-center text-danger" })
                             <br />
@@ -53,11 +52,12 @@
                             <table class="table table-sm table-bordered table-hover">
                                 <thead>
                                     <tr>
+                                        <th>Tipo de documento</th>
                                         <th>Documento</th>
                                         <th>Nombres</th>
                                         <th>Email</th>
-                                        <th>Active</th>
-                                        <th>Editar</th>
+                                        <th class="text-center">Active</th>
+                                        <th class="text-center">Editar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -66,11 +66,12 @@
                                         foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
                                         {
                                             <tr>
-                                                <td>@item.Identification</td>
+                                                <td>@(Model.IdentificationTypes.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description)</td>
+                                                <td>@item.IdentificationId</td>
                                                 <td>@item.Names</td>
                                                 <td>@item.Email</td>
-                                                <td>@item.Active</td>
-                                                <td>
+                                                <td class="text-center">@(item.Active == 1 ? "Sí" : "No")</td>
+                                                <td class="text-center">
                                                     @Html.ActionLink("Editar", "AddUser", new { id= item.Id}, new { @class="btn btn-primary"})
                                                 </td>
                                             </tr>

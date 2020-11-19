@@ -361,10 +361,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.cs" />
-    <Compile Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.Designer.cs">
-      <DependentUpon>202011171731077_NewTables-Menu-SubMenu-Permission.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountTwoFactorViewModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -375,7 +371,6 @@
     <Compile Include="Models\ExternalUserViewModel.cs" />
     <Compile Include="Models\QueryEventViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
-    <Compile Include="Models\ExternalUserViewModel.cs" />
     <Compile Include="Models\MenuViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedViewModel.cs" />
     <Compile Include="Models\RadianContributorFileTypeViewModel.cs" />
@@ -2852,7 +2847,6 @@
     <Folder Include="Content\js\NewFolder1\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
-    <Folder Include="Views\ExternalUsers\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -2894,11 +2888,6 @@
       <Project>{319e3a78-ed5c-463a-a323-fe1037f38aea}</Project>
       <Name>Gosocket.Dian.Application</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.resx">
-      <DependentUpon>202011171731077_NewTables-Menu-SubMenu-Permission.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

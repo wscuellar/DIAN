@@ -24,6 +24,8 @@ namespace Gosocket.Dian.Web.Models
 
         public int? CurrentContributorId { get; set; }
 
+        public string IdentificationId { get; set; }
+
         public int IdentificationTypeId { get; set; }
 
         public string Name { get; set; }
@@ -90,5 +92,6 @@ namespace Gosocket.Dian.Web.Models
         }
         public DbSet<Contributor> Contributor { set; get; }
         public DbSet<ContributorOperations> ContributorOperation { set; get; }
+        //public DbSet<AspNetUserRoles> UserRoles { set; get; }
     }
 }

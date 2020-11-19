@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -23,12 +24,13 @@ namespace Gosocket.Dian.Web.Controllers
     /// Para que puedan ingresar al catalogo de validación sin necesidad(Facturando electrónicamente) de usar token
     /// </summary>
     [AllowAnonymous]
-    [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
+    //[CustomRoleAuthorization(CustomRoles = "Administrador, Super, UsuarioExterno")]
     public class ExternalUsersController : Controller
     {
         ApplicationDbContext _context;
 
         private UserService userService = new UserService();
+
         private ApplicationUserManager _userManager;
         public ApplicationUserManager UserManager
         {
@@ -61,8 +63,14 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult AddUser(string id = "")
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.ExternalUsersCreate;
-            ViewBag.Roles = new SelectList(_context.Roles.Where(u => u.Name.Contains("UsuarioExterno"))
-                                            .ToList(), "Id", "Name");
+
+            var identificationTypeList = identificationTypeService.List();
+
+            //var roles = new SelectList(_context.Roles.Where(u => u.Name.Contains("UsuarioExterno"))
+            //                                .ToList(), "Id", "Name");
+            var role = _context.Roles.FirstOrDefault(u => u.Name.Contains("UsuarioExterno"));
+
+            //var userExt2 = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id)).ToList();
 
             //ViewBag.Menu = this.MenuApp();
             ViewBag.Menu = _permisionService.GetAppMenu().Select(m =>
@@ -83,14 +91,19 @@ namespace Gosocket.Dian.Web.Controllers
                         }).ToList()
                 }).ToList();
 
-            ViewBag.ExternalUsersList = _context.Users.Select(u =>
+            ViewBag.ExternalUsersList = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id)).ToList()
+                .Select(u =>
                 new ExternalUserViewModel
                 {
                     Id = u.Id,
+                    IdentificationTypeId =  u.IdentificationTypeId,
+                    IdentificationId = u.IdentificationId,
+                    Names = u.Name,
                     Email = u.Email,
-                    Names = u.UserName,
-                    Roles = u.Roles.ToList(),
-                    Active = u.Active
+                    //Roles = u.Roles.ToList(),
+                    Active = u.Active,
+                    IdentificationTypes = identificationTypeService.List()
+                        .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList()
                 }).ToList();
 
             ExternalUserViewModel model = null;
@@ -104,9 +117,11 @@ namespace Gosocket.Dian.Web.Controllers
                     model = new ExternalUserViewModel()
                     {
                         Id = userBD.Id,
+                        IdentificationTypeId = userBD.IdentificationTypeId,
+                        IdentificationId = userBD.IdentificationId,
+                        Names = userBD.Name,
                         Email = userBD.Email,
-                        Names = userBD.UserName,
-                        Roles = userBD.Roles?.ToList(),
+                        //Roles = userBD.Roles.ToList(),
                         Active = userBD.Active,
                         IdentificationTypes = identificationTypeService.List()
                         .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList()
@@ -118,7 +133,6 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         IdentificationTypes = identificationTypeService.List()
                         .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList(),
-                        //Roles = UserManager.GetRoles().ToList()
                     };
                 }
 
@@ -129,7 +143,6 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     IdentificationTypes = identificationTypeService.List()
                         .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList(),
-                    //Roles = UserManager.GetRoles().ToList()
                 };
             }
 

@@ -5,15 +5,15 @@
     <div class="row">
         <div class="col-sm-3 padding-xs-0">
             <div class="form-group">
-                @Html.LabelFor(m => m.IdentificationType, new { @class = "control-label" })
-                @Html.DropDownListFor(m => m.IdentificationType, new SelectList(Model.IdentificationTypes, "Id", "Description", Model.IdentificationType), new { @class = "form-control selectpicker" })
+                @Html.LabelFor(m => m.IdentificationTypeId, new { @class = "control-label" })
+                @Html.DropDownListFor(m => m.IdentificationTypeId, new SelectList(Model.IdentificationTypes, "Id", "Description", Model.IdentificationTypeId), new { @class = "form-control selectpicker" })
             </div>
         </div>
         <div class="col-sm-3 padding-xs-0">
             <div class="form-group">
-                @Html.LabelFor(m => m.Identification, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Identification, new { @class="form-control" })
-                @Html.ValidationMessageFor(m => m.Identification, "", new { @class = "text-danger" })
+                @Html.LabelFor(m => m.IdentificationId, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.IdentificationId, new { @class="form-control" })
+                @Html.ValidationMessageFor(m => m.IdentificationId, "", new { @class = "text-danger" })
             </div>
         </div>
     </div>
