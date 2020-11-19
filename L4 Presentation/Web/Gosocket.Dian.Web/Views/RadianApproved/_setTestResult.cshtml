@@ -1,0 +1,270 @@
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control fields" } };}
+@{
+    ViewBag.title = "Datos del modo de operación";
+}
+
+<div class="row">
+    <div class="panel-heading">
+        <i class="fas fa-check-circle" style=" color: #FD7E14"></i>
+        <div class="radian-vertical-line"></div>
+        <p>
+            Su empresa se encuentra en el proceso de prueba de validación, el set de pruebas se encuentra en proceso. <br />
+            Usted debe proporcionar el identificador del set de pruebas @*@Model.RadianTestSetResult.Id*@ en el web service para el envío de su set de pruebas.
+        </p>
+    </div>
+</div>
+
+
+<div class="panel">
+    <div class="panel-body padding-top-20">
+        <div class="row margin-horizontal-0">
+            <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                @using (Html.BeginForm("ShowSetTestDetails", "RadianApproved", FormMethod.Post))
+                {
+                    <div class="row">
+                        <h4 class="panel-title-radian padding-0"><strong>Datos del modo operación</strong></h4>
+                        <hr class="margin-5" />
+
+                        <div class="col-sm-3 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Seleccione el modo de operación", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.OperationModeName, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-9 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Descripción", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.StatusDescription, defaultHtmlAttr)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <h4 class="panel-title-radian padding-0"><strong>Información del software</strong></h4>
+                        <hr class="margin-5" />
+
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Identificación", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.Software.Id, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Nombre", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.Software.Name, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-8 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("PIN", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.Software.Pin, defaultHtmlAttr)
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Required *@
+                    <div class="row">
+                        <h4 class="panel-title-radian padding-0"><strong>Total de documentos requeridos</strong></h4>
+                        <hr class="margin-5" />
+
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Documentos (Total)", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.TotalDocumentRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Acuse de recibo de la FEV", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptNoticeTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Recibo del bien o prestación del servicio", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptServiceTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Aceptación expresa", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Aceptación tácita", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Rechazo de la FEV", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.RejectInvoiceTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Avales", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.GuaranteeTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Mandato", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.ElectronicMandateTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Terminación del mandato", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndMandateTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Endoso electrónico", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Anulación del endoso", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementCancellationTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Notificación de pago parcial o total", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Limitación de circulación", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-10 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Terminación de la limitación de circulación", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Accept *@
+                    <div class="row">
+                        <h4 class="panel-title-radian padding-0"><strong>Total de documentos requeridos</strong></h4>
+                        <hr class="margin-5" />
+
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Documentos (Total)", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.TotalDocumentAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Acuse de recibo de la FEV", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptNoticeTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Recibo del bien o prestación del servicio", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptServiceTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Aceptación expresa", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Aceptación tácita", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Rechazo de la FEV", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.RejectInvoiceTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Avales", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.GuaranteeTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Mandato", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.ElectronicMandateTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Terminación del mandato", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndMandateTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Endoso electrónico", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Anulación del endoso", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementCancellationTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Notificación de pago parcial o total", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-2 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Limitación de circulación", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                        <div class="col-sm-10 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Terminación de la limitación de circulación", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-footer text-right">
+                        <button type="submit" class="btn btn-success btn-radian-success">Detalles</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+

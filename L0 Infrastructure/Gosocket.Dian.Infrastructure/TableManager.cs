@@ -445,6 +445,26 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
+        public List<T> FindDocumentReferenced_TypeId<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                    QueryComparisons.Equal,
+                    documentReferencedKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+
+
         public List<T> FindDocumentReferenced_EventCode_TypeId<T>(string documentReferencedKey, string documentTypeId, string eventCode) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();

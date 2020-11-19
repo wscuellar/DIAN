@@ -46,7 +46,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult RegistrationValidation(RegistrationDataViewModel registrationData)
         {
-            RadianRegistrationValidation validation = _radianContributorService.RegistrationValidation(User.UserCode(), registrationData.RadianContributorType, registrationData.RadianOperationMode);
+            ResponseMessage validation = _radianContributorService.RegistrationValidation(User.UserCode(), registrationData.RadianContributorType, registrationData.RadianOperationMode);
             return Json(validation, JsonRequestBehavior.AllowGet);
         } 
 
@@ -222,9 +222,17 @@ namespace Gosocket.Dian.Web.Controllers
                     RadianContributorFile radianContributorFileInstance = null;
                     foreach (var n in data)
                     {
+                        RadianContributorFileHistory radianFileHistory = new RadianContributorFileHistory();
                         radianContributorFileInstance = _radianContributorService.RadianContributorFileList(n.Id).FirstOrDefault();
                         radianContributorFileInstance.Status = n.NewState;
                         _ = _radianContributorService.UpdateRadianContributorFile(radianContributorFileInstance).ToString();
+
+                        radianFileHistory.FileName = radianContributorFileInstance.FileName;
+                        radianFileHistory.Comments = "Cambio de estado por Admin";
+                        radianFileHistory.CreatedBy = radianContributorFileInstance.CreatedBy;
+                        radianFileHistory.Status = n.NewState;
+                        radianFileHistory.RadianContributorFileId = radianContributorFileInstance.Id;
+                        _ = _radianContributorService.AddFileHistory(radianFileHistory);
                     }
                 }
 

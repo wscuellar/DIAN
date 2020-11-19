@@ -328,6 +328,7 @@
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ExternalUsersController.cs" />
+    <Compile Include="Controllers\QueryAssociatedEventsController.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
     <Compile Include="Controllers\ContributorFileTypeController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
@@ -360,13 +361,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201810031323318_InitialCreate.cs" />
-    <Compile Include="Migrations\201810031323318_InitialCreate.Designer.cs">
-      <DependentUpon>201810031323318_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202010282054253_AddTableRadianContributor.cs" />
-    <Compile Include="Migrations\202010282054253_AddTableRadianContributor.Designer.cs">
-      <DependentUpon>202010282054253_AddTableRadianContributor.cs</DependentUpon>
+    <Compile Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.cs" />
+    <Compile Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.Designer.cs">
+      <DependentUpon>202011171731077_NewTables-Menu-SubMenu-Permission.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountTwoFactorViewModels.cs" />
@@ -375,7 +372,12 @@
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\ContributorCategoryViewModel.cs" />
+    <Compile Include="Models\ExternalUserViewModel.cs" />
+    <Compile Include="Models\QueryEventViewModel.cs" />
+    <Compile Include="Models\RadianApproved\RadianApprovedOperationModeViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
+    <Compile Include="Models\ExternalUserViewModel.cs" />
+    <Compile Include="Models\MenuViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedViewModel.cs" />
     <Compile Include="Models\RadianContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorFileTypeViewModel.cs" />
@@ -387,6 +389,7 @@
     <Compile Include="Models\NumberRangeViewModel.cs" />
     <Compile Include="Models\OperationModeViewModel.cs" />
     <Compile Include="Models\ProviderViewModel.cs" />
+    <Compile Include="Models\RadianContributorUploadFileViewModel.cs" />
     <Compile Include="Models\RadianTestSetResultViewModel.cs" />
     <Compile Include="Models\RadianTestSetTableViewModel.cs" />
     <Compile Include="Models\RadianTestSetTrackingViewModel.cs" />
@@ -400,6 +403,8 @@
     <Compile Include="Models\Document.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\SummaryEventsViewModel.cs" />
+    <Compile Include="Models\SubMenuViewModel.cs" />
     <Compile Include="Models\TestSetViewModel.cs" />
     <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -426,9 +431,14 @@
     <Content Include="Content\crush-page\img\city-img.png" />
     <Content Include="Content\crush-page\img\crush-bg.png" />
     <Content Include="Content\crush-page\img\gosign-img.png" />
+    <Content Include="Content\css\bootstrap-grid.css" />
+    <Content Include="Content\css\bootstrap-grid.min.css" />
+    <Content Include="Content\css\bootstrap-reboot.css" />
+    <Content Include="Content\css\bootstrap-reboot.min.css" />
     <Content Include="Content\css\bootstrap-tokenfield.min.css" />
     <Content Include="Content\css\bootstrap.css" />
     <Content Include="Content\css\bootstrap.min.css" />
+    <Content Include="Content\css\custom-form.css" />
     <Content Include="Content\css\daterangepicker.min.css" />
     <Content Include="Content\css\demo\nifty-demo.css" />
     <Content Include="Content\css\demo\nifty-demo.min.css" />
@@ -545,12 +555,23 @@
     <Content Include="Content\images\pendiente-1.png" />
     <Content Include="Content\images\pendiente-2.png" />
     <Content Include="Content\images\pendiente-3.png" />
+    <Content Include="Content\images\png\done.png" />
+    <Content Include="Content\images\png\flagFinish.png" />
+    <Content Include="Content\images\png\ingreso1.png" />
+    <Content Include="Content\images\png\pendiente1.png" />
+    <Content Include="Content\images\png\pendiente2.png" />
+    <Content Include="Content\images\png\pruebas1.png" />
+    <Content Include="Content\images\png\pruebas2.png" />
+    <Content Include="Content\images\png\pruebas3.png" />
+    <Content Include="Content\images\png\validado1.png" />
+    <Content Include="Content\images\png\validado2.png" />
+    <Content Include="Content\images\png\validado3.png" />
     <Content Include="Content\images\pruebas-1.png" />
     <Content Include="Content\images\pruebas-3.png" />
     <Content Include="Content\images\puerbas-2.png" />
     <Content Include="Content\images\reject.png" />
     <Content Include="Content\images\spinner.gif" />
-    <Content Include="Content\images\Svg\StepOneOk.svg" />
+    <Content Include="Content\images\Svg\Loaded.svg" />
     <Content Include="Content\images\Svg\Factor.svg" />
     <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
     <Content Include="Content\images\Svg\OperacionDirecta.svg" />
@@ -642,6 +663,8 @@
     <Content Include="Content\js\bootstrap-filestyle.js" />
     <Content Include="Content\js\bootstrap-filestyle.min.js" />
     <Content Include="Content\js\bootstrap-tokenfield.min.js" />
+    <Content Include="Content\js\bootstrap.bundle.js" />
+    <Content Include="Content\js\bootstrap.bundle.min.js" />
     <Content Include="Content\js\bootstrap.js" />
     <Content Include="Content\js\bootstrap.min.js" />
     <Content Include="Content\js\common\common.js" />
@@ -676,6 +699,7 @@
     <Content Include="Content\js\nifty.js cambios.txt" />
     <Content Include="Content\js\nifty.min.js" />
     <Content Include="Content\js\Radian\RadianIndex.js" />
+    <Content Include="Content\js\Radian\RadianTestSet.js" />
     <Content Include="Content\js\user\user.js" />
     <Content Include="Content\plugins\animate-css\animate.css" />
     <Content Include="Content\plugins\animate-css\animate.min.css" />
@@ -862,6 +886,39 @@
     <Content Include="Content\plugins\cropper\cropper.js" />
     <Content Include="Content\plugins\cropper\cropper.min.css" />
     <Content Include="Content\plugins\cropper\cropper.min.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.bootstrap.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.bootstrap.min.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.bootstrap4.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.bootstrap4.min.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.foundation.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.foundation.min.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.jqueryui.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.jqueryui.min.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.semanticui.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.semanticui.min.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\jquery.dataTables.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\jquery.dataTables.min.css" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\images\sort_asc.png" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\images\sort_asc_disabled.png" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\images\sort_both.png" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\images\sort_desc.png" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\images\sort_desc_disabled.png" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\dataTables.bootstrap.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\dataTables.bootstrap.min.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\dataTables.bootstrap4.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\dataTables.bootstrap4.min.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\dataTables.foundation.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\dataTables.foundation.min.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\dataTables.jqueryui.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\dataTables.jqueryui.min.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\dataTables.semanticui.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\dataTables.semanticui.min.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\jquery.dataTables.js" />
+    <Content Include="Content\plugins\data-tables\DataTables-1.10.22\js\jquery.dataTables.min.js" />
+    <Content Include="Content\plugins\data-tables\datatables.css" />
+    <Content Include="Content\plugins\data-tables\datatables.js" />
+    <Content Include="Content\plugins\data-tables\datatables.min.css" />
+    <Content Include="Content\plugins\data-tables\datatables.min.js" />
     <Content Include="Content\plugins\datatables\examples\advanced_init\column_render.html" />
     <Content Include="Content\plugins\datatables\examples\advanced_init\complex_header.html" />
     <Content Include="Content\plugins\datatables\examples\advanced_init\defaults.html" />
@@ -2763,6 +2820,20 @@
     <Content Include="Views\RadianApproved\_personalInfo.cshtml" />
     <Content Include="Views\RadianApproved\_certificates.cshtml" />
     <Content Include="Views\RadianApproved\_documentStates.cshtml" />
+    <Content Include="Views\Document\QueryEventsList.cshtml" />
+    <Content Include="Views\QueryAssociatedEvents\EventsView.cshtml" />
+    <Content Include="Views\Radian\_iconsState.cshtml" />
+    <Content Include="Views\User\_externalUserLogin.cshtml" />
+    <Content Include="Views\User\ExternalUserLogin.cshtml" />
+    <Content Include="Views\RadianApproved\_setTestRedirect.cshtml" />
+    <Content Include="Views\RadianApproved\_fileHistory.cshtml" />
+    <Content Include="Views\RadianApproved\_setTestResult.cshtml" />
+    <Content Include="Views\ExternalUsers\AddUser.cshtml" />
+    <Content Include="Views\ExternalUsers\_userForm.cshtml" />
+    <Content Include="Views\RadianApproved\_factorOperationMode.cshtml" />
+    <Content Include="Views\RadianApproved\GetSetTestResult.cshtml" />
+    <Content Include="Views\RadianApproved\_customers.cshtml" />
+    <Content Include="Views\RadianApproved\_finalStep.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2784,10 +2855,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Content\js\NewFolder1\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
-    <Folder Include="Views\RadianSetTest\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -2831,11 +2900,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201810031323318_InitialCreate.resx">
-      <DependentUpon>201810031323318_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202010282054253_AddTableRadianContributor.resx">
-      <DependentUpon>202010282054253_AddTableRadianContributor.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.resx">
+      <DependentUpon>202011171731077_NewTables-Menu-SubMenu-Permission.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

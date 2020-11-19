@@ -1,0 +1,51 @@
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@{
+    ViewBag.Title = "Requisitos";
+}
+
+@* Todo: validar nombre y método del controlador *@
+@using (Html.BeginForm("UploadFiles", "RadianApproved", FormMethod.Post, new { id = "uploadForm", enctype = "multipart/form-data" }))
+{
+    <div class="panel-body padding-20 padding-bottom-10">
+        <div class="row radian-subtitle-container radian-certificates">
+            <div class="col-sm-10">
+                <p class="subtitle-view">
+                    @ViewBag.title
+                </p>
+            </div>
+            <div class="col-sm-2">
+                <a class="show-history"><u class="green-text"><i class="fa fa-history"></i> Ver Historial</u></a>
+            </div>
+        </div>
+        <div class="row radian-subtitle-line"></div>
+        @Html.Partial("_documentStates")
+        <div class="row">
+            @{ int i = 0;}
+            @foreach (var n in Model.FilesRequires)
+            {
+                <div class="col-sm-4 padding-xs-0">
+                    <div class="form-group">
+                        <p class="radian-file-top-label">@n.Name</p>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" />
+                            <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
+                        </div>
+                    </div>
+                </div>
+                i++;
+            }
+        </div>
+        <div id="progress-wrp">
+            <div class="progress-bar"></div>
+            <div class="status">0%</div>
+        </div>
+    </div>
+    <div class="panel-footer text-right">
+        <div class="form-group">
+            <button type="button" class="btn btn-default btn-radian-default" id="view-costumers">Ver mis clientes asociados</button>
+            <button name="Submit" class="btn btn-radian-success" id="view-operation-mode">Configurar modos de operación</button>
+        </div>
+    </div>
+
+}
+

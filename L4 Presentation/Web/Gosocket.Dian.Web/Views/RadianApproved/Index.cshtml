@@ -1,4 +1,5 @@
-﻿
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@using Newtonsoft.Json
 @{
     ViewBag.title = "Titulo";
 }
@@ -10,29 +11,30 @@
         <div class="underline-title"></div>
     </div>
     <div class="row margin-horizontal-0">
-        <div class="panel">
+        <div class="panel" data-target="#panel-form" data-toggle="panel-overlay" >
             <div class="panel-body padding-top-20">
                 <div id="steps-approved">
-                     @Html.Partial("_personalInfo")
-                    <h3></h3>
+                    <div class="radian-personal-info">
+                        @Html.Partial("_personalInfo")
+                    </div>
+                    <h3><span class="name-state">Ingreso de solicitud</span></h3>
+                    <section>
+                    </section>
+                    <h3><span class="name-state">Pendiente</span></h3>
                     <section>
                         @Html.Partial("_certificates")
                     </section>
-                    <h3></h3>
+                    <h3><span class="name-state">Validando documentos</span></h3>
                     <section>
-                        @Html.Partial("_documentStates");
+                        @Html.Partial("_certificates")
+                    </section>
+                    <h3><span class="name-state">Pruebas de aceptación</span></h3>
+                    <section>
+                        @Html.Partial("_setTestRedirect")
                     </section>
                     <h3></h3>
                     <section>
-                        <p>The next and previous buttons help you to navigate through your content.</p>
-                    </section>
-                    <h3></h3>
-                    <section>
-                        <p>The next and previous buttons help you to navigate through your content.</p>
-                    </section>
-                    <h3></h3>
-                    <section>
-                        <p>The next and previous buttons help you to navigate through your content.</p>
+                        @Html.Partial("_finalStep")
                     </section>
                 </div>
             </div>
@@ -40,15 +42,116 @@
     </div>
 </div>
 
-    @section scripts{
-        <script>
-            $(document).ready(function () {
+@section scripts{
+    <script>
+            $(document).ready(function () {debugger
+                var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
                 $("#steps-approved").steps({
                     headerTag: "h3",
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
-                    autoFocus: true
+                    autoFocus: true,
+                    startIndex: index,
+                    enablePagination: false,
+                    enableKeyNavigation: false
                 });
-            })
-        </script>
-    }
+
+                $(".radian-file").click(function (file) {
+                    $(this).val("");
+                });
+                $(".radian-file").change(function (file) {
+                    var fileObj = file.target.files[0];
+                    var fileSize = Math.round(fileObj.size/10000) / 100;
+                    $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
+                });
+
+                $(".show-history").click(function () {
+                    var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
+                    var dialog = bootbox.dialog({
+                        message: htmlPartial,
+                        className: "table-data",
+                        size: 'large'
+                    });
+                    dialog.init(function (e) {
+                        $('#table-history').DataTable();
+                    } )
+                });
+
+                $('#submit-button').click(function (e) {
+                    e.preventDefault();
+                    var files = $("#uploadForm")[0];
+                    var formdata = new FormData();
+                    var numberFiles = 0;
+                    for (var i = 0 ; i < files.length - 2 ; i++) {
+                        if (files[i].files.length > 0) {
+                            formdata.append(files[i].files[0].name, files[i].files[i]);
+                            formdata.append("TypeId_" + numberFiles, files[i].dataset.typeid);
+                            numberFiles++;
+                        }
+                    };
+                    formdata.append("nit", "@Model.Nit");
+                    formdata.append("email", "@Model.Email");
+                    formdata.append("contributorId", "@Model.ContributorId");
+                    formdata.append("filesNumber", files.length - 2);
+                    formdata.append("step", @Model.Step);
+
+
+                    $.ajax({
+                        url: "@Url.Action("UploadFiles", "RadianApproved")",
+                        type: 'POST',
+                        data: formdata,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        enctype: 'multipart/form-data',
+                        xhr: function () {
+                            //upload Progress
+                            var xhr = $.ajaxSettings.xhr();
+                            if (xhr.upload) {
+                                xhr.upload.addEventListener('progress', function (event) {
+                                    var percent = 0;
+                                    var position = event.loaded || event.position;
+                                    var total = event.total;
+                                    if (event.lengthComputable) {
+                                        percent = Math.ceil(position / total * 100);
+                                    }
+                                    //update progressbar
+                                    $(".progress-bar").css("width", + percent + "%");
+                                    $(".status").text(percent + "%");
+                                }, true);
+                            }
+                            return xhr;
+                        },
+                        success: function (data) {
+                            bootbox.alert({
+                                title: "Paso actualizado",
+                                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + data.message + "</strong></h4></div></div>",
+                                buttons: {
+                                    ok: {
+                                        label: 'Aceptar',
+                                        className: 'btn-success'
+                                    }
+                                },
+                                callback: function () {
+                                    showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                    window.location.href = '@Url.Action("Index", "RadianApproved", new { id = Model.ContributorId })';
+                                }
+                            });
+                        },
+                    });
+                });
+
+                $("#view-costumers").click(function () {
+                    var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));
+                    var dialog = bootbox.dialog({
+                        message: htmlPartial,
+                        className: "table-data",
+                        size: 'large'
+                    });
+                    dialog.init(function (e) {
+                        $('#table-history').DataTable();
+                    } )
+                });
+            });
+    </script>
+}

@@ -1,0 +1,36 @@
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@{ 
+    ViewBag.title = "Historial de carga";
+}
+<div class="page-content radian-view margin-15">
+    <div class="row title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+</div>
+
+    <table id="table-history" class="table table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Estado</th>
+                <th>Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model.Files)
+            {
+                <tr>
+                    <td>@d.FileName</td>
+                    <td>@d.Updated</td>
+                    <td>@d.CreatedBy</td>
+                    <td>@d.Status</td>
+                    <td>@d.Comments</td>
+                </tr>
+            }
+        </tbody>
+    </table>

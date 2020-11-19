@@ -1,0 +1,328 @@
+﻿@model Gosocket.Dian.Web.Models.SummaryEventsViewModel
+
+<style>
+    /* Acuse de Recibo de Factura Electrónica */
+
+    eventTittle {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 30px;
+        line-height: 34px;
+        color: #2C323C;
+    }
+
+    .cerrar {
+        color: #aaa;
+        float: right;
+        font-size: 19px;
+        font-weight: bolder;
+        width: 19px;
+        text-align: center;
+    }
+
+    .redondear {
+        border-radius: 52% 48% 49% 51% / 53% 49% 51% 47%;
+        background-color: forestgreen;
+    }
+
+    .cerrar:hover,
+    .cerrar:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .ContainerDownload {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        font-style: normal;
+        font-size: 14px;
+        line-height: 14px;
+        color: #348441;
+    }
+
+    .titlecs {
+        /* Acuse de Recibo de Factura Electrónica */
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 23px;
+        /* identical to box height */
+        color: #2C323C;
+    }
+
+    .titleSecondary {
+        /* Validaciones del Evento */
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 18px;
+        line-height: 21px;
+        /* identical to box height */
+        color: #2C323C;
+    }
+
+    h5 {
+        /* Datos del Emisor del evento */
+        font-family: Arial;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 23px;
+        /* identical to box height */
+        color: #2C323C;
+    }
+
+   span {
+        /* Datos del Emisor del evento */
+        font-family: Arial;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 23px;
+        /* identical to box height */
+        color: #2C323C;
+    }
+
+    
+
+    .rowSpace {
+        margin-top:10px;
+        margin-bottom: 10px;
+    }
+
+</style>
+
+
+<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
+
+<div class="event-section page-content radian-view margin-15">
+
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading padding-15">
+                <div class="row">
+                    <div class="col-sm-8 left-section">
+                        <p class="titlecs">
+                            @Model.Title
+                        </p>
+                        <div class="underline-title"></div>
+                    </div>
+                    <div class="col-sm-4 text-right right-section">
+
+                        <span id="EventViewClose" onclick="darClick()" class="cerrar redondear">&times;</span>
+
+                        @*<button onclick="darClick()" class="cerrar" id="EventViewClose">X</button>*@
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body padding-top-20">
+                <div class="row cude-section">
+                    <div class="col-sm-4 left-section">
+                        <span>CUDE:</span>
+                        <span class="cude-text">@Model.CUDE</span>
+                        <div class="left-section ContainerDownload">
+                            <p><i class="fa fa-download"></i><um> Descarga</um></p>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-8 text-right right-section">
+                        <span>Prefijo: @Model.Prefix </span>
+                        <span>Número: @Model.Number</span>
+                        <span>Fecha de emisión del Evento: @Model.DateOfIssue.ToString("yyyy-MM-dd")</span>
+                    </div>
+                </div>
+
+                <div class="row aditional-data-section">
+
+                    <div class="col-sm-4">
+                        <h5>Datos del Emisor del evento </h5>
+                        <p>NIT: @Model.SenderCode</p>
+                        <p>Nombre: @Model.SenderName</p>
+                    </div>
+                    <div class="col-sm-4">
+                        <h5>Datos del Receptor del Evento </h5>
+                        <p>NIT: @Model.ReceiverCode</p>
+                        <p>Nombre: @Model.ReceiverName</p>
+                    </div>
+                    <div class="col-sm-4">
+                        @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.Mandato)
+                        {
+                            <h5>Datos del Mandato </h5>
+                            <span>NIT: @Model.Mandate.ReceiverCode</span>
+                            <span>MANDATARIO: @Model.Mandate.ReceiverName</span>
+                            <span>NIT: @Model.Mandate.SenderCode</span>
+                            <span>MANDANTE: @Model.Mandate.SenderName</span>
+
+                            <div class="row aditional-data-section">
+                                <div class="col-sm-4 second-section">
+                                    <h5>Fecha del contrato</h5>
+                                    <span>@Model.Mandate.ContractDate</span>
+                                    <span>@Model.Mandate.MandateType</span>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.SolicitudDisponibilizacion)
+                        {
+                            <h5>Tipo de solicitud de Disponibilización </h5>
+                            <span>@Model.RequestType</span>
+                        }
+
+                        @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia ||
+                             Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
+                        {
+                            <h5>Datos del Mandato </h5>
+                            <span>NIT: @Model.Endoso.ReceiverCode</span>
+                            <span>ENDOSATARIO: @Model.Endoso.ReceiverName</span>
+                            <span>NIT: @Model.Endoso.SenderCode</span>
+                            <span>ENDOSANTE: @Model.Endoso.SenderName</span>
+
+                            <div class="row aditional-data-section">
+                                <div class="col-sm-4 second-section">
+                                    <h5>Tipo de Endoso</h5>
+                                    <span>@Model.Endoso.EndosoType</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="row radian-subtitle-line"></div>
+                </div>
+
+                @*Validaciones*@
+                <div class="rowSpace">
+                    <div class="row radian-subtitle-container radian-certificates">
+                        <div class="col-sm-10">
+                            <p class="titleSecondary">
+                                @ViewBag.ValidationTitle
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row radian-subtitle-line"></div>
+                    <div>
+                        @if (Model.Validations.Count == 0)
+                        {
+                            <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i> @Model.ValidationMessage </h5>
+                        }
+                        else
+                        {
+                            <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th class="text-right right-section">Resultados</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Validations)
+                                    {
+                                    <tr>
+                                        <td>@item.RuleName</td>
+                                        <td class="text-right right-section"><a class="eventView " data-toggle="tooltip" data-placement="top" title="@item.Message"><i class="fa fa-info-circle "></i> @item.Status</a></td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+
+                @*referencias*@
+                <div class="rowSpace">
+                    <div class="row radian-subtitle-container radian-certificates">
+                        <div class="col-sm-10">
+                            <p class="titleSecondary">
+                                @ViewBag.ReferenceTitle
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row radian-subtitle-line "></div>
+
+                    <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
+                        <thead>
+                            <tr>
+                                <th>Tipo de documento</th>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>NIT del Emisor</th>
+                                <th>Emisor</th>
+                                <th>NIT del Receptor</th>
+                                <th>Receptor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.References)
+                            {
+                                <tr>
+                                    <td>@item.Document</td>
+                                    <td>@item.DateOfIssue.ToString("yyyy-MM-dd")</td>
+                                    <td>@item.Description</td>
+                                    <td>@item.SenderCode</td>
+                                    <td>@item.SenderName</td>
+                                    <td>@item.ReceiverCode</td>
+                                    <td>@item.ReceiverName</td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @*Eventos asociados*@
+                @if (Model.AssociatedEvents.Count > 0)
+                {
+                    <div class="rowSpace">
+                        <div class="row radian-subtitle-container">
+                            <div class="col-sm-10">
+                                <p class="titleSecondary">
+                                    @Model.EventTitle;
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row radian-subtitle-line"></div>
+
+                        <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Fecha de Emisión</th>
+                                    <th>Resultado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.AssociatedEvents)
+                                {
+                                    <tr>
+                                        <td>@item.Document</td>
+                                        <td>@item.EventDate.ToString("yyyy-MM-dd")</td>
+                                        <td>Validado</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+
+        <!--Bootstrap Select [ OPTIONAL ]-->
+        <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+        <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+        <script src="~/Content/js/file-validator.js"></script>
+
+
+        <script>
+
+
+
+
+
+        </script>
+
+    }

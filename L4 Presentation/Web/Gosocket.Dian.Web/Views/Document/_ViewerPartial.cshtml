@@ -20,7 +20,6 @@
     <link href="~/Content/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
 }
 
-
 <!--Message-->
 <!--===================================================-->
 <div class="mar-top pad-no bg-white" id="html-gdoc">
@@ -131,7 +130,8 @@ else
 }
 <br />
 <br />
-<div class="row mar-no" style="border-bottom: 2px solid #348441;">
+@Html.Partial("QueryEventsList", Model)
+@*<div class="row mar-no" style="border-bottom: 2px solid #348441;">
     <div class="col-sm-6 pad-no">
         <h4 class="margin-top-10">Eventos del documento</h4>
     </div>
@@ -172,7 +172,7 @@ else
             </tbody>
         </table>
     </div>
-}
+}*@
 <br />
 <br />
 @if (Model.Document.References.Where(x => x.ShowAsReference).Count() > 0)
@@ -213,6 +213,7 @@ else
         </table>
     </div>
 }
+
 
 
 

@@ -1,0 +1,21 @@
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+<div class="panel-body">
+    <div class="row">
+        @using (Html.BeginForm("GetSetTestResult", "RadianApproved", FormMethod.Post, new { RadianApprovedViewModel = Model }))
+        {
+            @Html.HiddenFor(m => m.Nit);
+            @Html.HiddenFor(m => m.Name);
+            @Html.HiddenFor(m => m.BusinessName);
+            @Html.HiddenFor(m => m.Email);
+            @Html.HiddenFor(m => m.Step);
+            @Html.HiddenFor(m => m.Nit);
+            @Html.HiddenFor(m => m.FilesRequires);
+            @Html.HiddenFor(m => m.Customers);
+            @Html.HiddenFor(m => m.RadianContributorTypeId);
+
+            <div class="panel-heading text-right">
+                <button type="submit" class="btn btn-success btn-radian-success">Set de pruebas</button>
+            </div>
+        }
+    </div>
+</div>

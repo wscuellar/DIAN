@@ -79,7 +79,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         {
             //arrange
             RegistrationDataViewModel registrationData = new RegistrationDataViewModel();
-            _radianContributorService.Setup(t => t.RegistrationValidation(It.IsAny<string>(), registrationData.RadianContributorType, registrationData.RadianOperationMode)).Returns(new Domain.Entity.RadianRegistrationValidation());
+            _radianContributorService.Setup(t => t.RegistrationValidation(It.IsAny<string>(), registrationData.RadianContributorType, registrationData.RadianOperationMode)).Returns(new Domain.Entity.ResponseMessage());
 
             //add
             var result = _current.RegistrationValidation(registrationData);
