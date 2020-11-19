@@ -3,7 +3,6 @@
     ViewBag.Title = "Requisitos";
 }
 
-@* Todo: validar nombre y método del controlador *@
 @using (Html.BeginForm("GetFactorOperationMode", "RadianApproved", FormMethod.Post))
 {
     @Html.HiddenFor(m => m.Nit);
@@ -15,6 +14,7 @@
     @Html.HiddenFor(m => m.FilesRequires);
     @Html.HiddenFor(m => m.Customers);
     @Html.HiddenFor(m => m.RadianContributorTypeId);
+    @Html.HiddenFor(m => m.ContributorId);
 
     <div class="panel-body padding-20 padding-bottom-10">
         <div class="row radian-subtitle-container radian-certificates">
