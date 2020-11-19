@@ -2832,6 +2832,8 @@
     <Content Include="Views\ExternalUsers\_userForm.cshtml" />
     <Content Include="Views\RadianApproved\_factorOperationMode.cshtml" />
     <Content Include="Views\RadianApproved\GetSetTestResult.cshtml" />
+    <Content Include="Views\RadianApproved\_customers.cshtml" />
+    <Content Include="Views\RadianApproved\_finalStep.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
