@@ -2834,6 +2834,7 @@
     <Content Include="Views\RadianApproved\GetSetTestResult.cshtml" />
     <Content Include="Views\RadianApproved\_customers.cshtml" />
     <Content Include="Views\RadianApproved\_finalStep.cshtml" />
+    <Content Include="Views\RadianApproved\GetFactorOperationMode.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,7 +1,7 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
 <div class="panel-body">
     <div class="row">
-        @using (Html.BeginForm("GetSetTestResult", "RadianApproved", FormMethod.Post, new { RadianApprovedViewModel = Model }))
+        @using (Html.BeginForm("GetSetTestResult", "RadianApproved", FormMethod.Post))
         {
             @Html.HiddenFor(m => m.Nit);
             @Html.HiddenFor(m => m.Name);

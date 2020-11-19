@@ -160,7 +160,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.OperationModeList = _radianTestSetService.OperationModeList();
             radianApprovedViewModel.Software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
 
-            return PartialView("_factorOperationMode", radianApprovedViewModel);
+            return View("_factorOperationMode", radianApprovedViewModel);
         }
 
         [HttpPost]

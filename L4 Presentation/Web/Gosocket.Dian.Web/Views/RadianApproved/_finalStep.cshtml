@@ -4,8 +4,18 @@
 }
 
 @* Todo: validar nombre y método del controlador *@
-@using (Html.BeginForm("UploadFiles", "RadianApproved", FormMethod.Post, new { id = "uploadForm", enctype = "multipart/form-data" }))
+@using (Html.BeginForm("GetFactorOperationMode", "RadianApproved", FormMethod.Post))
 {
+    @Html.HiddenFor(m => m.Nit);
+    @Html.HiddenFor(m => m.Name);
+    @Html.HiddenFor(m => m.BusinessName);
+    @Html.HiddenFor(m => m.Email);
+    @Html.HiddenFor(m => m.Step);
+    @Html.HiddenFor(m => m.Nit);
+    @Html.HiddenFor(m => m.FilesRequires);
+    @Html.HiddenFor(m => m.Customers);
+    @Html.HiddenFor(m => m.RadianContributorTypeId);
+
     <div class="panel-body padding-20 padding-bottom-10">
         <div class="row radian-subtitle-container radian-certificates">
             <div class="col-sm-10">
