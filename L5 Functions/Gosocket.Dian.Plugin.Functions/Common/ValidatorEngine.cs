@@ -9,8 +9,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.Event;
+using static Gosocket.Dian.Domain.Common.EnumHelper;
 using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
@@ -77,7 +79,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             XmlParser xmlParserCude = null;
 
             //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
-            if (eventPrev.EventCode == "040")
+            if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
             {
                 var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackIdCude, eventPrev.TrackIdCude);
                 if (documentMeta != null)
@@ -87,7 +89,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
-            if (eventPrev.EventCode == "036" || eventPrev.EventCode == "038")
+            if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.SolicitudDisponibilizacion || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoGarantia)
             {
                 //Obtiene XML Factura electronica CUFE
                 var xmlBytes = await GetXmlFromStorageAsync(eventPrev.TrackId);
@@ -121,45 +123,52 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {           
             var validateResponses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
-            string code;
-            switch (data.EventCode)
+            EventStatus code;
+            switch (int.Parse(data.EventCode))
             {
-                case "032": //Constancia de recibo del bien
-                    code = "030"; // Acuse de recibo de la FEV
+                case (int)EventStatus.Receipt:
+                    code = EventStatus.Received; 
                     break;
-                case "044":  //Terminacion del mandato
-                    code = "043"; //Mandato
+                case (int)EventStatus.TerminacionMandato:
+                    code = EventStatus.Mandato;
                     break;
-                case "039":  //Endoso en procuracion
-                    code = "036"; //disponibilización
+                case (int)EventStatus.EndosoProcuracion:
+                    code = EventStatus.SolicitudDisponibilizacion;
                     break;
-                case "036": //Solicitud de Dsiponibilizacion 
-                    code = "033"; //Aceptacion Expresa
+                case (int)EventStatus.SolicitudDisponibilizacion:
+                    code = EventStatus.Accepted;
                     break;
-                case "042": //Terminación Circulacion  
-                    code = "041"; //Limitación Circulacion
+                case (int)EventStatus.AnulacionLimitacionCirculacion:
+                    code = EventStatus.NegotiatedInvoice;
                     break;
-                case "045"://Notificación Pago Total Parcial 
-                case "041"://Limitación Circulacion
-                    code = "036"; //disponibilización
+                case (int)EventStatus.NotificacionPagoTotalParcial:
+                case (int)EventStatus.NegotiatedInvoice:
+                    code = EventStatus.SolicitudDisponibilizacion;
                     break;
                 default:
-                    code = "032"; //Constancia de recibo del bien
+                    code = EventStatus.Receipt;
                     break;
             }
 
-            if (data.EventCode == "031" || data.EventCode == "032" || data.EventCode == "033" || data.EventCode == "034" || data.EventCode == "044" || data.EventCode == "036" || data.EventCode == "039" || data.EventCode == "042")
+            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.Rejected ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.Receipt ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.TerminacionMandato ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, "0"+ (int)code).FirstOrDefault();
                 if (documentMeta != null)
                 {
                     data.TrackId = documentMeta.PartitionKey;
                 }
                 // Validación de la Sección Signature - Fechas valida transmisión evento TASK 714
-                else if (data.EventCode == "036")
+                else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
                 {
-                    code = "034"; //Aceptacion Tácita
-                    documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code).FirstOrDefault();
+                    code = EventStatus.AceptacionTacita; 
+                    documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, "0" + (int)code).FirstOrDefault();
                     if (documentMeta != null)
                     {
                         data.TrackId = documentMeta.PartitionKey;
@@ -176,7 +185,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
                 //Solo si es eventcode AR Aceptacion Expresa - Tácita
-                else if (data.EventCode != "031")
+                else if (Convert.ToInt32(data.EventCode) != (int)EventStatus.Rejected)
                 {
                     ValidateListResponse response = new ValidateListResponse();
                     response.ErrorMessage = $"No se encontró documento electrónico para el CUDE/CUFE {data.TrackId}";
@@ -187,9 +196,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return validateResponses;
                 }
             }
-            else if(data.EventCode == "041" || data.EventCode == "045")
+            else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice ||
+                    Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, code, data.CustomizationID).FirstOrDefault();
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, "0" + (int)code, data.CustomizationID).FirstOrDefault();
                 if (documentMeta != null)
                 {
                     data.TrackId = documentMeta.PartitionKey;

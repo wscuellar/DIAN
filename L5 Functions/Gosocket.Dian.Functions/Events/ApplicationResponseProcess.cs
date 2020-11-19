@@ -95,11 +95,11 @@ namespace Gosocket.Dian.Functions.Events
             {
                 globalDataDocument.Events = new List<Event>()
                 {
-                    InstanceEventObject(globalDataDocument, responseCode)
+                    InstanceEventObject(globalDataDocument, data.Cude)
                 };
             }
             else
-                globalDataDocument.Events.Add(InstanceEventObject(globalDataDocument, responseCode));
+                globalDataDocument.Events.Add(InstanceEventObject(globalDataDocument, data.Cude));
 
             // upsert document in cosmos
             var result = CosmosDBService.Instance(documentMeta.EmissionDate).UpdateDocument(globalDataDocument);
@@ -133,6 +133,8 @@ namespace Gosocket.Dian.Functions.Events
             public string ResponseCode { get; set; }
             [JsonProperty(PropertyName = "trackId")]
             public string TrackId { get; set; }
+            [JsonProperty(PropertyName = "cude")]
+            public string Cude { get; set; }
         }
     }
 }

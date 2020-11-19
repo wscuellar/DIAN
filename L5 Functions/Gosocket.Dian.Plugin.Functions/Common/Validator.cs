@@ -494,10 +494,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string sender2DvErrorCode = "89";
             switch (Convert.ToInt16(party.ResponseCode))
             {
-                case 30: //Acuse de recibo de la FEV
-                case 31: //Rechazo de la FEV
-                case 32: //Constancia de recibo del bien
-                case 33: //Aceptacion Expresa
+                case (int)EventStatus.Received:
+                case (int)EventStatus.Rejected:
+                case (int)EventStatus.Receipt:
+                case (int)EventStatus.Accepted:
                     //Valida emeisor documento 
                     if (party.SenderParty != receiverCode)
                     {
@@ -555,7 +555,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     return responses;
-                case 38: //Endoso en Garantia                    
+                case (int)EventStatus.EndosoGarantia:
                     if (party.ListId != "2") // No informa SenderParty es un endoso en blanco entonces no valida emisor documento
                     {
                         if (party.SenderParty != senderCode)
@@ -603,8 +603,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     return responses;
-                case 34: //Aceptacion Tácita
-                case 43: //Mandato
+                case (int)EventStatus.AceptacionTacita:
+                case (int)EventStatus.Mandato:
                     if (party.SenderParty != senderCode)
                     {
                         //valida si existe los permisos del mandatario 
@@ -662,7 +662,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     return responses;
-                case 36: //Solicitud de Dsiponibilizacion
+                case (int)EventStatus.SolicitudDisponibilizacion:
                     if (party.CustomizationID == "361" || party.CustomizationID == "362")
                     {
                         if (party.SenderParty != senderCode)
@@ -724,7 +724,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     return responses;
                 // Validación de la Sección SenderParty / ReceiverParty TASK 791
-                case 40: //Anulacion de endoso electronico
+                case (int)EventStatus.InvoiceOfferedForNegotiation:
                     if (party.SenderParty != senderCode)
                     {
                         //valida si existe los permisos del mandatario 
@@ -782,7 +782,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     return responses;
                 // Validación de la Sección SenderParty / ReceiverParty TASK 791
-                case 44: //Terminacion del mandato
+                case (int)EventStatus.TerminacionMandato:
                     //Revocación es información del mandante
                     if (party.CustomizationID == "441")
                     {
@@ -872,7 +872,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     return responses;
                 //NotificacionPagoTotalParcial
-                case 45:
+                case (int)EventStatus.NotificacionPagoTotalParcial:
                     if (party.SenderParty != receiverCode)
                     {
                         //valida si existe los permisos del mandatario 
@@ -1884,9 +1884,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else
                     {
-                        switch (eventPrev.EventCode)
+                        switch (Convert.ToInt32(eventPrev.EventCode))
                         {
-                            case "031": //Rechazo de la FEV    
+                            case (int)EventStatus.Rejected:   
                                 if (document != null)
                                 {
                                     if (documentMeta.Where(t => t.EventCode == "033" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
@@ -1928,7 +1928,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     }
                                 }                                   
                                 break;
-                            case "032": //Recibo del bien o aceptacion de la prestacion del servicio
+                            case (int)EventStatus.Receipt:
                                 if (documentMeta.Where(t => t.EventCode == "030").ToList().Count == decimal.Zero)
                                 {
                                     validFor = true;
@@ -1954,8 +1954,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
                                 break;
-                            case "033": //Aceptacion Expresa
-                                 if(document != null)
+                            case (int)EventStatus.Accepted:
+                                if (document != null)
                                 {
                                     //DEbe existir Recibo del bien o aceptacion de la prestacion del servicio 
                                     if (documentMeta.Where(t => t.EventCode == "032").ToList().Count > decimal.Zero)
@@ -2014,7 +2014,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                   
                                 }                              
                                 break;
-                            case "034": //Aceptacion Tácita
+                            case (int)EventStatus.AceptacionTacita:
                                 if (document != null)
                                 {
                                     if (documentMeta.Where(t => t.EventCode == "031" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
@@ -2056,7 +2056,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     }
                                 }                                  
                                 break;
-                            case "036": // Solicitud de Dsiponibilizacion
+                            case (int)EventStatus.SolicitudDisponibilizacion:
                                 //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
                                 if (xmlParserCude.CustomizationID == "363" || xmlParserCude.CustomizationID == "364")
                                 {
@@ -2100,9 +2100,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                                 break;
                             //Validación de la existencia eventos previos Endoso
-                            case "037":  //Endoso en Propiedad
-                            case "038":  //Endoso en Garantía                            
-                            case "039":  //Endoso en Procuracion
+                            case (int)EventStatus.EndosoPropiedad:
+                            case (int)EventStatus.EndosoGarantia:
+                            case (int)EventStatus.EndosoProcuracion:
                                 //Valida Valores endoso electronico versus FEVTV                               
                                 if (documentMeta
                                  .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
@@ -2232,7 +2232,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             //Validación de la existencia de Endosos y Limitaciones TASK  730
-                            case "040": //Anulacion de endoso electronico  
+                            case (int)EventStatus.InvoiceOfferedForNegotiation:
                                 if (documentMeta
                                     .Where(t => t.EventCode == "037" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
                                     .Count > decimal.Zero)
@@ -2275,7 +2275,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
                                 break;
-                            case "043": //Mandato                               
+                            case (int)EventStatus.Mandato:
                                 responses.Add(new ValidateListResponse
                                 {
                                     IsValid = true,
@@ -2285,7 +2285,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                                 break;
-                            case "045"://NotificacionPagoTotalParcial
+                            case (int)EventStatus.NotificacionPagoTotalParcial:
                                 //Si el titulo valor tiene una limitación previa (041)
                                 if (documentMeta
                                     .Where(t => t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
@@ -2444,15 +2444,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             var businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
 
-            switch (data.EventCode)
+            switch (int.Parse(data.EventCode))
             {
-                case "030": //Acuse de recibo de la FEV
-                case "032": //Constancia de recibo del bien
-                //Validación de la Sección Signature - Fecha mayor o igual al endoso referenciado TASK 727
-                case "040": //Anulacion de endoso electronico
-                case "043": //Mandato
-                case "039": //Endoso en procuracion
-                case "037": //Endoso en propiedad
+                case (int)EventStatus.Received:
+                case (int)EventStatus.Receipt:
+                case (int)EventStatus.InvoiceOfferedForNegotiation:
+                case (int)EventStatus.Mandato:
+                case (int)EventStatus.EndosoProcuracion:
+                case (int)EventStatus.EndosoPropiedad:
                     responses.Add(Convert.ToDateTime(data.SigningTime) >= Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
@@ -2472,7 +2471,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
-                case "031": //Rechazo de la FEV
+                case (int)EventStatus.Rejected:
                     responses.Add(businessDays > 3
                          ? new ValidateListResponse
                          {
@@ -2492,7 +2491,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
-                case "033": //Aceptacion Expresa
+                case (int)EventStatus.Accepted:
                     responses.Add(businessDays >= 3
                         ? new ValidateListResponse
                         {
@@ -2512,7 +2511,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
 
                     break;
-                case "034": //Aceptacion Tácita
+                case (int)EventStatus.AceptacionTacita:
                     responses.Add(businessDays > 3
                         ? new ValidateListResponse
                         {
@@ -2531,9 +2530,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
-                case "036"://Solicitud de Dsiponibilizacion
-                case "041": //DocumentoLimitacionCirculacion
-                case "042": //DocumentoTerminacionCirculacion
+                case (int)EventStatus.SolicitudDisponibilizacion:
+                case (int)EventStatus.NegotiatedInvoice:
+                case (int)EventStatus.AnulacionLimitacionCirculacion:
                     if (dataModel.CustomizationID == "361" || dataModel.CustomizationID == "362" ||
                        dataModel.CustomizationID == "363" || dataModel.CustomizationID == "364")
                     {
@@ -2578,7 +2577,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }                    
                     break;               
-                case "045": //NotificacionPagoTotalParcial
+                case (int)EventStatus.NotificacionPagoTotalParcial:
                     responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
                        ? new ValidateListResponse
                        {
@@ -2599,7 +2598,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        });                
                     break;
                 //Validación fecha emite evento AR menor a fecha de vencimiento factura
-                case "038": //Endoso en Garantía
+                case (int)EventStatus.EndosoGarantia:
                     responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModel.PaymentDueDate)
                         ? new ValidateListResponse
                         {
@@ -2618,7 +2617,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
-                case "044": // Terminacion del mandato 
+                case (int)EventStatus.TerminacionMandato:
                     DateTime signingTime = Convert.ToDateTime(data.SigningTime);
                     //General por tiempo ilimitado_432 - limitado por tiempo ilimitado_434
                     if (dataModel.CustomizationID == "432" || dataModel.CustomizationID == "434") //que se mayor
