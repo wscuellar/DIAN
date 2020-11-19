@@ -21,32 +21,33 @@
                             @Html.Partial("_userForm")
                             @Html.ValidationSummary("", new { @class = "text-center text-danger" })
                             @Html.ValidationMessage("no_permissions", new { @class = "text-center text-danger" })
-                            <br />
-                            foreach (Gosocket.Dian.Web.Models.MenuViewModel menu in ((List<Gosocket.Dian.Web.Models.MenuViewModel>)ViewBag.Menu))
-                            {
-                                <div class="btn-group" id="controlMenu">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        @menu.Name &nbsp;<span class="badge badge-light" style="color: #074fbb;">@(menu.Options != null ? (((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options).Count() : 0)</span>
-                                        &nbsp;<span class="caret"></span>
-                                    </button>
-                                    <div class="dropdown-menu" style="padding-left: 8px; padding-right: 8px; }">
-                                        <div class="custom-control custom-checkbox dropdown-item">
-                                            <input type="checkbox" class="custom-control-input" id="@("menu" + menu.Id)" onchange="changeAllMenu(@menu.Id)">
-                                            <label class="custom-control-label" for="@("menu" + menu.Id)">Todos...</label>
-                                        </div>
-                                        @if (menu.Options != null)
-                                        {
-                                            foreach (Gosocket.Dian.Web.Models.SubMenuViewModel subMenu in ((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options)
+                            <div class="padding-20">
+                                @foreach (Gosocket.Dian.Web.Models.MenuViewModel menu in ((List<Gosocket.Dian.Web.Models.MenuViewModel>)ViewBag.Menu))
+                                {
+                                    <div class="btn-group" id="controlMenu">
+                                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @menu.Name &nbsp;<span class="badge badge-light" style="color: #074fbb;">@(menu.Options != null ? (((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options).Count() : 0)</span>
+                                            &nbsp;<span class="caret"></span>
+                                        </button>
+                                        <div class="dropdown-menu" style="padding-left: 8px; padding-right: 8px;">
+                                            <div class="custom-control custom-checkbox dropdown-item">
+                                                <input type="checkbox" class="custom-control-input" id="@("menu" + menu.Id)" onchange="changeAllMenu(@menu.Id)">
+                                                <label class="custom-control-label" for="@("menu" + menu.Id)">Todos...</label>
+                                            </div>
+                                            @if (menu.Options != null)
                                             {
-                                                <div class="custom-control custom-checkbox dropdown-item">
-                                                    <input type="checkbox" class="custom-control-input" id="@("submenu" + menu.Id + "_" + subMenu.Id)">
-                                                    <label class="custom-control-label" for="@("submenu" + menu.Id + "_" + subMenu.Id)">@subMenu.Name</label>
-                                                </div>
+                                                foreach (Gosocket.Dian.Web.Models.SubMenuViewModel subMenu in ((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options)
+                                                {
+                                                    <div class="custom-control custom-checkbox dropdown-item">
+                                                        <input type="checkbox" class="custom-control-input" id="@("submenu" + menu.Id + "_" + subMenu.Id)">
+                                                        <label class="custom-control-label" for="@("submenu" + menu.Id + "_" + subMenu.Id)">@subMenu.Name</label>
+                                                    </div>
+                                                }
                                             }
-                                        }
+                                        </div>
                                     </div>
-                                </div>
-                            }
+                                }
+                            </div>
                             <br />
                             <br />
                             <table class="table table-sm table-bordered table-hover">
@@ -72,7 +73,7 @@
                                                 <td>@item.Email</td>
                                                 <td class="text-center">@(item.Active == 1 ? "Sí" : "No")</td>
                                                 <td class="text-center">
-                                                    @Html.ActionLink("Editar", "AddUser", new { id= item.Id}, new { @class="btn btn-primary"})
+                                                    @Html.ActionLink("Editar", "AddUser", new { id = item.Id }, new { @class = "btn btn-primary" })
                                                 </td>
                                             </tr>
                                         }

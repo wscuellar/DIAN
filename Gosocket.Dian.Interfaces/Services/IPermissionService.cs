@@ -18,5 +18,6 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <returns></returns>
         int AddOrUpdate(List<Permission> permissionList);
         List<Permission> GetPermissionsByUser(string userId);
+        List<SubMenu> GetSubMenusByMenuId(int menuId);
     }
 }

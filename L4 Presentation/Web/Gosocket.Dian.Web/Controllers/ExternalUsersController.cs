@@ -68,7 +68,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             //var roles = new SelectList(_context.Roles.Where(u => u.Name.Contains("UsuarioExterno"))
             //                                .ToList(), "Id", "Name");
-            var role = _context.Roles.FirstOrDefault(u => u.Name.Contains("UsuarioExterno"));
+            var role = _context.Roles.FirstOrDefault(u => u.Name.Contains(Roles.UsuarioExterno));
 
             //var userExt2 = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id)).ToList();
 
@@ -80,7 +80,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Name = m.Name,
                     Title = m.Title,
                     Description = m.Description,
-                    Options = m.Options?.Select(s =>
+                    Options = _permisionService.GetSubMenusByMenuId(m.Id).Select(s =>
                         new SubMenuViewModel()
                         {
                             Id = s.Id,
