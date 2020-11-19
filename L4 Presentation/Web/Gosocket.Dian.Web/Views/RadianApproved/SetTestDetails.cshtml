@@ -41,18 +41,16 @@
 
     <script>
                     $(document).ready(function () {
-                        debugger
-                        var nit = @Model.Nit;
+                        var nit = '@Model.Nit';
 
                         $.ajax({
                             url: '@Url.Action("RadianTestResultByNit", "RadianApproved")',
                             type: "POST",
                             data: {
-                                id: nit,
+                                nit: nit,
                             },
                             error: function (error) { },
                             success: function (response) {
-                                debugger
                                 showChart(response);
                             }
                         });
@@ -93,8 +91,8 @@
                                     data: [3, 4, 4, 2, 5]
                                 }]
                             });
-                        });
                         }
+                    });
 
     </script>
 }

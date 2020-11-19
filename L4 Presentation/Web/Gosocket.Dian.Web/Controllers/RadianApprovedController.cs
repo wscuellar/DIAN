@@ -31,12 +31,12 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Index(int id)
+        public ActionResult Index(RegistrationDataViewModel registrationData)
         {
 
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(id);
-            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(1);
-            //var mode = registrationData.RadianOperationMode;
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId);
+            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
+            var mode = registrationData.RadianOperationMode;
 
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
@@ -167,6 +167,11 @@ namespace Gosocket.Dian.Web.Controllers
                _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
             return View(radianApprovedViewModel);
         }
-
+        
+        public JsonResult RadianTestResultByNit(string nit)
+        {
+            RadianTestSetResult testSetResult = _radianAprovedService.RadianTestSetResultByNit(nit);
+            return Json(new { data = testSetResult }, JsonRequestBehavior.AllowGet);
+        }
     }
 }
