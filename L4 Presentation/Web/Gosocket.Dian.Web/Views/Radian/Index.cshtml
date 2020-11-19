@@ -102,9 +102,11 @@
 
                     CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
                         function (param) {
-                            CallExecution("POST", '@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel,
+                            CallExecution("POST", '@Url.Action("Add", "RadianApproved")', RegistrationDataViewModel,
                                 function (param) {
-                                    window.location.href = '@Url.Action("Index", "RadianApproved")';
+                                    var url = "@Url.Action("Index", "RadianApproved")"+ "?ContributorId=" + param.ContributorId + "&RadianContributorType=" + param.RadianContributorType + "&RadianOperationMode=" + param.RadianOperationMode;
+                                    alert(url);
+                                    window.location.href = url;
                                 }, false
                             );
                         }, true
@@ -113,7 +115,7 @@
             }
         });
 
-        
+
     </script>
 
 }

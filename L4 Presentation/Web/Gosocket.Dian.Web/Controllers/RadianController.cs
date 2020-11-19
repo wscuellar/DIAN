@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 
         #region Registro de participantes
-        
+
         // GET: Radian
         public ActionResult Index()
         {
@@ -47,8 +47,10 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult RegistrationValidation(RegistrationDataViewModel registrationData)
         {
             ResponseMessage validation = _radianContributorService.RegistrationValidation(User.UserCode(), registrationData.RadianContributorType, registrationData.RadianOperationMode);
+            if (validation.MessageType == "redirect")
+                validation.RedirectTo = Url.Action("Index", "RadianApproved",registrationData);
             return Json(validation, JsonRequestBehavior.AllowGet);
-        } 
+        }
 
         #endregion
 

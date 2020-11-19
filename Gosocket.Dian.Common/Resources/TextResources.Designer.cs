@@ -70,7 +70,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Confirm.
+        ///   Busca una cadena traducida similar a confirm.
         /// </summary>
         public static string confirmType {
             get {
@@ -120,6 +120,15 @@ namespace Gosocket.Dian.Common.Resources {
         public static string ParticipantWithoutSoftware {
             get {
                 return ResourceManager.GetString("ParticipantWithoutSoftware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a redirect.
+        /// </summary>
+        public static string redirectType {
+            get {
+                return ResourceManager.GetString("redirectType", resourceCulture);
             }
         }
         
