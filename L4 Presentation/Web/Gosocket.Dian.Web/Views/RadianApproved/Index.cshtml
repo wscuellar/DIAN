@@ -11,7 +11,7 @@
         <div class="underline-title"></div>
     </div>
     <div class="row margin-horizontal-0">
-        <div class="panel">
+        <div class="panel" data-target="#panel-form" data-toggle="panel-overlay" >
             <div class="panel-body padding-top-20">
                 <div id="steps-approved">
                     <div class="radian-personal-info">
@@ -45,12 +45,13 @@
 @section scripts{
     <script>
             $(document).ready(function () {debugger
+                var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
                 $("#steps-approved").steps({
                     headerTag: "h3",
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
                     autoFocus: true,
-                    startIndex: 4,
+                    startIndex: index,
                     enablePagination: false,
                     enableKeyNavigation: false
                 });
@@ -77,7 +78,6 @@
                 });
 
                 $('#submit-button').click(function (e) {
-                    debugger
                     e.preventDefault();
                     var files = $("#uploadForm")[0];
                     var formdata = new FormData();
@@ -122,11 +122,21 @@
                             }
                             return xhr;
                         },
-                        success: function (mdata) {
-                            if (mdata == 0) {
-                                alert("Done");
-                            }
-
+                        success: function (data) {
+                            bootbox.alert({
+                                title: "Paso actualizado",
+                                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + data.message + "</strong></h4></div></div>",
+                                buttons: {
+                                    ok: {
+                                        label: 'Aceptar',
+                                        className: 'btn-success'
+                                    }
+                                },
+                                callback: function () {
+                                    showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                    window.location.href = '@Url.Action("Index", "RadianApproved", new { id = Model.ContributorId })';
+                                }
+                            });
                         },
                     });
                 });

@@ -48,6 +48,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public RadianApprovedOperationModeViewModel RadianApprovedOperationModeViewModel { get; set; }
 
+        public string RadianState { get; set; }
         public RadianApprovedViewModel()
         {
             RadianFileList = new List<RadianContributorFileTypeTableViewModel>();

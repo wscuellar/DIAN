@@ -781,3 +781,28 @@ h4.text-thin {
     border-left: 6px solid #FD7E14;
     height: 200px;
 }
+
+span.state-file {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 0;
+    background-repeat: no-repeat;
+    top: 0;
+    margin: 11px;
+}
+span.state-file.status-1 {
+    background-image: url(../../images/Svg/Loaded.svg);
+}
+span.state-file.status-2 {
+    background-image: url(../../images/aproved.png);
+}
+span.state-file.status-3 {
+    background-image: url(../../images/observations.png);
+}
+span.state-file.status-4 {
+    background-image: url(../../images/reject.png);
+}
+.file-input-disabled{
+    position: relative;
+}

@@ -232,7 +232,7 @@ namespace Gosocket.Dian.Web.Controllers
                         radianFileHistory.CreatedBy = radianContributorFileInstance.CreatedBy;
                         radianFileHistory.Status = n.NewState;
                         radianFileHistory.RadianContributorFileId = radianContributorFileInstance.Id;
-                        //_ = _radianContributorService.AddFileHistory(radianFileHistory);
+                        _ = _radianContributorService.AddFileHistory(radianFileHistory);
                     }
                 }
 

@@ -21,19 +21,33 @@
     @Html.Partial("_documentStates")
     <div class="row">
         @{ int i = 0;}
-        @foreach (var n in Model.FilesRequires)
-        {
-            <div class="col-sm-4 padding-xs-0">
-                <div class="form-group">
-                    <p class="radian-file-top-label">@n.Name</p>
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" />
-                        <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
+        <div class="col-sm-4 padding-xs-0">
+            @if (Model.Step == 1)
+            {
+                foreach (var n in Model.FilesRequires)
+                {
+                    <div class="form-group">
+                        <p class="radian-file-top-label">@n.Name</p>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" />
+                            <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
+                        </div>
                     </div>
-                </div>
-            </div>
-            i++;
-        }
+                    i++;
+                }
+            }
+            @if (Model.Step == 2)
+            {
+                foreach (var n in Model.Files)
+                {
+                    <div class="form-group file-input-disabled">
+                        @Html.TextBox("file-" + i, n.FileName, new { @class = "form-control input-general", @readonly = true })
+                        <span class="state-file status-@n.Status"></span>
+                    </div>
+                    i++;
+                }
+            }
+        </div>
     </div>
     <div id="progress-wrp">
         <div class="progress-bar"></div>

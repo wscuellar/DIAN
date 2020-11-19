@@ -34,7 +34,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Index(int Id)
         {
             // LoadSoftwareModeOperation();
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(1704648);
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(Id);
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(radianAdmin.Type.Id);
 
             RadianApprovedViewModel model = new RadianApprovedViewModel()
@@ -46,7 +46,8 @@ namespace Gosocket.Dian.Web.Controllers
                 Email = radianAdmin.Contributor.Email,
                 Files = radianAdmin.Files,
                 FilesRequires = listFileType,
-                Step = radianAdmin.Contributor.Step
+                Step = radianAdmin.Contributor.Step,
+                RadianState = radianAdmin.Contributor.RadianState
 
             };
             return View(model);
@@ -139,7 +140,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             return Json(new
             {
-                messasge = "Datos actualizados correctamente.",
+                message = "Datos actualizados correctamente.",
                 success = true,
             }, JsonRequestBehavior.AllowGet);
         }
