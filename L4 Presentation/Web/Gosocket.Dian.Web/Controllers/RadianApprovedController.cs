@@ -31,12 +31,12 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Index(RegistrationDataViewModel registrationData)
+        public ActionResult Index(int id)
         {
 
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId);
-            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
-            var mode = registrationData.RadianOperationMode;
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(id);
+            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(1);
+            //var mode = registrationData.RadianOperationMode;
 
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
@@ -145,7 +145,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.OperationModeList = _radianTestSetService.OperationModeList();
             radianApprovedViewModel.Software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
 
-            return View("_factorOperationMode", radianApprovedViewModel);
+            return View(radianApprovedViewModel);
         }
 
         [HttpPost]
@@ -160,5 +160,13 @@ namespace Gosocket.Dian.Web.Controllers
                     success = true,
                 }, JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult SetTestDetails(RadianApprovedViewModel radianApprovedViewModel)
+        {
+            radianApprovedViewModel.RadianTestSetResult =
+               _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
+            return View(radianApprovedViewModel);
+        }
+
     }
 }

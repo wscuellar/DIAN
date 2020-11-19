@@ -1,0 +1,100 @@
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@using Gosocket.Dian.Domain.Entity
+@using Newtonsoft.Json
+@{
+    ViewBag.title = "Detalle de Set de Pruebas - Propios Medios";
+}
+
+<div class="page-content radian-view margin-15">
+    <div class="row title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-body padding-top-20">
+                <div class="row warning-wrapper">
+                    <div class="col-sm-1 icon-warning">
+                        <i class="fa fa-exclamation-circle"></i>
+                    </div>
+                    <div class="col-sm-11">
+                        <span class="warning-title">¡Importante!</span>
+                        <p>
+                            Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta en proceso.<br>
+                            Usted debe proporcinar el identificador del st de pruebas (TestSetld) <b>42f705e7-4906-4144-8ef2-9ed76f7d84</b> en el web service  para el envío de su set de pruebas.
+                        </p>
+                    </div>
+                </div>
+                <div class="row margin-horizontal-0">
+                    <figure class="highcharts-figure">
+                        <div id="setTestDetails"></div>
+                    </figure>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>
+                    $(document).ready(function () {
+                        debugger
+                        var nit = @Model.Nit;
+
+                        $.ajax({
+                            url: '@Url.Action("RadianTestResultByNit", "RadianApproved")',
+                            type: "POST",
+                            data: {
+                                id: nit,
+                            },
+                            error: function (error) { },
+                            success: function (response) {
+                                debugger
+                                showChart(response);
+                            }
+                        });
+
+                        function showChart(dataChart) {
+                            Highcharts.chart('setTestDetails', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: 'Stacked bar chart'
+                                },
+                                xAxis: {
+                                    categories: []
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: 'Total fruit consumption'
+                                    }
+                                },
+                                legend: {
+                                    reversed: true
+                                },
+                                plotOptions: {
+                                    series: {
+                                        stacking: 'normal'
+                                    }
+                                },
+                                series: [{
+                                    name: 'John',
+                                    data: [5, 3, 4, 7, 2]
+                                }, {
+                                    name: 'Jane',
+                                    data: [2, 2, 3, 2, 1]
+                                }, {
+                                    name: 'Joe',
+                                    data: [3, 4, 4, 2, 5]
+                                }]
+                            });
+                        });
+                        }
+
+    </script>
+}
