@@ -23,7 +23,6 @@ namespace Gosocket.Dian.DataContext.Repositories
         public List<RadianContributorOperation> List(Expression<Func<RadianContributorOperation, bool>> expression)
         {
             var query = _sqlDBContext.RadianContributorOperations
-                .Include(rc => rc.Software)
                 .Where(expression);
             return query.ToList();
         }

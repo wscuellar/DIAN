@@ -82,11 +82,6 @@ namespace Gosocket.Dian.DataContext
             .HasRequired<Contributor>(s => s.Contributor)
             .WithMany(g => g.Softwares)
             .HasForeignKey<int>(s => s.ContributorId);
-
-            modelBuilder.Entity<RadianContributorOperation>()
-            .HasRequired<Software>(s => s.Software)
-            .WithMany(g => g.RadianContributorOperations)
-            .HasForeignKey<string>(s => s.SoftwareId);
             #endregion
 
             #region ContributorOperations
