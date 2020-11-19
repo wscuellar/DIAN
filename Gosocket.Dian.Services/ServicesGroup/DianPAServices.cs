@@ -1041,7 +1041,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { DocumentKey = trackIdCude, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };
                     UpdateFinishAttorney(trackIdCude, documentParsed.DocumentKey.ToLower(), eventCode);
 
-                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode });
+                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude = trackIdCude });
                     if (processEventResponse.Code != Properties.Settings.Default.Code_100)
                     {
                         dianResponse.IsValid = false;
