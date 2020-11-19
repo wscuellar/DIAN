@@ -23,13 +23,14 @@ namespace Gosocket.Dian.Application.Tests
         private readonly Mock<IRadianTestSetResultManager> _radianTestSetResultManager = new Mock<IRadianTestSetResultManager>();
         private readonly Mock<IRadianOperationModeRepository> _radianOperationModeRepository = new Mock<IRadianOperationModeRepository>();
         private readonly Mock<IContributorOperationsService> _contributorOperationService = new Mock<IContributorOperationsService>();
+        private readonly Mock<IRadianContributorFileHistoryRepository> _radianContributorFileHistoryRepository = new Mock<IRadianContributorFileHistoryRepository>();
         private RadianContributorService _current;
 
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _current = new RadianContributorService(_contributorService.Object, _contributorOperationService.Object, _radianContributorRepository.Object, _radianContributorTypeRepository.Object, _radianContributorFileRepository.Object, _radianTestSetResultManager.Object, _radianOperationModeRepository.Object);
+            _current = new RadianContributorService(_contributorService.Object, _contributorOperationService.Object, _radianContributorRepository.Object, _radianContributorTypeRepository.Object, _radianContributorFileRepository.Object, _radianTestSetResultManager.Object, _radianOperationModeRepository.Object, _radianContributorFileHistoryRepository.Object);
         }
 
 

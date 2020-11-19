@@ -44,5 +44,6 @@ namespace Gosocket.Dian.Interfaces.Services
         List<Domain.RadianOperationMode> OperationModeList();
 
         bool ChangeContributorStep(int radianContributorId, int step);
+        ResponseMessage AddFileHistory(RadianContributorFileHistory radianFileHistory);
     }
 }
