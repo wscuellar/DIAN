@@ -11,21 +11,111 @@
         line-height: 34px;
         color: #2C323C;
     }
+
+    .cerrar {
+        color: #aaa;
+        float: right;
+        font-size: 19px;
+        font-weight: bolder;
+        width: 19px;
+        text-align: center;
+    }
+
+    .redondear {
+        border-radius: 52% 48% 49% 51% / 53% 49% 51% 47%;
+        background-color: forestgreen;
+    }
+
+    .cerrar:hover,
+    .cerrar:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .ContainerDownload {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        font-style: normal;
+        font-size: 14px;
+        line-height: 14px;
+        color: #348441;
+    }
+
+    .titlecs {
+        /* Acuse de Recibo de Factura Electrónica */
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 23px;
+        /* identical to box height */
+        color: #2C323C;
+    }
+
+    .titleSecondary {
+        /* Validaciones del Evento */
+        font-family: Arial;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 18px;
+        line-height: 21px;
+        /* identical to box height */
+        color: #2C323C;
+    }
+
+    h5 {
+        /* Datos del Emisor del evento */
+        font-family: Arial;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 23px;
+        /* identical to box height */
+        color: #2C323C;
+    }
+
+   span {
+        /* Datos del Emisor del evento */
+        font-family: Arial;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 23px;
+        /* identical to box height */
+        color: #2C323C;
+    }
+
+    
+
+    .rowSpace {
+        margin-top:10px;
+        margin-bottom: 10px;
+    }
+
 </style>
 
 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 
 <div class="event-section page-content radian-view margin-15">
-    <button id="EventViewClose">X</button>
+
     <div class="row margin-horizontal-0">
         <div class="panel">
             <div class="panel-heading padding-15">
-                <div class="row title-container">
-                    <p class="title-view">
-                        @Model.Title
-                    </p>
-                    <div class="underline-title"></div>
+                <div class="row">
+                    <div class="col-sm-8 left-section">
+                        <p class="titlecs">
+                            @Model.Title
+                        </p>
+                        <div class="underline-title"></div>
+                    </div>
+                    <div class="col-sm-4 text-right right-section">
+
+                        <span id="EventViewClose" onclick="darClick()" class="cerrar redondear">&times;</span>
+
+                        @*<button onclick="darClick()" class="cerrar" id="EventViewClose">X</button>*@
+                    </div>
                 </div>
             </div>
             <div class="panel-body padding-top-20">
@@ -33,7 +123,10 @@
                     <div class="col-sm-4 left-section">
                         <span>CUDE:</span>
                         <span class="cude-text">@Model.CUDE</span>
-                        <span><i class="fa fa-download"></i><um>Descarga</um></span>
+                        <div class="left-section ContainerDownload">
+                            <p><i class="fa fa-download"></i><um> Descarga</um></p>
+                        </div>
+
                     </div>
                     <div class="col-sm-8 text-right right-section">
                         <span>Prefijo: @Model.Prefix </span>
@@ -41,6 +134,7 @@
                         <span>Fecha de emisión del Evento: @Model.DateOfIssue.ToString("yyyy-MM-dd")</span>
                     </div>
                 </div>
+
                 <div class="row aditional-data-section">
 
                     <div class="col-sm-4">
@@ -77,8 +171,7 @@
                         }
 
                         @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia ||
-                             Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion ||
-                             Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoPropiedad)
+                             Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
                         {
                             <h5>Datos del Mandato </h5>
                             <span>NIT: @Model.Endoso.ReceiverCode</span>
@@ -94,51 +187,57 @@
                             </div>
                         }
                     </div>
+                    <div class="row radian-subtitle-line"></div>
                 </div>
 
-
-
-                <div class="row radian-subtitle-container radian-certificates">
-                    <div class="col-sm-10">
-                        <p class="subtitle-view">
-                            @ViewBag.subtitle1
-                        </p>
-                    </div>
-                </div>
-                <div class="row radian-subtitle-line"></div>
-                <div class="table-responsive">
-                    @if (Model.Validations.Count == 0)
-                    {
-                        <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i> @Model.ValidationMessage </h5>
-                    }
-                    else
-                    {
-                        <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Resultados</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.Validations)
-                                {
-                                    <tr>
-                                        <td>@item.RuleName</td>
-                                        <td>@item.Status</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
+                @*Validaciones*@
+                <div class="rowSpace">
                     <div class="row radian-subtitle-container radian-certificates">
                         <div class="col-sm-10">
-                            <p class="subtitle-view">
-                                @ViewBag.subtitle2
+                            <p class="titleSecondary">
+                                @ViewBag.ValidationTitle
                             </p>
                         </div>
                     </div>
                     <div class="row radian-subtitle-line"></div>
+                    <div>
+                        @if (Model.Validations.Count == 0)
+                        {
+                            <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i> @Model.ValidationMessage </h5>
+                        }
+                        else
+                        {
+                            <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th class="text-right right-section">Resultados</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Validations)
+                                    {
+                                    <tr>
+                                        <td>@item.RuleName</td>
+                                        <td class="text-right right-section"><a class="eventView " data-toggle="tooltip" data-placement="top" title="@item.Message"><i class="fa fa-info-circle "></i> @item.Status</a></td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+
+                @*referencias*@
+                <div class="rowSpace">
+                    <div class="row radian-subtitle-container radian-certificates">
+                        <div class="col-sm-10">
+                            <p class="titleSecondary">
+                                @ViewBag.ReferenceTitle
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row radian-subtitle-line "></div>
 
                     <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
                         <thead>
@@ -168,12 +267,15 @@
                             }
                         </tbody>
                     </table>
+                </div>
 
-                    @if (Model.AssociatedEvents.Count > 0)
-                    {
+                @*Eventos asociados*@
+                @if (Model.AssociatedEvents.Count > 0)
+                {
+                    <div class="rowSpace">
                         <div class="row radian-subtitle-container">
                             <div class="col-sm-10">
-                                <p class="subtitle-view">
+                                <p class="titleSecondary">
                                     @Model.EventTitle;
                                 </p>
                             </div>
@@ -199,10 +301,9 @@
                                 }
                             </tbody>
                         </table>
-                    }
+                    </div>
+                }
 
-
-                </div>
             </div>
         </div>
     </div>
@@ -218,13 +319,9 @@
 
         <script>
 
-            $("#EventViewClose").click(function () {
-                alert("hago algo");
-                $('#modifyWrapper').hide();
-                $('#container1').show();
-            })
 
-          
+
+
 
         </script>
 
