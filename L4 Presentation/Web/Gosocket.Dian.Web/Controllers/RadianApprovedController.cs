@@ -31,11 +31,12 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Index(int Id)
+        public ActionResult Index(RegistrationDataViewModel registrationData)
         {
-            // LoadSoftwareModeOperation();
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(Id);
-            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList(radianAdmin.Type.Id);
+
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId);
+            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
+            var mode = registrationData.RadianOperationMode;
 
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
@@ -56,7 +57,7 @@ namespace Gosocket.Dian.Web.Controllers
         // GET: RadianFactor
 
         [HttpPost]
-        public ActionResult Index(RegistrationDataViewModel registrationData)
+        public void Add(RegistrationDataViewModel registrationData)
         {
             _radianContributorService.CreateContributor(registrationData.ContributorId,
                                                         RadianState.Registrado,
@@ -66,23 +67,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 
 
-            // Lista de Software Modo de Operacion 
-            // CA 2.3
-            // LoadSoftwareModeOperation();
-
-            // CA 2.4 
-            // Software de un Proveedor Electronico
-            RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(registrationData.ContributorId);
-            RadianApprovedViewModel model = new RadianApprovedViewModel()
-            {
-                Name = radianAdmin.Contributor.TradeName,
-                Nit = radianAdmin.Contributor.Code,
-                BusinessName = radianAdmin.Contributor.BusinessName,
-                Email = radianAdmin.Contributor.Email,
-                Files = radianAdmin.Files
-            };
-            return View(model);
-
+        
         }
 
         private void LoadSoftwareModeOperation()

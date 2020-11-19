@@ -36,14 +36,19 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage) {
                 if (data.MessageType === "alert") {
                     showConfirmation(data.Message, AlertExec());
                 }
-                else {
+                if (data.MessageType === "confirm") {
                     showConfirmation(data.Message, ConfirmExec(method, jsonvalue));
+                }
+                if (data.MessageType === "redirect") {
+                    alert(data.RedirectTo);
+                    operationClick = false;
+                    window.location.href = data.RedirectTo;
                 }
             }
             else {
                 method(jsonvalue);
             }
-            
+
         }
     });
 }

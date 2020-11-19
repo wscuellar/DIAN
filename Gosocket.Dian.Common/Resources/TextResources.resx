@@ -121,7 +121,7 @@
     <value>alert</value>
   </data>
   <data name="confirmType" xml:space="preserve">
-    <value>Confirm</value>
+    <value>confirm</value>
   </data>
   <data name="ElectronicInvoice_Confirm" xml:space="preserve">
     <value>¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?</value>
@@ -137,6 +137,9 @@
   </data>
   <data name="ParticipantWithoutSoftware" xml:space="preserve">
     <value>El participante no cuenta con un software propio activo en el sistema</value>
+  </data>
+  <data name="redirectType" xml:space="preserve">
+    <value>redirect</value>
   </data>
   <data name="RegisteredParticipant" xml:space="preserve">
     <value>El participante ya se encuentra registrado en RADIAN</value>

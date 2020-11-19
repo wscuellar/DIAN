@@ -69,7 +69,7 @@ namespace Gosocket.Dian.Application
 
             RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType);
             if (radianContributor != null && radianContributor.RadianState != RadianState.Cancelado.GetDescription())
-                return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.alertType);
+                return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.redirectType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.TechnologyProvider && (contributor.ContributorTypeId != (int)Domain.Common.ContributorType.Provider || !contributor.Status))
                 return new ResponseMessage(TextResources.TechnologProviderDisabled, TextResources.alertType);
@@ -218,24 +218,18 @@ namespace Gosocket.Dian.Application
 
         public void CreateContributor(int contributorId, RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy)
         {
-            List<Domain.RadianContributor> radianContributor = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == (int)radianContributorType);
-
-
-            if (!radianContributor.Any())
+            RadianContributor newRadianContributor = new Domain.RadianContributor()
             {
-                RadianContributor newRadianContributor = new Domain.RadianContributor()
-                {
-                    ContributorId = contributorId,
-                    CreatedBy = createdBy,
-                    RadianContributorTypeId = (int)radianContributorType,
-                    RadianOperationModeId = (int)radianOperationMode,
-                    RadianState = radianState.GetDescription(),
-                    CreatedDate = System.DateTime.Now,
-                    Update = System.DateTime.Now,
-                };
-                int id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
-                newRadianContributor.Id = id;
-            }
+                ContributorId = contributorId,
+                CreatedBy = createdBy,
+                RadianContributorTypeId = (int)radianContributorType,
+                RadianOperationModeId = (int)radianOperationMode,
+                RadianState = radianState.GetDescription(),
+                CreatedDate = System.DateTime.Now,
+                Update = System.DateTime.Now,
+            };
+            int id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
+            newRadianContributor.Id = id;
         }
 
         public List<RadianContributorFile> RadianContributorFileList(string id)
