@@ -13,5 +13,9 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         [Display(Name = "PIN del Software")]
         public string SoftwarePin { get; set; }
+
+        public string Url { get; set; }
+
+        public string CreatedBy { get; set; }
     }
 }
