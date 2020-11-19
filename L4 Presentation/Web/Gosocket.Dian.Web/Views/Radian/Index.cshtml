@@ -3,7 +3,6 @@
 }
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 
-
 <div style="text-align:left; margin-left:25px; margin-top:20px; ">
     <p style=" width: 174px; height: 34px; font-family: Arial; font-style: normal; font-weight: normal; font-size: 30px; line-height: 34px; color: #000000; ">
         Participantes
@@ -33,7 +32,6 @@
                 </div>
             </div>
         </div>
-
 
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
@@ -112,7 +110,6 @@
             }
             else {
                 var url = ('@ViewBag.RadianContributorTypeId' !== '') ? "@Url.Action("Index", "RadianApproved")" + "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.RadianOperationModeId' : '@Url.Action("ElectronicInvoiceView", "Radian")';
-                alert(url);
                 window.location.href = url;
             }
         });
