@@ -35,5 +35,8 @@ namespace Gosocket.Dian.Interfaces.Services
         int RadianContributorId(int contributorId);
 
         Software SoftwareByContributor(int contributorId);
+
+        int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation);
+        RadianTestSetResult RadianTestSetResultByNit(string nit);
     }
 }

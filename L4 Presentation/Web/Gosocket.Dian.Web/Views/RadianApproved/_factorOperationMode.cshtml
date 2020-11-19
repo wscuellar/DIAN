@@ -1,6 +1,6 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
 
-@{ ViewBag.title = "Listado de Participantes RADIAN"; }
+@{ ViewBag.title = "Configurar modo de operación-Factor"; }
 
 @{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" } };}
 
@@ -30,10 +30,10 @@
                                                         @*@Html.DropDownListFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new SelectList(Model.OperationModeList, "Id", "Name", Model.RadianApprovedOperationModeViewModel.OperationModeSelected), new { @class = "form-control selectpicker" })*@
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-9 padding-xs-0">
+                                                <div class="col-sm-5 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.Label("Url de recepción de eventos", new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.Software.Url, defaultHtmlAttr)
+                                                        @Html.TextBoxFor(m => m.Software.Url, new { @class = "form-control input-general", disabled = "disabled" })
                                                     </div>
                                                 </div>
                                             </div>
@@ -45,16 +45,16 @@
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.Software.CreatedBy, defaultHtmlAttr)
+                                                        @Html.TextBoxFor(m => m.Software.CreatedBy, new { @class = "form-control input-general", disabled = "disabled" })
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-9 padding-xs-0">
+                                                <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.SoftwareName, new { @class = "control-label" })
                                                         @Html.TextBoxFor(m => m.RadianApprovedOperationModeViewModel.SoftwareName, defaultHtmlAttr)
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-9 padding-xs-0">
+                                                <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.SoftwarePin, new { @class = "control-label" })
                                                         @Html.TextBoxFor(m => m.RadianApprovedOperationModeViewModel.SoftwarePin, defaultHtmlAttr)
@@ -63,14 +63,14 @@
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.Label("ID del Software", new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.Software.Id, defaultHtmlAttr)
+                                                        @Html.TextBoxFor(m => m.Software.Id, new { @class = "form-control input-general", disabled = "disabled" })
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="panel-footer-grey text-right">
-                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Adicionar</button>
+                                            <button name="Submit" class="btn btn-radian-success" id="view-operation-mode">Adicionar</button>
                                         </div>
 
                                     </div>
@@ -80,7 +80,9 @@
 
                         <div class="panel">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Listado de modos de operación asociados</h3>
+                                <h4 class="panel-title-radian padding-0"><strong>Listado de modos de operación asociados</strong></h4>
+                                <hr class="margin-5" />
+                                @*<h3 class="panel-title">Listado de modos de operación asociados</h3>*@
                             </div>
                             <div class="panel-body">
                                 <div class="table-responsive">

@@ -21,8 +21,9 @@ namespace Gosocket.Dian.Application
         private readonly IRadianContributorFileRepository _radianContributorFileRepository;
         private readonly IRadianContributorFileHistoryRepository _radianContributorFileHistoryRepository;
         private readonly IContributorOperationsService _contributorOperationsService;
+        private readonly IRadianTestSetResultService _radianTestSetResultService;
 
-        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository, IContributorOperationsService contributorOperationsService)
+        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository, IContributorOperationsService contributorOperationsService, IRadianTestSetResultService radianTestSetResultService)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
@@ -32,6 +33,7 @@ namespace Gosocket.Dian.Application
             _radianContributorFileRepository = radianContributorFileRepository;
             _radianContributorFileHistoryRepository = radianContributorFileHistoryRepository;
             _contributorOperationsService = contributorOperationsService;
+            _radianTestSetResultService = radianTestSetResultService;
         }
 
         /// <summary>
@@ -182,6 +184,21 @@ namespace Gosocket.Dian.Application
         public int RadianContributorId(int contributorId)
         {
             return _radianContributorRepository.Get(c => c.ContributorId == contributorId).Id;
+        }
+
+        public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
+        {
+           return _radianContributorOperationRepository.Add(radianContributorOperation);
+        }
+
+        public List<RadianContributorOperation> ListRadianContributorOperations(int radianContributorId)
+        {
+            return _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId);
+        }
+
+        public RadianTestSetResult RadianTestSetResultByNit(string nit)
+        {
+            return _radianTestSetResultService.GetTestSetResultByNit(nit).FirstOrDefault();
         }
     }
 }
