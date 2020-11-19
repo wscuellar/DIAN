@@ -44,7 +44,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                     context.Entry(radianContributorOperationInstance).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();
 
-                    responseMessage = new ResponseMessage("Datos actuzalizados corresctamente", "Actualizado");
+                    responseMessage = new ResponseMessage("Datos actualizados correctamente", "Actualizado");
                 }
                 else
                 {
@@ -53,6 +53,18 @@ namespace Gosocket.Dian.DataContext.Repositories
 
                 return responseMessage;
             }
+        }
+
+        public int Add(RadianContributorOperation contributorOperation)
+        {
+            int result = 0;
+            using (var context = new SqlDBContext())
+            {
+                context.RadianContributorOperations.Add(contributorOperation);
+                result = 1;
+            }
+
+            return result;
         }
     }
 }

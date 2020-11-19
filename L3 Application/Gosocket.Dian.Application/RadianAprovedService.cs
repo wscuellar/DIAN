@@ -183,5 +183,15 @@ namespace Gosocket.Dian.Application
         {
             return _radianContributorRepository.Get(c => c.ContributorId == contributorId).Id;
         }
+
+        public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
+        {
+           return _radianContributorOperationRepository.Add(radianContributorOperation);
+        }
+
+        public List<RadianContributorOperation> ListRadianContributorOperations(int radianContributorId)
+        {
+            return _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId);
+        }
     }
 }

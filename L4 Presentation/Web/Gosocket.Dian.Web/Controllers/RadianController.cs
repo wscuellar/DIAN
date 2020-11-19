@@ -35,6 +35,8 @@ namespace Gosocket.Dian.Web.Controllers
         {
             NameValueCollection result = _radianContributorService.Summary(User.UserCode());
             ViewBag.ContributorId = result["ContributorId"];
+            ViewBag.RadianContributorTypeId = result["RadianContributorTypeId"];
+            ViewBag.RadianOperationModeId = result["RadianOperationModeId"];
             return View();
         }
 
