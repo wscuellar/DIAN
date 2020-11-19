@@ -160,5 +160,6 @@ namespace Gosocket.Dian.Web.Controllers
                     success = true,
                 }, JsonRequestBehavior.AllowGet);
         }
+
     }
 }
