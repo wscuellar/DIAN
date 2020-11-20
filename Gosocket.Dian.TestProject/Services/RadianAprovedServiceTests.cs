@@ -235,15 +235,87 @@ namespace Gosocket.Dian.Application.Tests
         public void RadianContributorIdTest()
         {
             // Arrange
-            int contributorId = 0;
+            int contributorId = 1;
 
             _current.Setup(t => t.RadianContributorId(contributorId))
                 .Returns(It.IsAny<int>());
 
-            ResponseMessage expected = null;
+            int expected = 0;
 
             //ACT
             var actual = _current.Object.RadianContributorId(contributorId);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void AddRadianContributorOperationTest()
+        {
+            // Arrange
+            RadianContributorOperation radianContributorOperation = null;
+
+            _current.Setup(t => t.AddRadianContributorOperation(radianContributorOperation))
+                .Returns(It.IsAny<int>());
+
+            int expected = 0;
+
+            //ACT
+            var actual = _current.Object.AddRadianContributorOperation(radianContributorOperation);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void ListRadianContributorOperationsTest()
+        {
+            // Arrange
+            int radianContributorId = 1;
+
+            _current.Setup(t => t.ListRadianContributorOperations(radianContributorId))
+                .Returns(It.IsAny<RadianContributorOperationWithSoftware>());
+
+            RadianContributorOperationWithSoftware expected = null;
+
+            //ACT
+            var actual = _current.Object.ListRadianContributorOperations(radianContributorId);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void RadianTestSetResultByNitTest()
+        {
+            // Arrange
+            string nit = "";
+
+            _current.Setup(t => t.RadianTestSetResultByNit(nit))
+                .Returns(It.IsAny<RadianTestSetResult>());
+
+            RadianTestSetResult expected = null;
+
+            //ACT
+            var actual = _current.Object.RadianTestSetResultByNit(nit);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void SoftwareByContributorTest()
+        {
+            // Arrange
+            int contributorId = 0;
+
+            _current.Setup(t => t.SoftwareByContributor(contributorId))
+                .Returns(It.IsAny<Software>());
+
+            Software expected = null;
+
+            //ACT
+            var actual = _current.Object.SoftwareByContributor(contributorId);
 
             // Assert
             Assert.AreEqual(expected, actual);
