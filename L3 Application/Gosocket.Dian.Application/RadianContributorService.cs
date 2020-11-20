@@ -173,7 +173,8 @@ namespace Gosocket.Dian.Application
                         RadianState = c.RadianState,
                         AcceptanceStatusId = c.Contributor.AcceptanceStatus.Id,
                         CreatedDate = c.CreatedDate,
-                        Step = c.Step
+                        Step = c.Step,
+                        RadianContributorTypeId = c.RadianContributorTypeId
                     },
                     Files = c.RadianContributorFile.ToList(),
                     Tests = testSet,
@@ -205,7 +206,7 @@ namespace Gosocket.Dian.Application
 
         public bool ChangeContributorStep(int radianContributorId, int step)
         {
-            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.ContributorId == radianContributorId);
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorId);
 
             if (radianContributor != null)
             {

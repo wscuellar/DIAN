@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.Identity.EntityFramework;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -49,6 +50,9 @@ namespace Gosocket.Dian.Web.Models
         public string ConfirmPassword { get; set; }
 
         public byte Active { get; set; }
+        public string UpdatedBy { get; set; }
+        public string ActiveDescription { get; set; }
+        public DateTime LastUpdated { get; set; }
 
         public List<IdentificationTypeListViewModel> IdentificationTypes { get; set; }
         

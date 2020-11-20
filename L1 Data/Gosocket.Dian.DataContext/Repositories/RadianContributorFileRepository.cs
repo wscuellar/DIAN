@@ -39,7 +39,7 @@ namespace Gosocket.Dian.DataContext.Repositories
             }
         }
 
-        public void AddOrUpdate(RadianContributorFile radianContributorFile)
+        public string AddOrUpdate(RadianContributorFile radianContributorFile)
         {
             RadianContributorFile radianContributorFileInstance = _sqlDBContext
                 .RadianContributorFiles
@@ -47,15 +47,19 @@ namespace Gosocket.Dian.DataContext.Repositories
 
             if (radianContributorFileInstance != null)
             {
+                radianContributorFile.Id = radianContributorFileInstance.Id;
                 radianContributorFileInstance.Status = radianContributorFile.Status;
                 _sqlDBContext.Entry(radianContributorFileInstance).State = System.Data.Entity.EntityState.Modified;
             }
             else
             {
+                radianContributorFile.Id = Guid.NewGuid();
                 _sqlDBContext.Entry(radianContributorFile).State = System.Data.Entity.EntityState.Added;
             }
 
             _sqlDBContext.SaveChanges();
+
+            return radianContributorFile.Id.ToString();
         }
     }
 

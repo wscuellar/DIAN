@@ -19,6 +19,9 @@
                             @Html.HiddenFor(m => m.Id)
                             <input type="hidden" id="listMenu" value="@Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Menu)" />
                             <input type="hidden" id="hddPermissions" name="hddPermissions" />
+                            <input type="hidden" id="hddPermissionsAsigned" name="hddPermissionsAsigned"
+                                   value="@(ViewBag.PermissionList != null ? Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.PermissionList) : null)" />
+
                             @Html.Partial("_userForm")
                             @Html.ValidationSummary("", new { @class = "text-center text-danger" })
                             @Html.ValidationMessage("no_permissions", new { @class = "text-center text-danger" })
@@ -33,7 +36,7 @@
                                         <div class="dropdown-menu" style="padding-left: 8px; padding-right: 8px;">
                                             <div class="custom-control custom-checkbox dropdown-item">
                                                 <input type="checkbox" class="custom-control-input" id="@("menu" + menu.Id)" onchange="changeAllMenu(@menu.Id)">
-                                                <label class="custom-control-label" for="@("menu" + menu.Id)">Todos...</label>
+                                                <label class="custom-control-label" for="@("lblMenu" + menu.Id)">Todos...</label>
                                             </div>
                                             @if (menu.Options != null)
                                             {
@@ -41,7 +44,7 @@
                                                 {
                                                     <div class="custom-control custom-checkbox dropdown-item">
                                                         <input type="checkbox" class="custom-control-input" id="@("submenu" + menu.Id + "_" + subMenu.Id)">
-                                                        <label class="custom-control-label" for="@("submenu" + menu.Id + "_" + subMenu.Id)">@subMenu.Name</label>
+                                                        <label class="custom-control-label" for="@("lblSubmenu" + menu.Id + "_" + subMenu.Id)">@subMenu.Name</label>
                                                     </div>
                                                 }
                                             }
@@ -82,9 +85,9 @@
                                 </tbody>
                             </table>
                             <br />
-                            <div class="panel-footer text-right">
+                            <div class="panel-footer text-center">
                                 <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-                                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">Guardar</button>
+                                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>
                             </div>
                         }
                     </div>
@@ -124,10 +127,11 @@
 {
     @Scripts.Render("~/bundles/jqueryval")
 
-<script>
+    <script>
         var listMenu;
         var userId = "";
         var reloadView = false;
+        var listPermisionsAsigned;
         $(document).ready(function ($) {
 
             userId = $("#Id").val();
@@ -153,11 +157,11 @@
                 }
             });
 
-            $('#dialogConfirmActive').on('hidden.bs.modal', function () {
-                if (reloadView)
-                    reloadPage();
+            //$('#dialogConfirmActive').on('hidden.bs.modal', function () {
+            //    if (reloadView)
+            //        reloadPage();
 
-            });
+            //});
 
             function confirmActive() {
                 $("#dialogConfirmActive").alert('show');
@@ -197,7 +201,7 @@
 
                     },
                     complete: function () {
-                        
+
                     },
                     error: function (result) {
 
@@ -218,7 +222,40 @@
                 $('#dialogConfirmActive').alert('close');
             });
 
+            if ($("#hddPermissionsAsigned").val() != null && $("#hddPermissionsAsigned").val() != "") {
+
+                listPermisionsAsigned = JSON.parse($("#hddPermissionsAsigned").val());
+
+                for (i = 0; i < listMenu.length; i++) {
+
+                    if (listMenu[i].Options != null) {
+                        for (j = 0; j < listMenu[i].Options.length; j++) {
+
+                            var asigned = validSubMenuAsigned(listMenu[i].Options[j].Id);
+
+                            if (asigned) {
+                                $("#submenu" + listMenu[i].Id + "_" + listMenu[i].Options[j].Id).prop("checked", "checked");
+                            }
+                        }
+                    }
+                }
+            }
+
         });
+
+
+        function validSubMenuAsigned(subMenuId) {
+            var asigned = false;
+
+            for (z = 0; z < listPermisionsAsigned.length; z++) {
+                if (subMenuId == listPermisionsAsigned[z].SubMenuId) {
+                    asigned = true;
+                    break;
+                }
+            }
+
+            return asigned;
+        }
 
         function changeAllMenu(menuId) {
 
@@ -277,5 +314,5 @@
             location.href = "@Url.Action("AddUser","ExternalUsers")";
         }
 
-</script>
+    </script>
 }

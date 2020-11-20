@@ -69,7 +69,7 @@
 
 @section scripts{
     <script>
-            $(document).ready(function () {debugger
+        $(document).ready(function () {
                 var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
                 $("#steps-approved").steps({
                     headerTag: "h3",
@@ -110,16 +110,21 @@
                     var limit = (files.length - 2) / 2
                     for (var i = 0; i <= limit ; i=i+2) {
                         if (files[i].files.length > 0) {
-                            formdata.append(files[i].files[0].name, files[i].files[i]);
+                            formdata.append(files[i].files[0].name, files[i].files[0]);
                             formdata.append("TypeId_" + numberFiles, files[i].dataset.typeid);
                             numberFiles++;
                         }
                     };
+                    debugger
                     formdata.append("nit", "@Model.Nit");
                     formdata.append("email", "@Model.Email");
                     formdata.append("contributorId", "@Model.ContributorId");
-                    formdata.append("filesNumber", files.length - 2);
+                    formdata.append("radianContributorType", '@Request.Params.Get("RadianContributorType")');
+                    formdata.append("radianContributorTypeiD", '@Model.RadianContributorTypeId');
+                    formdata.append("radianOperationMode", '@Request.Params.Get("RadianOperationMode")');
+                    formdata.append("filesNumber", numberFiles);
                     formdata.append("step", @Model.Step);
+                    formdata.append("radianState", '@Model.RadianState');
                     $(".file-input-enabled").toggle();
                     $(".file-input-disabled").toggle();
 
@@ -136,7 +141,6 @@
                             var xhr = $.ajaxSettings.xhr();
                             if (xhr.upload) {
                                 xhr.upload.addEventListener('progress', function (event) {
-                                    debugger
                                     var percent = 0;
                                     var position = event.loaded || event.position;
                                     var total = event.total;
@@ -151,6 +155,7 @@
                             return xhr;
                         },
                         success: function (data) {
+                            var objData = data.data;
                             bootbox.alert({
                                 title: "Paso actualizado",
                                 message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + data.message + "</strong></h4></div></div>",
@@ -160,9 +165,9 @@
                                         className: 'btn-success'
                                     }
                                 },
-                                callback: function () {
+                                callback: function () {debugger
                                     showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
-                                    window.location.href = '@Url.Action("Index", "RadianApproved", new { id = Model.ContributorId })';
+                                    window.location.href = '@Url.Action("Index", "RadianApproved")' + "?ContributorId=" + objData.ContributorId + "&RadianContributorType=" + objData.RadianContributorType + "&RadianOperationMode=" + objData.RadianOperationMode;
                                 }
                             });
                         },

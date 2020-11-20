@@ -153,12 +153,12 @@ namespace Gosocket.Dian.Application
             string fileName = StringTools.MakeValidFileName(radianContributorFile.FileName);
             var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
             bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
+            string idFile = string.Empty;
 
             if (result)
             {
-                radianContributorFile.Id = Guid.NewGuid();
-                _radianContributorFileRepository.AddOrUpdate(radianContributorFile);
-                return new ResponseMessage($"{radianContributorFile.Id}", "Guardado");
+                idFile = _radianContributorFileRepository.AddOrUpdate(radianContributorFile);
+                return new ResponseMessage($"{idFile}", "Guardado");
             }
 
             return new ResponseMessage($"{string.Empty}", "Nulo");
@@ -193,11 +193,11 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage($"El registro no pudo ser actualizado", "Nulo");
         }
 
-        public int RadianContributorId(int contributorId)
+        public int RadianContributorId(int contributorId, int contributorTypeId, string state)
         {
-            return _radianContributorRepository.Get(c => c.ContributorId == contributorId).Id;
+            return _radianContributorRepository.Get(c => c.ContributorId == contributorId && c.RadianContributorTypeId == contributorTypeId && c.RadianState == state).Id;
         }
-
+        
         public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
         {
             return _radianContributorOperationRepository.Add(radianContributorOperation);
