@@ -493,25 +493,18 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
-        public List<T> FindDocumentReferenceAttorney<T>(string partitionKey, string rowKey, string issueAtorney, string senderCode) where T : ITableEntity, new()
+        public List<T> FindDocumentReferenceAttorney<T>(string rowKey, string senderCode) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
 
             var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("PartitionKey",
-                    QueryComparisons.Equal,
-                    partitionKey),
-                TableOperators.And,
                 TableQuery.GenerateFilterCondition("RowKey",
                     QueryComparisons.Equal,
-                    rowKey));
-
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("IssuerAttorney",
-                QueryComparisons.Equal,
-                issueAtorney));
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("SenderCode",
-                QueryComparisons.Equal,
-                senderCode));
+                    rowKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("SenderCode",
+                    QueryComparisons.Equal,
+                    senderCode));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 

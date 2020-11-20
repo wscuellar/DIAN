@@ -191,16 +191,36 @@ namespace Gosocket.Dian.Domain.Common
     {
         [Description("Acuse de recibo")]
         Received = 030,
-        [Description("Rechazo de documento")]
+        [Description("Rechazo de la Factura Electrónica")]
         Rejected = 031,
-        [Description("Recibimiento de los bienes")]
+        [Description("Constancia de recibo del bien o aceptación de la prestación del servicio")]
         Receipt = 032,
-        [Description("Aceptación de documento")]
+        [Description("Aceptación Expresa")]
         Accepted = 033,
-        [Description("Factura ofrecida para negociación como título valor")]
+        [Description("Aceptación Tácita")]
+        AceptacionTacita = 034,
+        [Description("Avales")]
+        Avales = 035,
+        [Description("Solicitud de Disponibilizacion")]
+        SolicitudDisponibilizacion = 036,
+        [Description("Endoso en Propiedad")]
+        EndosoPropiedad = 037,
+        [Description("Endoso en Garantía")]
+        EndosoGarantia = 038,
+        [Description("Endoso en Procuración")]
+        EndosoProcuracion = 039,
+        [Description("Anulacion de endoso electrónico")]
         InvoiceOfferedForNegotiation = 040,
-        [Description("Factura negociada como título valor")]
+        [Description("Limitación de circulación")]
         NegotiatedInvoice = 041,
+        [Description("Anulación de limitación de circulación")]
+        AnulacionLimitacionCirculacion = 042,
+        [Description("Mandato")]
+        Mandato = 043,
+        [Description("Terminación del mandato")]
+        TerminacionMandato = 044,
+        [Description("Notificación del pago total o parcial")]
+        NotificacionPagoTotalParcial = 045
     }
 
     public enum ExportStatus
