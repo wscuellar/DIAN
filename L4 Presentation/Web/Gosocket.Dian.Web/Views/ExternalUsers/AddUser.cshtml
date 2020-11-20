@@ -173,7 +173,7 @@
                     url: "@Url.Action("UpdateActive","ExternalUsers")",
                     type: "POST",
                     data: {
-                        userId: $("#Id").val(), active: $(".btn-active").text(), activeDescription: $("#txtActiveDescription").val() },
+                        userId: $("#Id").val(), active: $(".btn-active").text(), activeDescription: $("#txtActiveDescription").val(), email: $("#Email").val() },
                     datatype: "json",
                     success: function (res) {
 
@@ -282,22 +282,8 @@
 
                         if ($("#submenu" + listMenu[index].Id + "_" + listMenu[index].Options[j].Id).prop("checked")) {
 
-                            //if (j == 0) {
-                            //    arrPermissions.push({
-                            //        Id: value.Id,
-                            //        Name: value.Name,
-                            //        Options: []
-                            //    });
-                            //}
-
-                            //arrPermissions[arrPermissions.length - 1].Options.push({
-                            //    Id: listMenu[index].Options[j].Id,
-                            //    MenuId: listMenu[index].Id,
-                            //    Name: listMenu[index].Options[j].Name
-                            //});
-
                             arrPermissions.push({
-                                //MenuId: listMenu[index].Id,
+                                MenuId: listMenu[index].Id,
                                 SubMenuId: listMenu[index].Options[j].Id
                             });
 
