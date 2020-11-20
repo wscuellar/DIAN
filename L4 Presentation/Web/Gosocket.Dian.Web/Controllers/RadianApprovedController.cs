@@ -183,7 +183,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.OperationModeList = _radianTestSetService.OperationModeList();
             radianApprovedViewModel.Software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
             radianApprovedViewModel.RadianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel();
-            //radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
+            radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
 
             return View(radianApprovedViewModel);
         }
