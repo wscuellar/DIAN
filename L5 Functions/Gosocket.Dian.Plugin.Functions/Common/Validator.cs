@@ -555,7 +555,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     return responses;
+                case (int)EventStatus.EndosoPropiedad:
                 case (int)EventStatus.EndosoGarantia:
+                case (int)EventStatus.EndosoProcuracion:
                     if (party.ListId != "2") // No informa SenderParty es un endoso en blanco entonces no valida emisor documento
                     {
                         if (party.SenderParty != senderCode)
