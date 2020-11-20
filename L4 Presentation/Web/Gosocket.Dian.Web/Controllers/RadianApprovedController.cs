@@ -54,8 +54,6 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        // GET: RadianFactor
-
         [HttpPost]
         public void Add(RegistrationDataViewModel registrationData)
         {
@@ -145,13 +143,13 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.OperationModeList = _radianTestSetService.OperationModeList();
             radianApprovedViewModel.Software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
             radianApprovedViewModel.RadianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel();
-            radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
+            //radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
 
             return View(radianApprovedViewModel);
         }
 
         [HttpPost]
-        public JsonResult UploadFactorOperationMode(dynamic tempObjectRequest)
+        public JsonResult UploadFactorOperationMode(RadianApprovedOperationModeViewModel approvedOperModeViewModel)
         {
 
 
