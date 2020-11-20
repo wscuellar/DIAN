@@ -108,7 +108,7 @@
                 <br />
                 <div class="form-group">
                     <label for="txtActiveDescription" class="control-label">Escriba la razon por la cual realiza esta acción:</label>
-                    <textarea type="text" id="txtActiveDescription" cols="3" rows="3" maxlength="150" class="form-control" />
+                    <textarea type="text" id="txtActiveDescription" cols="3" rows="3" maxlength="150" class="form-control"></textarea>
                 </div>
 
             </div>
@@ -164,12 +164,12 @@
             }
 
             $("#btnOkActive").click(function () {
-
+                debugger;
                 $.ajax({
                     url: "@Url.Action("UpdateActive","ExternalUsers")",
                     type: "POST",
                     data: {
-                        userId: $("#Id").val(), active: $(".btn-active").text(), activeDescription: $("#ActiveDescription").val() },
+                        userId: $("#Id").val(), active: $(".btn-active").text(), activeDescription: $("#txtActiveDescription").val() },
                     datatype: "json",
                     success: function (res) {
 
