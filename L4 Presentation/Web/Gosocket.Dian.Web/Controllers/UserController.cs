@@ -553,8 +553,8 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ExternalUserAuthentication(UserLoginViewModel model, string returnUrl)
-        {
-            return View("LoginConfirmed", model);
+        {           
+            return RedirectToAction(nameof(HomeController.Dashboard), "Home");
         }
 
             [HttpPost]
