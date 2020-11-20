@@ -88,5 +88,40 @@ namespace Gosocket.Dian.Web.Utils
             return _sqlDBContext.Roles.FirstOrDefault(r => r.Id == id)?.Name;
         }
 
+        /// <summary>
+        /// Activando o Inactivando al Usario externo
+        /// </summary>
+        /// <param name="userId">Id del Usuario externo a actualizar</param>
+        /// <param name="active">1: Activar, 0: Inactivar</param>
+        /// <param name="updatedBy">Usuario que realiza la acción</param>
+        /// <param name="activeDescription">Motivo por el cual se realiza la acción</param>
+        /// <returns></returns>
+        public int UpdateActive(string userId, byte active, string updatedBy, string activeDescription)
+        {
+            int result = 0;
+            try
+            {
+                using (var db = new ApplicationDbContext())
+                {
+                    var user = db.Users.FirstOrDefault(u => u.Id == userId);
+                    if (user != null)
+                    {
+                        user.Active = active;
+                        //user.LastUpdated = DateTime.Now;
+                        //user.UpdatedBy = updatedBy;
+                        //user.ActiveDescription = activeDescription;
+                        result = db.SaveChanges();
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                result = -1;
+                System.Diagnostics.Debug.WriteLine("UserService:UpdateActive: " + ex);
+            }
+
+            return result;
+        }
+
     }
 }

@@ -26,12 +26,12 @@ namespace Gosocket.Dian.Web.Models
 
         [Display(Name = "Tipo de Identificación")]
         [Required(ErrorMessage = "{0} es requerido.")]
-        public int IdentificationType { get; set; }
+        public int IdentificationTypeId { get; set; }
 
         [DataType(DataType.Text)]
         [Display(Name = "Número de documento")]
         [Required(ErrorMessage = "{0} es requerido.")]
-        public string Identification { get; set; }
+        public string IdentificationId { get; set; }
 
         [Display(Name = "Correo electrónico")]
         [Required(ErrorMessage = "{0} es requerido")]

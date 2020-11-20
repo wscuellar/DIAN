@@ -28,6 +28,25 @@ namespace Gosocket.Dian.DataContext.Repositories
             return list;
         }
 
+        public List<SubMenu> GetSubMenusByMenuId(int menuId)
+        {
+            List<SubMenu> list = null;
+
+            try
+            {
+                using (var context = new SqlDBContext())
+                {
+                    list = context.SubMenus.Where(s => s.MenuId == menuId).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("PermissionRepository:GetSubMenus: " + ex);
+            }
+
+            return list;
+        }
+
         public int AddOrUpdate(List<Permission> permissionList)
         {
             int result = 0;
