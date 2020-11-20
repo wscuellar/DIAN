@@ -153,12 +153,13 @@ namespace Gosocket.Dian.Application
             string fileName = StringTools.MakeValidFileName(radianContributorFile.FileName);
             var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
             bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
+            string idFile = string.Empty;
 
             if (result)
             {
-                radianContributorFile.Id = Guid.NewGuid();
-                _radianContributorFileRepository.AddOrUpdate(radianContributorFile);
-                return new ResponseMessage($"{radianContributorFile.Id}", "Guardado");
+                //radianContributorFile.Id = Guid.NewGuid();
+                idFile = _radianContributorFileRepository.AddOrUpdate(radianContributorFile);
+                return new ResponseMessage($"{idFile}", "Guardado");
             }
 
             return new ResponseMessage($"{string.Empty}", "Nulo");
