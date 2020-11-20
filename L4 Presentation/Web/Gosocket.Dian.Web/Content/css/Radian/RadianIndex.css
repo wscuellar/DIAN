@@ -671,12 +671,16 @@ h4.text-thin {
     border: 1px solid #348441;
     box-sizing: border-box;
     border-radius: 4px;
+    height: 33px;
+    line-height: 1.9;
 }
 
 .custom-file-label::after {
     content: "Adjuntar";
     color: white;
     background: #348441;
+    height: 31px;
+    line-height: 1.9;
 }
 
 #steps-approved .steps {
@@ -800,10 +804,10 @@ span.state-file.status-2 {
     background-image: url(../../images/aproved.png);
 }
 span.state-file.status-3 {
-    background-image: url(../../images/observations.png);
+    background-image: url(../../images/reject.png);
 }
 span.state-file.status-4 {
-    background-image: url(../../images/reject.png);
+    background-image: url(../../images/observations.png);
 }
 .file-input-disabled{
     position: relative;
@@ -886,3 +890,10 @@ span.close {
     margin: 10px;
 }
 
+.underline-reject-text {
+    color: #348441;
+}
+
+.custom-file {
+    width: 50%;
+}
