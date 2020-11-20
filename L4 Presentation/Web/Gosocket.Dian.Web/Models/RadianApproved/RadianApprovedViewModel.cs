@@ -53,6 +53,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public List<string> LegalRepresentativeIds { get; set; }
 
+        public List<UserViewModel> LegalRepresentativeList { get; set; }
         public RadianApprovedViewModel()
         {
             RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
