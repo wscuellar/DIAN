@@ -47,6 +47,7 @@ namespace Gosocket.Dian.DataContext.Repositories
 
             if (radianContributorFileInstance != null)
             {
+                radianContributorFile.Id = radianContributorFileInstance.Id;
                 radianContributorFileInstance.Status = radianContributorFile.Status;
                 _sqlDBContext.Entry(radianContributorFileInstance).State = System.Data.Entity.EntityState.Modified;
             }

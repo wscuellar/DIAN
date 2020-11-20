@@ -157,7 +157,6 @@ namespace Gosocket.Dian.Application
 
             if (result)
             {
-                //radianContributorFile.Id = Guid.NewGuid();
                 idFile = _radianContributorFileRepository.AddOrUpdate(radianContributorFile);
                 return new ResponseMessage($"{idFile}", "Guardado");
             }
@@ -194,11 +193,11 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage($"El registro no pudo ser actualizado", "Nulo");
         }
 
-        public int RadianContributorId(int contributorId)
+        public int RadianContributorId(int contributorId, int contributorTypeId, string state)
         {
-            return _radianContributorRepository.Get(c => c.ContributorId == contributorId).Id;
+            return _radianContributorRepository.Get(c => c.ContributorId == contributorId && c.RadianContributorTypeId == contributorTypeId && c.RadianState == state).Id;
         }
-
+        
         public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
         {
             return _radianContributorOperationRepository.Add(radianContributorOperation);

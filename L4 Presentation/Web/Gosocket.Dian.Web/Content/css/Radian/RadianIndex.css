@@ -672,7 +672,7 @@ h4.text-thin {
     box-sizing: border-box;
     border-radius: 4px;
     height: 33px;
-    line-height: 1.9 !important;
+    line-height: 2 !important;
 }
 
 .custom-file-label::after {
@@ -680,7 +680,7 @@ h4.text-thin {
     color: white;
     background: #348441;
     height: 31px;
-    line-height: 1.9 !important;
+    line-height: 2 !important;
 }
 
 #steps-approved .steps {
@@ -893,8 +893,13 @@ span.close {
 
 .underline-reject-text {
     color: #348441;
+    cursor: pointer;
 }
 
 .custom-file {
     width: 50%;
+}
+
+.reject-observation {
+    font-weight: bold;
 }

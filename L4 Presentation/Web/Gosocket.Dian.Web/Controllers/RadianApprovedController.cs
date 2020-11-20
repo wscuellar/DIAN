@@ -49,6 +49,7 @@ namespace Gosocket.Dian.Web.Controllers
                 FilesRequires = listFileType,
                 Step = radianAdmin.Contributor.Step,
                 RadianState = radianAdmin.Contributor.RadianState,
+                RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId,
                 LegalRepresentativeList = userService.GetUsers(radianAdmin.LegalRepresentativeIds).Select(u => new UserViewModel
                 {
                     Id = u.Id,
@@ -110,6 +111,9 @@ namespace Gosocket.Dian.Web.Controllers
             string RadianOperationMode = Request.Form.Get("radianOperationMode");
             string filesNumber = Request.Form.Get("filesNumber");
             string step = Request.Form.Get("step");
+            string radianState = Request.Form.Get("radianState");
+            string radianContributorTypeiD = Request.Form.Get("radianContributorTypeiD");
+            
 
             ParametersDataViewModel data = new ParametersDataViewModel()
             {
@@ -117,8 +121,8 @@ namespace Gosocket.Dian.Web.Controllers
                 RadianContributorType = RadianContributorType,
                 RadianOperationMode = RadianOperationMode
             };
-            int idRadianContributor = _radianAprovedService.RadianContributorId(Convert.ToInt32(ContributorId));
-
+           
+            int idRadianContributor = _radianAprovedService.RadianContributorId(Convert.ToInt32(ContributorId), Convert.ToInt32(radianContributorTypeiD), radianState);
             for (int i = 0; i < Request.Files.Count; i++)
             {
                 RadianContributorFile radianContributorFile = new RadianContributorFile();
@@ -152,7 +156,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (Convert.ToInt32(filesNumber) == Request.Files.Count)
             {
                 int newStep = Convert.ToInt32(step) + 1;
-                int contributorId = Convert.ToInt32(ContributorId);
+                int contributorId = idRadianContributor;
                 ResponseMessage responseUpdateStep = _radianAprovedService.UpdateRadianContributorStep(contributorId, newStep);
             }
 
