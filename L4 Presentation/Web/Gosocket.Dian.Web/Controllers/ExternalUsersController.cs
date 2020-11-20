@@ -269,6 +269,9 @@ namespace Gosocket.Dian.Web.Controllers
 
                     var result1 = await UserManager.AddToRoleAsync(user.Id, Roles.UsuarioExterno);
 
+                    //Envio de notificacion por correo
+                    _ = SendMailCreate(model);
+
                     if (!result1.Succeeded)
                     {
                         ModelState.AddModelError("", "El Usario no puedo ser asignado al role 'Usuario Externo'");
@@ -315,7 +318,8 @@ namespace Gosocket.Dian.Web.Controllers
                 if (ru > 0)
                 {
                     ViewBag.messageAction = "Usuario actualizado exitosamente!";
-
+                    //Envio de notificacion por correo
+                    _ = SendMailUpdate(model);
                     return RedirectToAction("AddUser");
                 }
                 else
@@ -340,18 +344,47 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         /// <summary>
-        /// Mail notification for external user creation
+        /// Activar o Desactivar un Usuario Externo
+        /// </summary>
+        /// <param name="userId">Id del Usuario Externo</param>
+        /// <param name="active">Activar o Desactivar según sea el caso</param>
+        /// <returns><see cref="Gosocket.Dian.Web.Models.GeneralResponseModel"/></returns>
+        [HttpPost]
+        public JsonResult UpdateActive(string userId, string active, string activeDescription, string email)
+        {
+            byte accion;
+
+            if (active.Equals("Desactivar"))
+                accion = 0;
+            else
+                accion = 1;
+
+            int result = userService.UpdateActive(userId, accion, User.Identity.Name, activeDescription);
+            //Envio de notificacion por correo
+            _ = SendMailActive(email, User.Identity.Name, active);
+
+            GeneralResponseModel res = new GeneralResponseModel()
+            {
+                HttpStatusCode = result > 0 ? System.Net.HttpStatusCode.OK.GetHashCode() : System.Net.HttpStatusCode.BadRequest.GetHashCode(),
+                StatusCode = result > 0 ? System.Net.HttpStatusCode.OK.ToString() : System.Net.HttpStatusCode.BadRequest.ToString(),
+                Message = result > 0 ? "Estado actualizado exitosamente!" : "No se pudo actualizar el estado del Usuario"
+            };
+
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Enviar notificacion email para creacion de usuario externo
         /// </summary>
         /// <param name="model"></param>
-        /// <param name="observations"></param>
         /// <returns></returns>
-        public bool SendMailCreate(ExternalUserViewModel model, string observations = "")
+        public bool SendMailCreate(ExternalUserViewModel model)
         {
             var emailService = new Gosocket.Dian.Application.EmailService();
             StringBuilder message = new StringBuilder();
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
-            message.Append("<span style='font-size:28px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
             message.Append("</br> <span style='font-size:18px;'><b>Se ha generado una clave de acceso al Catalogo de DIAN</b></span></br>");
             message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.Names);
             message.Append("</br> A continuación, se entrega la clave para realizar tramites y gestión de solicitudes recepción documentos electrónicos.");
@@ -368,28 +401,58 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         /// <summary>
-        /// /// Mail notification for external user update
+        /// Enviar notificacion email para actualizacion de usuario externo
         /// </summary>
         /// <param name="model"></param>
-        /// <param name="observations"></param>
         /// <returns></returns>
-        public bool SendMailUpdate(ExternalUserViewModel model, string observations = "")
+        public bool SendMailUpdate(ExternalUserViewModel model)
         {
             var emailService = new Gosocket.Dian.Application.EmailService();
             StringBuilder message = new StringBuilder();
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
-            message.Append("<span style='font-size:28px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
             message.Append("</br> <span style='font-size:18px;'><b>Se ha actualizado su información de acceso al Catalogo de DIAN</b></span></br>");
             message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.Names);
             message.Append("</br> Su información de registro y acceso al Catalogo de DIAN ha sido actualizada satisfactoriamente.");
-            
+            message.AppendFormat("</br> Tipo de documento: {0}", model.IdentificationTypeId);
+            message.AppendFormat("</br> Numero  de documento: {0}", model.IdentificationId);
+            message.AppendFormat("</br> Correo electronico: {0}", model.Email);
+            message.AppendFormat("</br> Clave de acceso: {0}", model.Password);                                                                                
+
             message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
 
             //Nombre del documento, estado, observaciones
             dic.Add("##CONTENT##", message.ToString());
 
             emailService.SendEmail(model.Email, "DIAN - Actualización de Usuario Registrado", dic);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Enviar notificacion email para activar/inactivar usuario externo
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool SendMailActive(string email, string name, string state)
+        {
+            var emailService = new Gosocket.Dian.Application.EmailService();
+            StringBuilder message = new StringBuilder();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("</br> <span style='font-size:18px;'><b>Se ha actualizado el estado de acceso al Catalogo de DIAN</b></span></br>");
+            message.AppendFormat("</br> Señor (a) usuario (a): {0}", name);
+            message.Append("</br> El estado de su acceso al Catalogo de DIAN ha sido actualizado satisfactoriamente.");
+            message.AppendFormat("</br> Estado: {0}", state);
+
+            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+
+            //Nombre del documento, estado, observaciones
+            dic.Add("##CONTENT##", message.ToString());
+
+            emailService.SendEmail(email, "DIAN - Cambio de Estado de Usuario Registrado", dic);
 
             return true;
         }
