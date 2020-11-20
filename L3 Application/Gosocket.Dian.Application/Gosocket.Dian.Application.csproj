@@ -182,6 +182,7 @@
     <Compile Include="Managers\RadianTestSetResultManager.cs" />
     <Compile Include="EmailService.cs" />
     <Compile Include="RadianAprovedService.cs" />
+    <Compile Include="RadianCallSoftwareService.cs" />
     <Compile Include="RadianContributorFileTypeService.cs" />
     <Compile Include="ContributorOperationsService.cs" />
     <Compile Include="ContributorService.cs" />
