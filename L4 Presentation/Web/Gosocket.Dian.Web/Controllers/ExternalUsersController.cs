@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -262,32 +263,48 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Activar o Desactivar un Usuario Externo
-        /// </summary>
-        /// <param name="userId">Id del Usuario Externo</param>
-        /// <param name="active">Activar o Desactivar según sea el caso</param>
-        /// <returns><see cref="Gosocket.Dian.Web.Models.GeneralResponseModel"/></returns>
-        [HttpPost]
-        public JsonResult UpdateActive(string userId, string active, string activeDescription)
+
+        public bool SendMailCreate(ExternalUserViewModel model, string observations = "")
         {
-            byte accion;
+            var emailService = new Gosocket.Dian.Application.EmailService();
+            StringBuilder message = new StringBuilder();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
 
-            if (active.Equals("Desactivar"))
-                accion = 0;
-            else
-                accion = 1;
+            message.Append("<span style='font-size:28px;'><b>Comunicación de servicio</b></span>");
+            message.Append("</br> <span style='font-size:18px;'><b>Se ha generado una clave de acceso al Catalogo de DIAN</b></span>");
+            message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.Names);
+            message.Append("</br> A continuación, se entrega la clave para realizar tramites y gestión de solicitudes recepción documentos electrónicos.");
+            message.AppendFormat("</br> Clave de acceso: {0}", model.Password);
 
-            int result = userService.UpdateActive(userId, accion, User.Identity.Name, activeDescription);
+            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
 
-            GeneralResponseModel res = new GeneralResponseModel()
-            {
-                HttpStatusCode = result > 0 ? System.Net.HttpStatusCode.OK.GetHashCode() : System.Net.HttpStatusCode.BadRequest.GetHashCode(),
-                StatusCode = result > 0 ? System.Net.HttpStatusCode.OK.ToString() : System.Net.HttpStatusCode.BadRequest.ToString(),
-                Message = result > 0 ? "Estado actualizado exitosamente!" : "No se pudo actualizar el estado del Usuario"
-            };
+            //Nombre del documento, estado, observaciones
+            dic.Add("##CONTENT##", message.ToString());
 
-            return Json(res, JsonRequestBehavior.AllowGet);
+            emailService.SendEmail(model.Email, "DIAN - Creacion de Usuario Registrado", dic);
+
+            return true;
+        }
+
+        public bool SendMailUpdate(ExternalUserViewModel model, string observations = "")
+        {
+            var emailService = new Gosocket.Dian.Application.EmailService();
+            StringBuilder message = new StringBuilder();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+            message.Append("<span style='font-size:28px;'><b>Comunicación de servicio</b></span>");
+            message.Append("</br> <span style='font-size:18px;'><b>Se ha actualizado su información de acceso al Catalogo de DIAN</b></span>");
+            message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.Names);
+            message.Append("</br> Su información de registro y acceso al Catalogo de DIAN ha sido actualizada satisfactoriamente.");
+            
+            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+
+            //Nombre del documento, estado, observaciones
+            dic.Add("##CONTENT##", message.ToString());
+
+            emailService.SendEmail(model.Email, "DIAN - Actualización de Usuario Registrado", dic);
+
+            return true;
         }
 
     }
