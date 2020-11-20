@@ -5,6 +5,7 @@ using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
+using Gosocket.Dian.Web.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianTestSetService _radianTestSetService;
         private readonly IRadianApprovedService _radianAprovedService;
         private readonly IRadianTestSetResultService _radianTestSetResultService;
+        private readonly UserService userService = new UserService();
 
         public RadianApprovedController(IRadianContributorService radianContributorService,
                                         IRadianTestSetService radianTestSetService,
@@ -35,7 +37,6 @@ namespace Gosocket.Dian.Web.Controllers
         {
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId);
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
-            var mode = registrationData.RadianOperationMode;
 
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
@@ -47,10 +48,36 @@ namespace Gosocket.Dian.Web.Controllers
                 Files = radianAdmin.Files,
                 FilesRequires = listFileType,
                 Step = radianAdmin.Contributor.Step,
-                RadianState = radianAdmin.Contributor.RadianState
-
+                RadianState = radianAdmin.Contributor.RadianState,
+                LegalRepresentativeList = userService.GetUsers(radianAdmin.LegalRepresentativeIds).Select(u => new UserViewModel
+                {
+                    Id = u.Id,
+                    Code = u.Code,
+                    Name = u.Name,
+                    Email = u.Email
+                }).ToList()
             };
-            return View(model);
+            if (Request.Params.Get("RadianOperationMode") == "Indirect")
+            {
+                if (model.RadianState == "Habilitado")
+                {
+                    model.OperationModeList = _radianTestSetService.OperationModeList();
+                    model.Software = _radianAprovedService.SoftwareByContributor(model.ContributorId);
+                    model.RadianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel();
+                    //radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
+                    return View("GetFactorOperationMode", model);
+                }
+                else
+                {
+                    model.RadianTestSetResult =
+                    _radianTestSetResultService.GetTestSetResultByNit(radianAdmin.Contributor.Code).FirstOrDefault();
+                    return View("GetSetTestResult", model);
+                }
+            }
+            else
+            {
+                return View(model);
+            }
         }
 
         [HttpPost]

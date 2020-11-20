@@ -719,19 +719,21 @@ h4.text-thin {
 #progress-wrp {
     border: 1px solid #0099CC;
     padding: 1px;
-    position: relative;
     border-radius: 3px;
     margin: 10px;
     text-align: left;
     background: #fff;
     box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.12);
+    width: 50%;
+    position: absolute;
+    top: 2px;
+    right: 21px;
 }
 
 #progress-wrp .progress-bar {
-    height: 20px;
+    height: 11px;
     border-radius: 3px;
-    background-color: #79f763;
-    width: 0;
+    background-color: #348441;
     box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.11);
 }
 
@@ -813,10 +815,6 @@ span.state-file.status-4 {
     margin: 1em auto;
 }
 
-#container {
-    height: 400px;
-}
-
 .highcharts-data-table table {
     font-family: Verdana, sans-serif;
     border-collapse: collapse;
@@ -869,3 +867,22 @@ span.warning-title {
     line-height: 18px;
     font-weight: bold;
 }
+
+.setTestForm {
+    padding: 20px;
+    border: 1px solid #348441;
+    box-sizing: border-box;
+    border-radius: 0px 5px 0px 0px;
+    margin-top: 20px;
+}
+
+span.close {
+    color: #565B64;
+    opacity: 1;
+    font-weight: 100 !important;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 10px;
+}
+

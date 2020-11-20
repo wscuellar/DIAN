@@ -55,7 +55,9 @@
                             }
                         });
 
-                        function showChart(dataChart) {
+                        function showChart(data) {
+                            debugger
+                            var dataChart = data.data;
                             Highcharts.chart('setTestDetails', {
                                 chart: {
                                     type: 'bar'
@@ -64,7 +66,22 @@
                                     text: 'Stacked bar chart'
                                 },
                                 xAxis: {
-                                    categories: []
+                                    categories: [
+                                        'Documentos',
+                                        'Acuse de recibo',
+                                        'Recibido del bien o prestación del S',
+                                        'Aceptación expresa',
+                                        'Aceptación tácita',
+                                        'Rechazo de la  FEV',
+                                        'Avales',
+                                        'Mandato eléctronico',
+                                        'Terminacion de mandato',
+                                        'Solicitud de disponibilización',
+                                        'Endoso',
+                                        'Anulación endoso',
+                                        'Notificación pago parcial o total',
+                                        'Terminación de la limitación de circulación'
+                                    ]
                                 },
                                 yAxis: {
                                     min: 0,
@@ -80,16 +97,108 @@
                                         stacking: 'normal'
                                     }
                                 },
-                                series: [{
-                                    name: 'John',
-                                    data: [5, 3, 4, 7, 2]
-                                }, {
-                                    name: 'Jane',
-                                    data: [2, 2, 3, 2, 1]
-                                }, {
-                                    name: 'Joe',
-                                    data: [3, 4, 4, 2, 5]
-                                }]
+                                series: [
+                                    {
+                                        name: 'Requeridos',
+                                        data: [
+                                            dataChart.TotalDocumentRequired,
+                                            dataChart.ReceiptNoticeTotalRequired,
+                                            dataChart.ReceiptServiceTotalRequired,
+                                            dataChart.ExpressAcceptanceTotalRequired,
+                                            dataChart.AutomaticAcceptanceTotalRequired,
+                                            dataChart.RejectInvoiceTotalRequired,
+                                            dataChart.GuaranteeTotalRequired,
+                                            dataChart.ElectronicMandateTotalRequired,
+                                            dataChart.EndMandateTotalRequired,
+                                            dataChart.ApplicationAvailableTotalRequired,
+                                            dataChart.EndorsementTotalRequired,
+                                            dataChart.EndorsementCancellationTotalRequired,
+                                            dataChart.PaymentNotificationTotalRequired,
+                                            dataChart.EndCirculationLimitationTotalRequired
+                                            
+
+
+                                        ]
+                                    },
+                                    {
+                                        name: 'Min requerido aceptado',
+                                        data: [
+                                            dataChart.TotalDocumentAcceptedRequired,
+                                            dataChart.ReceiptNoticeTotalAcceptedRequired,
+                                            dataChart.ReceiptServiceTotalAcceptedRequired,
+                                            dataChart.ExpressAcceptanceTotalAcceptedRequired,
+                                            dataChart.AutomaticAcceptanceTotalAcceptedRequired,
+                                            dataChart.RejectInvoiceTotalAcceptedRequired,
+                                            dataChart.GuaranteeTotalAcceptedRequired,
+                                            dataChart.ElectronicMandateTotalAcceptedRequired,
+                                            dataChart.EndMandateTotalAcceptedRequired,
+                                            dataChart.ApplicationAvailableTotalAcceptedRequired,
+                                            dataChart.EndorsementTotalAcceptedRequired,
+                                            dataChart.EndorsementCancellationTotalAcceptedRequired,
+                                            dataChart.PaymentNotificationTotalAcceptedRequired,
+                                            dataChart.EndCirculationLimitationTotalAcceptedRequired
+
+                                        ]
+                                    },
+                                    {
+                                        name: 'Recibidos',
+                                        data: [
+                                            dataChart.TotalDocumentSent,
+                                            dataChart.TotalReceiptNoticeSent,
+                                            dataChart.TotalReceiptServiceSent,
+                                            dataChart.TotalExpressAcceptanceSent,
+                                            dataChart.TotalAutomaticAcceptanceSent,
+                                            dataChart.TotalRejectInvoiceSent,
+                                            dataChart.TotalGuaranteeSent,
+                                            dataChart.TotalElectronicMandateSent,
+                                            dataChart.TotalEndMandateSent,
+                                            dataChart.TotalApplicationAvailableSent,
+                                            dataChart.TotalEndorsementSent,
+                                            dataChart.TotalEndorsementCancellationSent,
+                                            dataChart.TotalPaymentNotificationSent,
+                                            dataChart.TotalEndCirculationLimitationSent
+                                        ]
+                                    },
+                                    {
+                                        name: 'Aceptados',
+                                        data: [
+                                            dataChart.TotalDocumentAccepted,
+                                            dataChart.ReceiptNoticeAccepted,
+                                            dataChart.ReceiptServiceAccepted,
+                                            dataChart.ExpressAcceptanceAccepted,
+                                            dataChart.AutomaticAcceptanceAccepted,
+                                            dataChart.RejectInvoiceAccepted,
+                                            dataChart.GuaranteeAccepted,
+                                            dataChart.ElectronicMandateAccepted,
+                                            dataChart.EndMandateAccepted,
+                                            dataChart.ApplicationAvailableAccepted,
+                                            dataChart.EndorsementAccepted,
+                                            dataChart.EndorsementCancellationAccepted,
+                                            dataChart.PaymentNotificationAccepted,
+                                            dataChart.EndCirculationLimitationAccepted
+
+                                        ]
+                                    },
+                                    {
+                                        name: 'Rechazados',
+                                        data: [
+                                            dataChart.TotalDocumentsRejected,
+                                            dataChart.ReceiptNoticeRejected,
+                                            dataChart.RejectInvoiceAccepted,
+                                            dataChart.ExpressAcceptanceRejected,
+                                            dataChart.AutomaticAcceptanceRejected,
+                                            dataChart.RejectInvoiceRejected,
+                                            dataChart.GuaranteeRejected,
+                                            dataChart.ElectronicMandateRejected,
+                                            dataChart.EndMandateRejected,
+                                            dataChart.ApplicationAvailableRejected,
+                                            dataChart.EndorsementRejected,
+                                            dataChart.EndorsementCancellationRejected,
+                                            dataChart.PaymentNotificationRejected,
+                                            dataChart.EndCirculationLimitationRejected
+                                        ]
+                                    }
+                                ]
                             });
                         }
                     });

@@ -2833,6 +2833,7 @@
     <Content Include="Views\RadianApproved\GetFactorOperationMode.cshtml" />
     <Content Include="Views\RadianApproved\_setTestDetails.cshtml" />
     <Content Include="Views\RadianApproved\SetTestDetails.cshtml" />
+    <Content Include="Views\RadianApproved\_users.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -69,9 +69,7 @@
                     RadianOperationMode: $(this).attr('operationMode'),
                 };
 
-                window.location.href = '@Url.Action("Index", "RadianApproved", new { id = ViewBag.ContributorId })';
-
-                @*CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
+                CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
                     function (param) {
                         CallExecution("POST", '@Url.Action("Add", "RadianApproved")', RegistrationDataViewModel,
                             function (param) {
@@ -80,7 +78,7 @@
                             }, false
                         );
                     }, true
-                );*@
+                );
             }
         });
 
