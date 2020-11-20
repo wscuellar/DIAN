@@ -41,6 +41,7 @@ namespace Gosocket.Dian.Functions.Events
 
             var trackId = data.TrackId;
             var responseCode = data.ResponseCode;
+            var trackIdCude = data.TrackIdCude;
 
             if(!StringUtils.HasOnlyNumbers(responseCode))
                 return new EventResponse { Code = ((int)EventValidationMessage.InvalidResponseCode).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.InvalidResponseCode) };
@@ -73,9 +74,14 @@ namespace Gosocket.Dian.Functions.Events
             }
 
             TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-
+            //Obtiene informacion del CUFE
             var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             if (documentMeta == null)
+                return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
+            
+            //Obtiene informacion del CUDE
+            var documentMetaCUDE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+            if (documentMetaCUDE == null)
                 return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
 
             var partitionKey = $"co|{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}|{documentMeta.DocumentKey.Substring(0, 2)}";
@@ -98,11 +104,11 @@ namespace Gosocket.Dian.Functions.Events
             {
                 globalDataDocument.Events = new List<Event>()
                 {
-                    InstanceEventObject(globalDataDocument, data.TrackIdCude)
+                    InstanceEventObject(documentMetaCUDE, responseCode)
                 };
             }
             else
-                globalDataDocument.Events.Add(InstanceEventObject(globalDataDocument, data.TrackIdCude));
+                globalDataDocument.Events.Add(InstanceEventObject(documentMetaCUDE, responseCode));
 
             // upsert document in cosmos
             var result = CosmosDBService.Instance(documentMeta.EmissionDate).UpdateDocument(globalDataDocument);
@@ -113,20 +119,20 @@ namespace Gosocket.Dian.Functions.Events
             return response;
         }
 
-        private static Event InstanceEventObject(GlobalDataDocument globalDataDocument, string code)
+        private static Event InstanceEventObject(GlobalDocValidatorDocumentMeta globalDataDocumentCude, string code)
         {
             return new Event
             {
                 Date = DateTime.UtcNow,
-                DocumentKey = globalDataDocument.DocumentKey,
+                DocumentKey = globalDataDocumentCude.DocumentKey,
                 DateNumber = int.Parse(DateTime.UtcNow.ToString("yyyyMMdd")),
                 TimeStamp = DateTime.UtcNow,
                 Code = code,
                 Description = EnumHelper.GetEnumDescription((EventStatus)int.Parse(code)),
-                SenderCode = globalDataDocument.SenderCode,
-                SenderName = globalDataDocument.SenderName,
-                ReceiverCode = globalDataDocument.ReceiverCode,
-                ReceiverName = globalDataDocument.ReceiverName
+                SenderCode = globalDataDocumentCude.SenderCode,
+                SenderName = globalDataDocumentCude.SenderName,
+                ReceiverCode = globalDataDocumentCude.ReceiverCode,
+                ReceiverName = globalDataDocumentCude.ReceiverName
             };
         }
 

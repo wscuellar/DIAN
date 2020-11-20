@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace Gosocket.Dian.Services.Utils.Common
 {
-    public class XmlParser
+    public class XmlParseNomina
     {
         private static MemoryCache xmlParserDefinitionsInstanceCache = MemoryCache.Default;
 
@@ -36,18 +36,15 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string TotalInvoice { get; set; }
         public string ListID { get; set; }
         public string DocumentID { get; set; }
-        public string NoteMandato { get; set; }
 
-        public XmlParser()
+        public XmlParseNomina()
         {
             Fields = new Dictionary<string, object>();
             AllXmlDefinitions = new XmlDocument();
             var xmlParserDefinitions = GetXmlParserDefinitions();
             AllXmlDefinitions.LoadXml(xmlParserDefinitions);
-            
         }
-
-        public XmlParser(byte[] xmlContentBytes, XmlNode extensions = null)
+        public XmlParseNomina(byte[] xmlContentBytes, XmlNode extensions = null)
             : this()
         {
             var utf8Preamble = System.Text.Encoding.UTF8.GetPreamble();
@@ -80,48 +77,11 @@ namespace Gosocket.Dian.Services.Utils.Common
                     XmlDocument.XmlResolver = null;
                     XmlDocument.Load(sr);
                     var node = XmlDocument.GetElementsByTagName("xades:SigningTime")[0];
-                    var nodePaymentMeansValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='ID']";                    
-                    var nodePaymentDueDateValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='PaymentDueDate']";
-                    var listIDValueXpath = XmlDocument.GetElementsByTagName("cbc:ResponseCode")[0];
-                    var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";
-                    var valueDiscountRateEndoso = XmlDocument.GetElementsByTagName("InformacionNegociacion")[0];
-                    var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
-                    var valueNote = "//*[local-name()='Note']";
-
-                    var documentReferenceId = XmlDocument.SelectSingleNode(documentReferenceIdValueXpath)?.InnerText;
-                    var nodePaymentMeans = XmlDocument.SelectSingleNode(nodePaymentMeansValuesXpath)?.InnerText;
-                    var nodePaymentDueDate = XmlDocument.SelectSingleNode(nodePaymentDueDateValuesXpath)?.InnerText;
-                    var nodeTotalInvoice = XmlDocument.SelectSingleNode(valueTotalInvoice)?.InnerText;
-                    var valueNoteMandato = XmlDocument.SelectSingleNode(valueNote)?.InnerText;
-
-
-                    SigningTime = node?.InnerText;
-                    PaymentMeansID = nodePaymentMeans;
-                    DocumentReferenceId = documentReferenceId;
-                    PaymentDueDate = nodePaymentDueDate;
-                    DiscountRateEndoso = valueDiscountRateEndoso?.InnerText;
-
-                    if(DiscountRateEndoso != null)
-                    {
-                        //string[] datos = DiscountRateEndoso.Split(new string[] { "\r\n\t\t\t\t\t", "\r\n\t\t\t\t", " " }, StringSplitOptions.None);
-                        string auxD = DiscountRateEndoso.Replace("\r\n\t\t\t\t\t", " ");
-                        string[] datos = auxD.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                        DiscountRateEndoso = datos[5];
-                        PriceToPay = datos[3];
-                        TotalEndoso = datos[1];
-                    }
-                    if(nodeTotalInvoice != null)
-                    {
-                        TotalInvoice = nodeTotalInvoice;
-                    }
-                    if (valueNoteMandato != null)
-                    {
-                        NoteMandato = valueNoteMandato;
-                    }
+                    
                 }
             }
         }
-        
+
         public virtual bool Parser(bool validate = true)
         {
             try
@@ -138,12 +98,6 @@ namespace Gosocket.Dian.Services.Utils.Common
                         Fields.Add(key, val);
                     }
 
-                //var referencesNodesXpath = CurrentXmlDefinition
-                //    .SelectSingleNode("List[@Name=\'Referencia\']/XPathValue");
-
-                //if (string.IsNullOrEmpty(referencesNodesXpath?.InnerText))
-                //    return true;
-
                 return true;
             }
             catch (Exception error)
@@ -158,7 +112,6 @@ namespace Gosocket.Dian.Services.Utils.Common
             var xmlDocument = new XmlDocument { PreserveWhitespace = true };
             using (var ms = new MemoryStream(XmlContent))
             {
-                //var defaultEncoding = ConfigurationManager.Settings["Encoding"];
                 using (var sr = new StreamReader(ms, System.Text.Encoding.UTF8))
                 {
                     xmlDocument.XmlResolver = null;
@@ -256,16 +209,16 @@ namespace Gosocket.Dian.Services.Utils.Common
         private string GetXmlParserDefinitions()
         {
             var xmlParserDefinitions = "";
-            var cacheItem = xmlParserDefinitionsInstanceCache.GetCacheItem("XmlParserDefinitions");
+            var cacheItem = xmlParserDefinitionsInstanceCache.GetCacheItem("XmlParserDefinitionsNomina");
             if (cacheItem == null)
             {
                 var fileManager = new FileManager();
-                xmlParserDefinitions = fileManager.GetText("configurations", "XmlParserDefinitions.config");
+                xmlParserDefinitions = fileManager.GetText("configurations", "XmlParserDefinitionsNomina.config");
                 CacheItemPolicy policy = new CacheItemPolicy
                 {
                     AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1)
                 };
-                xmlParserDefinitionsInstanceCache.Set(new CacheItem("XmlParserDefinitions", xmlParserDefinitions), policy);
+                xmlParserDefinitionsInstanceCache.Set(new CacheItem("XmlParserDefinitionsNomina", xmlParserDefinitions), policy);
             }
             else
                 xmlParserDefinitions = (string)cacheItem.Value;

@@ -555,7 +555,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     return responses;
+                case (int)EventStatus.EndosoPropiedad:
                 case (int)EventStatus.EndosoGarantia:
+                case (int)EventStatus.EndosoProcuracion:
                     if (party.ListId != "2") // No informa SenderParty es un endoso en blanco entonces no valida emisor documento
                     {
                         if (party.SenderParty != senderCode)
@@ -663,28 +665,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     return responses;
                 case (int)EventStatus.SolicitudDisponibilizacion:
-                    if (party.CustomizationID == "361" || party.CustomizationID == "362")
+                    if (party.SenderParty != senderCode)
                     {
-                        if (party.SenderParty != senderCode)
+                        //valida si existe los permisos del mandatario 
+                        var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
+                            party.ResponseCode, xmlParserCude.NoteMandato);
+                        if (response != null)
                         {
-                            //valida si existe los permisos del mandatario 
-                            var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
-                                party.ResponseCode, xmlParserCude.NoteMandato);
-                            if (response != null)
-                            {
-                                responses.Add(response);
-                            }
-                            else
-                            {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = true,
-                                    Mandatory = true,
-                                    ErrorCode = "100",
-                                    ErrorMessage = "Evento senderParty referenciado correctamente",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }                          
+                            responses.Add(response);
                         }
                         else
                         {
@@ -696,30 +684,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ErrorMessage = "Evento senderParty referenciado correctamente",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
-                        }
-                        //Valida receptor documento AR coincida con DIAN
-                        if (party.ReceiverParty != "800197268")
+                        }                          
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = sender2DvErrorCode,
-                                ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                        else
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    //Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }                       
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = sender2DvErrorCode,
+                            ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
                     }
 
                     return responses;
@@ -1052,7 +1051,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida exista informacion mandato - Mandatario - CUFE
             var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cufe, senderCode);
             bool valid = false;
-            if (docsReferenceAttorney == null)
+            if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
             {
                 return new ValidateListResponse
                 {
