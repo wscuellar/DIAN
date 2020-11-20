@@ -47,7 +47,8 @@ namespace Gosocket.Dian.Web.Controllers
                 Files = radianAdmin.Files,
                 FilesRequires = listFileType,
                 Step = radianAdmin.Contributor.Step,
-                RadianState = radianAdmin.Contributor.RadianState
+                RadianState = radianAdmin.Contributor.RadianState,
+                LegalRepresentativeIds = radianAdmin.LegalRepresentativeIds
 
             };
             return View(model);

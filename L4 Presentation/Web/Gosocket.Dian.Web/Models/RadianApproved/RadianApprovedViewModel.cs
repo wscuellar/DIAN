@@ -51,7 +51,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public List<RadianContributorOperation> RadianContributorOperations { get; set; }
 
-        public List<UserViewModel> Users { get; set; }
+        public List<string> LegalRepresentativeIds { get; set; }
 
         public RadianApprovedViewModel()
         {

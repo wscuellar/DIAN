@@ -865,3 +865,11 @@ span.warning-title {
     line-height: 18px;
     font-weight: bold;
 }
+
+.setTestForm {
+    padding: 20px;
+    border: 1px solid #348441;
+    box-sizing: border-box;
+    border-radius: 0px 5px 0px 0px;
+    margin-top: 20px;
+}

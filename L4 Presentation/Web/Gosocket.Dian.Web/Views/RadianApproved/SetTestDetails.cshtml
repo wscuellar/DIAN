@@ -55,8 +55,9 @@
                             }
                         });
 
-                        function showChart(dataChart) {
+                        function showChart(data) {
                             debugger
+                            var dataChart = data.data;
                             Highcharts.chart('setTestDetails', {
                                 chart: {
                                     type: 'bar'
