@@ -257,6 +257,15 @@ namespace Gosocket.Dian.Web.Controllers
                 return View(model);
             }
 
+            permissions = JsonConvert.DeserializeObject<List<Permission>>(fc["hddPermissions"].ToString());
+
+            foreach (var item in permissions)
+            {
+                item.UserId = string.IsNullOrEmpty(model.Id) ? user.Id : model.Id;
+                item.CreatedBy = User.Identity.GetUserId();
+                item.UpdatedBy = User.Identity.GetUserId();
+            }
+
             if (string.IsNullOrEmpty(model.Id))
             {
                 user.Code = Guid.NewGuid().ToString().Substring(0, 6);
@@ -277,6 +286,8 @@ namespace Gosocket.Dian.Web.Controllers
 
                         return View(model);
                     }
+
+                    var affected = _permisionService.AddOrUpdate(permissions);
 
                     return RedirectToAction("AddUser");
                 }
@@ -316,25 +327,13 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     ViewBag.messageAction = "Usuario actualizado exitosamente!";
 
+                    var affected = _permisionService.AddOrUpdate(permissions);
+
                     return RedirectToAction("AddUser");
                 }
                 else
                     ViewBag.messageAction = "No se pudo actualizar el Usuario!";
             }
-
-            
-
-            permissions = JsonConvert.DeserializeObject<List<Permission>>(fc["hddPermissions"].ToString());
-
-            foreach (var item in permissions)
-            {
-                item.UserId = user.Id;
-                item.CreatedBy = User.Identity.GetUserId();
-                item.UpdatedBy = User.Identity.GetUserId();
-            }
-
-            var affected = _permisionService.AddOrUpdate(permissions);
-
 
             return View(model);
         }
