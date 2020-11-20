@@ -692,6 +692,7 @@ namespace Gosocket.Dian.Services.Utils
             var documentCude = documentParsed.Cude;
             var customizationId = documentParsed.CustomizationId;
             var documentID = documentParsed.DocumentID;
+            var serieAndNumber = documentParsed.SerieAndNumber;
 
             switch (docTypeCode)
             {
@@ -750,7 +751,7 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
-                if (string.IsNullOrEmpty(eventCode.Trim()))
+                if (string.IsNullOrEmpty(eventCode))
                 {
                     stringBuilder.AppendLine($"{codeMessage}H03-(R) Código tipo de evento no puede estar vacío.");
                     errors.Add(stringBuilder.ToString());
@@ -764,7 +765,24 @@ namespace Gosocket.Dian.Services.Utils
                     stringBuilder.Clear();
                     isValid = false;
                 }
+                if (string.IsNullOrEmpty(serieAndNumber))
+                {
+                    if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34)
+                    {
+                        stringBuilder.AppendLine($"{codeMessage}AAD05 No fue informado un número para el evento.");
+                        errors.Add(stringBuilder.ToString());
+                        stringBuilder.Clear();
+                        isValid = false;
+                    }
+                    if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 45)
+                    {
+                        stringBuilder.AppendLine($"{codeMessage}AAD05a No fue informado un número para el evento.");
+                        errors.Add(stringBuilder.ToString());
+                        stringBuilder.Clear();
+                        isValid = false;
+                    }
 
+                }
 
                 if (string.IsNullOrEmpty(documentCude))
                 {
