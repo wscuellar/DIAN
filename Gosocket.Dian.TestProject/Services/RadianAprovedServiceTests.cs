@@ -276,7 +276,7 @@ namespace Gosocket.Dian.Application.Tests
             _current.Setup(t => t.ListRadianContributorOperations(radianContributorId))
                 .Returns(It.IsAny<RadianContributorOperationWithSoftware>());
 
-            RadianContributorOperationWithSoftware expected = null;
+           RadianContributorOperationWithSoftware expected = null;
 
             //ACT
             var actual = _current.Object.ListRadianContributorOperations(radianContributorId);

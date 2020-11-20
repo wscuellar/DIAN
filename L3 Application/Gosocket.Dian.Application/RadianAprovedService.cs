@@ -157,7 +157,6 @@ namespace Gosocket.Dian.Application
 
             if (result)
             {
-                //radianContributorFile.Id = Guid.NewGuid();
                 idFile = _radianContributorFileRepository.AddOrUpdate(radianContributorFile);
                 return new ResponseMessage($"{idFile}", "Guardado");
             }
@@ -194,9 +193,9 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage($"El registro no pudo ser actualizado", "Nulo");
         }
 
-        public int RadianContributorId(int contributorId)
+        public int RadianContributorId(int contributorId, int contributorTypeId, string state)
         {
-            return _radianContributorRepository.Get(c => c.ContributorId == contributorId).Id;
+            return _radianContributorRepository.Get(c => c.ContributorId == contributorId && c.RadianContributorTypeId == contributorTypeId && c.RadianState == state).Id;
         }
 
         public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
@@ -207,12 +206,9 @@ namespace Gosocket.Dian.Application
         public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
         {
             RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
-
             radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId);
-
             int code = Convert.ToInt32(radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianContributor.Contributor.Code);
-
-            radianContributorOperationWithSoftware.Software = _radianCallSoftwareService.GetSoftwares(code).LastOrDefault();
+            radianContributorOperationWithSoftware.Softwares = _radianCallSoftwareService.GetSoftwares(code);
 
             return radianContributorOperationWithSoftware;
         }

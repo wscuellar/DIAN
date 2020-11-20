@@ -58,7 +58,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                 {
                     if (context.Permissions.Count() > 0)
                     {
-                        var permissions = context.Permissions.Where<Permission>(p => p.UserId == userId);
+                        var permissions = context.Permissions.Where<Permission>(p => p.UserId == userId).ToList();
 
                         if (permissions != null)
                         {
@@ -70,21 +70,43 @@ namespace Gosocket.Dian.DataContext.Repositories
                                 item.UpdatedBy = permissionList.ElementAt(0).UpdatedBy;
                             }
 
-                            int ru = context.SaveChanges();
+                            int ru = context.SaveChanges();//se marcan para eliminar los permisos anteriores
                             if (ru > 0)
                             {
-                                //Si la actualizacón fue exitosa, eliminar los aneriores
-                                context.Permissions.RemoveRange(context.Permissions.Where(p => p.State == System.Data.Entity.EntityState.Deleted.ToString()));
-                                result = context.SaveChanges();
+                                //Insertar los nuevos perrmisoss
+                                context.Permissions.AddRange(permissionList);
+                                int reInsert = context.SaveChanges();
+
+                                if (reInsert > 0)//Inserto los nuevos permisos exitosamente
+                                {
+                                    //Si la actualizacón fue exitosa, eliminar los aneriores
+                                    context.Permissions.RemoveRange(context.Permissions.Where(p => p.State == System.Data.Entity.EntityState.Deleted.ToString()));
+                                    result = context.SaveChanges();
+                                }
+                                else //si no fue exitoso la Actualización/Inserción de los nuevos permisos, quitar la marcación de Eliminados
+                                {
+                                    result = -2;//No se pudo actualizarInsertar los nuevos permisos
+
+                                    foreach (var item in permissions)
+                                    {
+                                        item.State = null;
+                                        item.UpdatedBy = permissionList.ElementAt(0).UpdatedBy;
+                                    }
+
+                                    int rollbackDelete = context.SaveChanges();
+
+                                }
                             }
+                            else
+                                result = -2;//no se pudo marcar para eliminar los permisos actuales
                         }
-                        else
+                        else //el Usuario actualmente no tiene permisos asignados. Entonces Insertar los nuevos perimisos
                         {
                             context.Permissions.AddRange(permissionList);
                             result = context.SaveChanges();
                         }
                     }
-                    else
+                    else //no hay ningunos permisos asignados en la tabla de la BD
                     {
                         context.Permissions.AddRange(permissionList);
                         result = context.SaveChanges();

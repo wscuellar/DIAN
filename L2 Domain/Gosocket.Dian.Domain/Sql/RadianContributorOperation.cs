@@ -24,5 +24,9 @@ namespace Gosocket.Dian.Domain
         public string SoftwareId { get; set; }
 
         public DateTime Timestamp { get; set; }
+
+        public string Pin { get; set; }
+        public string SoftwareName { get; set; }
+        public string Url { get; set; }
     }
 }

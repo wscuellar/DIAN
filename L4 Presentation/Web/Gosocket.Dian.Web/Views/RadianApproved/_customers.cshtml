@@ -14,23 +14,19 @@
     <table id="table-history" class="table table-striped" style="width:100%">
         <thead>
             <tr>
-                <th>Nombre</th>
-                <th>Fecha</th>
-                <th>Usuario</th>
+                <th>Nit</th>
+                <th>Razon Social</th>
                 <th>Estado</th>
-                <th>Detalle</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var d in Model.Files)
+            @*@foreach (var d in Model.Customers)
             {
                 <tr>
-                    <td>@d.FileName</td>
-                    <td>@d.Updated</td>
-                    <td>@d.CreatedBy</td>
-                    <td>@d.Status</td>
-                    <td>@d.Comments</td>
+                    <td>@d.Nit</td>
+                    <td>@d.BussinessName</td>
+                    <td>@d.RadianState</td>>
                 </tr>
-            }
+            }*@
         </tbody>
     </table>

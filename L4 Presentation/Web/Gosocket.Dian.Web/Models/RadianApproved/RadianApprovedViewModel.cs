@@ -49,7 +49,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         [Display(Name = "Estado de aprobación")]
         public string RadianState { get; set; }
 
-        public List<RadianContributorOperation> RadianContributorOperations { get; set; }
+        public RadianContributorOperationWithSoftware RadianContributorOperations { get; set; }
 
         public List<string> LegalRepresentativeIds { get; set; }
 
