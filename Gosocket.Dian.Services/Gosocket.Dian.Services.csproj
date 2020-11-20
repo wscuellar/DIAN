@@ -82,6 +82,7 @@
     <Compile Include="Utils\Common\ExceptionExtensions.cs" />
     <Compile Include="Utils\Common\Formatter.cs" />
     <Compile Include="Utils\Common\Schemas.cs" />
+    <Compile Include="Utils\Common\XmlParseNomina.cs" />
     <Compile Include="Utils\Common\XmlParser.cs" />
     <Compile Include="Utils\Common\XPathQuery.cs" />
     <Compile Include="Utils\Cryptography\KeyManager.cs" />
