@@ -96,7 +96,7 @@ namespace Gosocket.Dian.Web.Controllers
                 new ExternalUserViewModel
                 {
                     Id = u.Id,
-                    IdentificationTypeId =  u.IdentificationTypeId,
+                    IdentificationTypeId = u.IdentificationTypeId,
                     IdentificationId = u.IdentificationId,
                     Names = u.Name,
                     Email = u.Email,
@@ -146,9 +146,18 @@ namespace Gosocket.Dian.Web.Controllers
                 };
             }
 
+            if (model.Active == 1)
+                ViewBag.txtActive = "Desactivar";
+            else
+                ViewBag.txtActive = "Activar";
+
             return View(model);
         }
 
+        /// <summary>
+        /// Moock del menu de la aplicación
+        /// </summary>
+        /// <returns></returns>
         private List<MenuViewModel> MenuApp()
         {
             return new List<MenuViewModel>()
@@ -199,11 +208,13 @@ namespace Gosocket.Dian.Web.Controllers
             var user = new ApplicationUser
             {
                 Code = Guid.NewGuid().ToString().Substring(0, 6),
+                IdentificationTypeId = model.IdentificationTypeId,
+                IdentificationId = model.IdentificationId,
                 Name = model.Names,
                 Email = model.Email,
-                PasswordHash = model.Password,// UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0]),
                 UserName = model.Email,
-                CreatedBy = User.Identity.Name
+                CreatedBy = User.Identity.Name,
+                
             };
 
             var result = await UserManager.CreateAsync(user);
@@ -249,6 +260,34 @@ namespace Gosocket.Dian.Web.Controllers
                     item.Value.Errors.Clear();
 
             return View(model);
+        }
+
+        /// <summary>
+        /// Activar o Desactivar un Usuario Externo
+        /// </summary>
+        /// <param name="userId">Id del Usuario Externo</param>
+        /// <param name="active">Activar o Desactivar según sea el caso</param>
+        /// <returns><see cref="Gosocket.Dian.Web.Models.GeneralResponseModel"/></returns>
+        [HttpPost]
+        public JsonResult UpdateActive(string userId, string active, string activeDescription)
+        {
+            byte accion;
+
+            if (active.Equals("Desactivar"))
+                accion = 0;
+            else
+                accion = 1;
+
+            int result = userService.UpdateActive(userId, accion, User.Identity.Name, activeDescription);
+
+            GeneralResponseModel res = new GeneralResponseModel()
+            {
+                HttpStatusCode = result > 0 ? System.Net.HttpStatusCode.OK.GetHashCode() : System.Net.HttpStatusCode.BadRequest.GetHashCode(),
+                StatusCode = result > 0 ? System.Net.HttpStatusCode.OK.ToString() : System.Net.HttpStatusCode.BadRequest.ToString(),
+                Message = result > 0 ? "Estado actualizado exitosamente!" : "No se pudo actualizar el estado del Usuario"
+            };
+
+            return Json(res, JsonRequestBehavior.AllowGet);
         }
 
     }

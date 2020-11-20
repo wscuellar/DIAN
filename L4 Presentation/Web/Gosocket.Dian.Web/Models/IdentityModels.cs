@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Domain;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
@@ -39,6 +40,21 @@ namespace Gosocket.Dian.Web.Models
         /// Activar o descativar el Usuario. Por ahora solo aplica para Usuarios externos
         /// </summary>
         public byte Active { get; set; }
+
+        ///// <summary>
+        ///// Descripcion o razon por la cual se Ativo/Inactivo el Usuario externo
+        ///// </summary>
+        //public string ActiveDescription { get; set; }
+
+        ///// <summary>
+        ///// Quien actualizo el Usuario
+        ///// </summary>
+        //public string UpdatedBy { get; set; }
+
+        ///// <summary>
+        ///// Ultima actualización del Usuario
+        ///// </summary>
+        //public DateTime? LastUpdated { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -92,6 +108,5 @@ namespace Gosocket.Dian.Web.Models
         }
         public DbSet<Contributor> Contributor { set; get; }
         public DbSet<ContributorOperations> ContributorOperation { set; get; }
-        //public DbSet<AspNetUserRoles> UserRoles { set; get; }
     }
 }

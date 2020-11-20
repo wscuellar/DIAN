@@ -369,6 +369,7 @@
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\ContributorCategoryViewModel.cs" />
     <Compile Include="Models\ExternalUserViewModel.cs" />
+    <Compile Include="Models\GeneralResponseModel.cs" />
     <Compile Include="Models\QueryEventViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
     <Compile Include="Models\MenuViewModel.cs" />
