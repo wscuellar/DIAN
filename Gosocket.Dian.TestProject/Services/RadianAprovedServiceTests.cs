@@ -231,23 +231,23 @@ namespace Gosocket.Dian.Application.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        [TestMethod()]
-        public void RadianContributorIdTest()
-        {
-            // Arrange
-            int contributorId = 1;
+        //[TestMethod()]
+        //public void RadianContributorIdTest()
+        //{
+        //    // Arrange
+        //    int contributorId = 1;
 
-            _current.Setup(t => t.RadianContributorId(contributorId))
-                .Returns(It.IsAny<int>());
+        //    _current.Setup(t => t.RadianContributorId(contributorId))
+        //        .Returns(It.IsAny<int>());
 
-            int expected = 0;
+        //    int expected = 0;
 
-            //ACT
-            var actual = _current.Object.RadianContributorId(contributorId);
+        //    //ACT
+        //    var actual = _current.Object.RadianContributorId(contributorId);
 
-            // Assert
-            Assert.AreEqual(expected, actual);
-        }
+        //    // Assert
+        //    Assert.AreEqual(expected, actual);
+        //}
 
         [TestMethod()]
         public void AddRadianContributorOperationTest()
@@ -276,7 +276,7 @@ namespace Gosocket.Dian.Application.Tests
             _current.Setup(t => t.ListRadianContributorOperations(radianContributorId))
                 .Returns(It.IsAny<RadianContributorOperationWithSoftware>());
 
-            RadianContributorOperationWithSoftware expected = null;
+           RadianContributorOperationWithSoftware expected = null;
 
             //ACT
             var actual = _current.Object.ListRadianContributorOperations(radianContributorId);
