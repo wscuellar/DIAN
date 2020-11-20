@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Cache\InstanceCache.cs" />
     <Compile Include="Models\ValidateListResponse.cs" />
+    <Compile Include="Models\ValidatePayroll.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -81,6 +82,7 @@
     <Compile Include="Utils\Common\ExceptionExtensions.cs" />
     <Compile Include="Utils\Common\Formatter.cs" />
     <Compile Include="Utils\Common\Schemas.cs" />
+    <Compile Include="Utils\Common\XmlParseNomina.cs" />
     <Compile Include="Utils\Common\XmlParser.cs" />
     <Compile Include="Utils\Common\XPathQuery.cs" />
     <Compile Include="Utils\Cryptography\KeyManager.cs" />
