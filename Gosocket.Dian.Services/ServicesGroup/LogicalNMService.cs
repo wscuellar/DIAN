@@ -904,5 +904,22 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return dianResponse;
         }
 
+        private ValidatePayroll CalculatePayrollvalues(ValidatePayroll payroll)
+        {
+            if (payroll.AccruedTotal != decimal.Zero && payroll.DeductionsTotal != decimal.Zero)
+            {
+                payroll.VoucherTotal = payroll.AccruedTotal - payroll.DeductionsTotal;
+
+
+            }
+            if (payroll.Salary != decimal.Zero && payroll.PercentageWorked != decimal.Zero && payroll.AmountAdditionalHours != decimal.Zero)
+            {
+                payroll.OvertimeSurcharges =
+                    (payroll.Salary / 240) * payroll.PercentageWorked * payroll.AmountAdditionalHours;
+            }
+
+            return payroll;
+        }
+
     }
 }

@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Cache\InstanceCache.cs" />
     <Compile Include="Models\ValidateListResponse.cs" />
+    <Compile Include="Models\ValidatePayroll.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
