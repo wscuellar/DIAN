@@ -23,6 +23,11 @@ namespace Gosocket.Dian.Web.Models
 
         public string CreatedBy;
 
+        /// <summary>
+        /// Fecha de creación del Usuario
+        /// </summary>
+        public DateTime? CreationDate { get; set; }
+
         public int? CurrentContributorId { get; set; }
 
         public string IdentificationId { get; set; }
@@ -41,20 +46,20 @@ namespace Gosocket.Dian.Web.Models
         /// </summary>
         public byte Active { get; set; }
 
-        ///// <summary>
-        ///// Descripcion o razon por la cual se Ativo/Inactivo el Usuario externo
-        ///// </summary>
-        //public string ActiveDescription { get; set; }
+        /// <summary>
+        /// Descripcion o razon por la cual se Ativo/Inactivo el Usuario externo
+        /// </summary>
+        public string ActiveDescription { get; set; }
 
-        ///// <summary>
-        ///// Quien actualizo el Usuario
-        ///// </summary>
-        //public string UpdatedBy { get; set; }
+        /// <summary>
+        /// Quien actualizo el Usuario
+        /// </summary>
+        public string UpdatedBy { get; set; }
 
-        ///// <summary>
-        ///// Ultima actualización del Usuario
-        ///// </summary>
-        //public DateTime? LastUpdated { get; set; }
+        /// <summary>
+        /// Ultima actualización del Usuario
+        /// </summary>
+        public DateTime? LastUpdated { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
