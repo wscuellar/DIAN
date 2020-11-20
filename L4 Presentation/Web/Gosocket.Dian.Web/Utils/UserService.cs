@@ -107,9 +107,9 @@ namespace Gosocket.Dian.Web.Utils
                     if (user != null)
                     {
                         user.Active = active;
-                        //user.LastUpdated = DateTime.Now;
-                        //user.UpdatedBy = updatedBy;
-                        //user.ActiveDescription = activeDescription;
+                        user.LastUpdated = DateTime.Now;
+                        user.UpdatedBy = updatedBy;
+                        user.ActiveDescription = activeDescription;
                         result = db.SaveChanges();
                     }
                 }
