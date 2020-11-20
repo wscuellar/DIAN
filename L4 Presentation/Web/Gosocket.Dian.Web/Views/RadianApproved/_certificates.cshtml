@@ -21,28 +21,28 @@
     @Html.Partial("_documentStates")
     <div class="row">
         @{ int i = 0;}
-        <div class="col-sm-4 padding-xs-0">
+        <div class="col-sm-8 padding-xs-0">
             @if (Model.Step == 1)
             {
                 foreach (var n in Model.FilesRequires)
                 {
-                <div class="inputs-dinamics">
-                    <div class="form-group file-input-enabled">
-                        <p class="radian-file-top-label">@n.Name</p>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" />
-                            <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
+                    <div class="inputs-dinamics">
+                        <div class="form-group file-input-enabled">
+                            <p class="radian-file-top-label">@n.Name</p>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" />
+                                <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-group file-input-disabled init-hide">
-                        @Html.TextBox("file-" + i, @n.Name, new { @class = "form-control input-general", @readonly = true })
-                        <div id="progress-wrp">
-                            <div class="progress-bar"></div>
+                        <div class="form-group file-input-disabled init-hide">
+                            @Html.TextBox("file-" + i, @n.Name, new { @class = "form-control input-general", @readonly = true })
+                            <div id="progress-wrp">
+                                <div class="progress-bar"></div>
+                            </div>
+                            <span class="close">x</span>
                         </div>
-                        <span class="close">x</span>
                     </div>
-                </div>
                     i++;
                 }
             }
@@ -50,10 +50,24 @@
             {
                 foreach (var n in Model.Files)
                 {
-                    <div class="form-group file-input-disabled">
-                        @Html.TextBox("file-" + i, n.FileName, new { @class = "form-control input-general", @readonly = true })
-                        <span class="state-file status-@n.Status"></span>
-                    </div>
+                    if (n.Status == 3)
+                    {
+                        <div class="form-group file-input-enabled">
+                            <p class="radian-file-top-label">@n.FileName 
+                            <span class="reject-observation font-weight-bold">Se ha rechazado el documento, debe adjuntar el archivo nuevamente, <u class="underline-reject-text">consulte el comentario de la DIAN</u></span><i class="far fa-comment-dots"></i></p>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" />
+                                <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group file-input-disabled">
+                            @Html.TextBox("file-" + i, n.FileName, new { @class = "form-control input-general", @readonly = true })
+                            <span class="state-file status-@n.Status"></span>
+                        </div>
+                    }
                     i++;
                 }
             }

@@ -49,6 +49,7 @@ namespace Gosocket.Dian.Web.Controllers
                 FilesRequires = listFileType,
                 Step = radianAdmin.Contributor.Step,
                 RadianState = radianAdmin.Contributor.RadianState,
+                RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId,
                 LegalRepresentativeList = userService.GetUsers(radianAdmin.LegalRepresentativeIds).Select(u => new UserViewModel
                 {
                     Id = u.Id,
@@ -106,11 +107,22 @@ namespace Gosocket.Dian.Web.Controllers
             string nit = Request.Form.Get("nit");
             string email = Request.Form.Get("email");
             string ContributorId = Request.Form.Get("contributorId");
+            string RadianContributorType = Request.Form.Get("radianContributorType");
+            string RadianOperationMode = Request.Form.Get("radianOperationMode");
             string filesNumber = Request.Form.Get("filesNumber");
             string step = Request.Form.Get("step");
+            string radianState = Request.Form.Get("radianState");
+            string radianContributorTypeiD = Request.Form.Get("radianContributorTypeiD");
+            
 
-            int idRadianContributor = _radianAprovedService.RadianContributorId(Convert.ToInt32(ContributorId));
-
+            ParametersDataViewModel data = new ParametersDataViewModel()
+            {
+                ContributorId = ContributorId,
+                RadianContributorType = RadianContributorType,
+                RadianOperationMode = RadianOperationMode
+            };
+           
+            int idRadianContributor = _radianAprovedService.RadianContributorId(Convert.ToInt32(ContributorId), Convert.ToInt32(radianContributorTypeiD), radianState);
             for (int i = 0; i < Request.Files.Count; i++)
             {
                 RadianContributorFile radianContributorFile = new RadianContributorFile();
@@ -144,14 +156,16 @@ namespace Gosocket.Dian.Web.Controllers
             if (Convert.ToInt32(filesNumber) == Request.Files.Count)
             {
                 int newStep = Convert.ToInt32(step) + 1;
-                int contributorId = Convert.ToInt32(ContributorId);
+                int contributorId = idRadianContributor;
                 ResponseMessage responseUpdateStep = _radianAprovedService.UpdateRadianContributorStep(contributorId, newStep);
             }
+
             return Json(new
             {
                 message = "Datos actualizados correctamente.",
                 success = true,
-            }, JsonRequestBehavior.AllowGet);
+                data
+        }, JsonRequestBehavior.AllowGet);
         }
 
 
@@ -169,7 +183,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.OperationModeList = _radianTestSetService.OperationModeList();
             radianApprovedViewModel.Software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
             radianApprovedViewModel.RadianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel();
-            //radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
+            radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
 
             return View(radianApprovedViewModel);
         }
