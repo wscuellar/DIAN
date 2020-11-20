@@ -2,8 +2,6 @@
 
 @{ ViewBag.title = "Configurar modo de operación-Factor"; }
 
-@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" } };}
-
 <div class="page-content radian-view margin-15">
     <div class="row title-container">
         <p class="title-view">
@@ -16,7 +14,7 @@
             <div class="panel-body padding-top-20">
                 <div class="pad-btm padding-bottom-0">
                     <div class="row margin-horizontal-0">
-                        @using (Html.BeginForm("UploadFactorOperationMode", "RadianApprovedController", FormMethod.Post, new { id = "radian-contributors-form" }))
+                        @using (Html.BeginForm("UploadFactorOperationMode", "RadianApproved", FormMethod.Post, new { id = "radian-contributors-form" }))
                         {
                             <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                 <div class="col-md-12 padding-horizontal-0">
@@ -27,7 +25,7 @@
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new { @class = "control-label" })
-                                                        @*@Html.DropDownListFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new SelectList(Model.OperationModeList, "Id", "Name", Model.RadianApprovedOperationModeViewModel.OperationModeSelected), new { @class = "form-control selectpicker" })*@
+                                                        @Html.DropDownListFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new SelectList(Model.OperationModeList, "Id", "Name", Model.RadianApprovedOperationModeViewModel.OperationModeSelected), new { @class = "form-control selectpicker", disabled = "disabled" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-5 padding-xs-0">
@@ -51,13 +49,13 @@
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.SoftwareName, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.RadianApprovedOperationModeViewModel.SoftwareName, defaultHtmlAttr)
+                                                        @Html.TextBox("SoftwareName", null, new { @class = "form-control input-general", @style = "background: #ffffff;" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.SoftwarePin, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.RadianApprovedOperationModeViewModel.SoftwarePin, defaultHtmlAttr)
+                                                        @Html.TextBox("SoftwarePin", null, new { @class = "form-control input-general", @style = "background: #ffffff;" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">

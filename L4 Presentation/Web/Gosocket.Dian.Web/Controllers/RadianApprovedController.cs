@@ -53,8 +53,6 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        // GET: RadianFactor
-
         [HttpPost]
         public void Add(RegistrationDataViewModel registrationData)
         {
@@ -150,7 +148,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult UploadFactorOperationMode(dynamic tempObjectRequest)
+        public JsonResult UploadFactorOperationMode(RadianApprovedOperationModeViewModel approvedOperModeViewModel)
         {
 
 
