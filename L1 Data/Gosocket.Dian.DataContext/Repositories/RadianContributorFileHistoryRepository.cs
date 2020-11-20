@@ -17,7 +17,6 @@ namespace Gosocket.Dian.DataContext.Repositories
         public Guid AddRegisterHistory(RadianContributorFileHistory radianContributorFileHistory)
         {            
             _sqlDBContext.Entry(radianContributorFileHistory).State = System.Data.Entity.EntityState.Added;
-
             _sqlDBContext.SaveChanges();
             return radianContributorFileHistory.Id;
         }

@@ -106,9 +106,17 @@ namespace Gosocket.Dian.Web.Controllers
             string nit = Request.Form.Get("nit");
             string email = Request.Form.Get("email");
             string ContributorId = Request.Form.Get("contributorId");
+            string RadianContributorType = Request.Form.Get("radianContributorType");
+            string RadianOperationMode = Request.Form.Get("radianOperationMode");
             string filesNumber = Request.Form.Get("filesNumber");
             string step = Request.Form.Get("step");
 
+            ParametersDataViewModel data = new ParametersDataViewModel()
+            {
+                ContributorId = ContributorId,
+                RadianContributorType = RadianContributorType,
+                RadianOperationMode = RadianOperationMode
+            };
             int idRadianContributor = _radianAprovedService.RadianContributorId(Convert.ToInt32(ContributorId));
 
             for (int i = 0; i < Request.Files.Count; i++)
@@ -147,11 +155,13 @@ namespace Gosocket.Dian.Web.Controllers
                 int contributorId = Convert.ToInt32(ContributorId);
                 ResponseMessage responseUpdateStep = _radianAprovedService.UpdateRadianContributorStep(contributorId, newStep);
             }
+
             return Json(new
             {
                 message = "Datos actualizados correctamente.",
                 success = true,
-            }, JsonRequestBehavior.AllowGet);
+                data
+        }, JsonRequestBehavior.AllowGet);
         }
 
 

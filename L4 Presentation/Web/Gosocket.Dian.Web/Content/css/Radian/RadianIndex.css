@@ -672,7 +672,7 @@ h4.text-thin {
     box-sizing: border-box;
     border-radius: 4px;
     height: 33px;
-    line-height: 1.9;
+    line-height: 1.9 !important;
 }
 
 .custom-file-label::after {
@@ -680,7 +680,7 @@ h4.text-thin {
     color: white;
     background: #348441;
     height: 31px;
-    line-height: 1.9;
+    line-height: 1.9 !important;
 }
 
 #steps-approved .steps {
@@ -809,8 +809,9 @@ span.state-file.status-3 {
 span.state-file.status-4 {
     background-image: url(../../images/observations.png);
 }
-.file-input-disabled{
+.file-input-disabled {
     position: relative;
+    width: 50%;
 }
 
 .highcharts-figure, .highcharts-data-table table {

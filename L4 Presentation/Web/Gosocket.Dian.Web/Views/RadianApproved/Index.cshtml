@@ -69,14 +69,14 @@
 
 @section scripts{
     <script>
-            $(document).ready(function () {debugger
+            $(document).ready(function () {
                 var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
                 $("#steps-approved").steps({
                     headerTag: "h3",
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
                     autoFocus: true,
-                    startIndex: 2,
+                    startIndex: index,
                     enablePagination: false,
                     enableKeyNavigation: false
                 });
@@ -118,6 +118,8 @@
                     formdata.append("nit", "@Model.Nit");
                     formdata.append("email", "@Model.Email");
                     formdata.append("contributorId", "@Model.ContributorId");
+                    formdata.append("radianContributorType", '@Request.Params.Get("RadianContributorType")');
+                    formdata.append("radianOperationMode", '@Request.Params.Get("RadianOperationMode")');
                     formdata.append("filesNumber", files.length - 2);
                     formdata.append("step", @Model.Step);
                     $(".file-input-enabled").toggle();
@@ -136,7 +138,6 @@
                             var xhr = $.ajaxSettings.xhr();
                             if (xhr.upload) {
                                 xhr.upload.addEventListener('progress', function (event) {
-                                    debugger
                                     var percent = 0;
                                     var position = event.loaded || event.position;
                                     var total = event.total;
@@ -162,7 +163,7 @@
                                 },
                                 callback: function () {
                                     showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
-                                    window.location.href = '@Url.Action("Index", "RadianApproved", new { id = Model.ContributorId })';
+                                    window.location.href = '@Url.Action("Index", "RadianApproved")' + "?ContributorId=" + data.ContributorId + "&RadianContributorType=" + data.RadianContributorType + "&RadianOperationMode=" + data.RadianOperationMode;
                                 }
                             });
                         },
