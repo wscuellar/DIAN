@@ -361,10 +361,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.cs" />
-    <Compile Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.Designer.cs">
-      <DependentUpon>202011171731077_NewTables-Menu-SubMenu-Permission.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountTwoFactorViewModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -373,10 +369,10 @@
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\ContributorCategoryViewModel.cs" />
     <Compile Include="Models\ExternalUserViewModel.cs" />
+    <Compile Include="Models\GeneralResponseModel.cs" />
     <Compile Include="Models\QueryEventViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedOperationModeViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
-    <Compile Include="Models\ExternalUserViewModel.cs" />
     <Compile Include="Models\MenuViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedViewModel.cs" />
     <Compile Include="Models\RadianContributorFileTypeViewModel.cs" />
@@ -2835,6 +2831,9 @@
     <Content Include="Views\RadianApproved\_customers.cshtml" />
     <Content Include="Views\RadianApproved\_finalStep.cshtml" />
     <Content Include="Views\RadianApproved\GetFactorOperationMode.cshtml" />
+    <Content Include="Views\RadianApproved\_setTestDetails.cshtml" />
+    <Content Include="Views\RadianApproved\SetTestDetails.cshtml" />
+    <Content Include="Views\RadianApproved\_users.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2899,11 +2898,6 @@
       <Project>{319e3a78-ed5c-463a-a323-fe1037f38aea}</Project>
       <Name>Gosocket.Dian.Application</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202011171731077_NewTables-Menu-SubMenu-Permission.resx">
-      <DependentUpon>202011171731077_NewTables-Menu-SubMenu-Permission.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

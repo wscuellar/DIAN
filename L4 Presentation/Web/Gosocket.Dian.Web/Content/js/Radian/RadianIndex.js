@@ -40,7 +40,6 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage) {
                     showConfirmation(data.Message, ConfirmExec(method, jsonvalue));
                 }
                 if (data.MessageType === "redirect") {
-                    alert(data.RedirectTo);
                     operationClick = false;
                     window.location.href = data.RedirectTo;
                 }

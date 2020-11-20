@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public int CurrentlyStep { get; set; }
 
+        [Display(Name = "Tipo de participante")]
         public int RadianContributorTypeId { get; set; }
 
         public List<RadianContributorFileType> FilesRequires { get; set; }
@@ -45,7 +46,14 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public RadianApprovedOperationModeViewModel RadianApprovedOperationModeViewModel { get; set; }
 
+        [Display(Name = "Estado de aprobación")]
         public string RadianState { get; set; }
+
+        public List<RadianContributorOperation> RadianContributorOperations { get; set; }
+
+        public List<string> LegalRepresentativeIds { get; set; }
+
+        public List<UserViewModel> LegalRepresentativeList { get; set; }
         public RadianApprovedViewModel()
         {
             RadianFileList = new List<RadianContributorFileTypeTableViewModel>();

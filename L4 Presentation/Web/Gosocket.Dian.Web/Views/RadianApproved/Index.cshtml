@@ -1,7 +1,23 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
 @using Newtonsoft.Json
 @{
-    ViewBag.title = "Titulo";
+    ViewBag.title = "";
+
+    switch (Request.Params["RadianContributorType"])
+    {
+        case "1":
+            ViewBag.Title = "Facturador Electrónico";
+            break;
+        case "2":
+            ViewBag.Title = "Proveedor Tecnológico";
+            break;
+        case "3":
+            ViewBag.Title = "Sistema de negociación";
+            break;
+        case "Factor":
+            ViewBag.Title = "Factor";
+            break;
+    }
 }
 <div class="page-content radian-view margin-15">
     <div class="row title-container">
@@ -11,7 +27,7 @@
         <div class="underline-title"></div>
     </div>
     <div class="row margin-horizontal-0">
-        <div class="panel" data-target="#panel-form" data-toggle="panel-overlay" >
+        <div class="panel" data-target="#panel-form" data-toggle="panel-overlay">
             <div class="panel-body padding-top-20">
                 <div id="steps-approved">
                     <div class="radian-personal-info">
@@ -37,6 +53,15 @@
                         @Html.Partial("_finalStep")
                     </section>
                 </div>
+
+                @if (Model.Step == 4)
+                {
+                    <div class="footer-table">
+                        <div class="row margin-horizontal-0">
+                            @Html.Partial("_users")
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -82,7 +107,8 @@
                     var files = $("#uploadForm")[0];
                     var formdata = new FormData();
                     var numberFiles = 0;
-                    for (var i = 0 ; i < files.length - 2 ; i++) {
+                    var limit = (files.length - 2) / 2
+                    for (var i = 0; i <= limit ; i=i+2) {
                         if (files[i].files.length > 0) {
                             formdata.append(files[i].files[0].name, files[i].files[i]);
                             formdata.append("TypeId_" + numberFiles, files[i].dataset.typeid);
@@ -94,7 +120,8 @@
                     formdata.append("contributorId", "@Model.ContributorId");
                     formdata.append("filesNumber", files.length - 2);
                     formdata.append("step", @Model.Step);
-
+                    $(".file-input-enabled").toggle();
+                    $(".file-input-disabled").toggle();
 
                     $.ajax({
                         url: "@Url.Action("UploadFiles", "RadianApproved")",
@@ -109,6 +136,7 @@
                             var xhr = $.ajaxSettings.xhr();
                             if (xhr.upload) {
                                 xhr.upload.addEventListener('progress', function (event) {
+                                    debugger
                                     var percent = 0;
                                     var position = event.loaded || event.position;
                                     var total = event.total;
@@ -140,6 +168,11 @@
                         },
                     });
                 });
+
+                $(".close").click(function () {debugger
+                    $(this).parent().toggle();
+                    $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
+                })
 
                 $("#view-costumers").click(function () {
                     var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));

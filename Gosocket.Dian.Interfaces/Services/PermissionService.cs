@@ -27,5 +27,10 @@ namespace Gosocket.Dian.Interfaces.Services
             return _permissionRepository.GetPermissionsByUser(userId);
         }
 
+        public List<SubMenu> GetSubMenusByMenuId(int menuId)
+        {
+            return _permissionRepository.GetSubMenusByMenuId(menuId);
+        }
+
     }
 }

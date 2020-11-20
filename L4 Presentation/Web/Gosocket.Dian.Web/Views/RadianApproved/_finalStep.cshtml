@@ -3,7 +3,6 @@
     ViewBag.Title = "Requisitos";
 }
 
-@* Todo: validar nombre y método del controlador *@
 @using (Html.BeginForm("GetFactorOperationMode", "RadianApproved", FormMethod.Post))
 {
     @Html.HiddenFor(m => m.Nit);
@@ -15,6 +14,7 @@
     @Html.HiddenFor(m => m.FilesRequires);
     @Html.HiddenFor(m => m.Customers);
     @Html.HiddenFor(m => m.RadianContributorTypeId);
+    @Html.HiddenFor(m => m.ContributorId);
 
     <div class="panel-body padding-20 padding-bottom-10">
         <div class="row radian-subtitle-container radian-certificates">
@@ -31,16 +31,11 @@
         @Html.Partial("_documentStates")
         <div class="row">
             @{ int i = 0;}
-            @foreach (var n in Model.FilesRequires)
+            @foreach (var n in Model.Files)
             {
-                <div class="col-sm-4 padding-xs-0">
-                    <div class="form-group">
-                        <p class="radian-file-top-label">@n.Name</p>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" />
-                            <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
-                        </div>
-                    </div>
+                <div class="form-group file-input-disabled">
+                    @Html.TextBox("file-" + i, n.FileName, new { @class = "form-control input-general", @readonly = true })
+                    <span class="state-file status-@n.Status"></span>
                 </div>
                 i++;
             }
@@ -56,6 +51,4 @@
             <button name="Submit" class="btn btn-radian-success" id="view-operation-mode">Configurar modos de operación</button>
         </div>
     </div>
-
 }
-

@@ -45,6 +45,12 @@ namespace Gosocket.Dian.Application
         {
             NameValueCollection collection = new NameValueCollection();
             Domain.Contributor contributor = _contributorService.GetByCode(userCode);
+            var radianContributor =  _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice && t.RadianState != "Cancelado");
+            if(radianContributor != null)
+            {
+                collection.Add("RadianContributorTypeId", radianContributor.RadianContributorTypeId.ToString());
+                collection.Add("RadianOperationModeId", radianContributor.RadianOperationModeId.ToString());
+            }
             if (contributor == null) return collection;
             collection.Add("ContributorId", contributor.Id.ToString());
             collection.Add("ContributorTypeId", contributor.ContributorTypeId.ToString());
@@ -69,7 +75,7 @@ namespace Gosocket.Dian.Application
 
             string cancelEvent = RadianState.Cancelado.GetDescription();
             List<RadianContributor> radianContributor = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType && t.RadianState !=  cancelEvent);
-            if (radianContributor.Any())
+            if (radianContributor.Any(t=> t.RadianState != cancelEvent))
                 return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.redirectType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.TechnologyProvider && (contributor.ContributorTypeId != (int)Domain.Common.ContributorType.Provider || !contributor.Status))

@@ -16,48 +16,50 @@
                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
                         @using (Html.BeginForm("AddUser", "ExternalUsers", FormMethod.Post, new { id = "add-user-form" }))
                         {
+                            @Html.HiddenFor(m => m.Id)
                             <input type="hidden" id="listMenu" value="@Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Menu)" />
                             <input type="hidden" id="hddPermissions" name="hddPermissions" />
                             @Html.Partial("_userForm")
-                            <br />
                             @Html.ValidationSummary("", new { @class = "text-center text-danger" })
                             @Html.ValidationMessage("no_permissions", new { @class = "text-center text-danger" })
-                            <br />
-                            foreach (Gosocket.Dian.Web.Models.MenuViewModel menu in ((List<Gosocket.Dian.Web.Models.MenuViewModel>)ViewBag.Menu))
-                            {
-                                <div class="btn-group" id="controlMenu">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        @menu.Name &nbsp;<span class="badge badge-light" style="color: #074fbb;">@(menu.Options != null ? (((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options).Count() : 0)</span>
-                                        &nbsp;<span class="caret"></span>
-                                    </button>
-                                    <div class="dropdown-menu" style="padding-left: 8px; padding-right: 8px; }">
-                                        <div class="custom-control custom-checkbox dropdown-item">
-                                            <input type="checkbox" class="custom-control-input" id="@("menu" + menu.Id)" onchange="changeAllMenu(@menu.Id)">
-                                            <label class="custom-control-label" for="@("menu" + menu.Id)">Todos...</label>
-                                        </div>
-                                        @if (menu.Options != null)
-                                        {
-                                            foreach (Gosocket.Dian.Web.Models.SubMenuViewModel subMenu in ((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options)
+                            <div class="padding-20">
+                                @foreach (Gosocket.Dian.Web.Models.MenuViewModel menu in ((List<Gosocket.Dian.Web.Models.MenuViewModel>)ViewBag.Menu))
+                                {
+                                    <div class="btn-group" id="controlMenu">
+                                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @menu.Name &nbsp;<span class="badge badge-light" style="color: #074fbb;">@(menu.Options != null ? (((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options).Count() : 0)</span>
+                                            &nbsp;<span class="caret"></span>
+                                        </button>
+                                        <div class="dropdown-menu" style="padding-left: 8px; padding-right: 8px;">
+                                            <div class="custom-control custom-checkbox dropdown-item">
+                                                <input type="checkbox" class="custom-control-input" id="@("menu" + menu.Id)" onchange="changeAllMenu(@menu.Id)">
+                                                <label class="custom-control-label" for="@("menu" + menu.Id)">Todos...</label>
+                                            </div>
+                                            @if (menu.Options != null)
                                             {
-                                                <div class="custom-control custom-checkbox dropdown-item">
-                                                    <input type="checkbox" class="custom-control-input" id="@("submenu" + menu.Id + "_" + subMenu.Id)">
-                                                    <label class="custom-control-label" for="@("submenu" + menu.Id + "_" + subMenu.Id)">@subMenu.Name</label>
-                                                </div>
+                                                foreach (Gosocket.Dian.Web.Models.SubMenuViewModel subMenu in ((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options)
+                                                {
+                                                    <div class="custom-control custom-checkbox dropdown-item">
+                                                        <input type="checkbox" class="custom-control-input" id="@("submenu" + menu.Id + "_" + subMenu.Id)">
+                                                        <label class="custom-control-label" for="@("submenu" + menu.Id + "_" + subMenu.Id)">@subMenu.Name</label>
+                                                    </div>
+                                                }
                                             }
-                                        }
+                                        </div>
                                     </div>
-                                </div>
-                            }
+                                }
+                            </div>
                             <br />
                             <br />
                             <table class="table table-sm table-bordered table-hover">
                                 <thead>
                                     <tr>
+                                        <th>Tipo de documento</th>
                                         <th>Documento</th>
                                         <th>Nombres</th>
                                         <th>Email</th>
-                                        <th>Active</th>
-                                        <th>Editar</th>
+                                        <th class="text-center">Active</th>
+                                        <th class="text-center">Editar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -66,12 +68,13 @@
                                         foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
                                         {
                                             <tr>
-                                                <td>@item.Identification</td>
+                                                <td>@(Model.IdentificationTypes.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description)</td>
+                                                <td>@item.IdentificationId</td>
                                                 <td>@item.Names</td>
                                                 <td>@item.Email</td>
-                                                <td>@item.Active</td>
-                                                <td>
-                                                    @Html.ActionLink("Editar", "AddUser", new { id= item.Id}, new { @class="btn btn-primary"})
+                                                <td class="text-center">@(item.Active == 1 ? "Sí" : "No")</td>
+                                                <td class="text-center">
+                                                    @Html.ActionLink("Editar", "AddUser", new { id = item.Id }, new { @class = "btn btn-primary" })
                                                 </td>
                                             </tr>
                                         }
@@ -80,8 +83,8 @@
                             </table>
                             <br />
                             <div class="panel-footer text-right">
-                                @*<a href="@Url.Action("Index", "ExternalUsers")" class="btn btn-default">Volver</a>*@
-                                <button type="submit" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
+                                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">Guardar</button>
                             </div>
                         }
                     </div>
@@ -93,13 +96,47 @@
     </div>
 </div>
 
+<div class="modal fade" id="dialogConfirmActive" tabindex='-1' data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Confirmar Acción</h4>
+            </div>
+            <div class="modal-body">
+
+                <h3>Esta seguro de <span style="font-weight:bold">@ViewBag.txtActive</span> el Usuario?</h3>
+                <br />
+                <div class="form-group">
+                    <label for="txtActiveDescription" class="control-label">Escriba la razon por la cual realiza esta acción:</label>
+                    <textarea type="text" id="txtActiveDescription" cols="3" rows="3" maxlength="150" class="form-control"></textarea>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button id="btnOkActive" type="button" data-dismiss="modal" class="btn btn-success">Aceptar</button>
+                <button id="btnCancelActive" type="button" data-dismiss="modal" class="btn btn-danger">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
 
-    <script>
+<script>
         var listMenu;
+        var userId = "";
+        var reloadView = false;
         $(document).ready(function ($) {
+
+            userId = $("#Id").val();
+            reloadView = false;
+
+            if(userId.length > 0)
+                $(".btn-active").show();
+            else
+                $(".btn-active").hide();
 
             listMenu = JSON.parse($("#listMenu").val());
 
@@ -115,6 +152,72 @@
                     //form.submit();
                 }
             });
+
+            $('#dialogConfirmActive').on('hidden.bs.modal', function () {
+                if (reloadView)
+                    reloadPage();
+
+            });
+
+            function confirmActive() {
+                $("#dialogConfirmActive").alert('show');
+            }
+
+            $("#btnOkActive").click(function () {
+                debugger;
+                $.ajax({
+                    url: "@Url.Action("UpdateActive","ExternalUsers")",
+                    type: "POST",
+                    data: {
+                        userId: $("#Id").val(), active: $(".btn-active").text(), activeDescription: $("#txtActiveDescription").val() },
+                    datatype: "json",
+                    success: function (res) {
+
+                        if (res.StatusCode == 'OK') {
+                            reloadView = true;
+
+                            if ($(".btn-active").text() == 'Activar')
+                                $(".btn-active").text('Desactivar');
+                            else
+                                $(".btn-active").text('Activar');
+
+                            $.niftyNoty({
+                                type: res.StatusCode == 'OK' ? "success" : "danger",
+                                container: "floating",
+                                title: "Mensaje...",
+                                message: res.Message,
+                                closeBtn: false,
+                                timer: 5000
+                            });
+
+                            reloadPage();
+                        }
+                        else
+                            reload = false;
+
+                    },
+                    complete: function () {
+                        
+                    },
+                    error: function (result) {
+
+                        $.niftyNoty({
+                            type: "danger",
+                            container: "floating",
+                            title: "Mensaje",
+                            message: "Error desconocido al actulizar el estado del Usuario",
+                            closeBtn: false,
+                            timer: 5000
+                        });
+                    }
+                });  //ajax
+
+            });
+
+            $("#btnCancelActive").click(function () {
+                $('#dialogConfirmActive').alert('close');
+            });
+
         });
 
         function changeAllMenu(menuId) {
@@ -170,5 +273,9 @@
             return JSON.stringify(arrPermissions);
         }
 
-    </script>
+        function reloadPage() {
+            location.href = "@Url.Action("AddUser","ExternalUsers")";
+        }
+
+</script>
 }

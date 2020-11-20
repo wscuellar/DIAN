@@ -212,5 +212,41 @@ namespace Gosocket.Dian.Application.Tests
             // Assert
             Assert.AreEqual(expected, actual);
         }
+
+        [TestMethod()]
+        public void UpdateRadianContributorStepTest()
+        {
+            // Arrange
+            int radianContributorId = 0, radianContributorStep = 0;
+
+            _current.Setup(t => t.UpdateRadianContributorStep(radianContributorId, radianContributorStep))
+                .Returns(It.IsAny<ResponseMessage>());
+
+            ResponseMessage expected = null;
+
+            //ACT
+            var actual = _current.Object.UpdateRadianContributorStep(radianContributorId, radianContributorStep);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void RadianContributorIdTest()
+        {
+            // Arrange
+            int contributorId = 0;
+
+            _current.Setup(t => t.RadianContributorId(contributorId))
+                .Returns(It.IsAny<int>());
+
+            ResponseMessage expected = null;
+
+            //ACT
+            var actual = _current.Object.RadianContributorId(contributorId);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
     }
 }

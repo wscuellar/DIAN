@@ -1,8 +1,6 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
 
-@{ ViewBag.title = "Listado de Participantes RADIAN"; }
-
-@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" } };}
+@{ ViewBag.title = "Configurar modo de operación-Factor"; }
 
 <div class="page-content radian-view margin-15">
     <div class="row title-container">
@@ -16,7 +14,7 @@
             <div class="panel-body padding-top-20">
                 <div class="pad-btm padding-bottom-0">
                     <div class="row margin-horizontal-0">
-                        @using (Html.BeginForm("UploadFactorOperationMode", "RadianApprovedController", FormMethod.Post, new { id = "radian-contributors-form" }))
+                        @using (Html.BeginForm("UploadFactorOperationMode", "RadianApproved", FormMethod.Post, new { id = "radian-contributors-form" }))
                         {
                             <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                 <div class="col-md-12 padding-horizontal-0">
@@ -27,13 +25,13 @@
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new { @class = "control-label" })
-                                                        @Html.DropDownListFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new SelectList(Model.OperationModeList, "Id", "Name", Model.RadianApprovedOperationModeViewModel.OperationModeSelected), new { @class = "form-control selectpicker" })
+                                                        @Html.DropDownListFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new SelectList(Model.OperationModeList, "Id", "Name", Model.RadianApprovedOperationModeViewModel.OperationModeSelected), new { @class = "form-control selectpicker", disabled = "disabled" })
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-9 padding-xs-0">
+                                                <div class="col-sm-5 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.Label("Url de recepción de eventos", new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.Software.Url, defaultHtmlAttr)
+                                                        @Html.TextBoxFor(m => m.Software.Url, new { @class = "form-control input-general", disabled = "disabled" })
                                                     </div>
                                                 </div>
                                             </div>
@@ -45,32 +43,32 @@
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.Software.CreatedBy, defaultHtmlAttr)
+                                                        @Html.TextBoxFor(m => m.Software.CreatedBy, new { @class = "form-control input-general", disabled = "disabled" })
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-9 padding-xs-0">
+                                                <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.SoftwareName, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.RadianApprovedOperationModeViewModel.SoftwareName, defaultHtmlAttr)
+                                                        @Html.TextBox("SoftwareName", null, new { @class = "form-control input-general", @style = "background: #ffffff;" })
                                                     </div>
                                                 </div>
-                                                <div class="col-sm-9 padding-xs-0">
+                                                <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.SoftwarePin, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.RadianApprovedOperationModeViewModel.SoftwarePin, defaultHtmlAttr)
+                                                        @Html.TextBox("SoftwarePin", null, new { @class = "form-control input-general", @style = "background: #ffffff;" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.Label("ID del Software", new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.Software.Id, defaultHtmlAttr)
+                                                        @Html.TextBoxFor(m => m.Software.Id, new { @class = "form-control input-general", disabled = "disabled" })
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="panel-footer-grey text-right">
-                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Adicionar</button>
+                                            <button name="Submit" class="btn btn-radian-success" id="view-operation-mode">Adicionar</button>
                                         </div>
 
                                     </div>
@@ -80,7 +78,8 @@
 
                         <div class="panel">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Listado de modos de operación asociados</h3>
+                                <h4 class="panel-title-radian padding-0"><strong>Listado de modos de operación asociados</strong></h4>
+                                <hr class="margin-5" />
                             </div>
                             <div class="panel-body">
                                 <div class="table-responsive">
@@ -98,20 +97,23 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @*@foreach (var RadianContributor in Model.)
-                                                {
-                                                    //var textClass = DataUtils.GetProviderStatusStyle(RadianContributor.AcceptanceStatusId);
-                                                    //var isClickableRow = User.IsInAnyRole("Administrador", "Super") ? "clickable-row" : "";
-                                                    //var urlView = User.IsInAnyRole("Administrador", "Super") ? Url.Action("ViewDetails", "Radian", new { id = RadianContributor.Id }) : "";
-                                                    <tr class='@isClickableRow' data-href="@urlView">
-                                                        <td class="smallText iffyTip"><a>@RadianContributor.Code</a></td>
-                                                        <td class="largeText iffyTip"><a>@RadianContributor.BusinessName</a></td>
-                                                        <td class="largeText iffyTip"><a>@RadianContributor.TradeName</a></td>
-                                                        <td class="largeText iffyTip">
-                                                            <a><i class="fa fa-circle @textClass"></i>&nbsp;@RadianContributor.AcceptanceStatusName</a>
-                                                        </td>
-                                                    </tr>
-                                                }*@
+                                            @foreach (var oper in Model.RadianContributorOperations)
+                                            {
+                                                //var textClass = DataUtils.GetProviderStatusStyle(RadianContributor.AcceptanceStatusId);
+                                                //var isClickableRow = User.IsInAnyRole("Administrador", "Super") ? "clickable-row" : "";
+                                                //var urlView = User.IsInAnyRole("Administrador", "Super") ? Url.Action("ViewDetails", "Radian", new { id = RadianContributor.Id }) : "";
+                                                @*<tr class='@isClickableRow' data-href="@urlView">*@
+                                                <tr>
+                                                    <td class="smallText iffyTip">@oper.RadianOperationMode.Name</td>
+                                                    <td class="smallText iffyTip">@oper.Timestamp.ToString("dd/MM/yyy")</td>
+                                                    <td class="largeText iffyTip">@oper.Software.Name</td>
+                                                    <td class="largeText iffyTip">@oper.Software.Id</td>
+                                                    <td class="largeText iffyTip">@oper.Software.Pin</td>
+                                                    <td class="largeText iffyTip">@oper.Software.Url</td>
+                                                    <td class="largeText iffyTip"><a title="Eliminar"><i class="fa fa-trash fa-1"></i></a></td>
+                                                    <td class="largeText iffyTip"><a title="Set de pruebas"><i class="fas fa-eye"></i></a></td>
+                                                </tr>
+                                            }
                                         </tbody>
                                     </table>
                                 </div>

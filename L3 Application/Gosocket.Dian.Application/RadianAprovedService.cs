@@ -15,14 +15,25 @@ namespace Gosocket.Dian.Application
     {
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianTestSetService _radianTestSetService;
+        private readonly IContributorService _contributorService;
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianContributorFileTypeService _radianContributorFileTypeService;
         private readonly IRadianContributorOperationRepository _radianContributorOperationRepository;
         private readonly IRadianContributorFileRepository _radianContributorFileRepository;
         private readonly IRadianContributorFileHistoryRepository _radianContributorFileHistoryRepository;
         private readonly IContributorOperationsService _contributorOperationsService;
+        private readonly IRadianTestSetResultService _radianTestSetResultService;
+        private readonly IRadianCallSoftwareService _radianCallSoftwareService;
 
-        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository, IContributorOperationsService contributorOperationsService)
+        public RadianAprovedService(IRadianContributorRepository radianContributorRepository,
+                                    IRadianTestSetService radianTestSetService,
+                                    IRadianContributorService radianContributorService,
+                                    IRadianContributorFileTypeService radianContributorFileTypeService,
+                                    IRadianContributorOperationRepository radianContributorOperationRepository,
+                                    IRadianContributorFileRepository radianContributorFileRepository,
+                                    IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository,
+                                    IContributorOperationsService contributorOperationsService,
+                                    IRadianTestSetResultService radianTestSetResultService, IContributorService contributorService, IRadianCallSoftwareService radianCallSoftwareService)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
@@ -32,6 +43,9 @@ namespace Gosocket.Dian.Application
             _radianContributorFileRepository = radianContributorFileRepository;
             _radianContributorFileHistoryRepository = radianContributorFileHistoryRepository;
             _contributorOperationsService = contributorOperationsService;
+            _radianTestSetResultService = radianTestSetResultService;
+            _contributorService = contributorService;
+            _radianCallSoftwareService = radianCallSoftwareService;
         }
 
         /// <summary>
@@ -182,6 +196,51 @@ namespace Gosocket.Dian.Application
         public int RadianContributorId(int contributorId)
         {
             return _radianContributorRepository.Get(c => c.ContributorId == contributorId).Id;
+        }
+
+        public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
+        {
+            return _radianContributorOperationRepository.Add(radianContributorOperation);
+        }
+
+        public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
+        {
+            RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
+
+            radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId);
+
+            int code = Convert.ToInt32(radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianContributor.Contributor.Code);
+
+            radianContributorOperationWithSoftware.Software = _radianCallSoftwareService.GetSoftwares(code).LastOrDefault();
+
+            return radianContributorOperationWithSoftware;
+        }
+
+        public RadianTestSetResult RadianTestSetResultByNit(string nit)
+        {
+            return _radianTestSetResultService.GetTestSetResultByNit(nit).FirstOrDefault();
+        }
+
+        public List<RadianUserData> ListUsers(List<string> listIds)
+        {
+            List<RadianUserData> listUsers = new List<RadianUserData>();
+
+            //Code, name, Email 
+            foreach (string id in listIds)
+            {
+                Contributor contributor = _contributorService.Get(int.Parse(id));
+
+                RadianUserData user = new RadianUserData()
+                {
+                    Code = contributor.Code,
+                    Name = contributor.Name,
+                    Email = contributor.Email
+                };
+
+                listUsers.Add(user);
+            }
+
+            return listUsers;
         }
     }
 }
