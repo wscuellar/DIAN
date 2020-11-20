@@ -45,8 +45,8 @@ namespace Gosocket.Dian.Application
         {
             NameValueCollection collection = new NameValueCollection();
             Domain.Contributor contributor = _contributorService.GetByCode(userCode);
-            var radianContributor =  _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice && t.RadianState != "Cancelado");
-            if(radianContributor != null)
+            var radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice && t.RadianState != "Cancelado");
+            if (radianContributor != null)
             {
                 collection.Add("RadianContributorTypeId", radianContributor.RadianContributorTypeId.ToString());
                 collection.Add("RadianOperationModeId", radianContributor.RadianOperationModeId.ToString());
@@ -74,8 +74,12 @@ namespace Gosocket.Dian.Application
             }
 
             string cancelEvent = RadianState.Cancelado.GetDescription();
-            List<RadianContributor> radianContributor = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType && t.RadianState !=  cancelEvent);
-            if (radianContributor.Any(t=> t.RadianState != cancelEvent))
+            int radianType = (int)radianContributorType;
+            List<RadianContributor> records = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == radianType);
+            RadianContributor lastRecord = (from p in records
+                                            group p by p.ContributorId into g
+                                            select g.OrderByDescending(x => x.Update).FirstOrDefault()).FirstOrDefault();
+            if (lastRecord != null && lastRecord.RadianState != cancelEvent)
                 return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.redirectType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.TechnologyProvider && (contributor.ContributorTypeId != (int)Domain.Common.ContributorType.Provider || !contributor.Status))
