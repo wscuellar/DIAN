@@ -29,12 +29,14 @@ namespace Gosocket.Dian.Web.Controllers
 
 
         #region Registro de participantes
-        
+
         // GET: Radian
         public ActionResult Index()
         {
             NameValueCollection result = _radianContributorService.Summary(User.UserCode());
             ViewBag.ContributorId = result["ContributorId"];
+            ViewBag.RadianContributorTypeId = result["RadianContributorTypeId"];
+            ViewBag.RadianOperationModeId = result["RadianOperationModeId"];
             return View();
         }
 
@@ -47,8 +49,10 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult RegistrationValidation(RegistrationDataViewModel registrationData)
         {
             ResponseMessage validation = _radianContributorService.RegistrationValidation(User.UserCode(), registrationData.RadianContributorType, registrationData.RadianOperationMode);
+            if (validation.MessageType == "redirect")
+                validation.RedirectTo = Url.Action("Index", "RadianApproved",registrationData);
             return Json(validation, JsonRequestBehavior.AllowGet);
-        } 
+        }
 
         #endregion
 
@@ -222,9 +226,17 @@ namespace Gosocket.Dian.Web.Controllers
                     RadianContributorFile radianContributorFileInstance = null;
                     foreach (var n in data)
                     {
+                        RadianContributorFileHistory radianFileHistory = new RadianContributorFileHistory();
                         radianContributorFileInstance = _radianContributorService.RadianContributorFileList(n.Id).FirstOrDefault();
                         radianContributorFileInstance.Status = n.NewState;
                         _ = _radianContributorService.UpdateRadianContributorFile(radianContributorFileInstance).ToString();
+
+                        radianFileHistory.FileName = radianContributorFileInstance.FileName;
+                        radianFileHistory.Comments = "Cambio de estado por Admin";
+                        radianFileHistory.CreatedBy = radianContributorFileInstance.CreatedBy;
+                        radianFileHistory.Status = n.NewState;
+                        radianFileHistory.RadianContributorFileId = radianContributorFileInstance.Id;
+                        _ = _radianContributorService.AddFileHistory(radianFileHistory);
                     }
                 }
 

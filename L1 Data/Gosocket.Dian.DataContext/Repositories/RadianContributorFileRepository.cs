@@ -9,42 +9,54 @@ namespace Gosocket.Dian.DataContext.Repositories
 {
     public class RadianContributorFileRepository : IRadianContributorFileRepository
     {
-
-        private readonly SqlDBContext sqlDBContext;
+        private readonly SqlDBContext _sqlDBContext;
 
         public RadianContributorFileRepository()
         {
-            if (sqlDBContext == null)
-                sqlDBContext = new SqlDBContext();
+            if (_sqlDBContext == null)
+                _sqlDBContext = new SqlDBContext();
         }
 
         public List<RadianContributorFile> List(Expression<Func<RadianContributorFile, bool>> expression)
         {
-            var query = sqlDBContext.RadianContributorFiles.Where(expression);
+            var query = _sqlDBContext.RadianContributorFiles.Where(expression);
             return query.ToList();
         }
 
         public Guid Update(RadianContributorFile radianContributorFile)
         {
-            using (var context = new SqlDBContext())
+            var radianContributorFileInstance = _sqlDBContext.RadianContributorFiles.FirstOrDefault(c => c.Id == radianContributorFile.Id);
+            if (radianContributorFileInstance != null)
             {
-                var radianContributorFileInstance = context.RadianContributorFiles.FirstOrDefault(c => c.Id == radianContributorFile.Id);
-                if (radianContributorFileInstance != null)
-                {
-                    radianContributorFileInstance.Status = radianContributorFile.Status;
-                    context.Entry(radianContributorFileInstance).State = System.Data.Entity.EntityState.Modified;
-                    context.SaveChanges();
-                    return radianContributorFileInstance.Id;
-                }
-                else
-                {
-                    return radianContributorFile.Id;
-                }
-
+                radianContributorFileInstance.Status = radianContributorFile.Status;
+                _sqlDBContext.Entry(radianContributorFileInstance).State = System.Data.Entity.EntityState.Modified;
+                _sqlDBContext.SaveChanges();
+                return radianContributorFileInstance.Id;
+            }
+            else
+            {
+                return radianContributorFile.Id;
             }
         }
 
+        public void AddOrUpdate(RadianContributorFile radianContributorFile)
+        {
+            RadianContributorFile radianContributorFileInstance = _sqlDBContext
+                .RadianContributorFiles
+                .FirstOrDefault(c => c.FileType == radianContributorFile.FileType && c.RadianContributorId == radianContributorFile.RadianContributorId);
 
+            if (radianContributorFileInstance != null)
+            {
+                radianContributorFileInstance.Status = radianContributorFile.Status;
+                _sqlDBContext.Entry(radianContributorFileInstance).State = System.Data.Entity.EntityState.Modified;
+            }
+            else
+            {
+                _sqlDBContext.Entry(radianContributorFile).State = System.Data.Entity.EntityState.Added;
+            }
+
+            _sqlDBContext.SaveChanges();
+        }
     }
 
 }

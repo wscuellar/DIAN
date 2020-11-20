@@ -14,6 +14,7 @@
             Code = 200;
         }
 
+        public string RedirectTo { get; set; }
         public string Message { get; set; }
         public string MessageType { get; set; }
         public int Code { get; set; }

@@ -23,13 +23,14 @@ namespace Gosocket.Dian.Application.Tests
         private readonly Mock<IRadianTestSetResultManager> _radianTestSetResultManager = new Mock<IRadianTestSetResultManager>();
         private readonly Mock<IRadianOperationModeRepository> _radianOperationModeRepository = new Mock<IRadianOperationModeRepository>();
         private readonly Mock<IContributorOperationsService> _contributorOperationService = new Mock<IContributorOperationsService>();
+        private readonly Mock<IRadianContributorFileHistoryRepository> _radianContributorFileHistoryRepository = new Mock<IRadianContributorFileHistoryRepository>();
         private RadianContributorService _current;
 
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _current = new RadianContributorService(_contributorService.Object, _contributorOperationService.Object, _radianContributorRepository.Object, _radianContributorTypeRepository.Object, _radianContributorFileRepository.Object, _radianTestSetResultManager.Object, _radianOperationModeRepository.Object);
+            _current = new RadianContributorService(_contributorService.Object, _contributorOperationService.Object, _radianContributorRepository.Object, _radianContributorTypeRepository.Object, _radianContributorFileRepository.Object, _radianTestSetResultManager.Object, _radianOperationModeRepository.Object, _radianContributorFileHistoryRepository.Object);
         }
 
 
@@ -90,7 +91,7 @@ namespace Gosocket.Dian.Application.Tests
 
                     //usuario registrado
                     RadianContributor radianContributor = new RadianContributor() { RadianState = "Registrado" };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor });
                     break;
                 case 4:
                     //tiene software con estatus activo
@@ -106,7 +107,7 @@ namespace Gosocket.Dian.Application.Tests
                     });
                     //usuario no registrado
                     RadianContributor radianContributor4 = null;
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor4);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>());
                     break;
                 case 5:
                     //tiene software con estatus activo
@@ -120,9 +121,9 @@ namespace Gosocket.Dian.Application.Tests
                             Software = new Software(){ Status = true}
                         }
                     });
-                    //usuario no registrado
+                    //usuario registrado pero cancelado
                     RadianContributor radianContributor5 = new RadianContributor() { RadianState = RadianState.Cancelado.GetDescription() };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor5);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor5 });
                     break;
             }
 
@@ -151,17 +152,16 @@ namespace Gosocket.Dian.Application.Tests
                 case 1:
                     //usuario registrado
                     RadianContributor radianContributor = new RadianContributor() { RadianState = "Registrado" };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor });
                     break;
                 case 2:
                     //usuario no registrado
-                    RadianContributor radianContributor2 = null;
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor2);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>());
                     break;
                 case 3:
                     //usuario registrado pero cancelado
                     RadianContributor radianContributor3 = new RadianContributor() { RadianState = "Cancelado" };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor3);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor3 });
                     break;
             }
 
@@ -212,7 +212,7 @@ namespace Gosocket.Dian.Application.Tests
                         }
                     });
                     RadianContributor radianContributor = new RadianContributor() { RadianState = "Registrado" };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor });
                     break;
                 case 3:
                     //Provedor activo con software inactivo
@@ -232,7 +232,7 @@ namespace Gosocket.Dian.Application.Tests
                         }
                     });
                     RadianContributor radianContributor3 = new RadianContributor() { RadianState = "Cancelado" };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor3);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor3 });
                     break;
                 case 4:
                     //Provedor activo con software activo
@@ -253,7 +253,7 @@ namespace Gosocket.Dian.Application.Tests
                     });
 
                     RadianContributor radianContributor4 = new RadianContributor() { RadianState = "Cancelado" };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor4);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor4 });
                     break;
             }
 
@@ -303,7 +303,7 @@ namespace Gosocket.Dian.Application.Tests
                         }
                     });
                     RadianContributor radianContributor = new RadianContributor() { RadianState = "Registrado" };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor });
                     break;
                 case 3:
                     //Provedor activo con software activo
@@ -323,7 +323,7 @@ namespace Gosocket.Dian.Application.Tests
                         }
                     });
                     RadianContributor radianContributor4 = new RadianContributor() { RadianState = "Cancelado" };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor4);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor4 });
                     break;
 
             }
@@ -373,7 +373,7 @@ namespace Gosocket.Dian.Application.Tests
                         }
                     });
                     RadianContributor radianContributor = new RadianContributor() { RadianState = "Registrado" };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor });
                     break;
                 case 3:
                     //Provedor activo con software activo
@@ -393,7 +393,7 @@ namespace Gosocket.Dian.Application.Tests
                         }
                     });
                     RadianContributor radianContributor4 = new RadianContributor() { RadianState = "Cancelado" };
-                    _radianContributorRepository.Setup(t => t.Get(It.IsAny<Expression<Func<RadianContributor, bool>>>())).Returns(radianContributor4);
+                    _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>() { radianContributor4 });
                     break;
 
             }
@@ -425,7 +425,7 @@ namespace Gosocket.Dian.Application.Tests
                             Software = new Software(){ Status = true}
                         }
                     });
-
+            _radianContributorRepository.Setup(t => t.List(It.IsAny<Expression<Func<RadianContributor, bool>>>(), 0, 0)).Returns(new List<RadianContributor>());
             //add
             Domain.Entity.ResponseMessage result = _current.RegistrationValidation(userCode, radianContributorType, radianOperationMode);
 

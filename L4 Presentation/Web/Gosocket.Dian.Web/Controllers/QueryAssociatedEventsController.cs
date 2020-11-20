@@ -64,8 +64,8 @@ namespace Gosocket.Dian.Web.Controllers
                         model.Title = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(EventStatus), eventItem.EventCode)));
                         break;
                 }
-                ViewBag.subtitle1 = "Validaciones del Evento";
-                ViewBag.subtitle2 = "Referencias del Evento";
+                ViewBag.ValidationTitle = "Validaciones del Evento";
+                ViewBag.ReferenceTitle = "Referencias del Evento";
 
                 model.CUDE = id;
                 model.Prefix = eventItem.Serie;
@@ -109,9 +109,7 @@ namespace Gosocket.Dian.Web.Controllers
                 //endosatorio = evento de receiver.
 
                 //---------------endoso enk propiedad
-                if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia ||
-                             model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion ||
-                             model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoPropiedad)
+                if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia || model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
                 {
                     model.Endoso = new EndosoViewModel()
                     {

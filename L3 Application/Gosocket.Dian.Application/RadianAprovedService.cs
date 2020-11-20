@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
+using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System;
@@ -14,13 +15,25 @@ namespace Gosocket.Dian.Application
     {
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianTestSetService _radianTestSetService;
+        private readonly IContributorService _contributorService;
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianContributorFileTypeService _radianContributorFileTypeService;
         private readonly IRadianContributorOperationRepository _radianContributorOperationRepository;
         private readonly IRadianContributorFileRepository _radianContributorFileRepository;
         private readonly IRadianContributorFileHistoryRepository _radianContributorFileHistoryRepository;
+        private readonly IContributorOperationsService _contributorOperationsService;
+        private readonly IRadianTestSetResultService _radianTestSetResultService;
+        private readonly IRadianCallSoftwareService _radianCallSoftwareService;
 
-        public RadianAprovedService(IRadianContributorRepository radianContributorRepository, IRadianTestSetService radianTestSetService, IRadianContributorService radianContributorService, IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorOperationRepository radianContributorOperationRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository)
+        public RadianAprovedService(IRadianContributorRepository radianContributorRepository,
+                                    IRadianTestSetService radianTestSetService,
+                                    IRadianContributorService radianContributorService,
+                                    IRadianContributorFileTypeService radianContributorFileTypeService,
+                                    IRadianContributorOperationRepository radianContributorOperationRepository,
+                                    IRadianContributorFileRepository radianContributorFileRepository,
+                                    IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository,
+                                    IContributorOperationsService contributorOperationsService,
+                                    IRadianTestSetResultService radianTestSetResultService, IContributorService contributorService, IRadianCallSoftwareService radianCallSoftwareService)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
@@ -29,6 +42,10 @@ namespace Gosocket.Dian.Application
             _radianContributorOperationRepository = radianContributorOperationRepository;
             _radianContributorFileRepository = radianContributorFileRepository;
             _radianContributorFileHistoryRepository = radianContributorFileHistoryRepository;
+            _contributorOperationsService = contributorOperationsService;
+            _radianTestSetResultService = radianTestSetResultService;
+            _contributorService = contributorService;
+            _radianCallSoftwareService = radianCallSoftwareService;
         }
 
         /// <summary>
@@ -107,6 +124,17 @@ namespace Gosocket.Dian.Application
             return _radianContributorService.ContributorSummary(contributorId);
         }
 
+        public Software SoftwareByContributor(int contributorId)
+        {
+            List<ContributorOperations> contributorOperations = _contributorOperationsService
+                .GetContributorOperations(contributorId);
+
+            if (contributorOperations == null)
+                return default;
+
+            return contributorOperations.FirstOrDefault(t => !t.Deleted && t.OperationModeId == (int)Domain.Common.OperationMode.Own && t.Software != null && t.Software.Status)?.Software ?? default;
+        }
+
         public List<RadianContributorFileType> ContributorFileTypeList(int radianContributorTypeId)
         {
             List<RadianContributorFileType> contributorTypeList = _radianContributorFileTypeService.FileTypeList()
@@ -124,26 +152,25 @@ namespace Gosocket.Dian.Application
         {
             string fileName = StringTools.MakeValidFileName(radianContributorFile.FileName);
             var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
-            Guid idFile = _radianContributorFileRepository.Update(radianContributorFile);            
+            bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
 
-            if (!string.IsNullOrEmpty(idFile.ToString()))
+            if (result)
             {
-                bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
+                radianContributorFile.Id = Guid.NewGuid();
+                _radianContributorFileRepository.AddOrUpdate(radianContributorFile);
+                return new ResponseMessage($"{radianContributorFile.Id}", "Guardado");
+            }
 
-                if(result)
-                    return new ResponseMessage($"Archivo {radianContributorFile.FileName} con el id {idFile} guardado", "Guardado");
-
-                return new ResponseMessage($"Se almacenó en Base de datos {radianContributorFile.FileName} peno no en el Storagecon el id {idFile} guardado", "Registrado con ");
-            }            
-
-           return new ResponseMessage($"No se guardó el archivo {radianContributorFile.FileName}", "Nulo");
+            return new ResponseMessage($"{string.Empty}", "Nulo");
         }
+
 
         public ResponseMessage AddFileHistory(RadianContributorFileHistory radianContributorFileHistory)
         {
             radianContributorFileHistory.Timestamp = DateTime.Now;
             string idHistoryRegister = string.Empty;
 
+            radianContributorFileHistory.Id = Guid.NewGuid();
             idHistoryRegister = _radianContributorFileHistoryRepository.AddRegisterHistory(radianContributorFileHistory).ToString();
 
             if (!string.IsNullOrEmpty(idHistoryRegister))
@@ -152,6 +179,68 @@ namespace Gosocket.Dian.Application
             }
 
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
+        }
+
+        public ResponseMessage UpdateRadianContributorStep(int radianContributorId, int radianContributorStep)
+        {
+            bool updated = _radianContributorService.ChangeContributorStep(radianContributorId, radianContributorStep);
+
+            if (updated)
+            {
+                return new ResponseMessage($"Paso actualizado", "Actualizado");
+            }
+
+            return new ResponseMessage($"El registro no pudo ser actualizado", "Nulo");
+        }
+
+        public int RadianContributorId(int contributorId)
+        {
+            return _radianContributorRepository.Get(c => c.ContributorId == contributorId).Id;
+        }
+
+        public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
+        {
+            return _radianContributorOperationRepository.Add(radianContributorOperation);
+        }
+
+        public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
+        {
+            RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
+
+            radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId);
+
+            int code = Convert.ToInt32(radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianContributor.Contributor.Code);
+
+            radianContributorOperationWithSoftware.Software = _radianCallSoftwareService.GetSoftwares(code).LastOrDefault();
+
+            return radianContributorOperationWithSoftware;
+        }
+
+        public RadianTestSetResult RadianTestSetResultByNit(string nit)
+        {
+            return _radianTestSetResultService.GetTestSetResultByNit(nit).FirstOrDefault();
+        }
+
+        public List<RadianUserData> ListUsers(List<string> listIds)
+        {
+            List<RadianUserData> listUsers = new List<RadianUserData>();
+
+            //Code, name, Email 
+            foreach (string id in listIds)
+            {
+                Contributor contributor = _contributorService.Get(int.Parse(id));
+
+                RadianUserData user = new RadianUserData()
+                {
+                    Code = contributor.Code,
+                    Name = contributor.Name,
+                    Email = contributor.Email
+                };
+
+                listUsers.Add(user);
+            }
+
+            return listUsers;
         }
     }
 }

@@ -182,7 +182,6 @@
     <Compile Include="Services\RadianAprovedServiceTests.cs" />
     <Compile Include="Services\RadianTestSetResultServiceTests.cs" />
     <Compile Include="Services\RadianLoggerServiceTests.cs" />
-    <Compile Include="Services\RadianTestSetAppliedServiceTests.cs" />
     <Compile Include="Services\RadianContributorServiceTests.cs" />
     <Compile Include="Utils\StringUtilTest.cs" />
     <Compile Include="WebServices\AllTest.cs" />

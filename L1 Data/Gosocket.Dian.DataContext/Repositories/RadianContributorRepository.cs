@@ -60,11 +60,13 @@ namespace Gosocket.Dian.DataContext.Repositories
                     radianContributorInstance.RadianState = radianContributor.RadianState;
                     radianContributorInstance.RadianOperationModeId = radianContributor.RadianOperationModeId;
                     radianContributorInstance.CreatedBy = radianContributor.CreatedBy;
+                    radianContributorInstance.Step = radianContributor.Step;
 
                     context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
                 }
                 else
                 {
+                    radianContributor.Step = 1;
                     context.Entry(radianContributor).State = System.Data.Entity.EntityState.Added;
                 }
 

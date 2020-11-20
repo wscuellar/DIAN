@@ -11,7 +11,7 @@
         <div class="underline-title"></div>
     </div>
     <div class="row margin-horizontal-0">
-        <div class="panel">
+        <div class="panel" data-target="#panel-form" data-toggle="panel-overlay" >
             <div class="panel-body padding-top-20">
                 <div id="steps-approved">
                     <div class="radian-personal-info">
@@ -26,15 +26,15 @@
                     </section>
                     <h3><span class="name-state">Validando documentos</span></h3>
                     <section>
-                        @Html.Partial("_documentStates");
+                        @Html.Partial("_certificates")
                     </section>
                     <h3><span class="name-state">Pruebas de aceptación</span></h3>
                     <section>
-                        @Html.Partial("_setTestRedirect");
+                        @Html.Partial("_setTestRedirect")
                     </section>
                     <h3></h3>
                     <section>
-                        <p>The next and previous buttons help you to navigate through your content.</p>
+                        @Html.Partial("_finalStep")
                     </section>
                 </div>
             </div>
@@ -44,22 +44,16 @@
 
 @section scripts{
     <script>
-            $(document).ready(function () {
+            $(document).ready(function () {debugger
+                var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
                 $("#steps-approved").steps({
                     headerTag: "h3",
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
                     autoFocus: true,
-                    startIndex: 1,
-                    labels: {
-                        cancel: "Cancel",
-                        current: "current step:",
-                        pagination: "Pagination",
-                        finish: "Finish",
-                        next: "Siguiente",
-                        previous: "Cancelar",
-                        loading: "Loading ..."
-                    }
+                    startIndex: 4,
+                    enablePagination: false,
+                    enableKeyNavigation: false
                 });
 
                 $(".radian-file").click(function (file) {
@@ -83,30 +77,23 @@
                     } )
                 });
 
-                //$('#fileupload').fileupload({
-                //    dataType: 'json',
-                //    done: function (e, data) {debugger
-                //        console.log("all loaded");
-                //    },
-                //    progressall: function (e, data) {debugger
-                //        var progress = parseInt(data.loaded / data.total * 100, 10);
-                //        $('#progress .bar').css(
-                //            'width',
-                //            progress + '%'
-                //        );
-                //    }
-                //});
-
                 $('#submit-button').click(function (e) {
                     e.preventDefault();
-                    debugger;
                     var files = $("#uploadForm")[0];
                     var formdata = new FormData();
-                    for (var i = 0 ; i < files.length - 1 ; i++) {
-                        debugger
-                        files[i].files.length > 0 &&
-                        formdata.append(files[i].files[0].name, files[i].files[i]);
-                    }
+                    var numberFiles = 0;
+                    for (var i = 0 ; i < files.length - 2 ; i++) {
+                        if (files[i].files.length > 0) {
+                            formdata.append(files[i].files[0].name, files[i].files[i]);
+                            formdata.append("TypeId_" + numberFiles, files[i].dataset.typeid);
+                            numberFiles++;
+                        }
+                    };
+                    formdata.append("nit", "@Model.Nit");
+                    formdata.append("email", "@Model.Email");
+                    formdata.append("contributorId", "@Model.ContributorId");
+                    formdata.append("filesNumber", files.length - 2);
+                    formdata.append("step", @Model.Step);
 
 
                     $.ajax({
@@ -122,7 +109,6 @@
                             var xhr = $.ajaxSettings.xhr();
                             if (xhr.upload) {
                                 xhr.upload.addEventListener('progress', function (event) {
-                                    debugger
                                     var percent = 0;
                                     var position = event.loaded || event.position;
                                     var total = event.total;
@@ -136,14 +122,35 @@
                             }
                             return xhr;
                         },
-                        success: function (mdata) {
-                            debugger
-                            if (mdata == 0) {
-                                alert("Done");
-                            }
-
+                        success: function (data) {
+                            bootbox.alert({
+                                title: "Paso actualizado",
+                                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + data.message + "</strong></h4></div></div>",
+                                buttons: {
+                                    ok: {
+                                        label: 'Aceptar',
+                                        className: 'btn-success'
+                                    }
+                                },
+                                callback: function () {
+                                    showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                    window.location.href = '@Url.Action("Index", "RadianApproved", new { id = Model.ContributorId })';
+                                }
+                            });
                         },
                     });
+                });
+
+                $("#view-costumers").click(function () {
+                    var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));
+                    var dialog = bootbox.dialog({
+                        message: htmlPartial,
+                        className: "table-data",
+                        size: 'large'
+                    });
+                    dialog.init(function (e) {
+                        $('#table-history').DataTable();
+                    } )
                 });
             });
     </script>

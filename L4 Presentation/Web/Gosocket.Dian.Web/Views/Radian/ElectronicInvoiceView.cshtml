@@ -24,7 +24,7 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <div id="1" contributorType="1" operationMode="1" class="card RadianCardContainer">
                 <div class="RadianImgContainer">
-                    <img  class="RadianimgSvg" src="~/Content/images/Svg/OperacionDirecta.svg" />
+                    <img class="RadianimgSvg" src="~/Content/images/Svg/OperacionDirecta.svg" />
                 </div>
                 <div class="card-body">
                     <p class="RadianTittleCard">Operación Directa</p>
@@ -36,7 +36,7 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <div id="2" contributorType="1" operationMode="2" class="card RadianCardContainer">
                 <div class="RadianImgContainer">
-                    <img  class="RadianimgSvg" src="~/Content/images/Svg/OperacionIndirecta.svg" />
+                    <img class="RadianimgSvg" src="~/Content/images/Svg/OperacionIndirecta.svg" />
                 </div>
                 <div class="card-body">
                     <p class="RadianTittleCard">Operación Indirecta</p>
@@ -69,15 +69,18 @@
                     RadianOperationMode: $(this).attr('operationMode'),
                 };
 
-                CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
+                window.location.href = '@Url.Action("Index", "RadianApproved", new { id = ViewBag.ContributorId })';
+
+                @*CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
                     function (param) {
-                        CallExecution("POST", '@Url.Action("Index", "RadianApproved")', RegistrationDataViewModel,
+                        CallExecution("POST", '@Url.Action("Add", "RadianApproved")', RegistrationDataViewModel,
                             function (param) {
-                                window.location.href = '@Url.Action("Index", "RadianApproved")';
+                                var url = "@Url.Action("Index", "RadianApproved")"+ "?ContributorId=" + param.ContributorId + "&RadianContributorType=" + param.RadianContributorType + "&RadianOperationMode=" + param.RadianOperationMode;
+                                window.location.href = url;
                             }, false
                         );
                     }, true
-                );
+                );*@
             }
         });
 

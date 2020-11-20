@@ -372,6 +372,20 @@
 
                                         </ul>
                                     </li>
+
+                                    <!--Rol Administrador-->
+                                    @if (User.IsInAnyRole("Administrador", "Super"))
+                                    {
+                                        <li id="@Navigation.NavigationEnum.ExternalUsersCreate">
+                                            <a href="@Url.Action("AddUser", "ExternalUsers")">
+                                                <i class="fa fa-users"></i>
+                                                <span class="menu-title">
+                                                    Crear Usuario
+                                                </span>
+                                            </a>
+                                        </li>
+                                    }
+
                                     <!--Rol Administrador-->
                                     @if (User.IsInAnyRole("Administrador", "Super"))
                                     {
@@ -567,6 +581,12 @@
     <script src="~/Content/js/gosocket/typeahead.js"></script>
     <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
     <script src="~/Content/js/common/common.js?1.2.0"></script>
+
+    <!-- highchart-->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
     <script>
         $(function () {

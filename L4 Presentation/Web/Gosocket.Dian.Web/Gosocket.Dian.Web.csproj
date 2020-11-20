@@ -371,6 +371,7 @@
     <Compile Include="Models\ExternalUserViewModel.cs" />
     <Compile Include="Models\GeneralResponseModel.cs" />
     <Compile Include="Models\QueryEventViewModel.cs" />
+    <Compile Include="Models\RadianApproved\RadianApprovedOperationModeViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
     <Compile Include="Models\MenuViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedViewModel.cs" />
@@ -694,6 +695,7 @@
     <Content Include="Content\js\nifty.js cambios.txt" />
     <Content Include="Content\js\nifty.min.js" />
     <Content Include="Content\js\Radian\RadianIndex.js" />
+    <Content Include="Content\js\Radian\RadianTestSet.js" />
     <Content Include="Content\js\user\user.js" />
     <Content Include="Content\plugins\animate-css\animate.css" />
     <Content Include="Content\plugins\animate-css\animate.min.css" />
@@ -2824,6 +2826,13 @@
     <Content Include="Views\RadianApproved\_setTestResult.cshtml" />
     <Content Include="Views\ExternalUsers\AddUser.cshtml" />
     <Content Include="Views\ExternalUsers\_userForm.cshtml" />
+    <Content Include="Views\RadianApproved\_factorOperationMode.cshtml" />
+    <Content Include="Views\RadianApproved\GetSetTestResult.cshtml" />
+    <Content Include="Views\RadianApproved\_customers.cshtml" />
+    <Content Include="Views\RadianApproved\_finalStep.cshtml" />
+    <Content Include="Views\RadianApproved\GetFactorOperationMode.cshtml" />
+    <Content Include="Views\RadianApproved\_setTestDetails.cshtml" />
+    <Content Include="Views\RadianApproved\SetTestDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2845,7 +2854,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Content\js\NewFolder1\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
   </ItemGroup>

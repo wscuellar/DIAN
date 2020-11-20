@@ -10,6 +10,7 @@ namespace Gosocket.Dian.Domain
         [Key]
         public int Id { get; set; }
 
+        [Display(Name = "Nombre")]
         public string Name { get; set; }
         public DateTime Timestamp { get; set; }
         public DateTime Updated { get; set; }

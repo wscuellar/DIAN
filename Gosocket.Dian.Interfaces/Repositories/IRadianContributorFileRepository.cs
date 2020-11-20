@@ -12,5 +12,7 @@ namespace Gosocket.Dian.Interfaces.Repositories
 
         Guid Update(RadianContributorFile radianContributorFile);
 
+        void AddOrUpdate(RadianContributorFile radianContributorFile);
+
     }
 }

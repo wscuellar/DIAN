@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -37,5 +38,7 @@ namespace Gosocket.Dian.Domain
         public DateTime Updated { get; set; }
 
         public string CreatedBy { get; set; }
+
+        public ICollection<RadianContributorOperation> RadianContributorOperations { get; set; }
     }
 }

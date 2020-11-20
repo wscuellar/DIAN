@@ -17,6 +17,10 @@
     </style>
 }
 
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
 
@@ -42,7 +46,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 </div>
 <div class="tab-content">
@@ -51,16 +55,16 @@
     </div>
 </div>
 
-    @section Scripts {
-        @Scripts.Render("~/bundles/jqueryval")
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
 
-        <!--Bootstrap Select [ OPTIONAL ]-->
-        <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
-        <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
-        <script src="~/Content/js/file-validator.js"></script>
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
 
 
-        <script>
+    <script>
             $(document).ready(function () {
                 $('.document-row').click('onClick', function () {
                     if (!$(this).hasClass('not-redirect')) {
@@ -76,8 +80,12 @@
                     var documentKey = $(this).parent().find("#DocumentKey").val()
                     GetEventsPartialView(documentKey);
                 })
+
             });
 
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
 
             function GetEventsPartialView(id) {
                 $.ajax({
@@ -86,8 +94,10 @@
                         var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
                         if (injectingPartialView == "true") {
                             $('#modifyWrapper').html(data);
-                            $('#modifyWrapper').show();
-                            $('#container1').hide();
+                            setTimeout(function () {
+                                $('#modifyWrapper').fadeIn(500);
+                            }, 500);
+                            $('#container1').fadeOut(300);
                         }
                         else {
                             window.location.href = '/User/Login';
@@ -99,6 +109,13 @@
             function changeTab(id) {
                 window.location.href = "/Document/Details?trackId=" + id;
             }
-        </script>
 
-    }
+            function darClick() {
+                $('#modifyWrapper').fadeOut(300);
+                setTimeout(function () {
+                    $('#container1').fadeIn(500);
+                }, 500);
+            }
+    </script>
+
+}
