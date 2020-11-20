@@ -73,7 +73,7 @@
                 $('#UserCode').val('');
             };
             grecaptcha.ready(function () {
-                grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
+                grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'externalUserLogin' }).then(function (token) {
                     $(".RecaptchaToken").val(token);
                 });
             });
