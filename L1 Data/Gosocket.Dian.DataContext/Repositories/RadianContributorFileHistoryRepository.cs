@@ -6,23 +6,20 @@ namespace Gosocket.Dian.DataContext.Repositories
 {
     public class RadianContributorFileHistoryRepository : IRadianContributorFileHistoryRepository
     {
-        private readonly SqlDBContext sqlDBContext;
+        private readonly SqlDBContext _sqlDBContext;
 
         public RadianContributorFileHistoryRepository()
         {
-            if (sqlDBContext == null)
-                sqlDBContext = new SqlDBContext();
+            if (_sqlDBContext == null)
+                _sqlDBContext = new SqlDBContext();
         }
 
         public Guid AddRegisterHistory(RadianContributorFileHistory radianContributorFileHistory)
-        {
-            using (var context = new SqlDBContext())
-            {
-                context.Entry(radianContributorFileHistory).State = System.Data.Entity.EntityState.Added;
+        {            
+            _sqlDBContext.Entry(radianContributorFileHistory).State = System.Data.Entity.EntityState.Added;
 
-                context.SaveChanges();
-                return radianContributorFileHistory.Id;
-            }
+            _sqlDBContext.SaveChanges();
+            return radianContributorFileHistory.Id;
         }
     }
 }
