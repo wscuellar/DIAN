@@ -2224,8 +2224,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "89",
-                                        ErrorMessage = "Error no es posible transmitir el evento Endoso, no existe una Solicitud de Disponibilización",
+                                        ErrorCode = "LGC24",
+                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Solicitud de disponibilización",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
