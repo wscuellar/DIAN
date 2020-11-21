@@ -61,16 +61,16 @@
                         });
 
                         function showChart(data) {
-                            //debugger
                             var dataChart = data.data;
                             Highcharts.chart('setTestDetails', {
                                 chart: {
                                     type: 'bar'
                                 },
                                 title: {
-                                    text: 'Stacked bar chart'
+                                    text: ''
                                 },
                                 xAxis: {
+                                    alternateGridColor: '#EBEEEC',
                                     categories: [
                                         'Documentos',
                                         'Acuse de recibo',
@@ -91,11 +91,15 @@
                                 yAxis: {
                                     min: 0,
                                     title: {
-                                        text: 'Total fruit consumption'
+                                        text: ''
                                     }
                                 },
                                 legend: {
-                                    reversed: true
+                                    reversed: true,
+                                    align: 'center',
+                                    verticalAlign: 'top',
+                                    x: 0,
+                                    y: 0
                                 },
                                 plotOptions: {
                                     series: {
