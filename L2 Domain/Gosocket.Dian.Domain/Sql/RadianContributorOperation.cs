@@ -13,16 +13,14 @@ namespace Gosocket.Dian.Domain
         public RadianContributor RadianContributor { get; set; }
 
         public int? RadianContributorTypeId { get; set; }
-
-        //[Key, Column(Order = 1)]
+                
         public int RadianOperationModeId { get; set; }
         public RadianOperationMode RadianOperationMode { get; set; }
 
         public int? RadianProviderId { get; set; }
         public RadianContributor RadianProvider { get; set; }
 
-        public string SoftwareId { get; set; }
-        public Software Software { get; set; }
+        public Guid SoftwareId { get; set; }
 
         public DateTime Timestamp { get; set; }
 

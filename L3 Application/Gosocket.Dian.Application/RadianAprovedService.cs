@@ -206,8 +206,10 @@ namespace Gosocket.Dian.Application
         public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
         {
             RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
+
             radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId);
-            int code = Convert.ToInt32(radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianContributor.Contributor.Code);
+
+            int code = (int)radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianProviderId;
             radianContributorOperationWithSoftware.Softwares = _radianCallSoftwareService.GetSoftwares(code);
 
             return radianContributorOperationWithSoftware;
@@ -216,28 +218,6 @@ namespace Gosocket.Dian.Application
         public RadianTestSetResult RadianTestSetResultByNit(string nit)
         {
             return _radianTestSetResultService.GetTestSetResultByNit(nit).FirstOrDefault();
-        }
-
-        public List<RadianUserData> ListUsers(List<string> listIds)
-        {
-            List<RadianUserData> listUsers = new List<RadianUserData>();
-
-            //Code, name, Email 
-            foreach (string id in listIds)
-            {
-                Contributor contributor = _contributorService.Get(int.Parse(id));
-
-                RadianUserData user = new RadianUserData()
-                {
-                    Code = contributor.Code,
-                    Name = contributor.Name,
-                    Email = contributor.Email
-                };
-
-                listUsers.Add(user);
-            }
-
-            return listUsers;
-        }
+        }        
     }
 }
