@@ -217,7 +217,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult ViewDetails(List<FilesChangeStateViewModel> data, int id, string approveState)
+        public JsonResult ViewDetails(List<FilesChangeStateViewModel> data, int id, string approveState, string radianState)
         {
             try
             {
@@ -254,7 +254,7 @@ namespace Gosocket.Dian.Web.Controllers
                     }
                 }
 
-                _ = _radianContributorService.ChangeParticipantStatus(id, approveState);
+                _ = _radianContributorService.ChangeParticipantStatus(id, approveState, radianAdmin.Contributor.RadianContributorTypeId, radianState);
                 _ = SendMail(radianAdmin);
 
                 return Json(new
