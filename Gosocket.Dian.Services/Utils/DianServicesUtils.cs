@@ -769,14 +769,14 @@ namespace Gosocket.Dian.Services.Utils
                 {
                     if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34)
                     {
-                        stringBuilder.AppendLine($"{codeMessage}AAD05 No fue informado un número para el evento.");
+                        stringBuilder.AppendLine($"{codeMessage}D05 No fue informado un número para el evento.");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
                     }
                     if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 45)
                     {
-                        stringBuilder.AppendLine($"{codeMessage}AAD05a No fue informado un número para el evento.");
+                        stringBuilder.AppendLine($"{codeMessage}D05a No fue informado un número para el evento.");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
