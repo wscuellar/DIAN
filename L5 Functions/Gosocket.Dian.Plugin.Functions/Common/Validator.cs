@@ -2198,8 +2198,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = "89",
-                                                    ErrorMessage = "No se pueda transmitir el evento 037-Endoso en Propiedad ya existen asociados los eventos 038 Endoso en Garantia o 039 Endoso en Procuracion o 041 Limitación de circulación.",
+                                                    ErrorCode = "LGC25",
+                                                    ErrorMessage = "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: " +
+                                                    "Endoso en garantía, Endoso en procuración o Limitación de circulación",
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                            }
+                                            else if (documentMeta
+                                                 .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                                 .Count > decimal.Zero)
+                                            {
+                                                validFor = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = "LGC26",
+                                                    ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento Notificación de Pago total",
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
                                             }
