@@ -178,7 +178,8 @@ namespace Gosocket.Dian.Application
                         AcceptanceStatusId = c.Contributor.AcceptanceStatus.Id,
                         CreatedDate = c.CreatedDate,
                         Step = c.Step,
-                        RadianContributorTypeId = c.RadianContributorTypeId
+                        RadianContributorTypeId = c.RadianContributorTypeId,
+                        RadianOperationModeId = c.RadianOperationModeId
                     },
                     Files = c.RadianContributorFile.ToList(),
                     Tests = testSet,

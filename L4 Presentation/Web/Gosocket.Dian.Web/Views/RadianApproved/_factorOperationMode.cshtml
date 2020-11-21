@@ -16,6 +16,10 @@
                     <div class="row margin-horizontal-0">
                         @using (Html.BeginForm("UploadFactorOperationMode", "RadianApproved", FormMethod.Post, new { id = "radian-contributors-form" }))
                         {
+                            @Html.HiddenFor(m => m.Contributor.Id)
+                            @Html.HiddenFor(m => m.SoftwareUrl)
+                            @Html.HiddenFor(m => m.SoftwareId)
+
                             <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                 <div class="col-md-12 padding-horizontal-0">
                                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
@@ -129,8 +133,8 @@
                                                     <td class="largeText iffyTip">@software.Id</td>
                                                     <td class="largeText iffyTip">@software.Pin</td>
                                                     <td class="largeText iffyTip">@software.Url</td>
-                                                    <td class="largeText iffyTip"><a title="Eliminar"><i class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a></td>
-                                                    <td class="largeText iffyTip"><a title="Set de pruebas"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a></td>
+                                                    <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer"><span ><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
+                                                    <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></td>
                                                 </tr>
                                             }
                                         </tbody>

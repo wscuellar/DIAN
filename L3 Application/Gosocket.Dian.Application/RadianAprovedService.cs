@@ -207,7 +207,7 @@ namespace Gosocket.Dian.Application
         {
             RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
 
-            radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId);
+            radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId && t.Deleted == false);
 
             int code = (int)radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianProviderId;
             radianContributorOperationWithSoftware.Softwares = _radianCallSoftwareService.GetSoftwares(code);

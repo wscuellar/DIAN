@@ -40,6 +40,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
+                Contributor = radianAdmin.Contributor,
                 ContributorId = radianAdmin.Contributor.Id,
                 Name = radianAdmin.Contributor.TradeName,
                 Nit = radianAdmin.Contributor.Code,
@@ -174,6 +175,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult GetFactorOperationMode(RadianApprovedViewModel radianApprovedViewModel)
         {
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(radianApprovedViewModel.ContributorId);
             Software software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
             List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
             RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
@@ -183,7 +185,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
             {
-                Contributor = radianApprovedViewModel.Contributor,
+                Contributor = radianAdmin.Contributor,
                 Software = software,
                 OperationModeList = operationModeList,
                 RadianContributorOperations = radianContributorOperations,
@@ -199,18 +201,19 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult UploadFactorOperationMode(RadianApprovedOperationModeViewModel approvedOperModeViewModel)
         {
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(approvedOperModeViewModel.Contributor.Id);
             _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
             {
-                RadianContributorId = approvedOperModeViewModel.Contributor.Id,
-                RadianOperationModeId = approvedOperModeViewModel.Contributor.RadiantContributors.FirstOrDefault().RadianOperationModeId,
-                RadianProviderId = approvedOperModeViewModel.Contributor.Id,
-                SoftwareId = approvedOperModeViewModel.SoftwareId,
+                RadianContributorId = radianAdmin.Contributor.Id,
+                RadianOperationModeId = radianAdmin.Contributor.RadianOperationModeId,
+                RadianProviderId = radianAdmin.Contributor.Id,
                 Deleted = false,
                 Timestamp = DateTime.Now,
-                RadianContributorTypeId = approvedOperModeViewModel.Contributor.ContributorTypeId,
+                RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId,
                 Pin = approvedOperModeViewModel.SoftwarePin,
                 SoftwareName = approvedOperModeViewModel.SoftwareName,
-                Url = approvedOperModeViewModel.Software.Url
+                Url = approvedOperModeViewModel.SoftwareUrl,
+                SoftwareId = approvedOperModeViewModel.SoftwareId,
             });
 
             return Json(
@@ -238,10 +241,20 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult DeleteUser(int id, string newState, int radianContributorTypeId, string radianState)
         {
             _radianContributorService.ChangeParticipantStatus(id, newState, radianContributorTypeId, radianState);
-
             return Json(new
             {
                 message = "Datos actualizados",
+                success = true,
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult DeleteOperationMode(string Id)
+        {
+            _radianAprovedService.Update(Convert.ToInt32(Id));
+            return Json(new
+            {
+                message = "Modo de operación eliminado.",
                 success = true,
             }, JsonRequestBehavior.AllowGet);
         }
