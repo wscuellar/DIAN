@@ -830,6 +830,13 @@ span.state-file {
     margin: 1em auto;
 }
 
+.highcharts-figure-settest {
+    min-width: 410px;
+    max-width: 900px;
+    margin: 1em auto;
+}
+
+
 .highcharts-data-table table {
     font-family: Verdana, sans-serif;
     border-collapse: collapse;
@@ -925,11 +932,11 @@ span.close {
     text-align: left !important;
 }
 
-.dataTables_filter label {
-    text-align: left !important;
-    width: 30% !important;
-    margin-right: 46px;
-}
+    .dataTables_filter label {
+        text-align: left !important;
+        width: 30% !important;
+        margin-right: 46px;
+    }
 
 .dataTable th {
     font-weight: lighter !important;
@@ -951,7 +958,6 @@ span.close {
     margin-bottom: 2px;
 }
 
-.modal .title-container {
 .modal-radian .title-container {
     margin-bottom: 30px;
 }
@@ -960,6 +966,7 @@ span.close {
     background: #E9E8E8 !important;
     height: 2px !important;
 }
+
 }
 
 .modal-radian .bootbox-close-button {
