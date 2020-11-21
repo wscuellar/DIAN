@@ -1,4 +1,4 @@
-﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedOperationModeViewModel
 
 @{ ViewBag.title = "Configurar modo de operación-Factor"; }
 
@@ -16,6 +16,10 @@
                     <div class="row margin-horizontal-0">
                         @using (Html.BeginForm("UploadFactorOperationMode", "RadianApproved", FormMethod.Post, new { id = "radian-contributors-form" }))
                         {
+                            @Html.HiddenFor(m => m.Contributor.Id)
+                            @Html.HiddenFor(m => m.SoftwareUrl)
+                            @Html.HiddenFor(m => m.SoftwareId)
+
                             <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                 <div class="col-md-12 padding-horizontal-0">
                                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
@@ -24,8 +28,8 @@
                                             <div class="row">
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new { @class = "control-label" })
-                                                        @Html.DropDownListFor(m => m.RadianApprovedOperationModeViewModel.OperationModeSelected, new SelectList(Model.OperationModeList, "Id", "Name", Model.RadianApprovedOperationModeViewModel.OperationModeSelected), new { @class = "form-control selectpicker", disabled = "disabled" })
+                                                        @Html.LabelFor(m => m.OperationModeSelected, new { @class = "control-label" })
+                                                        @Html.DropDownListFor(m => m.OperationModeSelected, new SelectList(Model.OperationModeList, "Id", "Name", Model.OperationModeSelected), new { @class = "form-control selectpicker", disabled = "disabled" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-5 padding-xs-0">
@@ -48,20 +52,22 @@
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.SoftwareName, new { @class = "control-label" })
-                                                        @Html.TextBox("SoftwareName", null, new { @class = "form-control input-general", @style = "background: #ffffff;" })
+                                                        @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
+                                                        @Html.ValidationMessageFor(m => m.SoftwareName)
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.RadianApprovedOperationModeViewModel.SoftwarePin, new { @class = "control-label" })
-                                                        @Html.TextBox("SoftwarePin", null, new { @class = "form-control input-general", @style = "background: #ffffff;" })
+                                                        @Html.LabelFor(m => m.SoftwarePin, new { @class = "control-label" })
+                                                        @Html.TextBoxFor(m => m.SoftwarePin, new { @id = "SoftwarePin", @name = "SoftwarePin", @class = "form-control input-general", @style = "background: #ffffff;" })
+                                                        @Html.ValidationMessageFor(m => m.SoftwarePin)
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.Label("ID del Software", new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.Software.Id, new { @class = "form-control input-general", disabled = "disabled" })
+                                                        @Html.TextBox("SoftwareId", Guid.NewGuid().ToString(), new { @class = "form-control input-general", disabled = "disabled" })
                                                     </div>
                                                 </div>
                                             </div>
@@ -104,12 +110,31 @@
                                                 <tr>
                                                     <td class="smallText iffyTip">@oper.RadianOperationMode.Name</td>
                                                     <td class="smallText iffyTip">@oper.Timestamp.ToString("dd/MM/yyy")</td>
-                                                    <td class="largeText iffyTip">@software.Status</td>
+                                                    <td class="largeText iffyTip">
+                                                        @{
+                                                            if (software.Status)
+                                                            {
+                                                                <p>Aceptado</p>
+                                                            }
+                                                            else
+                                                            {
+                                                                if (software.Deleted)
+                                                                {
+                                                                    <p>Rechazado</p>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <p>En proceso</p>
+                                                                }
+                                                            }
+                                                        }
+                                                    </td>
+                                                    <td class="largeText iffyTip">@software.Name</td>
                                                     <td class="largeText iffyTip">@software.Id</td>
                                                     <td class="largeText iffyTip">@software.Pin</td>
                                                     <td class="largeText iffyTip">@software.Url</td>
-                                                    <td class="largeText iffyTip"><a title="Eliminar"><i class="fa fa-trash fa-1"></i></a></td>
-                                                    <td class="largeText iffyTip"><a title="Set de pruebas"><i class="fas fa-eye"></i></a></td>
+                                                    <td class="largeText iffyTip"><a title="Eliminar"><i class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a></td>
+                                                    <td class="largeText iffyTip"><a title="Set de pruebas"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a></td>
                                                 </tr>
                                             }
                                         </tbody>
@@ -127,82 +152,3 @@
         </div>
     </div>
 </div>
-
-@*@section Scripts
-    {
-
-        <script>
-            $(document).ready(function () {
-                var form = $('#radian-contributors-form');
-                $('#DateInterval').daterangepicker({
-                    locale: {
-                        applyLabel: "Aplicar",
-                        cancelLabel: "Cancelar",
-                        format: 'DD-MMMM-yyyy',
-                        monthNames: [
-                            "Enero",
-                            "Febrero",
-                            "Marzo",
-                            "Abril",
-                            "Mayo",
-                            "Junio",
-                            "Julio",
-                            "Agosto",
-                            "Septiembre",
-                            "Octubre",
-                            "Noviembre",
-                            "Diciembre"
-                        ],
-                        separator: " al ",
-                    }
-
-                });
-
-
-                 $("#Code").focus();
-
-                if (@Model.RadianContributors.Count == 0) {
-                    $('.table-responsive').css('display', 'none');
-                }
-
-                $('.btn-search').click(function () {
-                    var dateRange = $("#DateInterval").val();
-                    $('#StartDate').val(dateRange.split("al")[0]);
-                    $('#EndDate').val(dateRange.split("al")[1]);
-                    $('#Page').val(0);
-
-                    $('#Type').val($("#RadianType").val());
-                    showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
-                    $(this).attr('disabled', 'disabled');
-                    $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
-                    $('.table-pagination').css('display', 'none');
-                    $('.table-responsive').css('display', 'none');
-                    form.submit();
-                });
-
-                //Pagination
-                $(".next-page").click(function () {
-                    $("#Page").val(@Model.Page + 1);
-                    form.submit();
-                })
-
-                $(".prev-page").click(function () {
-                    $("#Page").val(@Model.Page - 1);
-                    form.submit();
-                })
-
-            })
-
-            //$(document).on('mouseenter', ".iffyTip", function () {
-            //    var $this = $(this);
-            //    if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
-            //        $this.tooltip({
-            //            title: $this.text(),
-            //            placement: "bottom",
-            //            container: "body"
-            //        });
-            //        $this.tooltip('show');
-            //    }
-            //});
-        </script>*@
-

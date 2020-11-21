@@ -90,3 +90,19 @@ function AlertExec() {
         }
     }
 }
+
+
+function ajaxFunction(url,metod,data,actionError,actionSuccess) {
+    $.ajax({
+        url: url,
+        type: metod,
+        data: data,
+        error: actionError,
+        success: actionSuccess
+    });
+}
+
+function FilesUploadRequired() {
+    var x = document.getElementsByClassName("radian-file").required;
+    document.getElementById("required-message").innerHTML = x; 
+}

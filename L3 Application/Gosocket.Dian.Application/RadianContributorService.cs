@@ -45,8 +45,8 @@ namespace Gosocket.Dian.Application
         {
             NameValueCollection collection = new NameValueCollection();
             Domain.Contributor contributor = _contributorService.GetByCode(userCode);
-            var radianContributor =  _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice && t.RadianState != "Cancelado");
-            if(radianContributor != null)
+            var radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice && t.RadianState != "Cancelado");
+            if (radianContributor != null)
             {
                 collection.Add("RadianContributorTypeId", radianContributor.RadianContributorTypeId.ToString());
                 collection.Add("RadianOperationModeId", radianContributor.RadianOperationModeId.ToString());
@@ -74,8 +74,12 @@ namespace Gosocket.Dian.Application
             }
 
             string cancelEvent = RadianState.Cancelado.GetDescription();
-            List<RadianContributor> radianContributor = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)radianContributorType && t.RadianState !=  cancelEvent);
-            if (radianContributor.Any(t=> t.RadianState != cancelEvent))
+            int radianType = (int)radianContributorType;
+            List<RadianContributor> records = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == radianType);
+            RadianContributor lastRecord = (from p in records
+                                            group p by p.ContributorId into g
+                                            select g.OrderByDescending(x => x.Update).FirstOrDefault()).FirstOrDefault();
+            if (lastRecord != null && lastRecord.RadianState != cancelEvent)
                 return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.redirectType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.TechnologyProvider && (contributor.ContributorTypeId != (int)Domain.Common.ContributorType.Provider || !contributor.Status))
@@ -174,7 +178,8 @@ namespace Gosocket.Dian.Application
                         AcceptanceStatusId = c.Contributor.AcceptanceStatus.Id,
                         CreatedDate = c.CreatedDate,
                         Step = c.Step,
-                        RadianContributorTypeId = c.RadianContributorTypeId
+                        RadianContributorTypeId = c.RadianContributorTypeId,
+                        RadianOperationModeId = c.RadianOperationModeId
                     },
                     Files = c.RadianContributorFile.ToList(),
                     Tests = testSet,
@@ -186,16 +191,16 @@ namespace Gosocket.Dian.Application
             return radianAdmin;
         }
 
-        public bool ChangeParticipantStatus(int contributorId, string approveState)
+        public bool ChangeParticipantStatus(int contributorId, string newState, int radianContributorTypeId, string actualState)
         {
-            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId);
+            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorTypeId && t.RadianState == actualState);
 
             if (contributors.Any())
             {
                 var radianContributor = contributors.FirstOrDefault();
 
-                if (approveState != "")
-                    radianContributor.RadianState = approveState == "0" ? RadianState.Test.GetDescription() : RadianState.Cancelado.GetDescription();
+                if (newState != "")
+                    radianContributor.RadianState = newState == "0" ? RadianState.Test.GetDescription() : RadianState.Cancelado.GetDescription();
 
                 _radianContributorRepository.AddOrUpdate(radianContributor);
                 return true;
@@ -226,15 +231,17 @@ namespace Gosocket.Dian.Application
 
         public void CreateContributor(int contributorId, RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy)
         {
+            RadianContributor existing = _radianContributorRepository.Get(t => t.ContributorId == contributorId && t.RadianContributorTypeId == (int)radianContributorType);
+
             RadianContributor newRadianContributor = new Domain.RadianContributor()
             {
+                Id = existing != null ? existing.Id : 0,
                 ContributorId = contributorId,
                 CreatedBy = createdBy,
                 RadianContributorTypeId = (int)radianContributorType,
                 RadianOperationModeId = (int)radianOperationMode,
                 RadianState = radianState.GetDescription(),
-                CreatedDate = System.DateTime.Now,
-                Update = System.DateTime.Now,
+                CreatedDate = existing != null ? existing.CreatedDate : System.DateTime.Now
             };
             int id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
             newRadianContributor.Id = id;

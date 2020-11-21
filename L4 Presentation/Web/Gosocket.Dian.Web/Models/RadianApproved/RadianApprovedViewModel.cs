@@ -11,9 +11,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public int ContributorId { get; set; }
 
-        public Contributor Contributor { get; set; }
-
-        public int CurrentlyStep { get; set; }
+        public RedianContributorWithTypes Contributor { get; set; }
 
         [Display(Name = "Tipo de participante")]
         public int RadianContributorTypeId { get; set; }
@@ -40,23 +38,17 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public RadianTestSetResult RadianTestSetResult { get; set; }
 
-        public Software Software { get; set; }
-
-        public List<RadianOperationMode> OperationModeList { get; set; }
-
-        public RadianApprovedOperationModeViewModel RadianApprovedOperationModeViewModel { get; set; }
-
         [Display(Name = "Estado de aprobación")]
         public string RadianState { get; set; }
+
+        public Software Software { get; set; }
 
         public RadianContributorOperationWithSoftware RadianContributorOperations { get; set; }
 
         public List<string> LegalRepresentativeIds { get; set; }
 
         public List<UserViewModel> LegalRepresentativeList { get; set; }
-        public RadianApprovedViewModel()
-        {
-            RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
-        }
+
+        public RadianApprovedViewModel() => RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
     }
 }

@@ -68,6 +68,9 @@
 </div>
 
 @section scripts{
+
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/Radian/constants.js"></script>
     <script>
         $(document).ready(function () {
                 var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
@@ -76,7 +79,7 @@
                     bodyTag: "section",
                     transitionEffect: "slideLeft",
                     autoFocus: true,
-                    startIndex: index,
+                    startIndex: 3,
                     enablePagination: false,
                     enableKeyNavigation: false
                 });
@@ -94,16 +97,31 @@
                     var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
                     var dialog = bootbox.dialog({
                         message: htmlPartial,
-                        className: "table-data",
+                        className: "table-data modal-radian",
                         size: 'large'
                     });
                     dialog.init(function (e) {
-                        $('#table-history').DataTable();
+                        $('#table-history').DataTable({
+                            "language": {
+                                "lengthMenu": "Mostrar _MENU_ elementos por página",
+                                "zeroRecords": "No se encontraron datos",
+                                "info": "Mostrando página _PAGE_ de _PAGES_",
+                                "infoEmpty": "No hay datos",
+                                "infoFiltered": "(Filtrado de _MAX_ registros)",
+                                "search": "Requisito:",
+                                "paginate": {
+                                    "next": ">",
+                                    "previous": "<"
+                                }
+                            }
+                        });
+                        $("#table-history_filter").append("<button class='btn btn-radian-success'>Buscar</button>");
                     } )
                 });
 
                 $('#submit-button').click(function (e) {
                     e.preventDefault();
+                    FilesUploadRequired();
                     var files = $("#uploadForm")[0];
                     var formdata = new FormData();
                     var numberFiles = 0;
@@ -115,7 +133,6 @@
                             numberFiles++;
                         }
                     };
-                    debugger
                     formdata.append("nit", "@Model.Nit");
                     formdata.append("email", "@Model.Email");
                     formdata.append("contributorId", "@Model.ContributorId");
@@ -165,7 +182,7 @@
                                         className: 'btn-success'
                                     }
                                 },
-                                callback: function () {debugger
+                                callback: function () {
                                     showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                                     window.location.href = '@Url.Action("Index", "RadianApproved")' + "?ContributorId=" + objData.ContributorId + "&RadianContributorType=" + objData.RadianContributorType + "&RadianOperationMode=" + objData.RadianOperationMode;
                                 }
@@ -174,7 +191,7 @@
                     });
                 });
 
-                $(".close").click(function () {debugger
+                $(".close").click(function () {
                     $(this).parent().toggle();
                     $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
                 })
@@ -183,12 +200,43 @@
                     var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));
                     var dialog = bootbox.dialog({
                         message: htmlPartial,
-                        className: "table-data",
+                        className: "table-data modal-radian",
                         size: 'large'
                     });
                     dialog.init(function (e) {
-                        $('#table-history').DataTable();
-                    } )
+                        $('#table-history').DataTable({
+                            "language": {
+                                "lengthMenu": "Mostrar _MENU_ elementos por página",
+                                "zeroRecords": "No se encontraron datos",
+                                "info": "Mostrando página _PAGE_ de _PAGES_",
+                                "infoEmpty": "No hay datos",
+                                "infoFiltered": "(Filtrado de _MAX_ registros)",
+                                "search": "Nit Facturador",
+                                "paginate": {
+                                    "next": ">",
+                                    "previous": "<"
+                                }
+                            }
+                        });
+                        $("#table-history_filter").append("<button class='btn btn-radian-success'>Buscar</button>");
+
+                    })
+                });
+
+            $("#cancel-register").click(function () {
+                    var url = "@Url.Action("DeleteUser", "RadianApproved")";
+                    var metod = 'POST';
+                    var dataAjax = {
+                        id: '@Model.ContributorId',
+                        newState: '4',
+                        radianContributorTypeId: @Model.RadianContributorTypeId,
+                        radianState: '@Model.RadianState'
+                    };
+                    var successAction = () => window.location.href = '@Url.Action("Index", "Radian")';
+                    var confirmMessage = bootboxMessage.CONFIRMATION_MESSAGE;
+                    var operation = () => ajaxFunction(url, metod, dataAjax, () => { }, successAction);
+                    var buttons = ConfirmExec(operation);
+                    showConfirmation(confirmMessage, buttons);
                 });
             });
     </script>

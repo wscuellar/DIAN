@@ -30,7 +30,8 @@
                         <div class="form-group file-input-enabled">
                             <p class="radian-file-top-label">@n.Name</p>
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" />
+                                <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" required/>
+                                <p id="required-message"></p>
                                 <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
                             </div>
                         </div>
@@ -76,7 +77,7 @@
 </div>
     <div class="panel-footer text-right">
         <div class="form-group">
-            <button type="button" class="btn btn-default btn-radian-default">Cancelar registro</button>
+            <button type="button" class="btn btn-default btn-radian-default" id="cancel-register">Cancelar registro</button>
             <button name="Submit" class="btn btn-radian-success " id="submit-button">Enviar</button>
         </div>
     </div>
