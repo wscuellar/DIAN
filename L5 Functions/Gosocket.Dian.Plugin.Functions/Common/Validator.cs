@@ -974,9 +974,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (eventCode == "037")
             {
                 //Valida precio a pagar endoso
-                int resultValuePriceToPay = (Convert.ToInt32(valueTotalEndoso) * Convert.ToInt32(valueDiscountRateEndoso));
+                int resultValuePriceToPay = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture));
 
-                if (Convert.ToInt32(valuePriceToPay) != resultValuePriceToPay)
+                if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultValuePriceToPay)
                 {
                     return new ValidateListResponse
                     {
