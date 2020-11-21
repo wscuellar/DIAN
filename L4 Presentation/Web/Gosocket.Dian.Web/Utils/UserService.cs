@@ -1,4 +1,6 @@
-﻿using Gosocket.Dian.Web.Models;
+﻿using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
+using Gosocket.Dian.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -151,6 +153,32 @@ namespace Gosocket.Dian.Web.Utils
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Registrar trazabilidad de Usuarios externos
+        /// </summary>
+        /// <param name="message">Datos del usuario</param>
+        /// <param name="actionName">Crear,Actualizar, Asignar/Actualizar permisos</param>
+        public void RegisterExternalUserTrazability(string message, string actionName)
+        {
+            var requestId = Guid.NewGuid();
+
+            var logger = new GlobalLogger(requestId.ToString(), requestId.ToString())
+            {
+                Action = actionName,
+                Controller = "ExternalUsers",
+                Message = message,
+                RouteData = null,
+                StackTrace = null
+            };
+
+            new TableManager("GlobalLogger").InsertOrUpdate(logger); 
+        }
+
+        public ApplicationUser FindUserByIdentificationAndTypeId(int identificationTypeId, string identificationId)
+        {
+            return _sqlDBContext.Users.FirstOrDefault(u => u.IdentificationTypeId == identificationTypeId && u.IdentificationId == identificationId);
         }
 
     }

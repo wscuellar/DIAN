@@ -83,6 +83,7 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         Id = s.Id,
                         UserId = id,
+                        MenuId = s.MenuId,
                         SubMenuId = s.SubMenuId,
                         State = s.State,
                         CreatedBy = s.CreatedBy,
@@ -182,6 +183,10 @@ namespace Gosocket.Dian.Web.Controllers
 
         private void LoadViewBags(string userId)
         {
+
+            ViewBag.IdentificationTypesList = identificationTypeService.List()
+                        .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList();
+
             //var roles = new SelectList(_context.Roles.Where(u => u.Name.Contains("UsuarioExterno"))
             //                                .ToList(), "Id", "Name");
             var role = _context.Roles.FirstOrDefault(u => u.Name.Contains(Roles.UsuarioExterno));
@@ -251,9 +256,9 @@ namespace Gosocket.Dian.Web.Controllers
             List<Permission> permissions = null;
             IdentityResult result = null;
 
-            if (fc["hddPermissions"] == null)
+            if (string.IsNullOrEmpty(fc["hddPermissions"]) || fc["hddPermissions"].ToString() == "[]")
             {
-                ModelState.AddModelError("no_permissions", "No ha seleccionado los Permisos para el Usuario");
+                ModelState.AddModelError("", "No ha seleccionado los Permisos para el Usuario");
                 return View(model);
             }
 
@@ -268,13 +273,44 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (string.IsNullOrEmpty(model.Id))
             {
+                if (!ModelState.IsValid)
+                {
+                    foreach (var item in ModelState.Values.SelectMany(v => v.Errors))
+                        ModelState.AddModelError("",item.ErrorMessage);
+                }
+
+                if(model.IdentificationTypeId <= 0)
+                {
+                    ModelState.AddModelError("", "Por favor seleccione el Tipo de Documento");
+
+                    return View(model);
+                }
+                
                 user.Code = Guid.NewGuid().ToString().Substring(0, 6);
+
+                //validar si ya existe un Usuario con el tipo documento y documento suministrados
+                var vUserDB = userService.FindUserByIdentificationAndTypeId(model.IdentificationTypeId, model.IdentificationId);
+
+                if(vUserDB != null)
+                {
+                    ModelState.AddModelError("", "Ya existe un Usuario con el Tipo de Documento y Documento suministrados");
+
+                    return View(model);
+                }
 
                 result = await UserManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
                     ViewBag.messageAction = "Usuario Registrado exitosamente!";
+
+                    userService.RegisterExternalUserTrazability(JsonConvert.SerializeObject( new ExternalUserViewModel() {
+                        Id = user.Id,
+                        IdentificationTypeId = model.IdentificationTypeId,
+                        IdentificationId =model.IdentificationId,
+                        Names = model.Names,
+                        Email = model.Email
+                    }), "Creación");
 
                     var result1 = await UserManager.AddToRoleAsync(user.Id, Roles.UsuarioExterno);
 
@@ -291,6 +327,14 @@ namespace Gosocket.Dian.Web.Controllers
                     }
 
                     var affected = _permisionService.AddOrUpdate(permissions);
+
+                    userService.RegisterExternalUserTrazability(JsonConvert.SerializeObject(new ExternalUserViewModel()
+                    {
+                        IdentificationTypeId = model.IdentificationTypeId,
+                        IdentificationId = model.IdentificationId,
+                        Names = model.Names,
+                        Email = model.Email
+                    }) + ", permisos: " + JsonConvert.SerializeObject(permissions), "Creación de Permisos");
 
                     return RedirectToAction("AddUser");
                 }
@@ -330,7 +374,23 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     ViewBag.messageAction = "Usuario actualizado exitosamente!";
 
+                    userService.RegisterExternalUserTrazability(JsonConvert.SerializeObject(new ExternalUserViewModel()
+                    {
+                        IdentificationTypeId = model.IdentificationTypeId,
+                        IdentificationId = model.IdentificationId,
+                        Names = model.Names,
+                        Email = model.Email
+                    }), "Actualización");
+
                     var affected = _permisionService.AddOrUpdate(permissions);
+
+                    userService.RegisterExternalUserTrazability(JsonConvert.SerializeObject(new ExternalUserViewModel()
+                    {
+                        IdentificationTypeId = model.IdentificationTypeId,
+                        IdentificationId = model.IdentificationId,
+                        Names = model.Names,
+                        Email = model.Email
+                    }) + ", permisos: " + JsonConvert.SerializeObject(permissions) , "Actualización de Permisos");
 
                     //Envio de notificacion por correo
                     _ = SendMailUpdate(model);

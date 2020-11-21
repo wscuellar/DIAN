@@ -24,7 +24,6 @@
 
                             @Html.Partial("_userForm")
                             @Html.ValidationSummary("", new { @class = "text-center text-danger" })
-                            @Html.ValidationMessage("no_permissions", new { @class = "text-center text-danger" })
                             <div class="padding-20">
                                 @foreach (Gosocket.Dian.Web.Models.MenuViewModel menu in ((List<Gosocket.Dian.Web.Models.MenuViewModel>)ViewBag.Menu))
                                 {
@@ -53,25 +52,31 @@
                                 }
                             </div>
                             <br />
+                            <div class="form-group text-center">
+                                @Html.ActionLink("Nuevo", "AddUser", "ExternalUsers", null, new { @class = "btn btn-default" })
+                                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>
+                            </div>
                             <br />
-                            <table class="table table-sm table-bordered table-hover">
+                            <table class="table table-sm table-bordered">
                                 <thead>
                                     <tr>
                                         <th>Tipo de documento</th>
                                         <th>Documento</th>
                                         <th>Nombres</th>
                                         <th>Email</th>
-                                        <th class="text-center">Active</th>
+                                        <th class="text-center">Activo?</th>
                                         <th class="text-center">Editar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @if (ViewBag.ExternalUsersList != null)
                                     {
+                                        List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
                                         foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
                                         {
                                             <tr>
-                                                <td>@(Model.IdentificationTypes.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description)</td>
+                                                <td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>
                                                 <td>@item.IdentificationId</td>
                                                 <td>@item.Names</td>
                                                 <td>@item.Email</td>
@@ -85,10 +90,11 @@
                                 </tbody>
                             </table>
                             <br />
-                            <div class="panel-footer text-center">
-                                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-                                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>
-                            </div>
+                            @*<div class="panel-footer text-center">
+                                    @Html.ActionLink("Nuevo", "AddUser", null, new { @class = "btn btn-secondary btn-hover-gosocket" })
+                                    <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                                    <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>
+                                </div>*@
                         }
                     </div>
                 </div>
@@ -168,7 +174,7 @@
             }
 
             $("#btnOkActive").click(function () {
-                debugger;
+
                 $.ajax({
                     url: "@Url.Action("UpdateActive","ExternalUsers")",
                     type: "POST",
@@ -227,8 +233,8 @@
                 listPermisionsAsigned = JSON.parse($("#hddPermissionsAsigned").val());
 
                 for (i = 0; i < listMenu.length; i++) {
-
-                    if (listMenu[i].Options != null) {
+                    console.log('Menu: ' + listMenu[i].Id + listMenu[i].Name);
+                    if (listMenu[i].Options != null && listMenu[i].Options.length > 0) {
                         for (j = 0; j < listMenu[i].Options.length; j++) {
 
                             var asigned = validSubMenuAsigned(listMenu[i].Options[j].Id);
@@ -238,11 +244,30 @@
                             }
                         }
                     }
+                    else {
+                        if (validMenuWithoutSubMenu(listMenu[i].Id)) {
+                            $("#menu" + listMenu[i].Id).prop("checked", "checked")
+                        }
+                    }
                 }
             }
 
         });
 
+        function validMenuWithoutSubMenu(menuId) {
+            var menuSelected = false;
+
+            for (z = 0; z < listPermisionsAsigned.length; z++) {
+                if (menuId == listPermisionsAsigned[z].MenuId && (listPermisionsAsigned[z].SubMenuId == 0)) {
+                    menuSelected = true;
+                    break;
+                }
+            }
+
+            console.log('menuId: ' + menuId + ', sin SubMenuId: ' + menuSelected);
+
+            return menuSelected;
+        }
 
         function validSubMenuAsigned(subMenuId) {
             var asigned = false;
@@ -277,7 +302,7 @@
             var arrPermissions = [];
 
             $.each(listMenu, function (index, value) {
-                if (value.Options != null) {
+                if (value.Options != null && value.Options.length > 0) {
                     for (j = 0; j < listMenu[index].Options.length; j++) {
 
                         if ($("#submenu" + listMenu[index].Id + "_" + listMenu[index].Options[j].Id).prop("checked")) {
@@ -290,9 +315,22 @@
                         }
                     }
                 }
+                else {
+
+                    console.log("menuId: " + listMenu[index].Id + ', checked: ' +  $("#menu" + listMenu[index].Id).prop("checked"));
+
+                    //Valido si la opcion de Menu que NO tiene SubMenu tiene la opción Todos seleccionada
+                    if($("#menu" + listMenu[index].Id).prop("checked")){
+                        arrPermissions.push({
+                            MenuId: listMenu[index].Id,
+                            SubMenuId: 0
+                        });
+                    }
+                }
 
             });
 
+            console.log('arrPermissions', arrPermissions);
             return JSON.stringify(arrPermissions);
         }
 

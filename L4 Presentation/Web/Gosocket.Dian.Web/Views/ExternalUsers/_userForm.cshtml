@@ -5,7 +5,7 @@
         <div class="col-sm-3 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.IdentificationTypeId, new { @class = "control-label" })
-                @Html.DropDownListFor(m => m.IdentificationTypeId, new SelectList(Model.IdentificationTypes, "Id", "Description", Model.IdentificationTypeId), new { @class = "form-control selectpicker" })
+                @Html.DropDownListFor(m => m.IdentificationTypeId, new SelectList(ViewBag.IdentificationTypesList, "Id", "Description"), new { @class = "form-control selectpicker" })
             </div>
         </div>
         <div class="col-sm-3 padding-xs-0">
