@@ -178,6 +178,9 @@
     <Compile Include="Common\CertificateExtensions.cs" />
     <Compile Include="Common\RedisExtensions.cs" />
     <Compile Include="IdentificationTypeService.cs" />
+    <Compile Include="GlobalDocValidationDocumentMetaService.cs" />
+    <Compile Include="GlobalDocValidatorDocumentService.cs" />
+    <Compile Include="GlobalDocValidatorTrackingService.cs" />
     <Compile Include="Managers\RadianLoggerManager.cs" />
     <Compile Include="Managers\RadianTestSetResultManager.cs" />
     <Compile Include="EmailService.cs" />
@@ -200,6 +203,7 @@
     <Compile Include="GlobalDocumentService.cs" />
     <Compile Include="RadianContributorService.cs" />
     <Compile Include="RadianLoggerService.cs" />
+    <Compile Include="QueryAssociatedEventsService.cs" />
     <Compile Include="RadianTestSetAppliedService.cs" />
     <Compile Include="RadianTestSetResultService.cs" />
     <Compile Include="RadianTestSetService.cs" />

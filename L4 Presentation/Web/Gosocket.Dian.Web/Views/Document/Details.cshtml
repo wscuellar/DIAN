@@ -87,7 +87,9 @@
                 $('[data-toggle="tooltip"]').tooltip()
             })
 
-            function GetEventsPartialView(id) {
+        function GetEventsPartialView(id) {
+            var url= '/QueryAssociatedEvents/EventsView?id=' + id  + "&cufe=" +'@Model.Document.DocumentKey'
+            console.log(url);
                 $.ajax({
                     url: '/QueryAssociatedEvents/EventsView?id=' + id  + "&cufe=" +'@Model.Document.DocumentKey',
                     success: function (data, status, xhr) {
