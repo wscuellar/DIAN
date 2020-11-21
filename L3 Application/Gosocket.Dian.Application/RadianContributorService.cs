@@ -230,15 +230,17 @@ namespace Gosocket.Dian.Application
 
         public void CreateContributor(int contributorId, RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy)
         {
+            RadianContributor existing = _radianContributorRepository.Get(t => t.ContributorId == contributorId && t.RadianContributorTypeId == (int)radianContributorType);
+
             RadianContributor newRadianContributor = new Domain.RadianContributor()
             {
+                Id = existing != null ? existing.Id : 0,
                 ContributorId = contributorId,
                 CreatedBy = createdBy,
                 RadianContributorTypeId = (int)radianContributorType,
                 RadianOperationModeId = (int)radianOperationMode,
                 RadianState = radianState.GetDescription(),
-                CreatedDate = System.DateTime.Now,
-                Update = System.DateTime.Now,
+                CreatedDate = existing != null ? existing.CreatedDate : System.DateTime.Now
             };
             int id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
             newRadianContributor.Id = id;

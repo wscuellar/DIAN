@@ -39,6 +39,6 @@ namespace Gosocket.Dian.Domain
 
         public string CreatedBy { get; set; }
 
-        public ICollection<RadianContributorOperation> RadianContributorOperations { get; set; }
+        public virtual ICollection<RadianContributorOperation> RadianContributorOperations { get; set; }
     }
 }

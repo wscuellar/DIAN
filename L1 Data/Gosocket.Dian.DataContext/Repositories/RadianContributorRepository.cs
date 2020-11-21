@@ -67,6 +67,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                 else
                 {
                     radianContributor.Step = 1;
+                    radianContributor.Update = DateTime.Now;
                     context.Entry(radianContributor).State = System.Data.Entity.EntityState.Added;
                 }
 
