@@ -11,7 +11,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public int ContributorId { get; set; }
 
-        public Contributor Contributor { get; set; }
+        public RedianContributorWithTypes Contributor { get; set; }
 
         [Display(Name = "Tipo de participante")]
         public int RadianContributorTypeId { get; set; }

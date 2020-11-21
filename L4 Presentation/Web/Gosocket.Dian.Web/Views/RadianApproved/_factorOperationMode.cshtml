@@ -16,6 +16,10 @@
                     <div class="row margin-horizontal-0">
                         @using (Html.BeginForm("UploadFactorOperationMode", "RadianApproved", FormMethod.Post, new { id = "radian-contributors-form" }))
                         {
+                            @Html.HiddenFor(m => m.Contributor.Id)
+                            @Html.HiddenFor(m => m.SoftwareUrl)
+                            @Html.HiddenFor(m => m.SoftwareId)
+
                             <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                 <div class="col-md-12 padding-horizontal-0">
                                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
