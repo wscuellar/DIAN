@@ -72,5 +72,10 @@ namespace Gosocket.Dian.Domain.Entity
         public string RadianState { get; set; }
         public int RadianContributorTypeId { get; set; }
         public int Step { get; set; }
+        public virtual ICollection<RadianContributor> RadiantContributors { get; set; }
+        public int? ContributorTypeId { get; set; }
+
+        public int RadianOperationModeId { get; set; }
+
     }
 }

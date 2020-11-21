@@ -26,7 +26,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public string CreatedBy { get; set; }
 
-        public Contributor Contributor { get; set; }
+        public RedianContributorWithTypes Contributor { get; set; }
 
         public Software Software { get; set; }
 
