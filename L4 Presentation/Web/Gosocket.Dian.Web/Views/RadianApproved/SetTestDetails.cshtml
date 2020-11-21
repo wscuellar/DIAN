@@ -28,6 +28,11 @@
                     </div>
                 </div>
                 <div class="row margin-horizontal-0">
+                    <p class="title-view" style="padding-top: 5px">
+                        Resumen documentos recibidos y aceptados para el Set de Pruebas
+                    </p>
+                    <div class="underline-title underline-title-grey"></div>
+
                     <figure class="highcharts-figure">
                         <div id="setTestDetails"></div>
                     </figure>
@@ -56,7 +61,7 @@
                         });
 
                         function showChart(data) {
-                            debugger
+                            //debugger
                             var dataChart = data.data;
                             Highcharts.chart('setTestDetails', {
                                 chart: {
@@ -115,7 +120,7 @@
                                             dataChart.EndorsementCancellationTotalRequired,
                                             dataChart.PaymentNotificationTotalRequired,
                                             dataChart.EndCirculationLimitationTotalRequired
-                                            
+
 
 
                                         ]
