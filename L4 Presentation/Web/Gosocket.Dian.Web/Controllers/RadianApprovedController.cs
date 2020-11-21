@@ -113,7 +113,7 @@ namespace Gosocket.Dian.Web.Controllers
             string step = Request.Form.Get("step");
             string radianState = Request.Form.Get("radianState");
             string radianContributorTypeiD = Request.Form.Get("radianContributorTypeiD");
-            
+
 
             ParametersDataViewModel data = new ParametersDataViewModel()
             {
@@ -121,7 +121,7 @@ namespace Gosocket.Dian.Web.Controllers
                 RadianContributorType = RadianContributorType,
                 RadianOperationMode = RadianOperationMode
             };
-           
+
             int idRadianContributor = _radianAprovedService.RadianContributorId(Convert.ToInt32(ContributorId), Convert.ToInt32(radianContributorTypeiD), radianState);
             for (int i = 0; i < Request.Files.Count; i++)
             {
@@ -165,7 +165,7 @@ namespace Gosocket.Dian.Web.Controllers
                 message = "Datos actualizados correctamente.",
                 success = true,
                 data
-        }, JsonRequestBehavior.AllowGet);
+            }, JsonRequestBehavior.AllowGet);
         }
 
 
@@ -184,6 +184,9 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.Software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
             radianApprovedViewModel.RadianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel();
             radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
+
+            foreach (RadianContributorOperation operation in radianApprovedViewModel.RadianContributorOperations.RadianContributorOperations)
+                operation.RadianOperationMode = radianApprovedViewModel.OperationModeList.FirstOrDefault(l => l.Id == operation.RadianOperationModeId);
 
             return View(radianApprovedViewModel);
         }
@@ -207,7 +210,7 @@ namespace Gosocket.Dian.Web.Controllers
                _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
             return View(radianApprovedViewModel);
         }
-        
+
         public JsonResult RadianTestResultByNit(string nit)
         {
             RadianTestSetResult testSetResult = _radianAprovedService.RadianTestSetResultByNit(nit);
