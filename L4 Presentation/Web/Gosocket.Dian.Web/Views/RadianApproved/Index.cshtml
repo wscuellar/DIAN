@@ -97,12 +97,11 @@
                     var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
                     var dialog = bootbox.dialog({
                         message: htmlPartial,
-                        className: "table-data",
+                        className: "table-data modal-radian",
                         size: 'large'
                     });
                     dialog.init(function (e) {
                         $('#table-history').DataTable({
-                            buttons: ['copy', 'csv', 'print'],
                             "language": {
                                 "lengthMenu": "Mostrar _MENU_ elementos por página",
                                 "zeroRecords": "No se encontraron datos",
@@ -116,6 +115,7 @@
                                 }
                             }
                         });
+                        $("#table-history_filter").append("<button class='btn btn-radian-success'>Buscar</button>");
                     } )
                 });
 
@@ -200,20 +200,27 @@
                     var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));
                     var dialog = bootbox.dialog({
                         message: htmlPartial,
-                        className: "table-data",
+                        className: "table-data modal-radian",
                         size: 'large'
                     });
                     dialog.init(function (e) {
                         $('#table-history').DataTable({
-                            language: {
+                            "language": {
                                 "lengthMenu": "Mostrar _MENU_ elementos por página",
                                 "zeroRecords": "No se encontraron datos",
                                 "info": "Mostrando página _PAGE_ de _PAGES_",
                                 "infoEmpty": "No hay datos",
-                                "infoFiltered": "(Filtrado de _MAX_ registros)"
+                                "infoFiltered": "(Filtrado de _MAX_ registros)",
+                                "search": "Nit Facturador",
+                                "paginate": {
+                                    "next": ">",
+                                    "previous": "<"
+                                }
                             }
                         });
-                    } )
+                        $("#table-history_filter").append("<button class='btn btn-radian-success'>Buscar</button>");
+
+                    })
                 });
 
             $("#cancel-register").click(function () {

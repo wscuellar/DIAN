@@ -910,13 +910,14 @@ span.close {
 }
 
 .dataTables_filter {
-    float: left !important;
-    width: 30% !important;
+    width: 100% !important;
+    text-align: left !important;
 }
 
 .dataTables_filter label {
     text-align: left !important;
-    width: 100% !important;
+    width: 30% !important;
+    margin-right: 46px;
 }
 
 .dataTable th {
@@ -935,9 +936,20 @@ span.close {
     margin: 10px 0 20px 0 !important;
 }
 
-.modal .title-view {
+.modal-radian .title-view {
     margin-bottom: 2px;
 }
-.modal .title-container {
+.modal-radian .title-container {
     margin-bottom: 30px;
+}
+
+.modal-radian .bootbox-close-button {
+    background-color: #348441 !important;
+    width: 20px;
+    height: 20px;
+    margin: 0px 8px !important;
+}
+
+#table-history .btn-radian-success {
+    width: 10%;
 }
