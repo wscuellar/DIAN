@@ -194,7 +194,19 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult UploadFactorOperationMode(RadianApprovedOperationModeViewModel approvedOperModeViewModel)
         {
-
+            _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
+            {
+                RadianContributorId = approvedOperModeViewModel.Contributor.Id,
+                RadianOperationModeId = approvedOperModeViewModel.Contributor.RadiantContributors.FirstOrDefault().RadianOperationModeId,
+                RadianProviderId = approvedOperModeViewModel.Contributor.Id,
+                SoftwareId = Guid.Parse(approvedOperModeViewModel.SoftwareId),
+                Deleted = false,
+                Timestamp = DateTime.Now,
+                RadianContributorTypeId = approvedOperModeViewModel.Contributor.ContributorTypeId,
+                Pin = approvedOperModeViewModel.SoftwarePin,
+                SoftwareName = approvedOperModeViewModel.SoftwareName,
+                Url = approvedOperModeViewModel.Software.Url
+            });
 
             return Json(
                 new
