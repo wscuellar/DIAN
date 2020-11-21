@@ -101,7 +101,21 @@
                         size: 'large'
                     });
                     dialog.init(function (e) {
-                        $('#table-history').DataTable();
+                        $('#table-history').DataTable({
+                            buttons: ['copy', 'csv', 'print'],
+                            "language": {
+                                "lengthMenu": "Mostrar _MENU_ elementos por página",
+                                "zeroRecords": "No se encontraron datos",
+                                "info": "Mostrando página _PAGE_ de _PAGES_",
+                                "infoEmpty": "No hay datos",
+                                "infoFiltered": "(Filtrado de _MAX_ registros)",
+                                "search": "Requisito:",
+                                "paginate": {
+                                    "next": ">",
+                                    "previous": "<"
+                                }
+                            }
+                        });
                     } )
                 });
 
@@ -190,7 +204,15 @@
                         size: 'large'
                     });
                     dialog.init(function (e) {
-                        $('#table-history').DataTable();
+                        $('#table-history').DataTable({
+                            language: {
+                                "lengthMenu": "Mostrar _MENU_ elementos por página",
+                                "zeroRecords": "No se encontraron datos",
+                                "info": "Mostrando página _PAGE_ de _PAGES_",
+                                "infoEmpty": "No hay datos",
+                                "infoFiltered": "(Filtrado de _MAX_ registros)"
+                            }
+                        });
                     } )
                 });
 

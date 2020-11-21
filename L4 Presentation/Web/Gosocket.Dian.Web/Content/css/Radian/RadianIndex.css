@@ -718,6 +718,7 @@ h4.text-thin {
     float: right;
     font-size: 18px;
     color: #348441;
+    cursor: pointer;
 }
 
 #progress-wrp {
@@ -902,4 +903,41 @@ span.close {
 
 .reject-observation {
     font-weight: bold;
+}
+
+.dataTables_length{
+    display: none;
+}
+
+.dataTables_filter {
+    float: left !important;
+    width: 30% !important;
+}
+
+.dataTables_filter label {
+    text-align: left !important;
+    width: 100% !important;
+}
+
+.dataTable th {
+    font-weight: lighter !important;
+    text-align: center;
+    border-bottom: solid 0px #E9E8E8 !important;
+}
+
+.dataTable {
+    border: none !important;
+}
+
+.dataTables_filter input[type="search"] {
+    display: block !important;
+    width: 100% !important;
+    margin: 10px 0 20px 0 !important;
+}
+
+.modal .title-view {
+    margin-bottom: 2px;
+}
+.modal .title-container {
+    margin-bottom: 30px;
 }
