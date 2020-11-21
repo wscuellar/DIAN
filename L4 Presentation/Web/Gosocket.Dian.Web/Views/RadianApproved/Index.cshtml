@@ -164,7 +164,7 @@
                                         className: 'btn-success'
                                     }
                                 },
-                                callback: function () {debugger
+                                callback: function () {
                                     showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                                     window.location.href = '@Url.Action("Index", "RadianApproved")' + "?ContributorId=" + objData.ContributorId + "&RadianContributorType=" + objData.RadianContributorType + "&RadianOperationMode=" + objData.RadianOperationMode;
                                 }
@@ -173,7 +173,7 @@
                     });
                 });
 
-                $(".close").click(function () {debugger
+                $(".close").click(function () {
                     $(this).parent().toggle();
                     $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
                 })
@@ -205,7 +205,6 @@
                         }
                     },
                     callback: function (confirmation) {
-                        debugger
                         if (confirmation) {
                            $.ajax({
                                 url: "@Url.Action("DeleteUser", "RadianApproved")",
