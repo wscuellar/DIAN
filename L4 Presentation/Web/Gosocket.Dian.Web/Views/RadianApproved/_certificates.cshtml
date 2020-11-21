@@ -30,7 +30,8 @@
                         <div class="form-group file-input-enabled">
                             <p class="radian-file-top-label">@n.Name</p>
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" />
+                                <input type="file" class="custom-file-input radian-file" data-typeId="@n.Id" name="file-@i" required/>
+                                <p id="required-message"></p>
                                 <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
                             </div>
                         </div>
