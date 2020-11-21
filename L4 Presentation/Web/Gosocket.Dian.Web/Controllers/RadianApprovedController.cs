@@ -213,5 +213,18 @@ namespace Gosocket.Dian.Web.Controllers
             RadianTestSetResult testSetResult = _radianAprovedService.RadianTestSetResultByNit(nit);
             return Json(new { data = testSetResult }, JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]
+        public ActionResult DeleteUser(int id, string newState, int radianContributorTypeId, string radianState)
+        {
+            _radianContributorService.ChangeParticipantStatus(id, newState, radianContributorTypeId, radianState);
+
+            return Json(new
+            {
+                message = "Datos actualizados",
+                success = true,
+            }, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }
