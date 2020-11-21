@@ -241,10 +241,20 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult DeleteUser(int id, string newState, int radianContributorTypeId, string radianState)
         {
             _radianContributorService.ChangeParticipantStatus(id, newState, radianContributorTypeId, radianState);
-
             return Json(new
             {
                 message = "Datos actualizados",
+                success = true,
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult DeleteOperationMode(string Id)
+        {
+            _radianAprovedService.Update(Convert.ToInt32(Id));
+            return Json(new
+            {
+                message = "Modo de operación eliminado.",
                 success = true,
             }, JsonRequestBehavior.AllowGet);
         }
