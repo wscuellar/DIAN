@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         
 
-        bool ChangeParticipantStatus(int contributorId, string approveState);
+        bool ChangeParticipantStatus(int contributorId, string newState, int radianContributorTypeId, string actualState);
 
         RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size);
 

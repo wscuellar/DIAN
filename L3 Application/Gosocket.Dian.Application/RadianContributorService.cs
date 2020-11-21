@@ -190,16 +190,16 @@ namespace Gosocket.Dian.Application
             return radianAdmin;
         }
 
-        public bool ChangeParticipantStatus(int contributorId, string approveState)
+        public bool ChangeParticipantStatus(int contributorId, string newState, int radianContributorTypeId, string actualState)
         {
-            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId);
+            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorTypeId && t.RadianState == actualState);
 
             if (contributors.Any())
             {
                 var radianContributor = contributors.FirstOrDefault();
 
-                if (approveState != "")
-                    radianContributor.RadianState = approveState == "0" ? RadianState.Test.GetDescription() : RadianState.Cancelado.GetDescription();
+                if (newState != "")
+                    radianContributor.RadianState = newState == "0" ? RadianState.Test.GetDescription() : RadianState.Cancelado.GetDescription();
 
                 _radianContributorRepository.AddOrUpdate(radianContributor);
                 return true;

@@ -115,7 +115,6 @@
                             numberFiles++;
                         }
                     };
-                    debugger
                     formdata.append("nit", "@Model.Nit");
                     formdata.append("email", "@Model.Email");
                     formdata.append("contributorId", "@Model.ContributorId");
@@ -165,7 +164,7 @@
                                         className: 'btn-success'
                                     }
                                 },
-                                callback: function () {debugger
+                                callback: function () {
                                     showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                                     window.location.href = '@Url.Action("Index", "RadianApproved")' + "?ContributorId=" + objData.ContributorId + "&RadianContributorType=" + objData.RadianContributorType + "&RadianOperationMode=" + objData.RadianOperationMode;
                                 }
@@ -174,7 +173,7 @@
                     });
                 });
 
-                $(".close").click(function () {debugger
+                $(".close").click(function () {
                     $(this).parent().toggle();
                     $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
                 })
@@ -189,6 +188,42 @@
                     dialog.init(function (e) {
                         $('#table-history').DataTable();
                     } )
+                });
+
+            $("#cancel-register").click(function () {
+                bootbox.confirm({
+                    title: "Advertencia",
+                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>¿Está seguro que desea cancelar el registro de este usuario?</strong></h4></div></div>",
+                    buttons: {
+                        confirm: {
+                            label: 'Confirmar',
+                            className: 'btn-success btn-gosocket'
+                        },
+                        cancel: {
+                            label: 'Cancelar',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (confirmation) {
+                        if (confirmation) {
+                           $.ajax({
+                                url: "@Url.Action("DeleteUser", "RadianApproved")",
+                                type: 'POST',
+                                data: {
+                                    id: '@Model.ContributorId',
+                                    newState: '4',
+                                    radianContributorTypeId: @Model.RadianContributorTypeId,
+                                    radianState: '@Model.RadianState'
+                                },
+                               error: function () {},
+                               success: function () {
+                                   window.location.href = '@Url.Action("Index", "Radian")';
+                               }
+                            });
+                        }
+                    }
+                });
+
                 });
             });
     </script>
