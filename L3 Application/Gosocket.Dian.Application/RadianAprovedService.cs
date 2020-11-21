@@ -197,7 +197,7 @@ namespace Gosocket.Dian.Application
         {
             return _radianContributorRepository.Get(c => c.ContributorId == contributorId && c.RadianContributorTypeId == contributorTypeId && c.RadianState == state).Id;
         }
-        
+
         public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
         {
             return _radianContributorOperationRepository.Add(radianContributorOperation);
@@ -206,12 +206,9 @@ namespace Gosocket.Dian.Application
         public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
         {
             RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
-
             radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId);
-
             int code = Convert.ToInt32(radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianContributor.Contributor.Code);
-
-            radianContributorOperationWithSoftware.Software = _radianCallSoftwareService.GetSoftwares(code).LastOrDefault();
+            radianContributorOperationWithSoftware.Softwares = _radianCallSoftwareService.GetSoftwares(code);
 
             return radianContributorOperationWithSoftware;
         }

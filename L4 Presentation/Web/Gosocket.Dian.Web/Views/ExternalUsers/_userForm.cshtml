@@ -32,26 +32,23 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-3 padding-xs-0">
-            <div class="form-group">
-                @Html.LabelFor(m => m.Password, new { @class = "control-label" })
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control", autocomplete = "off" })
-                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        <div class="col-sm-3 padding-xs-0">
-            <div class="form-group">
-                @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
-                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", autocomplete = "off" })
-                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
-            </div>
-        </div>
-    </div>
-    @*<div class="row">
+    @if (ViewBag.txtAccion == "Guardar")
+    {
+        <div class="row">
             <div class="col-sm-3 padding-xs-0">
-                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", autocomplete = "off" })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                </div>
             </div>
-        </div>*@
+            <div class="col-sm-3 padding-xs-0">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
+                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", autocomplete = "off" })
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    }
 </div>
-

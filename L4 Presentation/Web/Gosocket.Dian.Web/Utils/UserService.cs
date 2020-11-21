@@ -123,5 +123,35 @@ namespace Gosocket.Dian.Web.Utils
             return result;
         }
 
+        public int UpdateExternalUser(ExternalUserViewModel user)
+        {
+            int result = 0;
+            try
+            {
+                using (var db = new ApplicationDbContext())
+                {
+                    var userDB = db.Users.FirstOrDefault(u => u.Id == user.Id);
+                    if (userDB != null)
+                    {
+                        userDB.IdentificationTypeId = user.IdentificationTypeId;
+                        userDB.IdentificationId = user.IdentificationId;
+                        userDB.Name = user.Names;
+                        userDB.Email = user.Email;
+                        userDB.LastUpdated = user.LastUpdated;
+                        userDB.UpdatedBy = user.UpdatedBy;
+
+                        result = db.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result = -1;
+                System.Diagnostics.Debug.WriteLine("UserService:UpdateExternalUser: " + ex);
+            }
+
+            return result;
+        }
+
     }
 }

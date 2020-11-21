@@ -65,52 +65,31 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.ExternalUsersCreate;
 
-            var identificationTypeList = identificationTypeService.List();
-
-            //var roles = new SelectList(_context.Roles.Where(u => u.Name.Contains("UsuarioExterno"))
-            //                                .ToList(), "Id", "Name");
-            var role = _context.Roles.FirstOrDefault(u => u.Name.Contains(Roles.UsuarioExterno));
-
-            //var userExt2 = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id)).ToList();
-
-            //ViewBag.Menu = this.MenuApp();
-            ViewBag.Menu = _permisionService.GetAppMenu().Select(m =>
-                new MenuViewModel
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    Title = m.Title,
-                    Description = m.Description,
-                    Options = _permisionService.GetSubMenusByMenuId(m.Id).Select(s =>
-                        new SubMenuViewModel()
-                        {
-                            Id = s.Id,
-                            MenuId = m.Id,
-                            Name = s.Name,
-                            Title = s.Title,
-                            Description = s.Description
-                        }).ToList()
-                }).ToList();
-
-            ViewBag.ExternalUsersList = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id)).ToList()
-                .Select(u =>
-                new ExternalUserViewModel
-                {
-                    Id = u.Id,
-                    IdentificationTypeId = u.IdentificationTypeId,
-                    IdentificationId = u.IdentificationId,
-                    Names = u.Name,
-                    Email = u.Email,
-                    //Roles = u.Roles.ToList(),
-                    Active = u.Active,
-                    IdentificationTypes = identificationTypeService.List()
-                        .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList()
-                }).ToList();
+            this.LoadViewBags(id);
 
             ExternalUserViewModel model = null;
+            ViewBag.PermissionList = null;
+            ViewBag.txtAccion = "Guardar";
 
             if (!string.IsNullOrEmpty(id))
             {
+                ViewBag.txtAccion = "Actualizar";
+
+                List<Permission> pe = _permisionService.GetPermissionsByUser(id);
+                if (pe != null)
+                {
+                    ViewBag.PermissionList = pe.Where(p => p.UserId.Equals(id)).ToList().Select(s =>
+                    new PermissionViewModel
+                    {
+                        Id = s.Id,
+                        UserId = id,
+                        SubMenuId = s.SubMenuId,
+                        State = s.State,
+                        CreatedBy = s.CreatedBy,
+                        UpdatedBy = s.UpdatedBy
+                    }).ToList();
+                }
+
                 var userBD = UserManager.FindById(id);
 
                 if (userBD != null)
@@ -201,77 +180,212 @@ namespace Gosocket.Dian.Web.Controllers
             };
         }
 
+        private void LoadViewBags(string userId)
+        {
+            //var roles = new SelectList(_context.Roles.Where(u => u.Name.Contains("UsuarioExterno"))
+            //                                .ToList(), "Id", "Name");
+            var role = _context.Roles.FirstOrDefault(u => u.Name.Contains(Roles.UsuarioExterno));
+
+            //var userExt2 = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id)).ToList();
+
+            //ViewBag.Menu = this.MenuApp();
+            ViewBag.Menu = _permisionService.GetAppMenu().Select(m =>
+                new MenuViewModel
+                {
+                    Id = m.Id,
+                    Name = m.Name,
+                    Title = m.Title,
+                    Description = m.Description,
+                    Options = _permisionService.GetSubMenusByMenuId(m.Id).Select(s =>
+                        new SubMenuViewModel()
+                        {
+                            Id = s.Id,
+                            MenuId = m.Id,
+                            Name = s.Name,
+                            Title = s.Title,
+                            Description = s.Description
+                        }).ToList()
+                }).ToList();
+
+            ViewBag.ExternalUsersList = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id)).ToList()
+                .Select(u =>
+                new ExternalUserViewModel
+                {
+                    Id = u.Id,
+                    IdentificationTypeId = u.IdentificationTypeId,
+                    IdentificationId = u.IdentificationId,
+                    Names = u.Name,
+                    Email = u.Email,
+                    //Roles = u.Roles.ToList(),
+                    Active = u.Active,
+                    IdentificationTypes = identificationTypeService.List()
+                        .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList()
+                }).ToList();
+        }
+
         [HttpPost]
         public async Task<ActionResult> AddUser(ExternalUserViewModel model, FormCollection fc)
         {
-            ViewBag.Menu = this.MenuApp();
+            ViewBag.CurrentPage = Navigation.NavigationEnum.ExternalUsersCreate;
+            ViewBag.txtAccion = "Guardar";
+
+            if (!string.IsNullOrEmpty(model.Id))
+                ViewBag.txtAccion = "Actualizar";
+
+            this.LoadViewBags(model.Id);
 
             var user = new ApplicationUser
             {
-                Code = Guid.NewGuid().ToString().Substring(0, 6),
+                //Code = Guid.NewGuid().ToString().Substring(0, 6),
                 IdentificationTypeId = model.IdentificationTypeId,
                 IdentificationId = model.IdentificationId,
                 Name = model.Names,
                 Email = model.Email,
                 UserName = model.Email,
                 CreatedBy = User.Identity.Name,
-                
+                CreationDate = DateTime.Now,
+                UpdatedBy = User.Identity.Name,
+                LastUpdated = DateTime.Now
             };
 
-            var result = await UserManager.CreateAsync(user);
-            if (result.Succeeded)
+            List<Permission> permissions = null;
+            IdentityResult result = null;
+
+            if (fc["hddPermissions"] == null)
             {
-                var result1 = await UserManager.AddToRoleAsync(user.Id, Roles.UsuarioExterno);
-
-                if (!result1.Succeeded)
-                {
-                    ModelState.AddModelError("", "El Usario no puedo ser asignado al role 'Usuario Externo'");
-                    return View(model);
-                }
-
-                List<Permission> permissions = null;
-
-                if (fc["hddPermissions"] == null)
-                {
-                    ModelState.AddModelError("no_permissions", "No ha seleccionado los Permisos para el Usuario");
-                    return View(model);
-                }
-
-                permissions = JsonConvert.DeserializeObject<List<Permission>>(fc["hddPermissions"].ToString());
-
-                foreach (var item in permissions)
-                {
-                    item.UserId = user.Id;
-                    item.CreatedBy = User.Identity.GetUserId();
-                    item.UpdatedBy = User.Identity.GetUserId();
-                }
-
-                var affected = _permisionService.AddOrUpdate(permissions);
-
-
-
+                ModelState.AddModelError("no_permissions", "No ha seleccionado los Permisos para el Usuario");
                 return View(model);
             }
 
-            foreach (var item in result.Errors)
-                ModelState.AddModelError(string.Empty, item);
+            permissions = JsonConvert.DeserializeObject<List<Permission>>(fc["hddPermissions"].ToString());
 
-            foreach (var item in ModelState)
-                if (item.Key.Contains("Code"))
-                    item.Value.Errors.Clear();
+            foreach (var item in permissions)
+            {
+                item.UserId = string.IsNullOrEmpty(model.Id) ? user.Id : model.Id;
+                item.CreatedBy = User.Identity.GetUserId();
+                item.UpdatedBy = User.Identity.GetUserId();
+            }
+
+            if (string.IsNullOrEmpty(model.Id))
+            {
+                user.Code = Guid.NewGuid().ToString().Substring(0, 6);
+
+                result = await UserManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    ViewBag.messageAction = "Usuario Registrado exitosamente!";
+
+                    var result1 = await UserManager.AddToRoleAsync(user.Id, Roles.UsuarioExterno);
+
+                    //Envio de notificacion por correo
+                    _ = SendMailCreate(model);
+
+                    if (!result1.Succeeded)
+                    {
+                        ModelState.AddModelError("", "El Usario no puedo ser asignado al role 'Usuario Externo'");
+
+                        UserManager.Delete(user);
+
+                        return View(model);
+                    }
+
+                    var affected = _permisionService.AddOrUpdate(permissions);
+
+                    return RedirectToAction("AddUser");
+                }
+                else
+                {
+                    ViewBag.messageAction = "No se pudo Registrar el Usuario!";
+                    
+                    if (!result.Succeeded)
+                    {
+                        foreach (var item in result.Errors)
+                            ModelState.AddModelError(string.Empty, item);
+
+                        foreach (var item in ModelState)
+                            if (item.Key.Contains("Code"))
+                                item.Value.Errors.Clear();
+
+                        return View(model);
+                    }
+
+                }
+            }
+            else
+            {
+
+                int ru = userService.UpdateExternalUser(new ExternalUserViewModel()
+                {
+                    Id = model.Id,
+                    IdentificationTypeId = model.IdentificationTypeId,
+                    IdentificationId = model.IdentificationId,
+                    Names = model.Names,
+                    Email = model.Email,
+                    UpdatedBy = User.Identity.Name,
+                    LastUpdated = DateTime.Now
+                });
+
+                if (ru > 0)
+                {
+                    ViewBag.messageAction = "Usuario actualizado exitosamente!";
+
+                    var affected = _permisionService.AddOrUpdate(permissions);
+
+                    //Envio de notificacion por correo
+                    _ = SendMailUpdate(model);
+                    return RedirectToAction("AddUser");
+                }
+                else
+                    ViewBag.messageAction = "No se pudo actualizar el Usuario!";
+            }
 
             return View(model);
         }
 
+        /// <summary>
+        /// Activar o Desactivar un Usuario Externo
+        /// </summary>
+        /// <param name="userId">Id del Usuario Externo</param>
+        /// <param name="active">Activar o Desactivar según sea el caso</param>
+        /// <returns><see cref="Gosocket.Dian.Web.Models.GeneralResponseModel"/></returns>
+        [HttpPost]
+        public JsonResult UpdateActive(string userId, string active, string activeDescription, string email)
+        {
+            byte accion;
 
-        public bool SendMailCreate(ExternalUserViewModel model, string observations = "")
+            if (active.Equals("Desactivar"))
+                accion = 0;
+            else
+                accion = 1;
+
+            int result = userService.UpdateActive(userId, accion, User.Identity.Name, activeDescription);
+            //Envio de notificacion por correo
+            _ = SendMailActive(email, User.Identity.Name, active);
+
+            GeneralResponseModel res = new GeneralResponseModel()
+            {
+                HttpStatusCode = result > 0 ? System.Net.HttpStatusCode.OK.GetHashCode() : System.Net.HttpStatusCode.BadRequest.GetHashCode(),
+                StatusCode = result > 0 ? System.Net.HttpStatusCode.OK.ToString() : System.Net.HttpStatusCode.BadRequest.ToString(),
+                Message = result > 0 ? "Estado actualizado exitosamente!" : "No se pudo actualizar el estado del Usuario"
+            };
+
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Enviar notificacion email para creacion de usuario externo
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool SendMailCreate(ExternalUserViewModel model)
         {
             var emailService = new Gosocket.Dian.Application.EmailService();
             StringBuilder message = new StringBuilder();
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
-            message.Append("<span style='font-size:28px;'><b>Comunicación de servicio</b></span>");
-            message.Append("</br> <span style='font-size:18px;'><b>Se ha generado una clave de acceso al Catalogo de DIAN</b></span>");
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("</br> <span style='font-size:18px;'><b>Se ha generado una clave de acceso al Catalogo de DIAN</b></span></br>");
             message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.Names);
             message.Append("</br> A continuación, se entrega la clave para realizar tramites y gestión de solicitudes recepción documentos electrónicos.");
             message.AppendFormat("</br> Clave de acceso: {0}", model.Password);
@@ -286,23 +400,59 @@ namespace Gosocket.Dian.Web.Controllers
             return true;
         }
 
-        public bool SendMailUpdate(ExternalUserViewModel model, string observations = "")
+        /// <summary>
+        /// Enviar notificacion email para actualizacion de usuario externo
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool SendMailUpdate(ExternalUserViewModel model)
         {
             var emailService = new Gosocket.Dian.Application.EmailService();
             StringBuilder message = new StringBuilder();
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
-            message.Append("<span style='font-size:28px;'><b>Comunicación de servicio</b></span>");
-            message.Append("</br> <span style='font-size:18px;'><b>Se ha actualizado su información de acceso al Catalogo de DIAN</b></span>");
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("</br> <span style='font-size:18px;'><b>Se ha actualizado su información de acceso al Catalogo de DIAN</b></span></br>");
             message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.Names);
             message.Append("</br> Su información de registro y acceso al Catalogo de DIAN ha sido actualizada satisfactoriamente.");
-            
+            message.AppendFormat("</br> Tipo de documento: {0}", model.IdentificationTypeId);
+            message.AppendFormat("</br> Numero  de documento: {0}", model.IdentificationId);
+            message.AppendFormat("</br> Correo electronico: {0}", model.Email);
+            message.AppendFormat("</br> Clave de acceso: {0}", model.Password);                                                                                
+
             message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
 
             //Nombre del documento, estado, observaciones
             dic.Add("##CONTENT##", message.ToString());
 
             emailService.SendEmail(model.Email, "DIAN - Actualización de Usuario Registrado", dic);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Enviar notificacion email para activar/inactivar usuario externo
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool SendMailActive(string email, string name, string state)
+        {
+            var emailService = new Gosocket.Dian.Application.EmailService();
+            StringBuilder message = new StringBuilder();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("</br> <span style='font-size:18px;'><b>Se ha actualizado el estado de acceso al Catalogo de DIAN</b></span></br>");
+            message.AppendFormat("</br> Señor (a) usuario (a): {0}", name);
+            message.Append("</br> El estado de su acceso al Catalogo de DIAN ha sido actualizado satisfactoriamente.");
+            message.AppendFormat("</br> Estado: {0}", state);
+
+            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+
+            //Nombre del documento, estado, observaciones
+            dic.Add("##CONTENT##", message.ToString());
+
+            emailService.SendEmail(email, "DIAN - Cambio de Estado de Usuario Registrado", dic);
 
             return true;
         }
