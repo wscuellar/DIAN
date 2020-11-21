@@ -696,6 +696,7 @@
     <Content Include="Content\js\nifty.js" />
     <Content Include="Content\js\nifty.js cambios.txt" />
     <Content Include="Content\js\nifty.min.js" />
+    <Content Include="Content\js\Radian\constants.js" />
     <Content Include="Content\js\Radian\RadianIndex.js" />
     <Content Include="Content\js\Radian\RadianTestSet.js" />
     <Content Include="Content\js\user\user.js" />

@@ -68,6 +68,9 @@
 </div>
 
 @section scripts{
+
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/Radian/constants.js"></script>
     <script>
         $(document).ready(function () {
                 var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
@@ -104,6 +107,7 @@
 
                 $('#submit-button').click(function (e) {
                     e.preventDefault();
+                    FilesUploadRequired();
                     var files = $("#uploadForm")[0];
                     var formdata = new FormData();
                     var numberFiles = 0;
@@ -191,39 +195,19 @@
                 });
 
             $("#cancel-register").click(function () {
-                bootbox.confirm({
-                    title: "Advertencia",
-                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>¿Está seguro que desea cancelar el registro de este usuario?</strong></h4></div></div>",
-                    buttons: {
-                        confirm: {
-                            label: 'Confirmar',
-                            className: 'btn-success btn-gosocket'
-                        },
-                        cancel: {
-                            label: 'Cancelar',
-                            className: 'btn-danger'
-                        }
-                    },
-                    callback: function (confirmation) {
-                        if (confirmation) {
-                           $.ajax({
-                                url: "@Url.Action("DeleteUser", "RadianApproved")",
-                                type: 'POST',
-                                data: {
-                                    id: '@Model.ContributorId',
-                                    newState: '4',
-                                    radianContributorTypeId: @Model.RadianContributorTypeId,
-                                    radianState: '@Model.RadianState'
-                                },
-                               error: function () {},
-                               success: function () {
-                                   window.location.href = '@Url.Action("Index", "Radian")';
-                               }
-                            });
-                        }
-                    }
-                });
-
+                    var url = "@Url.Action("DeleteUser", "RadianApproved")";
+                    var metod = 'POST';
+                    var dataAjax = {
+                        id: '@Model.ContributorId',
+                        newState: '4',
+                        radianContributorTypeId: @Model.RadianContributorTypeId,
+                        radianState: '@Model.RadianState'
+                    };
+                    var successAction = () => window.location.href = '@Url.Action("Index", "Radian")';
+                    var confirmMessage = bootboxMessage.CONFIRMATION_MESSAGE;
+                    var operation = () => ajaxFunction(url, metod, dataAjax, () => { }, successAction);
+                    var buttons = ConfirmExec(operation);
+                    showConfirmation(confirmMessage, buttons);
                 });
             });
     </script>
