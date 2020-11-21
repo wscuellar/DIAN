@@ -61,13 +61,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (Request.Params.Get("RadianOperationMode") == "Indirect")
             {
                 if (model.RadianState == "Habilitado")
-                {
-                    model.OperationModeList = _radianTestSetService.OperationModeList();
-                    model.Software = _radianAprovedService.SoftwareByContributor(model.ContributorId);
-                    model.RadianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel();
-                    //radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
                     return View("GetFactorOperationMode", model);
-                }
                 else
                 {
                     model.RadianTestSetResult =
@@ -180,15 +174,26 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult GetFactorOperationMode(RadianApprovedViewModel radianApprovedViewModel)
         {
-            radianApprovedViewModel.OperationModeList = _radianTestSetService.OperationModeList();
-            radianApprovedViewModel.Software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
-            radianApprovedViewModel.RadianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel();
-            radianApprovedViewModel.RadianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
+            Software software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
+            List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
+            RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
 
-            foreach (RadianContributorOperation operation in radianApprovedViewModel.RadianContributorOperations.RadianContributorOperations)
-                operation.RadianOperationMode = radianApprovedViewModel.OperationModeList.FirstOrDefault(l => l.Id == operation.RadianOperationModeId);
+            foreach (RadianContributorOperation co in radianContributorOperations.RadianContributorOperations)
+                co.RadianOperationMode = operationModeList.FirstOrDefault(o => o.Id == co.RadianOperationModeId);
 
-            return View(radianApprovedViewModel);
+            RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
+            {
+                Contributor = radianApprovedViewModel.Contributor,
+                Software = software,
+                OperationModeList = operationModeList,
+                RadianContributorOperations = radianContributorOperations,
+                CreatedBy = software.CreatedBy,
+                SoftwareId = software.Id,
+                SoftwareUrl = software.Url,
+                OperationModeSelected = operationModeList.FirstOrDefault(o => o.Name.Equals("Software propio"))
+            };
+
+            return View(radianApprovedOperationModeViewModel);
         }
 
         [HttpPost]
@@ -199,7 +204,7 @@ namespace Gosocket.Dian.Web.Controllers
                 RadianContributorId = approvedOperModeViewModel.Contributor.Id,
                 RadianOperationModeId = approvedOperModeViewModel.Contributor.RadiantContributors.FirstOrDefault().RadianOperationModeId,
                 RadianProviderId = approvedOperModeViewModel.Contributor.Id,
-                SoftwareId = Guid.Parse(approvedOperModeViewModel.SoftwareId),
+                SoftwareId = approvedOperModeViewModel.SoftwareId,
                 Deleted = false,
                 Timestamp = DateTime.Now,
                 RadianContributorTypeId = approvedOperModeViewModel.Contributor.ContributorTypeId,
