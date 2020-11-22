@@ -34,39 +34,28 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.EventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), eventItem.EventCode);
 
-            #region header
-                model.CUDE = id;
-                SetTitles(eventItem, model);
-            #endregion
+            model.CUDE = id;
+            SetTitles(eventItem, model);
 
             GlobalDocValidatorDocumentMeta invoice = _queryAssociatedEventsService.DocumentValidation(cufe);
 
-            #region general 
-                SetMandate(model, eventItem, invoice);
-                SetEndoso(model, eventItem, invoice);
-                model.RequestType = TextResources.Event_RequestType;
-            #endregion            
+            SetMandate(model, eventItem, invoice);
+            SetEndoso(model, eventItem, invoice);
+            model.RequestType = TextResources.Event_RequestType;
 
-            #region eventValidations
-                GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem.Identifier);
-                SetValidations(model, eventItem, eventVerification);
-            #endregion
+            GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem.Identifier);
+            SetValidations(model, eventItem, eventVerification);
 
-            #region references
-                GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
-                SetReferences(model, referenceMeta);
-            #endregion
-
-            #region eventsAssociated
-                //eventos que se se puede desprender 
-                string allowEvent = IdentifyEvent(eventItem); ///*****
-                SetEventAssociated(model, eventItem, allowEvent);
-            #endregion            
+            GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
+            SetReferences(model, referenceMeta);
+            
+            SetEventAssociated(model, eventItem);
 
             Response.Headers["InjectingPartialView"] = "true";
             return PartialView(model);
         }
 
+        #region Private Methods
         private void SetTitles(GlobalDocValidatorDocumentMeta eventItem, SummaryEventsViewModel model)
         {
             model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
@@ -74,34 +63,23 @@ namespace Gosocket.Dian.Web.Controllers
             model.ReferenceTitle = TextResources.Event_ReferenceTitle;
         }
 
-        private void SetEventAssociated(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem, string allowEvent)
+        private void SetEventAssociated(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem)
         {
-            if (!string.IsNullOrEmpty(allowEvent))
+            EventStatus allowEvent = _queryAssociatedEventsService.IdentifyEvent(eventItem);
+
+            if (allowEvent != EventStatus.None)
             {
                 model.EventTitle = "Eventos de " + Domain.Common.EnumHelper.GetEnumDescription(model.EventStatus);
-                var otherEvents = _queryAssociatedEventsService.OtherEvents(eventItem.DocumentKey, allowEvent);
+                List<GlobalDocValidatorDocumentMeta> otherEvents = _queryAssociatedEventsService.OtherEvents(eventItem.DocumentKey, allowEvent);
                 if (otherEvents.Any())
                 {
-                    foreach (var otherEvent in otherEvents)
+                    foreach (GlobalDocValidatorDocumentMeta otherEvent in otherEvents)
                     {
-                        if (!string.IsNullOrEmpty(otherEvent.EventCode)
-                            && _queryAssociatedEventsService.IsVerificated(otherEvent.Identifier))
+                        if (_queryAssociatedEventsService.IsVerificated(otherEvent))
                             model.AssociatedEvents.Add(new AssociatedEventsViewModel(otherEvent));
                     }
                 }
             }
-        }
-
-        private static string IdentifyEvent(GlobalDocValidatorDocumentMeta eventItem)
-        {
-            string endosoCodes = "037,038,039";
-            string limitacionCodes = "041";
-            string mandatoCodes = "043";
-            string eventCode2 = endosoCodes.Contains(eventItem.EventCode.Trim()) ? "040" :
-                                mandatoCodes.Contains(eventItem.EventCode.Trim()) ? "044" :
-                                limitacionCodes.Contains(eventItem.EventCode.Trim()) ? "042" :
-                                string.Empty;
-            return eventCode2;
         }
 
         private static void SetReferences(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta referenceMeta)
@@ -145,5 +123,6 @@ namespace Gosocket.Dian.Web.Controllers
                     model.Mandate.ContractDate = referenceAttorneys.FirstOrDefault().EffectiveDate;
             }
         }
+        #endregion
     }
 }
