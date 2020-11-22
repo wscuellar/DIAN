@@ -106,3 +106,17 @@ function FilesUploadRequired() {
     var x = document.getElementsByClassName("radian-file").required;
     document.getElementById("required-message").innerHTML = x; 
 }
+
+function DeleteOperationMode(url) {debugger
+    $("#delete-software").click(function () {debugger
+        var metod = 'POST';
+        var data = {
+                Id:  $(this).attr("data-id")
+            }
+        var actionError = () => { }
+        var actionSuccess = () => {
+            location.reload();
+        }
+        ajaxFunction(url, metod, data, actionError, actionSuccess)
+    })
+}

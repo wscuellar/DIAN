@@ -2877,6 +2877,10 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Gosocket.Dian.Common\Gosocket.Dian.Common.csproj">
+      <Project>{61F42A77-9C41-446B-9C1F-D3D84241BB6C}</Project>
+      <Name>Gosocket.Dian.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Gosocket.Dian.Interfaces\Gosocket.Dian.Interfaces.csproj">
       <Project>{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1}</Project>
       <Name>Gosocket.Dian.Interfaces</Name>

@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Accepted" xml:space="preserve">
+    <value>Aceptación expresa de la Factura  Electrónica</value>
+  </data>
   <data name="alertType" xml:space="preserve">
     <value>alert</value>
   </data>
@@ -126,11 +129,38 @@
   <data name="ElectronicInvoice_Confirm" xml:space="preserve">
     <value>¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?</value>
   </data>
+  <data name="Endoso" xml:space="preserve">
+    <value>Endoso Electronico</value>
+  </data>
+  <data name="Event_DocumentType" xml:space="preserve">
+    <value>Factura Electronica</value>
+  </data>
+  <data name="Event_MandateType" xml:space="preserve">
+    <value>Mandato por documento</value>
+  </data>
+  <data name="Event_ReferenceTitle" xml:space="preserve">
+    <value>Referencias del Evento</value>
+  </data>
+  <data name="Event_RequestType" xml:space="preserve">
+    <value>Solicitud de Disponibilización para Negociaciación General</value>
+  </data>
+  <data name="Event_Status_01" xml:space="preserve">
+    <value>Notificación</value>
+  </data>
+  <data name="Event_ValidationMessage" xml:space="preserve">
+    <value>Documento validado por la DIAN</value>
+  </data>
+  <data name="Event_ValidationTitle" xml:space="preserve">
+    <value>Validaciones del Evento</value>
+  </data>
   <data name="Factor_Confirm" xml:space="preserve">
     <value>¿Está seguro que desea operar como Factor?</value>
   </data>
   <data name="FailedValidation" xml:space="preserve">
     <value>No se logro realizar la validación del participante a Registrar!!!</value>
+  </data>
+  <data name="Mandato" xml:space="preserve">
+    <value>Inscripción de Mandato Electrónico</value>
   </data>
   <data name="NonExistentParticipant" xml:space="preserve">
     <value>El usuario no existe en el sistema!!!</value>
@@ -138,11 +168,23 @@
   <data name="ParticipantWithoutSoftware" xml:space="preserve">
     <value>El participante no cuenta con un software propio activo en el sistema</value>
   </data>
+  <data name="Receipt" xml:space="preserve">
+    <value>Constancia de Recibo de mercancia</value>
+  </data>
+  <data name="Received" xml:space="preserve">
+    <value>Acuse de Recibo de Factura Electrónica</value>
+  </data>
   <data name="redirectType" xml:space="preserve">
     <value>redirect</value>
   </data>
   <data name="RegisteredParticipant" xml:space="preserve">
     <value>El participante ya se encuentra registrado en RADIAN</value>
+  </data>
+  <data name="SolicitudDisponibilizacion" xml:space="preserve">
+    <value>Solicitud de Primera Disponibilización</value>
+  </data>
+  <data name="SolicitudDisponibilizacion1" xml:space="preserve">
+    <value>Solicitud de Disponibilización Posterior</value>
   </data>
   <data name="TechnologProviderDisabled" xml:space="preserve">
     <value>El participante no es un proveedor tecnológico habilitado</value>
