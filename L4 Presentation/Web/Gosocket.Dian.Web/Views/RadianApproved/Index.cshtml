@@ -119,10 +119,25 @@
                     } )
                 });
 
-                $('#submit-button').click(function (e) {
-                    e.preventDefault();
-                    FilesUploadRequired();
-                    var files = $("#uploadForm")[0];
+            $('.submit-button').click(function (e) {
+                debugger
+                var form = $("#uploadForm");
+                var files = $("#uploadForm")[0];
+                var messages = new Object();
+                var j = 0;
+                for (var i = 0; i <= (files.length - 2) / 2; i = i + 2) {
+                    messages = Object.assign(messages, {
+                        ['file-' + j]: {
+                            required: "Archivo requerido."
+                        }
+                    });
+                    j++;
+                }
+                form.validate({
+                    messages: messages
+                });
+                    form.valid() && e.preventDefault();
+                    if (form.valid()) {
                     var formdata = new FormData();
                     var numberFiles = 0;
                     var limit = (files.length - 2) / 2
@@ -173,22 +188,15 @@
                         },
                         success: function (data) {
                             var objData = data.data;
-                            bootbox.alert({
-                                title: "Paso actualizado",
-                                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + data.message + "</strong></h4></div></div>",
-                                buttons: {
-                                    ok: {
-                                        label: 'Aceptar',
-                                        className: 'btn-success'
-                                    }
-                                },
-                                callback: function () {
-                                    showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
-                                    window.location.href = '@Url.Action("Index", "RadianApproved")' + "?ContributorId=" + objData.ContributorId + "&RadianContributorType=" + objData.RadianContributorType + "&RadianOperationMode=" + objData.RadianOperationMode;
-                                }
-                            });
+                            var operation = () => {
+                                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                window.location.href = '@Url.Action("Index", "RadianApproved")' + "?ContributorId=" + objData.ContributorId + "&RadianContributorType=" + objData.RadianContributorType + "&RadianOperationMode=" + objData.RadianOperationMode;
+                            }
+                            showConfirmation(data.message, AlertExec(operation));
                         },
                     });
+                    }
+
                 });
 
                 $(".close").click(function () {
@@ -223,7 +231,7 @@
                     })
                 });
 
-            $("#cancel-register").click(function () {
+            $(".cancel-register").click(function () {
                     var url = "@Url.Action("DeleteUser", "RadianApproved")";
                     var metod = 'POST';
                     var dataAjax = {

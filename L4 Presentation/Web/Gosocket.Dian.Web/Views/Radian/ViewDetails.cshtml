@@ -15,18 +15,8 @@
     </div>
     <div class="row margin-horizontal-0">
         <div class="panel">
-            @*<div class="panel-heading">
-                    <h3 class="panel-title">@ViewBag.Title</h3>
-                </div>*@
-
             <div class="panel-body padding-top-20">
                 <div class="row margin-horizontal-0">
-
-                    @*@using (Html.BeginForm("ViewDetails", "Radian", FormMethod.Post, new { id = "radian-contributor-form" }))
-                        {*@
-                    @*@Html.HiddenFor(m => m.Id)
-                        @Html.HiddenFor(m => m.IsEdit)*@
-
                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
                         <div class="panel-body padding-20 padding-bottom-10">
                             @Html.Partial("_default")
@@ -64,9 +54,13 @@
 {
 
     <script src="~/Content/js/Radian/DownloadFile.js?1.0.0"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/Radian/constants.js"></script>
 
     <script>
         $(document).ready(function () {
+            SetIconsList();
+
             var id = @Model.Id;
             var radianState = "";
             if ("@Model.RadianState" != "Registrado") {
@@ -109,20 +103,11 @@
                     success: function (data) {
                         var messageSuccess = Object.values(data)[0];
                         var id = Object.values(data)[2];
-                        bootbox.alert({
-                            title: "Advertencia",
-                            message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + messageSuccess + "</strong></h4></div></div>",
-                            buttons: {
-                                ok: {
-                                    label: 'Aceptar',
-                                    className: 'btn-success'
-                                }
-                            },
-                            callback: function () {
-                                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
-                                window.location.href = "/Radian/ViewDetails/" + id;
-                            }
-                        });
+                        var operation = () => {
+                            showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                            window.location.href = "/Radian/ViewDetails/" + id;
+                        }
+                        showConfirmation(messageSuccess, AlertExec(operation));
                     }
                 });
             });
@@ -136,36 +121,24 @@
 
             $(".list-change-status").change(function () {
                 var element = this;
-                bootbox.confirm({
-                    title: "Advertencia",
-                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>¿Está seguro que desea cambiar el estado del archivo?</strong></h4></div></div>",
-                    buttons: {
-                        confirm: {
-                            label: 'Confirmar',
-                            className: 'btn-success btn-gosocket'
-                        },
-                        cancel: {
-                            label: 'Cancelar',
-                            className: 'btn-danger'
-                        }
-                    },
-                    callback: function (confirmation) {
-                        if (confirmation) {
-                            var idFile = $(element).parents("tr").attr("data-idFile");
-                            var newState = $(element).val();
-                            var objToAdd = {
-                                Id: idFile,
-                                NewState: Number(newState)
-                            };
-                            documentsEdited.push(objToAdd);
-                        } else {
-                            $(element).parents("tr").children(".init-show").toggle();
-                            $(element).parents("tr").children(".init-hide").toggle();
-                            var string = $(element).parents("tr").children(".edit-state").html() == "Editar" ? "Cancelar" : "Editar"
-                            $(element).parents("tr").children(".edit-state").html(string);
-                        }
-                    }
-                });
+                var confirmationMessage = bootboxMessage.CHANGE_STATE;
+                var operation = () => {
+                    var idFile = $(element).parents("tr").attr("data-idFile");
+                    var newState = $(element).val();
+                    var objToAdd = {
+                        Id: idFile,
+                        NewState: Number(newState)
+                    };
+                    documentsEdited.push(objToAdd);
+                }
+                var operationCancel = () => {
+                    $(element).parents("tr").children(".init-show").toggle();
+                    $(element).parents("tr").children(".init-hide").toggle();
+                    var string = $(element).parents("tr").children(".edit-state").html() == "Editar" ? "Cancelar" : "Editar"
+                    $(element).parents("tr").children(".edit-state").html(string);
+
+                }
+                showConfirmation(confirmationMessage, ConfirmExec(operation, null, operationCancel));
             })
 
         });

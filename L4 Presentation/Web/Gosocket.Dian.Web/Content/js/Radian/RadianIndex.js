@@ -59,7 +59,7 @@ function showConfirmation(confirmMessage, buttons) {
     });
 }
 
-function ConfirmExec(operation, param) {
+function ConfirmExec(operation, param, operationCancel) {
     return {
         del: {
             label: "Aceptar",
@@ -73,18 +73,20 @@ function ConfirmExec(operation, param) {
             label: "Cancelar",
             className: "btn-radian-default",
             callback: function () {
+                operationCancel != null && operationCancel();
                 operationClick = false;
             }
         }
     }
 }
 
-function AlertExec() {
+function AlertExec(operation) {
     return {
         del: {
             label: "Aceptar",
             className: "btn-radian-default",
             callback: function () {
+                operation != null && operation();
                 operationClick = false;
             }
         }
@@ -102,11 +104,6 @@ function ajaxFunction(url,metod,data,actionError,actionSuccess) {
     });
 }
 
-function FilesUploadRequired() {
-    var x = document.getElementsByClassName("radian-file").required;
-    document.getElementById("required-message").innerHTML = x; 
-}
-
 function DeleteOperationMode(url) {debugger
     $("#delete-software").click(function () {debugger
         var metod = 'POST';
@@ -119,4 +116,51 @@ function DeleteOperationMode(url) {debugger
         }
         ajaxFunction(url, metod, data, actionError, actionSuccess)
     })
+}
+
+
+function SetIconsList() {
+    var myOptions = [
+        ['ct', 'aproved.png', 'Catalonia'],
+        ['es', 'es.png', 'Spain'],
+        ['gb', 'gb.png', 'Great Britain'],
+        ['de', 'de.png', 'Germany'],
+        ['it', 'it.png', 'Italy'],
+        ['fi', 'fi.png', 'Finland'],
+        ['fr', 'fr.png', 'France']
+    ];
+    var myTemplate = "<div class='jqcs_option' data-select-value='$0' style='background-image:url(../../Content/images/$1);'>$2</div>";
+    $.customSelect({
+        selector: '#RadianFileStatus',
+        placeholder: '',
+        options: myOptions,
+        template: myTemplate
+    });
+    $('input#RadianFileStatus')[0].value;
+    //var numberOptions = $(".list-change-status option").length;
+    //var actualHtml = "";
+    //var newHtml = "";
+    //for (var i = 1; i <= numberOptions; i++) {
+    //    actualHtml = $($(".list-change-status option")[i]).html();
+    //    switch (i) {
+    //        case 1:
+    //            newHtml = "<i class='fa fa-exclamation-circle'></i>";
+    //            break;
+    //        case 2:
+    //            newHtml = "<img src='../../Content/images/Svg/Loaded.svg'>";
+    //            break;
+    //        case 3:
+    //            newHtml = "<i class='fa fa-check-circle'></i>";
+    //            break;
+    //        case 4:
+    //            newHtml = "<i class='fa fa-times-circle'></i>";
+    //            break;
+    //        case 5:
+    //            newHtml = "<i class='fa fa-info-circle'></i>";
+    //            break;
+    //        default:
+    //            newHtml = "<i class='fa fa-exclamation-circle'></i>";
+    //    }
+    //    debugger
+    //    $($($(".list-change-status option")[i])[0]).html(newHtml + " " + actualHtml);
 }

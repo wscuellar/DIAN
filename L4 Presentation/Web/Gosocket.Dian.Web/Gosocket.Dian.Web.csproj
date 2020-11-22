@@ -885,6 +885,10 @@
     <Content Include="Content\plugins\cropper\cropper.js" />
     <Content Include="Content\plugins\cropper\cropper.min.css" />
     <Content Include="Content\plugins\cropper\cropper.min.js" />
+    <Content Include="Content\plugins\custom-select\customSelect.jquery.css" />
+    <Content Include="Content\plugins\custom-select\customSelect.jquery.js" />
+    <Content Include="Content\plugins\custom-select\customSelect.jquery.min.js" />
+    <Content Include="Content\plugins\custom-select\images\arrow_down.png" />
     <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.bootstrap.css" />
     <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.bootstrap.min.css" />
     <Content Include="Content\plugins\data-tables\DataTables-1.10.22\css\dataTables.bootstrap4.css" />
@@ -1956,6 +1960,8 @@
     <Content Include="Content\plugins\x-editable\js\bootstrap-editable.js" />
     <Content Include="Content\plugins\x-editable\js\bootstrap-editable.min.js" />
     <Content Include="Content\resources\DOC_1_980005140.xml" />
+    <Content Include="Content\tooltipify.css" />
+    <Content Include="Content\tooltipify.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -2616,6 +2622,8 @@
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery-tooltipify.js" />
+    <Content Include="Scripts\jquery-tooltipify.min.js" />
     <Content Include="Scripts\jquery.steps.js" />
     <Content Include="Scripts\jquery.steps.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
