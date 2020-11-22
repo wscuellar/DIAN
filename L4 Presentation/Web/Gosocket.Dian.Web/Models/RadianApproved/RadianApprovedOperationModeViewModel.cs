@@ -17,9 +17,9 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public Guid SoftwareId { get; set; }
 
+        [Required(ErrorMessage = "PIN del Software es requerido")]
         [Display(Name = "PIN del Software")]
         [RegularExpression(@"\d{5}", ErrorMessage = "El PIN no cuenta con el formato correcto")]
-        [Required(ErrorMessage = "PIN del Software es requerido")]
         public string SoftwarePin { get; set; }
 
         public string SoftwareUrl { get; set; }

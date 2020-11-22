@@ -965,8 +965,7 @@ span.close {
 .underline-title-grey {
     background: #E9E8E8 !important;
     height: 2px !important;
-}
-
+    width: calc(95% + 5%) !important
 }
 
 .modal-radian .bootbox-close-button {

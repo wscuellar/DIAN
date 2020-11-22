@@ -54,14 +54,14 @@
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
                                                         @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                        @Html.ValidationMessageFor(m => m.SoftwareName)
+                                                        @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.SoftwarePin, new { @class = "control-label" })
                                                         @Html.TextBoxFor(m => m.SoftwarePin, new { @id = "SoftwarePin", @name = "SoftwarePin", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                        @Html.ValidationMessageFor(m => m.SoftwarePin)
+                                                        @Html.ValidationMessageFor(m => m.SoftwarePin, null, new { @class = "text-danger" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
@@ -74,7 +74,7 @@
                                         </div>
 
                                         <div class="panel-footer-grey text-right">
-                                            <button name="Submit" class="btn btn-radian-success" id="view-operation-mode">Adicionar</button>
+                                            <button name="Submit" class="btn btn-radian-success" type="submit">Adicionar</button>
                                         </div>
 
                                     </div>

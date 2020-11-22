@@ -95,20 +95,21 @@
                                     }
                                 },
                                 legend: {
-                                    reversed: true,
-                                    align: 'center',
+                                    align: 'right',
                                     verticalAlign: 'top',
                                     x: 0,
-                                    y: 0
+                                    y: 15
                                 },
                                 plotOptions: {
                                     series: {
-                                        stacking: 'normal'
+                                        stacking: 'normal',
+                                        borderRadius: 8
                                     }
                                 },
                                 series: [
                                     {
                                         name: 'Requeridos',
+                                        color: '#6A197D',
                                         data: [
                                             dataChart.TotalDocumentRequired,
                                             dataChart.ReceiptNoticeTotalRequired,
@@ -124,13 +125,11 @@
                                             dataChart.EndorsementCancellationTotalRequired,
                                             dataChart.PaymentNotificationTotalRequired,
                                             dataChart.EndCirculationLimitationTotalRequired
-
-
-
                                         ]
                                     },
                                     {
                                         name: 'Min requerido aceptado',
+                                        color: '#D9F489',
                                         data: [
                                             dataChart.TotalDocumentAcceptedRequired,
                                             dataChart.ReceiptNoticeTotalAcceptedRequired,
@@ -146,11 +145,11 @@
                                             dataChart.EndorsementCancellationTotalAcceptedRequired,
                                             dataChart.PaymentNotificationTotalAcceptedRequired,
                                             dataChart.EndCirculationLimitationTotalAcceptedRequired
-
                                         ]
                                     },
                                     {
                                         name: 'Recibidos',
+                                        color: '#FFD271',
                                         data: [
                                             dataChart.TotalDocumentSent,
                                             dataChart.TotalReceiptNoticeSent,
@@ -170,6 +169,7 @@
                                     },
                                     {
                                         name: 'Aceptados',
+                                        color: '#348441',
                                         data: [
                                             dataChart.TotalDocumentAccepted,
                                             dataChart.ReceiptNoticeAccepted,
@@ -185,11 +185,11 @@
                                             dataChart.EndorsementCancellationAccepted,
                                             dataChart.PaymentNotificationAccepted,
                                             dataChart.EndCirculationLimitationAccepted
-
                                         ]
                                     },
                                     {
                                         name: 'Rechazados',
+                                        color: '#FF414D',
                                         data: [
                                             dataChart.TotalDocumentsRejected,
                                             dataChart.ReceiptNoticeRejected,
