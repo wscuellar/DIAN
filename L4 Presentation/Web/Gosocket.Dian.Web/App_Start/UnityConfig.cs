@@ -45,6 +45,9 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IPermissionService, PermissionService>();
             container.RegisterType<IRadianTestSetResultService, RadianTestSetResultService>();
             container.RegisterType<IRadianCallSoftwareService, RadianCallSoftwareService>();
+            container.RegisterType<IGlobalDocValidatorDocumentService, GlobalDocValidatorDocumentService>();
+            container.RegisterType<IGlobalDocValidatorTrackingService, GlobalDocValidatorTrackingService>();
+            container.RegisterType<IQueryAssociatedEventsService, QueryAssociatedEventsService>();
 
             #endregion
 
@@ -53,6 +56,7 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IRadianTestSetResultManager, RadianTestSetResultManager>();
             container.RegisterType<IRadianTestSetManager, RadianTestSetManager>();
             container.RegisterType<IRadianLoggerManager, RadianLoggerManager>();
+            container.RegisterType<IGlobalDocValidationDocumentMetaService, GlobalDocValidationDocumentMetaService>();            
 
             #endregion
 
