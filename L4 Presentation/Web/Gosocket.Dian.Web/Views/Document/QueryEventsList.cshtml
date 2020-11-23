@@ -1,27 +1,34 @@
 ﻿@model Gosocket.Dian.Web.Models.DocValidatorModel
 
-<style>
-    /*eventlink {*/
-        /* Ver detalle */
-        /*font-family: Arial;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 12px;
-        line-height: 14px;*/
-        /* identical to box height */
-        /*text-decoration-line: underline;
-        color: #348441;
-    }*/
+@section css {
+    <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
+}
 
+<style>
     a {
         text-decoration: none;
         color: #348441;
         outline: 0;
     }
+</style>
 
-   </style>
+<div id="container1-title" style="display:none;">
+    <div class="row mar-no" style="border-bottom: 2px solid #E9E8E8;">
+        <div class="col-sm-6 pad-no">
+            <h4 class="margin-top-10">Eventos de la factura electronica</h4>
+        </div>
+    </div>
+    <div class="row mar-no">
+        <div class="row mar-no">
+            <div class="view-more-collapse">
+                <u style="font-size: 15px; color: #348441;" onclick="showMore()">VER MÁS<a class="fa fa-angle-down" style="font-size: 16px; color: #348441;"></a></u>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="container1">
-    <div class="row mar-no" style="border-bottom: 2px solid #348441;">
+    <div class="row mar-no" style="border-bottom: 2px solid #E9E8E8;">
         <div class="col-sm-6 pad-no">
             <h4 class="margin-top-10">Eventos de la factura electronica</h4>
         </div>
