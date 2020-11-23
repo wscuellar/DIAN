@@ -250,8 +250,10 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatedBy = User.Identity.Name,
                 CreationDate = DateTime.Now,
                 UpdatedBy = User.Identity.Name,
-                LastUpdated = DateTime.Now
+                LastUpdated = DateTime.Now,
+                PasswordHash = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0])
             };
+            model.Password = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0]);
 
             List<Permission> permissions = null;
             IdentityResult result = null;

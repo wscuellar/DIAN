@@ -59,7 +59,10 @@
 
     <script>
         $(document).ready(function () {
-            SetIconsList();
+            for (var i = 0; i < $("tr.select-radian-contributor").length; i++){
+                var fileId = "status-file-" + i;
+                SetIconsList(fileId);
+            }
 
             var id = @Model.Id;
             var radianState = "";
@@ -119,16 +122,17 @@
                 $(this).html(string);
             })
 
-            $(".list-change-status").change(function () {
+            $(".jqcs_option").click(function () {
+                debugger
                 var element = this;
                 var confirmationMessage = bootboxMessage.CHANGE_STATE;
+                var idFile = $(element).parents("tr").attr("data-idFile");
+                var newState = element.dataset.selectValue;
+                var objToAdd = {
+                    Id: idFile,
+                    NewState: Number(newState)
+                };
                 var operation = () => {
-                    var idFile = $(element).parents("tr").attr("data-idFile");
-                    var newState = $(element).val();
-                    var objToAdd = {
-                        Id: idFile,
-                        NewState: Number(newState)
-                    };
                     documentsEdited.push(objToAdd);
                 }
                 var operationCancel = () => {

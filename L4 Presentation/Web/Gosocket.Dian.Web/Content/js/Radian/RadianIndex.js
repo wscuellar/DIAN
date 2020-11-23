@@ -104,8 +104,8 @@ function ajaxFunction(url,metod,data,actionError,actionSuccess) {
     });
 }
 
-function DeleteOperationMode(url) {debugger
-    $("#delete-software").click(function () {debugger
+function DeleteOperationMode(url) {
+    $("#delete-software").click(function () {
         var metod = 'POST';
         var data = {
                 Id:  $(this).attr("data-id")
@@ -118,49 +118,36 @@ function DeleteOperationMode(url) {debugger
     })
 }
 
+function AddOperationMode(url, contributorId, radianTypeId) {
+    $("#save-operation-mode").click(function () {
+        var metod = 'POST';
+        var data = {
+            ContributorId: contributorId,
+            RadianTypeId: radianTypeId
+        }
+        var actionError = () => { }
+        var actionSuccess = () => {
+            location.reload();
+        }
+        ajaxFunction(url, metod, data, actionError, actionSuccess)
+    })
+}
 
-function SetIconsList() {
+
+function SetIconsList(fileId) {
     var myOptions = [
-        ['ct', 'aproved.png', 'Catalonia'],
-        ['es', 'es.png', 'Spain'],
-        ['gb', 'gb.png', 'Great Britain'],
-        ['de', 'de.png', 'Germany'],
-        ['it', 'it.png', 'Italy'],
-        ['fi', 'fi.png', 'Finland'],
-        ['fr', 'fr.png', 'France']
+        ['0', 'exclamation-circle.png', 'Pendiente'],
+        ['1', 'Loaded.png', 'Cargado y en revisión'],
+        ['2', 'aproved.png', 'Aprobado'],
+        ['3', 'reject.png', 'Rechazado'],
+        ['4', 'observations.png', 'Observaciones']
     ];
     var myTemplate = "<div class='jqcs_option' data-select-value='$0' style='background-image:url(../../Content/images/$1);'>$2</div>";
     $.customSelect({
-        selector: '#RadianFileStatus',
+        selector: '#'+fileId,
         placeholder: '',
         options: myOptions,
         template: myTemplate
     });
-    $('input#RadianFileStatus')[0].value;
-    //var numberOptions = $(".list-change-status option").length;
-    //var actualHtml = "";
-    //var newHtml = "";
-    //for (var i = 1; i <= numberOptions; i++) {
-    //    actualHtml = $($(".list-change-status option")[i]).html();
-    //    switch (i) {
-    //        case 1:
-    //            newHtml = "<i class='fa fa-exclamation-circle'></i>";
-    //            break;
-    //        case 2:
-    //            newHtml = "<img src='../../Content/images/Svg/Loaded.svg'>";
-    //            break;
-    //        case 3:
-    //            newHtml = "<i class='fa fa-check-circle'></i>";
-    //            break;
-    //        case 4:
-    //            newHtml = "<i class='fa fa-times-circle'></i>";
-    //            break;
-    //        case 5:
-    //            newHtml = "<i class='fa fa-info-circle'></i>";
-    //            break;
-    //        default:
-    //            newHtml = "<i class='fa fa-exclamation-circle'></i>";
-    //    }
-    //    debugger
-    //    $($($(".list-change-status option")[i])[0]).html(newHtml + " " + actualHtml);
+    $('input#' + fileId)[0].value;
 }
