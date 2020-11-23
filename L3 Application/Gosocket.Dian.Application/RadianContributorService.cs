@@ -153,9 +153,15 @@ namespace Gosocket.Dian.Application
             return radianAdmin;
         }
 
-        public RadianAdmin ContributorSummary(int contributorId)
+        public RadianAdmin ContributorSummary(int contributorId, int radianContributorType = 0)
         {
-            List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId);
+            List<RadianContributor> radianContributors;
+
+            if(radianContributorType!=0)
+                radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorType);
+            else
+                radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId);
+
             List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(contributorId).ToList();
             List<string> userIds = _contributorService.GetUserContributors(contributorId).Select(u => u.UserId).ToList();
 
