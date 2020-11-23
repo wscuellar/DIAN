@@ -39,16 +39,14 @@ namespace Gosocket.Dian.Web.Models
         [EmailAddress(ErrorMessage = "Formato de correo electrónico inválido")]
         public string Email { get; set; }
 
-        [DataType(DataType.Password)]
-        [Display(Name = "Contraseña")]
-        [Required(ErrorMessage = "{0} es requerida")]
+        /// <summary>
+        /// El password se genera automaticamente y se le informa al Usuario cual es, en un correo
+        /// </summary>
         public string Password { get; set; }
 
-        [DataType(DataType.Password)]
-        [Display(Name = "Confirmar contraseña")]
-        [Compare("Password", ErrorMessage = "La contraseña y la confirmación no coinciden.")]
-        public string ConfirmPassword { get; set; }
-
+        /// <summary>
+        /// Indica si el Usuario esta Activo o Inactivo
+        /// </summary>
         public byte Active { get; set; }
         public string UpdatedBy { get; set; }
         public string ActiveDescription { get; set; }

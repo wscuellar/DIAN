@@ -118,11 +118,12 @@ function DeleteOperationMode(url) {
     })
 }
 
-function AddOperationMode(url, contributorId) {
-    $("#save-operation-mode").click(function () {debugger
+function AddOperationMode(url, contributorId, radianTypeId) {
+    $("#save-operation-mode").click(function () {
         var metod = 'POST';
         var data = {
-            ContributorId: contributorId
+            ContributorId: contributorId,
+            RadianTypeId: radianTypeId
         }
         var actionError = () => { }
         var actionSuccess = () => {

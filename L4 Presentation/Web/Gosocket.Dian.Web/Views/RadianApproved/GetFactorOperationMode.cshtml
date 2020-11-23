@@ -7,7 +7,7 @@
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
     <script>
         $(document).ready(function () {
-            AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.Id);
+            AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.Id, @Model.Contributor.RadianContributorTypeId);
             DeleteOperationMode('@Url.Action("DeleteOperationMode", "RadianApproved")');
         })
     </script>

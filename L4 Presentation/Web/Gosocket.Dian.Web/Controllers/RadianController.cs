@@ -35,8 +35,14 @@ namespace Gosocket.Dian.Web.Controllers
         {
             NameValueCollection result = _radianContributorService.Summary(User.UserCode());
             ViewBag.ContributorId = result["ContributorId"];
-            ViewBag.RadianContributorTypeId = result["RadianContributorTypeId"];
-            ViewBag.RadianOperationModeId = result["RadianOperationModeId"];
+            ViewBag.ElectronicInvoice_RadianContributorTypeId = result["ElectronicInvoice_RadianContributorTypeId"];
+            ViewBag.ElectronicInvoice_RadianOperationModeId = result["ElectronicInvoice_RadianOperationModeId"];
+            ViewBag.TechnologyProvider_RadianContributorTypeId = result["TechnologyProvider_RadianContributorTypeId"];
+            ViewBag.TechnologyProvider_RadianOperationModeId = result["TechnologyProvider_RadianOperationModeId"];
+            ViewBag.TradingSystem_RadianContributorTypeId = result["TradingSystem_RadianContributorTypeId"];
+            ViewBag.TradingSystem_RadianOperationModeId = result["TradingSystem_RadianOperationModeId"];
+            ViewBag.Factor_RadianContributorTypeId = result["Factor_RadianContributorTypeId"];
+            ViewBag.Factor_RadianOperationModeId = result["Factor_RadianOperationModeId"];
             return View();
         }
 
@@ -50,7 +56,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ResponseMessage validation = _radianContributorService.RegistrationValidation(User.UserCode(), registrationData.RadianContributorType, registrationData.RadianOperationMode);
             if (validation.MessageType == "redirect")
-                validation.RedirectTo = Url.Action("Index", "RadianApproved",registrationData);
+                validation.RedirectTo = Url.Action("Index", "RadianApproved", registrationData);
             return Json(validation, JsonRequestBehavior.AllowGet);
         }
 
@@ -98,6 +104,7 @@ namespace Gosocket.Dian.Web.Controllers
                 Code = model.Code,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
+                Type= model.Type,
                 RadianState = model.RadianState != null ? model.RadianState.Value.GetDescription() : null
             };
             RadianAdmin radianAdmin = _radianContributorService.ListParticipantsFilter(filter, model.Page, model.Length);

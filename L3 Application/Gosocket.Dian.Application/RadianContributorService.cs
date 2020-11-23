@@ -45,12 +45,14 @@ namespace Gosocket.Dian.Application
         {
             NameValueCollection collection = new NameValueCollection();
             Domain.Contributor contributor = _contributorService.GetByCode(userCode);
-            var radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice && t.RadianState != "Cancelado");
-            if (radianContributor != null)
-            {
-                collection.Add("RadianContributorTypeId", radianContributor.RadianContributorTypeId.ToString());
-                collection.Add("RadianOperationModeId", radianContributor.RadianOperationModeId.ToString());
-            }
+            List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
+            if (radianContributors.Any())
+                foreach (var radianContributor in radianContributors)
+                {
+                    string key = Enum.GetName(typeof(Domain.Common.RadianContributorType), radianContributor.RadianContributorTypeId);
+                    collection.Add(key + "_RadianContributorTypeId", radianContributor.RadianContributorTypeId.ToString());
+                    collection.Add(key + "_RadianOperationModeId", radianContributor.RadianOperationModeId.ToString());
+                }
             if (contributor == null) return collection;
             collection.Add("ContributorId", contributor.Id.ToString());
             collection.Add("ContributorTypeId", contributor.ContributorTypeId.ToString());
@@ -127,12 +129,13 @@ namespace Gosocket.Dian.Application
         public RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size)
         {
             string cancelState = Domain.Common.RadianState.Cancelado.GetDescription();
+            string stateDescriptionFilter = filter.RadianState == null ? string.Empty : filter.RadianState.GetDescription();
             DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
             DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
 
             var radianContributors = _radianContributorRepository.List(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
                                                                              (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
-                                                                             (t.RadianState == filter.RadianState.GetDescription() || (filter.RadianState == null && t.RadianState != cancelState)) &&
+                                                                             ((filter.RadianState == null && t.RadianState != cancelState) || t.RadianState == stateDescriptionFilter) &&
                                                                              (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) &&
                                                                              (DbFunctions.TruncateTime(t.CreatedDate) <= endDate || !endDate.HasValue),
             page, size);
@@ -153,9 +156,15 @@ namespace Gosocket.Dian.Application
             return radianAdmin;
         }
 
-        public RadianAdmin ContributorSummary(int contributorId)
+        public RadianAdmin ContributorSummary(int contributorId, int radianContributorType = 0)
         {
-            List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId);
+            List<RadianContributor> radianContributors;
+
+            if(radianContributorType!=0)
+                radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorType);
+            else
+                radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId);
+
             List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(contributorId).ToList();
             List<string> userIds = _contributorService.GetUserContributors(contributorId).Select(u => u.UserId).ToList();
 
