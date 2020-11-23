@@ -12,6 +12,6 @@ namespace Gosocket.Dian.Interfaces.Services
         bool IsVerificated(GlobalDocValidatorDocumentMeta otherEvent);
         List<Domain.Entity.GlobalDocValidatorTracking> ListTracking(string eventDocumentKey);
         List<GlobalDocValidatorDocumentMeta> OtherEvents(string documentKey, EventStatus eventCode);
-        List<GlobalDocReferenceAttorney> ReferenceAttorneys(GlobalDocValidatorDocumentMeta eventItem);
+        List<GlobalDocReferenceAttorney> ReferenceAttorneys(string documentKey, string documentReferencedKey, string receiverCode, string senderCode);
     }
 }
