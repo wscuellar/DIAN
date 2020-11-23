@@ -25,7 +25,7 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <returns></returns>
         RadianAdmin ListParticipants(int page, int size);
 
-        RadianAdmin ContributorSummary(int contributorId);
+        RadianAdmin ContributorSummary(int contributorId, int radianContributorType = 0);
 
         
 

@@ -119,9 +119,9 @@ namespace Gosocket.Dian.Application
             return radianContributor.RadianContributorFile.ToList();
         }
 
-        public RadianAdmin ContributorSummary(int contributorId)
+        public RadianAdmin ContributorSummary(int contributorId, int radianContributorType)
         {
-            return _radianContributorService.ContributorSummary(contributorId);
+            return _radianContributorService.ContributorSummary(contributorId, radianContributorType);
         }
 
         public Software SoftwareByContributor(int contributorId)
