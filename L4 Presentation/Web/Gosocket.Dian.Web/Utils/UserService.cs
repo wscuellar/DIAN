@@ -125,6 +125,11 @@ namespace Gosocket.Dian.Web.Utils
             return result;
         }
 
+        /// <summary>
+        /// Actualizar los campos basicos del Usuario Externo
+        /// </summary>
+        /// <param name="user"><see cref="ExternalUserViewModel"/></param>
+        /// <returns></returns>
         public int UpdateExternalUser(ExternalUserViewModel user)
         {
             int result = 0;

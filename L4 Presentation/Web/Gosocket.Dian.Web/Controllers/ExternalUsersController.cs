@@ -1,5 +1,7 @@
 ﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Filters;
 using Gosocket.Dian.Web.Models;
@@ -46,13 +48,14 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         private readonly IPermissionService _permisionService;
-
+        private readonly IContributorService _contributorService;
         private IdentificationTypeService identificationTypeService = new IdentificationTypeService();
 
-        public ExternalUsersController(IPermissionService permisionService)
+        public ExternalUsersController(IPermissionService permisionService, IContributorService contributorService)
         {
             _context = new ApplicationDbContext();
             _permisionService = permisionService;
+            _contributorService = contributorService;
         }
 
         // GET: ExternalUsers
@@ -65,7 +68,21 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.ExternalUsersCreate;
 
-            this.LoadViewBags(id);
+            var uCompany = userService.Get(User.Identity.GetUserId());
+
+            if (uCompany == null)
+            {
+                ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
+                return View();
+            }
+
+            if (string.IsNullOrEmpty(uCompany.Code))
+            {
+                ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
+                return View();
+            }
+
+            this.LoadViewBags(uCompany.Code);
 
             ExternalUserViewModel model = null;
             ViewBag.PermissionList = null;
@@ -181,7 +198,11 @@ namespace Gosocket.Dian.Web.Controllers
             };
         }
 
-        private void LoadViewBags(string userId)
+        /// <summary>
+        /// Listas para llenar el Modelo de la Vista
+        /// </summary>
+        /// <param name="nit">Nit de la empresa del Representante Legal o Nit de la persona Natural registrada en el Rut</param>
+        private void LoadViewBags(string nit)
         {
 
             ViewBag.IdentificationTypesList = identificationTypeService.List()
@@ -212,7 +233,8 @@ namespace Gosocket.Dian.Web.Controllers
                         }).ToList()
                 }).ToList();
 
-            ViewBag.ExternalUsersList = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id)).ToList()
+            //ViewBag.ExternalUsersList = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id) && u.Code == nit).ToList()
+            ViewBag.ExternalUsersList = _context.Users.Where(u => u.CreatorNit == nit).ToList()
                 .Select(u =>
                 new ExternalUserViewModel
                 {
@@ -237,21 +259,35 @@ namespace Gosocket.Dian.Web.Controllers
             if (!string.IsNullOrEmpty(model.Id))
                 ViewBag.txtAccion = "Actualizar";
 
-            this.LoadViewBags(model.Id);
+            var uCompany = userService.Get(User.Identity.GetUserId());
+
+            if (uCompany == null)
+            {
+                ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
+                return View();
+            }
+
+            if (string.IsNullOrEmpty(uCompany.Code))
+            {
+                ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
+                return View();
+            }
+
+            this.LoadViewBags(uCompany.Code);
 
             var user = new ApplicationUser
             {
-                //Code = Guid.NewGuid().ToString().Substring(0, 6),
+                CreatorNit = uCompany.Code,
                 IdentificationTypeId = model.IdentificationTypeId,
                 IdentificationId = model.IdentificationId,
                 Name = model.Names,
                 Email = model.Email,
                 UserName = model.Email,
-                CreatedBy = User.Identity.Name,
+                CreatedBy = User.Identity.GetUserId(),
                 CreationDate = DateTime.Now,
                 UpdatedBy = User.Identity.Name,
                 LastUpdated = DateTime.Now,
-                PasswordHash = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0])
+                //PasswordHash = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0])
             };
             model.Password = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0]);
 
@@ -273,7 +309,7 @@ namespace Gosocket.Dian.Web.Controllers
                 item.UpdatedBy = User.Identity.GetUserId();
             }
 
-            if (string.IsNullOrEmpty(model.Id))
+            if (string.IsNullOrEmpty(model.Id))//creación de nuevo Usuario
             {
                 if (!ModelState.IsValid)
                 {
@@ -288,15 +324,12 @@ namespace Gosocket.Dian.Web.Controllers
                     return View(model);
                 }
                 
-                user.Code = Guid.NewGuid().ToString().Substring(0, 6);
-
                 //validar si ya existe un Usuario con el tipo documento y documento suministrados
                 var vUserDB = userService.FindUserByIdentificationAndTypeId(model.IdentificationTypeId, model.IdentificationId);
 
                 if(vUserDB != null)
                 {
                     ModelState.AddModelError("", "Ya existe un Usuario con el Tipo de Documento y Documento suministrados");
-
                     return View(model);
                 }
 
@@ -311,7 +344,8 @@ namespace Gosocket.Dian.Web.Controllers
                         IdentificationTypeId = model.IdentificationTypeId,
                         IdentificationId =model.IdentificationId,
                         Names = model.Names,
-                        Email = model.Email
+                        Email = model.Email,
+                        CreatorNit = user.CreatorNit
                     }), "Creación");
 
                     var result1 = await UserManager.AddToRoleAsync(user.Id, Roles.UsuarioExterno);

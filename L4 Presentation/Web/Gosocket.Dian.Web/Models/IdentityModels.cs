@@ -21,7 +21,7 @@ namespace Gosocket.Dian.Web.Models
 
         public string Code { get; set; }
 
-        public string CreatedBy;
+        public string CreatedBy { get; set; }
 
         /// <summary>
         /// Fecha de creación del Usuario
@@ -60,6 +60,11 @@ namespace Gosocket.Dian.Web.Models
         /// Ultima actualización del Usuario
         /// </summary>
         public DateTime? LastUpdated { get; set; }
+
+        /// <summary>
+        /// Nit del Representate Legal o Persona Natural registrado en el Rut que crea el Usuario externo
+        /// </summary>
+        public string CreatorNit { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
