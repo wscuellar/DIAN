@@ -8,6 +8,7 @@
             @ViewBag.title
         </p>
         <div class="underline-title"></div>
+        <div class="back-button"><a href="javascript:history.back()"><i class="fa fa-chevron-left"></i> Volver</a></div>
     </div>
     <div class="row margin-horizontal-0">
         <div class="panel">
@@ -54,14 +55,14 @@
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
                                                         @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                        @Html.ValidationMessageFor(m => m.SoftwareName)
+                                                        @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.SoftwarePin, new { @class = "control-label" })
                                                         @Html.TextBoxFor(m => m.SoftwarePin, new { @id = "SoftwarePin", @name = "SoftwarePin", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                        @Html.ValidationMessageFor(m => m.SoftwarePin)
+                                                        @Html.ValidationMessageFor(m => m.SoftwarePin, null, new { @class = "text-danger" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
@@ -74,7 +75,7 @@
                                         </div>
 
                                         <div class="panel-footer-grey text-right">
-                                            <button name="Submit" class="btn btn-radian-success" id="view-operation-mode">Adicionar</button>
+                                            <button name="Submit" id="save-operation-mode" class="btn btn-radian-success" type="submit">Adicionar</button>
                                         </div>
 
                                     </div>
@@ -129,12 +130,12 @@
                                                             }
                                                         }
                                                     </td>
-                                                    <td class="largeText iffyTip">@software.Name</td>
-                                                    <td class="largeText iffyTip">@software.Id</td>
-                                                    <td class="largeText iffyTip">@software.Pin</td>
-                                                    <td class="largeText iffyTip">@software.Url</td>
-                                                    <td class="largeText iffyTip"><a title="Eliminar"><i class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a></td>
-                                                    <td class="largeText iffyTip"><a title="Set de pruebas"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a></td>
+                                                    <td class="largeText iffyTip">@oper.SoftwareName</td>
+                                                    <td class="largeText iffyTip">@oper.SoftwareId</td>
+                                                    <td class="largeText iffyTip">@oper.Pin</td>
+                                                    <td class="largeText iffyTip">@oper.Url</td>
+                                                    <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer"><span ><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
+                                                    <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
                                                 </tr>
                                             }
                                         </tbody>

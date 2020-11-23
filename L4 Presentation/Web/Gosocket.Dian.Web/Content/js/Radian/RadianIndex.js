@@ -59,7 +59,7 @@ function showConfirmation(confirmMessage, buttons) {
     });
 }
 
-function ConfirmExec(operation, param) {
+function ConfirmExec(operation, param, operationCancel) {
     return {
         del: {
             label: "Aceptar",
@@ -73,18 +73,20 @@ function ConfirmExec(operation, param) {
             label: "Cancelar",
             className: "btn-radian-default",
             callback: function () {
+                operationCancel != null && operationCancel();
                 operationClick = false;
             }
         }
     }
 }
 
-function AlertExec() {
+function AlertExec(operation) {
     return {
         del: {
             label: "Aceptar",
             className: "btn-radian-default",
             callback: function () {
+                operation != null && operation();
                 operationClick = false;
             }
         }
@@ -102,7 +104,49 @@ function ajaxFunction(url,metod,data,actionError,actionSuccess) {
     });
 }
 
-function FilesUploadRequired() {
-    var x = document.getElementsByClassName("radian-file").required;
-    document.getElementById("required-message").innerHTML = x; 
+function DeleteOperationMode(url) {
+    $("#delete-software").click(function () {
+        var metod = 'POST';
+        var data = {
+                Id:  $(this).attr("data-id")
+            }
+        var actionError = () => { }
+        var actionSuccess = () => {
+            location.reload();
+        }
+        ajaxFunction(url, metod, data, actionError, actionSuccess)
+    })
+}
+
+function AddOperationMode(url, contributorId) {
+    $("#save-operation-mode").click(function () {debugger
+        var metod = 'POST';
+        var data = {
+            ContributorId: contributorId
+        }
+        var actionError = () => { }
+        var actionSuccess = () => {
+            location.reload();
+        }
+        ajaxFunction(url, metod, data, actionError, actionSuccess)
+    })
+}
+
+
+function SetIconsList(fileId) {
+    var myOptions = [
+        ['0', 'exclamation-circle.png', 'Pendiente'],
+        ['1', 'Loaded.png', 'Cargado y en revisión'],
+        ['2', 'aproved.png', 'Aprobado'],
+        ['3', 'reject.png', 'Rechazado'],
+        ['4', 'observations.png', 'Observaciones']
+    ];
+    var myTemplate = "<div class='jqcs_option' data-select-value='$0' style='background-image:url(../../Content/images/$1);'>$2</div>";
+    $.customSelect({
+        selector: '#'+fileId,
+        placeholder: '',
+        options: myOptions,
+        template: myTemplate
+    });
+    $('input#' + fileId)[0].value;
 }

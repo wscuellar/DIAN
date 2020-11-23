@@ -11,6 +11,7 @@
             @ViewBag.title
         </p>
         <div class="underline-title"></div>
+        <div class="back-button"><a href="javascript:history.back()"><i class="fa fa-chevron-left"></i> Volver</a></div>
     </div>
     <div class="row margin-horizontal-0">
         <div class="panel">
@@ -33,7 +34,7 @@
                     </p>
                     <div class="underline-title underline-title-grey"></div>
 
-                    <figure class="highcharts-figure">
+                    <figure class="highcharts-figure-settest">
                         <div id="setTestDetails"></div>
                     </figure>
                 </div>
@@ -61,16 +62,16 @@
                         });
 
                         function showChart(data) {
-                            //debugger
                             var dataChart = data.data;
                             Highcharts.chart('setTestDetails', {
                                 chart: {
                                     type: 'bar'
                                 },
                                 title: {
-                                    text: 'Stacked bar chart'
+                                    text: ''
                                 },
                                 xAxis: {
+                                    alternateGridColor: '#EBEEEC',
                                     categories: [
                                         'Documentos',
                                         'Acuse de recibo',
@@ -91,20 +92,25 @@
                                 yAxis: {
                                     min: 0,
                                     title: {
-                                        text: 'Total fruit consumption'
+                                        text: ''
                                     }
                                 },
                                 legend: {
-                                    reversed: true
+                                    align: 'right',
+                                    verticalAlign: 'top',
+                                    x: 0,
+                                    y: 15
                                 },
                                 plotOptions: {
                                     series: {
-                                        stacking: 'normal'
+                                        stacking: 'normal',
+                                        borderRadius: 8
                                     }
                                 },
                                 series: [
                                     {
                                         name: 'Requeridos',
+                                        color: '#6A197D',
                                         data: [
                                             dataChart.TotalDocumentRequired,
                                             dataChart.ReceiptNoticeTotalRequired,
@@ -120,13 +126,11 @@
                                             dataChart.EndorsementCancellationTotalRequired,
                                             dataChart.PaymentNotificationTotalRequired,
                                             dataChart.EndCirculationLimitationTotalRequired
-
-
-
                                         ]
                                     },
                                     {
                                         name: 'Min requerido aceptado',
+                                        color: '#D9F489',
                                         data: [
                                             dataChart.TotalDocumentAcceptedRequired,
                                             dataChart.ReceiptNoticeTotalAcceptedRequired,
@@ -142,11 +146,11 @@
                                             dataChart.EndorsementCancellationTotalAcceptedRequired,
                                             dataChart.PaymentNotificationTotalAcceptedRequired,
                                             dataChart.EndCirculationLimitationTotalAcceptedRequired
-
                                         ]
                                     },
                                     {
                                         name: 'Recibidos',
+                                        color: '#FFD271',
                                         data: [
                                             dataChart.TotalDocumentSent,
                                             dataChart.TotalReceiptNoticeSent,
@@ -166,6 +170,7 @@
                                     },
                                     {
                                         name: 'Aceptados',
+                                        color: '#348441',
                                         data: [
                                             dataChart.TotalDocumentAccepted,
                                             dataChart.ReceiptNoticeAccepted,
@@ -181,11 +186,11 @@
                                             dataChart.EndorsementCancellationAccepted,
                                             dataChart.PaymentNotificationAccepted,
                                             dataChart.EndCirculationLimitationAccepted
-
                                         ]
                                     },
                                     {
                                         name: 'Rechazados',
+                                        color: '#FF414D',
                                         data: [
                                             dataChart.TotalDocumentsRejected,
                                             dataChart.ReceiptNoticeRejected,

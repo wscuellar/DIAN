@@ -55,68 +55,68 @@
 
 @Html.Partial("_iconsState")
 
-    <div id="row-provider" class="row padding-top-10">
-        @if (Model.RadianContributorFiles != null && Model.RadianContributorFiles.Count > 0)
-        {
-            <div class="col-sm-6 padding-xs-0">
-                <div class="form-group">
-                    <div class="table-responsive">
-                        <table id="table-contributor-files" class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-left">Archivo</th>
-                                    <th class="text-center">Estado</th>
-                                    <th class="text-center"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{var index = 0;}
-                                @foreach (var f in Model.RadianContributorFiles.OrderByDescending(f => f.ContributorFileType.Id).ToList())
+<div id="row-provider" class="row padding-top-10">
+    @if (Model.RadianContributorFiles != null && Model.RadianContributorFiles.Count > 0)
+    {
+        <div class="col-sm-6 padding-xs-0">
+            <div class="form-group">
+                <div class="table-responsive">
+                    <table id="table-contributor-files" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Archivo</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{var index = 0;}
+                            @foreach (var f in Model.RadianContributorFiles.OrderByDescending(f => f.ContributorFileType.Id).ToList())
+                            {
+                                var label = "";
+                                var statusId = "";
+                                switch (f.ContributorFileStatus.Id)
                                 {
-                                    var label = "";
-                                    var statusId = "";
-                                    switch (f.ContributorFileStatus.Id)
-                                    {
-                                        case 0:
-                                            label = "<i class='fa fa-exclamation-circle'></i>";
-                                            statusId = "status-0";
-                                            break;
-                                        case 1:
-                                            label = "<img src='../../Content/images/Svg/Loaded.svg'>";
-                                            statusId = "status-1";
-                                            break;
-                                        case 2:
-                                            label = "<i class='fa fa-check-circle'></i>";
-                                            statusId = "status-2";
-                                            break;
-                                        case 3:
-                                            label = "<i class='fa fa-times-circle'></i>";
-                                            statusId = "status-3";
-                                            break;
-                                        case 4:
-                                            label = "<i class='fa fa-info-circle'></i>";
-                                            statusId = "status-4";
-                                            break;
-                                        default:
-                                            label = "<i class='fa fa-exclamation-circle'></i>";
-                                            statusId = "status-5";
-                                            break;
-                                    };
+                                    case 0:
+                                        label = "<i class='fa fa-exclamation-circle'></i>";
+                                        statusId = "status-0";
+                                        break;
+                                    case 1:
+                                        label = "<img src='../../Content/images/Svg/Loaded.svg'>";
+                                        statusId = "status-1";
+                                        break;
+                                    case 2:
+                                        label = "<i class='fa fa-check-circle'></i>";
+                                        statusId = "status-2";
+                                        break;
+                                    case 3:
+                                        label = "<i class='fa fa-times-circle'></i>";
+                                        statusId = "status-3";
+                                        break;
+                                    case 4:
+                                        label = "<i class='fa fa-info-circle'></i>";
+                                        statusId = "status-4";
+                                        break;
+                                    default:
+                                        label = "<i class='fa fa-exclamation-circle'></i>";
+                                        statusId = "status-5";
+                                        break;
+                                };
                                 <tr data-id="@f.ContributorFileType.Id" data-idFile="@f.Id" class="select-radian-contributor">
-                                    <td class="text-left"><span class="fa fa fa-download add-tooltip download-contributor-files" data-original-title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>@f.ContributorFileType.Name</td>
-                                        <td class="text-center init-hide @statusId">@Html.EnumDropDownListFor(m => m.RadianFileStatus, new { @class = "list-change-status"})</td>
-                                        <td class="text-center init-show"><div><span class="">@Html.Raw(label) @f.ContributorFileStatus.Name</span></div></td>
-                                    <td class="text-center"><i class="fa fa-pencil"></i><button type="button" class="btn btn-link edit-state">Editar</button></td>
+                                    <td width="33%" class="text-left"><span class="fa fa fa-download add-tooltip download-contributor-files" data-original-title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>@f.ContributorFileType.Name</td>
+                                    <td width="33%" class="text-center init-hide @statusId"><input type="hidden" class="list-change-status" id="status-file-@index" value=""></td>
+                                    <td width="33%" class="text-center init-show"><div><span class="">@Html.Raw(label) @f.ContributorFileStatus.Name</span></div></td>
+                                    <td width="33%" class="text-center"><i class="fa fa-pencil"></i><button type="button" class="btn btn-link edit-state">Editar</button></td>
                                 </tr>
-                                    index++;
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                index++;
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        }
-    </div>
+        </div>
+    }
+</div>
 
     <div class="row dropdown-state">
         <div class="col-sm-6 padding-xs-0">
