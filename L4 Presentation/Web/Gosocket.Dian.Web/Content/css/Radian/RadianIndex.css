@@ -327,6 +327,7 @@ i.fa-info-circle {
     line-height: 16px;
     color: #2C323C;
     padding: 6px 10px;
+    vertical-align: middle;
 }
 
 .fa-pencil {
@@ -381,7 +382,7 @@ i.fa-info-circle {
 
 .title-container {
     width: max-content;
-    margin-bottom: 40px;
+    margin-bottom: 0px;
 }
 
 .btn-radian-default {
@@ -1001,6 +1002,8 @@ span.close {
 
 .back-button {
     color: #348441;
+    font-size: 18px;
+    margin: 12px 0px 17px 0px;
 }
 
 .tooltip {
@@ -1054,14 +1057,28 @@ span.close {
     margin: 4px 0px;
 }
 
-.list-change-status .fa {
-    font-family: "Font Awesome 5 Free", Open Sans;
-    font-weight: 500;
-}
 .jqcs_options {
     display: block;
     position: absolute;
     z-index: 10;
-    width: 30%;
+    width: 149px;
     background-color: white;
+}
+
+.jqcs_arrow {
+    width: 10% !important;
+}
+
+.jqcs_select {
+    background: white;
+}
+.jqcs_option {
+    text-align: left;
+    background-repeat: no-repeat;
+    background-position: 6px;
+    padding: 5px 20px 5px 32px;
+}
+
+.jqcs_value {
+    width: 100%;
 }

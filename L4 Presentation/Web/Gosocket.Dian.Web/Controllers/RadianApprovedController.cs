@@ -199,9 +199,11 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult UploadFactorOperationMode(RadianApprovedOperationModeViewModel approvedOperModeViewModel)
+        public JsonResult UploadFactorOperationMode(int ContributorId)
         {
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(approvedOperModeViewModel.Contributor.Id);
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId);
+            Software software = _radianAprovedService.SoftwareByContributor(ContributorId);
+
             _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
             {
                 RadianContributorId = radianAdmin.Contributor.Id,
@@ -210,10 +212,10 @@ namespace Gosocket.Dian.Web.Controllers
                 Deleted = false,
                 Timestamp = DateTime.Now,
                 RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId,
-                Pin = approvedOperModeViewModel.SoftwarePin,
-                SoftwareName = approvedOperModeViewModel.SoftwareName,
-                Url = approvedOperModeViewModel.SoftwareUrl,
-                SoftwareId = approvedOperModeViewModel.SoftwareId,
+                Pin = software.Pin,
+                SoftwareName = software.Name,
+                Url = software.Url,
+                SoftwareId = software.Id,
             });
 
             return Json(
