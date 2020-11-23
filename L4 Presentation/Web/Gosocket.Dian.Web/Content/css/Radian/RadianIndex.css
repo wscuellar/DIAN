@@ -1082,3 +1082,7 @@ span.close {
 .jqcs_value {
     width: 100%;
 }
+
+li.done::after{
+    content: "";
+}
