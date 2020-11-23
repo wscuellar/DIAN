@@ -40,9 +40,10 @@ th {
 }
 /*    general Styles      */
 .RadianContainerBegin {
-    margin: 15px;
+    margin: 50px 0px 15px;
     background: #FFFFFF;
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+    padding-bottom: 70px;
 }
 
 .RadianAlertText {
@@ -57,14 +58,14 @@ th {
 }
 
 .RadianCardContainer {
-    background: #F2F6FB;
-    border-radius: 10px;
+    padding: 16px 0px 30px;
     width: 60%;
-    height: 200px;
+    height: 188px;
     background: #F2F6FB;
     border-radius: 10px;
     float: none;
-    margin: 15px auto;
+    margin: 45px auto 15px;
+    box-shadow: 4px 5px 7px rgba(0, 0, 0, 0.1);
 }
 
 .close {
@@ -79,14 +80,14 @@ th {
 @media screen and (min-width: 1101px) {
 
     .RadianTextSelected {
-        height: 21px;
         font-family: Arial;
         font-style: normal;
         font-weight: bold;
-        font-size: 1vw;
+        font-size: 18px;
         line-height: 21px;
         color: #2C323C;
-        margin-top: 25px;
+        margin-top: 40px;
+        margin-bottom: 0px;
     }
 
     .RadianTittleCard {
@@ -473,7 +474,7 @@ h4.text-thin {
 }
 
 #steps-approved .steps li {
-    width: 107.01px;
+    width: 15%;
     height: 108.15px;
     border-radius: 50%;
     margin: 0px 20px;
@@ -608,8 +609,8 @@ h4.text-thin {
 #steps-approved .steps li.done::before {
     content: "";
     position: absolute;
-    right: 4px;
-    top: 1px;
+    right: 16px;
+    top: 2px;
     width: 35px;
     height: 35px;
     background-repeat: no-repeat;
@@ -706,7 +707,10 @@ h4.text-thin {
 }
 
 #steps-approved .steps {
-    padding: 60px 15%;
+    width: 80%;
+    margin: auto;
+    padding: 50px 0px;
+    margin-bottom: 30px;
 }
 
 #steps-approved li.done .name-state {
@@ -1041,12 +1045,13 @@ span.close {
             transform: rotate(46deg);
             z-index: -1;
         }
-        /* Show the tooltip text when you mouse over the tooltip container */
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-        }
 
-.dataTable td{
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+    }
+
+.dataTable td {
     text-align: center;
 }
 
@@ -1072,6 +1077,7 @@ span.close {
 .jqcs_select {
     background: white;
 }
+
 .jqcs_option {
     text-align: left;
     background-repeat: no-repeat;
@@ -1083,6 +1089,35 @@ span.close {
     width: 100%;
 }
 
-li.done::after{
+li.done a::after, li.current a::after {
     content: "";
+    width: 54%;
+    height: 3px;
+    background: #348441;
+    border-radius: 4px;
+    position: absolute;
+    right: -42%;
+    top: 50%;
+}
+
+li.disabled a::after {
+    content: "";
+    width: 54%;
+    height: 0px;
+    position: absolute;
+    right: -42%;
+    top: 50%;
+    border: 1px dashed #B0B0B0;
+}
+
+li.last a::after {
+    display: none;
+}
+
+
+.view-more-collapse {
+    cursor: pointer;
+    justify-content: center;
+    display: flex;
+    padding-top: 10px;
 }
