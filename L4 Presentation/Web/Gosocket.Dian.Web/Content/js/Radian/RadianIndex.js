@@ -148,6 +148,5 @@ function SetIconsList(fileId) {
         options: myOptions,
         template: myTemplate
     });
-    debugger
     $('input#' + fileId)[0].value;
 }
