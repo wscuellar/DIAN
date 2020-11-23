@@ -39,9 +39,9 @@ namespace Gosocket.Dian.Application
             return _globalDocValidatorDocument.EventVerification(eventItemIdentifier);
         }
 
-        public List<GlobalDocReferenceAttorney> ReferenceAttorneys(string documentKey, string documentReferencedKey, string receiverCode, string senderCode)
-        {
-            return _radianGlobalDocValidationDocumentMeta.ReferenceAttorneys(documentKey, documentReferencedKey, receiverCode, senderCode);
+        public List<GlobalDocReferenceAttorney> ReferenceAttorneys(GlobalDocValidatorDocumentMeta eventItem)
+        {           
+            return _radianGlobalDocValidationDocumentMeta.ReferenceAttorneys(eventItem.DocumentKey, eventItem.DocumentReferencedKey, eventItem.ReceiverCode, eventItem.SenderCode);
         }
 
         public List<GlobalDocValidatorDocumentMeta> OtherEvents(string documentKey, EventStatus eventCode)
@@ -89,14 +89,11 @@ namespace Gosocket.Dian.Application
 
         public bool IsVerificated(GlobalDocValidatorDocumentMeta otherEvent)
         {
-            //otherEvent.Identifier
             if (string.IsNullOrEmpty(otherEvent.EventCode))
                 return false;
 
-            GlobalDocValidatorDocument eventVerification = EventVerification(otherEvent.Identifier);
-
-            return eventVerification != null 
-                && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10);
+            GlobalDocValidatorDocument verification = EventVerification(otherEvent.Identifier);
+            return verification != null && (verification.ValidationStatus == 1 || verification.ValidationStatus == 10);
         }
 
         public List<GlobalDocValidatorTracking> ListTracking(string eventDocumentKey)
