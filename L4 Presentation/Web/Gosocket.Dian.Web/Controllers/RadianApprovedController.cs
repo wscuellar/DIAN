@@ -35,7 +35,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpGet]
         public ActionResult Index(RegistrationDataViewModel registrationData)
         {
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId);
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId, (int)registrationData.RadianContributorType);
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
 
             RadianApprovedViewModel model = new RadianApprovedViewModel()
@@ -59,7 +59,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Email = u.Email
                 }).ToList()
             };
-            if (Request.Params.Get("RadianOperationMode") == "Indirect" || Request.Params.Get("RadianOperationMode") == "2")
+            if ((int)registrationData.RadianOperationMode == 2)
             {
                 if (model.RadianState == "Habilitado")
                 {
@@ -195,7 +195,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult GetFactorOperationMode(RadianApprovedViewModel radianApprovedViewModel)
         {
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(radianApprovedViewModel.ContributorId);
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(radianApprovedViewModel.ContributorId, radianApprovedViewModel.RadianContributorTypeId);
             Software software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
             List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
             RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
@@ -219,9 +219,9 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult UploadFactorOperationMode(int ContributorId)
+        public JsonResult UploadFactorOperationMode(int ContributorId, int RadianTypeId)
         {
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId);
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId, RadianTypeId);
             Software software = _radianAprovedService.SoftwareByContributor(ContributorId);
 
             _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
@@ -282,10 +282,10 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-        public ActionResult ViewTestSet(int id)
+        public ActionResult ViewTestSet(int id, int radianTypeId)
         {
             RadianApprovedViewModel radianApprovedViewModel = new RadianApprovedViewModel();
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(id);
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(id, radianTypeId);
             radianApprovedViewModel.RadianTestSetResult =
                _radianTestSetResultService.GetTestSetResultByNit(radianAdmin.Contributor.Code).FirstOrDefault();
 
