@@ -73,6 +73,7 @@
     <script src="~/Content/js/Radian/constants.js"></script>
     <script>
         $(document).ready(function () {
+
                 var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
                 $("#steps-approved").steps({
                     headerTag: "h3",
@@ -245,7 +246,10 @@
                     var operation = () => ajaxFunction(url, metod, dataAjax, () => { }, successAction);
                     var buttons = ConfirmExec(operation);
                     showConfirmation(confirmMessage, buttons);
-                });
             });
+
+     });
+
+
     </script>
 }

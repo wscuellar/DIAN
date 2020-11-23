@@ -39,7 +39,7 @@
 		});
 		
 		$('#jqcs_o_'+options.identifier+' .jqcs_option').click(function(e){
-			$('input#RadianFileStatus')[0].value = $(this).data('select-value');
+			$('input.list-change-status')[0].value = $(this).data('select-value');
 			$($('#jqcs_s_'+options.identifier+' .jqcs_value')[0]).html(this.outerHTML);
 		});
 		
