@@ -1,5 +1,4 @@
-﻿using Gosocket.Dian.Application;
-using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,7 +10,7 @@ using System.IO;
 namespace Gosocket.Dian.Application.Tests
 {
     [TestClass()]
-    public class RadianAprovedServiceTests
+    public class RadianAprovedServiceTests 
     {
         private readonly Mock<IRadianApprovedService> _current = new Mock<IRadianApprovedService>();
 
