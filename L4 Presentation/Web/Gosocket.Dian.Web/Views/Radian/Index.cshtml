@@ -81,12 +81,13 @@
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
     <script>
-
+        var existingModes = ['@ViewBag.ElectronicInvoice_RadianContributorTypeId', '@ViewBag.TechnologyProvider_RadianContributorTypeId', '@ViewBag.TradingSystem_RadianContributorTypeId', '@ViewBag.Factor_RadianContributorTypeId'];
         var contributorId = '@ViewBag.ContributorId';
         var operationClick = false;
 
         $('.RadianCardContainer').click(function () {
-            if ($(this).attr('operationMode') === "1") {
+            if ($(this).attr('operationMode') === "1" && !existingModes.includes($(this).attr('contributorType')))
+            {
                 if (!operationClick) {
                     operationClick = true;
 
@@ -109,11 +110,34 @@
                 }
             }
             else {
-                var url = ('@ViewBag.RadianContributorTypeId' !== '') ? "@Url.Action("Index", "RadianApproved")" + "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.RadianOperationModeId' : '@Url.Action("ElectronicInvoiceView", "Radian")';
-                window.location.href = url;
+                var url = "@Url.Action("Index", "RadianApproved")";
+                var complement = "";
+                if (!existingModes.includes($(this).attr('contributorType')))
+                    url = '@Url.Action("ElectronicInvoiceView", "Radian")';
+                complement =getComplement( $(this).attr('contributorType'));
+                window.location.href = url + complement;
             }
         });
 
+        function getComplement(option){
+              var complement="";
+              switch (option)
+              {
+                    case "1":
+                        complement = "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.ElectronicInvoice_RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.ElectronicInvoice_RadianOperationModeId';
+                        break;
+                    case "2":
+                        complement = "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.TechnologyProvider_RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.TechnologyProvider_RadianOperationModeId';
+                        break;
+                    case "3":
+                        complement = "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.TradingSystem_RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.TradingSystem_RadianOperationModeId';
+                        break;
+                    case "4":
+                        complement = "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.Factor_RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.Factor_RadianOperationModeId';
+                        break;
+              };
+              return complement;
+        }
 
     </script>
 
