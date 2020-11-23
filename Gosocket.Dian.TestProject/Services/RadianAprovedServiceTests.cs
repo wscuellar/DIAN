@@ -125,14 +125,15 @@ namespace Gosocket.Dian.Application.Tests
         {
             // Arrange
             int contributorId = 0;
+            int radianContributorType = 0;
 
-            _current.Setup(t => t.ContributorSummary(contributorId))
+            _current.Setup(t => t.ContributorSummary(contributorId, radianContributorType))
                 .Returns(It.IsAny<RadianAdmin>());
 
             RadianAdmin expected = null;
 
             //ACT
-            var actual = _current.Object.ContributorSummary(contributorId);
+            var actual = _current.Object.ContributorSummary(contributorId, radianContributorType);
 
             // Assert
             Assert.AreEqual(expected, actual);

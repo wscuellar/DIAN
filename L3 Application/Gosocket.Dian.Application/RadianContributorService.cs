@@ -45,12 +45,14 @@ namespace Gosocket.Dian.Application
         {
             NameValueCollection collection = new NameValueCollection();
             Domain.Contributor contributor = _contributorService.GetByCode(userCode);
-            var radianContributor = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice && t.RadianState != "Cancelado");
-            if (radianContributor != null)
-            {
-                collection.Add("RadianContributorTypeId", radianContributor.RadianContributorTypeId.ToString());
-                collection.Add("RadianOperationModeId", radianContributor.RadianOperationModeId.ToString());
-            }
+            List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
+            if (radianContributors.Any())
+                foreach (var radianContributor in radianContributors)
+                {
+                    string key = Enum.GetName(typeof(Domain.Common.RadianContributorType), radianContributor.RadianContributorTypeId);
+                    collection.Add(key + "_RadianContributorTypeId", radianContributor.RadianContributorTypeId.ToString());
+                    collection.Add(key + "_RadianOperationModeId", radianContributor.RadianOperationModeId.ToString());
+                }
             if (contributor == null) return collection;
             collection.Add("ContributorId", contributor.Id.ToString());
             collection.Add("ContributorTypeId", contributor.ContributorTypeId.ToString());
