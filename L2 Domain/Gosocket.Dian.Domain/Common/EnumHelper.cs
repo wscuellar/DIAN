@@ -189,6 +189,8 @@ namespace Gosocket.Dian.Domain.Common
 
     public enum EventStatus
     {
+        [Description("None")]
+        None = 000,
         [Description("Acuse de recibo")]
         Received = 030,
         [Description("Rechazo de la Factura Electrónica")]

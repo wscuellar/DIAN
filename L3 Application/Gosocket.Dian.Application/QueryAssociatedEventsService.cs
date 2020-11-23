@@ -18,6 +18,10 @@ namespace Gosocket.Dian.Application
         const string CONS363 = "363";
         const string CONS364 = "364";
 
+        const string ENDOSOCODES = "037,038,039";
+        const string LIMITACIONCODES = "041";
+        const string MANDATOCODES = "043";
+
         public QueryAssociatedEventsService(IGlobalDocValidationDocumentMetaService radianGlobalDocValidationDocumentMeta, IGlobalDocValidatorDocumentService globalDocValidatorDocument, IGlobalDocValidatorTrackingService globalDocValidatorTracking)
         {
             _radianGlobalDocValidationDocumentMeta = radianGlobalDocValidationDocumentMeta;
@@ -35,14 +39,15 @@ namespace Gosocket.Dian.Application
             return _globalDocValidatorDocument.EventVerification(eventItemIdentifier);
         }
 
-        public List<GlobalDocReferenceAttorney> ReferenceAttorneys(string documentKey, string documentReferencedKey, string receiverCode, string senderCode)
-        {
-            return _radianGlobalDocValidationDocumentMeta.ReferenceAttorneys(documentKey, documentReferencedKey, receiverCode, senderCode);
+        public List<GlobalDocReferenceAttorney> ReferenceAttorneys(GlobalDocValidatorDocumentMeta eventItem)
+        {           
+            return _radianGlobalDocValidationDocumentMeta.ReferenceAttorneys(eventItem.DocumentKey, eventItem.DocumentReferencedKey, eventItem.ReceiverCode, eventItem.SenderCode);
         }
 
-        public List<GlobalDocValidatorDocumentMeta> OtherEvents(string documentKey, string eventCode)
+        public List<GlobalDocValidatorDocumentMeta> OtherEvents(string documentKey, EventStatus eventCode)
         {
-            return _radianGlobalDocValidationDocumentMeta.OtherEvents(documentKey, eventCode);
+            string code = ((int)eventCode).ToString();
+            return _radianGlobalDocValidationDocumentMeta.GetAssociatedDocuments(documentKey, code);
         }
 
         public string EventTitle(EventStatus eventStatus, string customizationId, string eventCode)
@@ -82,12 +87,13 @@ namespace Gosocket.Dian.Application
             return title;
         }
 
-        public bool IsVerificated(string identifier)
+        public bool IsVerificated(GlobalDocValidatorDocumentMeta otherEvent)
         {
-            GlobalDocValidatorDocument eventVerification = EventVerification(identifier);
+            if (string.IsNullOrEmpty(otherEvent.EventCode))
+                return false;
 
-            return eventVerification != null 
-                && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10);
+            GlobalDocValidatorDocument verification = EventVerification(otherEvent.Identifier);
+            return verification != null && (verification.ValidationStatus == 1 || verification.ValidationStatus == 10);
         }
 
         public List<GlobalDocValidatorTracking> ListTracking(string eventDocumentKey)
@@ -95,9 +101,18 @@ namespace Gosocket.Dian.Application
             return _globalDocValidatorTracking.ListTracking(eventDocumentKey);
         }
 
-        //public List<GlobalDocReferenceAttorney> IsMandato(EventStatus eventStatus, GlobalDocValidatorDocumentMeta eventitem)
-        //{
-            
-        //}
+        public EventStatus IdentifyEvent(GlobalDocValidatorDocumentMeta eventItem)
+        {
+            if (ENDOSOCODES.Contains(eventItem.EventCode.Trim()))
+                return EventStatus.InvoiceOfferedForNegotiation;
+
+            if (MANDATOCODES.Contains(eventItem.EventCode.Trim()))
+                return EventStatus.TerminacionMandato;
+
+            if (LIMITACIONCODES.Contains(eventItem.EventCode.Trim()))
+                return EventStatus.AnulacionLimitacionCirculacion;
+
+            return EventStatus.None;
+        }
     }
 }
