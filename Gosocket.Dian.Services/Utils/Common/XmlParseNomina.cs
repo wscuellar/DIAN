@@ -1,9 +1,11 @@
-﻿using Gosocket.Dian.Infrastructure;
+﻿using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Caching;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace Gosocket.Dian.Services.Utils.Common
 {
@@ -18,6 +20,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public XmlNode Extentions { get; set; }
         public XPathQuery XPathQuery { get; set; }
         public byte[] XmlContent { get; set; }
+        public GlobalDocPayroll.NominaIndividualDeAjuste globalDocPayrolls { get; set; };
 
 
         public string Type { get; set; }
@@ -77,7 +80,13 @@ namespace Gosocket.Dian.Services.Utils.Common
                     XmlDocument.XmlResolver = null;
                     XmlDocument.Load(sr);
                     var node = XmlDocument.GetElementsByTagName("xades:SigningTime")[0];
-                    
+                    // Create an instance of a serializer
+                    var serializer = new XmlSerializer(typeof(GlobalDocPayroll.NominaIndividualDeAjuste));
+                    Console.WriteLine(String.Format("{0}", sr.ReadToEnd()));
+                    using (TextReader reader = new StringReader(XmlDocument.OuterXml))
+                    {
+                        globalDocPayrolls = (GlobalDocPayroll.NominaIndividualDeAjuste)serializer.Deserialize(reader);
+                    }
                 }
             }
         }
