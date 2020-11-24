@@ -70,6 +70,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             AdminRadianViewModel model = new AdminRadianViewModel()
             {
+                TotalCount = radianAdmin.RowCount,
+                CurrentPage = radianAdmin.CurrentPage,
                 RadianContributors = radianAdmin.Contributors.Select(c => new RadianContributorsViewModel()
                 {
                     Id = c.Id,
@@ -110,6 +112,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             AdminRadianViewModel result = new AdminRadianViewModel()
             {
+                TotalCount = radianAdmin.RowCount,
+                CurrentPage = radianAdmin.CurrentPage,
                 Page = model.Page,
                 RadianContributors = radianAdmin.Contributors.Select(c => new RadianContributorsViewModel()
                 {

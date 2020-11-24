@@ -1,55 +1,74 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
 @{
     ViewBag.Title = "Datos";
-}
+    string contributorType = "";
+    switch (Model.Contributor.RadianContributorTypeId)
+    {
+        case 1:
+            contributorType = "Facturador Electrónico";
+            break;
+        case 2:
+            contributorType = "Proveedor Tecnológico";
+            break;
+        case 3:
+            contributorType = "Sistema de negociación";
+            break;
+        case 4:
+            contributorType = "Factor";
+            break;
+    }
+            }
+            @if (Request.Params["RadianOperationMode"] != "2")
+            {
     <div class="row radian-subtitle-container">
         <p class="subtitle-view">
             @ViewBag.title
         </p>
         <div class="radian-subtitle-line"></div>
     </div>
-    <div class="row radian-personal-info">
+}
+<div class="row radian-personal-info">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Nit, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Nit, new { @class = "form-control contributorFileType-props input-general", disabled="disabled" })
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control contributorFileType-props input-general", disabled = "disabled" })
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="form-group">
+                @Html.LabelFor(m => m.BusinessName, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.BusinessName, new { @class = "form-control contributorFileType-props input-general", disabled = "disabled" })
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control contributorFileType-props input-general", disabled = "disabled" })
+            </div>
+        </div>
+    </div>
+    @if (Model.Step == 4 || Request.Params["RadianOperationMode"] == "2")
+    {
         <div class="row">
             <div class="col-sm-3">
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Nit, new { @class = "control-label" })
-                    @Html.TextBoxFor(m => m.Nit, new { @class = "form-control contributorFileType-props input-general" })
+                    @Html.LabelFor(m => m.RadianState, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.RadianState, new { @class = "form-control contributorFileType-props input-general", disabled = "disabled" })
                 </div>
             </div>
             <div class="col-sm-3">
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Name, new { @class = "control-label" })
-                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control contributorFileType-props input-general" })
-                </div>
-            </div>
-            <div class="col-sm-3">
-                <div class="form-group">
-                    @Html.LabelFor(m => m.BusinessName, new { @class = "control-label" })
-                    @Html.TextBoxFor(m => m.BusinessName, new { @class = "form-control contributorFileType-props input-general" })
-                </div>
-            </div>
-            <div class="col-sm-3">
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control contributorFileType-props input-general" })
+                    @Html.LabelFor(m => m.RadianContributorTypeId, new { @class = "control-label" })
+                    @Html.TextBox("RadianContributorTypeId", contributorType, new { @class = "form-control contributorFileType-props input-general", disabled = "disabled" })
                 </div>
             </div>
         </div>
-        @if (Model.Step == 4)
-        {
-            <div class="row">
-                <div class="col-sm-3">
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.RadianState, new { @class = "control-label" })
-                        @Html.TextBoxFor(m => m.RadianState, new { @class = "form-control contributorFileType-props input-general" })
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.RadianContributorTypeId, new { @class = "control-label" })
-                        @Html.TextBoxFor(m => m.RadianContributorTypeId, new { @class = "form-control contributorFileType-props input-general" })
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
+    }
+</div>

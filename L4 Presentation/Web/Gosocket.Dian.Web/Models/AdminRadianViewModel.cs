@@ -38,6 +38,10 @@ namespace Gosocket.Dian.Web.Models
         public int Page { get; set; }
         public int Length { get; set; }
 
+        public int TotalCount { get; set; }
+
+        public int CurrentPage { get; set; }
+
         public int Id { get; set; }
         public bool SearchFinished { set; get; }
         [Display(Name = "Tipo de participante")]
