@@ -45,7 +45,7 @@ namespace Gosocket.Dian.Application
         {
             NameValueCollection collection = new NameValueCollection();
             Domain.Contributor contributor = _contributorService.GetByCode(userCode);
-            List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado");
+            List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado").Results;
             if (radianContributors.Any())
                 foreach (var radianContributor in radianContributors)
                 {
@@ -77,7 +77,7 @@ namespace Gosocket.Dian.Application
 
             string cancelEvent = RadianState.Cancelado.GetDescription();
             int radianType = (int)radianContributorType;
-            List<RadianContributor> records = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == radianType);
+            List<RadianContributor> records = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == radianType).Results;
             RadianContributor lastRecord = (from p in records
                                             group p by p.ContributorId into g
                                             select g.OrderByDescending(x => x.Update).FirstOrDefault()).FirstOrDefault();
@@ -107,11 +107,11 @@ namespace Gosocket.Dian.Application
         public RadianAdmin ListParticipants(int page, int size)
         {
             string cancelState = Domain.Common.RadianState.Cancelado.GetDescription();
-            List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.RadianState != cancelState, page, size);
+            PagedResult<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.RadianState != cancelState, page, size);
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
             {
-                Contributors = radianContributors.Select(c =>
+                Contributors = radianContributors.Results.Select(c =>
                new RedianContributorWithTypes()
                {
                    Id = c.Contributor.Id,
@@ -120,7 +120,9 @@ namespace Gosocket.Dian.Application
                    BusinessName = c.Contributor.BusinessName,
                    AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name
                }).ToList(),
-                Types = radianContributorType
+                Types = radianContributorType,
+                RowCount = radianContributors.RowCount,
+                CurrentPage = radianContributors.CurrentPage
             };
             return radianAdmin;
         }
@@ -142,7 +144,7 @@ namespace Gosocket.Dian.Application
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
             {
-                Contributors = radianContributors.Select(c =>
+                Contributors = radianContributors.Results.Select(c =>
                new RedianContributorWithTypes()
                {
                    Id = c.Contributor.Id,
@@ -151,8 +153,10 @@ namespace Gosocket.Dian.Application
                    BusinessName = c.Contributor.BusinessName,
                    AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name
                }).ToList(),
-                Types = radianContributorType
-            };
+                Types = radianContributorType,
+                RowCount = radianContributors.RowCount,
+                CurrentPage = radianContributors.CurrentPage
+        };
             return radianAdmin;
         }
 
@@ -161,9 +165,9 @@ namespace Gosocket.Dian.Application
             List<RadianContributor> radianContributors;
 
             if(radianContributorType!=0)
-                radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorType);
+                radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorType).Results;
             else
-                radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId);
+                radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId).Results;
 
             List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(contributorId).ToList();
             List<string> userIds = _contributorService.GetUserContributors(contributorId).Select(u => u.UserId).ToList();
@@ -202,7 +206,7 @@ namespace Gosocket.Dian.Application
 
         public bool ChangeParticipantStatus(int contributorId, string newState, int radianContributorTypeId, string actualState)
         {
-            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorTypeId && t.RadianState == actualState);
+            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorTypeId && t.RadianState == actualState).Results;
 
             if (contributors.Any())
             {

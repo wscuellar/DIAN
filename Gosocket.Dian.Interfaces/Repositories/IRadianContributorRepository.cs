@@ -1,6 +1,6 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Gosocket.Dian.Interfaces.Repositories
@@ -10,7 +10,7 @@ namespace Gosocket.Dian.Interfaces.Repositories
     {
 
         RadianContributor Get(Expression<Func<RadianContributor, bool>> expression);
-        List<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0);
+        PagedResult<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0);
 
         int AddOrUpdate(RadianContributor radianContributor);
         
