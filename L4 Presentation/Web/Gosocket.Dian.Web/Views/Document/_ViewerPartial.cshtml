@@ -18,6 +18,7 @@
     <style>
     </style>
     <link href="~/Content/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
+    <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 }
 
 <!--Message-->
@@ -93,7 +94,7 @@
     </div>
 </div>
 
-<div class="row mar-no" style="border-bottom: 2px solid #348441;">
+<div class="row mar-no" style="border-bottom: 2px solid #E9E8E8;">
     <div class="col-sm-6 pad-no">
         <h4 class="margin-top-10">Validaciones del documento</h4>
     </div>
@@ -128,51 +129,51 @@ else
         </table>
     </div>
 }
-<br />
+
 <br />
 @Html.Partial("QueryEventsList", Model)
 @*<div class="row mar-no" style="border-bottom: 2px solid #348441;">
-    <div class="col-sm-6 pad-no">
-        <h4 class="margin-top-10">Eventos del documento</h4>
+        <div class="col-sm-6 pad-no">
+            <h4 class="margin-top-10">Eventos del documento</h4>
+        </div>
     </div>
-</div>
-@if (Model.Document.Events.Count() == 0)
-{
-    <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i>  No existen eventos para el documento.</h5>
-}
-else
-{
-    <div class="table-responsive">
+    @if (Model.Document.Events.Count() == 0)
+    {
+        <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i>  No existen eventos para el documento.</h5>
+    }
+    else
+    {
+        <div class="table-responsive">
 
-        <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Descripción</th>
-                    <th>Fecha</th>
-                    <th>Nit Emisor</th>
-                    <th>Emisor</th>
-                    <th>Nit Receptor</th>
-                    <th>Receptor</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Document.Events)
-                {
+            <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
+                <thead>
                     <tr>
-                        <td>@item.Code</td>
-                        <td>@item.Description</td>
-                        <td>@item.Date.ToString("yyyy-MM-dd")</td>
-                        <td>@item.SenderCode</td>
-                        <td>@item.SenderName</td>
-                        <td>@item.ReceiverCode</td>
-                        <td>@item.ReceiverName</td>
+                        <th>Code</th>
+                        <th>Descripción</th>
+                        <th>Fecha</th>
+                        <th>Nit Emisor</th>
+                        <th>Emisor</th>
+                        <th>Nit Receptor</th>
+                        <th>Receptor</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}*@
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Document.Events)
+                    {
+                        <tr>
+                            <td>@item.Code</td>
+                            <td>@item.Description</td>
+                            <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                            <td>@item.SenderCode</td>
+                            <td>@item.SenderName</td>
+                            <td>@item.ReceiverCode</td>
+                            <td>@item.ReceiverName</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }*@
 <br />
 <br />
 @if (Model.Document.References.Where(x => x.ShowAsReference).Count() > 0)

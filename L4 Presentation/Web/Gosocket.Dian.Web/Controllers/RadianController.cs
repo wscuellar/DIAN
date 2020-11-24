@@ -104,6 +104,7 @@ namespace Gosocket.Dian.Web.Controllers
                 Code = model.Code,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
+                Type= model.Type,
                 RadianState = model.RadianState != null ? model.RadianState.Value.GetDescription() : null
             };
             RadianAdmin radianAdmin = _radianContributorService.ListParticipantsFilter(filter, model.Page, model.Length);

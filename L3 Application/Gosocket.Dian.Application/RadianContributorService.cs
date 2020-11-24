@@ -129,12 +129,13 @@ namespace Gosocket.Dian.Application
         public RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size)
         {
             string cancelState = Domain.Common.RadianState.Cancelado.GetDescription();
+            string stateDescriptionFilter = filter.RadianState == null ? string.Empty : filter.RadianState.GetDescription();
             DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
             DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
 
             var radianContributors = _radianContributorRepository.List(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
                                                                              (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
-                                                                             (t.RadianState == filter.RadianState.GetDescription() || (filter.RadianState == null && t.RadianState != cancelState)) &&
+                                                                             ((filter.RadianState == null && t.RadianState != cancelState) || t.RadianState == stateDescriptionFilter) &&
                                                                              (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) &&
                                                                              (DbFunctions.TruncateTime(t.CreatedDate) <= endDate || !endDate.HasValue),
             page, size);

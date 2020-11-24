@@ -51,6 +51,7 @@ namespace Gosocket.Dian.Web.Models
         public string UpdatedBy { get; set; }
         public string ActiveDescription { get; set; }
         public DateTime LastUpdated { get; set; }
+        public string CreatorNit { get; set; }
 
         public List<IdentificationTypeListViewModel> IdentificationTypes { get; set; }
         
