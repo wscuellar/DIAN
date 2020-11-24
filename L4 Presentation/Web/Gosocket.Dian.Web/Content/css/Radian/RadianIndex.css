@@ -392,12 +392,18 @@ i.fa-info-circle {
     box-sizing: border-box;
     border-radius: 10px;
     margin-right: 30px;
+    padding: 8px 20px;
+    font-size: 14px;
+    line-height: 16px;
 }
 
 .btn-radian-success {
     background: #348441;
     border-radius: 10px;
     color: white;
+    padding: 8px 20px;
+    font-size: 14px;
+    line-height: 16px;
 }
 
 .dropdown-state #RadianState {
@@ -421,6 +427,13 @@ i.fa-info-circle {
 .init-hide {
     display: none;
 }
+
+    .init-hide input {
+        color: #2458C5;
+        font-weight: bold;
+        text-overflow: ellipsis;
+        padding-right: 194px;
+    }
 
 .modal-footer {
     border: none;
@@ -670,7 +683,7 @@ h4.text-thin {
     line-height: 21px;
     margin: 0;
     color: #2C323C;
-    padding: 2px;
+    padding: 2px 2px 10px;
 }
 
 #steps-approved section {
@@ -696,6 +709,7 @@ h4.text-thin {
     border-radius: 4px;
     height: 33px;
     line-height: 2 !important;
+    font-size: 12px;
 }
 
 .custom-file-label::after {
@@ -719,24 +733,28 @@ h4.text-thin {
     color: black;
     text-align: center;
     width: 100%;
-    padding: 0px 2px;
+    padding: 0px 12px;
 }
 
 #steps-approved li.current .name-state {
     position: absolute;
-    bottom: -22px;
+    bottom: -29px;
     text-align: center;
     color: #348441;
     width: 100%;
     font-weight: bold;
 }
+#steps-approved li.done:nth-child(2) .name-state {
+    bottom: -20px;
+}
 
-#steps-approved li.disabled .name-state {
+    #steps-approved li.disabled .name-state {
     position: absolute;
     bottom: -29px;
     text-align: center;
     color: #B0B0B0;
     width: 100%;
+    padding: 0 12px;
 }
 
 .show-history {
@@ -755,7 +773,7 @@ h4.text-thin {
     text-align: left;
     background: #fff;
     box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.12);
-    width: 50%;
+    width: 38%;
     position: absolute;
     top: 2px;
     right: 21px;
@@ -1112,3 +1130,10 @@ li.last a::after{
     display: none;
 }
 
+.custom-file {
+    padding: 2px 2px 10px;
+}
+
+.custom-file-input {
+    height: 33px !important;
+}

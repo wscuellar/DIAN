@@ -448,6 +448,7 @@
     <Content Include="Content\css\nifty.css" />
     <Content Include="Content\css\nifty.min.css" />
     <Content Include="Content\css\Radian\RadianIndex.css" />
+    <Content Include="Content\css\Radian\RadianResponsive.css" />
     <Content Include="Content\css\themes\type-a\theme-coffee.css" />
     <Content Include="Content\css\themes\type-a\theme-coffee.min.css" />
     <Content Include="Content\css\themes\type-a\theme-dark.css" />

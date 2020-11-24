@@ -26,7 +26,7 @@ namespace Gosocket.Dian.Web.Models
 
         [DataType(DataType.Date)]
         [Display(Name = "Rango de fechas Registro")]
-        public DateTime DateInterval { get; set; }
+        public DateTime? DateInterval { get; set; }
 
         [Display(Name = "Tipo de participante")]
         public int Type { get; set; }
