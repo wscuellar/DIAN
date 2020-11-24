@@ -198,6 +198,7 @@
     <Compile Include="Entity\GlobalOseProcessResult.cs" />
     <Compile Include="Entity\GlobalOseTrackIdMapper.cs" />
     <Compile Include="Entity\GlobalTypeList.cs" />
+    <Compile Include="Entity\PagedResultBase.cs" />
     <Compile Include="Entity\RadianContributorOperationWithSoftware.cs" />
     <Compile Include="Entity\RadianLogger.cs" />
     <Compile Include="Entity\RadianUserData.cs" />
