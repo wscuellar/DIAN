@@ -259,9 +259,9 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult DeleteUser(int id, string newState, int radianContributorTypeId, string radianState)
+        public ActionResult DeleteUser(int id, string newState, int radianContributorTypeId, string radianState, string description)
         {
-            _radianContributorService.ChangeParticipantStatus(id, newState, radianContributorTypeId, radianState);
+            _radianContributorService.ChangeParticipantStatus(id, newState, radianContributorTypeId, radianState, description);
             return Json(new
             {
                 message = "Datos actualizados",

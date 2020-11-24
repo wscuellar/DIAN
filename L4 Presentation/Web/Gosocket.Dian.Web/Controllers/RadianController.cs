@@ -263,7 +263,7 @@ namespace Gosocket.Dian.Web.Controllers
                     }
                 }
 
-                _ = _radianContributorService.ChangeParticipantStatus(id, approveState, radianAdmin.Contributor.RadianContributorTypeId, radianState);
+                _ = _radianContributorService.ChangeParticipantStatus(id, approveState, radianAdmin.Contributor.RadianContributorTypeId, radianState, string.Empty);
                 _ = SendMail(radianAdmin);
 
                 return Json(new
