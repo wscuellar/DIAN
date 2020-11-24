@@ -693,6 +693,7 @@ namespace Gosocket.Dian.Services.Utils
             var customizationId = documentParsed.CustomizationId;
             var documentID = documentParsed.DocumentID;
             var serieAndNumber = documentParsed.SerieAndNumber;
+            var listID = documentParsed.listID;
 
             switch (docTypeCode)
             {
@@ -800,7 +801,7 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
-                if (string.IsNullOrEmpty(senderCode))
+                if (!((Convert.ToInt32(eventCode) >= 36 && Convert.ToInt32(eventCode) <= 38) && listID == "2") && string.IsNullOrEmpty(senderCode))
                 {
                     stringBuilder.AppendLine($"{codeMessage}F04-(R) No fue informado el Nit.");
                     errors.Add(stringBuilder.ToString());
