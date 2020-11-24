@@ -122,7 +122,7 @@
               switch (option)
               {
                     case "1":
-                        complement = "?ContributorId=" + '1' + "&RadianContributorType=" + '1' + "&RadianOperationMode=" + '@ViewBag.ElectronicInvoice_RadianOperationModeId';
+                        complement = "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.ElectronicInvoice_RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.ElectronicInvoice_RadianOperationModeId';
                         break;
                     case "2":
                         complement = "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.TechnologyProvider_RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.TechnologyProvider_RadianOperationModeId';
