@@ -744,7 +744,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             //validation if is an endoso of endorsement (Code 037-038-039)
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (eventCode == "037" || eventCode == "038" || eventCode == "039")
+                         
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad 
+                || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia 
+                || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
             {
                 if (!validatorDocumentMeta.InTransaction)
                 {
@@ -757,7 +760,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse = new DianResponse()
                     {
                         StatusMessage = "CUFE relacionado ya cuenta con un proceso En Negociación",
-                        StatusCode = "89",
+                        StatusCode = Properties.Settings.Default.Code_89,
                         IsValid = false
                     };
                     ;
@@ -769,7 +772,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
 
             //Solicitud de Disponibilizacion
-            if (eventCode == "036")
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.SolicitudDisponibilizacion)
             {
                 var eventApproveCufe = EventApproveCufe(trackId, eventCode, docTypeCode);
                 if (!eventApproveCufe.IsValid)
@@ -1020,7 +1023,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 GlobalDocValidatorDocument validatorDocument = null;
 
-                if(!errors.Any() && eventCode == "043")
+                if(!errors.Any() && Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
                 {
                     var documentReferenceAttorney = ValidationReferenceAttorney(trackIdCude);
                     if (!documentReferenceAttorney.IsValid)
@@ -1448,7 +1451,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response = new DianResponse()
                 {
                     StatusMessage = validations[0].ErrorMessage,
-                    StatusCode = validations[0].ErrorCode,
+                    StatusCode = Properties.Settings.Default.Code_89,
                     IsValid = validations[0].IsValid
                 };
                 response.ErrorMessage = new List<string>();
@@ -1474,7 +1477,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response = new DianResponse()
                 {
                     StatusMessage = validations[0].ErrorMessage,
-                    StatusCode = validations[0].ErrorCode,
+                    StatusCode = Properties.Settings.Default.Code_89,
                     IsValid = validations[0].IsValid
                 };
                 response.ErrorMessage = new List<string>();
@@ -1505,7 +1508,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response = new DianResponse()
                 {
                     StatusMessage = validations[0].ErrorMessage,
-                    StatusCode = validations[0].ErrorCode,
+                    StatusCode = Properties.Settings.Default.Code_89,
                     IsValid = validations[0].IsValid
                 };
                 response.ErrorMessage = new List<string>();
@@ -1514,11 +1517,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     if (!item.IsValid)
                     {
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
-                        response.IsValid = item.IsValid;
-                        response.StatusCode = item.ErrorCode;
+                        response.IsValid = item.IsValid;                        
                         response.StatusMessage = item.ErrorMessage;
-                        response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                        return response;
+                        response.StatusDescription = "Validación contiene errores en campos mandatorios.";                        
                     }
                 }
 
@@ -1536,7 +1537,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response = new DianResponse()
                 {
                     StatusMessage = validations[0].ErrorMessage,
-                    StatusCode = validations[0].ErrorCode,
+                    StatusCode = Properties.Settings.Default.Code_89,
                     IsValid = validations[0].IsValid
                 };
                 response.ErrorMessage = new List<string>();
@@ -1545,11 +1546,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     if (!item.IsValid)
                     {
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
-                        response.IsValid = item.IsValid;
-                        response.StatusCode = item.ErrorCode;
+                        response.IsValid = item.IsValid;   
                         response.StatusMessage = item.ErrorMessage;
-                        response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                        return response;
+                        response.StatusDescription = "Validación contiene errores en campos mandatorios.";                        
                     }                   
                 }
             }
@@ -1567,7 +1566,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response = new DianResponse
                 {
                     StatusMessage = validations[0].ErrorMessage,
-                    StatusCode = validations[0].ErrorCode,
+                    StatusCode = Properties.Settings.Default.Code_89,
                     IsValid = validations[0].IsValid,
                     ErrorMessage = new List<string>()
                 };
@@ -1594,7 +1593,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response = new DianResponse
                 {
                     StatusMessage = validations[0].ErrorMessage,
-                    StatusCode = validations[0].ErrorCode,
+                    StatusCode = Properties.Settings.Default.Code_89,
                     IsValid = validations[0].IsValid,
                     ErrorMessage = new List<string>()
                 };
@@ -1647,7 +1646,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var arrayTasks = new List<Task>();
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (eventCode == "037" || eventCode == "038" || eventCode == "039")
+            
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad
+              || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia
+              || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
             {
                 validatorDocumentMeta.InTransaction = false;
                 arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
@@ -1657,9 +1659,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private void UpdateFinishAttorney(string trackId, string trackIdAttorney, string eventCode)
         {
             //validation if is an anulacion de mandato (Code 044)
-
             var arrayTasks = new List<Task>();            
-            if (eventCode == "044")
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.TerminacionMandato)
             {
                 List<GlobalDocReferenceAttorney> documentsAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(trackIdAttorney).ToList();
                 foreach(var documentAttorney in documentsAttorney)

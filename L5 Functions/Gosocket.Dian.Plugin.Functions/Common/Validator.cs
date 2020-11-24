@@ -485,7 +485,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             party.TrackId = party.TrackId.ToLower();
-
+            ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(party.ResponseCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             var senderCode = nitModel.SenderCode;
@@ -538,8 +538,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = sender2DvErrorCode,
-                            ErrorMessage = "El receptor del documento transmitido no coincide con el Emisor/Facturador de la factura informada",
+                            ErrorCode = errorCodeMessage.errorCodeReceiverFETV,
+                            ErrorMessage = errorCodeMessage.errorMessageReceiverFETV,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -647,8 +647,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = sender2DvErrorCode,
-                            ErrorMessage = "El receptor del documento transmitido no coincide con el NIT DIAN",
+                            ErrorCode = Convert.ToInt16(party.ResponseCode) == 34 ? "AAG01e": sender2DvErrorCode,
+                            ErrorMessage = "No fue informado los datos de la DIAN",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1048,6 +1048,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         };
                     }
                 }
+                else
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "89",
+                        ErrorMessage = $"{(string)null} Emisor de servicios no autorizado.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+
             }
             //Valida exista informacion mandato - Mandatario - CUFE
             var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cufe, senderCode);
@@ -1058,8 +1070,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = errorCodeMessage.errorCode,
-                    ErrorMessage = errorCodeMessage.errorMessage,
+                    ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCode,
+                    ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessage,
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 };
             }
@@ -1108,8 +1120,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = errorCodeMessage.errorCodeB,
-                    ErrorMessage = errorCodeMessage.errorMessageB,
+                    ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV :  errorCodeMessage.errorCodeB,
+                    ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageB,
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 };
             }
@@ -2794,6 +2806,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             public string errorMessageNoteA = string.Empty;
             public string errorCodeNote = string.Empty;
             public string errorMessageNote = string.Empty;
+            public string errorCodeFETV { get; set; }
+            public string errorMessageFETV { get; set; }
+            public string errorCodeReceiverFETV { get; set; }
+            public string errorMessageReceiverFETV { get; set; }
+
 
         }
 
@@ -2808,19 +2825,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCodeNoteA = string.Empty,
                 errorMessageNoteA = string.Empty,
                 errorCodeNote = string.Empty,
-                errorMessageNote = string.Empty
+                errorMessageNote = string.Empty,
+                errorCodeFETV = string.Empty,
+                errorMessageFETV = string.Empty,
+                errorCodeReceiverFETV = string.Empty,
+                errorMessageReceiverFETV = string.Empty
             };
 
             response.errorCodeNote = "AAD11";
             response.errorMessageNote = "No fue informada la nota cuando el evento fue generado por un mandato. ";
+            response.errorMessageFETV = "Nombre o Razón social no esta autorizado para generar esté evento";
+            response.errorMessageReceiverFETV = "El adquiriente no esta autorizado para recibir esté evento";
 
-            if (eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034")
-            {
-                response.errorCodeB = "AAF01b";
-                response.errorMessageB = "No corresponde a la información del Tenedor Legítimo";
-                response.errorCode = "AAF01a";
-                response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico";
-            }
+            //SenderPArty
+            if (eventCode == "030") response.errorCodeFETV = "AAF01a";
+            if (eventCode == "031") response.errorCodeFETV = "AAF01b";
+            if (eventCode == "032") response.errorCodeFETV = "AAF01c";
+            if (eventCode == "033") response.errorCodeFETV = "AAF01d";
+            if (eventCode == "034") response.errorCodeFETV = "AAF01e";
+            //ReceiverParty
+            if (eventCode == "030") response.errorCodeReceiverFETV = "AAG01a";
+            if (eventCode == "031") response.errorCodeReceiverFETV = "AAG01b";
+            if (eventCode == "032") response.errorCodeReceiverFETV = "AAG01c";
+            if (eventCode == "033") response.errorCodeReceiverFETV = "AAG01d";      
+
             else if (eventCode == "036")
             {
                 response.errorCodeB = "AAF01b";

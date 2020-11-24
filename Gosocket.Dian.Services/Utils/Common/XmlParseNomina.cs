@@ -20,7 +20,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public XmlNode Extentions { get; set; }
         public XPathQuery XPathQuery { get; set; }
         public byte[] XmlContent { get; set; }
-        public GlobalDocPayroll.NominaIndividualDeAjuste globalDocPayrolls { get; set; };
+        public GlobalDocPayroll.NominaIndividualDeAjuste globalDocPayrolls { get; set; }
 
 
         public string Type { get; set; }
