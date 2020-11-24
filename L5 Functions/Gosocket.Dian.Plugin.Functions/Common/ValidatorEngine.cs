@@ -306,7 +306,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if(xmlParser.PaymentMeansID != "2")
             {
                 ValidateListResponse response = new ValidateListResponse();
-                response.ErrorMessage = $"Tipo factura diferente a Credito.";
+                response.ErrorMessage = $"Tipo factura diferente a Crédito.";
                 response.IsValid = false;
                 response.ErrorCode = "89";
                 response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
