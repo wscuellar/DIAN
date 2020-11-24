@@ -1,7 +1,7 @@
 ﻿
 @{
     ViewBag.Title = "Modo de operación";
-
+}
 <div class="page-content radian-view margin-20">
     <div class="title-container">
         <p class="title-view">
@@ -46,39 +46,39 @@
     </div>
 </div>
 
-    @section scripts
+@section scripts
 {
-        @Scripts.Render("~/bundles/jqueryval")
-        <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
-        <script>
+    <script>
 
-        var contributorId = '@ViewBag.ContributorId';
-        var operationClick = false;
+            var contributorId = '@ViewBag.ContributorId';
+            var operationClick = false;
 
-        $('.RadianCardContainer').click(function () {
-            if (!operationClick) {
-                operationClick = true;
+            $('.RadianCardContainer').click(function () {
+                if (!operationClick) {
+                    operationClick = true;
 
-                var RegistrationDataViewModel = {
-                    ContributorId: '@ViewBag.ContributorId',
-                    RadianContributorType: $(this).attr('contributorType'),
-                    RadianOperationMode: $(this).attr('operationMode'),
-                };
+                    var RegistrationDataViewModel = {
+                        ContributorId: '@ViewBag.ContributorId',
+                        RadianContributorType: $(this).attr('contributorType'),
+                        RadianOperationMode: $(this).attr('operationMode'),
+                    };
 
-                CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
-                    function (param) {
-                        CallExecution("POST", '@Url.Action("Add", "RadianApproved")', RegistrationDataViewModel,
-                            function (param) {
-                                var url = "@Url.Action("Index", "RadianApproved")"+ "?ContributorId=" + param.ContributorId + "&RadianContributorType=" + param.RadianContributorType + "&RadianOperationMode=" + param.RadianOperationMode;
-                                window.location.href = url;
-                            }, false
-                        );
-                    }, true
-                );
-            }
-        });
+                    CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
+                        function (param) {
+                            CallExecution("POST", '@Url.Action("Add", "RadianApproved")', RegistrationDataViewModel,
+                                function (param) {
+                                    var url = "@Url.Action("Index", "RadianApproved")"+ "?ContributorId=" + param.ContributorId + "&RadianContributorType=" + param.RadianContributorType + "&RadianOperationMode=" + param.RadianOperationMode;
+                                    window.location.href = url;
+                                }, false
+                            );
+                        }, true
+                    );
+                }
+            });
 
-        </script>
-    }
+    </script>
+}
 

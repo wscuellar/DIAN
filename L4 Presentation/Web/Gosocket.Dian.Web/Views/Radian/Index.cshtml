@@ -83,7 +83,19 @@
         var contributorId = '@ViewBag.ContributorId';
         var operationClick = false;
 
-        $('.RadianCardContainer').click(function () {debugger
+        Array.prototype.clean = function (deleteValue) {
+            for (var i = 0, j = this.length; i < j; i++) {
+                if (this[i] == deleteValue) {
+                    this.splice(i, 1);
+                    i--;
+                }
+            }
+            return this;
+        };
+
+        $('.RadianCardContainer').click(function () {
+            existingModes.clean("");
+            debugger
             if ($(this).attr('operationMode') === "1" && !existingModes.includes($(this).attr('contributorType')))
             {
                 if (!operationClick) {
@@ -108,11 +120,13 @@
                 }
             }
             else {
+                debugger;
                 var url = "@Url.Action("Index", "RadianApproved")";
                 var complement = "";
                 if (!existingModes.includes($(this).attr('contributorType')))
                     url = '@Url.Action("ElectronicInvoiceView", "Radian")';
-                complement = getComplement($(this).attr('contributorType'));
+                else 
+                    complement = getComplement($(this).attr('contributorType'));
                 window.location.href = url + complement;
             }
         });
@@ -136,6 +150,8 @@
               };
               return complement;
         }
+
+        
 
         </script>
 

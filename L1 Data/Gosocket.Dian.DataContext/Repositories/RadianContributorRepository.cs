@@ -57,6 +57,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                     radianContributorInstance.RadianState = radianContributor.RadianState;
                     radianContributorInstance.RadianOperationModeId = radianContributor.RadianOperationModeId;
                     radianContributorInstance.CreatedBy = radianContributor.CreatedBy;
+                    radianContributorInstance.Description = radianContributor.Description;
                     radianContributorInstance.Step = radianContributor.Step == 0 ? 1 : radianContributor.Step;
 
                     context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
