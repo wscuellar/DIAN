@@ -247,20 +247,18 @@
                     })
                 });
 
-            $(".cancel-register").click(function () {
-                    var url = "@Url.Action("DeleteUser", "RadianApproved")";
-                    var metod = 'POST';
-                    var dataAjax = {
-                        id: '@Model.ContributorId',
-                        newState: '4',
-                        radianContributorTypeId: @Model.RadianContributorTypeId,
-                        radianState: '@Model.RadianState'
-                    };
-                    var successAction = () => window.location.href = '@Url.Action("Index", "Radian")';
-                    var confirmMessage = bootboxMessage.CONFIRMATION_MESSAGE;
-                    var operation = () => ajaxFunction(url, metod, dataAjax, () => { }, successAction);
-                    var buttons = ConfirmExec(operation);
-                    showConfirmation(confirmMessage, buttons);
+            $(".cancel-register").click(function () {debugger
+                var url = "@Url.Action("DeleteUser", "RadianApproved")";
+                var confirmationMessage = bootboxMessage.CONFIRMATION_MESSAGE;
+                var successAction = () => window.location.href = '@Url.Action("Index", "Radian")';
+                var dataAjax = {
+                    id: '@Model.ContributorId',
+                    newState: '4',
+                    radianContributorTypeId: @Model.RadianContributorTypeId,
+                    radianState: '@Model.RadianState'
+                };
+                var label = bootboxMessage.CANCEL_DESCRIPTION;
+                CancelRegister(url, dataAjax, confirmationMessage, successAction, label);
             });
 
      });
