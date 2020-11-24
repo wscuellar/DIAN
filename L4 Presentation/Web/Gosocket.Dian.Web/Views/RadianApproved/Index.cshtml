@@ -89,6 +89,16 @@
     <script src="~/Content/js/Radian/constants.js"></script>
     <script>
         $(document).ready(function () {
+            var url = "@Url.Action("DeleteUser", "RadianApproved")";
+            var confirmationMessage = bootboxMessage.CONFIRMATION_MESSAGE;
+            var successAction = () => window.location.href = '@Url.Action("Index", "Radian")';
+            var dataAjax = {
+                id: '@Model.ContributorId',
+                newState: '4',
+                radianContributorTypeId: @Model.RadianContributorTypeId,
+                radianState: '@Model.RadianState'
+            };
+            CancelRegister(url, dataAjax, confirmMessage, successAction);
 
                 var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
                 $("#steps-approved").steps({
@@ -246,23 +256,6 @@
 
                     })
                 });
-
-            $(".cancel-register").click(function () {
-                    var url = "@Url.Action("DeleteUser", "RadianApproved")";
-                    var metod = 'POST';
-                    var dataAjax = {
-                        id: '@Model.ContributorId',
-                        newState: '4',
-                        radianContributorTypeId: @Model.RadianContributorTypeId,
-                        radianState: '@Model.RadianState'
-                    };
-                    var successAction = () => window.location.href = '@Url.Action("Index", "Radian")';
-                    var confirmMessage = bootboxMessage.CONFIRMATION_MESSAGE;
-                    var operation = () => ajaxFunction(url, metod, dataAjax, () => { }, successAction);
-                    var buttons = ConfirmExec(operation);
-                    showConfirmation(confirmMessage, buttons);
-            });
-
      });
 
 

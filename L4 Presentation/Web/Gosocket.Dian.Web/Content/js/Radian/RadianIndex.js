@@ -151,3 +151,22 @@ function SetIconsList(fileId) {
     });
     $('input#' + fileId)[0].value;
 }
+
+function CancelRegister(url, dataAjax, confirmMessage, successAction) {
+    $(".cancel-register").click(function () {
+        var metod = 'POST';
+        var operation = () => ajaxFunction(url, metod, dataAjax, () => { }, successAction);
+        var buttons = ConfirmExec(operation);
+        ShowPromptCancel(confirmMessage, event);
+    });
+}
+
+function ShowPromptCancel(title,event) {
+    bootbox.prompt({
+        title: title,
+        centerVertical: true,
+        callback: function (result) {
+            event(result)
+        }
+    });
+}
