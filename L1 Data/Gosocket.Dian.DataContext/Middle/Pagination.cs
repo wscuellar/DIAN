@@ -8,7 +8,7 @@ namespace Gosocket.Dian.DataContext.Middle
 {
     public static class PagedQuery
     {
-        public static PagedResult<T> Paginate<T>(this IQueryable<T> query, int page, int pageSize, Expression<Func<T, string>> orderby = null) where T : class
+        public static PagedResult<T> Paginate<T>(this IQueryable<T> query, int page, int pageSize, Expression<Func<T, string>> orderby) where T : class
         {
             var result = new PagedResult<T>
             {
@@ -16,26 +16,20 @@ namespace Gosocket.Dian.DataContext.Middle
                 PageSize = pageSize,
                 RowCount = query.Count()
             };
-            try
-            {
-                if (page == 0)
-                {
-                    result.Results = query.ToList();
-                    return result;
-                }
 
-                if (page != 0 && pageSize != 0 && orderby != null) query = query.OrderBy(orderby);
-                var pageCount = (double)result.RowCount / pageSize;
-                result.PageCount = (int)Math.Ceiling(pageCount);
-
-                var skip = (page - 1) * pageSize;
-                var sql = query.Skip(skip).Take(pageSize).AsQueryable();
-                result.Results = sql.ToList();
-            }
-            catch (Exception ex)
+            if (page == 0)
             {
-                Console.Out.WriteLine(ex.Message);
+                result.Results = query.ToList();
+                return result;
             }
+            query = query.OrderBy(orderby);
+
+            double pageCount = (double)result.RowCount / pageSize;
+            result.PageCount = (int)Math.Ceiling(pageCount);
+
+            int skip = (page - 1) * pageSize;
+            IQueryable<T> sql = query.Skip(skip).Take(pageSize).AsQueryable();
+            result.Results = sql.ToList();
 
             return result;
         }

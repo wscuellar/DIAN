@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.DataContext.Middle;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
@@ -35,8 +36,8 @@ namespace Gosocket.Dian.DataContext.Repositories
         public List<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0)
         {
             IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode").Include("RadianContributorFile");
-
-            return query.ToList();
+            var result = query.Paginate(page, length, t => t.Id.ToString());
+            return result.Results;
         }
 
         /// <summary>
