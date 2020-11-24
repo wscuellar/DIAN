@@ -81,10 +81,10 @@
                                 <strong>@((Model.Page - 1) * Model.Length + 1)-@(Model.Length > Model.RadianContributors.Count ? (Model.Page - 1) * Model.Length + Model.RadianContributors.Count : (Model.Page) * Model.Length)</strong>
                             </span>
                             <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
-                                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 1 ? "disabled=\"disabled\"" : "")>
+                                <a class="btn btn-default paginate-btn prev-page">
                                     <span class="fa fa-chevron-left"></span>
                                 </a>
-                                <a class="btn btn-default paginate-btn next-page" @(Model.RadianContributors.Count < Model.Length ? "disabled=\"disabled\"" : "")>
+                                <a class="btn btn-default paginate-btn next-page">
                                     <span class="fa fa-chevron-right"></span>
                                 </a>
                             </div>
@@ -176,7 +176,7 @@
             })
 
             $(".prev-page").click(function () {
-                $("#Page").val(@Model.Page - 1);
+                $("#Page").val(@Model.Page);
                 form.submit();
             })
 
