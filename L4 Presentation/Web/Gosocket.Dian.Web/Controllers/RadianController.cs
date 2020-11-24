@@ -97,7 +97,6 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult AdminRadianView(AdminRadianViewModel model)
         {
-
             AdminRadianFilter filter = new AdminRadianFilter()
             {
                 Id = model.Id,
@@ -111,6 +110,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             AdminRadianViewModel result = new AdminRadianViewModel()
             {
+                Page = model.Page,
                 RadianContributors = radianAdmin.Contributors.Select(c => new RadianContributorsViewModel()
                 {
                     Id = c.Id,
@@ -128,8 +128,6 @@ namespace Gosocket.Dian.Web.Controllers
                 }).ToList(),
                 SearchFinished = true
             };
-
-
             return View(result);
         }
 

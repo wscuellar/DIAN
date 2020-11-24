@@ -2,7 +2,7 @@
 @using Newtonsoft.Json
 @{
     ViewBag.title = "";
-
+    var operationMode = Request.Params["RadianOperationMode"];
     switch (Request.Params["RadianContributorType"])
     {
         case "1":
@@ -54,7 +54,7 @@
                     </section>
                 </div>
 
-                @if (Model.Step == 4)
+                @if (Model.Step == 4 || operationMode == "2")
                 {
                     <div class="footer-table">
                         <div class="row margin-horizontal-0">
