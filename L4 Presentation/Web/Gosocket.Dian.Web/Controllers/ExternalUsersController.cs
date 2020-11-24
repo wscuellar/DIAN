@@ -68,7 +68,14 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.ExternalUsersCreate;
 
+            ViewBag.txtAccion = "Guardar";
+
+            if (!string.IsNullOrEmpty(id))
+                ViewBag.txtAccion = "Actualizar";
+
             var uCompany = userService.Get(User.Identity.GetUserId());
+
+            this.LoadViewBags();
 
             if (uCompany == null)
             {
@@ -82,16 +89,13 @@ namespace Gosocket.Dian.Web.Controllers
                 return View();
             }
 
-            this.LoadViewBags(uCompany.Code);
+            this.LoadExternalUsersViewBags(uCompany.Code);
 
             ExternalUserViewModel model = null;
             ViewBag.PermissionList = null;
-            ViewBag.txtAccion = "Guardar";
 
             if (!string.IsNullOrEmpty(id))
             {
-                ViewBag.txtAccion = "Actualizar";
-
                 List<Permission> pe = _permisionService.GetPermissionsByUser(id);
                 if (pe != null)
                 {
@@ -202,9 +206,27 @@ namespace Gosocket.Dian.Web.Controllers
         /// Listas para llenar el Modelo de la Vista
         /// </summary>
         /// <param name="nit">Nit de la empresa del Representante Legal o Nit de la persona Natural registrada en el Rut</param>
-        private void LoadViewBags(string nit)
+        private void LoadExternalUsersViewBags(string nit)
         {
+            //ViewBag.ExternalUsersList = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id) && u.Code == nit).ToList()
+            ViewBag.ExternalUsersList = _context.Users.Where(u => u.CreatorNit == nit).ToList()
+                .Select(u =>
+                new ExternalUserViewModel
+                {
+                    Id = u.Id,
+                    IdentificationTypeId = u.IdentificationTypeId,
+                    IdentificationId = u.IdentificationId,
+                    Names = u.Name,
+                    Email = u.Email,
+                    //Roles = u.Roles.ToList(),
+                    Active = u.Active,
+                    IdentificationTypes = identificationTypeService.List()
+                        .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList()
+                }).ToList();
+        }
 
+        public void LoadViewBags()
+        {
             ViewBag.IdentificationTypesList = identificationTypeService.List()
                         .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList();
 
@@ -233,21 +255,6 @@ namespace Gosocket.Dian.Web.Controllers
                         }).ToList()
                 }).ToList();
 
-            //ViewBag.ExternalUsersList = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id) && u.Code == nit).ToList()
-            ViewBag.ExternalUsersList = _context.Users.Where(u => u.CreatorNit == nit).ToList()
-                .Select(u =>
-                new ExternalUserViewModel
-                {
-                    Id = u.Id,
-                    IdentificationTypeId = u.IdentificationTypeId,
-                    IdentificationId = u.IdentificationId,
-                    Names = u.Name,
-                    Email = u.Email,
-                    //Roles = u.Roles.ToList(),
-                    Active = u.Active,
-                    IdentificationTypes = identificationTypeService.List()
-                        .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList()
-                }).ToList();
         }
 
         [HttpPost]
@@ -258,6 +265,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (!string.IsNullOrEmpty(model.Id))
                 ViewBag.txtAccion = "Actualizar";
+
+            this.LoadViewBags();
 
             var uCompany = userService.Get(User.Identity.GetUserId());
 
@@ -273,7 +282,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return View();
             }
 
-            this.LoadViewBags(uCompany.Code);
+            this.LoadExternalUsersViewBags(uCompany.Code);
 
             var user = new ApplicationUser
             {
@@ -314,20 +323,20 @@ namespace Gosocket.Dian.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     foreach (var item in ModelState.Values.SelectMany(v => v.Errors))
-                        ModelState.AddModelError("",item.ErrorMessage);
+                        ModelState.AddModelError("", item.ErrorMessage);
                 }
 
-                if(model.IdentificationTypeId <= 0)
+                if (model.IdentificationTypeId <= 0)
                 {
                     ModelState.AddModelError("", "Por favor seleccione el Tipo de Documento");
 
                     return View(model);
                 }
-                
+
                 //validar si ya existe un Usuario con el tipo documento y documento suministrados
                 var vUserDB = userService.FindUserByIdentificationAndTypeId(model.IdentificationTypeId, model.IdentificationId);
 
-                if(vUserDB != null)
+                if (vUserDB != null)
                 {
                     ModelState.AddModelError("", "Ya existe un Usuario con el Tipo de Documento y Documento suministrados");
                     return View(model);
@@ -339,10 +348,11 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     ViewBag.messageAction = "Usuario Registrado exitosamente!";
 
-                    userService.RegisterExternalUserTrazability(JsonConvert.SerializeObject( new ExternalUserViewModel() {
+                    userService.RegisterExternalUserTrazability(JsonConvert.SerializeObject(new ExternalUserViewModel()
+                    {
                         Id = user.Id,
                         IdentificationTypeId = model.IdentificationTypeId,
-                        IdentificationId =model.IdentificationId,
+                        IdentificationId = model.IdentificationId,
                         Names = model.Names,
                         Email = model.Email,
                         CreatorNit = user.CreatorNit
@@ -377,7 +387,7 @@ namespace Gosocket.Dian.Web.Controllers
                 else
                 {
                     ViewBag.messageAction = "No se pudo Registrar el Usuario!";
-                    
+
                     if (!result.Succeeded)
                     {
                         foreach (var item in result.Errors)
@@ -426,7 +436,7 @@ namespace Gosocket.Dian.Web.Controllers
                         IdentificationId = model.IdentificationId,
                         Names = model.Names,
                         Email = model.Email
-                    }) + ", permisos: " + JsonConvert.SerializeObject(permissions) , "Actualización de Permisos");
+                    }) + ", permisos: " + JsonConvert.SerializeObject(permissions), "Actualización de Permisos");
 
                     //Envio de notificacion por correo
                     _ = SendMailUpdate(model);
@@ -514,7 +524,7 @@ namespace Gosocket.Dian.Web.Controllers
             message.AppendFormat("</br> Tipo de documento: {0}", model.IdentificationTypeId);
             message.AppendFormat("</br> Numero  de documento: {0}", model.IdentificationId);
             message.AppendFormat("</br> Correo electronico: {0}", model.Email);
-            message.AppendFormat("</br> Clave de acceso: {0}", model.Password);                                                                                
+            message.AppendFormat("</br> Clave de acceso: {0}", model.Password);
 
             message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
 
