@@ -293,11 +293,19 @@ namespace Gosocket.Dian.Web.Controllers
             return View("GetSetTestResult", radianApprovedViewModel);
         }
 
-        public ActionResult AutoCompleteExternalData(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
+        public ActionResult AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
         {
-            List<Software> softwares = _radianAprovedService.AutoCompleteSoftware(contributorId, contributorTypeId, softwareType, term);
-            List<AutoListModel> filteredItems =  softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            List<RadianContributor> softwares = _radianAprovedService.AutoCompleteProvider(contributorId, contributorTypeId, softwareType, term);
+            List<AutoListModel> filteredItems =  softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Contributor.BusinessName)).ToList();
             return Json(filteredItems, JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult SoftwareList(int radianContributorId)
+        {
+            List<Software> softwares = _radianAprovedService.SoftwareList(radianContributorId);
+            List<AutoListModel> filteredItems = softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            return Json(filteredItems, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

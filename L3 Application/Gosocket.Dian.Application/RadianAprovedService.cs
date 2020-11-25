@@ -231,22 +231,25 @@ namespace Gosocket.Dian.Application
         /// <param name="operationMode"></param>
         /// <param name="term"></param>
         /// <returns></returns>
-        public List<Software> AutoCompleteSoftware(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
+        public List<Software> SoftwareList(int radianContributorId)
         {
             List<RadianContributor> participants;
-            if (softwareType == RadianOperationModeTestSet.OwnSoftware)
-                participants = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.Softwares.Any(x => x.Name.Contains(term))).Results;
-            else
-            {
-                participants = _radianContributorRepository.List(t => t.ContributorId != contributorId && t.RadianContributorTypeId == (int)softwareType && t.Contributor.Softwares.Any(x => x.Name.Contains(term))).Results;
-            }
-                
-
+            participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.Contributor.Softwares.Any()).Results;
             return participants.Select(t => t.Contributor).Aggregate(new List<Software>(), (list, source) =>
             {
                 list.AddRange(source.Softwares.ToList());
                 return list;
             }).Distinct().ToList();
+        }
+
+        public List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
+        {
+            List<RadianContributor> participants;
+            if (softwareType == RadianOperationModeTestSet.OwnSoftware)
+                participants = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.BusinessName.Contains(term)).Results;
+            else
+                participants = _radianContributorRepository.List(t => t.ContributorId != contributorId && t.RadianContributorTypeId == (int)softwareType && t.Contributor.BusinessName.Contains(term)).Results;
+            return participants.Distinct().ToList();
         }
     }
 }
