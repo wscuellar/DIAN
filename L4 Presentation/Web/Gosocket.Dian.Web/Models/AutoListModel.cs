@@ -8,8 +8,8 @@ namespace Gosocket.Dian.Web.Models
     public class AutoListModel
     {
         public string text;
-        public int value;
-        public AutoListModel(int value, string text)
+        public string value;
+        public AutoListModel(string value, string text)
         {
             this.value = value;
             this.text = text;

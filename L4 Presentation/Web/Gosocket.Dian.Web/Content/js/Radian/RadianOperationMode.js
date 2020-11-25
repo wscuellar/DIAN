@@ -28,32 +28,9 @@ function AddOperationMode(url, contributorId, radianTypeId) {
 }
 
 function RenderAutocomplete(url) {
-    $('.basicAutoSelect').autoComplete({
-        resolver: 'custom',
-        events: {
-            search: function (qry, callback) {debugger
-                $.ajax(
-                    url,
-                    {
-                        data: {
-                            term: qry,
-                            contributorId: 1704648,
-                            contributorTypeId: 1,
-                            softwareType: 1
-                        }
-                    }
-                ).done(function (res) {debugger
-                    callback([
-                        { "value": 1, "text": "Google Cloud Platform" },
-                        { "value": 2, "text": "Amazon AWS" },
-                        { "value": 3, "text": "Docker" },
-                        { "value": 4, "text": "Digital Ocean" }
-                    ])
-                });
-            },
-            searchPost: function (resultFromServer) {
-                return resultFromServer;
-            }
+    $('.basicAutoComplete').autoComplete({
+        resolverSettings: {
+            url: url
         }
     });
 }
