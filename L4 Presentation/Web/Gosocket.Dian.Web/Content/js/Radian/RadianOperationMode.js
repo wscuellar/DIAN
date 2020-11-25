@@ -27,26 +27,20 @@ function AddOperationMode(url, contributorId, radianTypeId) {
     })
 }
 
-function RenderAutocomplete() {
-    const myData = [{
-        "id": 1,
-        "name": 'Item 1',
-        "ignore": false
-    }, {
-        "id": 2,
-        "name": 'Item 2',
-        "ignore": false
-    }, {
-        "id": 3,
-        "name": 'Item 3',
-        "ignore": false
-    },
-        // ...
-    ]
-
-    $('.demo').autocomplete({
-        nameProperty: 'name',
-        valueField: '#hidden-field',
-        dataSource: myData
+function RenderAutocomplete(url) {
+    $('.basicAutoSelect').autoComplete({
+        resolver: 'custom',
+        events: {
+            search: function (qry, callback) {
+                $.ajax(
+                    url,
+                    {
+                        data: { 'qry': qry }
+                    }
+                ).done(function (res) {
+                    callback(res.results)
+                });
+            }
+        }
     });
 }

@@ -13,7 +13,7 @@
         $(document).ready(function () {
             AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.Id, @Model.Contributor.RadianContributorTypeId);
             DeleteOperationMode('@Url.Action("DeleteOperationMode", "RadianApproved")');
-            RenderAutocomplete();
+            RenderAutocomplete('@Url.Action("AutoCompleteExternalData", "RadianApproved")');
             @operationMode != 2 && $("#OperationModeSelected").attr("disabled", "disabled");
         })
     </script>
