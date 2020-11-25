@@ -231,10 +231,10 @@ namespace Gosocket.Dian.Application
         /// <param name="operationMode"></param>
         /// <param name="term"></param>
         /// <returns></returns>
-        public List<Software> AutoCompleteSoftware(int contributorId, int contributorTypeId, RadianOperationModeTestSet operationMode, string term)
+        public List<Software> AutoCompleteSoftware(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
         {
             List<RadianContributor> participants;
-            if (operationMode == RadianOperationModeTestSet.OwnSoftware)
+            if (softwareType == RadianOperationModeTestSet.OwnSoftware)
                 participants = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.Softwares.Any(x => x.Name.Contains(term))).Results;
             else
                 participants = _radianContributorRepository.List(t => t.ContributorId != contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.Softwares.Any(x => x.Name.Contains(term))).Results;
