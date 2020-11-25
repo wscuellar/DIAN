@@ -360,19 +360,7 @@ namespace Gosocket.Dian.Domain.Common
     }
 
 
-    public enum RadianContributorType
-    {
-        [Description("Cero")]
-        Zero = 0,
-        [Description("Facturador Electronico")]
-        ElectronicInvoice = 1,
-        [Description("Proveedor Tecnologico")]
-        TechnologyProvider = 2,
-        [Description("Sistema de Negociacion")]
-        TradingSystem = 3,
-        [Description("Factor")]
-        Factor = 4
-    }
+   
 
     public enum RadianOperationMode
     {
@@ -398,6 +386,19 @@ namespace Gosocket.Dian.Domain.Common
         Cancelado = 4
     }
 
+    public enum RadianContributorType
+    {
+        [Description("Cero")]
+        Zero = 0,
+        [Description("Facturador Electronico")]
+        ElectronicInvoice = 1,
+        [Description("Proveedor Tecnologico")]
+        TechnologyProvider = 2,
+        [Description("Sistema de Negociacion")]
+        TradingSystem = 3,
+        [Description("Factor")]
+        Factor = 4
+    }
 
     public enum RadianOperationModeTestSet
     {
