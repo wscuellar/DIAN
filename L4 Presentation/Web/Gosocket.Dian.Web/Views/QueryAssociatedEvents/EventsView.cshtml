@@ -69,13 +69,17 @@
         font-family: Arial;
         font-style: normal;
         font-weight: 500;
-        font-size: 16px;
+        font-size: 18px;
         line-height: 23px;
         /* identical to box height */
         color: #2C323C;
     }
 
-   span {
+    .p-event-issuer {
+        font-size: 14px;
+    }
+
+    span {
         /* Datos del Emisor del evento */
         font-family: Arial;
         font-style: normal;
@@ -86,19 +90,21 @@
         color: #2C323C;
     }
 
-    
-
     .rowSpace {
-        margin-top:10px;
+        margin-top: 10px;
         margin-bottom: 10px;
     }
 
+    .close-button-acuse {
+        color: #348441 !important;
+        font-size: 28px;
+        cursor: pointer;
+    }
 
-
-
-
+    .padding-panel {
+        padding-bottom: 12px;
+    }
 </style>
-
 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 
@@ -115,10 +121,7 @@
                         <div class="underline-title"></div>
                     </div>
                     <div class="col-sm-4 text-right right-section">
-
-                        <span id="EventViewClose" onclick="darClick()" class="cerrar redondear">&times;</span>
-
-                        @*<button onclick="darClick()" class="cerrar" id="EventViewClose">X</button>*@
+                        <i class="fa fa-times-circle close-button-acuse" onclick="darClick()"></i>
                     </div>
                 </div>
             </div>
@@ -128,7 +131,7 @@
                         <span>CUDE:</span>
                         <span class="cude-text">@Model.CUDE</span>
                         <div class="left-section ContainerDownload">
-                            <p><i class="fa fa-download"></i><um> Descarga</um></p>
+                            <p><i class="fa fa-download"></i><um><ins> Descarga</ins></um></p>
                         </div>
 
                     </div>
@@ -139,17 +142,17 @@
                     </div>
                 </div>
 
-                <div class="row aditional-data-section">
+                <div class="row aditional-data-section padding-panel">
 
                     <div class="col-sm-4">
                         <h5>Datos del Emisor del evento </h5>
-                        <p>NIT: @Model.SenderCode</p>
-                        <p>Nombre: @Model.SenderName</p>
+                        <p class="p-event-issuer">NIT: @Model.SenderCode</p>
+                        <p class="p-event-issuer">Nombre: @Model.SenderName</p>
                     </div>
                     <div class="col-sm-4">
                         <h5>Datos del Receptor del Evento </h5>
-                        <p>NIT: @Model.ReceiverCode</p>
-                        <p>Nombre: @Model.ReceiverName</p>
+                        <p class="p-event-issuer">NIT: @Model.ReceiverCode</p>
+                        <p class="p-event-issuer">Nombre: @Model.ReceiverName</p>
                     </div>
                     <div class="col-sm-4">
                         @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.Mandato)
@@ -195,7 +198,7 @@
                 </div>
 
                 @*Validaciones*@
-                <div class="rowSpace">
+                <div class="rowSpace padding-panel">
                     <div class="row radian-subtitle-container radian-certificates">
                         <div class="col-sm-10">
                             <p class="titleSecondary">
@@ -221,10 +224,12 @@
                                 <tbody>
                                     @foreach (var item in Model.Validations)
                                     {
-                                    <tr>
-                                        <td>@item.RuleName</td>
-                                        <td class="text-right right-section"><a data-toggle="tooltip" data-placement="top" title="@item.Message"><i class="fa fa-info-circle "></i> @item.Status</a></td>
-                                    </tr>
+                                        <tr>
+                                            <td>@item.RuleName</td>
+                                            @* todo fer: *@
+                                            @*<td class="text-right right-section"><a data-toggle="tooltip" data-placement="top" title="@item.Message"><i class="fa fa-info-circle "></i> @item.Status</a></td>*@
+                                            <td class="text-right right-section"><a class="btn btn-lg btn-success" data-toggle="modal" data-target="#basicModal">Click to open Modal</a></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
@@ -311,22 +316,33 @@
             </div>
         </div>
     </div>
+</div>
 
-    @section Scripts {
-        @Scripts.Render("~/bundles/jqueryval")
+@* todo fer: *@
+<div class="modal" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Basic Modal</h4>
+            </div>
+            <div class="modal-body">
+                <h3>Modal Body</h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        <!--Bootstrap Select [ OPTIONAL ]-->
-        <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
-        <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
-        <script src="~/Content/js/file-validator.js"></script>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
 
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
 
-        <script>
-
-
-
-
-
-        </script>
-
-    }
+}
