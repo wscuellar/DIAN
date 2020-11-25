@@ -15,7 +15,7 @@
       <Value Profile="(Default)">AAJ47</Value>
     </Setting>
     <Setting Name="COD_VN_DocumentMeta_AAB22" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">AAB22</Value>
+      <Value Profile="(Default)">AAB22b</Value>
     </Setting>
     <Setting Name="COD_VN_DocumentMeta_AAJ21" Type="System.String" Scope="Application">
       <Value Profile="(Default)">AAJ21</Value>

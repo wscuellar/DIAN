@@ -37,6 +37,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string ListID { get; set; }
         public string DocumentID { get; set; }
         public string NoteMandato { get; set; }
+        public string UBLVersionID { get; set; }
 
         public XmlParser()
         {

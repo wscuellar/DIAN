@@ -694,6 +694,7 @@ namespace Gosocket.Dian.Services.Utils
             var documentID = documentParsed.DocumentID;
             var serieAndNumber = documentParsed.SerieAndNumber;
             var listID = documentParsed.listID;
+            var UBLVersionID = documentParsed.UBLVersionID;
 
             switch (docTypeCode)
             {
@@ -736,6 +737,14 @@ namespace Gosocket.Dian.Services.Utils
 
             if(docTypeCode == "96")
             {
+                if (!UBLVersionID.Equals("UBL 2.1"))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}D01-(R) El elemento no contiene el literal 'UBL 2.1'");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
                 if (string.IsNullOrEmpty(documentID))
                 {
                     stringBuilder.AppendLine($"{codeMessage}H06-(R) El número de documento electrónico referenciado no coinciden con reportado..");
@@ -801,13 +810,32 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
-                if (!((Convert.ToInt32(eventCode) >= 36 && Convert.ToInt32(eventCode) <= 38) && listID == "2") && string.IsNullOrEmpty(senderCode))
-                {
+                if(listID == "1" && (Convert.ToInt32(eventCode) >= 36 && Convert.ToInt32(eventCode) <= 38) && string.IsNullOrEmpty(senderCode))
+                {                  
                     stringBuilder.AppendLine($"{codeMessage}F04-(R) No fue informado el Nit.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
-                    isValid = false;
+                    isValid = false;                    
                 }
+                else if (!(Convert.ToInt32(eventCode) >= 36 && Convert.ToInt32(eventCode) <= 38) && string.IsNullOrEmpty(senderCode))
+                {           
+                    if(Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34)
+                    {
+
+                        stringBuilder.AppendLine($"{codeMessage}F04-(R) El ID de emisor del evento no es Valido..");
+                        errors.Add(stringBuilder.ToString());
+                        stringBuilder.Clear();
+                        isValid = false;
+                    }
+                    else
+                    {
+                        stringBuilder.AppendLine($"{codeMessage}F04-(R) No fue informado el Nit.");
+                        errors.Add(stringBuilder.ToString());
+                        stringBuilder.Clear();
+                        isValid = false;
+                    }                              
+                }
+                            
             }
             else
             {
