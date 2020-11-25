@@ -237,7 +237,10 @@ namespace Gosocket.Dian.Application
             if (softwareType == RadianOperationModeTestSet.OwnSoftware)
                 participants = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.Softwares.Any(x => x.Name.Contains(term))).Results;
             else
-                participants = _radianContributorRepository.List(t => t.ContributorId != contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.Softwares.Any(x => x.Name.Contains(term))).Results;
+            {
+                participants = _radianContributorRepository.List(t => t.ContributorId != contributorId && t.RadianContributorTypeId == (int)softwareType && t.Contributor.Softwares.Any(x => x.Name.Contains(term))).Results;
+            }
+                
 
             return participants.Select(t => t.Contributor).Aggregate(new List<Software>(), (list, source) =>
             {
