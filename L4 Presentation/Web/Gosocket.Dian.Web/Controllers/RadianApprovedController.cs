@@ -72,8 +72,8 @@ namespace Gosocket.Dian.Web.Controllers
                     List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
                     RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(registrationData.ContributorId);
 
-                    foreach (RadianContributorOperation co in radianContributorOperations.RadianContributorOperations)
-                        co.RadianOperationMode = operationModeList.FirstOrDefault(o => o.Id == co.RadianOperationModeId);
+                    //foreach (RadianContributorOperation co in radianContributorOperations.RadianContributorOperations)
+                    //    co.RadianOperationMode = operationModeList.FirstOrDefault(o => o.Id == co.RadianOperationModeId);
 
                     RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
                     {
@@ -199,8 +199,8 @@ namespace Gosocket.Dian.Web.Controllers
             List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
             RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
 
-            foreach (RadianContributorOperation co in radianContributorOperations.RadianContributorOperations)
-                co.RadianOperationMode = operationModeList.FirstOrDefault(o => o.Id == co.RadianOperationModeId);
+            //foreach (RadianContributorOperation co in radianContributorOperations.RadianContributorOperations)
+            //    co.RadianOperationMode = operationModeList.FirstOrDefault(o => o.Id == co.RadianOperationModeId);
 
             RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
             {
@@ -218,24 +218,16 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult UploadFactorOperationMode(int ContributorId, int RadianTypeId)
+        public JsonResult UploadFactorOperationMode(int ContributorId,  int RadianTypeId, string softwareId)
         {
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId, RadianTypeId);
-            Software software = _radianAprovedService.SoftwareByContributor(ContributorId);
-
-            _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
-            {
-                RadianContributorId = radianAdmin.Contributor.Id,
-                RadianOperationModeId = radianAdmin.Contributor.RadianOperationModeId,
-                RadianProviderId = radianAdmin.Contributor.Id,
-                Deleted = false,
-                Timestamp = DateTime.Now,
-                RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId,
-                Pin = software.Pin,
-                SoftwareName = software.Name,
-                Url = software.Url,
-                SoftwareId = software.Id,
-            });
+            //RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId, RadianTypeId);
+            //_radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
+            //{
+            //    RadianContributorId = radianAdmin.Contributor.RadianContributorId,
+            //    Deleted = false,
+            //    Timestamp = DateTime.Now,
+            //    SoftwareId = new Guid(softwareId),
+            //});
 
             return Json(
                 new
@@ -300,5 +292,19 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View("GetSetTestResult", radianApprovedViewModel);
         }
+
+        //public ActionResult AutoCompleteExternalData(string contributorId, string contributorTypeId, string term)
+        //{
+
+        //    _radianContributorService.ListParticipantsFilter()
+        //    //  //items is the source data and can be replaced by a request to a DataBase
+        //    //  string[] items = {"Test", "Test 1", "Test 2",
+        //    //"Example 1", "Example 2", "Example 3"};
+        //    //  //we did a fetch of term from items
+        //    //  var filteredItems = items.Where(
+        //    //      item => item.IndexOf(term, StringComparison.InvariantCultureIgnoreCase) >= 0);
+        //    //  //we return a json data
+        //    //  return Json(filteredItems, JsonRequestBehavior.AllowGet);
+        //}
     }
 }

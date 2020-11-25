@@ -68,21 +68,21 @@ namespace Gosocket.Dian.Application.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        [TestMethod()]
-        public void ListSoftwareModeOperationTest()
-        {
-            // Arrange
-            _current.Setup(t => t.ListSoftwareModeOperation())
-                .Returns(It.IsAny<List<RadianOperationMode>>());
+        //[TestMethod()]
+        //public void ListSoftwareModeOperationTest()
+        //{
+        //    // Arrange
+        //    _current.Setup(t => t.ListSoftwareModeOperation())
+        //        .Returns(It.IsAny<List<RadianOperationMode>>());
 
-            List<RadianOperationMode> expected = null;
+        //    List<RadianOperationMode> expected = null;
 
-            //ACT
-            var actual = _current.Object.ListSoftwareModeOperation();
+        //    //ACT
+        //    var actual = _current.Object.ListSoftwareModeOperation();
 
-            // Assert
-            Assert.AreEqual(expected, actual);
-        }
+        //    // Assert
+        //    Assert.AreEqual(expected, actual);
+        //}
 
         [TestMethod()]
         public void GetRadianContributorTest()
