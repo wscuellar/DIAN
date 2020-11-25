@@ -40,6 +40,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         RadianTestSetResult RadianTestSetResultByNit(string nit);
 
-        RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId);        
+        RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId);
+        List<Software> AutoCompleteSoftware(int contributorId, int contributorTypeId, Domain.Common.RadianOperationModeTestSet operationMode, string term);
     }
 }
