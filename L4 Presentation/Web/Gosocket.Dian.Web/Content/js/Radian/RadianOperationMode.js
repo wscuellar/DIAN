@@ -31,13 +31,18 @@ function RenderAutocomplete(url) {
     $('.basicAutoSelect').autoComplete({
         resolver: 'custom',
         events: {
-            search: function (qry, callback) {
+            search: function (qry, callback) {debugger
                 $.ajax(
                     url,
                     {
-                        data: { 'qry': qry }
+                        data: {
+                            term: qry,
+                            contributorId: 1704648,
+                            contributorTypeId: 1,
+                            operationMode: 2
+                        }
                     }
-                ).done(function (res) {
+                ).done(function (res) {debugger
                     callback(res.results)
                 });
             }
