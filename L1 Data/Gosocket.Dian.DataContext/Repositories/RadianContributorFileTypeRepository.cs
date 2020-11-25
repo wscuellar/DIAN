@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,13 @@ namespace Gosocket.Dian.DataContext.Repositories
             var query = _sqlDBContext.RadianContributorFileTypes.Where(expression).OrderBy(c => c.RadianContributorType.Id).Include("RadianContributorType");
 
             return query.ToList();
+        }
+
+        public List<KeyValue> FileTypeCounter()
+        {
+            return (from t in _sqlDBContext.RadianContributorFileTypes
+                    join f in _sqlDBContext.RadianContributorFiles on t.Id equals f.FileType
+                    select t.Id).GroupBy(t => t).Select(t => new KeyValue() { Key = t.Key, value = t.Count() }).ToList();
         }
 
         public int AddOrUpdate(RadianContributorFileType radianContributorFileType)
