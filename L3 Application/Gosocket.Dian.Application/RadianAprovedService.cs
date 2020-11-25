@@ -49,21 +49,6 @@ namespace Gosocket.Dian.Application
             _radianCallSoftwareService = radianCallSoftwareService;
         }
 
-
-        //public void AutoComplete(int contributorId, RadianOperationModeTestSet operationMode, string term)
-        //{
-        //    if (operationMode == RadianOperationModeTestSet.OwnSoftware)
-        //    {
-        //        //con software propio
-        //        _radianContributorRepository.List(t => t.ContributorId == contributorId);
-        //    }
-        //    else
-        //    {
-        //        _radianContributorOperationRepository.List(t=> t.)
-
-        //    }
-        //}
-
         /// <summary>
         /// 
         /// </summary>
@@ -229,13 +214,36 @@ namespace Gosocket.Dian.Application
             //    int code = (int)radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianProviderId;
             //    radianContributorOperationWithSoftware.Softwares = _radianCallSoftwareService.GetSoftwares(code);
             //}
-                
+
             return radianContributorOperationWithSoftware;
         }
 
         public RadianTestSetResult RadianTestSetResultByNit(string nit)
         {
             return _radianTestSetResultService.GetTestSetResultByNit(nit).FirstOrDefault();
-        }        
+        }
+
+        /// <summary>
+        /// Metodo encargado de filtrar los software disponibles de acuerdo el modo de seleccion.
+        /// </summary>
+        /// <param name="contributorId"></param>
+        /// <param name="contributorTypeId"></param>
+        /// <param name="operationMode"></param>
+        /// <param name="term"></param>
+        /// <returns></returns>
+        public List<Software> AutoCompleteSoftware(int contributorId, int contributorTypeId, RadianOperationModeTestSet operationMode, string term)
+        {
+            List<RadianContributor> participants;
+            if (operationMode == RadianOperationModeTestSet.OwnSoftware)
+                participants = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.Softwares.Any(x => x.Name.Contains(term))).Results;
+            else
+                participants = _radianContributorRepository.List(t => t.ContributorId != contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.Softwares.Any(x => x.Name.Contains(term))).Results;
+
+            return participants.Select(t => t.Contributor).Aggregate(new List<Software>(), (list, source) =>
+            {
+                list.AddRange(source.Softwares.ToList());
+                return list;
+            }).Distinct().ToList();
+        }
     }
 }
