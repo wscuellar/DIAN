@@ -21,7 +21,7 @@ namespace Gosocket.Dian.Application
 
         private RadianContributorFileType map(RadianContributorFileType input, KeyValue Counter)
         {
-            input.Counter = Counter.value > 0;
+            input.HideDelete = Counter != null && Counter.value > 0;
             return input;
         }
 
@@ -29,10 +29,15 @@ namespace Gosocket.Dian.Application
         {
             List<KeyValue> counter = _radianContributorFileTypeRepository.FileTypeCounter();
             List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(ft => !ft.Deleted);
+
+            //if (!counter.Any())
+            //{
+            //    return fileTypes;
+            //}
             return (from f in fileTypes
-                    from c in counter
-                    where c.Key == f.Id
-                    select map(f, c)).ToList();
+                    join c in counter on f.Id equals c.Key into g
+                    from x in g.DefaultIfEmpty()
+                    select map(f, x)).ToList();
         }
 
         public List<RadianContributorType> ContributorTypeList()

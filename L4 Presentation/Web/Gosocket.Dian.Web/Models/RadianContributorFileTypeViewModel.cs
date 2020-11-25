@@ -35,6 +35,8 @@ namespace Gosocket.Dian.Web.Models
     {
         public int Id { get; set; }
 
+        public bool HideDelete { get; set; }
+
         [Required (ErrorMessage = "El campo nombre es requerido")]
         [Display(Name = "Nombre")]
         public string Name { get; set; }

@@ -20,6 +20,6 @@ namespace Gosocket.Dian.Domain
         public int RadianContributorTypeId { get; set; }
         public virtual RadianContributorType RadianContributorType { get; set; }
         [NotMapped]
-        public bool Counter { get; set; }
+        public bool HideDelete { get; set; }
     }
 }

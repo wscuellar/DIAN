@@ -30,8 +30,11 @@
                     </td>
                     <td class="text-nowrap"><a>@fileType.RadianContributorType.Name</a></td>
                     <td class="text-nowrap" style="">
-                        <a onclick="editRadianContributorFileType(@fileType.Id)"><i class="fa fa-pencil" style="color: #348441; margin:1vh"></i></a>
-                        <a onclick="deleteRadianContributorFileType(@fileType.Id)"><i class="fa fa-trash" style="color: #348441; margin:1vh"></i></a>
+                        <a onclick="editRadianContributorFileType(@fileType.Id)"><i class="fa fa-pencil" style="color: #348441; margin:1vh"></i></a>                        
+                        @if (!fileType.HideDelete)
+                        {
+                            <a onclick="deleteRadianContributorFileType(@fileType.Id)"><i class="fa fa-trash" style="color: #348441; margin:1vh"></i></a>
+                        }
                     </td>
                 </tr>
             }
