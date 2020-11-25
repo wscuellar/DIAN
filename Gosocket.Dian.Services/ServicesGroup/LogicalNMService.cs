@@ -38,7 +38,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
-        private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+        private TableManager TableManagerGlobalDocPayroll = new TableManager("GlobalDocPayroll");
 
         private FileManager fileManager = new FileManager();
 
@@ -878,6 +878,43 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            var response = ValdiateWorkedCode(xmlParser.globalDocPayrolls);
+            if (!response) {
+                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
+                dianResponse.StatusDescription = "Error en el sistema";
+                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
+                if (globalEnd >= 10)
+                {
+                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
+                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                }
+                return dianResponse;
+            }
+            
+            GlobalDocPayroll.NominaIndividualDeAjuste docReferenceAttorney = new GlobalDocPayroll.NominaIndividualDeAjuste(xmlParser.globalDocPayrolls.InformacionGeneral.CUNE, xmlParser.globalDocPayrolls.InformacionGeneral.CUNE)
+            {
+                CodigoQR = xmlParser.globalDocPayrolls.CodigoQR,
+                ComprobanteTotal = xmlParser.globalDocPayrolls.ComprobanteTotal,
+                Deducciones = xmlParser.globalDocPayrolls.Deducciones,
+                Devengados = xmlParser.globalDocPayrolls.Devengados,
+                DevengadosTotal = xmlParser.globalDocPayrolls.DevengadosTotal,
+                DeduccionesTotal = xmlParser.globalDocPayrolls.DeduccionesTotal,
+                Empleador = xmlParser.globalDocPayrolls.Empleador,
+                ETag = xmlParser.globalDocPayrolls.ETag,
+                InformacionGeneral = xmlParser.globalDocPayrolls.InformacionGeneral,
+                LugarGeneracionXML = xmlParser.globalDocPayrolls.LugarGeneracionXML,
+                Notas = xmlParser.globalDocPayrolls.Notas,
+                NumeroSecuenciaXML = xmlParser.globalDocPayrolls.NumeroSecuenciaXML,
+                Pago = xmlParser.globalDocPayrolls.Pago,
+                Periodo = xmlParser.globalDocPayrolls.Periodo,
+                ProveedorXML = xmlParser.globalDocPayrolls.ProveedorXML,
+                ReemplazandoPredecesor = xmlParser.globalDocPayrolls.ReemplazandoPredecesor,
+                SchemaLocation = xmlParser.globalDocPayrolls.SchemaLocation,
+                Trabajador = xmlParser.globalDocPayrolls.Trabajador,
+                Timestamp = new DateTime().ToUniversalTime()
+            };
+            TableManagerGlobalDocPayroll.InsertOrUpdate(docReferenceAttorney);
+
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
             DocumentParsed.SetValues(ref documentParsed);
             var parser = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Parser) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -899,7 +936,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             start = DateTime.UtcNow;
 
             var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = "11", trackId, eventNomina = true };
-            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>("http://localhost:7071/api/UploadXml", uploadXmlRequest);
+            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
             if (!uploadXmlResponse.Success)
             {
                 //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
@@ -916,7 +953,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             trackId = trackIdCude;
             var requestObjTrackId = new { trackId, draft = Properties.Settings.Default.Param_False };
-            var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>("http://localhost:7071/api/ValidateDocument", requestObjTrackId);
+            var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId);
             var validate = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Validate6) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // send to validate document sync
 
@@ -1094,6 +1131,27 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
         }
 
+        public bool ValdiateWorkedCode(GlobalDocPayroll.NominaIndividualDeAjuste globaldoc)
+        {
+            
+            var codJob = globaldoc.Trabajador.CodigoTrabajador;
+            var numDoc = Convert.ToString(globaldoc.Trabajador.NumeroDocumento).Length;
+            var codArea = globaldoc.Trabajador.CodigoArea;
+            var codCargo = globaldoc.Trabajador.CodigoCargo;
+
+            var subCodJob = codJob.ToString().Substring(0, numDoc);
+            var subCodArea = codJob.ToString().Substring(numDoc, 2);
+            var subCodCargo = codJob.ToString().Substring(numDoc + 2, 2);
+
+            var vNumbDoc = Int32.Parse(subCodJob) == Convert.ToInt32(globaldoc.Trabajador.NumeroDocumento) ? true : false;
+            var vCodArea = Int32.Parse(subCodArea) == Convert.ToInt32(codArea) ? true : false;
+            var vCodCargo = Int32.Parse(subCodCargo) == Convert.ToInt32(codCargo) ? true : false;
+
+            if (vNumbDoc && vCodArea && vCodCargo)
+                return true;
+
+            return false;
+        }
 
         private ValidatePayroll CalculatePayrollvalues(ValidatePayroll payroll)
         {

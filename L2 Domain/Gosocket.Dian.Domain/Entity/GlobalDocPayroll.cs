@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Gosocket.Dian.Domain.Entity
 {
-    public class GlobalDocPayroll
+    public class GlobalDocPayroll : TableEntity
     {
 
         // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
@@ -13,8 +14,15 @@ namespace Gosocket.Dian.Domain.Entity
         [System.ComponentModel.DesignerCategoryAttribute("code")]
         [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "dian:gov:co:facturaelectronica:NominaIndividualDeAjuste")]
         [System.Xml.Serialization.XmlRootAttribute(Namespace = "dian:gov:co:facturaelectronica:NominaIndividualDeAjuste", IsNullable = false)]
-        public partial class NominaIndividualDeAjuste
+        public partial class NominaIndividualDeAjuste : TableEntity
         {
+
+            public NominaIndividualDeAjuste() { }
+
+            public NominaIndividualDeAjuste(string pk, string rk) : base(pk, rk)
+            {
+
+            }
 
             private NominaIndividualDeAjustePeriodo periodoField;
 
