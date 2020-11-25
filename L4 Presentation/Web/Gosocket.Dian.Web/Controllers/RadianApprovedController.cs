@@ -296,7 +296,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult AutoCompleteExternalData(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
         {
             List<Software> softwares = _radianAprovedService.AutoCompleteSoftware(contributorId, contributorTypeId, softwareType, term);
-            List<AutoListModel> filteredItems =  softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            List<AutoListModel> filteredItems =  softwares.Select(t => new AutoListModel(1, t.Name)).ToList();
             return Json(filteredItems, JsonRequestBehavior.AllowGet);
         }
     }

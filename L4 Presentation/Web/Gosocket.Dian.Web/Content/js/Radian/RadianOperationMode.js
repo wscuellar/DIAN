@@ -43,8 +43,16 @@ function RenderAutocomplete(url) {
                         }
                     }
                 ).done(function (res) {debugger
-                    callback(res)
+                    callback([
+                        { "value": 1, "text": "Google Cloud Platform" },
+                        { "value": 2, "text": "Amazon AWS" },
+                        { "value": 3, "text": "Docker" },
+                        { "value": 4, "text": "Digital Ocean" }
+                    ])
                 });
+            },
+            searchPost: function (resultFromServer) {
+                return resultFromServer;
             }
         }
     });
