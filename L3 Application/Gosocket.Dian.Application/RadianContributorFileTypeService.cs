@@ -30,10 +30,6 @@ namespace Gosocket.Dian.Application
             List<KeyValue> counter = _radianContributorFileTypeRepository.FileTypeCounter();
             List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(ft => !ft.Deleted);
 
-            //if (!counter.Any())
-            //{
-            //    return fileTypes;
-            //}
             return (from f in fileTypes
                     join c in counter on f.Id equals c.Key into g
                     from x in g.DefaultIfEmpty()
