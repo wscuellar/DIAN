@@ -61,7 +61,7 @@ namespace Gosocket.Dian.Plugin.Functions.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("AAB22")]
+        [global::System.Configuration.DefaultSettingValueAttribute("AAB22b")]
         public string COD_VN_DocumentMeta_AAB22 {
             get {
                 return ((string)(this["COD_VN_DocumentMeta_AAB22"]));

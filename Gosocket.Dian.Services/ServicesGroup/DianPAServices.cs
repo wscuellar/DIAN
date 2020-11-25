@@ -727,6 +727,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var signingTime = xmlParser.SigningTime;
             var customizationID = documentParsed.CustomizationId;
             var listId = documentParsed.listID == "" ? "1": documentParsed.listID;
+            var UBLVersionID = documentParsed.UBLVersionID;
 
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -789,22 +790,27 @@ namespace Gosocket.Dian.Services.ServicesGroup
           
             // Auth
             start = DateTime.UtcNow;
-            var authEntity = GetAuthorization(senderCode, authCode);
-            if (authEntity == null)
+            //Si no es un endoso en blanco valida autorizacion
+            if(listId != "2")
             {
-                dianResponse.XmlFileName = Properties.Settings.Default.Param_ApplicationResponse;
-                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
-                dianResponse.StatusDescription = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
-                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-                if (globalEnd >= 10)
+                var authEntity = GetAuthorization(senderCode, authCode);
+                if (authEntity == null)
                 {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Auth };
-                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
-                }
-                UpdateInTransactions(trackId, eventCode);
+                    dianResponse.XmlFileName = Properties.Settings.Default.Param_ApplicationResponse;
+                    dianResponse.StatusCode = Properties.Settings.Default.Code_89;
+                    dianResponse.StatusDescription = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
+                    var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
+                    if (globalEnd >= 10)
+                    {
+                        var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Auth };
+                        TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                    }
+                    UpdateInTransactions(trackId, eventCode);
 
-                return dianResponse;
+                    return dianResponse;
+                }
             }
+           
             var auth = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Auth3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // Auth
 

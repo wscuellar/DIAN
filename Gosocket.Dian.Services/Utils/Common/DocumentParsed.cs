@@ -14,6 +14,7 @@
         public string CustomizationId { get; set; }
         public string listID { get; set; }
         public string DocumentID { get; set; }
+        public string UBLVersionID { get; set; }
 
         public static void SetValues(ref DocumentParsed documentParsed)
         {
