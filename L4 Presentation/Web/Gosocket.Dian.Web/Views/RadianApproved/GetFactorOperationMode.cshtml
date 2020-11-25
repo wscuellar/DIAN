@@ -1,16 +1,20 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedOperationModeViewModel
 
 @Html.Partial("_factorOperationMode")
-@{ 
-    
+@{
+    string operationMode = Request.Params["RadianOperationMode"];
 }
 @section Scripts{
-    
+
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/Radian/RadianOperationMode.js"></script>
+
     <script>
         $(document).ready(function () {
-            @*AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.Id, @Model.Contributor.RadianContributorTypeId,"1");
-            DeleteOperationMode('@Url.Action("DeleteOperationMode", "RadianApproved")');*@
+            AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.Id, @Model.Contributor.RadianContributorTypeId);
+            DeleteOperationMode('@Url.Action("DeleteOperationMode", "RadianApproved")');
+            RenderAutocomplete();
+            @operationMode != 2 && $("#OperationModeSelected").attr("disabled", "disabled");
         })
     </script>
 

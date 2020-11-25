@@ -6,7 +6,7 @@
     var classMarginTop = operationMode == "2" ? "margin-top-50" : "";
 }
 
-<div class="page-content radian-view margin-15">
+<div class="page-content radian-view margin-20">
     <div class="row title-container">
         <p class="title-view">
             @ViewBag.title
@@ -18,7 +18,7 @@
         }
 
     </div>
-    <div class="row @classMarginTop">
+    <div class="@classMarginTop">
         <div class="panel">
             <div class="panel-body padding-top-20">
                 <div class="pad-btm padding-bottom-0">
@@ -53,32 +53,52 @@
                                                 <h4 class="panel-title-radian padding-0"><strong>Datos de la Empresa y Software</strong></h4>
                                                 <hr class="margin-5" />
 
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.Software.CreatedBy, new { @class = "form-control input-general", disabled = "disabled" })
+                                                @if (operationMode == "2")
+                                                {
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
+                                                            <input type="text" class="demo">
+                                                            <input type="hidden" id="hidden-field">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                        @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+                                                            @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
+                                                            @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        @Html.LabelFor(m => m.SoftwarePin, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.SoftwarePin, new { @id = "SoftwarePin", @name = "SoftwarePin", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                        @Html.ValidationMessageFor(m => m.SoftwarePin, null, new { @class = "text-danger" })
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
+                                                            @Html.TextBoxFor(m => m.Software.CreatedBy, new { @class = "form-control input-general", disabled = "disabled" })
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        @Html.Label("ID del Software", new { @class = "control-label" })
-                                                        @Html.TextBox("SoftwareId", Guid.NewGuid().ToString(), new { @class = "form-control input-general", disabled = "disabled" })
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+                                                            @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
+                                                            @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.LabelFor(m => m.SoftwarePin, new { @class = "control-label" })
+                                                            @Html.TextBoxFor(m => m.SoftwarePin, new { @id = "SoftwarePin", @name = "SoftwarePin", @class = "form-control input-general", @style = "background: #ffffff;" })
+                                                            @Html.ValidationMessageFor(m => m.SoftwarePin, null, new { @class = "text-danger" })
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.Label("ID del Software", new { @class = "control-label" })
+                                                            @Html.TextBox("SoftwareId", Guid.NewGuid().ToString(), new { @class = "form-control input-general", disabled = "disabled" })
+                                                        </div>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
 
