@@ -39,7 +39,7 @@ function RenderAutocomplete(url) {
                             term: qry,
                             contributorId: 1704648,
                             contributorTypeId: 1,
-                            operationMode: 2
+                            softwareType: 2
                         }
                     }
                 ).done(function (res) {debugger
