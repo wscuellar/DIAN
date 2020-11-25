@@ -695,6 +695,7 @@ namespace Gosocket.Dian.Services.Utils
             var serieAndNumber = documentParsed.SerieAndNumber;
             var listID = documentParsed.listID;
             var UBLVersionID = documentParsed.UBLVersionID;
+            var receiverCode = documentParsed.ReceiverCode;
 
             switch (docTypeCode)
             {
@@ -810,7 +811,36 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
-                if(listID == "1" && (Convert.ToInt32(eventCode) >= 36 && Convert.ToInt32(eventCode) <= 38) && string.IsNullOrEmpty(senderCode))
+                if ( (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) && string.IsNullOrEmpty(receiverCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}G04-(R) El ID de receptor del evento no es Válido");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+                else if ((Convert.ToInt32(eventCode) >= 36 && Convert.ToInt32(eventCode) <= 38) && string.IsNullOrEmpty(receiverCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}G04-(R) No fue informado el documento del endosatario");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+                else if (Convert.ToInt32(eventCode) == 45 && string.IsNullOrEmpty(receiverCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}G04-(R) No fue informado el número de identificación.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+                else if(string.IsNullOrEmpty(receiverCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}G04-(R) No fue informado el literal “800197268”");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
+                if (listID == "1" && (Convert.ToInt32(eventCode) >= 36 && Convert.ToInt32(eventCode) <= 38) && string.IsNullOrEmpty(senderCode))
                 {                  
                     stringBuilder.AppendLine($"{codeMessage}F04-(R) No fue informado el Nit.");
                     errors.Add(stringBuilder.ToString());
