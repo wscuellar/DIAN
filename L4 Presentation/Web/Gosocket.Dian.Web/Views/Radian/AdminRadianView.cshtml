@@ -73,6 +73,7 @@
 
                 <div class="row margin-horizontal-0">
                     <div class="col-md-9 table-toolbar-left padding-left-0">
+                        <span>Mostrando @(Model.TotalCount < Model.Length ?  Model.TotalCount : 10) de @Model.TotalCount resultados</span>
                     </div>
                     <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
                         @if (Model.RadianContributors.Count > 0)
@@ -148,15 +149,9 @@
                 $('.table-responsive').css('display', 'none');
             }
 
-            $('.btn-search').click(function () {debugger
+            $('.btn-search').click(function () {
                 var dateRange = $("#DateInterval").val();
                 var radianType = $("#RadianType").val();
-                var radianState = $("#RadianState").val();
-                var nit = $("#Code").val();
-
-                if (dateRange == "" && radianType == "" && radianState == "" && nit == "")
-                    return null;
-
                 $('#StartDate').val(dateRange.split("al")[0]);
                 $('#EndDate').val(dateRange.split("al")[1]);
                 $('#Page').val(1);

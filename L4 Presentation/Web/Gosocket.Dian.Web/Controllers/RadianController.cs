@@ -70,6 +70,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             AdminRadianViewModel model = new AdminRadianViewModel()
             {
+                TotalCount = radianAdmin.RowCount,
+                CurrentPage = radianAdmin.CurrentPage,
                 RadianContributors = radianAdmin.Contributors.Select(c => new RadianContributorsViewModel()
                 {
                     Id = c.Id,
@@ -97,7 +99,6 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult AdminRadianView(AdminRadianViewModel model)
         {
-
             AdminRadianFilter filter = new AdminRadianFilter()
             {
                 Id = model.Id,
@@ -111,6 +112,9 @@ namespace Gosocket.Dian.Web.Controllers
 
             AdminRadianViewModel result = new AdminRadianViewModel()
             {
+                TotalCount = radianAdmin.RowCount,
+                CurrentPage = radianAdmin.CurrentPage,
+                Page = model.Page,
                 RadianContributors = radianAdmin.Contributors.Select(c => new RadianContributorsViewModel()
                 {
                     Id = c.Id,
@@ -128,8 +132,6 @@ namespace Gosocket.Dian.Web.Controllers
                 }).ToList(),
                 SearchFinished = true
             };
-
-
             return View(result);
         }
 
@@ -261,7 +263,7 @@ namespace Gosocket.Dian.Web.Controllers
                     }
                 }
 
-                _ = _radianContributorService.ChangeParticipantStatus(id, approveState, radianAdmin.Contributor.RadianContributorTypeId, radianState);
+                _ = _radianContributorService.ChangeParticipantStatus(id, approveState, radianAdmin.Contributor.RadianContributorTypeId, radianState, string.Empty);
                 _ = SendMail(radianAdmin);
 
                 return Json(new

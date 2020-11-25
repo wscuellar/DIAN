@@ -94,7 +94,7 @@ function AlertExec(operation) {
 }
 
 
-function ajaxFunction(url,metod,data,actionError,actionSuccess) {
+function ajaxFunction(url,metod,data,actionError,actionSuccess) {debugger
     $.ajax({
         url: url,
         type: metod,
@@ -150,4 +150,33 @@ function SetIconsList(fileId) {
         template: myTemplate
     });
     $('input#' + fileId)[0].value;
+}
+
+function CancelRegister(url, dataAjax, confirmMessage, successAction, label) {
+        var metod = 'POST';
+        var operation = (description) => ajaxFunction(url, metod, { ...dataAjax, description }, () => { }, successAction);
+        ShowPromptCancel(confirmMessage, operation, label);
+}
+
+function ShowPromptCancel(title, event, label) {
+    bootbox.prompt({
+        title: title,
+        inputType: 'textarea',
+        placeholder: label,
+        message: label,
+        buttons: {
+            confirm: {
+                label: "Aceptar",
+                className: "btn-radian-default btn-radian-success",
+            },
+            cancel: {
+                label: "Cancelar",
+                className: "btn-radian-default",
+
+            }
+        },
+        callback: function (result) {
+            result && event(result);
+        }
+    });
 }

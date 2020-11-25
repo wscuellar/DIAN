@@ -83,7 +83,7 @@ namespace Gosocket.Dian.Application
 
         public List<RadianContributor> ListContributorByType(int radianContributorTypeId)
         {
-            return _radianContributorRepository.List(t => t.RadianContributorTypeId == radianContributorTypeId);
+            return _radianContributorRepository.List(t => t.RadianContributorTypeId == radianContributorTypeId).Results;
         }
 
         // Manquip

@@ -15,7 +15,12 @@
 
 /*Extra large devices (large desktops, 1200px and up)*/
 @media (min-width: 1200px) {
-
+    .modal-dialog {
+        min-width: 800px;
+    }
+    .panel-body {
+        padding-left: 0;
+    }
 }
 
 @media (max-width: 1299px) {

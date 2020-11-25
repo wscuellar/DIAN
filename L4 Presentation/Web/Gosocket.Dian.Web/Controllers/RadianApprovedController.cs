@@ -63,6 +63,11 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 if (model.RadianState == "Habilitado")
                 {
+                   
+                    return View(model);
+                }
+                else
+                {
                     Software software = _radianAprovedService.SoftwareByContributor(registrationData.ContributorId);
                     List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
                     RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(registrationData.ContributorId);
@@ -82,12 +87,6 @@ namespace Gosocket.Dian.Web.Controllers
                         OperationModeSelected = operationModeList.FirstOrDefault(o => o.Name.Equals("Software propio"))
                     };
                     return View("GetFactorOperationMode", radianApprovedOperationModeViewModel);
-                }
-                else
-                {
-                    model.RadianTestSetResult =
-                    _radianTestSetResultService.GetTestSetResultByNit(radianAdmin.Contributor.Code).FirstOrDefault();
-                    return View("GetSetTestResult", model);
                 }
             }
             else
@@ -260,9 +259,9 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult DeleteUser(int id, string newState, int radianContributorTypeId, string radianState)
+        public ActionResult DeleteUser(int id, string newState, int radianContributorTypeId, string radianState, string description)
         {
-            _radianContributorService.ChangeParticipantStatus(id, newState, radianContributorTypeId, radianState);
+            _radianContributorService.ChangeParticipantStatus(id, newState, radianContributorTypeId, radianState, description);
             return Json(new
             {
                 message = "Datos actualizados",

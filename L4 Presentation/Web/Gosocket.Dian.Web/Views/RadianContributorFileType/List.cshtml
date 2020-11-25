@@ -9,11 +9,6 @@
     <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
 
-    <style>
-        .modal-dialog {
-            width: 150vh !important;
-        }
-    </style>
 }
 
 
@@ -176,6 +171,7 @@
     <!-- end modals-->
 </div>
 
+
 @section Scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
@@ -227,8 +223,7 @@
                         $.validator.unobtrusive.parse($("#edit-radianContributorFileType-form"));
                         $('#modifyModal').modal('show');
                     }
-                    else
-                    {
+                    else {
                         window.location.href = '/User/Login';
                     }
                 }

@@ -15,7 +15,7 @@ namespace Gosocket.Dian.Application.Tests
     public class RadianContributorServiceTests
     {
 
-
+        /*
         private readonly Mock<IContributorService> _contributorService = new Mock<IContributorService>();
         private readonly Mock<IRadianContributorRepository> _radianContributorRepository = new Mock<IRadianContributorRepository>();
         private readonly Mock<IRadianContributorTypeRepository> _radianContributorTypeRepository = new Mock<IRadianContributorTypeRepository>();
@@ -434,6 +434,6 @@ namespace Gosocket.Dian.Application.Tests
 
         }
 
-
+        */
     }
 }

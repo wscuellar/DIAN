@@ -19,6 +19,7 @@ namespace Gosocket.Dian.Domain
         public int RadianOperationModeId { get; set; }
         public RadianOperationMode RadianOperationMode { get; set; }
         public string RadianState { get; set; }
+        public string Description { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime Update { get; set; }
         public int Step { get; set; }
