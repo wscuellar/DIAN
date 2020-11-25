@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
@@ -47,6 +48,21 @@ namespace Gosocket.Dian.Application
             _contributorService = contributorService;
             _radianCallSoftwareService = radianCallSoftwareService;
         }
+
+
+        //public void AutoComplete(int contributorId, RadianOperationModeTestSet operationMode, string term)
+        //{
+        //    if (operationMode == RadianOperationModeTestSet.OwnSoftware)
+        //    {
+        //        //con software propio
+        //        _radianContributorRepository.List(t => t.ContributorId == contributorId);
+        //    }
+        //    else
+        //    {
+        //        _radianContributorOperationRepository.List(t=> t.)
+
+        //    }
+        //}
 
         /// <summary>
         /// 
@@ -97,11 +113,11 @@ namespace Gosocket.Dian.Application
             return softwares;
         }
 
-        public List<RadianOperationMode> ListSoftwareModeOperation()
-        {
-            List<RadianOperationMode> list = _radianTestSetService.OperationModeList();
-            return list;
-        }
+        //public List<RadianOperationMode> ListSoftwareModeOperation()
+        //{
+        //    List<RadianOperationMode> list = _radianTestSetService.OperationModeList();
+        //    return list;
+        //}
 
         public RadianContributor GetRadianContributor(int radianContributorId)
         {
@@ -208,10 +224,12 @@ namespace Gosocket.Dian.Application
             RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
 
             radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId && t.Deleted == false);
-
-            int code = (int)radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianProviderId;
-            radianContributorOperationWithSoftware.Softwares = _radianCallSoftwareService.GetSoftwares(code);
-
+            //if(radianContributorOperationWithSoftware.RadianContributorOperations.Any())
+            //{
+            //    int code = (int)radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianProviderId;
+            //    radianContributorOperationWithSoftware.Softwares = _radianCallSoftwareService.GetSoftwares(code);
+            //}
+                
             return radianContributorOperationWithSoftware;
         }
 

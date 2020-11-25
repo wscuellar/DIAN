@@ -8,7 +8,7 @@ namespace Gosocket.Dian.Interfaces.Services
 {
     public interface IRadianApprovedService
     {
-        List<Domain.RadianOperationMode> ListSoftwareModeOperation();
+       // List<Domain.RadianOperationMode> ListSoftwareModeOperation();
 
         List<RadianContributor> ListContributorByType(int radianContributorTypeId);
 

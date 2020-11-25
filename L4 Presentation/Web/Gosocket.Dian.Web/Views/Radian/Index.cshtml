@@ -95,7 +95,6 @@
 
         $('.RadianCardContainer').click(function () {
             existingModes.clean("");
-            debugger
             if ($(this).attr('operationMode') === "1" && !existingModes.includes($(this).attr('contributorType')))
             {
                 if (!operationClick) {
@@ -120,8 +119,7 @@
                 }
             }
             else {
-                debugger;
-                var url = "@Url.Action("Index", "RadianApproved")";
+                    var url = "@Url.Action("Index", "RadianApproved")";
                 var complement = "";
                 if (!existingModes.includes($(this).attr('contributorType')))
                     url = '@Url.Action("ElectronicInvoiceView", "Radian")';
@@ -131,7 +129,7 @@
             }
         });
 
-        function getComplement(option){debugger
+        function getComplement(option){
               var complement="";
               switch (option)
               {
