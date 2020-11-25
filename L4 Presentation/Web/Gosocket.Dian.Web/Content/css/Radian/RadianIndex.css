@@ -1146,3 +1146,7 @@ li.last a::after {
 .custom-file-input {
     height: 33px !important;
 }
+
+#addRadianContributorFileTypeModal {
+    min-width: 400px;
+}

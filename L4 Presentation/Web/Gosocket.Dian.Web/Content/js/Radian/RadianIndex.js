@@ -176,7 +176,7 @@ function ShowPromptCancel(title, event, label) {
             }
         },
         callback: function (result) {
-            event(result)
+            result && event(result);
         }
     });
 }
