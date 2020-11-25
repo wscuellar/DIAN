@@ -39,11 +39,11 @@ function RenderAutocomplete(url) {
                             term: qry,
                             contributorId: 1704648,
                             contributorTypeId: 1,
-                            softwareType: 2
+                            softwareType: 1
                         }
                     }
                 ).done(function (res) {debugger
-                    callback(res.results)
+                    callback(res)
                 });
             }
         }
