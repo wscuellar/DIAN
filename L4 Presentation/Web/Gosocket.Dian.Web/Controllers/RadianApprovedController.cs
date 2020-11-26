@@ -84,7 +84,6 @@ namespace Gosocket.Dian.Web.Controllers
                         CreatedBy = software.CreatedBy,
                         SoftwareId = software.Id,
                         SoftwareUrl = software.Url,
-                        OperationModeSelectedId = operationModeList.FirstOrDefault().Id.ToString(),
                         OperationModes = new SelectList(operationModeList, "Id", "Name")
                     };
                     return View("GetFactorOperationMode", radianApprovedOperationModeViewModel);
@@ -212,7 +211,6 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatedBy = software.CreatedBy,
                 SoftwareId = software.Id,
                 SoftwareUrl = software.Url,
-                OperationModeSelectedId = operationModeList.FirstOrDefault(o => o.Name.Equals("Software propio")).Id.ToString(),
                 OperationModes = new SelectList(operationModeList, "Id", "Name")
             };
 

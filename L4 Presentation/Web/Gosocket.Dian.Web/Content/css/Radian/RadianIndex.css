@@ -1150,3 +1150,10 @@ li.last a::after {
 #addRadianContributorFileTypeModal {
     min-width: 400px;
 }
+
+button.selectpicker {
+    background: transparent;
+    padding: 12px 20px;
+    border: 1px solid #CCCCCC !important;
+    border-radius: 4px;
+}

@@ -19,14 +19,13 @@
             DeleteOperationMode('@Url.Action("DeleteOperationMode", "RadianApproved")');
             @operationMode != 2 && $("#OperationModeSelected").attr("disabled", "disabled");
 
-            $("#OperationModeSelectedId").change(function (value) {
+            $("#OperationModeSelectedId").change(function (value) {debugger
                 var software = $("#OperationModeSelectedId").val();
                 RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
-
             })
 
-            $("#save-operation-mode").click(function () {
-                softwareType = $("#SoftwareNameList").value();
+            $("#save-operation-mode").click(function () {debugger
+                softwareType = $("#SoftwareNameList").val();
                 AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.Id, @Model.Contributor.RadianContributorTypeId, softwareType);
             })
         })

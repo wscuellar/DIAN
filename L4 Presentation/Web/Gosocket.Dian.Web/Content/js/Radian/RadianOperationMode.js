@@ -27,7 +27,29 @@ function AddOperationMode(url, contributorId, radianTypeId, softwareId) {
         ajaxFunction(url, metod, data, actionError, actionSuccess);
 }
 
-function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType) {
+function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType) {debugger
+    if (softwareType == "1") {
+        var metod = "POST";
+        var data = {
+            term: "",
+            contributorId,
+            contributorTypeId,
+            softwareType
+        };
+        var actionError = () => { };
+        var actionSuccess = (response) => {debugger
+            var newUrl = "/RadianApproved/SoftwareList";
+            var newData = {
+                radianContributorId: response[0].value
+            };
+            var newAction = (response) => {
+                $("#SoftwareNameList").append($("<option>", { value: response[0].value, text: response[0].text }));
+            }
+            $("#CustomerName").val(response[0].text);
+            ajaxFunction(newUrl, metod, newData, actionError, newAction);
+        }
+        ajaxFunction(url, metod, data, actionError, actionSuccess);
+    } else {
         $("#CustomerName").autocomplete({
             source: function (request, response) {
                 $.ajax({
@@ -40,13 +62,13 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
                         softwareType
                     },
                     success: function (data) {
-                        response($.map(data, function (val, item) {
-                            return {
-                                label: val.text,
-                                value: val.text,
-                                customerId: val.value
-                            }
-                        }))
+                            response($.map(data, function (val, item) {
+                                return {
+                                    label: val.text,
+                                    value: val.text,
+                                    customerId: val.value
+                                }
+                            }))
                     }
                 })
             },
@@ -60,6 +82,8 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
                 LoadSoftwareList(ui.item.customerId);
             }
         });
+    }
+
 }
 
 function ChangeSelected() {
