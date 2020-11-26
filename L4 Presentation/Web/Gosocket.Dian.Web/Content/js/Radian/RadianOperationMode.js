@@ -1,6 +1,6 @@
 ﻿
 function DeleteOperationMode(url) {
-    $("#delete-software").click(function () {
+    $(".delete-software").click(function () {
         var metod = 'POST';
         var data = {
             Id: $(this).attr("data-id")
@@ -50,6 +50,8 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
         }
         ajaxFunction(url, metod, data, actionError, actionSuccess);
     } else {
+        $("#CustomerName").val("");
+        $("#SoftwareNameList option").remove();
         $("#CustomerName").autocomplete({
             source: function (request, response) {
                 $.ajax({
