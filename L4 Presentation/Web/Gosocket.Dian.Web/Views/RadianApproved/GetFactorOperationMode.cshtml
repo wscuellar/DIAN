@@ -19,7 +19,7 @@
             DeleteOperationMode('@Url.Action("DeleteOperationMode", "RadianApproved")');
             @operationMode != 2 && $("#OperationModeSelected").attr("disabled", "disabled");
 
-            $("#OperationModeSelectedId").change(function (value) {debugger
+            $("#OperationModeSelectedId").change(function (value) {
                 var software = $("#OperationModeSelectedId").val();
                 RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
             })

@@ -27,7 +27,7 @@ function AddOperationMode(url, contributorId, radianTypeId, softwareId) {
         ajaxFunction(url, metod, data, actionError, actionSuccess);
 }
 
-function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType) {debugger
+function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType) {
     if (softwareType == "1") {
         var metod = "POST";
         var data = {
@@ -37,7 +37,7 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
             softwareType
         };
         var actionError = () => { };
-        var actionSuccess = (response) => {debugger
+        var actionSuccess = (response) => {
             var newUrl = "/RadianApproved/SoftwareList";
             var newData = {
                 radianContributorId: response[0].value
@@ -92,7 +92,7 @@ function ChangeSelected() {
     })
 }
 
-function LoadSoftwareList(radianId) {debugger
+function LoadSoftwareList(radianId) {
     var url = "/RadianApproved/SoftwareList";
     var metod = "POST";
     var data = {
@@ -100,7 +100,6 @@ function LoadSoftwareList(radianId) {debugger
     }
     var actionError = () => { };
     var actionSuccess = (response) => {
-        debugger
         for (var i = 0; i < response.length; i++) {
             $("#SoftwareNameList").append($("<option>", { value: response[i].value, text: response[i].text }));
         }
