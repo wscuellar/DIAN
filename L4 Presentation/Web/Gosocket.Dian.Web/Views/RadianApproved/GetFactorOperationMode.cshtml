@@ -26,7 +26,9 @@
 
             $("#save-operation-mode").click(function () {
                 softwareType = $("#SoftwareNameList option:selected").val();
-                AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.Id, @Model.Contributor.RadianContributorTypeId, softwareType);
+                alert("@Model.Contributor.RadianContributorId");
+                alert(softwareType);
+                AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.RadianContributorId, softwareType);
             })
         })
     </script>
