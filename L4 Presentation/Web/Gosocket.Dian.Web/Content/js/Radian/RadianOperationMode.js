@@ -1,6 +1,6 @@
 ﻿
 function DeleteOperationMode(url) {
-    $("#delete-software").click(function () {
+    $(".delete-software").click(function () {
         var metod = 'POST';
         var data = {
             Id: $(this).attr("data-id")
