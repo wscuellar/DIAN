@@ -34,7 +34,9 @@ namespace Gosocket.Dian.Web.Controllers
                 Mandatory = ft.Mandatory,
                 Timestamp = ft.Timestamp,
                 Updated = ft.Updated,
-                RadianContributorType = ft.RadianContributorType
+                RadianContributorType = ft.RadianContributorType,
+                HideDelete = ft.HideDelete
+
             }).ToList();
         }
 

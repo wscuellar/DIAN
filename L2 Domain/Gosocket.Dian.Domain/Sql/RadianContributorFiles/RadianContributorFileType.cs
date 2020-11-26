@@ -19,5 +19,7 @@ namespace Gosocket.Dian.Domain
         public bool Deleted { get; set; }
         public int RadianContributorTypeId { get; set; }
         public virtual RadianContributorType RadianContributorType { get; set; }
+        [NotMapped]
+        public bool HideDelete { get; set; }
     }
 }

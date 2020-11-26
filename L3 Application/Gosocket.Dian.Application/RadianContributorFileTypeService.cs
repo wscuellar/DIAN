@@ -1,7 +1,9 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Gosocket.Dian.Application
 {
@@ -16,9 +18,22 @@ namespace Gosocket.Dian.Application
             _radianContributorTypeRepository = radianContributorTypeRepository;
         }
 
+
+        private RadianContributorFileType map(RadianContributorFileType input, KeyValue Counter)
+        {
+            input.HideDelete = Counter != null && Counter.value > 0;
+            return input;
+        }
+
         public List<RadianContributorFileType> FileTypeList()
         {
-            return _radianContributorFileTypeRepository.List(ft => !ft.Deleted);
+            List<KeyValue> counter = _radianContributorFileTypeRepository.FileTypeCounter();
+            List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(ft => !ft.Deleted);
+
+            return (from f in fileTypes
+                    join c in counter on f.Id equals c.Key into g
+                    from x in g.DefaultIfEmpty()
+                    select map(f, x)).ToList();
         }
 
         public List<RadianContributorType> ContributorTypeList()
