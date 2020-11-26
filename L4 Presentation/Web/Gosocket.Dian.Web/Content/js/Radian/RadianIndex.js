@@ -129,11 +129,15 @@ function CancelRegister(url, dataAjax, confirmMessage, successAction, label) {
 }
 
 function ShowPromptCancel(title, event, label, operationCancel) {
-    bootbox.prompt({
+    var bootboxPrompt = bootbox.prompt({
+        className: "prompt-comment",
         title: title,
         inputType: 'textarea',
-        placeholder: label,
         message: label,
+        inputOptions: {
+            text: "text",
+            value: "value"
+        },
         buttons: {
             confirm: {
                 label: "Aceptar",
@@ -148,4 +152,9 @@ function ShowPromptCancel(title, event, label, operationCancel) {
             result ? event(result) : operationCancel();
         }
     });
+
+    bootboxPrompt.init(function () {
+        $(".bootbox-form").prepend($("<label>", { text: bootboxMessage.LABEL_PROMPT }));
+    });
+
 }
