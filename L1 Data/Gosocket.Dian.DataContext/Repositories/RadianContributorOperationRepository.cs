@@ -29,7 +29,8 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public RadianContributorOperation Get(Expression<Func<RadianContributorOperation, bool>> expression)
         {
-            var query = _sqlDBContext.RadianContributorOperations.Where(expression);
+            var query = _sqlDBContext.RadianContributorOperations.Include("RadianContributor").Include("Software")
+                .Where(expression);
             return query.FirstOrDefault();
         }
 
