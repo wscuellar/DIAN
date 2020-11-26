@@ -70,7 +70,7 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     Software software = _radianAprovedService.SoftwareByContributor(registrationData.ContributorId);
                     List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
-                    RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(registrationData.ContributorId);
+                    RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianAdmin.Contributor.RadianContributorId);
 
                     //foreach (RadianContributorOperation co in radianContributorOperations.RadianContributorOperations)
                     //    co.RadianOperationMode = operationModeList.FirstOrDefault(o => o.Id == co.RadianOperationModeId);

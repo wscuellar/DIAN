@@ -134,20 +134,18 @@
                                         <tbody>
                                             @foreach (var oper in Model.RadianContributorOperations.RadianContributorOperations)
                                             {
-                                                var software = @Model.RadianContributorOperations.Softwares.Where(s => s.ContributorId == oper.RadianContributorId).First();
-
                                                 <tr>
                                                     <td class="smallText iffyTip">Se quito debe arreglarse</td>
                                                     <td class="smallText iffyTip">@oper.Timestamp.ToString("dd/MM/yyy")</td>
                                                     <td class="largeText iffyTip">
                                                         @{
-                                                            if (software.Status)
+                                                            if (oper.Software.Status)
                                                             {
                                                                 <p>Aceptado</p>
                                                             }
                                                             else
                                                             {
-                                                                if (software.Deleted)
+                                                                if (oper.Software.Deleted)
                                                                 {
                                                                     <p>Rechazado</p>
                                                                 }
@@ -160,8 +158,8 @@
                                                     </td>
                                                     <td class="largeText iffyTip">arreglar</td>
                                                     <td class="largeText iffyTip">@oper.SoftwareId</td>
-                                                    <td class="largeText iffyTip"></td>
-                                                    <td class="largeText iffyTip"></td>
+                                                    <td class="largeText iffyTip">@oper.Software.Pin</td>
+                                                    <td class="largeText iffyTip">@oper.Software.Url</td>
                                                     <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer"><span><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
                                                     <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = Model.Contributor.RadianContributorTypeId})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
                                                 </tr>
