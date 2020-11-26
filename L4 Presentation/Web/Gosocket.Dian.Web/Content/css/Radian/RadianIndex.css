@@ -1157,3 +1157,8 @@ button.selectpicker {
     border: 1px solid #CCCCCC !important;
     border-radius: 4px;
 }
+
+button.selectpicker .fa-caret-down {
+    right: 15px;
+    position: absolute;
+}

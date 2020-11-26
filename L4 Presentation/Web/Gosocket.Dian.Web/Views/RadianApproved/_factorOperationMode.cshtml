@@ -38,7 +38,7 @@
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.OperationModeSelectedId, new { @class = "control-label" })
-                                                        @Html.DropDownListFor(m => m.OperationModeSelectedId, Model.OperationModes, "Configuración modo de Operación", new { @class = "form-control selectpicker input-general" })
+                                                        @Html.DropDownListFor(m => m.OperationModeSelectedId, Model.OperationModes, " ", new { @class = "form-control selectpicker input-general" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-5 padding-xs-0">
@@ -156,7 +156,7 @@
                                                         }
                                                     </td>
                                                     <td class="largeText iffyTip">arreglar</td>
-                                                    <td class="largeText iffyTip">@oper.SoftwareId</td>
+                                                    <td class="largeText iffyTip">@oper.Software.Id</td>
                                                     <td class="largeText iffyTip">@oper.Software.Pin</td>
                                                     <td class="largeText iffyTip">@oper.Software.Url</td>
                                                     <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer delete-software"><span><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
