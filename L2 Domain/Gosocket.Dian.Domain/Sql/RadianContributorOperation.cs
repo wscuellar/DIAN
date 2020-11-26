@@ -12,6 +12,7 @@ namespace Gosocket.Dian.Domain
         [ForeignKey("RadianContributor")]
         public int RadianContributorId { get; set; }
         public RadianContributor RadianContributor { get; set; }
+        public int SoftwareType { get; set; }
         public Guid SoftwareId { get; set; }
         public Software Software { get; set; }
         public bool Deleted { get; set; }

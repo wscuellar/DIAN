@@ -372,6 +372,7 @@ namespace Gosocket.Dian.Domain.Common
 
     public enum RadianState
     {
+        none = 0,
         [Display(Name = "Registrado")]
         [Description("Registrado")]
         Registrado = 1,
