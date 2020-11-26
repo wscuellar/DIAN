@@ -24,8 +24,8 @@
                 RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
             })
 
-            $("#save-operation-mode").click(function () {debugger
-                softwareType = $("#SoftwareNameList").val();
+            $("#save-operation-mode").click(function () {
+                softwareType = $("#SoftwareNameList option:selected").val();
                 AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.Id, @Model.Contributor.RadianContributorTypeId, softwareType);
             })
         })
