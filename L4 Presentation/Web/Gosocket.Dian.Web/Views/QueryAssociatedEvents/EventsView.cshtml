@@ -104,6 +104,25 @@
     .padding-panel {
         padding-bottom: 12px;
     }
+
+    .titlecs {
+        font-size: 22px;
+    }
+
+    .underline-title {
+        width: calc(34% + 5%) !important;
+    }
+
+    .radian-subtitle-line {
+        width: 100%;
+        margin-left: 0px !important;
+    }
+
+    .notification-tooltip {
+        width: 400%;
+        height: 512%;
+        font-size: 0.5vw;
+    }
 </style>
 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
@@ -133,7 +152,6 @@
                         <div class="left-section ContainerDownload">
                             <p><i class="fa fa-download"></i><um><ins> Descarga</ins></um></p>
                         </div>
-
                     </div>
                     <div class="col-sm-8 text-right right-section">
                         <span>Prefijo: @Model.Prefix </span>
@@ -143,7 +161,6 @@
                 </div>
 
                 <div class="row aditional-data-section padding-panel">
-
                     <div class="col-sm-4">
                         <h5>Datos del Emisor del evento </h5>
                         <p class="p-event-issuer">NIT: @Model.SenderCode</p>
@@ -226,9 +243,12 @@
                                     {
                                         <tr>
                                             <td>@item.RuleName</td>
-                                            @* todo fer: *@
-                                            @*<td class="text-right right-section"><a data-toggle="tooltip" data-placement="top" title="@item.Message"><i class="fa fa-info-circle "></i> @item.Status</a></td>*@
-                                            <td class="text-right right-section"><a data-toggle="modal" data-target="#basicModal" style="cursor:pointer"><i class="fa fa-info-circle "></i> @item.Status</a></td>
+                                            <td class="text-right right-section">
+                                                <u class="underline-reject-text tooltip">
+                                                    <span><i class="fa fa-info-circle"> </i> @item.Status</span>
+                                                    <span class="tooltiptext">@item.Message</span>
+                                                </u>
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
@@ -313,20 +333,6 @@
                     </div>
                 }
 
-            </div>
-        </div>
-    </div>
-</div>
-
-@* todo fer: *@
-<div class="modal" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <p id="modalPopapBodyEventEf">Modal Body</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Aceptar</button>
             </div>
         </div>
     </div>
