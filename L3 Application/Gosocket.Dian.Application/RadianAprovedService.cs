@@ -243,7 +243,11 @@ namespace Gosocket.Dian.Application
             if (softwareType == RadianOperationModeTestSet.OwnSoftware)
                 participants = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.BusinessName.Contains(term)).Results;
             else
-                participants = _radianContributorRepository.List(t => t.ContributorId != contributorId && t.RadianContributorTypeId == (int)softwareType && t.Contributor.BusinessName.Contains(term)).Results;
+            {
+                string radianState = RadianState.Habilitado.GetDescription();
+                participants = _radianContributorRepository.List(t => t.RadianState == radianState && t.RadianContributorTypeId == (int)softwareType && t.Contributor.BusinessName.Contains(term)).Results;
+
+            }
             return participants.Distinct().ToList();
         }
     }
