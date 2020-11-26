@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Services;
@@ -63,7 +64,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 if (model.RadianState == "Habilitado")
                 {
-                   
+
                     return View(model);
                 }
                 else
@@ -206,14 +207,23 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult UploadFactorOperationMode(int radianContributorId, string softwareId)
         {
-            int result = _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
+            int result = -1;
+            if (softwareId != null)
             {
-                RadianContributorId = radianContributorId,
-                Deleted = false,
-                Timestamp = DateTime.Now,
-                SoftwareId = new Guid(softwareId),
-            });
-            string message = result == 0 ? "El participante ya tiene asociado el software asignado!!!" : "Datos actualizados correctamente.";
+                result = _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
+                {
+                    RadianContributorId = radianContributorId,
+                    Deleted = false,
+                    Timestamp = DateTime.Now,
+                    SoftwareId = new Guid(softwareId),
+                });
+            }
+
+            string message;
+            if (result == -1)
+                message = TextResources.RequiredSoftware;
+            else
+                message = result == 0 ? TextResources.ExistingSoftware : TextResources.SuccessSoftware;
             return Json(
                 new
                 {
@@ -281,7 +291,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
         {
             List<RadianContributor> softwares = _radianAprovedService.AutoCompleteProvider(contributorId, contributorTypeId, softwareType, term);
-            List<AutoListModel> filteredItems =  softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Contributor.BusinessName)).ToList();
+            List<AutoListModel> filteredItems = softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Contributor.BusinessName)).ToList();
             return Json(filteredItems, JsonRequestBehavior.AllowGet);
         }
 
