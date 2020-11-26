@@ -158,7 +158,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-
+            string errorMessarge = string.Empty;
             string key = string.Empty;
             var errorCode = "FAD06";
             var prop = "CUFE";
@@ -200,8 +200,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     key = range?.TechnicalKey;
                 }
             }
-
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = $"Valor del {prop} no está calculado correctamente." };
+            errorMessarge = documentMeta.DocumentTypeId == "96" ? "El valor UUID no está correctamente calculado" : $"Valor del { prop} no está calculado correctamente.";
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessarge };
 
             var number = cufeModel.SerieAndNumber;
             var emissionDate = cufeModel.EmissionDate;
