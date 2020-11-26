@@ -268,7 +268,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-        public ActionResult ViewTestSet(int id, int radianTypeId)
+        public ActionResult ViewTestSet(int id, int radianTypeId, string softwareId)
         {
             RadianApprovedViewModel radianApprovedViewModel = new RadianApprovedViewModel();
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(id, radianTypeId);

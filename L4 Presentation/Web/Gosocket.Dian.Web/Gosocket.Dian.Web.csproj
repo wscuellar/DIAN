@@ -668,7 +668,7 @@
     <Content Include="Content\jquery-ui.structure.css" />
     <Content Include="Content\jquery-ui.theme.css" />
     <Content Include="Content\jquery.steps.css" />
-    <Content Include="Content\js\autocomplete.js" />
+    <Content Include="Content\js\combobox-autocomplete.js" />
     <Content Include="Content\js\autocomplete.min.js" />
     <Content Include="Content\js\bootstrap-datepicker.es.min.js" />
     <Content Include="Content\js\bootstrap-filestyle.js" />

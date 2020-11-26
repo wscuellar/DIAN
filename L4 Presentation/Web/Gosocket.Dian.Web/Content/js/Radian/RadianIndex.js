@@ -128,7 +128,7 @@ function CancelRegister(url, dataAjax, confirmMessage, successAction, label) {
         ShowPromptCancel(confirmMessage, operation, label);
 }
 
-function ShowPromptCancel(title, event, label) {
+function ShowPromptCancel(title, event, label, operationCancel) {
     bootbox.prompt({
         title: title,
         inputType: 'textarea',
@@ -142,11 +142,10 @@ function ShowPromptCancel(title, event, label) {
             cancel: {
                 label: "Cancelar",
                 className: "btn-radian-default",
-
             }
         },
         callback: function (result) {
-            result && event(result);
+            result ? event(result) : operationCancel();
         }
     });
 }

@@ -29,6 +29,11 @@
                 softwareType = $("#SoftwareNameList option:selected").val();
                 AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.RadianContributorId, softwareType);
             })
+
+            $("#combobox").combobox();
+            $("#toggle").on("click", function () {
+                $("#combobox").toggle();
+            });
         })
     </script>
 
