@@ -201,7 +201,8 @@ namespace Gosocket.Dian.Application
 
         public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
         {
-            return _radianContributorOperationRepository.Add(radianContributorOperation);
+            var existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == t.SoftwareId);
+            return (existingsoft == null) ? _radianContributorOperationRepository.Add(radianContributorOperation) : 0;
         }
 
         public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)

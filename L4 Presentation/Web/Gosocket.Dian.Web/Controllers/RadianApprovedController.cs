@@ -71,10 +71,6 @@ namespace Gosocket.Dian.Web.Controllers
                     Software software = _radianAprovedService.SoftwareByContributor(registrationData.ContributorId);
                     List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
                     RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianAdmin.Contributor.RadianContributorId);
-
-                    //foreach (RadianContributorOperation co in radianContributorOperations.RadianContributorOperations)
-                    //    co.RadianOperationMode = operationModeList.FirstOrDefault(o => o.Id == co.RadianOperationModeId);
-
                     RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
                     {
                         Contributor = radianAdmin.Contributor,
@@ -107,12 +103,6 @@ namespace Gosocket.Dian.Web.Controllers
 
 
 
-        }
-
-        private void LoadSoftwareModeOperation()
-        {
-            List<Domain.RadianOperationMode> list = _radianTestSetService.OperationModeList();
-            ViewBag.RadianSoftwareOperationMode = list;
         }
 
         [HttpPost]
@@ -198,10 +188,6 @@ namespace Gosocket.Dian.Web.Controllers
             Software software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
             List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
             RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
-
-            //foreach (RadianContributorOperation co in radianContributorOperations.RadianContributorOperations)
-            //    co.RadianOperationMode = operationModeList.FirstOrDefault(o => o.Id == co.RadianOperationModeId);
-
             RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
             {
                 Contributor = radianAdmin.Contributor,
@@ -218,21 +204,20 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult UploadFactorOperationMode(int ContributorId,  int RadianTypeId, string softwareId)
+        public JsonResult UploadFactorOperationMode(int radianContributorId, string softwareId)
         {
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId, RadianTypeId);
-            _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
+            int result = _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
             {
-                RadianContributorId = radianAdmin.Contributor.RadianContributorId,
+                RadianContributorId = radianContributorId,
                 Deleted = false,
                 Timestamp = DateTime.Now,
                 SoftwareId = new Guid(softwareId),
             });
-
+            string message = result == 0 ? "El participante ya tiene asociado el software asignado!!!" : "Datos actualizados correctamente.";
             return Json(
                 new
                 {
-                    messasge = "Datos actualizados correctamente.",
+                    messasge = message,
                     success = true,
                 }, JsonRequestBehavior.AllowGet);
         }
