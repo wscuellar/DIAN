@@ -14,14 +14,14 @@ function DeleteOperationMode(url) {
     })
 }
 
-function AddOperationMode(url, contributorId, softwareId) {debugger
+function AddOperationMode(url, contributorId, softwareId) {
         var metod = 'POST';
         var data = {
             radianContributorId: contributorId,
             softwareId: softwareId
         }
         var actionError = () => { }
-        var actionSuccess = (response) => {debugger
+        var actionSuccess = (response) => {
             var message = response.message;
             var operation = () => { location.reload() };
             var button = AlertExec(operation);
