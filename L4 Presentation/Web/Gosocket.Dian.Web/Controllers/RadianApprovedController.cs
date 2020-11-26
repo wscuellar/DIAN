@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Services;
@@ -63,18 +64,14 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 if (model.RadianState == "Habilitado")
                 {
-                   
+
                     return View(model);
                 }
                 else
                 {
                     Software software = _radianAprovedService.SoftwareByContributor(registrationData.ContributorId);
                     List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
-                    RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(registrationData.ContributorId);
-
-                    foreach (RadianContributorOperation co in radianContributorOperations.RadianContributorOperations)
-                        co.RadianOperationMode = operationModeList.FirstOrDefault(o => o.Id == co.RadianOperationModeId);
-
+                    RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianAdmin.Contributor.RadianContributorId);
                     RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
                     {
                         Contributor = radianAdmin.Contributor,
@@ -84,7 +81,7 @@ namespace Gosocket.Dian.Web.Controllers
                         CreatedBy = software.CreatedBy,
                         SoftwareId = software.Id,
                         SoftwareUrl = software.Url,
-                        OperationModeSelected = operationModeList.FirstOrDefault(o => o.Name.Equals("Software propio"))
+                        OperationModes = new SelectList(operationModeList, "Id", "Name")
                     };
                     return View("GetFactorOperationMode", radianApprovedOperationModeViewModel);
                 }
@@ -107,12 +104,6 @@ namespace Gosocket.Dian.Web.Controllers
 
 
 
-        }
-
-        private void LoadSoftwareModeOperation()
-        {
-            List<Domain.RadianOperationMode> list = _radianTestSetService.OperationModeList();
-            ViewBag.RadianSoftwareOperationMode = list;
         }
 
         [HttpPost]
@@ -198,10 +189,6 @@ namespace Gosocket.Dian.Web.Controllers
             Software software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
             List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
             RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
-
-            foreach (RadianContributorOperation co in radianContributorOperations.RadianContributorOperations)
-                co.RadianOperationMode = operationModeList.FirstOrDefault(o => o.Id == co.RadianOperationModeId);
-
             RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
             {
                 Contributor = radianAdmin.Contributor,
@@ -211,36 +198,36 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatedBy = software.CreatedBy,
                 SoftwareId = software.Id,
                 SoftwareUrl = software.Url,
-                OperationModeSelected = operationModeList.FirstOrDefault(o => o.Name.Equals("Software propio"))
+                OperationModes = new SelectList(operationModeList, "Id", "Name")
             };
 
             return View(radianApprovedOperationModeViewModel);
         }
 
         [HttpPost]
-        public JsonResult UploadFactorOperationMode(int ContributorId, int RadianTypeId)
+        public JsonResult UploadFactorOperationMode(int radianContributorId, string softwareId)
         {
-            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId, RadianTypeId);
-            Software software = _radianAprovedService.SoftwareByContributor(ContributorId);
-
-            _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
+            int result = -1;
+            if (softwareId != null)
             {
-                RadianContributorId = radianAdmin.Contributor.Id,
-                RadianOperationModeId = radianAdmin.Contributor.RadianOperationModeId,
-                RadianProviderId = radianAdmin.Contributor.Id,
-                Deleted = false,
-                Timestamp = DateTime.Now,
-                RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId,
-                Pin = software.Pin,
-                SoftwareName = software.Name,
-                Url = software.Url,
-                SoftwareId = software.Id,
-            });
+                result = _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
+                {
+                    RadianContributorId = radianContributorId,
+                    Deleted = false,
+                    Timestamp = DateTime.Now,
+                    SoftwareId = new Guid(softwareId),
+                });
+            }
 
+            string message;
+            if (result == -1)
+                message = TextResources.RequiredSoftware;
+            else
+                message = result == 0 ? TextResources.ExistingSoftware : TextResources.SuccessSoftware;
             return Json(
                 new
                 {
-                    messasge = "Datos actualizados correctamente.",
+                    message = message,
                     success = true,
                 }, JsonRequestBehavior.AllowGet);
         }
@@ -300,5 +287,20 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View("GetSetTestResult", radianApprovedViewModel);
         }
+
+        public ActionResult AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
+        {
+            List<RadianContributor> softwares = _radianAprovedService.AutoCompleteProvider(contributorId, contributorTypeId, softwareType, term);
+            List<AutoListModel> filteredItems = softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Contributor.BusinessName)).ToList();
+            return Json(filteredItems, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult SoftwareList(int radianContributorId)
+        {
+            List<Software> softwares = _radianAprovedService.SoftwareList(radianContributorId);
+            List<AutoListModel> filteredItems = softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            return Json(filteredItems, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

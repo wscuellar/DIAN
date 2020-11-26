@@ -5,8 +5,8 @@
 }
 
 
-<div class="page-content radian-view margin-15">
-    <div class="row title-container">
+<div class="page-content radian-view margin-20">
+    <div class="title-container">
         <p class="title-view">
             @ViewBag.title
         </p>
@@ -93,7 +93,7 @@
                             </div>
                             <div class="col-sm-2 padding-xs-0">
                                 <div class="form-group">
-                                    @Html.Label("Recibo del bien o prestación del servicio", new { @class = "control-label" })
+                                    @Html.Label("Recibo del bien", new { @class = "control-label" })
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptServiceTotalRequired, defaultHtmlAttr)
                                 </div>
                             </div>
@@ -150,7 +150,7 @@
                             </div>
                             <div class="col-sm-2 padding-xs-0">
                                 <div class="form-group">
-                                    @Html.Label("Notificación de pago parcial o total", new { @class = "control-label" })
+                                    @Html.Label("Notificación de pago", new { @class = "control-label" })
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired, defaultHtmlAttr)
                                 </div>
                             </div>
@@ -190,7 +190,7 @@
                             </div>
                             <div class="col-sm-2 padding-xs-0">
                                 <div class="form-group">
-                                    @Html.Label("Recibo del bien o prestación del servicio", new { @class = "control-label" })
+                                    @Html.Label("Recibo del bien", new { @class = "control-label" })
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptServiceTotalAcceptedRequired, defaultHtmlAttr)
                                 </div>
                             </div>
@@ -247,7 +247,7 @@
                             </div>
                             <div class="col-sm-2 padding-xs-0">
                                 <div class="form-group">
-                                    @Html.Label("Notificación de pago parcial o total", new { @class = "control-label" })
+                                    @Html.Label("Notificación de pago", new { @class = "control-label" })
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired, defaultHtmlAttr)
                                 </div>
                             </div>

@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ namespace Gosocket.Dian.Interfaces.Services
 {
     public interface IRadianApprovedService
     {
-        List<Domain.RadianOperationMode> ListSoftwareModeOperation();
+       // List<Domain.RadianOperationMode> ListSoftwareModeOperation();
 
         List<RadianContributor> ListContributorByType(int radianContributorTypeId);
 
@@ -40,6 +41,9 @@ namespace Gosocket.Dian.Interfaces.Services
 
         RadianTestSetResult RadianTestSetResultByNit(string nit);
 
-        RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId);        
+        RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId);
+
+        List<Software> SoftwareList(int radianContributorId);
+        List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term);
     }
 }

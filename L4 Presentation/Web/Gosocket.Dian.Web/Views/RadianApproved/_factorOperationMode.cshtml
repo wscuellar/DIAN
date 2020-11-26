@@ -6,7 +6,7 @@
     var classMarginTop = operationMode == "2" ? "margin-top-50" : "";
 }
 
-<div class="page-content radian-view margin-15">
+<div class="page-content radian-view margin-20">
     <div class="row title-container">
         <p class="title-view">
             @ViewBag.title
@@ -18,7 +18,7 @@
         }
 
     </div>
-    <div class="row @classMarginTop">
+    <div class="@classMarginTop">
         <div class="panel">
             <div class="panel-body padding-top-20">
                 <div class="pad-btm padding-bottom-0">
@@ -37,8 +37,8 @@
                                             <div class="row">
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.OperationModeSelected, new { @class = "control-label" })
-                                                        @Html.DropDownListFor(m => m.OperationModeSelected, new SelectList(Model.OperationModeList, "Id", "Name", Model.OperationModeSelected), new { @class = "form-control selectpicker" })
+                                                        @Html.LabelFor(m => m.OperationModeSelectedId, new { @class = "control-label" })
+                                                        @Html.DropDownListFor(m => m.OperationModeSelectedId, Model.OperationModes, " ", new { @class = "form-control selectpicker input-general" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-5 padding-xs-0">
@@ -53,32 +53,51 @@
                                                 <h4 class="panel-title-radian padding-0"><strong>Datos de la Empresa y Software</strong></h4>
                                                 <hr class="margin-5" />
 
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.Software.CreatedBy, new { @class = "form-control input-general", disabled = "disabled" })
+                                                @if (operationMode == "2")
+                                                {
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
+                                                            @Html.TextBoxFor(model => Model.CustomerName, new { @class = "form-control  input-general" })
+                                                            @Html.HiddenFor(model => Model.CustomerID)
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                        @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+                                                            <select id="SoftwareNameList" class="form-control input-general"></select>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        @Html.LabelFor(m => m.SoftwarePin, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.SoftwarePin, new { @id = "SoftwarePin", @name = "SoftwarePin", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                        @Html.ValidationMessageFor(m => m.SoftwarePin, null, new { @class = "text-danger" })
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
+                                                            @Html.TextBoxFor(m => m.Software.CreatedBy, new { @class = "form-control input-general", disabled = "disabled" })
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        @Html.Label("ID del Software", new { @class = "control-label" })
-                                                        @Html.TextBox("SoftwareId", Guid.NewGuid().ToString(), new { @class = "form-control input-general", disabled = "disabled" })
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+                                                            @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
+                                                            @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.LabelFor(m => m.SoftwarePin, new { @class = "control-label" })
+                                                            @Html.TextBoxFor(m => m.SoftwarePin, new { @id = "SoftwarePin", @name = "SoftwarePin", @class = "form-control input-general", @style = "background: #ffffff;" })
+                                                            @Html.ValidationMessageFor(m => m.SoftwarePin, null, new { @class = "text-danger" })
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3 padding-xs-0">
+                                                        <div class="form-group">
+                                                            @Html.Label("ID del Software", new { @class = "control-label" })
+                                                            @Html.TextBox("SoftwareId", Guid.NewGuid().ToString(), new { @class = "form-control input-general", disabled = "disabled" })
+                                                        </div>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
 
@@ -91,7 +110,7 @@
                             </div>
                         }
 
-                        <div class="panel">
+                        <div id="table-modes" data-target="#table-modes" data-toggle="panel-overlay" class="panel">
                             <div class="panel-heading">
                                 <h4 class="panel-title-radian padding-0"><strong>Listado de modos de operación asociados</strong></h4>
                                 <hr class="margin-5" />
@@ -114,20 +133,18 @@
                                         <tbody>
                                             @foreach (var oper in Model.RadianContributorOperations.RadianContributorOperations)
                                             {
-                                                var software = @Model.RadianContributorOperations.Softwares.Where(s => s.ContributorId == oper.RadianContributorId).First();
-
                                                 <tr>
-                                                    <td class="smallText iffyTip">@oper.RadianOperationMode.Name</td>
+                                                    <td class="smallText iffyTip">Se quito debe arreglarse</td>
                                                     <td class="smallText iffyTip">@oper.Timestamp.ToString("dd/MM/yyy")</td>
                                                     <td class="largeText iffyTip">
                                                         @{
-                                                            if (software.Status)
+                                                            if (oper.Software.Status)
                                                             {
                                                                 <p>Aceptado</p>
                                                             }
                                                             else
                                                             {
-                                                                if (software.Deleted)
+                                                                if (oper.Software.Deleted)
                                                                 {
                                                                     <p>Rechazado</p>
                                                                 }
@@ -138,11 +155,11 @@
                                                             }
                                                         }
                                                     </td>
-                                                    <td class="largeText iffyTip">@oper.SoftwareName</td>
-                                                    <td class="largeText iffyTip">@oper.SoftwareId</td>
-                                                    <td class="largeText iffyTip">@oper.Pin</td>
-                                                    <td class="largeText iffyTip">@oper.Url</td>
-                                                    <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer"><span ><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
+                                                    <td class="largeText iffyTip">arreglar</td>
+                                                    <td class="largeText iffyTip">@oper.Software.Id</td>
+                                                    <td class="largeText iffyTip">@oper.Software.Pin</td>
+                                                    <td class="largeText iffyTip">@oper.Software.Url</td>
+                                                    <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer delete-software"><span><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
                                                     <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = Model.Contributor.RadianContributorTypeId})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
                                                 </tr>
                                             }

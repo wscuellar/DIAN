@@ -128,6 +128,9 @@ namespace Gosocket.Dian.Application
         }
 
 
+       
+
+
         public RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size)
         {
             string cancelState = Domain.Common.RadianState.Cancelado.GetDescription();
@@ -180,6 +183,7 @@ namespace Gosocket.Dian.Application
                 {
                     Contributor = new RedianContributorWithTypes()
                     {
+                        RadianContributorId =  c.Id,
                         Id = c.Contributor.Id,
                         Code = c.Contributor.Code,
                         TradeName = c.Contributor.Name,

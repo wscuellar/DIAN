@@ -365,6 +365,7 @@
     <Compile Include="Models\AccountTwoFactorViewModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdminRadianViewModel.cs" />
+    <Compile Include="Models\AutoListModel.cs" />
     <Compile Include="Models\ParametersDataViewModel.cs" />
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
@@ -580,6 +581,12 @@
     <Content Include="Content\images\thumb-200x100.jpg" />
     <Content Include="Content\images\thumb-200x100.png" />
     <Content Include="Content\images\trash-alt.png" />
+    <Content Include="Content\images\ui-icons_444444_256x240.png" />
+    <Content Include="Content\images\ui-icons_555555_256x240.png" />
+    <Content Include="Content\images\ui-icons_777620_256x240.png" />
+    <Content Include="Content\images\ui-icons_777777_256x240.png" />
+    <Content Include="Content\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
     <Content Include="Content\images\Validado-1.png" />
     <Content Include="Content\images\Validado-2.png" />
     <Content Include="Content\images\Validado-3.png" />
@@ -657,7 +664,12 @@
     <Content Include="Content\img\video_advance.png" />
     <Content Include="Content\img\visa.png" />
     <Content Include="Content\img\walmart.png" />
+    <Content Include="Content\jquery-ui.css" />
+    <Content Include="Content\jquery-ui.structure.css" />
+    <Content Include="Content\jquery-ui.theme.css" />
     <Content Include="Content\jquery.steps.css" />
+    <Content Include="Content\js\autocomplete.js" />
+    <Content Include="Content\js\autocomplete.min.js" />
     <Content Include="Content\js\bootstrap-datepicker.es.min.js" />
     <Content Include="Content\js\bootstrap-filestyle.js" />
     <Content Include="Content\js\bootstrap-filestyle.min.js" />
@@ -699,6 +711,7 @@
     <Content Include="Content\js\nifty.min.js" />
     <Content Include="Content\js\Radian\constants.js" />
     <Content Include="Content\js\Radian\RadianIndex.js" />
+    <Content Include="Content\js\Radian\RadianOperationMode.js" />
     <Content Include="Content\js\Radian\RadianTestSet.js" />
     <Content Include="Content\js\user\user.js" />
     <Content Include="Content\plugins\animate-css\animate.css" />
@@ -2625,6 +2638,7 @@
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery-tooltipify.js" />
     <Content Include="Scripts\jquery-tooltipify.min.js" />
+    <Content Include="Scripts\jquery-ui.js" />
     <Content Include="Scripts\jquery.steps.js" />
     <Content Include="Scripts\jquery.steps.min.js" />
     <Content Include="Scripts\jquery.validate.js" />

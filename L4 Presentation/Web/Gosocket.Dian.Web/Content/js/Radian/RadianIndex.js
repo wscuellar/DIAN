@@ -85,7 +85,7 @@ function AlertExec(operation) {
         del: {
             label: "Aceptar",
             className: "btn-radian-default",
-            callback: function () {
+            callback: function () {debugger
                 operation != null && operation();
                 operationClick = false;
             }
@@ -94,7 +94,7 @@ function AlertExec(operation) {
 }
 
 
-function ajaxFunction(url,metod,data,actionError,actionSuccess) {debugger
+function ajaxFunction(url,metod,data,actionError,actionSuccess) {
     $.ajax({
         url: url,
         type: metod,
@@ -103,36 +103,6 @@ function ajaxFunction(url,metod,data,actionError,actionSuccess) {debugger
         success: actionSuccess
     });
 }
-
-function DeleteOperationMode(url) {
-    $("#delete-software").click(function () {
-        var metod = 'POST';
-        var data = {
-                Id:  $(this).attr("data-id")
-            }
-        var actionError = () => { }
-        var actionSuccess = () => {
-            location.reload();
-        }
-        ajaxFunction(url, metod, data, actionError, actionSuccess)
-    })
-}
-
-function AddOperationMode(url, contributorId, radianTypeId) {
-    $("#save-operation-mode").click(function () {
-        var metod = 'POST';
-        var data = {
-            ContributorId: contributorId,
-            RadianTypeId: radianTypeId
-        }
-        var actionError = () => { }
-        var actionSuccess = () => {
-            location.reload();
-        }
-        ajaxFunction(url, metod, data, actionError, actionSuccess)
-    })
-}
-
 
 function SetIconsList(fileId) {
     var myOptions = [

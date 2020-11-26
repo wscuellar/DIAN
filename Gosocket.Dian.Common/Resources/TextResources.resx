@@ -153,6 +153,9 @@
   <data name="Event_ValidationTitle" xml:space="preserve">
     <value>Validaciones del Evento</value>
   </data>
+  <data name="ExistingSoftware" xml:space="preserve">
+    <value>El participante ya tiene asociado el software asignado!!!</value>
+  </data>
   <data name="Factor_Confirm" xml:space="preserve">
     <value>¿Está seguro que desea operar como Factor?</value>
   </data>
@@ -180,11 +183,17 @@
   <data name="RegisteredParticipant" xml:space="preserve">
     <value>El participante ya se encuentra registrado en RADIAN</value>
   </data>
+  <data name="RequiredSoftware" xml:space="preserve">
+    <value>El software es un campo obligatorio</value>
+  </data>
   <data name="SolicitudDisponibilizacion" xml:space="preserve">
     <value>Solicitud de Primera Disponibilización</value>
   </data>
   <data name="SolicitudDisponibilizacion1" xml:space="preserve">
     <value>Solicitud de Disponibilización Posterior</value>
+  </data>
+  <data name="SuccessSoftware" xml:space="preserve">
+    <value>Datos actualizados correctamente.</value>
   </data>
   <data name="TechnologProviderDisabled" xml:space="preserve">
     <value>El participante no es un proveedor tecnológico habilitado</value>

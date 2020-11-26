@@ -22,7 +22,12 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public RadianContributor Get(Expression<Func<RadianContributor, bool>> expression)
         {
-            IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode").Include("RadianContributorFile");
+            IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression)
+                .Include("Contributor")
+                .Include("RadianContributorType")
+                .Include("RadianOperationMode")
+                .Include("RadianContributorFile")
+                .Include("RadianContributorOperations");
             return query.FirstOrDefault();
         }
 
@@ -35,7 +40,12 @@ namespace Gosocket.Dian.DataContext.Repositories
         /// <returns></returns>
         public PagedResult<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0)
         {
-            IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode").Include("RadianContributorFile");
+            IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression)
+                .Include("Contributor")
+                .Include("RadianContributorType")
+                .Include("RadianOperationMode")
+                .Include("RadianContributorFile")
+                .Include("RadianContributorOperations");
             return query.Paginate(page, length, t => t.Id.ToString());
         }
 

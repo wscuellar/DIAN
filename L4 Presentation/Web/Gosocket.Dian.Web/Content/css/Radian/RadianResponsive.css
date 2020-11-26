@@ -18,7 +18,7 @@
     .modal-dialog {
         min-width: 800px;
     }
-    .panel-body {
+    .modal .panel-body {
         padding-left: 0;
     }
 }

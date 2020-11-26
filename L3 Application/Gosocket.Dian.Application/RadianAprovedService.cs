@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
@@ -97,11 +98,11 @@ namespace Gosocket.Dian.Application
             return softwares;
         }
 
-        public List<RadianOperationMode> ListSoftwareModeOperation()
-        {
-            List<RadianOperationMode> list = _radianTestSetService.OperationModeList();
-            return list;
-        }
+        //public List<RadianOperationMode> ListSoftwareModeOperation()
+        //{
+        //    List<RadianOperationMode> list = _radianTestSetService.OperationModeList();
+        //    return list;
+        //}
 
         public RadianContributor GetRadianContributor(int radianContributorId)
         {
@@ -200,24 +201,54 @@ namespace Gosocket.Dian.Application
 
         public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
         {
-            return _radianContributorOperationRepository.Add(radianContributorOperation);
+            var existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == t.SoftwareId &&  !t.Deleted);
+            return (existingsoft == null) ? _radianContributorOperationRepository.Add(radianContributorOperation) : 0;
         }
 
         public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
         {
             RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
-
             radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId && t.Deleted == false);
-
-            int code = (int)radianContributorOperationWithSoftware.RadianContributorOperations.FirstOrDefault().RadianProviderId;
-            radianContributorOperationWithSoftware.Softwares = _radianCallSoftwareService.GetSoftwares(code);
-
+            radianContributorOperationWithSoftware.Softwares = radianContributorOperationWithSoftware.RadianContributorOperations.Select(t => t.Software).ToList();
             return radianContributorOperationWithSoftware;
         }
 
         public RadianTestSetResult RadianTestSetResultByNit(string nit)
         {
             return _radianTestSetResultService.GetTestSetResultByNit(nit).FirstOrDefault();
-        }        
+        }
+
+        /// <summary>
+        /// Metodo encargado de filtrar los software disponibles de acuerdo el modo de seleccion.
+        /// </summary>
+        /// <param name="contributorId"></param>
+        /// <param name="contributorTypeId"></param>
+        /// <param name="operationMode"></param>
+        /// <param name="term"></param>
+        /// <returns></returns>
+        public List<Software> SoftwareList(int radianContributorId)
+        {
+            List<RadianContributor> participants;
+            participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.Contributor.Softwares.Any()).Results;
+            return participants.Select(t => t.Contributor).Aggregate(new List<Software>(), (list, source) =>
+            {
+                list.AddRange(source.Softwares.ToList());
+                return list;
+            }).Distinct().ToList();
+        }
+
+        public List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
+        {
+            List<RadianContributor> participants;
+            if (softwareType == RadianOperationModeTestSet.OwnSoftware)
+                participants = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.BusinessName.Contains(term)).Results;
+            else
+            {
+                string radianState = RadianState.Habilitado.GetDescription();
+                participants = _radianContributorRepository.List(t => t.RadianState == radianState && t.RadianContributorTypeId == (int)softwareType && t.Contributor.BusinessName.Contains(term)).Results;
+
+            }
+            return participants.Distinct().ToList();
+        }
     }
 }
