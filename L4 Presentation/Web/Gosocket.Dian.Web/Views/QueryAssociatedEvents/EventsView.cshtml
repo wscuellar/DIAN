@@ -117,6 +117,12 @@
         width: 100%;
         margin-left: 0px !important;
     }
+
+    .notification-tooltip {
+        width: 400%;
+        height: 512%;
+        font-size: 0.5vw;
+    }
 </style>
 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
@@ -237,19 +243,12 @@
                                     {
                                         <tr>
                                             <td>@item.RuleName</td>
-                                            <td class="text-right right-section"><a data-toggle="tooltip" data-placement="top" title="@item.Message"><i class="fa fa-info-circle "></i> @item.Status</a></td>
-                                            @*<td class="text-right right-section tooltip">
-                                                <a data-toggle="tooltip" data-placement="top" title="">
-                                                    <i class="fa fa-info-circle"></i>
-                                                    @item.Status
-                                                    <span>consulte el comentario de la DIAN</span>
+                                            <td class="text-right right-section">
+                                                <u class="underline-reject-text tooltip">
+                                                    <span><i class="fa fa-info-circle"> </i> @item.Status</span>
                                                     <span class="tooltiptext">@item.Message</span>
-                                                </a>
-                                            </td>*@
-                                            @*<u class="underline-reject-text tooltip">
-                                                    <span>consulte el comentario de la DIAN</span>
-                                                    <span class="tooltiptext">@n.Comments</span>
-                                                </u>*@
+                                                </u>
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
