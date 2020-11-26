@@ -971,7 +971,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 Task secondLocalRun = Task.Run(() =>
                 {
-                    documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                    documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude.ToLower(), trackIdCude.ToLower());
                     //var prefix = !string.IsNullOrEmpty(serie) ? serie : string.Empty;
                     message = $"La {documentMeta.DocumentTypeName} {serieAndNumber}, ha sido autorizada."; // (string.IsNullOrEmpty(prefix)) ? $"La {documentMeta.DocumentTypeName} {serieAndNumber}, ha sido autorizada." : $"La {documentMeta.DocumentTypeName} {prefix}-{number}, ha sido autorizada.";
                     existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
@@ -1506,8 +1506,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var ReceiverParty = receiverCode;
             var ResponseCode = eventCode;
             var ListID = listID;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, trackIdCude, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });            
-
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, trackIdCude, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
+            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

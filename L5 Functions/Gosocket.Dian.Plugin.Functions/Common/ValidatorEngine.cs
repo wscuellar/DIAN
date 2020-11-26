@@ -278,7 +278,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 throw new Exception(xmlParserCufe.ParserError);
 
             //Obtiene XML ApplicationResponse CUDE
-            var xmlBytesCude = await GetXmlFromStorageAsync(party.TrackIdCude);
+            var xmlBytesCude = await GetXmlFromStorageAsync(party.TrackIdCude.ToLower());
             xmlParserCude = new XmlParser(xmlBytesCude);
             if (!xmlParserCude.Parser())
                 throw new Exception(xmlParserCude.ParserError);
