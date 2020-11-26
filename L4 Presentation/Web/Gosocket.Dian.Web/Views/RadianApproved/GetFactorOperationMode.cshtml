@@ -2,7 +2,9 @@
 
 @Html.Partial("_factorOperationMode")
 @{
+    string contributorType = Request.Params["RadianContributorType"];
     string operationMode = Request.Params["RadianOperationMode"];
+
 }
 @section Scripts{
 
@@ -11,10 +13,22 @@
 
     <script>
         $(document).ready(function () {
-            AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.Id, @Model.Contributor.RadianContributorTypeId);
+            var contributorId = @Model.Contributor.Id;
+            var contributorTypeId = parseInt(@contributorType);
+            var softwareType = "";
             DeleteOperationMode('@Url.Action("DeleteOperationMode", "RadianApproved")');
-            RenderAutocomplete('@Url.Action("AutoCompleteExternalData", "RadianApproved")');
             @operationMode != 2 && $("#OperationModeSelected").attr("disabled", "disabled");
+
+            $("#OperationModeSelectedId").change(function (value) {
+                var software = $("#OperationModeSelectedId").val();
+                RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
+
+            })
+
+            $("#save-operation-mode").click(function () {
+                softwareType = $("#SoftwareNameList").value();
+                AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.Id, @Model.Contributor.RadianContributorTypeId, softwareType);
+            })
         })
     </script>
 

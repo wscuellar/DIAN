@@ -37,8 +37,8 @@
                                             <div class="row">
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.OperationModeSelected, new { @class = "control-label" })
-                                                        @Html.DropDownListFor(m => m.OperationModeSelected, new SelectList(Model.OperationModeList, "Id", "Name", Model.OperationModeSelected), new { @class = "form-control selectpicker" })
+                                                        @Html.LabelFor(m => m.OperationModeSelectedId, new { @class = "control-label" })
+                                                        @Html.DropDownListFor(m => m.OperationModeSelectedId, Model.OperationModes, new { @class = "form-control selectpicker input-general" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-5 padding-xs-0">
@@ -58,14 +58,15 @@
                                                     <div class="col-sm-3 padding-xs-0">
                                                         <div class="form-group">
                                                             @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
-                                                            <input class="form-control basicAutoComplete" type="text" autocomplete="off">
+                                                            @Html.LabelFor(model => Model.CustomerName, new { @class = "control-label" })
+                                                            @Html.TextBoxFor(model => Model.CustomerName, new { @class = "form-control  input-general" })
+                                                            @Html.HiddenFor(model => Model.CustomerID)
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3 padding-xs-0">
                                                         <div class="form-group">
                                                             @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
-                                                            @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                            @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
+                                                            <select id="SoftwareNameList" class="form-control input-general"></select>
                                                         </div>
                                                     </div>
                                                 }
@@ -161,7 +162,7 @@
                                                     <td class="largeText iffyTip">@oper.SoftwareId</td>
                                                     <td class="largeText iffyTip"></td>
                                                     <td class="largeText iffyTip"></td>
-                                                    <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer"><span ><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
+                                                    <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer"><span><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
                                                     <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = Model.Contributor.RadianContributorTypeId})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
                                                 </tr>
                                             }

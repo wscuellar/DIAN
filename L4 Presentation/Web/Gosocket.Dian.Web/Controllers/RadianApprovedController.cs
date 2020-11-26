@@ -84,7 +84,8 @@ namespace Gosocket.Dian.Web.Controllers
                         CreatedBy = software.CreatedBy,
                         SoftwareId = software.Id,
                         SoftwareUrl = software.Url,
-                        OperationModeSelected = operationModeList.FirstOrDefault(o => o.Name.Equals("Software propio"))
+                        OperationModeSelectedId = operationModeList.FirstOrDefault().Id.ToString(),
+                        OperationModes = new SelectList(operationModeList, "Id", "Name")
                     };
                     return View("GetFactorOperationMode", radianApprovedOperationModeViewModel);
                 }
@@ -211,7 +212,8 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatedBy = software.CreatedBy,
                 SoftwareId = software.Id,
                 SoftwareUrl = software.Url,
-                OperationModeSelected = operationModeList.FirstOrDefault(o => o.Name.Equals("Software propio"))
+                OperationModeSelectedId = operationModeList.FirstOrDefault(o => o.Name.Equals("Software propio")).Id.ToString(),
+                OperationModes = new SelectList(operationModeList, "Id", "Name")
             };
 
             return View(radianApprovedOperationModeViewModel);
@@ -220,14 +222,14 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult UploadFactorOperationMode(int ContributorId,  int RadianTypeId, string softwareId)
         {
-            //RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId, RadianTypeId);
-            //_radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
-            //{
-            //    RadianContributorId = radianAdmin.Contributor.RadianContributorId,
-            //    Deleted = false,
-            //    Timestamp = DateTime.Now,
-            //    SoftwareId = new Guid(softwareId),
-            //});
+            RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId, RadianTypeId);
+            _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
+            {
+                RadianContributorId = radianAdmin.Contributor.Id,
+                Deleted = false,
+                Timestamp = DateTime.Now,
+                SoftwareId = new Guid(softwareId),
+            });
 
             return Json(
                 new
