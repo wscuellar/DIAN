@@ -225,7 +225,7 @@ namespace Gosocket.Dian.Web.Controllers
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId, RadianTypeId);
             _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
             {
-                RadianContributorId = radianAdmin.Contributor.Id,
+                RadianContributorId = radianAdmin.Contributor.RadianContributorId,
                 Deleted = false,
                 Timestamp = DateTime.Now,
                 SoftwareId = new Guid(softwareId),
