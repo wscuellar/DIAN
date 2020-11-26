@@ -251,7 +251,7 @@ namespace Gosocket.Dian.Application
             return participants.Distinct().ToList();
         }
 
-        public List<RadianContributor> CustormerList(int radianContributorId, RadianState radianState, int page, int pagesize)
+        public List<RadianContributor> CustormerList(int radianContributorId, string code, RadianState radianState, int page, int pagesize)
         {
             //traigo mi software
             RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorId);
@@ -263,6 +263,7 @@ namespace Gosocket.Dian.Application
             return (from s in radianContributor.Contributor.Softwares
                    from c in s.RadianContributorOperations
                    where c.SoftwareType != (int)RadianOperationModeTestSet.OwnSoftware
+                   && (string.IsNullOrEmpty(code) || c.RadianContributor.Contributor.Code == code)
                    && (string.IsNullOrEmpty(radianStateText) || c.RadianContributor.RadianState == radianStateText)
                     select c.RadianContributor).ToList();
 

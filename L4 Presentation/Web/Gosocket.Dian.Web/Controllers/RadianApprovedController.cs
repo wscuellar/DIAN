@@ -62,7 +62,7 @@ namespace Gosocket.Dian.Web.Controllers
             };
 
             //aqui se adiciona los clientes asociados.
-            var  customers=_radianAprovedService.CustormerList(radianAdmin.Contributor.RadianContributorId, RadianState.none, 1, 10);
+            var  customers=_radianAprovedService.CustormerList(radianAdmin.Contributor.RadianContributorId,string.Empty, RadianState.none, 1, 10);
             model.Customers = customers.Select(t => new RadianCustomerViewModel()
             {
                 BussinessName = t.Contributor.BusinessName,
@@ -311,9 +311,9 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(filteredItems, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult CustomersList(int radianContributorId, RadianState radianState,  int page, int pagesize)
+        public ActionResult CustomersList(int radianContributorId, string code, RadianState radianState,  int page, int pagesize)
         {
-            List<RadianContributor> customers = _radianAprovedService.CustormerList(radianContributorId, radianState,  page, pagesize);
+            List<RadianContributor> customers = _radianAprovedService.CustormerList(radianContributorId, code, radianState,  page, pagesize);
 
             List<RadianCustomerViewModel> customerModel = customers.Select(t => new RadianCustomerViewModel()
             {
