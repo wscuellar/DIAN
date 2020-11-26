@@ -14,9 +14,8 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         }
         public int Lenght { get; set; }
         public int Page { get; set; }
-        public int Nit { get; set; }
-        public int RadianApproveState { get; set; }
-        public int BussinessName { get; set; }
+        public string Nit { get; set; }
+        public string BussinessName { get; set; }
         public string RadianState { get; set; }
     }
 }

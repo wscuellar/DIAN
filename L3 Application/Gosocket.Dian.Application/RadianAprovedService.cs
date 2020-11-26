@@ -201,7 +201,7 @@ namespace Gosocket.Dian.Application
 
         public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
         {
-            var existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == t.SoftwareId &&  !t.Deleted);
+            var existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == t.SoftwareId && !t.Deleted);
             return (existingsoft == null) ? _radianContributorOperationRepository.Add(radianContributorOperation) : 0;
         }
 
@@ -249,6 +249,24 @@ namespace Gosocket.Dian.Application
 
             }
             return participants.Distinct().ToList();
+        }
+
+        public List<RadianContributor> CustormerList(int radianContributorId, RadianState radianState, int page, int pagesize)
+        {
+            //traigo mi software
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorId);
+            if (radianContributor == null)
+                return new List<RadianContributor>();
+
+            //si tengo miro cuales operaciones tengo quen no sean software propio
+            string radianStateText = radianState !=  RadianState.none ? radianState.GetDescription() : string.Empty;
+            return (from s in radianContributor.Contributor.Softwares
+                   from c in s.RadianContributorOperations
+                   where c.SoftwareType != (int)RadianOperationModeTestSet.OwnSoftware
+                   && (string.IsNullOrEmpty(radianStateText) || c.RadianContributor.RadianState == radianStateText)
+                    select c.RadianContributor).ToList();
+
+            //Falta paginar a este nivel.
         }
     }
 }

@@ -60,6 +60,18 @@ namespace Gosocket.Dian.Web.Controllers
                     Email = u.Email
                 }).ToList()
             };
+
+            //aqui se adiciona los clientes asociados.
+            var  customers=_radianAprovedService.CustormerList(radianAdmin.Contributor.RadianContributorId, RadianState.none, 1, 10);
+            model.Customers = customers.Select(t => new RadianCustomerViewModel()
+            {
+                BussinessName = t.Contributor.BusinessName,
+                Nit = t.Contributor.Code,
+                RadianState = t.RadianState,
+                Page =1,
+                Lenght = 10
+            }).ToList();
+            
             if ((int)registrationData.RadianOperationMode == 2)
             {
                 if (model.RadianState == "Habilitado")
@@ -100,10 +112,6 @@ namespace Gosocket.Dian.Web.Controllers
                                                         registrationData.RadianContributorType,
                                                         registrationData.RadianOperationMode,
                                                         User.UserName());
-
-
-
-
         }
 
         [HttpPost]
@@ -205,7 +213,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult UploadFactorOperationMode(int radianContributorId, string softwareId)
+        public JsonResult UploadFactorOperationMode(int radianContributorId, int softwareType, string softwareId)
         {
             int result = -1;
             if (softwareId != null)
@@ -215,6 +223,7 @@ namespace Gosocket.Dian.Web.Controllers
                     RadianContributorId = radianContributorId,
                     Deleted = false,
                     Timestamp = DateTime.Now,
+                    SoftwareType = softwareType,
                     SoftwareId = new Guid(softwareId),
                 });
             }
@@ -300,6 +309,22 @@ namespace Gosocket.Dian.Web.Controllers
             List<Software> softwares = _radianAprovedService.SoftwareList(radianContributorId);
             List<AutoListModel> filteredItems = softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
             return Json(filteredItems, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult CustomersList(int radianContributorId, RadianState radianState,  int page, int pagesize)
+        {
+            List<RadianContributor> customers = _radianAprovedService.CustormerList(radianContributorId, radianState,  page, pagesize);
+
+            List<RadianCustomerViewModel> customerModel = customers.Select(t => new RadianCustomerViewModel()
+            {
+                BussinessName = t.Contributor.BusinessName,
+                Nit = t.Contributor.Code,
+                RadianState = t.RadianState,
+                Page =page,
+                Lenght=pagesize
+            }).ToList();
+
+            return Json(customerModel, JsonRequestBehavior.AllowGet);
         }
 
     }
