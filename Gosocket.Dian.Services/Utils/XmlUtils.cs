@@ -267,22 +267,33 @@ namespace Gosocket.Dian.Services.Utils
         public static XElement BuildDocumentReferenceNode(GlobalDocValidatorDocumentMeta processResultEntity)
         {
             var ticketId = processResultEntity.DocumentKey;
-            
-            if(processResultEntity.DocumentTypeId == "96")
+
+            switch (processResultEntity.DocumentTypeId)
             {
-                return new XElement(cac + "DocumentReference",
-                      new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
-                      new XElement(cbc + "UUID", ticketId,
-                          new XAttribute("schemeName", "CUDE-SHA384")));
+                case "11":
+                case "12":
+                    {
+                        return new XElement(cac + "DocumentReference",
+                               new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
+                               new XElement(cbc + "UUID", ticketId,
+                                new XAttribute("schemeName", "CUNE-SHA384")));
+                    }
+                case "96":
+                    {
+                        return new XElement(cac + "DocumentReference",
+                              new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
+                              new XElement(cbc + "UUID", ticketId,
+                                  new XAttribute("schemeName", "CUDE-SHA384")));
+                    }
+                default:
+                    {
+                        return new XElement(cac + "DocumentReference",
+                               new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
+                               new XElement(cbc + "UUID", ticketId,
+                                   new XAttribute("schemeName", "CUFE-SHA384")));
+                    }
             }
-            else
-            {
-                return new XElement(cac + "DocumentReference",
-                       new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
-                       new XElement(cbc + "UUID", ticketId,
-                           new XAttribute("schemeName", "CUFE-SHA384")));
-            }
-           
+
         }
 
         public static XElement BuildResponseLineResponse(int line, long nsu)
