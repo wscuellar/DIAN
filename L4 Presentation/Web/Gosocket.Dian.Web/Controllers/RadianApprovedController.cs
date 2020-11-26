@@ -217,7 +217,7 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(
                 new
                 {
-                    messasge = message,
+                    message = message,
                     success = true,
                 }, JsonRequestBehavior.AllowGet);
         }

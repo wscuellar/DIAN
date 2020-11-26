@@ -1,5 +1,6 @@
 ﻿
 function DeleteOperationMode(url) {
+    showLoading('#table-modes', 'Cargando', 'Buscando datos, por favor espere.');
     $(".delete-software").click(function () {
         var metod = 'POST';
         var data = {
@@ -13,15 +14,18 @@ function DeleteOperationMode(url) {
     })
 }
 
-function AddOperationMode(url, contributorId, softwareId) {
+function AddOperationMode(url, contributorId, softwareId) {debugger
         var metod = 'POST';
         var data = {
             radianContributorId: contributorId,
             softwareId: softwareId
         }
         var actionError = () => { }
-        var actionSuccess = () => {
-            location.reload();
+        var actionSuccess = (response) => {debugger
+            var message = response.message;
+            var operation = () => { location.reload() };
+            var button = AlertExec(operation);
+            showConfirmation(message, button);
         }
         ajaxFunction(url, metod, data, actionError, actionSuccess);
 }

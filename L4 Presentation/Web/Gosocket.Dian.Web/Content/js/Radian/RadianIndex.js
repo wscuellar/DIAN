@@ -85,7 +85,7 @@ function AlertExec(operation) {
         del: {
             label: "Aceptar",
             className: "btn-radian-default",
-            callback: function () {
+            callback: function () {debugger
                 operation != null && operation();
                 operationClick = false;
             }
