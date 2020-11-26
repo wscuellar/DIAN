@@ -272,7 +272,7 @@
                     })
                 });
 
-            $(".cancel-register").click(function () {debugger
+            $(".cancel-register").click(function () {
                 var url = "@Url.Action("DeleteUser", "RadianApproved")";
                 var confirmationMessage = bootboxMessage.CONFIRMATION_MESSAGE;
                 var successAction = () => window.location.href = '@Url.Action("Index", "Radian")';

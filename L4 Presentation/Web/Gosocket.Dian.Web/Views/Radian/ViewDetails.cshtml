@@ -131,17 +131,18 @@
                     Id: idFile,
                     NewState: Number(newState)
                 };
-                var operation = () => {
+                var operation = (comment) => {
                     documentsEdited.push(objToAdd);
                 }
                 var operationCancel = () => {
                     $(element).parents("tr").children(".init-show").toggle();
                     $(element).parents("tr").children(".init-hide").toggle();
-                    var string = $(element).parents("tr").children(".edit-state").html() == "Editar" ? "Cancelar" : "Editar"
+                    var string = $(element).parents("tr").children("button.edit-state").html() == "Editar" ? "Cancelar" : "Editar"
                     $(element).parents("tr").children(".edit-state").html(string);
 
                 }
-                showConfirmation(confirmationMessage, ConfirmExec(operation, null, operationCancel));
+                ShowPromptCancel(confirmationMessage, operation, null, operationCancel);
+                //showConfirmation(confirmationMessage, ConfirmExec(operation, null, operationCancel));
             })
 
         });
