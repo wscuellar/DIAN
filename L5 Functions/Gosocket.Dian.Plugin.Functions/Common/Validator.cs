@@ -1901,7 +1901,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     else
                     {
                         switch (Convert.ToInt32(eventPrev.EventCode))
-                        {
+                        {                           
                             case (int)EventStatus.Rejected:   
                                 if (document != null)
                                 {
@@ -2053,9 +2053,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "89",
-                                            ErrorMessage = "No se pueda transmitir el evento (034) Aceptación Tácita de la factura," +
-                                            " Cuando ya existe un evento (033) Aceptación Expresa de la factura",
+                                            ErrorCode = "LGC05",
+                                            ErrorMessage = "No se puede generar una aceptación tácita sobre un documento que haya sido aceptada expresamente previamente",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
@@ -2556,8 +2555,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "La fecha de firma debe ser mayor a los tres días hábiles contados a partir de la fecha de la firma del evento transmitido 032",
+                            ErrorCode = "DC24e",
+                            ErrorMessage = "No se puede generar el evento antes de los 3 días hábiles de la fecha de generación del evento Recibo del bien y prestación del servicio.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
