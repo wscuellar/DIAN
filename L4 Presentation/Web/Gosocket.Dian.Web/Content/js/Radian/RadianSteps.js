@@ -34,7 +34,7 @@ function RenderSteps(index) {
                     required: "Solo documentos .PDF"
                 }
             });
-        } else {debugger
+        } else {
             $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").toggle();
             $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
@@ -51,7 +51,7 @@ function RenderSteps(index) {
     })
 }
 
-function RenderTable(element, data, form, urlSearch, radianId, tableRendered) {debugger
+function RenderTable(element, data, form, urlSearch, radianId, tableRendered) {
     tableRendered && tableRendered.destroy();
     var table = $(element).DataTable({
         data: data,
