@@ -945,9 +945,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
-            string valueDiscountRateEndoso = xmlParserCude.DiscountRateEndoso;
-            string valuePriceToPay = xmlParserCude.PriceToPay;
-            string valueTotalEndoso = xmlParserCude.TotalEndoso;
+            string valueTotalEndoso = xmlParserCude.ValorTotalEndoso;
+            string valuePriceToPay = xmlParserCude.PrecioPagarseFEV;
+            string valueDiscountRateEndoso = xmlParserCude.TasaDescuento;            
             string valueTotalInvoice = xmlParserCufe.TotalInvoice;
 
             //Valida informacion Endoso 

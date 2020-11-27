@@ -29,15 +29,16 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string CustomizationID { get; set; }
         public string DocumentReferenceId { get; set; }
         public string PaymentMeansID { get; set; }
-        public string PaymentDueDate { get; set; }
-        public string DiscountRateEndoso { get; set; }
-        public string PriceToPay { get; set; }
-        public string TotalEndoso { get; set; }
+        public string PaymentDueDate { get; set; }                 
         public string TotalInvoice { get; set; }
         public string ListID { get; set; }
         public string DocumentID { get; set; }
         public string NoteMandato { get; set; }
         public string UBLVersionID { get; set; }
+        public string ValorTotalEndoso { get; set; }
+        public string PrecioPagarseFEV { get; set; }
+        public string TasaDescuento { get; set; }
+        public string MedioPago { get; set; }
 
         public XmlParser()
         {
@@ -84,8 +85,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var nodePaymentMeansValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='ID']";                    
                     var nodePaymentDueDateValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='PaymentDueDate']";
                     var listIDValueXpath = XmlDocument.GetElementsByTagName("cbc:ResponseCode")[0];
-                    var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";
-                    var valueDiscountRateEndoso = XmlDocument.GetElementsByTagName("InformacionNegociacion")[0];
+                    var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";                    
                     var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
                     var valueNote = "//*[local-name()='Note']";
 
@@ -99,22 +99,14 @@ namespace Gosocket.Dian.Services.Utils.Common
                     SigningTime = node?.InnerText;
                     PaymentMeansID = nodePaymentMeans;
                     DocumentReferenceId = documentReferenceId;
-                    PaymentDueDate = nodePaymentDueDate;
-                    DiscountRateEndoso = valueDiscountRateEndoso?.InnerText;
-
-                    if(DiscountRateEndoso != null)
-                    {
-                        //string[] datos = DiscountRateEndoso.Split(new string[] { "\r\n\t\t\t\t\t", "\r\n\t\t\t\t", " " }, StringSplitOptions.None);
-                        string auxD = DiscountRateEndoso.Replace("\r\n\t\t\t\t\t", " ");
-                        string[] datos = auxD.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                        DiscountRateEndoso = datos[5];
-                        PriceToPay = datos[3];
-                        TotalEndoso = datos[1];
-                    }
+                    PaymentDueDate = nodePaymentDueDate;    
+                    
+                    //Valor total factura
                     if(nodeTotalInvoice != null)
                     {
                         TotalInvoice = nodeTotalInvoice;
                     }
+                    //Nota del mandato
                     if (valueNoteMandato != null)
                     {
                         NoteMandato = valueNoteMandato;
