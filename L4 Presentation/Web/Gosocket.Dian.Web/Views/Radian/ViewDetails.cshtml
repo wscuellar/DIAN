@@ -131,14 +131,14 @@
                     Id: idFile,
                     NewState: Number(newState)
                 };
-                var operation = (comment) => {
-                    documentsEdited.push(objToAdd);
+                var operation = (comment) => {debugger
+                    documentsEdited.push({ ...objToAdd, comment });
                 }
-                var operationCancel = () => {
+                var operationCancel = () => {debugger
                     $(element).parents("tr").children(".init-show").toggle();
                     $(element).parents("tr").children(".init-hide").toggle();
-                    var string = $(element).parents("tr").children("button.edit-state").html() == "Editar" ? "Cancelar" : "Editar"
-                    $(element).parents("tr").children(".edit-state").html(string);
+                    var string = $(element).parents("tr").children("td.edit-state-td").children("button.edit-state").html() == "Editar" ? "Cancelar" : "Editar"
+                    $(element).parents("tr").children("td.edit-state-td").children("button.edit-state").html(string);
 
                 }
                 ShowPromptCancel(confirmationMessage, operation, null, operationCancel);

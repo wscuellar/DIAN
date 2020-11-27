@@ -201,7 +201,7 @@ namespace Gosocket.Dian.Application
 
         public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation)
         {
-            var existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == t.SoftwareId &&  !t.Deleted);
+            var existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == t.SoftwareId && !t.Deleted);
             return (existingsoft == null) ? _radianContributorOperationRepository.Add(radianContributorOperation) : 0;
         }
 
@@ -249,6 +249,28 @@ namespace Gosocket.Dian.Application
 
             }
             return participants.Distinct().ToList();
+        }
+
+        public List<RadianContributor> CustormerList(int radianContributorId, string code, RadianState radianState, int page, int pagesize)
+        {
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorId);
+            if (radianContributor == null)
+                return new List<RadianContributor>();
+
+            string radianStateText = radianState != RadianState.none ? radianState.GetDescription() : string.Empty;
+            List<int> customersId = (
+                                    from s in radianContributor.Contributor.Softwares
+                                    from c in s.RadianContributorOperations
+                                    where 
+                                            c.SoftwareType != (int)RadianOperationModeTestSet.OwnSoftware
+                                        && (string.IsNullOrEmpty(code) || c.RadianContributor.Contributor.Code == code)
+                                    select c.RadianContributorId).ToList();
+
+            var customers = _radianContributorRepository.List(c => customersId.Any(x => x == c.Id)
+                  && (string.IsNullOrEmpty(radianStateText) || c.RadianState == radianStateText)
+            , page, pagesize);
+
+            return customers.Results;
         }
     }
 }

@@ -14,10 +14,11 @@ function DeleteOperationMode(url) {
     })
 }
 
-function AddOperationMode(url, contributorId, softwareId) {
+function AddOperationMode(url, contributorId, softwareType, softwareId) {
         var metod = 'POST';
         var data = {
             radianContributorId: contributorId,
+            softwareType: softwareType,
             softwareId: softwareId
         }
         var actionError = () => { }
