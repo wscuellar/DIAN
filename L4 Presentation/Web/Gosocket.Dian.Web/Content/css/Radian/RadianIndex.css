@@ -428,12 +428,12 @@ i.fa-info-circle {
     display: none;
 }
 
-    .init-hide input {
-        color: #2458C5;
-        font-weight: bold;
-        text-overflow: ellipsis;
-        padding-right: 194px;
-    }
+.file-input-disabled input {
+    color: #2458C5;
+    font-weight: bold;
+    text-overflow: ellipsis;
+    padding-right: 194px;
+}
 
 .modal-footer {
     border: none;
@@ -974,12 +974,6 @@ span.close {
     width: 100% !important;
     text-align: left !important;
 }
-
-    .dataTables_filter label {
-        text-align: left !important;
-        width: 30% !important;
-        margin-right: 46px;
-    }
 
 .dataTable th {
     font-weight: lighter !important;

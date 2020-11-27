@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain.Entity;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Gosocket.Dian.Web.Utils;
 
 namespace Gosocket.Dian.Web.Models.RadianApproved
 {
@@ -50,5 +51,11 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         public List<UserViewModel> LegalRepresentativeList { get; set; }
 
         public RadianApprovedViewModel() => RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
+       
+        [Display(Name = "Nit Facturador")]
+        public string NitSearch { get; set; }
+
+        [Display(Name = "Estado de aprobación")]
+        public RadianUtil.UserStates RadianStateSelect { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿function RenderSteps(index) {
+﻿
+function RenderSteps(index) {
     $("#steps-approved").steps({
         headerTag: "h3",
         bodyTag: "section",
@@ -26,16 +27,17 @@
                 }
             });
         }
-        else {
-            $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
-        }
-        if (fileObj.type != "application/pdf") {
+        else if (fileObj.type != "application/pdf") {
             $(this).val("");
             messages = Object.assign(messages, {
                 [id]: {
                     required: "Solo documentos .PDF"
                 }
             });
+        } else {debugger
+            $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
+            $(this).parents(".inputs-dinamics").children(".file-input-disabled").toggle();
+            $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
         }
         form.validate({
             messages: messages
@@ -49,6 +51,57 @@
     })
 }
 
-function LoadEventsToSearch() {
+function RenderTable(element, data, form, urlSearch, radianId, tableRendered) {debugger
+    tableRendered && tableRendered.destroy();
+    var table = $(element).DataTable({
+        data: data,
+        language: {
+            "lengthMenu": "Mostrar _MENU_ elementos por página",
+            "zeroRecords": "No se encontraron datos",
+            "info": "Mostrando página _PAGE_ de _PAGES_",
+            "infoEmpty": "No hay datos",
+            "infoFiltered": "(Filtrado de _MAX_ registros)",
+            "search": "Nit Facturador",
+            "paginate": {
+                "next": ">",
+                "previous": "<"
+            }
+        }
+    });
+    $("#table-customers_filter > label").hide();
+    $("#table-customers_filter").append(form);
+    LoadEventsToSearch(urlSearch, radianId, form, table);
+}
 
+function LoadEventsToSearch(url, radianContributorId, form, table) {
+    $("#search-customers").click(function (e) {
+        e.preventDefault();
+        var nit = $("#NitSearch").val();
+        var state = $("#RadianStateSelect").val();
+        var data = {
+            radianContributorId,
+            code: nit,
+            radianState: state,
+            page: 1,
+            pagesize: 10
+        };
+        var dataTable = [
+            [
+                "Tiger Nixon",
+                "System Architect",
+                "Edinburgh"
+            ],
+            [
+                "Garrett Winters",
+                "Director",
+                "Edinburgh"
+            ]
+        ];
+        var actionError = () => {}
+        var actionSuccess = (response) => {
+            RenderTable('#table-customers', dataTable, form, url, radianContributorId, table)
+        }
+        ajaxFunction(url, 'POST', data, actionError, actionSuccess);
+       
+    })
 }
