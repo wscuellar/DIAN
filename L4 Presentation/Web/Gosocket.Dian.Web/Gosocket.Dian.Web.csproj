@@ -712,6 +712,7 @@
     <Content Include="Content\js\Radian\constants.js" />
     <Content Include="Content\js\Radian\RadianIndex.js" />
     <Content Include="Content\js\Radian\RadianOperationMode.js" />
+    <Content Include="Content\js\Radian\RadianSteps.js" />
     <Content Include="Content\js\Radian\RadianTestSet.js" />
     <Content Include="Content\js\user\user.js" />
     <Content Include="Content\plugins\animate-css\animate.css" />
@@ -2860,6 +2861,7 @@
     <Content Include="Views\RadianApproved\_setTestDetails.cshtml" />
     <Content Include="Views\RadianApproved\SetTestDetails.cshtml" />
     <Content Include="Views\RadianApproved\_users.cshtml" />
+    <Content Include="Views\RadianApproved\_formSearch.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -90,76 +90,35 @@
     <script>
         $(document).ready(function () {
 
-                var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
-                $("#steps-approved").steps({
-                    headerTag: "h3",
-                    bodyTag: "section",
-                    transitionEffect: "slideLeft",
-                    autoFocus: true,
-                    startIndex: index,
-                    enablePagination: false,
-                    enableKeyNavigation: false
-                });
+            var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
+            RenderSteps(index);
 
-                $(".radian-file").click(function (file) {
-                    $(this).val("");
-                });
-            $(".radian-file").change(function (file) {
-                var form = $("#uploadForm");
-                var messages = new Object();
-                var id = $(this).attr('name');
-                var fileObj = file.target.files[0];
-                var fileSize = Math.round(fileObj.size / 10000) / 100;
-                if (fileSize > 10) {
-                    $(this).val("");
-                    messages = Object.assign(messages, {
-                        [id]: {
-                            required: "Tamaño máximo 10 Mb."
-                        }
-                    });
-                }
-                else {
-                    $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
-                }
-                if (fileObj.type != "application/pdf") {
-                    $(this).val("");
-                    messages = Object.assign(messages, {
-                        [id]: {
-                            required: "Solo documentos .PDF"
-                        }
-                    });
-                }
-                form.validate({
-                    messages: messages
-                });
-                form.valid();
-                });
 
-                $(".show-history").click(function () {
-                    var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
-                    var dialog = bootbox.dialog({
-                        message: htmlPartial,
-                        className: "table-data modal-radian",
-                        size: 'large'
-                    });
-                    dialog.init(function (e) {
-                        $('#table-history').DataTable({
-                            "language": {
-                                "lengthMenu": "Mostrar _MENU_ elementos por página",
-                                "zeroRecords": "No se encontraron datos",
-                                "info": "Mostrando página _PAGE_ de _PAGES_",
-                                "infoEmpty": "No hay datos",
-                                "infoFiltered": "(Filtrado de _MAX_ registros)",
-                                "search": "Requisito:",
-                                "paginate": {
-                                    "next": ">",
-                                    "previous": "<"
-                                }
-                            }
-                        });
-                        $("#table-history_filter").append("<button class='btn btn-radian-success'>Buscar</button>");
-                    } )
+        $(".show-history").click(function () {
+            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
+            var dialog = bootbox.dialog({
+                message: htmlPartial,
+                className: "table-data modal-radian",
+                size: 'large'
+            });
+            dialog.init(function (e) {
+                $('#table-history').DataTable({
+                    "language": {
+                        "lengthMenu": "Mostrar _MENU_ elementos por página",
+                        "zeroRecords": "No se encontraron datos",
+                        "info": "Mostrando página _PAGE_ de _PAGES_",
+                        "infoEmpty": "No hay datos",
+                        "infoFiltered": "(Filtrado de _MAX_ registros)",
+                        "search": "Requisito:",
+                        "paginate": {
+                            "next": ">",
+                            "previous": "<"
+                        }
+                    }
                 });
+                $("#table-history_filter").append("<button class='btn btn-radian-success'>Buscar</button>");
+            })
+        });
 
             $('.submit-button').click(function (e) {
                 var form = $("#uploadForm");
@@ -237,13 +196,7 @@
                         },
                     });
                     }
-
                 });
-
-                $(".close").click(function () {
-                    $(this).parent().toggle();
-                    $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
-                })
 
                 $("#view-costumers").click(function () {
                     var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));
@@ -253,7 +206,8 @@
                         size: 'large'
                     });
                     dialog.init(function (e) {
-                        $('#table-history').DataTable({
+                        LoadEventsToSearch();
+                        $('#table-customers').DataTable({
                             "language": {
                                 "lengthMenu": "Mostrar _MENU_ elementos por página",
                                 "zeroRecords": "No se encontraron datos",
@@ -267,7 +221,8 @@
                                 }
                             }
                         });
-                        $("#table-history_filter").append("<button class='btn btn-radian-success'>Buscar</button>");
+
+                        $("#table-customers_filter").append(@(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_formSearch").ToString().Trim('"')))));
 
                     })
                 });
