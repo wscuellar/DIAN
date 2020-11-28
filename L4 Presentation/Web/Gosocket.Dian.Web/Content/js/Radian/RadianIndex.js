@@ -125,23 +125,24 @@ function SetIconsList(fileId) {
 function CancelRegister(url, dataAjax, confirmMessage, successAction, label) {
         var metod = 'POST';
         var operation = (description) => ajaxFunction(url, metod, { ...dataAjax, description }, () => { }, successAction);
-        ShowPromptCancel(confirmMessage, operation, label);
+        ShowPromptCancel(confirmMessage, operation, label, null, bootboxMessage.CANCEL_REGISTER);
 }
 
-function ShowPromptCancel(title, event, label, operationCancel) {
+function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText) {
     var bootboxPrompt = bootbox.prompt({
         className: "prompt-comment",
         title: title,
         inputType: 'textarea',
         message: label,
+        placeholder: "Escriba aquí...",
         inputOptions: {
             text: "text",
             value: "value"
         },
         buttons: {
             confirm: {
-                label: "Aceptar",
-                className: "btn-radian-default btn-radian-success",
+                label: buttonAceptText ? buttonAceptText : bootboxMessage.ACEPTAR,
+                className: "btn-radian-success",
             },
             cancel: {
                 label: "Cancelar",

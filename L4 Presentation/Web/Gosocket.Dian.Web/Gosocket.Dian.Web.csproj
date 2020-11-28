@@ -556,6 +556,7 @@
     <Content Include="Content\images\pendiente-1.png" />
     <Content Include="Content\images\pendiente-2.png" />
     <Content Include="Content\images\pendiente-3.png" />
+    <Content Include="Content\images\png\closeButton.png" />
     <Content Include="Content\images\png\commet-doots.png" />
     <Content Include="Content\images\png\done.png" />
     <Content Include="Content\images\png\flagFinish.png" />

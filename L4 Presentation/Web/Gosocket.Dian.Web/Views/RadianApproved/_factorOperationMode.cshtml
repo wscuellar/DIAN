@@ -160,7 +160,7 @@
                                                 <td class="largeText iffyTip">@oper.Software.Url</td>
                                                 <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer delete-software"><span><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
                                                 @if(operationMode == "2"){
-                                                    <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = "", softwareId = oper.Software.Id})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
+                                                    <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = Model.Contributor.RadianContributorTypeId, softwareId = oper.Software.Id})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
                                                 }else{
                                                     <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = Model.Contributor.RadianContributorTypeId})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
                                                 }
