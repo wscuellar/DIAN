@@ -30,10 +30,10 @@
 		$('#jqcs_s_'+options.identifier).click(function(e){
 			e.stopPropagation();
 			if($('#jqcs_o_'+options.identifier).css('display') == "block"){
-				$('#jqcs_o_'+options.identifier).slideUp();
+				$('#jqcs_o_'+options.identifier).slideUp(0);
 				$($('#jqcs_s_'+options.identifier+' .jqcs_arrow')[0]).removeClass('rotated');
 			}else{
-				$('#jqcs_o_'+options.identifier).slideDown();
+				$('#jqcs_o_'+options.identifier).slideDown(0);
 				$($('#jqcs_s_'+options.identifier+' .jqcs_arrow')[0]).addClass('rotated');
 			}
 		});
@@ -44,7 +44,7 @@
 		});
 		
 		$(window).click(function(e){
-			$('#jqcs_o_'+options.identifier).slideUp();
+			$('#jqcs_o_'+options.identifier).slideUp(0);
 			$($('#jqcs_s_'+options.identifier+' .jqcs_arrow')[0]).removeClass('rotated');
 		});
 	}

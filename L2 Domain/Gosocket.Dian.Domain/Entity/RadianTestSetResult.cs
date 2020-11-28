@@ -27,24 +27,6 @@ namespace Gosocket.Dian.Domain.Entity
         public int TotalDocumentAccepted { get; set; }
         public int TotalDocumentsRejected { get; set; }
 
-        public int InvoicesTotalRequired { get; set; }
-        public int TotalInvoicesAcceptedRequired { get; set; }
-        public int InvoicesTotalSent { get; set; }
-        public int TotalInvoicesAccepted { get; set; }
-        public int TotalInvoicesRejected { get; set; }
-
-        public int TotalCreditNotesRequired { get; set; }
-        public int TotalCreditNotesAcceptedRequired { get; set; }
-        public int TotalCreditNotesSent { get; set; }
-        public int TotalCreditNotesAccepted { get; set; }
-        public int TotalCreditNotesRejected { get; set; }
-
-        public int TotalDebitNotesRequired { get; set; }
-        public int TotalDebitNotesAcceptedRequired { get; set; }
-        public int TotalDebitNotesSent { get; set; }
-        public int TotalDebitNotesAccepted { get; set; }
-        public int TotalDebitNotesRejected { get; set; }
-
         // Acuse de recibo
         public int ReceiptNoticeTotalRequired { get; set; }
         public int ReceiptNoticeTotalAcceptedRequired { get; set; }

@@ -62,16 +62,16 @@ namespace Gosocket.Dian.Web.Controllers
             };
 
             //aqui se adiciona los clientes asociados.
-            //var  customers=_radianAprovedService.CustormerList(radianAdmin.Contributor.RadianContributorId,string.Empty, RadianState.none, 1, 10);
-            //model.Customers = customers.Select(t => new RadianCustomerViewModel()
-            //{
-            //    BussinessName = t.Contributor.BusinessName,
-            //    Nit = t.Contributor.Code,
-            //    RadianState = t.RadianState,
-            //    Page =1,
-            //    Lenght = 10
-            //}).ToList();
-            
+            var customers = _radianAprovedService.CustormerList(radianAdmin.Contributor.RadianContributorId, string.Empty, RadianState.none, 1, 10);
+            model.Customers = customers.Select(t => new RadianCustomerViewModel()
+            {
+                BussinessName = t.Contributor.BusinessName,
+                Nit = t.Contributor.Code,
+                RadianState = t.RadianState,
+                Page = 1,
+                Lenght = 10
+            }).ToList();
+
             if ((int)registrationData.RadianOperationMode == 2)
             {
                 if (model.RadianState == "Habilitado")
@@ -166,7 +166,7 @@ namespace Gosocket.Dian.Web.Controllers
                     ResponseMessage responseUpdateFileHistory = _radianAprovedService.AddFileHistory(radianFileHistory);
                 }
             }
-            if (Convert.ToInt32(filesNumber) == Request.Files.Count)
+            if (Convert.ToInt32(filesNumber) == Request.Files.Count && Convert.ToInt32(step) != 2)
             {
                 int newStep = Convert.ToInt32(step) + 1;
                 int contributorId = idRadianContributor;

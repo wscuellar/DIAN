@@ -57,7 +57,7 @@
                         </section>
                         <h3><span class="name-state">Validando documentos</span></h3>
                         <section>
-                            @Html.Partial("_certificates")
+                            @Html.Partial("_certificatesThirdStep")
                         </section>
                         <h3><span class="name-state">Pruebas de aceptación</span></h3>
                         <section>
@@ -123,13 +123,20 @@
             })
         });
 
-        $('.submit-button').click(function (e) {debugger
-                var form = $("#uploadForm");
-            var files = $("#uploadForm")[0];
-            if (files.length > 0) {
-                    var messages = new Object();
-                    var j = 0;
-                    for (var i = 0; i < (files.length - 2); i = i + 2) {
+            $('.submit-button').click(function (e) {
+                
+            var form = $(this).parents("form");
+            var files = $(form)[0];
+            var filteredFiles = [];
+            for (var i = 0 ; i < files.length ; i++) {
+                files[i].type == "file" && files[i].id == "" &&
+                files[i].files.length > 0 &&
+                filteredFiles.push(files[i]);
+            }
+                var messages = new Object();
+                var j = 0;
+                for (var i = 0; i < files.length; i++) {
+                    if (files[i].type == "file" && files[i].id == "") {
                         messages = Object.assign(messages, {
                             ['file-' + j]: {
                                 required: "Archivo requerido."
@@ -137,20 +144,21 @@
                         });
                         j++;
                     }
-                    form.validate({
-                        messages: messages
-                    });
-                    form.valid() && e.preventDefault();
+                }
+                form.validate({
+                    messages: messages
+                });
+                e.preventDefault();
+            if (filteredFiles.length > 0) {
+                   
                     if (form.valid()) {
                         var formdata = new FormData();
                         var numberFiles = 0;
-                        var limit = (files.length - 2)
-                        for (var i = 0; i < limit; i = i + 2) {
-                            if (files[i].files.length > 0) {
-                                formdata.append(files[i].files[0].name, files[i].files[0]);
-                                formdata.append("TypeId_" + numberFiles, files[i].dataset.typeid);
+                        var limit = filteredFiles.length
+                        for (var i = 0; i < limit; i++) {
+                            formdata.append(filteredFiles[i].files[0].name, filteredFiles[i].files[0]);
+                            formdata.append("TypeId_" + numberFiles, filteredFiles[i].dataset.typeid);
                                 numberFiles++;
-                            }
                         };
                         formdata.append("nit", "@Model.Nit");
                         formdata.append("email", "@Model.Email");
@@ -201,33 +209,23 @@
                 }
             });
 
-        $("#view-costumers").click(function () {
-                    var element = '#table-customers';
-                    var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));
-                    var urlSearch = '@Url.Action("CustomersList", "RadianApproved")';
-                    var form = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_formSearch").ToString().Trim('"'))));
-                    var radianId = "@Model.Contributor.RadianContributorId";
-                    var dialog = bootbox.dialog({
-                        message: htmlPartial,
-                        className: "table-data modal-radian",
-                        size: 'large'
-                    });
-                    dialog.init(function (e) {
-                        var dataTable = [
-                            [
-                                "Tiger Nixon",
-                                "System Architect",
-                                "Edinburgh"
-                            ],
-                            [
-                                "Garrett Winters",
-                                "Director",
-                                "Edinburgh"
-                            ]
-                        ]
-                        RenderTable(element, dataTable, form, urlSearch, radianId);
-                    })
+            $("#view-costumers").click(function () {
+                var page = @Model.PageTable;
+                var element = '#table-customers';
+                var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));
+                var urlSearch = '@Url.Action("CustomersList", "RadianApproved")';
+                var form = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_formSearch").ToString().Trim('"'))));
+                var radianId = "@Model.Contributor.RadianContributorId";
+                var dialog = bootbox.dialog({
+                    message: htmlPartial,
+                    className: "table-data modal-radian",
+                    size: 'large'
                 });
+            dialog.init(function (e) {debugger
+                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.Customers))');
+                    RenderTable(element, dataTable, form, urlSearch, radianId, page);
+                })
+            });
 
         $(".cancel-register").click(function () {
                 var url = "@Url.Action("DeleteUser", "RadianApproved")";

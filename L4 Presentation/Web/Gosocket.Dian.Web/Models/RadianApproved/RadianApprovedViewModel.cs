@@ -8,6 +8,11 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 {
     public class RadianApprovedViewModel
     {
+        public RadianApprovedViewModel()
+        {
+            RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
+            PageTable = 1;
+        }
         public int Step { get; set; }
 
         public int ContributorId { get; set; }
@@ -50,12 +55,12 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         public List<UserViewModel> LegalRepresentativeList { get; set; }
 
-        public RadianApprovedViewModel() => RadianFileList = new List<RadianContributorFileTypeTableViewModel>();
        
         [Display(Name = "Nit Facturador")]
         public string NitSearch { get; set; }
 
         [Display(Name = "Estado de aprobación")]
         public RadianUtil.UserStates RadianStateSelect { get; set; }
+        public int PageTable { get; set; }
     }
 }

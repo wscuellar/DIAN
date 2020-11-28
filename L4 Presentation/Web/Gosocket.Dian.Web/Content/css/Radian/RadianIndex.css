@@ -345,7 +345,7 @@ i.fa-info-circle {
     margin: 0px 6px;
 }
 
-.edit-state {
+button.edit-state {
     font-family: Arial;
     font-style: normal;
     font-weight: normal;
@@ -1039,7 +1039,7 @@ span.close {
         padding: 5px 0;
         border-radius: 6px;
         position: absolute;
-        top: -35px;
+        bottom: 100%;
         right: 15px;
         border: solid 1px;
     }
@@ -1050,13 +1050,17 @@ span.close {
             position: absolute;
             height: 20px;
             left: 42%;
-            top: 10px;
+            top: 24px;
             background: white;
             border: solid 1px;
             width: 20px;
             transform: rotate(46deg);
             z-index: -1;
         }
+
+.underline-reject-text.tooltip img{
+    margin: 0 4px;
+}
 
     /* Show the tooltip text when you mouse over the tooltip container */
     .tooltip:hover .tooltiptext {

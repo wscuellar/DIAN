@@ -131,10 +131,10 @@
                     Id: idFile,
                     NewState: Number(newState)
                 };
-                var operation = (comment) => {debugger
+                var operation = (comment) => {
                     documentsEdited.push({ ...objToAdd, comment });
                 }
-                var operationCancel = () => {debugger
+                var operationCancel = () => {
                     $(element).parents("tr").children(".init-show").toggle();
                     $(element).parents("tr").children(".init-hide").toggle();
                     var string = $(element).parents("tr").children("td.edit-state-td").children("button.edit-state").html() == "Editar" ? "Cancelar" : "Editar"

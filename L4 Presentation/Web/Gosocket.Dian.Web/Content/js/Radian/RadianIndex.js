@@ -149,7 +149,7 @@ function ShowPromptCancel(title, event, label, operationCancel) {
             }
         },
         callback: function (result) {
-            result ? event(result) : operationCancel();
+            result ? event(result) : operationCancel;
         }
     });
 

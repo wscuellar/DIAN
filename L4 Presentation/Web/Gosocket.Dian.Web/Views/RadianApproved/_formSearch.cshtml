@@ -4,6 +4,8 @@
 
 @using (Html.BeginForm("AdminRadianView", "Radian", FormMethod.Post, new { id = "radian-contributors-form" }))
 {
+
+@Html.HiddenFor(m => m.PageTable);
 <div class="row">
     <div class="col-sm-5 padding-xs-0">
         <div class="form-group">
