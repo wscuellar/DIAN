@@ -123,6 +123,13 @@
         height: 512%;
         font-size: 0.5vw;
     }
+
+    .tooltip .tooltiptext {
+        width: auto !important;
+        background: #F2ECE7 !important;
+        font-size: 9px;
+        text-align: justify !important;
+    }
 </style>
 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
@@ -246,7 +253,10 @@
                                             <td class="text-right right-section">
                                                 <u class="underline-reject-text tooltip">
                                                     <span><i class="fa fa-info-circle"> </i> @item.Status</span>
-                                                    <span class="tooltiptext">@item.Message</span>
+                                                    <span class="tooltiptext">
+                                                        <i class="fa fa-exclamation-circle"></i>
+                                                        @item.Message
+                                                    </span>
                                                 </u>
                                             </td>
                                         </tr>
