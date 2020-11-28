@@ -6,6 +6,41 @@ namespace Gosocket.Dian.Web.Models
 {
     public class SearchDocumentViewModel
     {
+        [Display(Name = "CUFE")]
+        public string DocumentKey { get; set; }
+
+        [Display(Name = "NIT emisor")]
+        public string SenderCode { get; set; }
+
+        [Display(Name = "NIT receptor")]
+        public string ReceiverCode { get; set; }
+
+        [Display(Name = "Prefijo y folio")]
+        public string SerieAndNumber { get; set; }
+
+        [Display(Name = "Resultado")]
+        public List<DocumentStatusViewModel> Statuses { get; set; }
+
+        [Display(Name = "Tipo de documento")]
+        public string DocumentTypeId { get; set; }
+
+        [Display(Name = "Tipo de referencia")]
+        public string ReferencesType { get; set; }
+
+        [Display(Name = "Estado RADIAN")]
+        public List<DocumentRadianStatusViewModel> RadianStatusList { get; set; }
+
+
+        public int Status { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int RadianStatus { get; set; }
+        public int Page { get; set; }
+        public bool IsNextPage { get; set; }
+        public int MaxItemCount { get; set; }
+        public List<DocumentViewModel> Documents { get; set; }
+        public List<DocumentTypeModel> DocumentTypes { get; set; }
+
         public SearchDocumentViewModel()
         {
             MaxItemCount = 15;
@@ -19,61 +54,25 @@ namespace Gosocket.Dian.Web.Models
             Documents = new List<DocumentViewModel>();
             DocumentTypes = DocumentTypeModel.List();
             Statuses = DocumentStatusViewModel.List();
+            RadianStatusList = DocumentRadianStatusViewModel.List();
         }
-
-        [Display(Name = "CUFE")]
-        public string DocumentKey { get; set; }
-        [Display(Name = "NIT emisor")]
-        public string SenderCode { get; set; }
-        [Display(Name = "NIT receptor")]
-        public string ReceiverCode { get; set; }
-        [Display(Name = "Prefijo y folio")]
-        public string SerieAndNumber { get; set; }
-        public int Page { get; set; }
-        public bool IsNextPage { get; set; }
-        public int MaxItemCount { get; set; }
-        public List<DocumentViewModel> Documents { get; set; }
-        public List<DocumentTypeModel> DocumentTypes { get; set; }
-        [Display(Name = "Estado")]
-        public List<DocumentStatusViewModel> Statuses { get; set; }
-        public int Status { get; set; }
-        [Display(Name = "Tipo de documento")]
-        public string DocumentTypeId { get; set; }
-        [Display(Name = "Tipo de referencia")]
-        public string ReferencesType { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
     }
 
     public class DocumentViewModel
     {
-        public DocumentViewModel()
-        {
-            DocumentTags = new List<DocumentTagViewModel>();
-            Events = new List<EventViewModel>();
-            References = new List<ReferenceViewModel>();
-            TaxesDetail = new TaxesDetailViewModel();
-        }
         public string Id { get; set; }
-
         public string PartitionKey { get; set; }
         public List<DocumentTagViewModel> DocumentTags { get; set; }
         public List<EventViewModel> Events { get; set; }
         public List<ReferenceViewModel> References { get; set; }
-
         public TaxesDetailViewModel TaxesDetail { get; set; }
-
         public DateTime EmissionDate { get; set; }
         public string DocumentKey { get; set; }
         public string DocumentTypeId { get; set; }
-
         public string DocumentTypeName { get; set; }
-
         public string Number { get; set; }
         public string Serie { get; set; }
         public string SerieAndNumber { get; set; }
-
-
         public string SenderCode { get; set; }
         public string SenderName { get; set; }
         public string ReceiverCode { get; set; }
@@ -91,6 +90,14 @@ namespace Gosocket.Dian.Web.Models
         public double TaxAmountIca { get; set; }
         public double TaxAmountIpc { get; set; }
         public double TotalAmount { get; set; }
+
+        public DocumentViewModel()
+        {
+            DocumentTags = new List<DocumentTagViewModel>();
+            Events = new List<EventViewModel>();
+            References = new List<ReferenceViewModel>();
+            TaxesDetail = new TaxesDetailViewModel();
+        }
     }
 
     public class DocumentTagViewModel
@@ -108,15 +115,19 @@ namespace Gosocket.Dian.Web.Models
 
         public static List<DocumentTypeModel> List()
         {
-            return new List<DocumentTypeModel>
+            return new List<DocumentTypeModel>()
             {
-                new DocumentTypeModel{Code = "00", Name = "Todos..." },
-                new DocumentTypeModel{Code = "01", Name = "Factura electrónica" },
-                new DocumentTypeModel{Code = "02", Name = "Factura de exportación electrónica" },
-                new DocumentTypeModel{Code = "03", Name = "Factura de contingencia electrónica" },
-                new DocumentTypeModel{Code = "04", Name = "Factura de contingencia electrónica DIAN" },
-                new DocumentTypeModel{Code = "07", Name = "Nota de crédito electrónica" },
-                new DocumentTypeModel{Code = "08", Name = "Nota de débito electrónica" }
+                new DocumentTypeModel() { Code = "00", Name = "Todos..." },
+                new DocumentTypeModel() { Code = "01", Name = "Factura electrónica" },
+                new DocumentTypeModel() { Code = "02", Name = "Factura de exportación electrónica" },
+                new DocumentTypeModel() { Code = "03", Name = "Factura de contingencia electrónica" },
+                new DocumentTypeModel() { Code = "04", Name = "Factura de contingencia electrónica DIAN" },
+                new DocumentTypeModel() { Code = "07", Name = "Nota de crédito electrónica" },
+                new DocumentTypeModel() { Code = "08", Name = "Nota de débito electrónica" },
+                new DocumentTypeModel() { Code = "09", Name = "Nomina electrónica" },
+                new DocumentTypeModel() { Code = "10", Name = "Documento de importación electrónico" },
+                new DocumentTypeModel() { Code = "11", Name = "Documento soporte electrónico" },
+                new DocumentTypeModel() { Code = "12", Name = "Documento equivalente POS electrónico" }
             };
         }
     }
@@ -153,6 +164,7 @@ namespace Gosocket.Dian.Web.Models
         //      referenciados por el presente documento
         public bool ShowAsReference { get; set; }
     }
+
     public class TaxesDetailViewModel
     {
         public double TaxAmountIva5Percent { get; set; }
@@ -163,6 +175,7 @@ namespace Gosocket.Dian.Web.Models
         public double TaxAmountIca { get; set; }
         public double TaxAmountIpc { get; set; }
     }
+
     public class DocumentStatusViewModel
     {
         public string Code { get; set; }
@@ -170,13 +183,32 @@ namespace Gosocket.Dian.Web.Models
 
         public static List<DocumentStatusViewModel> List()
         {
-            return new List<DocumentStatusViewModel>
+            return new List<DocumentStatusViewModel>()
             {
-                new DocumentStatusViewModel {Code = "0", Name = "Todos..." },
-                new DocumentStatusViewModel{ Code = "1", Name = "Aprobado"},
-                new DocumentStatusViewModel{ Code = "10", Name = "Aprobado con notificación"}
+                new DocumentStatusViewModel() { Code = "0", Name = "Todos..." },
+                new DocumentStatusViewModel() { Code = "1", Name = "Aprobado" },
+                new DocumentStatusViewModel() { Code = "10", Name = "Aprobado con notificación" }
             };
         }
     }
 
+    public class DocumentRadianStatusViewModel
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+
+        public static List<DocumentRadianStatusViewModel> List()
+        {
+            return new List<DocumentRadianStatusViewModel>()
+            {
+                new DocumentRadianStatusViewModel() { Code = "0", Name = "Todos..." },
+                new DocumentRadianStatusViewModel() { Code = "1", Name = "Titulo valor" },
+                new DocumentRadianStatusViewModel() { Code = "3", Name = "Disponibilizada" },
+                new DocumentRadianStatusViewModel() { Code = "4", Name = "Endosada" },
+                new DocumentRadianStatusViewModel() { Code = "5", Name = "Pagada" },
+                new DocumentRadianStatusViewModel() { Code = "6", Name = "Limitada" },
+                new DocumentRadianStatusViewModel() { Code = "7", Name = "No Aplica" }
+            };
+        }
+    }
 }

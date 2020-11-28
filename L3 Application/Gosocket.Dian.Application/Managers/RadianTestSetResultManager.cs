@@ -51,5 +51,6 @@ namespace Gosocket.Dian.Application.Managers
         {
             return testSetManager.FindByPartition<RadianTestSetResult> (nit);
         }
+
     }
 }
