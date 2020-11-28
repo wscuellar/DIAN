@@ -941,13 +941,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndoso
-        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, string eventCode)
+        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, NitModel nitModel, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
-            string valueTotalEndoso = xmlParserCude.ValorTotalEndoso;
-            string valuePriceToPay = xmlParserCude.PrecioPagarseFEV;
-            string valueDiscountRateEndoso = xmlParserCude.TasaDescuento;            
+
+            string valueTotalEndoso = nitModel.ValorTotalEndoso;           
+            string valuePriceToPay = nitModel.PrecioPagarseFEV;
+            string valueDiscountRateEndoso = nitModel.TasaDescuento;            
             string valueTotalInvoice = xmlParserCufe.TotalInvoice;
 
             //Valida informacion Endoso 
@@ -1906,7 +1907,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region validation to emition to event
-        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude)
+        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe,  NitModel nitModel)
         {
             bool validFor = false;
             string eventCode = eventPrev.EventCode;
@@ -1930,8 +1931,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "Solo se pueda transmitir un evento AR de cada tipo para un CUFE - ApplicationResponse (" + eventPrev.EventCode + ") ya existe",
+                            ErrorCode = "LGC01",
+                            ErrorMessage = "Evento registrado previamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -2110,7 +2111,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 break;
                             case (int)EventStatus.SolicitudDisponibilizacion:
                                 //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
-                                if (xmlParserCude.CustomizationID == "363" || xmlParserCude.CustomizationID == "364")
+                                if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                                 {
                                     if (documentMeta
                                    .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
@@ -2173,7 +2174,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 //Solicitud de Disponibilización
                                 else if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
                                 {
-                                    var response = ValidateEndoso(xmlParserCufe, xmlParserCude, eventCode);
+                                    var response = ValidateEndoso(xmlParserCufe, nitModel, eventCode);
                                     if (response != null)
                                     {
                                         validFor = true;

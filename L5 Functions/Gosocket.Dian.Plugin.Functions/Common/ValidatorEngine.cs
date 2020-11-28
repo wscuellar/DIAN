@@ -75,6 +75,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateEmitionEventPrevAsync(ValidateEmitionEventPrev.RequestObject eventPrev)
         {
             var validateResponses = new List<ValidateListResponse>();
+            var nitModel = new NitModel();
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
 
@@ -103,10 +104,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 xmlParserCude = new XmlParser(xmlBytesCude);
                 if (!xmlParserCude.Parser())
                     throw new Exception(xmlParserCude.ParserError);
+
+                nitModel = xmlParserCude.Fields.ToObject<NitModel>();
             }
 
             var validator = new Validator();           
-            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude));
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, nitModel));
 
             return validateResponses;
 
