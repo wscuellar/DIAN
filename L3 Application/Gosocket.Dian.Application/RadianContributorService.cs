@@ -11,32 +11,39 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.Entity;
 using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Gosocket.Dian.Application
 {
     public class RadianContributorService : IRadianContributorService
     {
         private readonly IContributorService _contributorService;
-        private readonly IContributorOperationsService _contributorOperationsService;
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
         private readonly IRadianContributorFileRepository _radianContributorFileRepository;
         private readonly IRadianTestSetResultManager _radianTestSetResultManager;
         private readonly IRadianOperationModeRepository _radianOperationModeRepository;
         private readonly IRadianContributorFileHistoryRepository _radianContributorFileHistoryRepository;
+        private readonly IRadianSoftwareRepository _radianSoftwareRepository;
 
         public RadianContributorService(IContributorService contributorService,
-            IContributorOperationsService contributorOperationsService,
-            IRadianContributorRepository radianContributorRepository, IRadianContributorTypeRepository radianContributorTypeRepository, IRadianContributorFileRepository radianContributorFileRepository, IRadianTestSetResultManager radianTestSetResultManager, IRadianOperationModeRepository radianOperationModeRepository, IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository)
+            IRadianContributorRepository radianContributorRepository, 
+            IRadianContributorTypeRepository radianContributorTypeRepository, 
+            IRadianContributorFileRepository radianContributorFileRepository, 
+            IRadianTestSetResultManager radianTestSetResultManager, 
+            IRadianOperationModeRepository radianOperationModeRepository, 
+            IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository,
+            IRadianSoftwareRepository radianSoftwareRepository)
         {
             _contributorService = contributorService;
-            _contributorOperationsService = contributorOperationsService;
             _radianContributorRepository = radianContributorRepository;
             _radianContributorTypeRepository = radianContributorTypeRepository;
             _radianContributorFileRepository = radianContributorFileRepository;
             _radianTestSetResultManager = radianTestSetResultManager;
             _radianOperationModeRepository = radianOperationModeRepository;
             _radianContributorFileHistoryRepository = radianContributorFileHistoryRepository;
+            _radianSoftwareRepository = radianSoftwareRepository;
         }
 
         #region Registro de participantes
@@ -63,25 +70,21 @@ namespace Gosocket.Dian.Application
         public ResponseMessage RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode)
         {
             Contributor contributor = _contributorService.GetByCode(userCode);
-            if (contributor == null)
+            if (contributor == null || contributor.AcceptanceStatusId != 4)
                 return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
 
             bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
             if (!indirectElectronicBiller)
             {
-                List<ContributorOperations> contributorOperations = _contributorOperationsService.GetContributorOperations(contributor.Id);
-                bool ownSoftware = contributorOperations != null && contributorOperations.Any(t => !t.Deleted && t.OperationModeId == (int)Domain.Common.OperationMode.Own && t.Software != null && t.Software.Status);
-                if (!ownSoftware)
+                Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributor.Id);
+                if (ownSoftware == null)
                     return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
             }
 
             string cancelEvent = RadianState.Cancelado.GetDescription();
             int radianType = (int)radianContributorType;
-            List<RadianContributor> records = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == radianType).Results;
-            RadianContributor lastRecord = (from p in records
-                                            group p by p.ContributorId into g
-                                            select g.OrderByDescending(x => x.Update).FirstOrDefault()).FirstOrDefault();
-            if (lastRecord != null && lastRecord.RadianState != cancelEvent)
+            RadianContributor record = _radianContributorRepository.Get(t => t.ContributorId == contributor.Id && t.RadianContributorTypeId == radianType);
+            if (record != null && record.RadianState != cancelEvent)
                 return new ResponseMessage(TextResources.RegisteredParticipant, TextResources.redirectType);
 
             if (radianContributorType == Domain.Common.RadianContributorType.TechnologyProvider && (contributor.ContributorTypeId != (int)Domain.Common.ContributorType.Provider || !contributor.Status))
@@ -126,9 +129,6 @@ namespace Gosocket.Dian.Application
             };
             return radianAdmin;
         }
-
-
-       
 
 
         public RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size)
@@ -262,6 +262,15 @@ namespace Gosocket.Dian.Application
                 CreatedDate = existing != null ? existing.CreatedDate : System.DateTime.Now
             };
             int id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
+            if(radianOperationMode == Domain.Common.RadianOperationMode.Direct)
+            {
+                Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributorId);
+                RadianSoftware radianSoftware = new RadianSoftware(ownSoftware,id,createdBy);
+                _radianSoftwareRepository.AddOrUpdate(radianSoftware);
+                //se hereda el software anterior a radian.
+            }
+            
+
             newRadianContributor.Id = id;
         }
 
@@ -280,13 +289,13 @@ namespace Gosocket.Dian.Application
             return _radianOperationModeRepository.List(t => true);
         }
 
-        public ResponseMessage AddFileHistory(RadianContributorFileHistory radianContributorFileHistory)
+        public ResponseMessage AddFileHistory(RadianContributorFileHistory radianFileHistory)
         {
-            radianContributorFileHistory.Timestamp = DateTime.Now;
+            radianFileHistory.Timestamp = DateTime.Now;
             string idHistoryRegister = string.Empty;
 
-            radianContributorFileHistory.Id = Guid.NewGuid();
-            idHistoryRegister = _radianContributorFileHistoryRepository.AddRegisterHistory(radianContributorFileHistory).ToString();
+            radianFileHistory.Id = Guid.NewGuid();
+            idHistoryRegister = _radianContributorFileHistoryRepository.AddRegisterHistory(radianFileHistory).ToString();
 
             if (!string.IsNullOrEmpty(idHistoryRegister))
             {
@@ -295,5 +304,31 @@ namespace Gosocket.Dian.Application
 
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
         }
+
+        public string getXmlBase64Report ()
+        {
+            //Header 
+            XmlDocument report = new XmlDocument();
+            XmlDeclaration xmlDeclaration = report.CreateXmlDeclaration("1.0", "UTF-8", null);
+            XmlElement root = report.DocumentElement;
+            report.InsertBefore(xmlDeclaration, root);
+            XmlElement element1 = report.CreateElement(string.Empty, "cuerpo", string.Empty);
+            report.AppendChild(element1);
+            XmlElement element2 = report.CreateElement(string.Empty, "nivel1", string.Empty);
+            element1.AppendChild(element2);
+            XmlElement element3 = report.CreateElement(string.Empty, "nivel2", string.Empty);
+            XmlText text1 = report.CreateTextNode("texto");
+            element3.AppendChild(text1);
+            element2.AppendChild(element3);
+            XmlElement element4 = report.CreateElement(string.Empty, "nivel3", string.Empty);
+            XmlText text2 = report.CreateTextNode("más texto");
+            element4.AppendChild(text2);
+            element2.AppendChild(element4);
+            report.Save("C://ruta//xml_ejemplo.xml");
+
+
+            return string.Empty;
+        }
+
     }
 }

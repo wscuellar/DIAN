@@ -123,93 +123,93 @@
             })
         });
 
-            $('.submit-button').click(function (e) {
+        $('.submit-button').click(function (e) {
                 
-            var form = $(this).parents("form");
-            var files = $(form)[0];
-            var filteredFiles = [];
-            for (var i = 0 ; i < files.length ; i++) {
-                files[i].type == "file" && files[i].id == "" &&
-                files[i].files.length > 0 &&
-                filteredFiles.push(files[i]);
+        var form = $(this).parents("form");
+        var files = $(form)[0];
+        var filteredFiles = [];
+        for (var i = 0 ; i < files.length ; i++) {
+            files[i].type == "file" && files[i].id == "" &&
+            files[i].files.length > 0 &&
+            filteredFiles.push(files[i]);
+        }
+            var messages = new Object();
+            var j = 0;
+            for (var i = 0; i < files.length; i++) {
+                if (files[i].type == "file" && files[i].id == "") {
+                    messages = Object.assign(messages, {
+                        ['file-' + j]: {
+                            required: "Archivo requerido."
+                        }
+                    });
+                    j++;
+                }
             }
-                var messages = new Object();
-                var j = 0;
-                for (var i = 0; i < files.length; i++) {
-                    if (files[i].type == "file" && files[i].id == "") {
-                        messages = Object.assign(messages, {
-                            ['file-' + j]: {
-                                required: "Archivo requerido."
-                            }
-                        });
-                        j++;
-                    }
-                }
-                form.validate({
-                    messages: messages
-                });
-                e.preventDefault();
-            if (filteredFiles.length > 0) {
-                   
-                    if (form.valid()) {
-                        var formdata = new FormData();
-                        var numberFiles = 0;
-                        var limit = filteredFiles.length
-                        for (var i = 0; i < limit; i++) {
-                            formdata.append(filteredFiles[i].files[0].name, filteredFiles[i].files[0]);
-                            formdata.append("TypeId_" + numberFiles, filteredFiles[i].dataset.typeid);
-                                numberFiles++;
-                        };
-                        formdata.append("nit", "@Model.Nit");
-                        formdata.append("email", "@Model.Email");
-                        formdata.append("contributorId", "@Model.ContributorId");
-                        formdata.append("radianContributorType", '@Request.Params.Get("RadianContributorType")');
-                        formdata.append("radianContributorTypeiD", '@Model.RadianContributorTypeId');
-                        formdata.append("radianOperationMode", '@Request.Params.Get("RadianOperationMode")');
-                        formdata.append("filesNumber", numberFiles);
-                        formdata.append("step", @Model.Step);
-                        formdata.append("radianState", '@Model.RadianState');
-
-                        $.ajax({
-                            url: "@Url.Action("UploadFiles", "RadianApproved")",
-                            type: 'POST',
-                            data: formdata,
-                            cache: false,
-                            contentType: false,
-                            processData: false,
-                            enctype: 'multipart/form-data',
-                            xhr: function () {
-                                //upload Progress
-                                var xhr = $.ajaxSettings.xhr();
-                                if (xhr.upload) {
-                                    xhr.upload.addEventListener('progress', function (event) {
-                                        var percent = 0;
-                                        var position = event.loaded || event.position;
-                                        var total = event.total;
-                                        if (event.lengthComputable) {
-                                            percent = Math.ceil(position / total * 100);
-                                        }
-                                        //update progressbar
-                                        $(".progress-bar").css("width", + percent + "%");
-                                        $(".status").text(percent + "%");
-                                    }, true);
-                                }
-                                return xhr;
-                            },
-                            success: function (data) {
-                                var objData = data.data;
-                                var operation = () => {
-                                    showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
-                                    window.location.href = '@Url.Action("Index", "RadianApproved")' + "?ContributorId=" + objData.ContributorId + "&RadianContributorType=" + objData.RadianContributorType + "&RadianOperationMode=" + objData.RadianOperationMode;
-                                }
-                                showConfirmation(data.message, AlertExec(operation));
-                            },
-                        });
-                    }
-                }
+            form.validate({
+                messages: messages
             });
+            e.preventDefault();
+        if (filteredFiles.length > 0) {
+                   
+                if (form.valid()) {
+                    var formdata = new FormData();
+                    var numberFiles = 0;
+                    var limit = filteredFiles.length
+                    for (var i = 0; i < limit; i++) {
+                        formdata.append(filteredFiles[i].files[0].name, filteredFiles[i].files[0]);
+                        formdata.append("TypeId_" + numberFiles, filteredFiles[i].dataset.typeid);
+                            numberFiles++;
+                    };
+                    formdata.append("nit", "@Model.Nit");
+                    formdata.append("email", "@Model.Email");
+                    formdata.append("contributorId", "@Model.ContributorId");
+                    formdata.append("radianContributorType", '@Request.Params.Get("RadianContributorType")');
+                    formdata.append("radianContributorTypeiD", '@Model.RadianContributorTypeId');
+                    formdata.append("radianOperationMode", '@Request.Params.Get("RadianOperationMode")');
+                    formdata.append("filesNumber", numberFiles);
+                    formdata.append("step", @Model.Step);
+                    formdata.append("radianState", '@Model.RadianState');
 
-            $("#view-costumers").click(function () {
+                    $.ajax({
+                        url: "@Url.Action("UploadFiles", "RadianApproved")",
+                        type: 'POST',
+                        data: formdata,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        enctype: 'multipart/form-data',
+                        xhr: function () {
+                            //upload Progress
+                            var xhr = $.ajaxSettings.xhr();
+                            if (xhr.upload) {
+                                xhr.upload.addEventListener('progress', function (event) {
+                                    var percent = 0;
+                                    var position = event.loaded || event.position;
+                                    var total = event.total;
+                                    if (event.lengthComputable) {
+                                        percent = Math.ceil(position / total * 100);
+                                    }
+                                    //update progressbar
+                                    $(".progress-bar").css("width", + percent + "%");
+                                    $(".status").text(percent + "%");
+                                }, true);
+                            }
+                            return xhr;
+                        },
+                        success: function (data) {
+                            var objData = data.data;
+                            var operation = () => {
+                                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                window.location.href = '@Url.Action("Index", "RadianApproved")' + "?ContributorId=" + objData.ContributorId + "&RadianContributorType=" + objData.RadianContributorType + "&RadianOperationMode=" + objData.RadianOperationMode;
+                            }
+                            showConfirmation(data.message, AlertExec(operation));
+                        },
+                    });
+                }
+            }
+        });
+
+        $("#view-costumers").click(function () {
                 var page = @Model.PageTable;
                 var element = '#table-customers';
                 var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));

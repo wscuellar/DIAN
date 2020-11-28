@@ -12,6 +12,7 @@ function RenderSteps(index) {
 
     $(".radian-file").click(function () {
         $(this).val("");
+        $(this).parents(".custom-file").children("label").html("");
     });
     $(".radian-file").change(function (file) {
         var form = $(this).parents("form");
@@ -20,7 +21,7 @@ function RenderSteps(index) {
         var fileObj = file.target.files[0];
         var fileSize = Math.round(fileObj.size / 10000) / 100;
         if (fileSize > 10) {
-            $(this).val("");
+            $(this).parents(".custom-file").children("label").html("");
             messages = Object.assign(messages, {
                 [id]: {
                     required: "Tamaño máximo 10 Mb."
@@ -28,7 +29,7 @@ function RenderSteps(index) {
             });
         }
         else if (fileObj.type != "application/pdf") {
-            $(this).val("");
+            $(this).parents(".custom-file").children("label").html("");
             messages = Object.assign(messages, {
                 [id]: {
                     required: "Solo documentos .PDF"
@@ -37,7 +38,9 @@ function RenderSteps(index) {
         } else {
             $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").toggle();
-            $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
+            $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();debugger
+            $(this).parents(".inputs-dinamics").children(".file-input-disabled").children("input").attr("value",fileObj.name);
+            //$(this).parents(".inputs-dinamics").children(".file-input-enabled").children("input").val();
         }
         form.validate({
             messages: messages

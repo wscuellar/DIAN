@@ -710,6 +710,9 @@ h4.text-thin {
     height: 33px;
     line-height: 2 !important;
     font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .custom-file-label::after {
@@ -775,7 +778,7 @@ h4.text-thin {
     box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.12);
     width: 38%;
     position: absolute;
-    top: 2px;
+    top: 30px;
     right: 21px;
 }
 
@@ -947,7 +950,7 @@ span.close {
     opacity: 1;
     font-weight: 100 !important;
     position: absolute;
-    top: 0;
+    top: 27px;
     right: 0;
     margin: 10px;
 }
@@ -1204,4 +1207,56 @@ button.selectpicker .fa-caret-down {
 
 .input-general .bootstrap-select {
     background-color: #f7f7f7;
+}
+
+.prompt-comment .bootbox-close-button.close {
+    background: url(/Content/images/png/closeButton.png);
+    background-repeat: no-repeat;
+    text-indent: -9000px;
+    right: -30px;
+}
+
+.prompt-comment {
+    font-size: 24px;
+}
+.prompt-comment .modal-title {
+    font-size: 24px;
+    width: fit-content;
+    border-bottom: 2px solid #62C7AB;
+    padding-right: 20px;
+    padding-bottom: 4px;
+}
+
+.prompt-comment .modal-header:after {
+    display: none;
+}
+
+.prompt-comment .modal-body {
+    display: inline-flex;
+    width: 80%;
+    padding-top: 0px;
+    padding-bottom: 20px;
+}
+
+.prompt-comment .modal-footer {
+    position: absolute;
+    display: inline-flex;
+    width: 20%;
+    padding-bottom: 0px;
+    bottom: 21px;
+}
+.prompt-comment button.btn-radian-default {
+    display: none;
+}
+
+.prompt-comment .bootbox-body {
+    width: 100%;
+}
+
+.prompt-comment .modal-header {
+    padding-bottom: 5px;
+}
+
+.prompt-comment .modal-content{
+    padding-right: 40px;
 }

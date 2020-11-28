@@ -133,7 +133,26 @@
                                             @foreach (var oper in Model.RadianContributorOperations.RadianContributorOperations)
                                             {
                                             <tr>
-                                                <td class="smallText iffyTip">Se quito debe arreglarse</td>
+                                                <td class="smallText iffyTip">
+                                                    @{
+                                                        if (oper.SoftwareType == 1)
+                                                        {
+                                                            <p>Software Propio</p>
+                                                        }
+                                                        if (oper.SoftwareType == 2)
+                                                        {
+                                                            <p>Software Proveedor Tecnológico</p>
+                                                        }
+                                                        if (oper.SoftwareType == 3)
+                                                        {
+                                                            <p>Software Sistema de Negociación</p>
+                                                        }
+                                                        if (oper.SoftwareType == 4)
+                                                        {
+                                                            <p>Software Factor</p>
+                                                        }
+                                                    }
+                                                </td>
                                                 <td class="smallText iffyTip">@oper.Timestamp.ToString("dd/MM/yyy")</td>
                                                 <td class="largeText iffyTip">
                                                     @{
@@ -154,13 +173,13 @@
                                                         }
                                                     }
                                                 </td>
-                                                <td class="largeText iffyTip">arreglar</td>
+                                                <td class="largeText iffyTip">@oper.SoftwareType</td>
                                                 <td class="largeText iffyTip">@oper.Software.Id</td>
                                                 <td class="largeText iffyTip">@oper.Software.Pin</td>
                                                 <td class="largeText iffyTip">@oper.Software.Url</td>
                                                 <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer delete-software"><span><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
                                                 @if(operationMode == "2"){
-                                                    <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = "", softwareId = oper.Software.Id})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
+                                                    <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = Model.Contributor.RadianContributorTypeId, softwareId = oper.Software.Id})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
                                                 }else{
                                                     <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = Model.Contributor.RadianContributorTypeId})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
                                                 }

@@ -125,7 +125,7 @@ namespace Gosocket.Dian.DataContext
             //modelBuilder.Entity<SubMenu>()
             //  .ToTable("SubMenu")
             //  .HasKey(c => c.Id);
-            
+
             //modelBuilder.Entity<Permission>()
             //  .ToTable("Permission")
             //  .HasKey(c => c.Id);
@@ -150,6 +150,11 @@ namespace Gosocket.Dian.DataContext
         public DbSet<RadianContributorFileHistory> RadianContributorFileHistories { set; get; }
         public DbSet<RadianContributorFileType> RadianContributorFileTypes { set; get; }
         public DbSet<RadianContributorFileStatus> RadianContributorFileStatuses { set; get; }
+        public DbSet<RadianContributor> RadianContributors { set; get; }
+        public DbSet<RadianContributorType> RadianContributorTypes { set; get; }
+        public DbSet<RadianOperationMode> RadianOperationModes { set; get; }
+        public DbSet<RadianContributorOperation> RadianContributorOperations { get; set; }
+        public DbSet<RadianSoftware> RadianSoftwares { get; set; }
         //Radian Files
 
         public DbSet<Contributor> Contributors { set; get; }
@@ -159,10 +164,6 @@ namespace Gosocket.Dian.DataContext
         public DbSet<OperationMode> OperationModes { set; get; }
 
 
-        public DbSet<RadianContributor> RadianContributors { set; get; }
-        public DbSet<RadianContributorType> RadianContributorTypes { set; get; }
-        public DbSet<RadianOperationMode> RadianOperationModes { set; get; }
-        public DbSet<RadianContributorOperation> RadianContributorOperations { get; set; }
 
         public DbSet<Menu> Menus { set; get; }
         public DbSet<SubMenu> SubMenus { set; get; }
