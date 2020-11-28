@@ -209,6 +209,7 @@
     <Compile Include="RadianContributorService.cs" />
     <Compile Include="RadianLoggerService.cs" />
     <Compile Include="QueryAssociatedEventsService.cs" />
+    <Compile Include="RadianPDFCreationService.cs" />
     <Compile Include="RadianTestSetAppliedService.cs" />
     <Compile Include="RadianTestSetResultService.cs" />
     <Compile Include="RadianTestSetService.cs" />
