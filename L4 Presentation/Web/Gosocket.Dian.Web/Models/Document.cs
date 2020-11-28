@@ -83,6 +83,7 @@ namespace Gosocket.Dian.Web.Models
         public DateTime ReceptionDate { get; set; }
         public int Status { get; set; }
         public string StatusName { get; set; }
+        public string RadianStatusName { get; set; }
         public double Amount { get; set; }
         public double TaxAmountIva5Percent { get; set; }
         public double TaxAmountIva19Percent { get; set; }
@@ -196,7 +197,7 @@ namespace Gosocket.Dian.Web.Models
     {
         public string Code { get; set; }
         public string Name { get; set; }
-
+        
         public static List<DocumentRadianStatusViewModel> List()
         {
             return new List<DocumentRadianStatusViewModel>()

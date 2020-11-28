@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.Cosmos;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
@@ -23,6 +24,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.Mvc;
+using EnumHelper = Gosocket.Dian.Web.Models.EnumHelper;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -60,9 +62,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         public async Task<ActionResult> Sent(SearchDocumentViewModel model)
-        {
-            return await GetDocuments(model, 2);
-        }
+            => await GetDocuments(model, 2);
 
         public async Task<ActionResult> Received(SearchDocumentViewModel model)
         {
@@ -455,7 +455,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
-        
+
         #region Private methods
 
         private bool IsValidCaptcha(string token)
@@ -593,7 +593,6 @@ namespace Gosocket.Dian.Web.Controllers
                     Number = d.Number,
                     Serie = d.Serie,
                     SerieAndNumber = d.SerieAndNumber,
-                    //TechProviderName = d?.TechProviderInfo?.TechProviderName,
                     TechProviderCode = d?.TechProviderInfo?.TechProviderCode,
                     ReceiverName = d.ReceiverName,
                     ReceiverCode = d.ReceiverCode,
@@ -604,13 +603,40 @@ namespace Gosocket.Dian.Web.Controllers
                     StatusName = d.ValidationResultInfo.StatusName,
                     TaxAmountIva = d.TaxAmountIva,
                     TotalAmount = d.TotalAmount,
+                    Events = d.Events.Select(
+                        e => new EventViewModel()
+                        {
+                            Code = e.Code,
+                            Date = e.Date,
+                            Description = e.Description
+                        }).ToList()
                 }).ToList();
+
+                foreach (DocumentViewModel docView in model.Documents)
+                    docView.RadianStatusName = DeterminateRadianStatus(docView.Events);
             }
 
             model.IsNextPage = result.Item1;
             this.Session["Continuation_Token_" + (model.Page + 1)] = result.Item2;
 
             return View("Index", model);
+        }
+
+        private string DeterminateRadianStatus(List<EventViewModel> events)
+        {
+            int received = (int)Enum.Parse(typeof(EventStatus), "Received");
+            int receipt = (int)Enum.Parse(typeof(EventStatus), "Receipt");
+            int accepted = (int)Enum.Parse(typeof(EventStatus), "Accepted");
+
+            if (events.Any(
+                e => int.Parse(e.Code) == received
+                && int.Parse(e.Code) == receipt
+                && int.Parse(e.Code) == accepted))
+            {
+                return "Titulo valor";
+            }
+
+            return "Status Radian Error";
         }
 
         private void SetView(int filterType)
