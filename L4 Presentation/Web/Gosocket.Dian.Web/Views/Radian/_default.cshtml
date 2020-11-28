@@ -103,10 +103,12 @@
                                         break;
                                 };
                                 <tr data-id="@f.ContributorFileType.Id" data-idFile="@f.Id" class="select-radian-contributor">
-                                    <td width="33%" class="text-left"><span class="fa fa fa-download add-tooltip download-contributor-files" data-original-title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>@f.ContributorFileType.Name</td>
+                                    <td width="33%" class="text-left"><span class="fa fa fa-download download-contributor-files" title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>@f.ContributorFileType.Name</td>
                                     <td width="33%" class="text-center init-hide @statusId"><input type="hidden" class="list-change-status" id="status-file-@index" value=""></td>
-                                    <td width="33%" class="text-center init-show"><div><span class="">@Html.Raw(label) @f.ContributorFileStatus.Name</span></div></td>
-                                    <td width="33%" class="text-center"><i class="fa fa-pencil"></i><button type="button" class="btn btn-link edit-state">Editar</button></td>
+                                    <td width="33%" class="text-center init-show">
+                                        <div><span class="">@Html.Raw(label) @f.ContributorFileStatus.Name</span></div>
+                                    </td>
+                                    <td width="33%" class="text-center edit-state-td"><i class="fa fa-pencil"></i><button type="button" class="btn btn-link edit-state">Editar</button></td>
                                 </tr>
                                 index++;
                             }

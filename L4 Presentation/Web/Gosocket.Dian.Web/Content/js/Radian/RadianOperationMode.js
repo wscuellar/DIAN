@@ -14,14 +14,15 @@ function DeleteOperationMode(url) {
     })
 }
 
-function AddOperationMode(url, contributorId, softwareId) {debugger
+function AddOperationMode(url, contributorId, softwareType, softwareId) {
         var metod = 'POST';
         var data = {
             radianContributorId: contributorId,
+            softwareType: softwareType,
             softwareId: softwareId
         }
         var actionError = () => { }
-        var actionSuccess = (response) => {debugger
+        var actionSuccess = (response) => {
             var message = response.message;
             var operation = () => { location.reload() };
             var button = AlertExec(operation);
@@ -31,6 +32,7 @@ function AddOperationMode(url, contributorId, softwareId) {debugger
 }
 
 function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType) {
+
     if (softwareType == "1") {
         var metod = "POST";
         var data = {

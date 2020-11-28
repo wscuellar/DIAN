@@ -85,7 +85,7 @@ function AlertExec(operation) {
         del: {
             label: "Aceptar",
             className: "btn-radian-default",
-            callback: function () {debugger
+            callback: function () {
                 operation != null && operation();
                 operationClick = false;
             }
@@ -128,12 +128,16 @@ function CancelRegister(url, dataAjax, confirmMessage, successAction, label) {
         ShowPromptCancel(confirmMessage, operation, label);
 }
 
-function ShowPromptCancel(title, event, label) {
-    bootbox.prompt({
+function ShowPromptCancel(title, event, label, operationCancel) {
+    var bootboxPrompt = bootbox.prompt({
+        className: "prompt-comment",
         title: title,
         inputType: 'textarea',
-        placeholder: label,
         message: label,
+        inputOptions: {
+            text: "text",
+            value: "value"
+        },
         buttons: {
             confirm: {
                 label: "Aceptar",
@@ -142,11 +146,15 @@ function ShowPromptCancel(title, event, label) {
             cancel: {
                 label: "Cancelar",
                 className: "btn-radian-default",
-
             }
         },
         callback: function (result) {
-            result && event(result);
+            result ? event(result) : operationCancel();
         }
     });
+
+    bootboxPrompt.init(function () {
+        $(".bootbox-form").prepend($("<label>", { text: bootboxMessage.LABEL_PROMPT }));
+    });
+
 }

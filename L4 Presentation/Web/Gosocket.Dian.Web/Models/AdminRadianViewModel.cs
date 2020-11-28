@@ -164,6 +164,8 @@ namespace Gosocket.Dian.Web.Models
     {
         public string Id { get; set; }
         public int NewState { get; set; }
+        public string comment { get; set; }
+
     }
 
 }

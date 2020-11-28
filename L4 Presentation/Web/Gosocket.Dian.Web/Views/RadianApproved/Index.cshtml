@@ -104,10 +104,35 @@
                 $(".radian-file").click(function (file) {
                     $(this).val("");
                 });
-                $(".radian-file").change(function (file) {
-                    var fileObj = file.target.files[0];
-                    var fileSize = Math.round(fileObj.size/10000) / 100;
+            $(".radian-file").change(function (file) {
+                var form = $("#uploadForm");
+                var messages = new Object();
+                var id = $(this).attr('name');
+                var fileObj = file.target.files[0];
+                var fileSize = Math.round(fileObj.size / 10000) / 100;
+                if (fileSize > 10) {
+                    $(this).val("");
+                    messages = Object.assign(messages, {
+                        [id]: {
+                            required: "Tamaño máximo 10 Mb."
+                        }
+                    });
+                }
+                else {
                     $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
+                }
+                if (fileObj.type != "application/pdf") {
+                    $(this).val("");
+                    messages = Object.assign(messages, {
+                        [id]: {
+                            required: "Solo documentos .PDF"
+                        }
+                    });
+                }
+                form.validate({
+                    messages: messages
+                });
+                form.valid();
                 });
 
                 $(".show-history").click(function () {
@@ -247,7 +272,7 @@
                     })
                 });
 
-            $(".cancel-register").click(function () {debugger
+            $(".cancel-register").click(function () {
                 var url = "@Url.Action("DeleteUser", "RadianApproved")";
                 var confirmationMessage = bootboxMessage.CONFIRMATION_MESSAGE;
                 var successAction = () => window.location.href = '@Url.Action("Index", "Radian")';
