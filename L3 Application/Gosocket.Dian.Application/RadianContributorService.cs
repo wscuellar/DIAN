@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.Entity;
 using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Gosocket.Dian.Application
 {
@@ -295,5 +297,31 @@ namespace Gosocket.Dian.Application
 
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
         }
+
+        public string getXmlBase64Report ()
+        {
+            //Header 
+            XmlDocument report = new XmlDocument();
+            XmlDeclaration xmlDeclaration = report.CreateXmlDeclaration("1.0", "UTF-8", null);
+            XmlElement root = report.DocumentElement;
+            report.InsertBefore(xmlDeclaration, root);
+            XmlElement element1 = report.CreateElement(string.Empty, "cuerpo", string.Empty);
+            report.AppendChild(element1);
+            XmlElement element2 = report.CreateElement(string.Empty, "nivel1", string.Empty);
+            element1.AppendChild(element2);
+            XmlElement element3 = report.CreateElement(string.Empty, "nivel2", string.Empty);
+            XmlText text1 = report.CreateTextNode("texto");
+            element3.AppendChild(text1);
+            element2.AppendChild(element3);
+            XmlElement element4 = report.CreateElement(string.Empty, "nivel3", string.Empty);
+            XmlText text2 = report.CreateTextNode("más texto");
+            element4.AppendChild(text2);
+            element2.AppendChild(element4);
+            report.Save("C://ruta//xml_ejemplo.xml");
+
+
+            return string.Empty;
+        }
+
     }
 }
