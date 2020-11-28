@@ -951,32 +951,70 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueTotalInvoice = xmlParserCufe.TotalInvoice;
 
             //Valida informacion Endoso 
-            if (valueTotalEndoso == null)
+
+            if (valueTotalInvoice == null)
             {
                 return new ValidateListResponse
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "Regla: AAI05a, Rechazo: ",
-                    ErrorMessage = $"{(string)null} El valor no es informado .",
+                    ErrorCode = "Regla: AAI04, Rechazo: ",
+                    ErrorMessage = $"{(string)null} El valor total del endoso no es informado .",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 };
             }
 
-            if (!String.Equals(valueTotalEndoso, valueTotalInvoice))
-            {
-                return new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAI05b, Rechazo: ",
-                    ErrorMessage = $"{(string)null} Valor Total del Endoso no es igual al Valor total FEVTV .",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
-            }
 
             if (eventCode == "037")
             {
+                if (valueTotalEndoso == null)
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAI05a, Rechazo: ",
+                        ErrorMessage = $"{(string)null} El valor no es informado .",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+
+                if (!String.Equals(valueTotalEndoso, valueTotalInvoice))
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAI05b, Rechazo: ",
+                        ErrorMessage = $"{(string)null} Valor Total del Endoso no es igual al Valor total FEVTV .",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+
+                if (valuePriceToPay == null)
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAI07a, Rechazo: ",
+                        ErrorMessage = $"{(string)null} El valor no es informado .",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+
+                if (valueDiscountRateEndoso == null)
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAI09, Rechazo: ",
+                        ErrorMessage = $"{(string)null} No fue informado la tasa de descuento.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+
                 //Valida precio a pagar endoso
                 int resultValuePriceToPay = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
                 resultValuePriceToPay = resultValuePriceToPay / 100;
@@ -1817,7 +1855,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
         }
         #endregion
-
+        
         #region Validación de la Sección DocumentReference - CUFE Informado
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
@@ -1848,7 +1886,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = "Regla: AAH06, Rechazo: ",
-                    ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
+                    ErrorMessage = "El número de documento electrónico referenciado no coinciden con un mandato reportado",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
                 return responses;
