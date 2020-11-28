@@ -192,16 +192,7 @@ namespace Gosocket.Dian.Web.Controllers
                 OperationModeName = t.OperationModeName,
                 SoftwareId = t.SoftwareId,
                 Status = t.Status,
-                StatusDescription = t.StatusDescription,
-                TotalInvoicesAcceptedRequired = t.TotalInvoicesAcceptedRequired,
-                TotalInvoicesAccepted = t.TotalInvoicesAccepted,
-                TotalInvoicesRejected = t.TotalInvoicesRejected,
-                TotalCreditNotesAcceptedRequired = t.TotalCreditNotesAcceptedRequired,
-                TotalCreditNotesAccepted = t.TotalCreditNotesAccepted,
-                TotalCreditNotesRejected = t.TotalCreditNotesRejected,
-                TotalDebitNotesAcceptedRequired = t.TotalDebitNotesAcceptedRequired,
-                TotalDebitNotesAccepted = t.TotalDebitNotesAccepted,
-                TotalDebitNotesRejected = t.TotalDebitNotesRejected
+                StatusDescription = t.StatusDescription
             }).ToList();
 
 
