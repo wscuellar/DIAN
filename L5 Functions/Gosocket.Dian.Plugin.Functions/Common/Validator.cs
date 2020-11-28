@@ -958,12 +958,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "Regla: AAI04, Rechazo: ",
-                    ErrorMessage = $"{(string)null} El valor total del endoso no es informado .",
+                    ErrorCode = "Regla: AAI05, Rechazo: ",
+                    ErrorMessage = "El valor no es informado.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 };
             }
 
+            if (!String.Equals(valueTotalEndoso, valueTotalInvoice))
+            {
+                return new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAI05b, Rechazo: ",
+                    ErrorMessage = $"{(string)null} Valor Total del Endoso no es igual al Valor total FEVTV .",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
+            }
 
             if (eventCode == "037")
             {
@@ -977,19 +988,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorMessage = $"{(string)null} El valor no es informado .",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
-                }
-
-                if (!String.Equals(valueTotalEndoso, valueTotalInvoice))
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAI05b, Rechazo: ",
-                        ErrorMessage = $"{(string)null} Valor Total del Endoso no es igual al Valor total FEVTV .",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
+                }               
 
                 if (valuePriceToPay == null)
                 {
