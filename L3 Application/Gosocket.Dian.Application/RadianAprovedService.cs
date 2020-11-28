@@ -206,7 +206,7 @@ namespace Gosocket.Dian.Application
         }
 
         public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
-        {
+        {   
             RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
             radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId && t.Deleted == false);
             radianContributorOperationWithSoftware.Softwares = radianContributorOperationWithSoftware.RadianContributorOperations.Select(t => t.Software).ToList();
@@ -226,13 +226,13 @@ namespace Gosocket.Dian.Application
         /// <param name="operationMode"></param>
         /// <param name="term"></param>
         /// <returns></returns>
-        public List<Software> SoftwareList(int radianContributorId)
+        public List<RadianSoftware> SoftwareList(int radianContributorId)
         {
             List<RadianContributor> participants;
-            participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.Contributor.Softwares.Any()).Results;
-            return participants.Select(t => t.Contributor).Aggregate(new List<Software>(), (list, source) =>
+            participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.RadianSoftwares.Any(x=> x.Status)).Results;
+            return participants.Select(t => t.RadianSoftwares).Aggregate(new List<RadianSoftware>(), (list, source) =>
             {
-                list.AddRange(source.Softwares.ToList());
+                list.AddRange(source);
                 return list;
             }).Distinct().ToList();
         }
@@ -259,9 +259,9 @@ namespace Gosocket.Dian.Application
 
             string radianStateText = radianState != RadianState.none ? radianState.GetDescription() : string.Empty;
             List<int> customersId = (
-                                    from s in radianContributor.Contributor.Softwares
+                                    from s in radianContributor.RadianSoftwares
                                     from c in s.RadianContributorOperations
-                                    where 
+                                    where
                                             c.SoftwareType != (int)RadianOperationModeTestSet.OwnSoftware
                                         && (string.IsNullOrEmpty(code) || c.RadianContributor.Contributor.Code == code)
                                     select c.RadianContributorId).ToList();

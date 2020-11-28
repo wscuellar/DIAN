@@ -205,7 +205,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a El usuario no existe en el sistema!!!.
+        ///   Busca una cadena traducida similar a El usuario no habilitado para el sistema!!!.
         /// </summary>
         public static string NonExistentParticipant {
             get {

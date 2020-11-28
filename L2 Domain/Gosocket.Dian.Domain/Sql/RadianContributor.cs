@@ -21,6 +21,7 @@ namespace Gosocket.Dian.Domain
         public int Step { get; set; }
         public string CreatedBy { get; set; }
         public virtual ICollection<RadianContributorFile> RadianContributorFile { get; set; }
+        public virtual ICollection<RadianSoftware> RadianSoftwares { get; set; }
         public virtual ICollection<RadianContributorOperation> RadianContributorOperations { get; set; }
         
     }

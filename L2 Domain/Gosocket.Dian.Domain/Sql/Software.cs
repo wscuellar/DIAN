@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -31,7 +30,7 @@ namespace Gosocket.Dian.Domain
         public int AcceptanceStatusSoftwareId { get; set; }
         public virtual AcceptanceStatusSoftware AcceptanceStatusSoftware { get; set; }
 
-    public bool Deleted { get; set; }
+        public bool Deleted { get; set; }
 
         public DateTime Timestamp { get; set; }
 
@@ -39,6 +38,6 @@ namespace Gosocket.Dian.Domain
 
         public string CreatedBy { get; set; }
 
-        public virtual ICollection<RadianContributorOperation> RadianContributorOperations { get; set; }
+
     }
 }

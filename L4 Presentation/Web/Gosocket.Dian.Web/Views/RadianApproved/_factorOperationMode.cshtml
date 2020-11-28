@@ -133,7 +133,26 @@
                                             @foreach (var oper in Model.RadianContributorOperations.RadianContributorOperations)
                                             {
                                             <tr>
-                                                <td class="smallText iffyTip">Se quito debe arreglarse</td>
+                                                <td class="smallText iffyTip">
+                                                    @{
+                                                        if (oper.SoftwareType == 1)
+                                                        {
+                                                            <p>Software Propio</p>
+                                                        }
+                                                        if (oper.SoftwareType == 2)
+                                                        {
+                                                            <p>Software Proveedor Tecnológico</p>
+                                                        }
+                                                        if (oper.SoftwareType == 3)
+                                                        {
+                                                            <p>Software Sistema de Negociación</p>
+                                                        }
+                                                        if (oper.SoftwareType == 4)
+                                                        {
+                                                            <p>Software Factor</p>
+                                                        }
+                                                    }
+                                                </td>
                                                 <td class="smallText iffyTip">@oper.Timestamp.ToString("dd/MM/yyy")</td>
                                                 <td class="largeText iffyTip">
                                                     @{
@@ -154,7 +173,7 @@
                                                         }
                                                     }
                                                 </td>
-                                                <td class="largeText iffyTip">arreglar</td>
+                                                <td class="largeText iffyTip">@oper.SoftwareType</td>
                                                 <td class="largeText iffyTip">@oper.Software.Id</td>
                                                 <td class="largeText iffyTip">@oper.Software.Pin</td>
                                                 <td class="largeText iffyTip">@oper.Software.Url</td>
