@@ -24,10 +24,13 @@ namespace Gosocket.Dian.DataContext.Repositories
         {
             IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression)
                 .Include("Contributor")
+                .Include("RadianSoftwares")
+                .Include("RadianSoftwares.RadianContributorOperations")
                 .Include("RadianContributorType")
                 .Include("RadianOperationMode")
                 .Include("RadianContributorFile")
                 .Include("RadianContributorOperations");
+            
             return query.FirstOrDefault();
         }
 

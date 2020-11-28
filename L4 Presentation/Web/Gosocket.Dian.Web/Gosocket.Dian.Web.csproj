@@ -2657,6 +2657,8 @@
     <Content Include="Scripts\numeral.min.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Templates\ElectronicInvoiceExistenceCertificateReport.html" />
+    <Content Include="Templates\RadianEventsTemplate.html" />
     <Content Include="w3c\p3p.xml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

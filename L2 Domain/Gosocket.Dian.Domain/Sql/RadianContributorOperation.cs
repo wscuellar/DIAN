@@ -14,7 +14,7 @@ namespace Gosocket.Dian.Domain
         public RadianContributor RadianContributor { get; set; }
         public int SoftwareType { get; set; }
         public Guid SoftwareId { get; set; }
-        public Software Software { get; set; }
+        public RadianSoftware Software { get; set; }
         public bool Deleted { get; set; }
         public DateTime Timestamp { get; set; }
     }

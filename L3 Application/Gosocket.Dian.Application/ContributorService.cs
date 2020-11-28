@@ -410,5 +410,17 @@ namespace Gosocket.Dian.Application
             var tableManager = new TableManager("GlobalLogger");
             tableManager.InsertOrUpdate(logger);
         }
+
+
+        public Software GetBaseSoftwareForRadian(int contributorid)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return (from c in context.Contributors.Where(t => t.Id == contributorid && t.AcceptanceStatusId == 4)
+                        from s in c.Softwares.Where(t => t.AcceptanceStatusSoftwareId != 3 && t.Status && !t.Deleted)
+                        join cp in context.ContributorOperations.Where(t=> !t.Deleted) on s.Id equals cp.SoftwareId
+                        select s).OrderByDescending(t=> t.Updated).FirstOrDefault();
+            }
+        }
     }
 }
