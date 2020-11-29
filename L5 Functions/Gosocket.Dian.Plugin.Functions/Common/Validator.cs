@@ -1943,7 +1943,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             case (int)EventStatus.Rejected:   
                                 if (document != null)
                                 {
-                                    if (documentMeta.Where(t => t.EventCode == "033" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
+                                    if (documentMeta.Where(t => t.EventCode == "032").ToList().Count == decimal.Zero)
                                     {
                                         validFor = true;
                                         responses.Add(new ValidateListResponse
@@ -1951,35 +1951,50 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             IsValid = false,
                                             Mandatory = true,
                                             ErrorCode = "202",
-                                            ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
-                                            "ya existe un evento (033) Aceptación Expresaa",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
-                                    else if (documentMeta.Where(t => t.EventCode == "034" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
-                                    {
-                                        validFor = true;
-                                        responses.Add(new ValidateListResponse
-                                        {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = "202",
-                                            ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
-                                            "ya existe un evento (034) Aceptación Tacita de la factura",
+                                            ErrorMessage = "No se puede rechazar documento, no existe un evento Recibo del Bien de la factura",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
                                     else
                                     {
-                                        responses.Add(new ValidateListResponse
+                                        if (documentMeta.Where(t => t.EventCode == "033" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                                         {
-                                            IsValid = true,
-                                            Mandatory = true,
-                                            ErrorCode = "100",
-                                            ErrorMessage = "Evento referenciado correctamente",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = "202",
+                                                ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
+                                                "ya existe un evento (033) Aceptación Expresaa",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                        else if (documentMeta.Where(t => t.EventCode == "034" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
+                                        {
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = "202",
+                                                ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
+                                                "ya existe un evento (034) Aceptación Tacita de la factura",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                        else
+                                        {
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = true,
+                                                Mandatory = true,
+                                                ErrorCode = "100",
+                                                ErrorMessage = "Evento referenciado correctamente",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                    }                                   
                                 }                                   
                                 break;
                             case (int)EventStatus.Receipt:
@@ -2011,7 +2026,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             case (int)EventStatus.Accepted:
                                 if (document != null)
                                 {
-                                    //DEbe existir Recibo del bien o aceptacion de la prestacion del servicio 
+                                    //Debe existir Recibo del bien o aceptacion de la prestacion del servicio 
                                     if (documentMeta.Where(t => t.EventCode == "032").ToList().Count > decimal.Zero)
                                     {
                                         if (documentMeta.Where(t => t.EventCode == "031" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
@@ -2064,46 +2079,62 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
-                                    }                                   
-                                  
+                                    }                                                                     
                                 }                              
                                 break;
                             case (int)EventStatus.AceptacionTacita:
                                 if (document != null)
                                 {
-                                    if (documentMeta.Where(t => t.EventCode == "031" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
+                                    //Debe existir Recibo del bien o aceptacion de la prestacion del servicio 
+                                    if (documentMeta.Where(t => t.EventCode == "032").ToList().Count > decimal.Zero)
                                     {
-                                        validFor = true;
-                                        responses.Add(new ValidateListResponse
+                                        if (documentMeta.Where(t => t.EventCode == "031" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                                         {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = "203",
-                                            ErrorMessage = "No se puede aceptar un documento que ha sido rechazado previamente, " +
-                                            "ya existe un evento (031) Rechazo de la factura de Venta",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }                                   
-                                    else if (documentMeta.Where(t => t.EventCode == "033" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
-                                    {
-                                        validFor = true;
-                                        responses.Add(new ValidateListResponse
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = "203",
+                                                ErrorMessage = "No se puede aceptar un documento que ha sido rechazado previamente, " +
+                                                "ya existe un evento (031) Rechazo de la factura de Venta",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                        else if (documentMeta.Where(t => t.EventCode == "033" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
                                         {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = "LGC05",
-                                            ErrorMessage = "No se puede generar una aceptación tácita sobre un documento que haya sido aceptada expresamente previamente",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = "LGC05",
+                                                ErrorMessage = "No se puede generar una aceptación tácita sobre un documento que haya sido aceptada expresamente previamente",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                        else
+                                        {
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = true,
+                                                Mandatory = true,
+                                                ErrorCode = "100",
+                                                ErrorMessage = "Evento referenciado correctamente",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
                                     }
                                     else
                                     {
+                                        validFor = true;
                                         responses.Add(new ValidateListResponse
                                         {
-                                            IsValid = true,
+                                            IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "100",
-                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ErrorCode = "89",
+                                            ErrorMessage = "Solo se pueda transmitir el evento (034) Aceptacion Tácita de la factura," +
+                                            " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
@@ -2547,7 +2578,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                              Mandatory = true,
                              ErrorCode = "89",
                              ErrorMessage =
-                                "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento, se rechaza la transmisión de este evento 31",
+                                "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento Recibo del Bien, se rechaza la transmisión de este evento 31",
                              ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                          }
                         : new ValidateListResponse
@@ -2566,7 +2597,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "89",
-                            ErrorMessage = "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento, se rechaza la transmisión de este evento 33",
+                            ErrorMessage = "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento Recibo del Bien, se rechaza la transmisión de este evento 33",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
                         : new ValidateListResponse
