@@ -220,6 +220,30 @@
             });
             // Pagination
 
+            //Set radian status circle styles
+            $(".radian-status-circle").each(
+                function () {
+                    if ($(this).parent().text().trim() == "TÍTULO VALOR") {
+                        $(this).css("color", "#C67BBE");
+                    }
+                    else if ($(this).parent().text().trim() == "PAGADA") {
+                        $(this).css("color", "#51B5D3");
+                    }
+                    else if ($(this).parent().text().trim() == "REGISTRADA") {
+                        $(this).css("color", "#62C6AB");
+                    }
+                    else if ($(this).parent().text().trim() == "ENDOSADA") {
+                        $(this).css("color", "#F8D630");
+                    }
+                    else if ($(this).parent().text().trim() == "LIMITADA") {
+                        $(this).css("color", "#8ED476");
+                    }
+                    else {
+                        $(this).css("color", "#8ED476");
+                    }
+                }
+            );
+            //Set radian status circle styles
         });
 
         startDate = moment("@Model.StartDate.ToString("yyyy-MM-dd")");
