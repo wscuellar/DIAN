@@ -371,6 +371,18 @@ namespace Gosocket.Dian.Domain.Common
         Indirect = 2,
     }
 
+
+    public enum RadianSoftwareStatus
+    {
+        None = 0,
+        [Description("En proceso")]
+        InProcess = 1,
+        [Description("Aceptado")]
+        Accepted = 2,
+        [Description("Rechazado")]
+        Rejected = 3,
+    }
+
     public enum RadianState
     {
         none = 0,

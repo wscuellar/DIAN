@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gosocket.Dian.Domain.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -26,6 +27,7 @@ namespace Gosocket.Dian.Domain
             CreatedBy = createdBy;
             Deleted = false;
             Status = true;
+            RadianSoftwareStatusId = (int)RadianSoftwareStatus.InProcess;
             Url = software.Url;
             Timestamp = software.Timestamp;
             Updated = software.Updated;
@@ -50,6 +52,8 @@ namespace Gosocket.Dian.Domain
         public string Url { get; set; }
 
         public bool Status { get; set; }
+
+        public int RadianSoftwareStatusId { get; set;}
 
         public bool Deleted { get; set; }
 

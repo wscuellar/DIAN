@@ -412,15 +412,23 @@ namespace Gosocket.Dian.Application
         }
 
 
+        /// <summary>
+        /// Consulta contribuyentes del catalogo que sean habilitados (AcceptanceStatusId == 4) que esten activo y no eliminados
+        /// con software en produccion habilitado y no eliminado
+        /// con operaciones con software propio no eliminado
+        /// </summary>
+        /// <param name="contributorid"></param>
+        /// <returns></returns>
         public Software GetBaseSoftwareForRadian(int contributorid)
         {
             using (var context = new SqlDBContext())
             {
-                return (from c in context.Contributors.Where(t => t.Id == contributorid && t.AcceptanceStatusId == 4)
-                        from s in c.Softwares.Where(t => t.AcceptanceStatusSoftwareId != 3 && t.Status && !t.Deleted)
-                        join cp in context.ContributorOperations.Where(t=> !t.Deleted) on s.Id equals cp.SoftwareId
+                return (from c in context.Contributors.Where(t => t.Id == contributorid && t.AcceptanceStatusId == 4 && t.Status && !t.Deleted)
+                        from s in c.Softwares.Where(t => t.AcceptanceStatusSoftwareId == 2 && t.Status && !t.Deleted)
+                        join cp in context.ContributorOperations.Where(t=> t.OperationModeId == 2) on s.Id equals cp.SoftwareId
                         select s).OrderByDescending(t=> t.Updated).FirstOrDefault();
             }
         }
+
     }
 }
