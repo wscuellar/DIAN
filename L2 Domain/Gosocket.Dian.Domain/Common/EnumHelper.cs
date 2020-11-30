@@ -364,6 +364,7 @@ namespace Gosocket.Dian.Domain.Common
 
     public enum RadianOperationMode
     {
+        None = 0,
         [Description("Operación Directa")]
         Direct = 1,
         [Description("Operación Indirecta")]

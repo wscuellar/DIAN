@@ -23,25 +23,25 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         }
 
 
-        [TestMethod()]
-        public void AddTest()
-        {
-            //arrange
-            RegistrationDataViewModel registrationData = new RegistrationDataViewModel();
-            _radianContributorService.Setup(t=> t.CreateContributor(registrationData.ContributorId, 
-                                                        RadianState.Registrado,
-                                                        registrationData.RadianContributorType,
-                                                        registrationData.RadianOperationMode,
-                                                        It.IsAny<string>()));
-            _radianTestSetService.Setup(t => t.OperationModeList()).Returns(new List<Domain.RadianOperationMode>());
+        //[TestMethod()]
+        //public void AddTest()
+        //{
+        //    //arrange
+        //    RegistrationDataViewModel registrationData = new RegistrationDataViewModel();
+        //    _radianContributorService.Setup(t=> t.CreateContributor(registrationData.ContributorId, 
+        //                                                RadianState.Registrado,
+        //                                                registrationData.RadianContributorType,
+        //                                                registrationData.RadianOperationMode,
+        //                                                It.IsAny<string>()));
+        //    _radianTestSetService.Setup(t => t.OperationModeList()).Returns(new List<Domain.RadianOperationMode>());
 
-            //add
-             _current.Add(registrationData);
+        //    //add
+        //     _current.Add(registrationData);
 
-            //assert
-            Assert.IsTrue(true);
+        //    //assert
+        //    Assert.IsTrue(true);
 
-        }
+        //}
 
        
     }
