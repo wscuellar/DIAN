@@ -223,9 +223,9 @@ namespace Gosocket.Dian.Web.Controllers
                 Deleted = false,
                 Timestamp = DateTime.Now,
                 SoftwareType = data.SoftwareType,
-                SoftwareId = new Guid(data.SoftwareId),
-            }, data.Url,
-            data.SoftwareName,
+                SoftwareId = data.SoftwareId != null ? new Guid(data.SoftwareId) : Guid.Empty,
+            },data.Url,
+            data.SoftwareName, 
             data.Pin,
             User.UserName());
 

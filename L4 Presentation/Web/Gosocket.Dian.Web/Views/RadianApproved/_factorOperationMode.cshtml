@@ -74,7 +74,7 @@
                                                     <div class="col-sm-3 padding-xs-0">
                                                         <div class="form-group">
                                                             @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
-                                                            @Html.TextBoxFor(m => m.Software.CreatedBy, new { @class = "form-control input-general", disabled = "disabled" })
+                                                            @Html.TextBoxFor(m => m.Contributor.BusinessName, new { @class = "form-control input-general", disabled = "disabled" })
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3 padding-xs-0">
@@ -173,7 +173,7 @@
                                                         }
                                                     }
                                                 </td>
-                                                <td class="largeText iffyTip">@oper.SoftwareType</td>
+                                                <td class="largeText iffyTip">@oper.Software.Name</td>
                                                 <td class="largeText iffyTip">@oper.Software.Id</td>
                                                 <td class="largeText iffyTip">@oper.Software.Pin</td>
                                                 <td class="largeText iffyTip">@oper.Software.Url</td>
