@@ -11,14 +11,18 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Gosocket.Dian.Functions.Pdf
 {
     public static class GetPdf
     {
+        private static readonly TableManager tableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+
         [FunctionName("GetPdf")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
         {
             try
             {
@@ -43,6 +47,18 @@ namespace Gosocket.Dian.Functions.Pdf
                     throw new Exception(response.Message);
                 var xmlBytes = Convert.FromBase64String(response.XmlBase64);
 
+                //Consultar si existe ApplicationResponse
+                GlobalDocValidatorDocumentMeta documentMetaEntity = null;
+                documentMetaEntity = tableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+                var applicationResponse = await XmlUtil.GetApplicationResponseIfExist(documentMetaEntity);
+                byte[] xmlBytesApplication = null;
+                if (applicationResponse != null) xmlBytesApplication = applicationResponse;
+                var responseApplication = new ResponseGetApplicationResponse { Success = true, Message = "OK" };
+                if (xmlBytesApplication != null)
+                {
+                    responseApplication.Content = xmlBytesApplication;
+                    responseApplication.ContentBase64 = Convert.ToBase64String(xmlBytesApplication);
+                }
 
                 // Diccionario para construir Pdf
                 var dictionary = new Dictionary<string, string>
@@ -58,7 +74,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 
                 // Transformar **XML** to **HTML**
-                var htmlGDoc = new HtmlGDoc(xmlBytes);
+                var htmlGDoc = new HtmlGDoc(xmlBytes, xmlBytesApplication);
                 string Html_Content = htmlGDoc.GetHtmlGDoc(dictionary);
 
                 //-------------------------------------------------------------------------------------------------------------------------
@@ -82,6 +98,13 @@ namespace Gosocket.Dian.Functions.Pdf
                 // Sustuir en el HTML la ruta de LOGO y CÓDIGO QR para colocar imágenes
                 Html_Content = Html_Content.Replace("#123logo", logoBase64);
                 Html_Content = Html_Content.Replace("#1qrcode", qrBase64);
+
+                // Sustituir en el HTML la respuesta de la validación del documento
+                var documentApplication = htmlGDoc.GetDocumentResponse();
+                if (documentApplication != null)
+                    Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication);
+                else
+                    Html_Content = Html_Content.Replace("#ApplicationResponse", "");
 
                 //-------------------------------------------------------------------------------------------------------------------------
 
