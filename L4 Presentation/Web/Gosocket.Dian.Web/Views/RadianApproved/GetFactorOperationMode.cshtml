@@ -18,11 +18,15 @@
             var softwareType = "";
             DeleteOperationMode('@Url.Action("DeleteOperationMode", "RadianApproved")');
             "@operationMode" != "2" && $("#OperationModeSelected").attr("disabled", "disabled");
+            if ("@operationMode" != "2") {
+                $("#OperationModeSelectedId").val(1);
 
-            $("#OperationModeSelectedId").change(function (value) {
-                var software = $("#OperationModeSelectedId").val();
-                RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
-            })
+            } else {
+                  $("#OperationModeSelectedId").change(function (value) {
+                    var software = $("#OperationModeSelectedId").val();
+                    RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
+                })
+            }
 
             $("#save-operation-mode").click(function (e) {debugger
                 e.preventDefault();
