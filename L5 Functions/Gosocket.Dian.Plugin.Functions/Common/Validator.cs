@@ -944,7 +944,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndoso
-        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, NitModel nitModel, string eventCode)
+        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
@@ -956,7 +956,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Valida informacion Endoso 
 
-            if (valueTotalEndoso == null)
+            if (valueTotalEndoso == null || valueTotalEndoso == "")
             {
                 return new ValidateListResponse
                 {
@@ -1033,6 +1033,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
                 }
+
+                if (xmlParserCude.Fields["listID"].ToString() != "2")
+                {
+                    XmlNodeList valueList = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
+                    int totalValue = 0;
+                    for (int i = 0; i < valueList.Count; i++)
+                    {
+                        string valueStockAmount = valueList.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                        totalValue += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                    }
+
+                    if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValue)
+                    {
+                        return new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: 89, Rechazo: ",
+                            ErrorMessage = $"{(string)null} El valor total del endoso es diferente a los valores reportados .",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        };
+                    }
+                }
+
             }
 
             return null;
@@ -1910,7 +1934,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region validation to emition to event
-        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe,  NitModel nitModel)
+        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude,  NitModel nitModel)
         {
             bool validFor = false;
             string eventCode = eventPrev.EventCode;
@@ -2208,7 +2232,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 //Solicitud de Disponibilización
                                 else if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
                                 {
-                                    var response = ValidateEndoso(xmlParserCufe, nitModel, eventCode);
+                                    var response = ValidateEndoso(xmlParserCufe, xmlParserCude,nitModel, eventCode);
                                     if (response != null)
                                     {
                                         validFor = true;
