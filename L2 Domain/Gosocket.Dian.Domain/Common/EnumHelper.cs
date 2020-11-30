@@ -392,4 +392,25 @@ namespace Gosocket.Dian.Domain.Common
         SoftwareFactor = 4
     }
 
+    /// <summary>
+    /// Documentos Electronicos. Utilizados en la configuración de Set de Pruebas - Otros Documentos
+    /// </summary>
+    public enum ElectronicsDocuments
+    {
+        [Description("Nomina Electrónica y Nomina de Ajuste")]
+        ElectronicPayroll = 1,
+
+        [Description("Documento de Importación")]
+        ImportDocument = 2,
+        
+        [Description("Documento de Soporte")]
+        SupportDocument = 3,
+        
+        [Description("Documento equivalente electrónico")]
+        ElectronicEquivalent = 4,
+        
+        [Description("POS electrónico")]
+        ElectronicPOS = 5
+    }
+
 }

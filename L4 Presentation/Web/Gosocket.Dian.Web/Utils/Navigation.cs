@@ -55,7 +55,11 @@ namespace Gosocket.Dian.Web.Utils
             RADIAN,
             RadianContributorFileType,
             RadianSetPruebas,
-            AdminRadian
+            AdminRadian,
+            /// <summary>
+            /// Opción de menu. Set de pruebas - Otros documentos
+            /// </summary>
+            TestSetOtherDocuments
         }
     }
 }

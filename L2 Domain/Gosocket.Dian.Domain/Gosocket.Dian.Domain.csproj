@@ -160,6 +160,7 @@
     <Compile Include="Entity\DianEmailTracker.cs" />
     <Compile Include="Entity\DianNsuControl.cs" />
     <Compile Include="Entity\DianOfeControl.cs" />
+    <Compile Include="Entity\ElectronicDocument.cs" />
     <Compile Include="Entity\GlobalAttorneyFacultity.cs" />
     <Compile Include="Entity\GlobalAuthorization.cs" />
     <Compile Include="Entity\GlobalBatchFileFailed.cs" />
@@ -190,6 +191,7 @@
     <Compile Include="Entity\GlobalRejectedDocument.cs" />
     <Compile Include="Entity\GlobalSoftware.cs" />
     <Compile Include="Entity\GlobalTask.cs" />
+    <Compile Include="Entity\GlobalTestSetOthersDocuments.cs" />
     <Compile Include="Entity\GlobalTestSetResult.cs" />
     <Compile Include="Entity\GlobalTestSet.cs" />
     <Compile Include="Entity\GlobalTestSetTracking.cs" />
@@ -207,6 +209,7 @@
     <Compile Include="KeyVault\ExportCertificatResult.cs" />
     <Compile Include="KeyVault\HttpMessageHandler.cs" />
     <Compile Include="KeyVault\ImportCertificateResult.cs" />
+    <Compile Include="Sql\ElectronicDocument.cs" />
     <Compile Include="Sql\OperationMode.cs" />
     <Compile Include="Sql\RadianContributorType.cs" />
     <Compile Include="Sql\RadianContributor.cs" />

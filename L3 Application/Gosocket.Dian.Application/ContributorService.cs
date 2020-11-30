@@ -332,7 +332,23 @@ namespace Gosocket.Dian.Application
         {
             using (var context = new SqlDBContext())
             {
-                return context.OperationModes.FirstOrDefault(x => x.Id == id);
+                var r = context.OperationModes.FirstOrDefault(x => x.Id == id);
+                if (r == null)
+                    return new OperationMode();
+                else
+                    return r;
+            }
+        }
+
+        /// <summary>
+        /// Retornar todos los Modos de Operación
+        /// </summary>
+        /// <returns></returns>
+        public List<OperationMode> GetOperationModes()
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.OperationModes.ToList();
             }
         }
 

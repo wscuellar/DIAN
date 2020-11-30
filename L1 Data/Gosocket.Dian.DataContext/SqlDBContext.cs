@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using System;
 using System.Data.Entity;
@@ -138,6 +139,11 @@ namespace Gosocket.Dian.DataContext
         public DbSet<RadianContributor> RadianContributors { set; get; }
         public DbSet<RadianContributorType> RadianContributorTypes { set; get; }
         public DbSet<RadianOperationMode> RadianOperationModes { set; get; }
+
+        /// <summary>
+        /// Otros documentos. Utilizado por el momento para la Opción/Vista de Set de Pruebas - Otros Documentos
+        /// </summary>
+        public DbSet<ElectronicDocument> ElectronicDocuments { set; get; }
 
     }
 

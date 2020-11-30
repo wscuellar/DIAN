@@ -45,5 +45,11 @@ namespace Gosocket.Dian.Interfaces
         void SetHabilitationAndProductionDates(Contributor contributor);
         void SetHabilitationAndProductionDates(Contributor contributor, string connectionString = null);
         void SetToEnabled(Contributor contributor);
+
+        /// <summary>
+        /// Retornar la lista de Modos de Operación
+        /// </summary>
+        /// <returns></returns>
+        List<OperationMode> GetOperationModes();
     }
 }
