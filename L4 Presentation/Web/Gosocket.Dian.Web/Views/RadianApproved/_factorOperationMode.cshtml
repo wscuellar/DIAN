@@ -156,20 +156,17 @@
                                                 <td class="smallText iffyTip">@oper.Timestamp.ToString("dd/MM/yyy")</td>
                                                 <td class="largeText iffyTip">
                                                     @{
-                                                        if (oper.Software.Status)
+                                                        if (oper.Software.RadianSoftwareStatusId == 1)
+                                                        {
+                                                            <p>En proceso</p>
+                                                        }
+                                                        if (oper.Software.RadianSoftwareStatusId == 2)
                                                         {
                                                             <p>Aceptado</p>
                                                         }
-                                                        else
+                                                        if(oper.Software.RadianSoftwareStatusId == 3)
                                                         {
-                                                            if (oper.Software.Deleted)
-                                                            {
-                                                                <p>Rechazado</p>
-                                                            }
-                                                            else
-                                                            {
-                                                                <p>En proceso</p>
-                                                            }
+                                                            <p>Rechazado</p>
                                                         }
                                                     }
                                                 </td>

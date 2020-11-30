@@ -1,4 +1,16 @@
 ﻿
+//var paramsObject = {
+//    element: "",
+//    data: [],
+//    form: "",
+//    urlSearch: "",
+//    radianId: 0,
+//    page: 0,
+//    tableRendered: "",
+//    customersTotalCount: 0,
+//    columns: []
+//}
+
 function RenderSteps(index) {
     $("#steps-approved").steps({
         headerTag: "h3",
@@ -78,12 +90,12 @@ function RenderTable(element, data, form, urlSearch, radianId, page, tableRender
     $(element+"_filter > label").hide();
     $(element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(page, customersTotalCount));
     $(element + "_filter").append(form);
-    LoadEventsToSearch(urlSearch, radianId, form, page, table);
-    LoadEventsToPagiantion(element, data, form, urlSearch, radianId, table, page);
+    LoadEventsToSearch(urlSearch, radianId, form, page, table, customersTotalCount, columns);
+    LoadEventsToPagiantion(element, data, form, urlSearch, radianId, page, table, customersTotalCount, columns);
     changeToSpanish();
 }
 
-function LoadEventsToSearch(url, radianContributorId, form, page, table) {
+function LoadEventsToSearch(url, radianContributorId, form, page, table, customersTotalCount, columns) {
     $("#search-customers").click(function (e) {
         e.preventDefault();
         var nit = $("#NitSearch").val();
@@ -97,13 +109,13 @@ function LoadEventsToSearch(url, radianContributorId, form, page, table) {
         };
         var actionError = () => {}
         var actionSuccess = (response) => {
-            RenderTable('#table-customers', response, form, url, radianContributorId, page, table)
+            RenderTable('#table-customers', response, form, url, radianContributorId, page, table, customersTotalCount, columns)
         }
         ajaxFunction(url, 'POST', data, actionError, actionSuccess); 
     })
 }
 
-function LoadEventsToPagiantion(element, data, form, urlSearch, radianId, table, page) {
+function LoadEventsToPagiantion(element, data, form, urlSearch, radianId, page, table, customersTotalCount, columns) {
     $(".next-page").click(function () {
         var newPage = parseInt($("#PageTable").val()) + 1;
         $("#PageTable").val(newPage);
@@ -118,7 +130,7 @@ function LoadEventsToPagiantion(element, data, form, urlSearch, radianId, table,
         };
         var actionError = () => { }
         var actionSuccess = (response) => {
-            RenderTable(element, response, form, urlSearch, radianId, newPage, table)
+            RenderTable(element, response, form, urlSearch, radianId, newPage, table, customersTotalCount, columns)
         }
         ajaxFunction(urlSearch, 'POST', data, actionError, actionSuccess); 
     });
@@ -136,7 +148,7 @@ function LoadEventsToPagiantion(element, data, form, urlSearch, radianId, table,
         };
         var actionError = () => { }
         var actionSuccess = (response) => {
-            RenderTable(element, response, form, urlSearch, radianId, newPage, table)
+            RenderTable(element, response, form, urlSearch, radianId, newPage, table, customersTotalCount, columns)
         }
         ajaxFunction(url, 'POST', data, actionError, actionSuccess); 
     });
