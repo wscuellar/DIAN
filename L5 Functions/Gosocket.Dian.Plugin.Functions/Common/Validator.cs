@@ -953,7 +953,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Valida informacion Endoso 
 
-            if (valueTotalEndoso == null)
+            if (valueTotalEndoso == null || valueTotalEndoso == "")
             {
                 return new ValidateListResponse
                 {
