@@ -75,8 +75,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateEmitionEventPrevAsync(ValidateEmitionEventPrev.RequestObject eventPrev)
         {
             var validateResponses = new List<ValidateListResponse>();
+            var nitModel = new NitModel();
             XmlParser xmlParserCufe = null;
-            XmlParser xmlParserCude = null;
 
             //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
             if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
@@ -100,13 +100,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 //Obtiene XML ApplicationResponse CUDE
                 var xmlBytesCude = await GetXmlFromStorageAsync(eventPrev.TrackIdCude);
-                xmlParserCude = new XmlParser(xmlBytesCude);
+                var xmlParserCude = new XmlParser(xmlBytesCude);
                 if (!xmlParserCude.Parser())
                     throw new Exception(xmlParserCude.ParserError);
+
+                nitModel = xmlParserCude.Fields.ToObject<NitModel>();
             }
 
             var validator = new Validator();           
-            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude));
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, nitModel));
 
             return validateResponses;
 
@@ -160,16 +162,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, "0"+ (int)code).FirstOrDefault();
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
+                    "0"+ (int)code).FirstOrDefault();                
                 if (documentMeta != null)
                 {
                     data.TrackId = documentMeta.PartitionKey;
                 }
-                // Validación de la Sección Signature - Fechas valida transmisión evento TASK 714
+                //No encuentra información del Recibo del bien para Aceptación Expresa y Tácita
+                else if (documentMeta == null && (Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.Rejected))
+                {
+                    ValidateListResponse response = new ValidateListResponse();
+                    response.ErrorMessage = $"No se encontró evento referenciado CUDE Recibo del Bien para evaluar fecha.";
+                    response.IsValid = false;
+                    response.ErrorCode = "89";
+                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                    validateResponses.Add(response);
+                    return validateResponses;
+                }
+                // Validación de la Sección Signature - Fechas valida transmisión evento Solicitud Disponibilizacion
                 else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
                 {
                     code = EventStatus.AceptacionTacita; 
-                    documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, "0" + (int)code).FirstOrDefault();
+                    documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, 
+                        "0" + (int)code).FirstOrDefault();
                     if (documentMeta != null)
                     {
                         data.TrackId = documentMeta.PartitionKey;
@@ -189,7 +206,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 else if (Convert.ToInt32(data.EventCode) != (int)EventStatus.Rejected)
                 {
                     ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE/CUFE {data.TrackId}";
+                    response.ErrorMessage = $"No se encontró evento referenciado CUDE y/o CUFE para evaluar fecha.";
                     response.IsValid = false;
                     response.ErrorCode = "89";
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
@@ -200,15 +217,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice ||
                     Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, "0" + (int)code, data.CustomizationID).FirstOrDefault();
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), 
+                    data.DocumentTypeId, "0" + (int)code, data.CustomizationID).FirstOrDefault();
                 if (documentMeta != null)
                 {
                     data.TrackId = documentMeta.PartitionKey;
                 }
                 else
                 {
+                    string msg = Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice ? "No se encontró evento referenciado CUDE para evaluar fecha Limitación de circulación"
+                        : "No se encontró evento referenciado CUDE para evaluar fecha Notificación del pago total o parcial";
                     ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = $"No se encontró documento electrónico para el CUDE/CUFE {data.TrackId}";
+                    response.ErrorMessage = msg;
                     response.IsValid = false;
                     response.ErrorCode = "89";
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
@@ -216,6 +236,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return validateResponses;
                 }
             }
+
             var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())

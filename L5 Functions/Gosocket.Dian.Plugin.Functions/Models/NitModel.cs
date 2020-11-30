@@ -20,6 +20,10 @@
         public string CustomizationId { get; set; }
         public string IssuerPartySchemeID { get; set; }
         public string IssuerPartyID { get; set; }
- 
+        public string ValorTotalEndoso { get; set; }
+        public string PrecioPagarseFEV { get; set; }
+        public string TasaDescuento { get; set; }
+        public string MedioPago { get; set; }
+
     }
 }
