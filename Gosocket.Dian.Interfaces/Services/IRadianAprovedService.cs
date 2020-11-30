@@ -45,6 +45,6 @@ namespace Gosocket.Dian.Interfaces.Services
 
         List<RadianSoftware> SoftwareList(int radianContributorId);
         List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term);
-        List<RadianContributor> CustormerList(int radianContributorId, string code, RadianState radianState, int page, int pagesize);
+        PagedResult<RadianContributor> CustormerList(int radianContributorId, string code, RadianState radianState, int page, int pagesize);
     }
 }

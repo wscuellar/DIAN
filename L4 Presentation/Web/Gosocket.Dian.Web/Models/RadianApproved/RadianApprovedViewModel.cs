@@ -62,5 +62,6 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         [Display(Name = "Estado de aprobación")]
         public RadianUtil.UserStates RadianStateSelect { get; set; }
         public int PageTable { get; set; }
+        public int CustomerTotalCount { get; internal set; }
     }
 }
