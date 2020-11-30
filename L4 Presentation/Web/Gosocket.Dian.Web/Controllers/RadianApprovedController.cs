@@ -82,7 +82,7 @@ namespace Gosocket.Dian.Web.Controllers
                 else
                 {
                     Software software = _radianAprovedService.SoftwareByContributor(registrationData.ContributorId);
-                    List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
+                    List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList(registrationData.RadianOperationMode);
                     RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianAdmin.Contributor.RadianContributorId);
                     RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
                     {
@@ -195,7 +195,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(radianApprovedViewModel.ContributorId, radianApprovedViewModel.RadianContributorTypeId);
             Software software = _radianAprovedService.SoftwareByContributor(radianApprovedViewModel.ContributorId);
-            List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList();
+            List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList((Domain.Common.RadianOperationMode)radianAdmin.Contributor.RadianOperationModeId);
             RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianApprovedViewModel.ContributorId);
             RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
             {
@@ -223,8 +223,8 @@ namespace Gosocket.Dian.Web.Controllers
                 Timestamp = DateTime.Now,
                 SoftwareType = data.SoftwareType,
                 SoftwareId = new Guid(data.SoftwareId),
-            },data.Url,
-            data.SoftwareName, 
+            }, data.Url,
+            data.SoftwareName,
             data.Pin,
             User.UserName());
 
@@ -311,17 +311,17 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(filteredItems, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult CustomersList(int radianContributorId, string code, RadianState radianState,  int page, int pagesize)
+        public ActionResult CustomersList(int radianContributorId, string code, RadianState radianState, int page, int pagesize)
         {
-            List<RadianContributor> customers = _radianAprovedService.CustormerList(radianContributorId, code, radianState,  page, pagesize);
+            List<RadianContributor> customers = _radianAprovedService.CustormerList(radianContributorId, code, radianState, page, pagesize);
 
             List<RadianCustomerViewModel> customerModel = customers.Select(t => new RadianCustomerViewModel()
             {
                 BussinessName = t.Contributor.BusinessName,
                 Nit = t.Contributor.Code,
                 RadianState = t.RadianState,
-                Page =page,
-                Lenght=pagesize
+                Page = page,
+                Lenght = pagesize
             }).ToList();
 
             return Json(customerModel, JsonRequestBehavior.AllowGet);

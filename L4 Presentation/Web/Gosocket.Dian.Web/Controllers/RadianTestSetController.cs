@@ -155,7 +155,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         private List<OperationModeViewModel> LoadSoftwareOperationMode()
         {
-            List<RadianOperationMode> list = _radianTestSetService.OperationModeList();
+            List<RadianOperationMode> list = _radianTestSetService.OperationModeList( Domain.Common.RadianOperationMode.None);
             List<OperationModeViewModel> OperationModes = list.Select(t => new OperationModeViewModel() { Id = t.Id, Name = t.Name }).ToList();
             return OperationModes;
         }
