@@ -162,10 +162,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string key = string.Empty;
             var errorCode = "FAD06";
             var prop = "CUFE";
-            string[] codesWithCUDE = { "03", "91", "92", "96" };
+            
+            string[] codesWithCUDE = { "03", "05", "91", "92", "96" };
             if (codesWithCUDE.Contains(documentMeta.DocumentTypeId))
                 prop = "CUDE";
-            if (documentMeta.DocumentTypeId == "91")
+            if (documentMeta.DocumentTypeId == "05")
+                errorCode = "DSAD06";
+            else if (documentMeta.DocumentTypeId == "91")
                 errorCode = "CAD06";
             else if (documentMeta.DocumentTypeId == "92")
                 errorCode = "DAD06";
