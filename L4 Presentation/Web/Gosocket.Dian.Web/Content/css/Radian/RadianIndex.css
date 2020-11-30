@@ -1267,3 +1267,24 @@ button.selectpicker .fa-caret-down {
 .prompt-comment .modal-content{
     padding-right: 40px;
 }
+
+#dateFrom, #dateTo {
+    padding-left: 20px;
+    background-image: url(/Content/images/png/calendarAlt.png);
+    background-repeat: no-repeat;
+    background-position: 20% 50%;
+    display: inline-flex;
+    width: 45%;
+}
+
+.ui-datepicker {
+    width: auto;
+}
+
+.input-daterange {
+    margin: 0px;
+}
+
+.input-daterange label {
+    width: 100%;
+}

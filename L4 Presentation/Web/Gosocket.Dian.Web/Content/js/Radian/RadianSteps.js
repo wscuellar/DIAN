@@ -54,17 +54,14 @@ function RenderSteps(index) {
     })
 }
 
-function RenderTable(element, data, form, urlSearch, radianId, page, tableRendered) {
+function RenderTable(element, data, form, urlSearch, radianId, page, tableRendered, customersTotalCount, columns) {
+    var totalPages = Math.round(customersTotalCount / 10) + 1 ;
     tableRendered && tableRendered.destroy();
     var table = $(element).DataTable({
         paging: false,
         info: false,
         data: data,
-        columns: [
-            { data: 'Nit' },
-            { data: 'RadianState' },
-            { data: 'BussinessName' }
-        ],
+        columns: columns,
         language: {
             "lengthMenu": "Mostrar _MENU_ elementos por página",
             "zeroRecords": "No se encontraron datos",
@@ -79,10 +76,11 @@ function RenderTable(element, data, form, urlSearch, radianId, page, tableRender
         }
     });
     $(element+"_filter > label").hide();
-    $(element + "_wrapper").append("<div><span>Mostrando 1 de 20 páginas</span>" + TablePagination());
+    $(element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(page, customersTotalCount));
     $(element + "_filter").append(form);
     LoadEventsToSearch(urlSearch, radianId, form, page, table);
     LoadEventsToPagiantion(element, data, form, urlSearch, radianId, table, page);
+    changeToSpanish();
 }
 
 function LoadEventsToSearch(url, radianContributorId, form, page, table) {
@@ -163,17 +161,28 @@ function SearchCustomers() {
 
 
 
-function TablePagination() {
+function TablePagination(page, totalCount) {
+    var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : ""; 
+    var disabledPrev = page == 1 ? 'disabled="disabled"' : "";
     var html = '<div class="pagination-controls pull-right"><span class="text-muted">\
                 <strong>1-1</strong >\
                 </span >\
                 <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">\
-                <a class="btn btn-default paginate-btn prev-page" disabled="disabled">\
+                <a class="btn btn-default paginate-btn prev-page" '+ disabledPrev +'>\
                         <span class="fa fa-chevron-left"></span>\
                     </a>\
-                <a class="btn btn-default paginate-btn next-page") >\
+                <a class="btn btn-default paginate-btn next-page" '+ disabledNext +'>\
                 <span class="fa fa-chevron-right"></span>\
                     </a >\
                 </div></div>'
     return html;
+}
+
+function changeToSpanish() {
+    $('.input-daterange').datepicker({
+        language: "es"
+    });
+    $(".input-daterange input").change(function(){
+        $(".datepicker-dropdown").css("display","none");
+    });
 }

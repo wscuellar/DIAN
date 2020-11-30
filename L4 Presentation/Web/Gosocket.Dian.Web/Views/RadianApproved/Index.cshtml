@@ -96,7 +96,34 @@
             RenderSteps(index);
 
 
-        $(".show-history").click(function () {
+            $(".show-history").click(function () {
+                var page = @Model.PageTable;
+                var element = '#table-history';
+                var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
+                var urlSearch = '@Url.Action("filesHistoryList", "RadianApproved")';
+                var form = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_formSearchHistory").ToString().Trim('"'))));
+                var radianId = "@Model.Contributor.RadianContributorId";
+                var dialog = bootbox.dialog({
+                    message: htmlPartial,
+                    className: "table-data modal-radian",
+                    size: 'large'
+                });
+                dialog.init(function (e) {
+                    debugger
+                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.Customers))');
+                    var customersTotalCount = @Model.CustomerTotalCount;
+                    var columns = [
+                        { data: 'FileName' },
+                        { data: 'Updated' },
+                        { data: 'CreatedBy' },
+                        { data: 'Status' },
+                        { data: 'Comments' }
+                    ]
+                    RenderTable(element, dataTable, form, urlSearch, radianId, page, null, customersTotalCount, columns);
+                })
+            });
+
+        @*$(".show-history").click(function () {
             var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
             var dialog = bootbox.dialog({
                 message: htmlPartial,
@@ -121,10 +148,10 @@
                 });
                 $("#table-history_filter").append("<button class='btn btn-radian-success'>Buscar</button>");
             })
-        });
+        });*@
 
         $('.submit-button').click(function (e) {
-                
+
         var form = $(this).parents("form");
         var files = $(form)[0];
         var filteredFiles = [];
@@ -150,7 +177,7 @@
             });
             e.preventDefault();
         if (filteredFiles.length > 0) {
-                   
+
                 if (form.valid()) {
                     var formdata = new FormData();
                     var numberFiles = 0;
@@ -221,11 +248,17 @@
                     className: "table-data modal-radian",
                     size: 'large'
                 });
-            dialog.init(function (e) {debugger
+                dialog.init(function (e) {debugger
                     var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.Customers))');
-                    RenderTable(element, dataTable, form, urlSearch, radianId, page);
+                    var customersTotalCount = @Model.CustomerTotalCount;
+                    var columns = [
+                        { data: 'Nit' },
+                        { data: 'BussinessName' },
+                        { data: 'RadianState' }
+                    ]
+                    RenderTable(element, dataTable, form, urlSearch, radianId, page, null, customersTotalCount, columns);
                 })
-            });
+        });
 
         $(".cancel-register").click(function () {
                 var url = "@Url.Action("DeleteUser", "RadianApproved")";
