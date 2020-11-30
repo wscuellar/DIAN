@@ -109,7 +109,6 @@
                     size: 'large'
                 });
                 dialog.init(function (e) {
-                    debugger
                     var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.Customers))');
                     var customersTotalCount = @Model.CustomerTotalCount;
                     var columns = [
