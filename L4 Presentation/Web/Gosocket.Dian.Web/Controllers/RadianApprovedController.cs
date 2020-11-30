@@ -62,8 +62,8 @@ namespace Gosocket.Dian.Web.Controllers
             };
 
             //aqui se adiciona los clientes asociados.
-            var customers = _radianAprovedService.CustormerList(radianAdmin.Contributor.RadianContributorId, string.Empty, RadianState.none, 1, 10);
-            model.Customers = customers.Select(t => new RadianCustomerViewModel()
+            PagedResult<RadianContributor> customers = _radianAprovedService.CustormerList(radianAdmin.Contributor.RadianContributorId, string.Empty, RadianState.none, 1, 10);
+            model.Customers = customers.Results.Select(t => new RadianCustomerViewModel()
             {
                 BussinessName = t.Contributor.BusinessName,
                 Nit = t.Contributor.Code,
@@ -71,6 +71,7 @@ namespace Gosocket.Dian.Web.Controllers
                 Page = 1,
                 Lenght = 10
             }).ToList();
+            model.CustomerTotalCount = customers.RowCount;
 
             if ((int)registrationData.RadianOperationMode == 2)
             {
@@ -313,9 +314,9 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult CustomersList(int radianContributorId, string code, RadianState radianState, int page, int pagesize)
         {
-            List<RadianContributor> customers = _radianAprovedService.CustormerList(radianContributorId, code, radianState, page, pagesize);
+            PagedResult<RadianContributor> customers = _radianAprovedService.CustormerList(radianContributorId, code, radianState, page, pagesize);
 
-            List<RadianCustomerViewModel> customerModel = customers.Select(t => new RadianCustomerViewModel()
+            List<RadianCustomerViewModel> customerModel = customers.Results.Select(t => new RadianCustomerViewModel()
             {
                 BussinessName = t.Contributor.BusinessName,
                 Nit = t.Contributor.Code,
@@ -324,7 +325,13 @@ namespace Gosocket.Dian.Web.Controllers
                 Lenght = pagesize
             }).ToList();
 
-            return Json(customerModel, JsonRequestBehavior.AllowGet);
+            RadianApprovedViewModel model = new RadianApprovedViewModel()
+            {
+                CustomerTotalCount = customers.RowCount,
+                Customers = customerModel
+            };
+
+            return Json(model, JsonRequestBehavior.AllowGet);
         }
 
     }
