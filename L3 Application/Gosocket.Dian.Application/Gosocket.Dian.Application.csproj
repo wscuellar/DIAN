@@ -188,7 +188,7 @@
     <Compile Include="Managers\RadianTestSetResultManager.cs" />
     <Compile Include="EmailService.cs" />
     <Compile Include="PdfCreatorEvents.cs" />
-    <Compile Include="PdfCreatorService.cs" />
+    <Compile Include="PdfCreatorModel.cs" />
     <Compile Include="RadianAprovedService.cs" />
     <Compile Include="RadianCallSoftwareService.cs" />
     <Compile Include="RadianContributorFileTypeService.cs" />

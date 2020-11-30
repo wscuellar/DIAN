@@ -1,43 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Interfaces.Services;
+using OpenHtmlToPdf;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application
 {
-    public class RadianPDFCreationService
+    public class RadianPDFCreationService : IRadianPDFCreationService
     {
-        public RadianPDFCreationService()
-        {
+        private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
 
+        public RadianPDFCreationService(IQueryAssociatedEventsService queryAssociatedEventsService)
+        {
+            _queryAssociatedEventsService = queryAssociatedEventsService;
         }
 
-        //public byte[] GetElectronicInvoicePdf()
-        //{
-        //    StringBuilder template = new StringBuilder(File.ReadAllText("../../Bin/Debug/Templates/RadianReport.html"));
+        public byte[] GetElectronicInvoicePdf(string eventItemIdentifier)
+        {
+            GlobalDocValidatorDocument input = _queryAssociatedEventsService.EventVerification(eventItemIdentifier);
 
-        //    /*  Espacio para mapeo de datos y etiquetas
-        //    template = template.Replace("{prefijo}", input.Prefix);
-        //    var report = PDFReport.PdfRender(template.ToString());
-        //    */
+            StringBuilder template = new StringBuilder(File.ReadAllText("../../Bin/Debug/Templates/RadianReport.html"));
 
-        //    byte[] report = GetPdfBytes(template.ToString());
+            template = template.Replace("{cude}", input.PartitionKey);
 
-        //    return report;
-        //}
+            byte[] report = GetPdfBytes(template.ToString());
 
-        //public static byte[] GetPdfBytes(string htmlContent)
-        //{
-        //    byte[] pdf = null;
-        //    // Convert
-        //    pdf = OpenHtmlToPdf.Pdf
-        //            .From(htmlContent)
-        //            .WithGlobalSetting("orientation", "Portrait")
-        //            .WithObjectSetting("web.defaultEncoding", "utf-8")
-        //            .Content();
-        //    return pdf;
-        //}
+            return report;
+        }
+
+        private static byte[] GetPdfBytes(string htmlContent)
+        {
+            byte[] pdf = null;
+
+            // Convert
+            pdf = Pdf
+                    .From(htmlContent)
+                    .WithGlobalSetting("orientation", "Portrait")
+                    .WithObjectSetting("web.defaultEncoding", "utf-8")
+                    .OfSize(PaperSize.A4)
+                    .Content();
+
+            return pdf;
+        }
     }
 }

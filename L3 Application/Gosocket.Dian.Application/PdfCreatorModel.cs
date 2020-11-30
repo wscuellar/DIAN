@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application
 {
-    public class PdfCreatorService
+    public class PdfCreatorModel
     {
         //Sección Membrete
         public string PathLogo { get; set; }
