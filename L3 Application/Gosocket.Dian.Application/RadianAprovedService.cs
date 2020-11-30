@@ -203,7 +203,7 @@ namespace Gosocket.Dian.Application
         {
             if(!string.IsNullOrEmpty(softwareName))
                  radianContributorOperation.SoftwareId =  _radianCallSoftwareService.CreateSoftware(radianContributorOperation.RadianContributorId, softwareName, url, pin, createdBy);
-            RadianContributorOperation existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == t.SoftwareId && !t.Deleted);
+            RadianContributorOperation existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == radianContributorOperation.SoftwareId && !t.Deleted);
             return (existingsoft == null) ? _radianContributorOperationRepository.Add(radianContributorOperation) : 0;
         }
 
