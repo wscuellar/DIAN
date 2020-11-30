@@ -941,7 +941,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndoso
-        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, NitModel nitModel, string eventCode)
+        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
@@ -1031,9 +1031,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     };
                 }
 
-                if (xmlParserCude.ListID != "2")
+                if (xmlParserCude.Fields["listID"].ToString() != "2")
                 {
-                    XmlNodeList valueList = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']");
+                    XmlNodeList valueList = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
                     int totalValue = 0;
                     for (int i = 0; i < valueList.Count; i++)
                     {
@@ -1931,7 +1931,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region validation to emition to event
-        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe,  NitModel nitModel)
+        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude,  NitModel nitModel)
         {
             bool validFor = false;
             string eventCode = eventPrev.EventCode;
@@ -2229,7 +2229,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 //Solicitud de Disponibilización
                                 else if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
                                 {
-                                    var response = ValidateEndoso(xmlParserCufe, nitModel, eventCode);
+                                    var response = ValidateEndoso(xmlParserCufe, xmlParserCude,nitModel, eventCode);
                                     if (response != null)
                                     {
                                         validFor = true;
