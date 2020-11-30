@@ -141,6 +141,7 @@ namespace Gosocket.Dian.Application
 
         public ResponseMessage Update(int radianContributorOperationId)
         {
+
             return _radianContributorOperationRepository.Update(radianContributorOperationId);
         }
 

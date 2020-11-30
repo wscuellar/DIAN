@@ -423,9 +423,16 @@ namespace Gosocket.Dian.Application
         {
             using (var context = new SqlDBContext())
             {
-                return (from c in context.Contributors.Where(t => t.Id == contributorid && t.AcceptanceStatusId == 4 && t.Status && !t.Deleted)
-                        from s in c.Softwares.Where(t => t.AcceptanceStatusSoftwareId == 2 && t.Status && !t.Deleted)
-                        join cp in context.ContributorOperations.Where(t=> t.OperationModeId == 2) on s.Id equals cp.SoftwareId
+                return (from c in context.Contributors
+                        from s in c.Softwares
+                        join cp in context.ContributorOperations on s.Id equals cp.SoftwareId
+                        where 
+                            c.Id == contributorid
+                        &&  c.Status
+                        &&  !c.Deleted
+                        && s.Status
+                        && !s.Deleted
+                        && cp.OperationModeId == 2
                         select s).OrderByDescending(t=> t.Updated).FirstOrDefault();
             }
         }
