@@ -1,5 +1,4 @@
-﻿using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Interfaces.Services;
+﻿using Gosocket.Dian.Interfaces.Services;
 using OpenHtmlToPdf;
 using System.IO;
 using System.Text;
@@ -17,7 +16,7 @@ namespace Gosocket.Dian.Application
 
         public byte[] GetElectronicInvoicePdf(string eventItemIdentifier)
         {
-            GlobalDocValidatorDocument input = _queryAssociatedEventsService.EventVerification(eventItemIdentifier);
+            GlobalDocValidatorDocumentMeta input = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
 
             StringBuilder template = new StringBuilder(File.ReadAllText("../../Bin/Debug/Templates/RadianReport.html"));
 
