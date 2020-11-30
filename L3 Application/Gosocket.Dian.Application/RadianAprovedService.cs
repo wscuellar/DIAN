@@ -98,12 +98,7 @@ namespace Gosocket.Dian.Application
             return softwares;
         }
 
-        //public List<RadianOperationMode> ListSoftwareModeOperation()
-        //{
-        //    List<RadianOperationMode> list = _radianTestSetService.OperationModeList();
-        //    return list;
-        //}
-
+       
         public RadianContributor GetRadianContributor(int radianContributorId)
         {
             RadianContributor radianContributor = _radianContributorRepository
@@ -231,10 +226,11 @@ namespace Gosocket.Dian.Application
         public List<RadianSoftware> SoftwareList(int radianContributorId)
         {
             List<RadianContributor> participants;
-            participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.RadianSoftwares.Any(x=> x.Status)).Results;
+            int softwareStatus = (int)RadianSoftwareStatus.Accepted;
+            participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.RadianSoftwares.Any(x=> x.Status &&  x.RadianSoftwareStatusId ==  softwareStatus)).Results;
             return participants.Select(t => t.RadianSoftwares).Aggregate(new List<RadianSoftware>(), (list, source) =>
             {
-                list.AddRange(source);
+                list.AddRange(source.Where(t=> t.RadianSoftwareStatusId ==  softwareStatus));
                 return list;
             }).Distinct().ToList();
         }

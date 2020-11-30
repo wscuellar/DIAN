@@ -267,7 +267,6 @@ namespace Gosocket.Dian.Application
                 Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributorId);
                 RadianSoftware radianSoftware = new RadianSoftware(ownSoftware,id,createdBy);
                 _radianSoftwareRepository.AddOrUpdate(radianSoftware);
-                //se hereda el software anterior a radian.
             }
             
 
