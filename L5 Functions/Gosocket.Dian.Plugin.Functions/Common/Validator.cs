@@ -1041,7 +1041,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         totalValue += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
                     }
 
-                    if (Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValue)
+                    if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValue)
                     {
                         return new ValidateListResponse
                         {
