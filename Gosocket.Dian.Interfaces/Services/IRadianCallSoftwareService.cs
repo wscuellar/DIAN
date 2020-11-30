@@ -8,5 +8,7 @@ namespace Gosocket.Dian.Interfaces.Services
     {
         Software Get(Guid id);
         List<Software> GetSoftwares(int contributorId);
+
+        Guid CreateSoftware(int radianContributorId, string softwareName, string url, string pin, string createdBy);
     }
 }

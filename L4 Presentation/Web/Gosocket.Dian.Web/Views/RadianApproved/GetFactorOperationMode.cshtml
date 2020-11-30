@@ -26,9 +26,15 @@
 
             $("#save-operation-mode").click(function (e) {
                 e.preventDefault();
-                softwareType  = $("#OperationModeSelectedId").val();
-                software = $("#SoftwareNameList option:selected").val();
-                AddOperationMode("@Url.Action("UploadFactorOperationMode", "RadianApproved")", @Model.Contributor.RadianContributorId, softwareType, software);
+                var SetOperationViewModel = {
+                    RadianContributorId: @Model.Contributor.RadianContributorId,
+                    SoftwareType: $("#OperationModeSelectedId").val(),
+                    SoftwareId: $("#SoftwareNameList option:selected").val(),
+                    SoftwareName: '@Model.SoftwareName',
+                    Pin: '@Model.SoftwarePin',
+                    Url: '@Model.SoftwareUrl',
+                 };
+                AddOperationMode("@Url.Action("UpdateFactorOperationMode", "RadianApproved")",SetOperationViewModel);
             })
 
             $("#combobox").combobox();

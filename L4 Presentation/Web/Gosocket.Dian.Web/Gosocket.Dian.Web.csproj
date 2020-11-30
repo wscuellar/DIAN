@@ -399,6 +399,7 @@
     <Compile Include="Models\Role\RoleModel.cs" />
     <Compile Include="Models\Role\Roles.cs" />
     <Compile Include="Models\SearchViewModel.cs" />
+    <Compile Include="Models\SetOperationViewModel.cs" />
     <Compile Include="Models\SoftwareViewModel.cs" />
     <Compile Include="Models\Document.cs" />
     <Compile Include="Models\IdentityModels.cs" />

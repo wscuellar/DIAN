@@ -213,20 +213,20 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult UploadFactorOperationMode(int radianContributorId, int softwareType, string softwareId)
+        public JsonResult UpdateFactorOperationMode(SetOperationViewModel data)
         {
             int result = -1;
-            if (softwareId != null)
+            result = _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
             {
-                result = _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
-                {
-                    RadianContributorId = radianContributorId,
-                    Deleted = false,
-                    Timestamp = DateTime.Now,
-                    SoftwareType = softwareType,
-                    SoftwareId = new Guid(softwareId),
-                });
-            }
+                RadianContributorId = data.RadianContributorId,
+                Deleted = false,
+                Timestamp = DateTime.Now,
+                SoftwareType = data.SoftwareType,
+                SoftwareId = new Guid(data.SoftwareId),
+            },data.Url,
+            data.SoftwareName, 
+            data.Pin,
+            User.UserName());
 
             string message;
             if (result == -1)
