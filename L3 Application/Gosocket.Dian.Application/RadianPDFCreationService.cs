@@ -2,6 +2,7 @@
 using OpenHtmlToPdf;
 using QRCoder;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Drawing;
 using System.IO;
@@ -14,6 +15,7 @@ namespace Gosocket.Dian.Application
         #region Properties
 
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
+
 
         #region RadianReportQRCodeRadianReportQRCodeUrl
 
@@ -46,42 +48,48 @@ namespace Gosocket.Dian.Application
 
         public byte[] GetElectronicInvoicePdf(string eventItemIdentifier)
         {
-            // Load Data
-            GlobalDocValidatorDocumentMeta input = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
-
             // Load Templates
             StringBuilder template = new StringBuilder(File.ReadAllText("../../Templates/ElectronicInvoiceExistenceCertificateReport.html"));
             StringBuilder eventTemplate = new StringBuilder(File.ReadAllText("../../Templates/RadianEventsTemplate.html"));
 
+            // Load Document Data
+            GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
+
+            //Load documents
+            List<GlobalDocReferenceAttorney> documents = _queryAssociatedEventsService.ReferenceAttorneys(documentMeta.DocumentKey, documentMeta.DocumentReferencedKey, documentMeta.ReceiverCode, documentMeta.SenderCode);
+
+            //Load Events
+            
+
             // Set Variables
             DateTime expeditionDate = DateTime.Now;
-            var qrCode = GenerateQR(string.Format("{0}{1}", this.RadianReportQRCodeRadianReportQRCodeUrl, input.PartitionKey));
+            var qrCode = GenerateQR(string.Format("{0}{1}", this.RadianReportQRCodeRadianReportQRCodeUrl, documentMeta.PartitionKey));
 
             // Mapping Labels
             template = template.Replace("{PrintDay}", expeditionDate.Day.ToString());
             template = template.Replace("{PrintMonth}", expeditionDate.Month.ToString());
             template = template.Replace("{PrintYear}", expeditionDate.Year.ToString());
             template = template.Replace("{PrintTime}", expeditionDate.TimeOfDay.ToString());
-            template = template.Replace("{InvoiceNumber}", input.SerieAndNumber);
-            template = template.Replace("{CUFE}", input.PartitionKey);
-            template = template.Replace("{EInvoiceGenerationDate}", input.EmissionDate.ToString("yyyy-mm-dd HH:mm:ss.sss"));
-            template = template.Replace("{SenderBusinessName}", input.SenderName);
-            template = template.Replace("{EInvoiceNit}", input.SenderCode);
+            template = template.Replace("{InvoiceNumber}", documentMeta.SerieAndNumber);
+            template = template.Replace("{CUFE}", documentMeta.PartitionKey);
+            template = template.Replace("{EInvoiceGenerationDate}", documentMeta.EmissionDate.ToString("yyyy-mm-dd HH:mm:ss.sss"));
+            template = template.Replace("{SenderBusinessName}", documentMeta.SenderName);
+            template = template.Replace("{EInvoiceNit}", documentMeta.SenderCode);
 
-            template = template.Replace("{InvoiceValue}", Convert.ToString(input.TotalAmount));
+            template = template.Replace("{InvoiceValue}", Convert.ToString(documentMeta.TotalAmount));
             template = template.Replace("{Badge}", string.Empty);
             template = template.Replace("{PaymentMethod}", string.Empty);
             template = template.Replace("{Expiration}", string.Empty);
-            template = template.Replace("{Acquirer}", input.ReceiverName);
-            template = template.Replace("{AcquirerNit}", input.ReceiverCode);
-            template = template.Replace("{DocumentsTotal}", string.Empty);
+            template = template.Replace("{Acquirer}", documentMeta.ReceiverName);
+            template = template.Replace("{AcquirerNit}", documentMeta.ReceiverCode);
+            template = template.Replace("{DocumentsTotal}", $"{documents.Count}");
             template = template.Replace("{EventsTotal}", string.Empty);
             template = template.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
             template = template.Replace("{QRCode}", qrCode.ToString());
 
             // Mapping Events
 
-            //template = template.Replace("{CurrentStatus}", input.);
+            
 
             // Render Pdf
             byte[] report = GetPdfBytes(template.ToString());
