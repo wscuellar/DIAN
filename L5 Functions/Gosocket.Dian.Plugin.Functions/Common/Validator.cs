@@ -1977,8 +1977,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "202",
-                                            ErrorMessage = "No se puede rechazar documento, no existe un evento Recibo del Bien de la factura",
+                                            ErrorCode = "LGC03",
+                                            ErrorMessage = "No se puede recibir un rechazo si previamente no se ha recibido los eventos " +
+                                            "Acuse de recibo de la factura electrónica y un recibo de bien y prestación de servicio ",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
@@ -2063,9 +2064,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "203",
-                                                ErrorMessage = "No se puede aceptar un documento que ha sido rechazado previamente, " +
-                                                "ya existe un evento (031) Rechazo de la factura de Venta",
+                                                ErrorCode = "LGC04",
+                                                ErrorMessage = "No se puede aceptar (expresa o tácitamente) un documento que ha sido rechazado previamente",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -2122,9 +2122,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "203",
-                                                ErrorMessage = "No se puede aceptar un documento que ha sido rechazado previamente, " +
-                                                "ya existe un evento (031) Rechazo de la factura de Venta",
+                                                ErrorCode = "LGC04",
+                                                ErrorMessage = "No se puede aceptar (expresa o tácitamente) un documento que ha sido rechazado previamente",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
