@@ -12,6 +12,6 @@ namespace Gosocket.Dian.Web.Models
         public string SoftwareId { get; set; }
         public string SoftwareName { get; set; }
         public string Pin { get; set; }
-        public string Url { get; internal set; }
+        public string Url { get; set; }
     }
 }
