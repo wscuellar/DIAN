@@ -35,7 +35,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         Guid UpdateRadianContributorFile(RadianContributorFile radianContributorFile);
 
-        void CreateContributor(int contributorId, Domain.Common.RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy);
+        RadianContributor CreateContributor(int contributorId, Domain.Common.RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy);
 
         List<RadianContributorFile> RadianContributorFileList(string id);
 

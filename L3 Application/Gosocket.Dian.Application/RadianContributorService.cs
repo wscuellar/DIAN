@@ -247,7 +247,7 @@ namespace Gosocket.Dian.Application
             return _radianContributorFileRepository.Update(radianContributorFile);
         }
 
-        public void CreateContributor(int contributorId, RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy)
+        public RadianContributor CreateContributor(int contributorId, RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy)
         {
             RadianContributor existing = _radianContributorRepository.Get(t => t.ContributorId == contributorId && t.RadianContributorTypeId == (int)radianContributorType);
 
@@ -261,16 +261,15 @@ namespace Gosocket.Dian.Application
                 RadianState = radianState.GetDescription(),
                 CreatedDate = existing != null ? existing.CreatedDate : System.DateTime.Now
             };
-            int id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
+            newRadianContributor.Id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
             if(radianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
                 Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributorId);
-                RadianSoftware radianSoftware = new RadianSoftware(ownSoftware,id,createdBy);
-                _radianSoftwareRepository.AddOrUpdate(radianSoftware);
+                RadianSoftware radianSoftware = new RadianSoftware(ownSoftware, newRadianContributor.Id, createdBy);
+                newRadianContributor.RadianSoftwares = new List<RadianSoftware>() { radianSoftware };
             }
             
-
-            newRadianContributor.Id = id;
+            return newRadianContributor;
         }
 
         public List<RadianContributorFile> RadianContributorFileList(string id)

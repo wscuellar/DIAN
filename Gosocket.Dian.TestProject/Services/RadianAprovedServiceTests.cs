@@ -163,13 +163,13 @@ namespace Gosocket.Dian.Application.Tests
             // Arrange
             int radianContributorOperatorId = 0;
 
-            _current.Setup(t => t.Update(radianContributorOperatorId))
+            _current.Setup(t => t.OperationDelete(radianContributorOperatorId))
                 .Returns(It.IsAny<ResponseMessage>());
 
             ResponseMessage expected = null;
 
             //ACT
-            var actual = _current.Object.Update(radianContributorOperatorId);
+            var actual = _current.Object.OperationDelete(radianContributorOperatorId);
 
             // Assert
             Assert.AreEqual(expected, actual);

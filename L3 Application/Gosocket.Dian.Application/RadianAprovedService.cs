@@ -98,7 +98,7 @@ namespace Gosocket.Dian.Application
             return softwares;
         }
 
-       
+
         public RadianContributor GetRadianContributor(int radianContributorId)
         {
             RadianContributor radianContributor = _radianContributorRepository
@@ -139,10 +139,18 @@ namespace Gosocket.Dian.Application
             return contributorTypeList;
         }
 
-        public ResponseMessage Update(int radianContributorOperationId)
+        public ResponseMessage OperationDelete(int radianContributorOperationId)
         {
+            RadianContributorOperation operation = _radianContributorOperationRepository.Get(t => t.Id == radianContributorOperationId);
+            RadianSoftware software = _radianCallSoftwareService.Get(operation.SoftwareId);
+            if (software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted && operation.SoftwareType == (int)RadianOperationModeTestSet.OwnSoftware)
+                return new ResponseMessage() { Message = "El software ya se encuentra en uso" };
+
+            if (software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted)
+                _ = _radianCallSoftwareService.DeleteSoftware(software.Id);
 
             return _radianContributorOperationRepository.Update(radianContributorOperationId);
+
         }
 
         public ResponseMessage UploadFile(Stream fileStream, string code, RadianContributorFile radianContributorFile)
@@ -195,16 +203,16 @@ namespace Gosocket.Dian.Application
             return _radianContributorRepository.Get(c => c.ContributorId == contributorId && c.RadianContributorTypeId == contributorTypeId && c.RadianState == state).Id;
         }
 
-        public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation,string url, string softwareName, string pin, string createdBy)
+        public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, string url, string softwareName, string pin, string createdBy)
         {
-            if(!string.IsNullOrEmpty(softwareName))
-                 radianContributorOperation.SoftwareId =  _radianCallSoftwareService.CreateSoftware(radianContributorOperation.RadianContributorId, softwareName, url, pin, createdBy);
+            if (!string.IsNullOrEmpty(softwareName))
+                radianContributorOperation.SoftwareId = _radianCallSoftwareService.CreateSoftware(radianContributorOperation.RadianContributorId, softwareName, url, pin, createdBy);
             RadianContributorOperation existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == radianContributorOperation.SoftwareId && !t.Deleted);
             return (existingsoft == null) ? _radianContributorOperationRepository.Add(radianContributorOperation) : 0;
         }
 
         public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
-        {   
+        {
             RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
             radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId && t.Deleted == false);
             radianContributorOperationWithSoftware.Softwares = radianContributorOperationWithSoftware.RadianContributorOperations.Select(t => t.Software).ToList();
@@ -228,10 +236,10 @@ namespace Gosocket.Dian.Application
         {
             List<RadianContributor> participants;
             int softwareStatus = (int)RadianSoftwareStatus.Accepted;
-            participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.RadianSoftwares.Any(x=> x.Status &&  x.RadianSoftwareStatusId ==  softwareStatus)).Results;
+            participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.RadianSoftwares.Any(x => x.Status && x.RadianSoftwareStatusId == softwareStatus)).Results;
             return participants.Select(t => t.RadianSoftwares).Aggregate(new List<RadianSoftware>(), (list, source) =>
             {
-                list.AddRange(source.Where(t=> t.RadianSoftwareStatusId ==  softwareStatus));
+                list.AddRange(source.Where(t => t.RadianSoftwareStatusId == softwareStatus));
                 return list;
             }).Distinct().ToList();
         }
