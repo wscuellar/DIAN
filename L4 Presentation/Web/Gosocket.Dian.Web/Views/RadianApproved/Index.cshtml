@@ -92,11 +92,11 @@
     <script>
         $(document).ready(function () {
 
-            var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
-            RenderSteps(index);
+        var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
+        RenderSteps(index);
 
 
-            $(".show-history").click(function () {
+        $(".show-history").click(function () {
                 var page = @Model.PageTable;
                 var element = '#table-history';
                 var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
@@ -118,7 +118,18 @@
                         { data: 'Status' },
                         { data: 'Comments' }
                     ]
-                    RenderTable(element, dataTable, form, urlSearch, radianId, page, null, customersTotalCount, columns);
+                    var paramsObject = {
+                        element: element,
+                        data: dataTable,
+                        form: form,
+                        urlSearch: urlSearch,
+                        radianId: radianId,
+                        page: page,
+                        tableRendered: null,
+                        customersTotalCount: customersTotalCount,
+                        columns: columns
+                    }
+                    RenderTable(paramsObject);
                 })
             });
 
@@ -255,23 +266,39 @@
                         { data: 'BussinessName' },
                         { data: 'RadianState' }
                     ]
-                    RenderTable(element, dataTable, form, urlSearch, radianId, page, null, customersTotalCount, columns);
+                    var ajaxData = {
+                        radianContributorId: @Model.Contributor.RadianContributorId,
+                        code: "#NitSearch",
+                        radianState: "#RadianStateSelect",
+                        page: page,
+                        pagesize: 10
+                    };
+                    var paramsObject = {
+                        element: element,
+                        data: dataTable,
+                        form: form,
+                        urlSearch: urlSearch,
+                        radianId: radianId,
+                        page: page,
+                        tableRendered: null,
+                        customersTotalCount: customersTotalCount,
+                        columns: columns,
+                        ajaxData: ajaxData
+                    }
+                    RenderTable(paramsObject);
                 })
         });
 
         $(".cancel-register").click(function () {
-                var url = "@Url.Action("DeleteUser", "RadianApproved")";
-                var confirmationMessage = bootboxMessage.CONFIRMATION_MESSAGE;
-                var successAction = () => window.location.href = '@Url.Action("Index", "Radian")';
-                var dataAjax = {
+                var cancelData = {
+                    url: "@Url.Action("DeleteUser", "RadianApproved")",
+                    href: '@Url.Action("Index", "Radian")',
                     id: '@Model.ContributorId',
-                    newState: '4',
-                    radianContributorTypeId: @Model.RadianContributorTypeId,
-                    radianState: '@Model.RadianState'
+                    type: @Model.RadianContributorTypeId,
+                    state: '@Model.RadianState'
                 };
-                var label = bootboxMessage.CANCEL_DESCRIPTION;
-                CancelRegister(url, dataAjax, confirmationMessage, successAction, label);
-            });
+                cancelRegister(cancelData);
+        });
 
      });
 
