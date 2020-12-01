@@ -28,6 +28,7 @@
         public string MedioPago { get; set; }
         public string DocumentKey { get; set; }
         public string ResponseCode { get; set; }
+        public string listID { get; set; }
 
     }
 }
