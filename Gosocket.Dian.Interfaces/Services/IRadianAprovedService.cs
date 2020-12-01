@@ -25,7 +25,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         List<RadianContributorFileType> ContributorFileTypeList(int typeId);
 
-        ResponseMessage Update(int radianContributorOperationId);
+        ResponseMessage OperationDelete(int radianContributorOperationId);
 
         ResponseMessage UploadFile(Stream fileStream, string code, RadianContributorFile radianContributorFile);
 

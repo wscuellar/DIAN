@@ -108,11 +108,25 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public void Add(RegistrationDataViewModel registrationData)
         {
-            _radianContributorService.CreateContributor(registrationData.ContributorId,
+            RadianContributor radianContributor = _radianContributorService.CreateContributor(registrationData.ContributorId,
                                                         RadianState.Registrado,
                                                         registrationData.RadianContributorType,
                                                         registrationData.RadianOperationMode,
                                                         User.UserName());
+
+            if (radianContributor.RadianSoftwares.Count > 0)
+            {
+                RadianSoftware software = radianContributor.RadianSoftwares.FirstOrDefault();
+                RadianContributorOperation radianContributorOperation = new RadianContributorOperation()
+                {
+                    RadianContributorId = radianContributor.Id,
+                    SoftwareId = software.Id,
+                    SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
+                    Timestamp = DateTime.Now
+                };
+                _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software.Url, software.Name, software.Pin, User.UserName());
+            }
+                
         }
 
         [HttpPost]
@@ -224,8 +238,8 @@ namespace Gosocket.Dian.Web.Controllers
                 Timestamp = DateTime.Now,
                 SoftwareType = data.SoftwareType,
                 SoftwareId = data.SoftwareId != null ? new Guid(data.SoftwareId) : Guid.Empty,
-            },data.Url,
-            data.SoftwareName, 
+            }, data.Url,
+            data.SoftwareName,
             data.Pin,
             User.UserName());
 
@@ -269,7 +283,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult DeleteOperationMode(string Id)
         {
-            var result = _radianAprovedService.Update(Convert.ToInt32(Id));
+            var result = _radianAprovedService.OperationDelete(Convert.ToInt32(Id));
             return Json(new
             {
                 message = "Modo de operación eliminado.",

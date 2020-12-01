@@ -18,9 +18,9 @@ namespace Gosocket.Dian.Application
 
         
 
-        public Software Get(Guid id)
+        public RadianSoftware Get(Guid id)
         {
-            return _softwareService.Get(id);
+            return _RadianSoftwareRepository.Get(t => t.Id == id);
         }
 
         public List<Software> GetSoftwares(int contributorId)
@@ -47,5 +47,12 @@ namespace Gosocket.Dian.Application
         }
 
 
+        public Guid DeleteSoftware(Guid id)
+        {
+            RadianSoftware software = _RadianSoftwareRepository.Get(t => t.Id == id);
+            software.Status = false;
+            software.Deleted = true;
+            return _RadianSoftwareRepository.AddOrUpdate(software);
+        }
     }
 }
