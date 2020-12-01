@@ -45,10 +45,7 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string UblVersion { get; set; }
     public string ZipKey { get; set; }
     public string EventCode { get; set; }
-    public bool InTransaction { get; set; }
-<<<<<<< HEAD
-    public string CustomizationID { get; set; }
-=======
+    public bool InTransaction { get; set; }    
     public DateTime SigningTimeStamp { get; set; }
->>>>>>> feature-sprint4_EntregaFactura_RADIAN
+
 }
