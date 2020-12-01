@@ -3,11 +3,8 @@
   <PropertyGroup>
     <UseIISExpress>true</UseIISExpress>
     <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
-<<<<<<< HEAD
     <NameOfLastUsedPublishProfile>gtpa-webservices-input-test-staging - Web Deploy</NameOfLastUsedPublishProfile>
-=======
     <NameOfLastUsedPublishProfile>gtpa-webservices-input-dev - Web Deploy</NameOfLastUsedPublishProfile>
->>>>>>> Fix
     <Use64BitIISExpress />
     <IISExpressSSLPort>44319</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
