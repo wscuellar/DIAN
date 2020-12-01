@@ -10,6 +10,8 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
 
     }
 
+    public string CustomizationID { get; set; }
+
     public string FileName { get; set; }
     public DateTime EmissionDate { get; set; }
     public string DocumentTypeId { get; set; }
@@ -44,5 +46,9 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string ZipKey { get; set; }
     public string EventCode { get; set; }
     public bool InTransaction { get; set; }
+<<<<<<< HEAD
     public string CustomizationID { get; set; }
+=======
+    public DateTime SigningTimeStamp { get; set; }
+>>>>>>> feature-sprint4_EntregaFactura_RADIAN
 }

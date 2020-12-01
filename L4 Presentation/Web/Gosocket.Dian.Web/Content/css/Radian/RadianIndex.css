@@ -1,10 +1,17 @@
 ﻿/*    general Styles      */
+body {
+    font-family: Arial;
+    font-style: normal;
+    font-weight: normal;
+    color: #2C323C;
+}
 h1, h2, h3, h4, h5, h6 {
     font-family: Arial;
     font-style: normal;
     font-weight: normal;
     color: #2C323C;
 }
+
 label {
     font-family: Arial;
     font-style: normal;
@@ -13,13 +20,14 @@ label {
     line-height: 14px;
 }
 
-li.list-inline-item{
+li.list-inline-item {
     font-family: Arial;
     font-style: normal;
     font-weight: normal;
     font-size: 14px;
     line-height: 16px;
     color: #2C323C;
+    display: inline-table !important;
 }
 
 th {
@@ -30,16 +38,19 @@ th {
     line-height: 18px;
     color: #2C323C;
     padding: 6px 10px;
+    text-align: center;
 }
+
 .button-top-left-radian {
     margin: 25px 0px;
     cursor: pointer;
 }
 /*    general Styles      */
 .RadianContainerBegin {
-    margin: 15px;
+    margin: 50px 0px 15px;
     background: #FFFFFF;
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+    padding: 0px 40px 70px;
 }
 
 .RadianAlertText {
@@ -54,14 +65,14 @@ th {
 }
 
 .RadianCardContainer {
-    background: #F2F6FB;
-    border-radius: 10px;
+    padding: 16px 0px 30px;
     width: 60%;
-    height: 200px;
+    height: 188px;
     background: #F2F6FB;
     border-radius: 10px;
     float: none;
-    margin: 15px auto;
+    margin: 45px auto 15px;
+    box-shadow: 4px 5px 7px rgba(0, 0, 0, 0.1);
 }
 
 .close {
@@ -76,14 +87,14 @@ th {
 @media screen and (min-width: 1101px) {
 
     .RadianTextSelected {
-        height: 21px;
         font-family: Arial;
         font-style: normal;
         font-weight: bold;
-        font-size: 1vw;
+        font-size: 18px;
         line-height: 21px;
         color: #2C323C;
-        margin-top: 25px;
+        margin-top: 40px;
+        margin-bottom: 0px;
     }
 
     .RadianTittleCard {
@@ -108,7 +119,7 @@ th {
         margin-top: -10px;
     }
 
-   .RadianCardContainer:hover .RadianTittleCard {
+    .RadianCardContainer:hover .RadianTittleCard {
         font-family: Arial;
         font-style: normal;
         font-weight: bold;
@@ -262,12 +273,6 @@ th {
 }
 
 
-
-
-.RadianimgSvg {
-    margin: 10px 35%;
-}
-
 .RadianCardContainer:hover .RadianimgSvg path {
     fill: #348441 !important;
 }
@@ -281,33 +286,39 @@ th {
     border-radius: 4px;
 }
 
-.radian-conventions i, #table-contributor-files i{
+.radian-conventions i, #table-contributor-files i {
     margin: 0px 7px;
     font-style: normal;
     font-weight: 900;
     font-size: 16px;
     line-height: 16px;
 }
-.radian-convention li{
+
+.radian-convention li {
     font-family: Arial;
     font-style: normal;
     font-weight: normal;
     font-size: 14px;
     line-height: 16px;
+    display: inline-table !important;
 }
 
 i.fa-exclamation-circle {
     color: #F3A632;
 }
+
 i.fa-check-circle {
     color: #348441;
 }
+
 i.fa-times-circle {
     color: #B81818;
 }
+
 i.fa-info-circle {
     color: #62C7AB;
 }
+
 #table-contributor-files .download-contributor-files {
     font-style: normal;
     font-weight: 900;
@@ -315,6 +326,7 @@ i.fa-info-circle {
     line-height: 14px;
     align-items: center;
 }
+
 #table-contributor-files td {
     font-family: Arial;
     font-style: normal;
@@ -323,9 +335,10 @@ i.fa-info-circle {
     line-height: 16px;
     color: #2C323C;
     padding: 6px 10px;
+    vertical-align: middle;
 }
 
-.fa-pencil{
+.fa-pencil {
     font-style: normal;
     font-weight: 900;
     font-size: 14px;
@@ -333,12 +346,13 @@ i.fa-info-circle {
     color: #348441;
     cursor: pointer;
 }
+
 .download-contributor-files {
     color: #348441;
     margin: 0px 6px;
 }
 
-.edit-state {
+button.edit-state {
     font-family: Arial;
     font-style: normal;
     font-weight: normal;
@@ -348,19 +362,23 @@ i.fa-info-circle {
     color: #348441;
     padding: 0px 10px;
 }
+
 .radian-view {
     text-align: left;
     margin-left: 25px;
 }
+
 .title-view {
-     height: 34px; 
-     font-family: Arial; 
-     font-style: normal; 
-     font-weight: normal; 
-     font-size: 30px; 
-     line-height: 34px; 
-     color: #000000;
+    height: 34px;
+    font-family: Arial;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 30px;
+    line-height: 34px;
+    color: #000000;
+    margin-bottom: 6px;
 }
+
 .underline-title {
     width: calc(100% + 5%);
     height: 3px;
@@ -372,7 +390,7 @@ i.fa-info-circle {
 
 .title-container {
     width: max-content;
-    margin-bottom: 40px
+    margin-bottom: 0px;
 }
 
 .btn-radian-default {
@@ -381,11 +399,18 @@ i.fa-info-circle {
     box-sizing: border-box;
     border-radius: 10px;
     margin-right: 30px;
+    padding: 8px 20px;
+    font-size: 14px;
+    line-height: 16px;
 }
 
 .btn-radian-success {
     background: #348441;
     border-radius: 10px;
+    color: white;
+    padding: 8px 20px;
+    font-size: 14px;
+    line-height: 16px;
 }
 
 .dropdown-state #RadianState {
@@ -397,7 +422,7 @@ i.fa-info-circle {
     width: auto;
 }
 
-.panel-title-radian{
+.panel-title-radian {
     font-size: 18px;
 }
 
@@ -405,6 +430,861 @@ i.fa-info-circle {
     cursor: pointer;
     font-size: 11px;
 }
-.init-hide{
+
+.init-hide {
     display: none;
+}
+
+.file-input-disabled input {
+    color: #2458C5;
+    font-weight: bold;
+    text-overflow: ellipsis;
+    padding-right: 194px;
+}
+
+.modal-footer {
+    border: none;
+    background: no-repeat;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    padding: 10px 10px 50px;
+}
+
+h4.text-thin {
+    text-align: center;
+    font-weight: bold;
+    width: 80%;
+    margin: auto;
+    line-height: 30px;
+    font-size: 21px;
+    color: #348441;
+}
+
+.modal-radian .bootbox-close-button {
+    margin-top: -10px;
+    width: 28px;
+    height: 28px;
+    background-color: #348441 !important;
+    opacity: 1;
+    color: white;
+    font-weight: lighter !important;
+}
+
+.bootbox-close-button {
+    margin-top: -10px;
+    width: 28px;
+    height: 28px;
+    background-color: #348441 !important;
+    opacity: 1;
+    color: white;
+    font-weight: lighter !important;
+}
+
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-dialog .media-body {
+    padding: 30px 30px 0px 30px;
+}
+
+.RadianImgContainer {
+    text-align: center;
+}
+
+#steps-approved .steps li {
+    width: 15%;
+    height: 108.15px;
+    border-radius: 50%;
+    margin: 0px 20px;
+}
+
+#steps-approved .steps a {
+    background: none;
+    position: relative;
+}
+
+#steps-approved .steps span.number {
+    display: none;
+}
+
+#steps-approved .steps img {
+    width: 100%;
+}
+
+#steps-approved .steps li a {
+    height: inherit;
+    top: -3px;
+    position: relative;
+}
+
+#steps-approved .steps li.done {
+    opacity: 1;
+    position: relative;
+}
+
+    #steps-approved .steps li.done::after {
+        content: "";
+        width: 108px;
+        height: 130px;
+        background: transparent;
+        position: absolute;
+        top: 0px;
+    }
+
+    #steps-approved .steps li.done::before {
+        width: 20px;
+        height: 20px;
+    }
+
+#steps-approved .steps li:nth-child(3).disabled a {
+    background: url(../../images/png/validado3.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(4).disabled a {
+    background: url(../../images/png/pruebas3.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+/*#steps-approved .steps li:nth-child(1).current a {
+    background: url(../../images/png/ingreso2.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}*/
+
+#steps-approved .steps li:nth-child(2).current a {
+    background: url(../../images/png/pendiente2.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(3).current a {
+    background: url(../../images/png/validado2.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(4).current a {
+    background: url(../../images/png/pruebas2.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(1).done a {
+    background: url(../../images/png/ingreso1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(2).done a {
+    background: url(../../images/png/pendiente1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(3).done a {
+    background: url(../../images/png/validado1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li:nth-child(4).done a {
+    background: url(../../images/png/pruebas1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li.last a {
+    background: url(../../images/png/flagFinish.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+#steps-approved .steps li.done::before {
+    content: "";
+    position: absolute;
+    right: 16px;
+    top: 2px;
+    width: 35px;
+    height: 35px;
+    background-repeat: no-repeat;
+    background-image: url(../../images/png/done.png);
+    z-index: 1;
+}
+
+.radian-personal-info {
+    padding: 10px;
+}
+
+#steps-approved .content {
+    background: none;
+}
+
+.radian-upload::-webkit-file-upload-button {
+    visibility: hidden;
+}
+
+.radian-upload::before {
+    content: 'Adjuntar';
+    display: inline-block;
+    background: linear-gradient(top, #f9f9f9, #e3e3e3);
+    border: 1px solid #999;
+    border-radius: 3px;
+    padding: 5px 8px;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    cursor: pointer;
+    text-shadow: 1px 1px #fff;
+    font-weight: 700;
+    font-size: 10pt;
+}
+
+.radian-sub-title-container p {
+    font-family: Arial;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 21px;
+}
+
+.radian-subtitle-container {
+    width: 100%;
+}
+
+.radian-subtitle-line {
+    background: #E9E8E8;
+    border-radius: 2px;
+    height: 1.98px;
+}
+
+.subtitle-view {
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 21px;
+    margin: 0;
+    color: #2C323C;
+    padding: 2px 2px 10px;
+}
+
+#steps-approved section {
+    border: 1px solid #348441;
+    padding: 0;
+    width: 100%;
+    height: auto;
+    position: relative;
+}
+
+.radian-personal-form {
+    padding: 20px 0;
+}
+
+#steps-approved .radian-conventions {
+    margin: 20px 0;
+}
+
+.radian-file-label {
+    background: #FFFFFF;
+    border: 1px solid #348441;
+    box-sizing: border-box;
+    border-radius: 4px;
+    height: 33px;
+    line-height: 2 !important;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.custom-file-label::after {
+    content: "Adjuntar";
+    color: white;
+    background: #348441;
+    height: 31px;
+    line-height: 2 !important;
+}
+
+#steps-approved .steps {
+    width: 80%;
+    margin: auto;
+    padding: 50px 0px;
+    margin-bottom: 30px;
+}
+
+#steps-approved li.done .name-state {
+    position: absolute;
+    bottom: -29px;
+    color: black;
+    text-align: center;
+    width: 100%;
+    padding: 0px 12px;
+}
+
+#steps-approved li.current .name-state {
+    position: absolute;
+    bottom: -29px;
+    text-align: center;
+    color: #348441;
+    width: 100%;
+    font-weight: bold;
+}
+#steps-approved li.done:nth-child(2) .name-state {
+    bottom: -20px;
+}
+
+    #steps-approved li.disabled .name-state {
+    position: absolute;
+    bottom: -29px;
+    text-align: center;
+    color: #B0B0B0;
+    width: 100%;
+    padding: 0 12px;
+}
+
+.show-history {
+    text-align: right;
+    float: right;
+    font-size: 18px;
+    color: #348441;
+    cursor: pointer;
+}
+
+#progress-wrp {
+    border: 1px solid #0099CC;
+    padding: 1px;
+    border-radius: 3px;
+    margin: 10px;
+    text-align: left;
+    background: #fff;
+    box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.12);
+    width: 38%;
+    position: absolute;
+    top: 30px;
+    right: 21px;
+}
+
+    #progress-wrp .progress-bar {
+        height: 11px;
+        border-radius: 3px;
+        background-color: #348441;
+        box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.11);
+    }
+
+    #progress-wrp .status {
+        top: 3px;
+        left: 50%;
+        position: absolute;
+        display: inline-block;
+        color: #000000;
+    }
+
+.event-section .cude-section span {
+    display: block;
+}
+
+.event-section .cude-text {
+    overflow-wrap: break-word;
+    width: auto;
+}
+
+.event-section .title-container {
+    margin-bottom: 10px;
+}
+
+.panel > .panel-heading:after {
+    display: none;
+}
+
+.event-section .aditional-data-section h5, .event-section .aditional-data-section p {
+    margin-bottom: 5px;
+}
+
+.event-section .aditional-data-section span {
+    text-align: left;
+    display: block;
+}
+
+.event-section .aditional-data-section .second-section {
+    float: right;
+    padding: 0px 7px;
+    margin-top: 10px;
+}
+
+#steps-approved .content {
+    background: none;
+}
+
+.radian-vertical-line {
+    border-left: 6px solid #FD7E14;
+    height: 200px;
+}
+
+span.state-file {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 0;
+    background-repeat: no-repeat;
+    top: 0;
+    margin: 11px;
+}
+
+    span.state-file.status-1 {
+        background-image: url(../../images/Svg/Loaded.svg);
+    }
+
+    span.state-file.status-2 {
+        background-image: url(../../images/aproved.png);
+    }
+
+    span.state-file.status-3 {
+        background-image: url(../../images/reject.png);
+    }
+
+    span.state-file.status-4 {
+        background-image: url(../../images/observations.png);
+    }
+
+.file-input-disabled {
+    position: relative;
+    width: 50%;
+}
+
+.highcharts-figure, .highcharts-data-table table {
+    min-width: 310px;
+    max-width: 800px;
+    margin: 1em auto;
+}
+
+.highcharts-figure-settest {
+    min-width: 410px;
+    max-width: 900px;
+    margin: 1em auto;
+}
+
+
+.highcharts-data-table table {
+    font-family: Verdana, sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #EBEBEB;
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.highcharts-data-table caption {
+    padding: 1em 0;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.highcharts-data-table th {
+    font-weight: 600;
+    padding: 0.5em;
+}
+
+.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+    padding: 0.5em;
+}
+
+.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
+
+.warning-wrapper .fa-exclamation-circle {
+    font-size: 34px;
+}
+
+.warning-wrapper .icon-warning {
+    text-align: center;
+    border-right: 3px solid #EA965A;
+    border-radius: 2px;
+    padding: 10px;
+}
+
+.warning-wrapper {
+    padding: 10px;
+    background: #F4F5F7;
+}
+
+span.warning-title {
+    font-size: 16px;
+    line-height: 18px;
+    font-weight: bold;
+}
+
+.setTestForm {
+    padding: 20px;
+    border: 1px solid #348441;
+    box-sizing: border-box;
+    border-radius: 0px 5px 0px 0px;
+    margin-top: 20px;
+}
+
+span.close {
+    color: #565B64;
+    opacity: 1;
+    font-weight: 100 !important;
+    position: absolute;
+    top: 27px;
+    right: 0;
+    margin: 10px;
+}
+
+.underline-reject-text {
+    color: #348441;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.custom-file {
+    width: 50%;
+}
+
+.reject-observation {
+    font-weight: bold;
+}
+
+.dataTables_length {
+    display: none;
+}
+
+.dataTables_filter {
+    width: 100% !important;
+    text-align: left !important;
+}
+
+.dataTable th {
+    font-weight: lighter !important;
+    text-align: center;
+    border-bottom: solid 0px #E9E8E8 !important;
+}
+
+.dataTable {
+    border: none !important;
+}
+
+.dataTables_filter input[type="search"] {
+    display: block !important;
+    width: 100% !important;
+    margin: 10px 0 20px 0 !important;
+}
+
+.modal-radian .title-view {
+    margin-bottom: 2px;
+}
+
+.modal-radian .title-container {
+    margin-bottom: 30px;
+}
+
+.underline-title-grey {
+    background: #E9E8E8 !important;
+    height: 2px !important;
+    width: calc(95% + 5%) !important
+}
+
+.modal-radian .bootbox-close-button {
+    background-color: #348441 !important;
+    width: 20px;
+    height: 20px;
+    margin: 0px 8px !important;
+}
+
+#table-history .btn-radian-success {
+    width: 10%;
+}
+
+.back-button {
+    color: #348441;
+    font-size: 18px;
+    margin: 12px 0px 17px 0px;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    z-index: 1;
+}
+
+    /* Tooltip text */
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: white;
+        color: black;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+        position: absolute;
+        bottom: 100%;
+        right: 15px;
+        border: solid 1px;
+    }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            font-size: 60px;
+            position: absolute;
+            height: 20px;
+            left: 42%;
+            top: 24px;
+            background: white;
+            border: solid 1px;
+            width: 20px;
+            transform: rotate(46deg);
+            z-index: -1;
+        }
+
+.underline-reject-text.tooltip img{
+    margin: 0 4px;
+}
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+    }
+
+.dataTable td {
+    text-align: center;
+}
+
+.wizard > .content > .body label.error {
+    color: #8a1f11;
+    display: inline-block;
+    margin-left: 1.5em;
+    margin: 4px 0px;
+}
+
+.jqcs_options {
+    display: block;
+    position: absolute;
+    z-index: 10;
+    width: 29.3%;
+    background-color: white;
+}
+
+.jqcs_arrow {
+    width: 10% !important;
+}
+
+.jqcs_select {
+    background: white;
+}
+
+.jqcs_option {
+    text-align: left;
+    background-repeat: no-repeat;
+    background-position: 6px;
+    padding: 5px 20px 5px 32px;
+}
+
+.jqcs_value {
+    width: 100%;
+}
+
+li.done a::after, li.current a::after {
+    content: "";
+    width: 54%;
+    height: 3px;
+    background: #348441;
+    border-radius: 4px;
+    position: absolute;
+    right: -42%;
+    top: 50%;
+}
+
+li.disabled a::after {
+    content: "";
+    width: 54%;
+    height: 0px;
+    position: absolute;
+    right: -42%;
+    top: 50%;
+    border: 1px dashed #B0B0B0;
+}
+
+li.last a::after {
+    display: none;
+}
+
+
+.view-more-collapse {
+    cursor: pointer;
+    justify-content: center;
+    display: flex;
+    padding-top: 10px;
+}
+.custom-file {
+    padding: 2px 2px 10px;
+}
+
+.custom-file-input {
+    height: 33px !important;
+}
+
+#addRadianContributorFileTypeModal {
+    min-width: 400px;
+}
+
+button.selectpicker {
+    background: transparent;
+    padding: 11px 20px;
+    border: 1px solid #CCCCCC !important;
+    border-radius: 4px;
+}
+
+button.selectpicker .fa-caret-down {
+    right: 15px;
+    position: absolute;
+}
+
+.custom-combobox {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-combobox-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-left: -1px;
+    padding: 0;
+}
+
+.custom-combobox-input {
+    margin: 0;
+    padding: 5px 10px;
+}
+.form-group.input-arrow::before {
+    content: "";
+    border-bottom: 2px solid;
+    border-left: 2px solid;
+    height: 7px;
+    width: 7px;
+    transform: rotate(-45deg);
+    position: absolute;
+    margin: 33px 0px 0px 0px;
+    right: 15px;
+}
+
+.fa-caret-down::before {
+    content: "";
+    border-bottom: 2px solid;
+    border-left: 2px solid;
+    height: 7px;
+    width: 7px;
+    transform: rotate(-45deg);
+    position: absolute;
+    margin: 3px 0px 0px 0px;
+    right: -9px;
+}
+
+.input-general .bootstrap-select {
+    background-color: #f7f7f7;
+}
+
+.prompt-comment .bootbox-close-button.close {
+    background: url(/Content/images/png/closeButton.png);
+    background-repeat: no-repeat;
+    text-indent: -9000px;
+    right: -30px;
+}
+
+.prompt-comment {
+    font-size: 24px;
+}
+.prompt-comment .modal-title {
+    font-size: 24px;
+    width: fit-content;
+    border-bottom: 2px solid #62C7AB;
+    padding-right: 20px;
+    padding-bottom: 4px;
+}
+
+.prompt-comment .modal-header:after {
+    display: none;
+}
+
+.prompt-comment .modal-body {
+    display: inline-flex;
+    width: 80%;
+    padding-top: 0px;
+    padding-bottom: 20px;
+}
+
+.prompt-comment .modal-footer {
+    position: absolute;
+    display: inline-flex;
+    width: 20%;
+    padding-bottom: 0px;
+    bottom: 21px;
+}
+.prompt-comment button.btn-radian-default {
+    display: none;
+}
+
+.prompt-comment .bootbox-body {
+    width: 100%;
+}
+
+.prompt-comment .modal-header {
+    padding-bottom: 5px;
+}
+
+.prompt-comment .modal-content{
+    padding-right: 40px;
+}
+
+#dateFrom, #dateTo {
+    padding-left: 20px;
+    background-image: url(/Content/images/png/calendarAlt.png);
+    background-repeat: no-repeat;
+    background-position: 20% 50%;
+    display: inline-flex;
+    width: 45%;
+}
+
+.ui-datepicker {
+    width: auto;
+}
+
+.input-daterange {
+    margin: 0px;
+}
+
+.input-daterange label {
+    width: 100%;
 }

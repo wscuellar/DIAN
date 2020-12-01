@@ -1,9 +1,9 @@
-﻿using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.DataContext.Middle;
+using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -20,6 +20,19 @@ namespace Gosocket.Dian.DataContext.Repositories
                 sqlDBContext = new SqlDBContext();
         }
 
+        public RadianContributor Get(Expression<Func<RadianContributor, bool>> expression)
+        {
+            IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression)
+                .Include("Contributor")
+                .Include("RadianSoftwares")
+                .Include("RadianSoftwares.RadianContributorOperations")
+                .Include("RadianContributorType")
+                .Include("RadianOperationMode")
+                .Include("RadianContributorFile")
+                .Include("RadianContributorOperations");
+            
+            return query.FirstOrDefault();
+        }
 
         /// <summary>
         /// Consulta los contribuyentes de radian.
@@ -28,14 +41,15 @@ namespace Gosocket.Dian.DataContext.Repositories
         /// <param name="length"></param>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public List<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0)
+        public PagedResult<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0)
         {
-            IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression).Include("Contributor").Include("RadianContributorType").Include("RadianOperationMode").Include("RadianContributorFile");
-            //if (page > 0 && length > 0)
-            //{
-            //    query = query.Skip(page * length).Take(length);
-            //}
-            return query.ToList();
+            IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression)
+                .Include("Contributor")
+                .Include("RadianContributorType")
+                .Include("RadianOperationMode")
+                .Include("RadianContributorFile")
+                .Include("RadianContributorOperations");
+            return query.Paginate(page, length, t => t.Id.ToString());
         }
 
         /// <summary>
@@ -56,11 +70,15 @@ namespace Gosocket.Dian.DataContext.Repositories
                     radianContributorInstance.RadianState = radianContributor.RadianState;
                     radianContributorInstance.RadianOperationModeId = radianContributor.RadianOperationModeId;
                     radianContributorInstance.CreatedBy = radianContributor.CreatedBy;
+                    radianContributorInstance.Description = radianContributor.Description;
+                    radianContributorInstance.Step = radianContributor.Step == 0 ? 1 : radianContributor.Step;
 
                     context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
                 }
                 else
                 {
+                    radianContributor.Step = 1;
+                    radianContributor.Update = DateTime.Now;
                     context.Entry(radianContributor).State = System.Data.Entity.EntityState.Added;
                 }
 
@@ -84,6 +102,5 @@ namespace Gosocket.Dian.DataContext.Repositories
                 sqlDBContext.SaveChanges();
             }
         }
-
     }
 }

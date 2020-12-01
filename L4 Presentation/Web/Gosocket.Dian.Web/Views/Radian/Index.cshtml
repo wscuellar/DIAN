@@ -1,162 +1,156 @@
 ﻿@{
     ViewBag.Title = "Habilitar Participantes";
 }
-@Html.Hidden("RedirectToTechnologyProviderView", Url.Action("Index", "RadianTechnologyProvider"))
-@Html.Hidden("RedirectToTradingSystemView", Url.Action("Index", "RadianTradingSystem"))
-@Html.Hidden("RedirectToFactorView", Url.Action("Index", "RadianFactor"))
-<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
+@*<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />*@
 
+<div class="page-content radian-view margin-20">
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="container-fluid RadianContainerBegin">
 
-<div style="text-align:left; margin-left:25px; margin-top:20px; ">
-    <p style=" width: 174px; height: 34px; font-family: Arial; font-style: normal; font-weight: normal; font-size: 30px; line-height: 34px; color: #000000; ">
-        Participantes
-    </p>
-    <svg width="198" height="3" viewBox="0 0 198 3" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="198" height="3" rx="1.5" fill="#62C7AB" />
-    </svg>
-</div>
+        <p class="RadianTextSelected">Seleccione el tipo de participante:</p>
+        <svg width="100%" height="2" viewBox="0 0 1110 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 1C0 0.447715 0.447715 0 1 0H1109C1109.55 0 1110 0.447715 1110 1C1110 1.55228 1109.55 2 1109 2H1.00003C0.447741 2 0 1.55228 0 1Z" fill="#E9E8E8" />
+        </svg>
 
-<div class="container-fluid RadianContainerBegin">
+        <div class="row-fluid">
 
-    <p class="RadianTextSelected">Seleccione el tipo de participante:</p>
-    <svg width="100%" height="2" viewBox="0 0 1110 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 1C0 0.447715 0.447715 0 1 0H1109C1109.55 0 1110 0.447715 1110 1C1110 1.55228 1109.55 2 1109 2H1.00003C0.447741 2 0 1.55228 0 1Z" fill="#E9E8E8" />
-    </svg>
-
-    <div class="row-fluid">
-
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-            <a href="@Url.Action("ElectronicInvoiceView", "Radian")">
-                <div class="card RadianCardContainer" id="1">
-                    <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
+                    <div class="RadianImgContainer">
+                        <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
+                    </div>
                     <div class="card-body">
                         <p class="RadianTittleCard">Facturador Electrónico</p>
                         <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
                     </div>
                 </div>
-            </a>
-        </div>
-
-
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-            <div class="card RadianCardContainer" action="RedirectToTechnologyProviderView" id="2">
-                <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
-                <div class="card-body">
-                    <p class="RadianTittleCard">Proveedor Tecnológico</p>
-                    <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
-                </div>
-                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea habilitar la trasmisión de eventos al RADIAN como Proveedor Tecnológico?" />
-                <input type="hidden" class="ConfirmReject" value="El participante no es un proveedor tecnológico habilitado." />
-                <input type="hidden" class="ConfirmRejectSoft" value="El participante no cuenta con un software propio activo en el sistema." />
-                <input type="hidden" class="ConfirmRejectUser" value="El participante ya se encuentra registrado en RADIAN como Proveedor Tecnologico." />
             </div>
-        </div>
-    </div>
 
-    <div class="row-fluid">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-            <div class="card RadianCardContainer" action="RedirectToTradingSystemView" id="3">
-                <img class="RadianimgSvg" src="~/Content/images/Svg/SistemaNegociacion.svg" />
-                <div class="card-body">
-                    <p class="RadianTittleCard">Sistema de negociación</p>
-                    <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
+                    <div class="RadianImgContainer">
+                        <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
+                    </div>
+                    <div class="card-body">
+                        <p class="RadianTittleCard">Proveedor Tecnológico</p>
+                        <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
+                    </div>
                 </div>
-                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea operar como Sistema de Negociación?" />
-                <input type="hidden" class="ConfirmReject" value="El participante no esta habilitado." />
-                <input type="hidden" class="ConfirmRejectSoft" value="El participante no cuenta con un software propio activo en el sistema." />
-                <input type="hidden" class="ConfirmRejectUser" value="El participante ya se encuentra registrado en RADIAN como Sistema de Negociación Electrónica." />
             </div>
         </div>
 
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-            <div class="card RadianCardContainer" action="RedirectToFactorView" id="4">
-                <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
-                <div class="card-body">
-                    <p class="RadianTittleCard">Factor</p>
-                    <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
+        <div class="row-fluid">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3">
+                    <div class="RadianImgContainer">
+                        <img class="RadianimgSvg" src="~/Content/images/Svg/SistemaNegociacion.svg" />
+                    </div>
+                    <div class="card-body">
+                        <p class="RadianTittleCard">Sistema de negociación</p>
+                        <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
+                    </div>
                 </div>
-                <input type="hidden" class="ConfirmMessage" value="¿Está seguro que desea operar como Factor?" />
-                <input type="hidden" class="ConfirmReject" value="El participante no esta habilitado." />
-                <input type="hidden" class="ConfirmRejectSoft" value="El participante no cuenta con un software propio activo en el sistema." />
-                <input type="hidden" class="ConfirmRejectUser" value="El participante ya se encuentra registrado en RADIAN como Factor." />
             </div>
-        </div>
 
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="4" operationMode="1" id="4">
+                    <div class="RadianImgContainer">
+                        <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
+                    </div>
+                    <div class="card-body">
+                        <p class="RadianTittleCard">Factor</p>
+                        <p class="RadianTittleCard2">Registro de Facturas Electrónicas</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
-
-@section scripts
+    @section scripts
 {
-    @Scripts.Render("~/bundles/jqueryval")
-    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+        @Scripts.Render("~/bundles/jqueryval")
+        <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
     <script>
-
-        var redirecTo = "";
-        var withSoft = '@ViewBag.WithSoft';
-        var existInRadian = '@ViewBag.ExistInRadian';
+        var existingModes = ['@ViewBag.ElectronicInvoice_RadianContributorTypeId', '@ViewBag.TechnologyProvider_RadianContributorTypeId', '@ViewBag.TradingSystem_RadianContributorTypeId', '@ViewBag.Factor_RadianContributorTypeId'];
         var contributorId = '@ViewBag.ContributorId';
+        var operationClick = false;
+
+        Array.prototype.clean = function (deleteValue) {
+            for (var i = 0, j = this.length; i < j; i++) {
+                if (this[i] == deleteValue) {
+                    this.splice(i, 1);
+                    i--;
+                }
+            }
+            return this;
+        };
 
         $('.RadianCardContainer').click(function () {
-            var index = $(this).attr('id');
-            if (index > 1) {
-                redirecTo = $(this).attr('action');
-                var findLabel = Validation(redirecTo, index);
-                var message = $(this).children(findLabel).val()
-                if (message != undefined) {
-                    var buttons = findLabel == ".ConfirmMessage" ? ConfirmExec(redirect) : AlertExec();
-                    showConfirmation(message, buttons);
+            existingModes.clean("");
+            if ($(this).attr('operationMode') === "1" && !existingModes.includes($(this).attr('contributorType')))
+            {
+                if (!operationClick) {
+                    operationClick = true;
+
+                    var RegistrationDataViewModel = {
+                        ContributorId: '@ViewBag.ContributorId',
+                        RadianContributorType: $(this).attr('contributorType'),
+                        RadianOperationMode: $(this).attr('operationMode'),
+                    };
+
+                    CallExecution("POST", '@Url.Action("RegistrationValidation", "Radian")', RegistrationDataViewModel,
+                        function (param) {
+                            CallExecution("POST", '@Url.Action("Add", "RadianApproved")', RegistrationDataViewModel,
+                                function (param) {
+                                    var url = "@Url.Action("Index", "RadianApproved")" + "?ContributorId=" + param.ContributorId + "&RadianContributorType=" + param.RadianContributorType + "&RadianOperationMode=" + param.RadianOperationMode;
+                                    window.location.href = url;
+                                }, false
+                            );
+                        }, true
+                    );
                 }
-            }            
+            }
+            else {
+                    var url = "@Url.Action("Index", "RadianApproved")";
+                var complement = "";
+                if (!existingModes.includes($(this).attr('contributorType')))
+                    url = '@Url.Action("ElectronicInvoiceView", "Radian")';
+                else 
+                    complement = getComplement($(this).attr('contributorType'));
+                window.location.href = url + complement;
+            }
         });
 
-        function redirect() {
-            var url = $("#" + redirecTo).val() + "?ContributorId=" + contributorId;
-            window.location.href = url;
+        function getComplement(option){
+              var complement="";
+              switch (option)
+              {
+                    case "1":
+                        complement = "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.ElectronicInvoice_RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.ElectronicInvoice_RadianOperationModeId';
+                        break;
+                    case "2":
+                        complement = "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.TechnologyProvider_RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.TechnologyProvider_RadianOperationModeId';
+                        break;
+                    case "3":
+                        complement = "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.TradingSystem_RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.TradingSystem_RadianOperationModeId';
+                        break;
+                    case "4":
+                        complement = "?ContributorId=" + '@ViewBag.ContributorId' + "&RadianContributorType=" + '@ViewBag.Factor_RadianContributorTypeId' + "&RadianOperationMode=" + '@ViewBag.Factor_RadianOperationModeId';
+                        break;
+              };
+              return complement;
         }
 
-        function Validation(redirectTo, index) {
-            var isActive = '@ViewBag.Active' == "True";
-            switch (redirecTo) {
-                case "RedirectToTechnologyProviderView":
-                    var isTecnologicProvider = '@ViewBag.ContributorTypeId' == "2";
-                    if (isTecnologicProvider && isActive && withSoft == "True" && !existInRadian.includes(index)) {
-                        return ".ConfirmMessage";
-                    }
-                    else {
-                        if (!isTecnologicProvider || !isActive) {
-                            return ".ConfirmReject";
-                        }
-                        if (withSoft == "False") {
-                            return ".ConfirmRejectSoft";
-                        }
-                        if (existInRadian.includes(index)) {
-                            return ".ConfirmRejectUser";
-                        }
-                    }
-                    break;
-                case "RedirectToTradingSystemView":
-                case "RedirectToFactorView":
-                    if (isActive && withSoft == "True" && !existInRadian.includes(index)) {
-                        return ".ConfirmMessage";
-                    }
-                    else {
-                        if (!isActive) {
-                            return ".ConfirmReject";
-                        }
-                        if (withSoft == "False") {
-                            return ".ConfirmRejectSoft";
-                        }
-                        if (existInRadian.includes(index)) {
-                            return ".ConfirmRejectUser";
-                        }
-                    }
-                    break;
-            }
-        }
+        
 
+        </script>
 
-    </script>
-
-}
+    }

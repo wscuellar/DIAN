@@ -26,7 +26,7 @@ namespace Gosocket.Dian.Web.Models
 
         [DataType(DataType.Date)]
         [Display(Name = "Rango de fechas Registro")]
-        public DateTime DateInterval { get; set; }
+        public DateTime? DateInterval { get; set; }
 
         [Display(Name = "Tipo de participante")]
         public int Type { get; set; }
@@ -37,6 +37,10 @@ namespace Gosocket.Dian.Web.Models
 
         public int Page { get; set; }
         public int Length { get; set; }
+
+        public int TotalCount { get; set; }
+
+        public int CurrentPage { get; set; }
 
         public int Id { get; set; }
         public bool SearchFinished { set; get; }
@@ -160,6 +164,8 @@ namespace Gosocket.Dian.Web.Models
     {
         public string Id { get; set; }
         public int NewState { get; set; }
+        public string comment { get; set; }
+
     }
 
 }

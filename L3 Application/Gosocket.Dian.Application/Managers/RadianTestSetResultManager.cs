@@ -12,7 +12,7 @@ namespace Gosocket.Dian.Application.Managers
     {
         private static readonly TableManager testSetManager = new TableManager("RadianTestSetResult");
 
-        public bool InsertTestSet(RadianTestSetResult testSetResult)
+        public bool InsertOrUpdateTestSetResult(RadianTestSetResult testSetResult)
         {
             return testSetManager.InsertOrUpdate(testSetResult);
         }
@@ -46,5 +46,11 @@ namespace Gosocket.Dian.Application.Managers
         {
             return testSetManager.FindByContributorIdWithPagination<RadianTestSetResult>(contributorId);
         }
+
+        public List<RadianTestSetResult> GetTestSetResultByNit(string nit)
+        {
+            return testSetManager.FindByPartition<RadianTestSetResult> (nit);
+        }
+
     }
 }

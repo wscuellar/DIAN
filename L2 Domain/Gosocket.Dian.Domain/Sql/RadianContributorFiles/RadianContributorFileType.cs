@@ -10,6 +10,7 @@ namespace Gosocket.Dian.Domain
         [Key]
         public int Id { get; set; }
 
+        [Display(Name = "Nombre")]
         public string Name { get; set; }
         public DateTime Timestamp { get; set; }
         public DateTime Updated { get; set; }
@@ -18,5 +19,7 @@ namespace Gosocket.Dian.Domain
         public bool Deleted { get; set; }
         public int RadianContributorTypeId { get; set; }
         public virtual RadianContributorType RadianContributorType { get; set; }
+        [NotMapped]
+        public bool HideDelete { get; set; }
     }
 }

@@ -314,7 +314,11 @@ namespace Gosocket.Dian.Functions.Activation
                                     Success = activation.Success,
                                     ContributorCode = contributor.Code,
                                     ContributorTypeId = contributor.ContributorTypeId,
+<<<<<<< HEAD
                                     OperationModeId = radianTesSetResult.OperationModeId,
+=======
+                                    OperationModeId =   radianTesSetResult.OperationModeId,
+>>>>>>> dev-indra-test
                                     OperationModeName = radianTesSetResult.OperationModeName,
                                     SentToActivateBy = "Function",
                                     SoftwareId = radianTesSetResult.SoftwareId,

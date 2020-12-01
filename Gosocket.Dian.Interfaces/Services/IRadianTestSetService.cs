@@ -10,7 +10,7 @@ namespace Gosocket.Dian.Interfaces.Services
         RadianOperationMode GetOperationMode(int id);
         RadianTestSet GetTestSet(string partitionKey, string rowKey);
         bool InsertTestSet(RadianTestSet testSet);
-        List<RadianOperationMode> OperationModeList();
+        List<RadianOperationMode> OperationModeList(Domain.Common.RadianOperationMode radianOperation);
 
     }
 }

@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Caching;
 
 namespace Gosocket.Dian.Domain
 {
@@ -19,10 +15,15 @@ namespace Gosocket.Dian.Domain
         public int RadianOperationModeId { get; set; }
         public RadianOperationMode RadianOperationMode { get; set; }
         public string RadianState { get; set; }
+        public string Description { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime Update { get; set; }
+        public int Step { get; set; }
         public string CreatedBy { get; set; }
         public virtual ICollection<RadianContributorFile> RadianContributorFile { get; set; }
+        public virtual ICollection<RadianSoftware> RadianSoftwares { get; set; }
+        public virtual ICollection<RadianContributorOperation> RadianContributorOperations { get; set; }
+        
     }
 
 }
