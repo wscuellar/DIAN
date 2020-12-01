@@ -217,11 +217,8 @@
     <Compile Include="KeyVault\ExportCertificatResult.cs" />
     <Compile Include="KeyVault\HttpMessageHandler.cs" />
     <Compile Include="KeyVault\ImportCertificateResult.cs" />
-<<<<<<< HEAD
     <Compile Include="Sql\ElectronicDocument.cs" />
-=======
     <Compile Include="Sql\Menu.cs" />
->>>>>>> dev-indra-test
     <Compile Include="Sql\OperationMode.cs" />
     <Compile Include="Sql\Permission.cs" />
     <Compile Include="Sql\RadianContributorOperations.cs" />
