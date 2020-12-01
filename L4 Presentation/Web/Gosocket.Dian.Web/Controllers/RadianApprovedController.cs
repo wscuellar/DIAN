@@ -349,5 +349,25 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(model, JsonRequestBehavior.AllowGet);
         }
 
+
+        public ActionResult FileHistoyList(FileHistoryFilterViewModel filter)
+        {
+            PagedResult<RadianContributorFileHistory> data = _radianAprovedService.FileHistoryFilter(filter.FileName, filter.Initial, filter.End, filter.Page, filter.PageSize);
+            FileHistoryListViewModel result = new FileHistoryListViewModel()
+            {
+                Page = filter.Page,
+                RowCount = data.RowCount,
+                items = data.Results.Select(t => new FileHistoryItemViewModel()
+                {
+                    FileName = t.FileName,
+                    Comments = t.Comments,
+                    CreatedBy = t.CreatedBy,
+                    Status = t.RadianContributorFileStatus?.Name,
+                    Updated = t.Timestamp
+                }).ToList()
+            };
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

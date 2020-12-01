@@ -279,5 +279,17 @@ namespace Gosocket.Dian.Application
 
             return customers;
         }
+
+        public PagedResult<RadianContributorFileHistory> FileHistoryFilter(string fileName, string initial, string end, int page, int pagesize)
+        {
+            DateTime initialDate, endDate;
+            PagedResult<RadianContributorFileHistory> result;
+            if (!string.IsNullOrEmpty(initial) && DateTime.TryParse(initial, out initialDate) && !string.IsNullOrEmpty(end) && DateTime.TryParse(end, out endDate))
+                result =_radianContributorFileHistoryRepository.List(t => t.FileName.Contains(fileName) && t.Timestamp.Date >= initialDate.Date && t.Timestamp.Date <= endDate.Date, page, pagesize);
+            else
+                result = _radianContributorFileHistoryRepository.List(t => t.FileName.Contains(fileName), page, pagesize);
+            return result;
+        }
+
     }
 }
