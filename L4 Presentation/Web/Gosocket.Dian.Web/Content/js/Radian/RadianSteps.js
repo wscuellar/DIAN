@@ -128,13 +128,11 @@ function SearchData(paramsObject) {
             paramsObject.ajaxData[element[0]] = $(element[1]).val();
         }
     });
-
     var actionError = () => { }
-    var actionSuccess = (response) => {
+    var actionSuccess = (response) => {debugger
         paramsObject.data = response;
         RenderTable(paramsObject);
     }
-    debugger
     ajaxFunction(paramsObject.urlSearch, 'POST', paramsObject.ajaxData, actionError, actionSuccess);
 }
 

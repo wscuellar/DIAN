@@ -100,7 +100,7 @@
                 var page = @Model.PageTable;
                 var element = '#table-history';
                 var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
-                var urlSearch = '@Url.Action("filesHistoryList", "RadianApproved")';
+                var urlSearch = '@Url.Action("FileHistoyList", "RadianApproved")';
                 var form = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_formSearchHistory").ToString().Trim('"'))));
                 var radianId = "@Model.Contributor.RadianContributorId";
                 var dialog = bootbox.dialog({
@@ -109,8 +109,8 @@
                     size: 'large'
                 });
                 dialog.init(function (e) {
-                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.Customers))');
-                    var customersTotalCount = @Model.CustomerTotalCount;
+                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.FileHistories))');
+                    var customersTotalCount = @Model.FileHistoriesRowCount;
                     var columns = [
                         { data: 'FileName' },
                         { data: 'Updated' },
@@ -119,11 +119,11 @@
                         { data: 'Comments' }
                     ]
                     var ajaxData = {
-                        radianContributorId: @Model.Contributor.RadianContributorId,
-                        code: "#NitSearch",
-                        radianState: "#RadianStateSelect",
-                        page: page,
-                        pagesize: 10
+                        FileName: "#NameSearch",
+                        Initial: "#dateFrom",
+                        End: "#dateTo",
+                        Page: page,
+                        PageSize: 10
                     };
                     var paramsObject = {
                         element: element,

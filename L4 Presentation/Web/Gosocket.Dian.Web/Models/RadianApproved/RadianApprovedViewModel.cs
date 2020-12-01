@@ -59,6 +59,9 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         [Display(Name = "Nit Facturador")]
         public string NitSearch { get; set; }
 
+        [Display(Name = "Nombre archivo")]
+        public string NameSearch { get; set; }
+
         [Display(Name = "Estado de aprobación")]
         public RadianUtil.UserStates RadianStateSelect { get; set; }
         public int PageTable { get; set; }
