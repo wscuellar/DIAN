@@ -73,7 +73,7 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
             model.CustomerTotalCount = customers.RowCount;
 
-            var data = _radianAprovedService.FileHistoryFilter(string.Empty, string.Empty, string.Empty, 1, 10);
+                var data = _radianAprovedService.FileHistoryFilter(string.Empty, string.Empty, string.Empty, 1, 10);
             FileHistoryListViewModel resultH = new FileHistoryListViewModel()
             {
                 Page = 1,

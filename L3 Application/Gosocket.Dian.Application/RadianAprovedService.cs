@@ -333,10 +333,10 @@ namespace Gosocket.Dian.Application
         {
             DateTime initialDate, endDate;
             if (!string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(initial) && DateTime.TryParse(initial, out initialDate) && !string.IsNullOrEmpty(end) && DateTime.TryParse(end, out endDate))
-                return _radianContributorFileHistoryRepository.List(t => t.FileName.Contains(fileName) && t.Timestamp.Date >= initialDate.Date && t.Timestamp.Date <= endDate.Date, page, pagesize);
+                return _radianContributorFileHistoryRepository.List(t => t.FileName.Contains(fileName) && t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
             
             if (string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(initial) && DateTime.TryParse(initial, out initialDate) && !string.IsNullOrEmpty(end) && DateTime.TryParse(end, out endDate))
-                return _radianContributorFileHistoryRepository.List(t => t.Timestamp.Date >= initialDate.Date && t.Timestamp.Date <= endDate.Date, page, pagesize);
+                return _radianContributorFileHistoryRepository.List(t => t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
 
             if (!string.IsNullOrEmpty(fileName))
                 return _radianContributorFileHistoryRepository.List(t => t.FileName.Contains(fileName), page, pagesize);
