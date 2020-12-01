@@ -73,6 +73,10 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
             model.CustomerTotalCount = customers.RowCount;
 
+            var filesHistories = _radianAprovedService.FileHistoryFilter(string.Empty, string.Empty, string.Empty, 1, 10);
+            model.FileHistories = filesHistories.Results;
+            model.FileHistoriesRowCount = filesHistories.RowCount;
+            
             if ((int)registrationData.RadianOperationMode == 2)
             {
                 if (model.RadianState == "Habilitado")
