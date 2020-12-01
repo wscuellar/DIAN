@@ -114,19 +114,20 @@ namespace Gosocket.Dian.Web.Controllers
                                                         registrationData.RadianOperationMode,
                                                         User.UserName());
 
-            if (radianContributor.RadianSoftwares.Count > 0)
+            if (radianContributor.RadianSoftwares == null || radianContributor.RadianSoftwares.Count == 0)
+                return;
+
+            RadianSoftware software = radianContributor.RadianSoftwares.FirstOrDefault();
+            RadianContributorOperation radianContributorOperation = new RadianContributorOperation()
             {
-                RadianSoftware software = radianContributor.RadianSoftwares.FirstOrDefault();
-                RadianContributorOperation radianContributorOperation = new RadianContributorOperation()
-                {
-                    RadianContributorId = radianContributor.Id,
-                    SoftwareId = software.Id,
-                    SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
-                    Timestamp = DateTime.Now
-                };
-                _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software.Url, software.Name, software.Pin, User.UserName());
-            }
-                
+                RadianContributorId = radianContributor.Id,
+                SoftwareId = software.Id,
+                SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
+                Timestamp = DateTime.Now
+            };
+            _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software.Url, software.Name, software.Pin, User.UserName());
+
+
         }
 
         [HttpPost]
