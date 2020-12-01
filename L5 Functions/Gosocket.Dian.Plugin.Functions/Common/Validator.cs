@@ -274,6 +274,27 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var ValTol = objCune.ValTol?.Trim();
             var errorCode = "FAD06";
             var prop = "CUFE";
+
+            string key = string.Empty;
+
+            var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
+            var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
+
+            //if (!codesWithCUDE.Contains(documentMeta.DocumentTypeId))
+            //    key = ConfigurationManager.GetValue("TestHabTechnicalKey");
+            //else
+            //{
+            //    var softwareId = cufeModel.SoftwareId;
+            //    if (softwareId == billerSoftwareId)
+            //        key = billerSoftwarePin;
+            //    else
+            //    {
+            //        var software = GetSoftwareInstanceCache(softwareId);
+            //        key = software?.Pin;
+            //    }
+            //}
+
+
             string errorMessarge = string.Empty;
             errorMessarge = $"Valor del { prop} no está calculado correctamente.";
             var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessarge };
@@ -294,10 +315,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var hash = numberSha384.EncryptSHA384();
 
-            if (objCune.Cune == hash)
+            if (objCune.Cune.ToLower() == hash)
             {
                 response.IsValid = true;
                 response.ErrorMessage = $"Valor del {prop} calculado correctamente.";
+            }
+            else
+            {
+                response.IsValid = false;
+                response.ErrorMessage = $"Valor del {prop} no esta calculado correctamente.";
             }
 
             response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
