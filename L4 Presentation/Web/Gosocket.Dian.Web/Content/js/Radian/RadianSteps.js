@@ -1,4 +1,16 @@
 ﻿
+//var paramsObject = {
+//    element: "",
+//    data: [],
+//    form: "",
+//    urlSearch: "",
+//    radianId: 0,
+//    page: 0,
+//    tableRendered: "",
+//    customersTotalCount: 0,
+//    columns: []
+//}
+
 function RenderSteps(index) {
     $("#steps-approved").steps({
         headerTag: "h3",
@@ -54,17 +66,14 @@ function RenderSteps(index) {
     })
 }
 
-function RenderTable(element, data, form, urlSearch, radianId, page, tableRendered) {
+function RenderTable(element, data, form, urlSearch, radianId, page, tableRendered, customersTotalCount, columns) {
+    var totalPages = Math.round(customersTotalCount / 10) + 1 ;
     tableRendered && tableRendered.destroy();
     var table = $(element).DataTable({
         paging: false,
         info: false,
         data: data,
-        columns: [
-            { data: 'Nit' },
-            { data: 'RadianState' },
-            { data: 'BussinessName' }
-        ],
+        columns: columns,
         language: {
             "lengthMenu": "Mostrar _MENU_ elementos por página",
             "zeroRecords": "No se encontraron datos",
@@ -79,13 +88,14 @@ function RenderTable(element, data, form, urlSearch, radianId, page, tableRender
         }
     });
     $(element+"_filter > label").hide();
-    $(element + "_wrapper").append("<div><span>Mostrando 1 de 20 páginas</span>" + TablePagination());
+    $(element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(page, customersTotalCount));
     $(element + "_filter").append(form);
-    LoadEventsToSearch(urlSearch, radianId, form, page, table);
-    LoadEventsToPagiantion(element, data, form, urlSearch, radianId, table, page);
+    LoadEventsToSearch(urlSearch, radianId, form, page, table, customersTotalCount, columns);
+    LoadEventsToPagiantion(element, data, form, urlSearch, radianId, page, table, customersTotalCount, columns);
+    changeToSpanish();
 }
 
-function LoadEventsToSearch(url, radianContributorId, form, page, table) {
+function LoadEventsToSearch(url, radianContributorId, form, page, table, customersTotalCount, columns) {
     $("#search-customers").click(function (e) {
         e.preventDefault();
         var nit = $("#NitSearch").val();
@@ -99,13 +109,13 @@ function LoadEventsToSearch(url, radianContributorId, form, page, table) {
         };
         var actionError = () => {}
         var actionSuccess = (response) => {
-            RenderTable('#table-customers', response, form, url, radianContributorId, page, table)
+            RenderTable('#table-customers', response, form, url, radianContributorId, page, table, customersTotalCount, columns)
         }
         ajaxFunction(url, 'POST', data, actionError, actionSuccess); 
     })
 }
 
-function LoadEventsToPagiantion(element, data, form, urlSearch, radianId, table, page) {
+function LoadEventsToPagiantion(element, data, form, urlSearch, radianId, page, table, customersTotalCount, columns) {
     $(".next-page").click(function () {
         var newPage = parseInt($("#PageTable").val()) + 1;
         $("#PageTable").val(newPage);
@@ -120,7 +130,7 @@ function LoadEventsToPagiantion(element, data, form, urlSearch, radianId, table,
         };
         var actionError = () => { }
         var actionSuccess = (response) => {
-            RenderTable(element, response, form, urlSearch, radianId, newPage, table)
+            RenderTable(element, response, form, urlSearch, radianId, newPage, table, customersTotalCount, columns)
         }
         ajaxFunction(urlSearch, 'POST', data, actionError, actionSuccess); 
     });
@@ -138,7 +148,7 @@ function LoadEventsToPagiantion(element, data, form, urlSearch, radianId, table,
         };
         var actionError = () => { }
         var actionSuccess = (response) => {
-            RenderTable(element, response, form, urlSearch, radianId, newPage, table)
+            RenderTable(element, response, form, urlSearch, radianId, newPage, table, customersTotalCount, columns)
         }
         ajaxFunction(url, 'POST', data, actionError, actionSuccess); 
     });
@@ -163,17 +173,28 @@ function SearchCustomers() {
 
 
 
-function TablePagination() {
+function TablePagination(page, totalCount) {
+    var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : ""; 
+    var disabledPrev = page == 1 ? 'disabled="disabled"' : "";
     var html = '<div class="pagination-controls pull-right"><span class="text-muted">\
                 <strong>1-1</strong >\
                 </span >\
                 <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">\
-                <a class="btn btn-default paginate-btn prev-page" disabled="disabled">\
+                <a class="btn btn-default paginate-btn prev-page" '+ disabledPrev +'>\
                         <span class="fa fa-chevron-left"></span>\
                     </a>\
-                <a class="btn btn-default paginate-btn next-page") >\
+                <a class="btn btn-default paginate-btn next-page" '+ disabledNext +'>\
                 <span class="fa fa-chevron-right"></span>\
                     </a >\
                 </div></div>'
     return html;
+}
+
+function changeToSpanish() {
+    $('.input-daterange').datepicker({
+        language: "es"
+    });
+    $(".input-daterange input").change(function(){
+        $(".datepicker-dropdown").css("display","none");
+    });
 }
