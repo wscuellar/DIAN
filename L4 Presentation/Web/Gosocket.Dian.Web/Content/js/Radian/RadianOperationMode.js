@@ -7,8 +7,8 @@ function DeleteOperationMode(url) {
             Id: $(this).attr("data-id")
         }
         var actionError = () => { }
-        var actionSuccess = () => {
-            location.reload();
+        var actionSuccess = (response) => {
+            showConfirmation(response.message, AlertExec(()=>location.reload()))
         }
         ajaxFunction(url, metod, data, actionError, actionSuccess)
     })
