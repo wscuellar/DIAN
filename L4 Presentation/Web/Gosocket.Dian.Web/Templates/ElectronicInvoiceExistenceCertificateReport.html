@@ -1,0 +1,239 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        body {
+            font-family: "Calibri",sans-serif;
+        }
+
+        article {
+            border: 1px solid #ccc;
+        }
+
+        header, section, footer {
+            display: flex;
+        }
+
+        header, footer {
+            border: 1px solid #ccc;
+        }
+
+            header div {
+                min-width: 300px;
+                word-wrap: break-word;
+            }
+
+            header .header-image {
+                min-width: 300px;
+            }
+
+        section div {
+            text-align: center;
+        }
+
+        table {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+            flex-wrap: wrap;
+        }
+
+        .th-number {
+            width: 40px;
+        }
+
+        .td-cude {
+            width: 100px;
+            flex-wrap: wrap;
+        }
+
+        .sub-header {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .business {
+            margin-top: 5px;
+            padding: 5px;
+        }
+
+        .business-div {
+            width: 50%;
+            text-align: center;
+        }
+
+        .invoice {
+            margin-top: 5px;
+            padding: 5px;
+        }
+
+            .invoice div {
+                width: 25%;
+            }
+
+        .centered {
+            text-align: center;
+        }
+
+        .principal-info {
+            font-size: 24px;
+        }
+
+        .adjust-text {
+            text-align: center;
+            word-wrap: break-word;
+            font-size: 18px;
+            padding: 0 20px;
+        }
+
+        .events {
+            border: 2px solid #808080;
+            min-height: 30px;
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-image">
+            <img src="https://d31dn7nfpuwjnm.cloudfront.net/images/valoraciones/0028/7646/dian-citas.png?1511288120" style="width: 300px;">
+        </div>
+        <div class="centered">
+            {DIRECCIÓN DE IMPUESTOS Y ADUANAS NACIONALES CERTIFICADO DE EXISTENCIA DE FACTURA ELECTRÓNICA COMO TITULO VALOR-RADIAN.}
+            <div>
+                Impreso el {PrintDay} de {PrintMonth} de {PrintYear} a las {PrintTime}
+            </div>
+        </div>
+        <div class="centered">
+            Página {Page}
+            <div>
+
+            </div>
+        </div>
+    </header>
+    <div class="sub-header">
+        {ESTE CERTIFICADO REFLEJA EL ESTADO ACTUAL DE LA FACTURA ELECTRÓNICA DE VENTA COMO TÍTULO VALOR-RADIAN HASTA LA FECHA Y HORA DE SU EXPEDICIÓN}
+        <div>
+            Factura Electrónica de Venta No. {InvoiceNumber}
+        </div>
+        <div>
+            CUFE: {CUFE}
+        </div>
+        <hr />
+        <div>
+            Fecha de Generación de la Factura Electrónica de Venta {EInvoiceGenerationDate}
+        </div>
+        <div>
+            Estado {CurrentStatus}
+        </div>
+    </div>
+
+    <article>
+        <section class="business">
+            <div class="business-div">
+                <div>
+                    <div>
+                        RAZÓN SOCIAL DEL EMISOR:
+                    </div>
+                    <div class="principal-info">
+                        {SenderBusinessName}
+                    </div>
+                </div>
+                <div>
+                    NIT : {EInvoiceNit}
+                </div>
+            </div>
+            <hr />
+            <div class="business-div">
+                <div>
+                    <div>
+                        RAZÓN SOCIAL DEL ADQUIRIENTE:
+                    </div>
+                    <div class="principal-info">
+                        {AcquirerBusinessName}
+                    </div>
+                </div>
+                <div>
+                    NIT: {AcquirerNit}
+                </div>
+            </div>
+        </section>
+        <hr />
+        <section class="invoice">
+            <div>
+                VALOR DE LA FACTURA ELECTRÓNICA: {InvoiceValue}
+            </div>
+            <hr />
+            <div>
+                DIVISA: {Badge}
+            </div>
+            <hr />
+            <div>
+                FORMA DE PAGO: {PaymentMethod}
+            </div>
+            <hr />
+            <div>
+                VENCIMIENTO: {Expiration}
+            </div>
+        </section>
+    </article>
+
+    <div class="events">
+        <table>
+            <thead>
+                <tr>
+                    <th class="th-number">EVENTO No</th>
+                    <th>Fecha de Validación</th>
+                    <th>CUDE</th>
+                    <th>RESPUESTA DE VALIDACIÓN POR LA DIAN</th>
+                    <th>PERSONAS QUE INTERVIENEN EN EL EVENTO</th>
+                    <th>ENTIDAD QUE VALIDAD EL EVENTO</th>
+                    <th>RECEPTOR DEL EVENTO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {Events}
+            </tbody>
+        </table>
+    </div>
+    <Section class="business">
+        <div class="adjust-text">
+            DOCUMENTOS Y EVENTOS ASOCIADOS A LA FACTURA ELECTRONICA DE VENTA COMO TÍTULO VALOR-RADIAN.
+        </div>
+        <div>
+            <div>
+                NRO. TOTAL DE DOCUMENTOS: {DocumentsTotal}
+            </div>
+            <div>
+                NRO. TOTAL DE EVENTOS: {EventsTotal}
+            </div>
+        </div>
+    </Section>
+    <hr />
+    <div class="centered">
+        El interesado debe comunicar a la Dirección de Impuestos y Aduanas Nacionales, cualquier falla o error en el registro de los documentos o eventos electrónicos del Certificado de Existencia de la Factura electrónica de venta como título valor-RADIAN.
+    </div>
+    <footer class="business">
+        <div class="business-div">
+            <div>
+                FECHA: {ExpeditionDate}
+            </div>
+            <div>
+                EXPEDIDO DIAN
+            </div>
+        </div>
+        <div class="business-div">
+            {QRCode}
+        </div>
+    </footer>
+</body>
+</html>

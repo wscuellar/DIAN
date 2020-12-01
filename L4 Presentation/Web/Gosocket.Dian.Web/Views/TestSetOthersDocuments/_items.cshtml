@@ -1,0 +1,54 @@
+﻿@using Gosocket.Dian.Web.Models
+
+<div class="table-responsive">
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        @if (ViewBag.listData == null && ((List<TestSetOthersDocumentsViewModel>)ViewBag.listData).Count <= 0)
+        {
+            <tr style="background-color: transparent !important;">
+                <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
+                    <div class="alert panel-footer-grey">
+                        Ningún set de pruebas disponible para mostrar.
+                    </div>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <thead>
+                <tr>
+                    <th>Documento eletrónico</th>
+                    <th>Modo de operación</th>
+                    <th>Descripción</th>
+                    <th>Documentos</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>Creado por</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (TestSetOthersDocumentsViewModel item in ((List<TestSetOthersDocumentsViewModel>)ViewBag.listData))
+                {
+
+                    <tr class='clickable-row' data-href="@Url.Action("Add","TestSetOthersDocuments",
+                            new { electronicDocumentId = item.ElectronicDocumentId, operationModeId = item.OperationModeId})">
+                        <td class="text-nowrap"><a>@item.ElectronicDocumentName</a></td>
+                        <td class="text-nowrap"><a>@item.OperationModeName</a></td>
+                        <td class="text-nowrap"><a>@item.Description</a></td>
+                        <td class="text-nowrap"><a>@item.TotalDocumentRequired</a></td>
+                        <td class="text-nowrap">
+                            @{
+                                var text_color = item.Active ? "text-gosocket" : "text-red";
+                                var text_status = item.Active ? "Activo" : "Inactivo";
+                                <a><i class="fa fa-circle @text_color"></i>&nbsp;@text_status</a>
+                            }
+                        </td>
+                        <td class="text-nowrap">
+                            <a>@item.Date.ToString("dd-MM-yyyy")</a>
+                        </td>
+                        <td class="text-nowrap"><a>@item.CreatedBy</a></td>
+                    </tr>
+                }
+            </tbody>
+        }
+    </table>
+</div>

@@ -332,7 +332,23 @@ namespace Gosocket.Dian.Application
         {
             using (var context = new SqlDBContext())
             {
-                return context.OperationModes.FirstOrDefault(x => x.Id == id);
+                var r = context.OperationModes.FirstOrDefault(x => x.Id == id);
+                if (r == null)
+                    return new OperationMode();
+                else
+                    return r;
+            }
+        }
+
+        /// <summary>
+        /// Retornar todos los Modos de Operación
+        /// </summary>
+        /// <returns></returns>
+        public List<OperationMode> GetOperationModes()
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.OperationModes.ToList();
             }
         }
 
@@ -410,5 +426,32 @@ namespace Gosocket.Dian.Application
             var tableManager = new TableManager("GlobalLogger");
             tableManager.InsertOrUpdate(logger);
         }
+
+
+        /// <summary>
+        /// Consulta contribuyentes del catalogo que sean habilitados (AcceptanceStatusId == 4) que esten activo y no eliminados
+        /// con software en produccion habilitado y no eliminado
+        /// con operaciones con software propio no eliminado
+        /// </summary>
+        /// <param name="contributorid"></param>
+        /// <returns></returns>
+        public Software GetBaseSoftwareForRadian(int contributorid)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return (from c in context.Contributors
+                        from s in c.Softwares
+                        join cp in context.ContributorOperations on s.Id equals cp.SoftwareId
+                        where 
+                            c.Id == contributorid
+                        &&  c.Status
+                        &&  !c.Deleted
+                        && s.Status
+                        && !s.Deleted
+                        && cp.OperationModeId == 2
+                        select s).OrderByDescending(t=> t.Updated).FirstOrDefault();
+            }
+        }
+
     }
 }

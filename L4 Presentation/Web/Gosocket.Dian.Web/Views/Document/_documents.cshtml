@@ -1,50 +1,47 @@
-﻿
-@model Gosocket.Dian.Web.Models.SearchDocumentViewModel
+﻿@model Gosocket.Dian.Web.Models.SearchDocumentViewModel
 
-<div class="row margin-horizontal-0 padding-top-35">
-    <div class="col-md-9 table-toolbar-left padding-left-0">
-    </div>
-    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
-        @if (Model.Documents.Any())
-        {
-            <span class="text-muted">
-                <strong>@(Model.Page * Model.MaxItemCount + 1)-@(Model.MaxItemCount > Model.Documents.Count ? (Model.Page) * Model.MaxItemCount + Model.Documents.Count : (Model.Page + 1) * Model.MaxItemCount)</strong>
-            </span>
-            <div class="btn-group btn-group margin-left-5">
-                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
-                    <span class="fa fa-chevron-left"></span>
-                </a>
-                <a class="btn btn-default paginate-btn next-page" @(Model.Documents.Count < Model.MaxItemCount ? "disabled=\"disabled\"" : "")>
-                    <span class="fa fa-chevron-right"></span>
-                </a>
-            </div>
-        }
-    </div>
+<style>
+    .fa-download {
+        color: #348441;
+        font-size: 125%;
+    }
+
+    .radian-subtitle-line {
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="row radian-subtitle-container">
+    <p class="subtitle-view">
+        Resultados de búsqueda
+    </p>
+    <div class="radian-subtitle-line"></div>
 </div>
 
 <div class="table-responsive padding-bottom-15">
-    <table colspan="12" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+    <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         <thead>
             <tr>
                 <th style="width: 50px;"></th>
                 <th>Recepción</th>
-                <th>Fecha</th>
+                <th class="text-center">Fecha</th>
                 <th class="text-center">Prefijo</th>
-                <th>Nº documento</th>
-                <th>Tipo documento</th>
+                <th class="text-center">Nº documento</th>
+                <th class="text-center">Tipo</th>
                 <th>NIT emisor</th>
                 <th>Emisor</th>
                 <th>NIT Receptor</th>
                 <th>Receptor</th>
-                <th>Estado</th>
-                <th class="text-right">Monto</th>
+                <th>Resultado</th>
+                <th>Estado RADIAN</th>
+                <th style="text-align:center">Valor Total</th>
             </tr>
         </thead>
         <tbody>
             @if (Model.Documents.Count == 0)
             {
                 <tr style="background-color: transparent !important;">
-                    <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
+                    <td class="text-nowrap text-center" colspan="13" style="padding-left: 0 !important; padding-right: 0 !important;">
                         <div class="alert panel-footer-grey">
                             Ningún documento disponible para mostrar.
                         </div>
@@ -66,10 +63,10 @@
                 }
                 <tr data-id="@document.Id" data-partitionKey="@document.PartitionKey" class="document-row">
                     <td>
-                        <span class="fa fa fa-circle text-@status add-tooltip" data-original-title="@document.StatusName"></span>
+                        @*<span class="fa fa fa-circle text-@status add-tooltip" data-original-title="@document.StatusName"></span>*@
                         @if (document.Status != 2)
                         {
-                            <span class="fa fa fa-download add-tooltip download-files" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                            <span class="fa fa fa-download add-tooltip" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
                         }
                         else
                         {
@@ -79,25 +76,38 @@
                     <td class="text-nowrap">
                         <a>@document.ReceptionDate.AddHours(-5).ToString("dd-MM-yyyy")</a>
                     </td>
-                    <td class="text-nowrap">
+                    <td class="text-nowrap text-center">
                         <a>@document.EmissionDate.ToString("dd-MM-yyyy")</a>
                     </td>
-                    <td class="text-center text-nowrap">@document.Serie</td>
-                    <td class="text-nowrap">@document.SerieAndNumber</td>
-                    <td>
+                    <td class="text-center text-nowrap">
+                        @document.Serie
+                    </td>
+                    <td class="text-nowrap text-center">
+                        @document.SerieAndNumber
+                    </td>
+                    <td class="text-center">
                         <div class="iffyTip hideText2">@document.DocumentTypeName</div>
                     </td>
-                    <td class="text-nowrap">@document.SenderCode</td>
+                    <td class="text-nowrap">
+                        @document.SenderCode
+                    </td>
                     <td>
                         <div class="iffyTip hideText2">@document.SenderName</div>
-
                     </td>
-                    <td class="text-nowrap">@document.ReceiverCode</td>
+                    <td class="text-nowrap">
+                        @document.ReceiverCode
+                    </td>
                     <td>
                         <div class="iffyTip hideText2">@document.ReceiverName</div>
                     </td>
-                    <td class="text-nowrap">@document.StatusName</td>
-                    <td class="text-right text-nowrap">
+                    <td class="text-nowrap">
+                        @document.StatusName
+                    </td>
+                    <td>
+                        <i class="fa fa-circle radian-status-circle"></i>
+                        @document.RadianStatusName
+                    </td>
+                    <td class="text-center text-nowrap">
                         @document.TotalAmount.ToString("C0")
                     </td>
                 </tr>

@@ -15,6 +15,8 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <returns></returns>
         NameValueCollection Summary(string userCode);
 
+        ResponseMessage RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode);
+
         /// <summary>
         /// Consulta de participantes de radian en estado Registrado
         /// </summary>
@@ -23,20 +25,25 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <returns></returns>
         RadianAdmin ListParticipants(int page, int size);
 
-        RadianAdmin ContributorSummary(int contributorId);
+        RadianAdmin ContributorSummary(int contributorId, int radianContributorType = 0);
 
-        bool ChangeParticipantStatus(int contributorId, string approveState);
+        
+
+        bool ChangeParticipantStatus(int contributorId, string newState, int radianContributorTypeId, string actualState, string description);
 
         RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size);
 
         Guid UpdateRadianContributorFile(RadianContributorFile radianContributorFile);
 
-        void CreateContributor(int contributorId, Domain.Common.RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy);
+        RadianContributor CreateContributor(int contributorId, Domain.Common.RadianState radianState, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode, string createdBy);
 
         List<RadianContributorFile> RadianContributorFileList(string id);
 
         RadianOperationMode GetOperationMode(int id);
 
         List<Domain.RadianOperationMode> OperationModeList();
+
+        bool ChangeContributorStep(int radianContributorId, int step);
+        ResponseMessage AddFileHistory(RadianContributorFileHistory radianFileHistory);
     }
 }

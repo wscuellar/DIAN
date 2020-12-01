@@ -1,12 +1,10 @@
-﻿@using Gosocket.Dian.Web.Common;
-@using Gosocket.Dian.Domain.Common
-@model Gosocket.Dian.Web.Models.SearchDocumentViewModel
+﻿@model Gosocket.Dian.Web.Models.SearchDocumentViewModel
 
 @{
     ViewBag.Title = "Consultar documentos";
     var view = ViewBag.ViewType;
 
-    var columnSize = 5;
+    var columnSize = 3;
     if (view == "Index" || view == "Provider")
     {
         columnSize = 3;
@@ -20,17 +18,40 @@
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
 }
 
+<style>
+    .form-control {
+        border-radius: 4px;
+        height: 43px !important;
+        border: 1px solid #CCCCCC;
+    }
+
+    .btn-default {
+        border-radius: 4px;
+        height: 43px !important;
+        padding-top: 12px;
+    }
+
+    .title-container {
+        margin-bottom: 20px !important;
+    }
+</style>
+
 <div class="page-content margin-15">
+
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+
+
     <div class="row margin-horizontal-0">
         <div class="tab-base">
             <!--Tabs Content-->
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
                     <div class="panel">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">@ViewBag.Title</h3>
-                        </div>
-
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
@@ -54,7 +75,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-sm-2 padding-xs-0">
+                                                            <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.SerieAndNumber, new { @class = "control-label" })
                                                                     @Html.TextBoxFor(m => m.SerieAndNumber, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SerieAndNumber) } })
@@ -63,7 +84,7 @@
 
                                                             @if (ViewBag.ViewType != "Sent")
                                                             {
-                                                                <div class="col-sm-2 padding-xs-0">
+                                                                <div class="col-sm-3 padding-xs-0">
                                                                     <div class="form-group">
                                                                         @Html.LabelFor(m => m.SenderCode, new { @class = "control-label" })
                                                                         @Html.TextBoxFor(m => m.SenderCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SenderCode) } })
@@ -73,7 +94,7 @@
 
                                                             @if (ViewBag.ViewType != "Received")
                                                             {
-                                                                <div class="col-sm-2 padding-xs-0">
+                                                                <div class="col-sm-3 padding-xs-0">
                                                                     <div class="form-group">
                                                                         @Html.LabelFor(m => m.ReceiverCode, new { @class = "control-label" })
                                                                         @Html.TextBoxFor(m => m.ReceiverCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.ReceiverCode) } })
@@ -102,13 +123,19 @@
                                                                     @Html.DropDownListFor(m => m.DocumentTypeId, new SelectList(Model.DocumentTypes, "Code", "Name", Model.DocumentTypeId), new { @class = "form-control selectpicker" })
                                                                 </div>
                                                             </div>
-                                                            <div class="col-sm-2" padding-xs-0">
+                                                            <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.Statuses, new { @class = "control-label" })
                                                                     @Html.DropDownListFor(m => m.Status, new SelectList(Model.Statuses, "Code", "Name", Model.Status), new { @class = "form-control selectpicker" })
                                                                 </div>
                                                             </div>
-                                                            <div class="col-sm-2 padding-xs-0">
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.RadianStatusList, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.RadianStatus, new SelectList(Model.RadianStatusList, "Code", "Name", Model.RadianStatus), new { @class = "form-control selectpicker" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.ReferencesType, new { @class = "control-label" })
                                                                     @Html.DropDownListFor(m => m.ReferencesType, new SelectList(Model.DocumentTypes.Where(d => new List<string> { "00", "07", "08" }.Contains(d.Code)), "Code", "Name", Model.ReferencesType), new { @class = "form-control selectpicker" })
@@ -118,13 +145,12 @@
                                                     </div>
 
                                                     <div class="panel-footer-grey text-right">
-                                                        <button class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Buscar</button>
+                                                        <button type="submit" class="btn btn-success btn-radian-success">Buscar</button>
                                                     </div>
 
                                                 </div>
                                             </div>
                                         </div>
-
                                     }
 
                                 </div>
@@ -139,6 +165,7 @@
         </div>
     </div>
 </div>
+
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
@@ -193,6 +220,30 @@
             });
             // Pagination
 
+            //Set radian status circle styles
+            $(".radian-status-circle").each(
+                function () {
+                    if ($(this).parent().text().trim() == "TÍTULO VALOR") {
+                        $(this).css("color", "#C67BBE");
+                    }
+                    else if ($(this).parent().text().trim() == "PAGADA") {
+                        $(this).css("color", "#51B5D3");
+                    }
+                    else if ($(this).parent().text().trim() == "REGISTRADA") {
+                        $(this).css("color", "#62C6AB");
+                    }
+                    else if ($(this).parent().text().trim() == "ENDOSADA") {
+                        $(this).css("color", "#F8D630");
+                    }
+                    else if ($(this).parent().text().trim() == "LIMITADA") {
+                        $(this).css("color", "#8ED476");
+                    }
+                    else {
+                        $(this).css("color", "#8ED476");
+                    }
+                }
+            );
+            //Set radian status circle styles
         });
 
         startDate = moment("@Model.StartDate.ToString("yyyy-MM-dd")");

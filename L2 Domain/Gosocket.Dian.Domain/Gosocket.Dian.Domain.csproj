@@ -190,6 +190,7 @@
     <Compile Include="Entity\GlobalRejectedDocument.cs" />
     <Compile Include="Entity\GlobalSoftware.cs" />
     <Compile Include="Entity\GlobalTask.cs" />
+    <Compile Include="Entity\GlobalTestSetOthersDocuments.cs" />
     <Compile Include="Entity\GlobalTestSetResult.cs" />
     <Compile Include="Entity\GlobalTestSet.cs" />
     <Compile Include="Entity\GlobalTestSetTracking.cs" />
@@ -199,6 +200,14 @@
     <Compile Include="Entity\GlobalOseProcessResult.cs" />
     <Compile Include="Entity\GlobalOseTrackIdMapper.cs" />
     <Compile Include="Entity\GlobalTypeList.cs" />
+    <Compile Include="Entity\KeyValue.cs" />
+    <Compile Include="Entity\PagedResultBase.cs" />
+    <Compile Include="Entity\PdfCreatorModel.cs" />
+    <Compile Include="Entity\RadianContributorOperationWithSoftware.cs" />
+    <Compile Include="Entity\RadianLogger.cs" />
+    <Compile Include="Entity\RadianUserData.cs" />
+    <Compile Include="Sql\RadianContributorOperation.cs" />
+    <Compile Include="Entity\ResponseMessage.cs" />
     <Compile Include="Entity\RadianTestSet.cs" />
     <Compile Include="Entity\RadianTestSetResult.cs" />
     <Compile Include="Entity\RedianContributorWithFiles.cs" />
@@ -207,7 +216,11 @@
     <Compile Include="KeyVault\ExportCertificatResult.cs" />
     <Compile Include="KeyVault\HttpMessageHandler.cs" />
     <Compile Include="KeyVault\ImportCertificateResult.cs" />
+    <Compile Include="Sql\ElectronicDocument.cs" />
+    <Compile Include="Sql\Menu.cs" />
     <Compile Include="Sql\OperationMode.cs" />
+    <Compile Include="Sql\Permission.cs" />
+    <Compile Include="Sql\RadianContributorOperations.cs" />
     <Compile Include="Sql\RadianContributorType.cs" />
     <Compile Include="Sql\RadianContributor.cs" />
     <Compile Include="Sql\IdentificationType.cs" />
@@ -224,8 +237,10 @@
     <Compile Include="Sql\RadianContributorFiles\RadianContributorFileStatus.cs" />
     <Compile Include="Sql\RadianContributorFiles\RadianContributorFileType.cs" />
     <Compile Include="Sql\RadianOperationMode.cs" />
+    <Compile Include="Sql\RadianSoftware.cs" />
     <Compile Include="Sql\Software.cs" />
     <Compile Include="Sql\ContributorOperations.cs" />
+    <Compile Include="Sql\SubMenu.cs" />
     <Compile Include="Sql\UserContributors.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\DeliveryStatus.cs" />

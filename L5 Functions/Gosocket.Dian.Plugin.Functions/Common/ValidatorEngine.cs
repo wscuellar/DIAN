@@ -77,6 +77,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
             var nitModel = new NitModel();
             XmlParser xmlParserCufe = null;
+            XmlParser xmlParserCude = null;
 
             //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
             if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
@@ -100,7 +101,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 //Obtiene XML ApplicationResponse CUDE
                 var xmlBytesCude = await GetXmlFromStorageAsync(eventPrev.TrackIdCude);
-                var xmlParserCude = new XmlParser(xmlBytesCude);
+                xmlParserCude = new XmlParser(xmlBytesCude);
                 if (!xmlParserCude.Parser())
                     throw new Exception(xmlParserCude.ParserError);
 
@@ -108,17 +109,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             var validator = new Validator();           
-            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, nitModel));
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude, nitModel));
 
             return validateResponses;
 
         }
 
 
-        public List<ValidateListResponse> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
+        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
         {
+            var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
-            return validator.ValidateDocumentReferencePrev(trackId, idDocumentReference);
+            //Obtiene XML Factura electronica CUFE
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParserCude = new XmlParser(xmlBytes);
+            if (!xmlParserCude.Parser())
+                throw new Exception(xmlParserCude.ParserError);
+
+            var nitModel = xmlParserCude.Fields.ToObject<NitModel>();
+
+            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference));
+
+            return validateResponses;
         }
 
 

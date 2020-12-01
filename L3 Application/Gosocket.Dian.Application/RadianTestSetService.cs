@@ -1,7 +1,5 @@
-﻿using Gosocket.Dian.Domain;
-using Gosocket.Dian.Domain.Common;
+﻿using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Managers;
 using Gosocket.Dian.Interfaces.Services;
 using System.Collections.Generic;
@@ -54,15 +52,18 @@ namespace Gosocket.Dian.Application
             return operationMode;
         }
 
-        public List<Domain.RadianOperationMode> OperationModeList()
+        public List<Domain.RadianOperationMode> OperationModeList(RadianOperationMode radianOperation)
         {
-            List<Domain.RadianOperationMode> list = new List<Domain.RadianOperationMode>
+            List<Domain.RadianOperationMode> list = new List<Domain.RadianOperationMode>();
+            if(radianOperation == RadianOperationMode.Direct || radianOperation == RadianOperationMode.None)
+                list.Add(new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.OwnSoftware, Name = RadianOperationModeTestSet.OwnSoftware.GetDescription() });
+
+            if (radianOperation == RadianOperationMode.Indirect || radianOperation == RadianOperationMode.None)
             {
-                new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.OwnSoftware, Name = RadianOperationModeTestSet.OwnSoftware.GetDescription() },
-                new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.SoftwareTechnologyProvider, Name = RadianOperationModeTestSet.SoftwareTechnologyProvider.GetDescription() },
-                new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.SoftwareTradingSystem, Name = RadianOperationModeTestSet.SoftwareTradingSystem.GetDescription() },
-                new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.SoftwareFactor, Name = RadianOperationModeTestSet.SoftwareFactor.GetDescription() }
-            };
+                list.Add(new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.SoftwareTechnologyProvider, Name = RadianOperationModeTestSet.SoftwareTechnologyProvider.GetDescription() });
+                list.Add(new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.SoftwareTradingSystem, Name = RadianOperationModeTestSet.SoftwareTradingSystem.GetDescription() });
+                list.Add(new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.SoftwareFactor, Name = RadianOperationModeTestSet.SoftwareFactor.GetDescription() });
+            }
 
             return list;
         }

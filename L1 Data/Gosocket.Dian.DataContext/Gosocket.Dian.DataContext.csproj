@@ -130,14 +130,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CosmosDbManager.cs" />
+    <Compile Include="Middle\Pagination.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\PermissionRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileHistoryRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileStatusRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileTypeRepository.cs" />
+    <Compile Include="Repositories\RadianContributorOperationRepository.cs" />
     <Compile Include="Repositories\RadianContributorRepository.cs" />
     <Compile Include="Repositories\RadianContributorTypeRepository.cs" />
     <Compile Include="Repositories\RadianOperationModeRepository.cs" />
+    <Compile Include="Repositories\RadianSoftwareRepository.cs" />
     <Compile Include="SqlDBContext.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -150,7 +154,7 @@
       <Name>Gosocket.Dian.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\L2 Domain\Gosocket.Dian.Domain\Gosocket.Dian.Domain.csproj">
-      <Project>{FBA40283-71DF-4B48-8E64-663468E6E0C6}</Project>
+      <Project>{fba40283-71df-4b48-8e64-663468e6e0c6}</Project>
       <Name>Gosocket.Dian.Domain</Name>
     </ProjectReference>
   </ItemGroup>

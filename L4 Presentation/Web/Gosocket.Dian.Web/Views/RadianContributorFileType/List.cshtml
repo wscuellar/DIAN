@@ -9,13 +9,6 @@
     <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
 
-    <style>
-        .modal-dialog {
-            width: 100vh !important;
-            margin: 50px auto !important;
-            margin-top: 50px !important;
-        }
-    </style>
 }
 
 
@@ -178,6 +171,7 @@
     <!-- end modals-->
 </div>
 
+
 @section Scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
@@ -226,10 +220,10 @@
                     var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
                     if (injectingPartialView == "true") {
                         $('#modifyWrapper').html(data);
+                        $.validator.unobtrusive.parse($("#edit-radianContributorFileType-form"));
                         $('#modifyModal').modal('show');
                     }
-                    else
-                    {
+                    else {
                         window.location.href = '/User/Login';
                     }
                 }

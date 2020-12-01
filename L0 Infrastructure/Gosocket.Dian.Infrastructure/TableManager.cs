@@ -449,6 +449,26 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
+        public List<T> FindDocumentReferenced_TypeId<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                    QueryComparisons.Equal,
+                    documentReferencedKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+
+
         public List<T> FindDocumentReferenced_EventCode_TypeId<T>(string documentReferencedKey, string documentTypeId, string eventCode) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -776,7 +796,6 @@ namespace Gosocket.Dian.Infrastructure
             return new Tuple<IEnumerable<T>, TableContinuationToken>(tableQueryResult.Results, continuationToken);
         }
 
-
         public IEnumerable<T> GetRowsContainsInPartitionKeys<T>(IEnumerable<string> partitionKeys) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -784,5 +803,31 @@ namespace Gosocket.Dian.Infrastructure
             var entities = CloudTable.ExecuteQuery(query.Where(filter));
             return entities;
         }
+
+        /// <summary>
+        /// Buscar Set de Pruebas - Otros Documentos por Id del Documento Electronico y el Id del Modo de Operación
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="partitionKey">Id del documento electronico</param>
+        /// <param name="rowKey">Id del modo de operación</param>
+        /// <returns></returns>
+        public List<T> GetOthersDocuments<T>(string partitionKey, string rowKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey", //ElectronicDocumentId
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RowKey", //OperationModeId
+                    QueryComparisons.Equal,
+                    rowKey));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+
     }
 }

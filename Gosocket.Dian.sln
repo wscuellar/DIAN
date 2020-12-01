@@ -52,11 +52,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gosocket.Dian.Functions", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gosocket.Dian.Logger", "L3 Application\Gosocket.Dian.Logger\Gosocket.Dian.Logger.csproj", "{E5A135B5-36D3-4083-95A6-D42B974D5931}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD4543B8-2016-4521-8CAC-8C647AE1E525}"
-	ProjectSection(SolutionItems) = preProject
-		NuGet.Config = NuGet.Config
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gosocket.Dian.Plugin.Functions", "L5 Functions\Gosocket.Dian.Plugin.Functions\Gosocket.Dian.Plugin.Functions.csproj", "{D09EB261-6BCC-47C4-9CA0-38126A7D22ED}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gosocket.Dian.Interfaces", "Gosocket.Dian.Interfaces\Gosocket.Dian.Interfaces.csproj", "{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1}"
@@ -64,7 +59,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{399028D5-116B-4F4A-86DA-849A06D93C3A}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		NuGet.Config = NuGet.Config
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "L7 Commons", "L7 Commons", "{53F5A8F5-D0C3-4493-AAC8-7DE866386989}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gosocket.Dian.Common", "Gosocket.Dian.Common\Gosocket.Dian.Common.csproj", "{61F42A77-9C41-446B-9C1F-D3D84241BB6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -220,6 +220,18 @@ Global
 		{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1}.Sandbox|Any CPU.Build.0 = Release|Any CPU
 		{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1}.Test|Any CPU.ActiveCfg = Release|Any CPU
 		{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1}.Test|Any CPU.Build.0 = Release|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Dev|Any CPU.ActiveCfg = Debug|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Dev|Any CPU.Build.0 = Debug|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Production|Any CPU.ActiveCfg = Release|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Production|Any CPU.Build.0 = Release|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Sandbox|Any CPU.ActiveCfg = Release|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Sandbox|Any CPU.Build.0 = Release|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Test|Any CPU.ActiveCfg = Release|Any CPU
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C}.Test|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -241,6 +253,7 @@ Global
 		{DD4543B8-2016-4521-8CAC-8C647AE1E525} = {38C06EA6-21AA-41C0-B28A-EDC17A004146}
 		{D09EB261-6BCC-47C4-9CA0-38126A7D22ED} = {45B40CC8-354B-47CE-9BFC-3DC20882DE7A}
 		{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1} = {497528AC-25BB-419B-8229-3F06FF710A30}
+		{61F42A77-9C41-446B-9C1F-D3D84241BB6C} = {53F5A8F5-D0C3-4493-AAC8-7DE866386989}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {860ACAD2-0459-45A3-A7C7-633229B1C9EC}

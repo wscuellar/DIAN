@@ -11,12 +11,8 @@
         </p>
         <div class="underline-title"></div>
     </div>
-    <div class="row margin-horizontal-0">
+    <div class="row margin-horizontal-0 margin-top-50">
         <div class="panel">
-            @*<div class="panel-heading">
-                    <h3 class="panel-title">@ViewBag.Title</h3>
-                </div>*@
-
             <div class="panel-body padding-top-20">
                 <div class="pad-btm padding-bottom-0">
                     <div class="row margin-horizontal-0">
@@ -77,15 +73,16 @@
 
                 <div class="row margin-horizontal-0">
                     <div class="col-md-9 table-toolbar-left padding-left-0">
+                        <span>Mostrando @(Model.TotalCount < Model.Length ?  Model.TotalCount : 10) de @Model.TotalCount resultados</span>
                     </div>
                     <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
                         @if (Model.RadianContributors.Count > 0)
                         {
                             <span class="text-muted">
-                                <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.RadianContributors.Count ? (Model.Page) * Model.Length + Model.RadianContributors.Count : (Model.Page + 1) * Model.Length)</strong>
+                                <strong>@((Model.Page - 1) * Model.Length + 1)-@(Model.Length > Model.RadianContributors.Count ? (Model.Page - 1) * Model.Length + Model.RadianContributors.Count : (Model.Page) * Model.Length)</strong>
                             </span>
                             <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
-                                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 1 ? "disabled=\"disabled\"" : "")>
                                     <span class="fa fa-chevron-left"></span>
                                 </a>
                                 <a class="btn btn-default paginate-btn next-page" @(Model.RadianContributors.Count < Model.Length ? "disabled=\"disabled\"" : "")>
@@ -114,7 +111,14 @@
     <script>
         $(document).ready(function () {
             var form = $('#radian-contributors-form');
+            $('input[name="DateInterval"]').on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('DD-MMMM-yyyy') + ' al ' + picker.endDate.format('DD-MMMM-yyyy'));
+            });
+            $('input[name="DateInterval"]').on('cancel.daterangepicker', function (ev, picker) {
+                $(this).val('');
+            });
             $('#DateInterval').daterangepicker({
+                autoUpdateInput: false,
                 locale: {
                     applyLabel: "Aplicar",
                     cancelLabel: "Cancelar",
@@ -147,11 +151,11 @@
 
             $('.btn-search').click(function () {
                 var dateRange = $("#DateInterval").val();
+                var radianType = $("#RadianType").val();
                 $('#StartDate').val(dateRange.split("al")[0]);
                 $('#EndDate').val(dateRange.split("al")[1]);
-                $('#Page').val(0);
-
-                $('#Type').val($("#RadianType").val());
+                $('#Page').val(1);
+                $('#Type').val(radianType);
                 showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
                 $(this).attr('disabled', 'disabled');
                 $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');

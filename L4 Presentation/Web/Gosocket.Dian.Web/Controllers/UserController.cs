@@ -552,6 +552,14 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         [ExcludeFilter(typeof(Authorization))]
         [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ExternalUserAuthentication(UserLoginViewModel model, string returnUrl)
+        {           
+            return RedirectToAction(nameof(HomeController.Dashboard), "Home");
+        }
+
+            [HttpPost]
+        [ExcludeFilter(typeof(Authorization))]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> PersonAuthentication(UserLoginViewModel model, string returnUrl)
         {
             model.IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList();
@@ -783,6 +791,21 @@ namespace Gosocket.Dian.Web.Controllers
                 IdentificationType = (int)Domain.Common.IdentificationType.CC
             };
             return View("CompanyLogin", model);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult ExternalUserLogin(string returnUrl)
+        {
+            if (ConfigurationManager.GetValue("LoginType") == "Certificate")
+                return RedirectToAction(nameof(CertificateLogin));
+
+            ViewBag.ReturnUrl = returnUrl;
+            UserLoginViewModel model = new UserLoginViewModel
+            {
+                IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList(),
+                IdentificationType = (int)Domain.Common.IdentificationType.CC
+            };
+            return View("ExternalUserLogin", model); ;
         }
 
         [ExcludeFilter(typeof(Authorization))]

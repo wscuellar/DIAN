@@ -1,0 +1,53 @@
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedOperationModeViewModel
+
+@Html.Partial("_factorOperationMode")
+@{
+    string contributorType = Request.Params["RadianContributorType"];
+    string operationMode = Request.Params["RadianOperationMode"];
+
+}
+@section Scripts{
+
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/Radian/RadianOperationMode.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var contributorId = @Model.Contributor.Id;
+            var contributorTypeId = parseInt(@contributorType);
+            var softwareType = "";
+            DeleteOperationMode('@Url.Action("DeleteOperationMode", "RadianApproved")');
+            "@operationMode" != "2" && $("#OperationModeSelected").attr("disabled", "disabled");
+            if ("@operationMode" != "2") {
+                $("#OperationModeSelectedId").val(1);
+
+            } else {
+                  $("#OperationModeSelectedId").change(function (value) {
+                    var software = $("#OperationModeSelectedId").val();
+                    RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
+                })
+            }
+
+            $("#save-operation-mode").click(function (e) {debugger
+                e.preventDefault();
+                var SetOperationViewModel = {
+                    RadianContributorId: @Model.Contributor.RadianContributorId,
+                    SoftwareType: $("#OperationModeSelectedId").val(),
+                    SoftwareId: $("#SoftwareNameList option:selected").val(),
+                    SoftwareName: $("#SoftwareName").val(),
+                    Pin: $("#SoftwarePin").val(),
+                    Url: '@Model.SoftwareUrl',
+                 };
+                AddOperationMode("@Url.Action("UpdateFactorOperationMode", "RadianApproved")",SetOperationViewModel);
+            })
+
+            $("#combobox").combobox();
+            $("#toggle").on("click", function () {
+                $("#combobox").toggle();
+            });
+        })
+    </script>
+
+
+
+}

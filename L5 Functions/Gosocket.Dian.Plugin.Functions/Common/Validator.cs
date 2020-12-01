@@ -162,10 +162,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string key = string.Empty;
             var errorCode = "FAD06";
             var prop = "CUFE";
-            string[] codesWithCUDE = { "03", "91", "92", "96" };
+            
+            string[] codesWithCUDE = { "03", "05", "91", "92", "96" };
             if (codesWithCUDE.Contains(documentMeta.DocumentTypeId))
                 prop = "CUDE";
-            if (documentMeta.DocumentTypeId == "91")
+            if (documentMeta.DocumentTypeId == "05")
+                errorCode = "DSAD06";
+            else if (documentMeta.DocumentTypeId == "91")
                 errorCode = "CAD06";
             else if (documentMeta.DocumentTypeId == "92")
                 errorCode = "DAD06";
@@ -398,7 +401,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
             else if (documentMeta.DocumentTypeId == "96") senderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ24;
             if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
-            if (ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
+            if ((documentMeta.EventCode=="037" && nitModel.listID=="2") || ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
@@ -446,8 +449,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
             {
-                if (sender != null)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                if ((documentMeta.EventCode == "037" && nitModel.listID == "2") || sender != null)
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
@@ -983,7 +986,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndoso
-        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, NitModel nitModel, string eventCode)
+        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
@@ -995,7 +998,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Valida informacion Endoso 
 
-            if (valueTotalEndoso == null)
+            if (valueTotalEndoso == null || valueTotalEndoso == "")
             {
                 return new ValidateListResponse
                 {
@@ -1072,6 +1075,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
                 }
+
+                if (xmlParserCude.Fields["listID"].ToString() != "2")
+                {
+                    XmlNodeList valueList = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
+                    int totalValue = 0;
+                    for (int i = 0; i < valueList.Count; i++)
+                    {
+                        string valueStockAmount = valueList.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                        totalValue += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                    }
+
+                    if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValue)
+                    {
+                        return new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: 89, Rechazo: ",
+                            ErrorMessage = $"{(string)null} El valor total del endoso es diferente a los valores reportados .",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        };
+                    }
+                }
+
             }
 
             return null;
@@ -1239,6 +1266,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validate Reference Attorney
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
         {
+            NitModel nitModel = new NitModel();
             int attorneyLimit = Properties.Settings.Default.MAX_Attorney;
             bool validate = true;
             string validateCufeErrorCode = "89";
@@ -1350,7 +1378,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                 attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 //Valida CUFE referenciado existe en sistema DIAN
-                var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference);
+                nitModel.DocumentKey = attorneyModel.cufe;
+                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference);
                 if (resultValidateCufe[0].IsValid)
                     attorney.Add(attorneyModel);
                 else
@@ -1901,24 +1930,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validación de la Sección DocumentReference - CUFE Informado
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
-        public List<ValidateListResponse> ValidateDocumentReferencePrev(string trackId, string idDocumentReference)
+        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference)
         {
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
             //Valida exista CUFE/CUDE en sistema DIAN
-            var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(trackId.ToLower()).FirstOrDefault();
+            var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(nitModel.DocumentKey.ToLower()).FirstOrDefault();
             if (documentMeta == null)
             {
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "Regla: AAH07, Rechazo: ",
+                    ErrorCode = "AAH07",
                     ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
-
-                return responses;
             }
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
@@ -1927,14 +1954,42 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "Regla: AAH06, Rechazo: ",
-                    ErrorMessage = "El número de documento electrónico referenciado no coinciden con un mandato reportado",
+                    ErrorCode = "AAH06 ",
+                    ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
-                return responses;
-
             }
 
+            if ( Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoPropiedad ||
+               Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ||
+               Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoProcuracion )
+            {
+                //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
+                if (documentMeta.ReceiverCode != nitModel.IssuerPartyCode)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "AAH26b",
+                        ErrorMessage = "El documento de identidad no corresponde al del documento electronico referenciado",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
+                if (documentMeta.ReceiverName != nitModel.IssuerPartyName)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "AAH25b",
+                        ErrorMessage = "El nombre o razon social no corresponde al del documento electronico referenciado",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+            
             responses.Add(new ValidateListResponse
             {
                 IsValid = true,
@@ -1949,7 +2004,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region validation to emition to event
-        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe,  NitModel nitModel)
+        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude,  NitModel nitModel)
         {
             bool validFor = false;
             string eventCode = eventPrev.EventCode;
@@ -1992,8 +2047,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "202",
-                                            ErrorMessage = "No se puede rechazar documento, no existe un evento Recibo del Bien de la factura",
+                                            ErrorCode = "LGC03",
+                                            ErrorMessage = "No se puede recibir un rechazo si previamente no se ha recibido los eventos " +
+                                            "Acuse de recibo de la factura electrónica y un recibo de bien y prestación de servicio ",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
@@ -2078,9 +2134,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "203",
-                                                ErrorMessage = "No se puede aceptar un documento que ha sido rechazado previamente, " +
-                                                "ya existe un evento (031) Rechazo de la factura de Venta",
+                                                ErrorCode = "LGC04",
+                                                ErrorMessage = "No se puede aceptar (expresa o tácitamente) un documento que ha sido rechazado previamente",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -2137,9 +2192,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "203",
-                                                ErrorMessage = "No se puede aceptar un documento que ha sido rechazado previamente, " +
-                                                "ya existe un evento (031) Rechazo de la factura de Venta",
+                                                ErrorCode = "LGC04",
+                                                ErrorMessage = "No se puede aceptar (expresa o tácitamente) un documento que ha sido rechazado previamente",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -2247,7 +2301,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 //Solicitud de Disponibilización
                                 else if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
                                 {
-                                    var response = ValidateEndoso(xmlParserCufe, nitModel, eventCode);
+                                    var response = ValidateEndoso(xmlParserCufe, xmlParserCude,nitModel, eventCode);
                                     if (response != null)
                                     {
                                         validFor = true;

@@ -189,6 +189,8 @@ namespace Gosocket.Dian.Domain.Common
 
     public enum EventStatus
     {
+        [Description("None")]
+        None = 000,
         [Description("Acuse de recibo")]
         Received = 030,
         [Description("Rechazo de la Factura Electrónica")]
@@ -222,6 +224,7 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Notificación del pago total o parcial")]
         NotificacionPagoTotalParcial = 045
     }
+
 
     public enum ExportStatus
     {
@@ -258,7 +261,25 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Cédula de ciudadanía")]
         CC = 10910094,
         [Description("Cédula de extranjería")]
-        CE = 10910096
+        CE = 10910096,
+        [Description("Registro civil")]
+        RC = 10910097,
+        [Description("Tarjeta de identidad")]
+        TI =10910098,
+        [Description("Tarjeta de extranjería")]
+        TE=10910099,
+        [Description("Nit")]
+        Nit=10910100,
+        [Description("Pasaporte")]
+        Pasaporte=10910101	,
+        [Description("Documento de identificación de extranjero")]
+        DIE=10910102,
+        [Description("PEP")]
+        PEP=10910103,
+        [Description("Nit de otro país")]
+        NitOP=10910104,
+        [Description("NIUP")]
+        NIUP=10910105
     }
 
     public enum OperationMode
@@ -281,6 +302,8 @@ namespace Gosocket.Dian.Domain.Common
         Company = 2,
         [Description("Persona")]
         Person = 3,
+        [Description("Usuario Registrado")]
+        ExternalUser = 4,
     }
 
     public enum NumberRangeState
@@ -337,6 +360,46 @@ namespace Gosocket.Dian.Domain.Common
     }
 
 
+   
+
+    public enum RadianOperationMode
+    {
+        None = 0,
+        [Description("Operación Directa")]
+        Direct = 1,
+        [Description("Operación Indirecta")]
+        Indirect = 2,
+    }
+
+
+    public enum RadianSoftwareStatus
+    {
+        None = 0,
+        [Description("En proceso")]
+        InProcess = 1,
+        [Description("Aceptado")]
+        Accepted = 2,
+        [Description("Rechazado")]
+        Rejected = 3,
+    }
+
+    public enum RadianState
+    {
+        none = 0,
+        [Display(Name = "Registrado")]
+        [Description("Registrado")]
+        Registrado = 1,
+        [Display(Name = "En pruebas")]
+        [Description("En pruebas")]
+        Test = 2,
+        [Display(Name = "Habilitado")]
+        [Description("Habilitado")]
+        Habilitado = 3,
+        [Display(Name = "Cancelado")]
+        [Description("Cancelado")]
+        Cancelado = 4
+    }
+
     public enum RadianContributorType
     {
         [Description("Cero")]
@@ -351,31 +414,6 @@ namespace Gosocket.Dian.Domain.Common
         Factor = 4
     }
 
-    public enum RadianOperationMode
-    {
-        [Description("Operación Directa")]
-        Direct = 1,
-        [Description("Operación Indirecta")]
-        Indirect = 2,
-    }
-
-    public enum RadianState
-    {
-        [Display(Name = "Registrado")]
-        [Description("Registrado")]
-        Registrado =1,
-        [Display(Name = "En pruebas")]
-        [Description("En pruebas")]
-        Test = 2,
-        [Display(Name = "Habilitado")]
-        [Description("Habilitado")]
-        Habilitado  = 3,
-        [Display(Name = "Cancelado")]
-        [Description("Cancelado")]
-        Cancelado = 4
-    }
-
-  
     public enum RadianOperationModeTestSet
     {
         [Display(Name = "Software Propio")]
@@ -383,13 +421,34 @@ namespace Gosocket.Dian.Domain.Common
         OwnSoftware = 1,
         [Display(Name = "Software Proveedor Tecnológico")]
         [Description("Software Proveedor Tecnológico")]
-        SoftwareTechnologyProvider=2,
+        SoftwareTechnologyProvider = 2,
         [Display(Name = "Software Sistema de Negociacion")]
         [Description("Software Sistema de Negociacion")]
         SoftwareTradingSystem = 3,
         [Display(Name = "Software Factor")]
         [Description("Software Factor")]
         SoftwareFactor = 4
+    }
+
+    /// <summary>
+    /// Documentos Electronicos. Utilizados en la configuración de Set de Pruebas - Otros Documentos
+    /// </summary>
+    public enum ElectronicsDocuments
+    {
+        [Description("Nomina Electrónica y Nomina de Ajuste")]
+        ElectronicPayroll = 1,
+
+        [Description("Documento de Importación")]
+        ImportDocument = 2,
+        
+        [Description("Documento de Soporte")]
+        SupportDocument = 3,
+        
+        [Description("Documento equivalente electrónico")]
+        ElectronicEquivalent = 4,
+        
+        [Description("POS electrónico")]
+        ElectronicPOS = 5
     }
 
 }

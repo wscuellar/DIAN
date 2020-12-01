@@ -55,7 +55,9 @@ namespace Gosocket.Dian.Web.Utils
             RADIAN,
             RadianContributorFileType,
             RadianSetPruebas,
-            AdminRadian
+            AdminRadian,
+            TestSetOtherDocuments,
+            ExternalUsersCreate
         }
     }
 }

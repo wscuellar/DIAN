@@ -8,6 +8,7 @@ namespace Gosocket.Dian.Interfaces.Managers
         IEnumerable<RadianTestSetResult> GetAllTestSetResult();
         IEnumerable<RadianTestSetResult> GetAllTestSetResultByContributor(int contributorId);
         RadianTestSetResult GetTestSetResult(string partitionKey, string rowKey);
-        bool InsertTestSet(RadianTestSetResult testSetResult);
+        bool InsertOrUpdateTestSetResult(RadianTestSetResult testSetResult);
+        List<RadianTestSetResult> GetTestSetResultByNit(string nit);
     }
 }

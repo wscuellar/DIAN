@@ -3,14 +3,14 @@
   <PropertyGroup>
     <UseIISExpress>true</UseIISExpress>
     <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
-    <NameOfLastUsedPublishProfile>gtpa-webservices-input-test-indra</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>webservices-TEST- Web Deploy</NameOfLastUsedPublishProfile>
     <Use64BitIISExpress />
     <IISExpressSSLPort>44319</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
-    <ProjectView>ProjectFiles</ProjectView>
+    <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>

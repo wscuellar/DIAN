@@ -30,12 +30,14 @@ namespace Gosocket.Dian.Domain
         public int AcceptanceStatusSoftwareId { get; set; }
         public virtual AcceptanceStatusSoftware AcceptanceStatusSoftware { get; set; }
 
-    public bool Deleted { get; set; }
+        public bool Deleted { get; set; }
 
         public DateTime Timestamp { get; set; }
 
         public DateTime Updated { get; set; }
 
         public string CreatedBy { get; set; }
+
+
     }
 }

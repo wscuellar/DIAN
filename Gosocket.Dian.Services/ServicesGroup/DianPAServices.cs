@@ -733,14 +733,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
             //Validation of the DocumentReference Section - Informed CUFE and CUDE         
-            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId);
+            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackIdCude, documentReferenceId);
             if (!documentReferenceCufe.IsValid)
             {
                 dianResponse = documentReferenceCufe;
                 dianResponse.XmlDocumentKey = trackIdCude;
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                dianResponse.IsValid = false;
-                return dianResponse;
+                dianResponse.IsValid = false;                
             }
 
             //validation if is an endoso of endorsement (Code 037-038-039)
@@ -1590,7 +1589,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
         }
         private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference)
         {
-
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, IdDocumentReference = idDocumentReference });
 
             DianResponse response = new DianResponse();
@@ -1600,17 +1598,18 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     StatusMessage = validations[0].ErrorMessage,
                     StatusCode = Properties.Settings.Default.Code_89,
-                    IsValid = validations[0].IsValid,
-                    ErrorMessage = new List<string>()
+                    IsValid = validations[0].IsValid,                   
                 };
                 response.ErrorMessage = new List<string>();
-                if (!response.IsValid)
+                foreach (var item in validations)
                 {
-                    foreach (var item in validations)
+                    if (!item.IsValid)
                     {
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                        response.IsValid = item.IsValid;
+                        response.StatusMessage = item.ErrorMessage;
+                        response.StatusDescription = "Validación contiene errores en campos mandatorios.";
                     }
-                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
                 }
             }
             return response;
