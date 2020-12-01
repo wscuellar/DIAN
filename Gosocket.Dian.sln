@@ -52,12 +52,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gosocket.Dian.Functions", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gosocket.Dian.Logger", "L3 Application\Gosocket.Dian.Logger\Gosocket.Dian.Logger.csproj", "{E5A135B5-36D3-4083-95A6-D42B974D5931}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{399028D5-116B-4F4A-86DA-849A06D93C3A}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-		NuGet.Config = NuGet.Config
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gosocket.Dian.Plugin.Functions", "L5 Functions\Gosocket.Dian.Plugin.Functions\Gosocket.Dian.Plugin.Functions.csproj", "{D09EB261-6BCC-47C4-9CA0-38126A7D22ED}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gosocket.Dian.Interfaces", "Gosocket.Dian.Interfaces\Gosocket.Dian.Interfaces.csproj", "{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1}"
