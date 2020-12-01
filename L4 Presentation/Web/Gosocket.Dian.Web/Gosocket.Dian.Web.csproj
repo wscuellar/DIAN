@@ -2858,13 +2858,11 @@
     <Content Include="Views\RadianContributorFileType\_Delete.cshtml" />
     <Content Include="Views\RadianContributorFileType\_Edit.cshtml" />
     <Content Include="Views\RadianContributorFileType\_Items.cshtml" />
-<<<<<<< HEAD
     <Content Include="Views\TestSetOthersDocuments\Add.cshtml" />
     <Content Include="Views\TestSetOthersDocuments\List.cshtml" />
     <Content Include="Views\TestSetOthersDocuments\_form.cshtml" />
     <Content Include="Views\TestSetOthersDocuments\_default.cshtml" />
     <Content Include="Views\TestSetOthersDocuments\_items.cshtml" />
-=======
     <Content Include="Views\RadianApproved\Index.cshtml" />
     <Content Include="Views\RadianEnablingInvoiceIndirect\Index.cshtml" />
     <Content Include="Views\RadianApproved\_personalInfo.cshtml" />
@@ -2891,7 +2889,7 @@
     <Content Include="Views\RadianApproved\_formSearch.cshtml" />
     <Content Include="Views\RadianApproved\_certificatesThirdStep.cshtml" />
     <Content Include="Views\RadianApproved\_formSearchHistory.cshtml" />
->>>>>>> dev-indra-test
+
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
