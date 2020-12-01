@@ -73,6 +73,23 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
             model.CustomerTotalCount = customers.RowCount;
 
+                var data = _radianAprovedService.FileHistoryFilter(string.Empty, string.Empty, string.Empty, 1, 10);
+            FileHistoryListViewModel resultH = new FileHistoryListViewModel()
+            {
+                Page = 1,
+                RowCount = data.RowCount,
+                items = data.Results.Select(t => new FileHistoryItemViewModel()
+                {
+                    FileName = t.FileName,
+                    Comments = t.Comments,
+                    CreatedBy = t.CreatedBy,
+                    Status = t.RadianContributorFileStatus?.Name,
+                    Updated = t.Timestamp.ToString("yyyy-MM-dd")
+                }).ToList()
+            };
+            model.FileHistories = resultH;
+            model.FileHistoriesRowCount = data.RowCount;
+            
             if ((int)registrationData.RadianOperationMode == 2)
             {
                 if (model.RadianState == "Habilitado")
@@ -300,6 +317,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.RadianTestSetResult =
                _radianTestSetResultService.GetTestSetResultByNit(radianAdmin.Contributor.Code).FirstOrDefault();
 
+
             radianApprovedViewModel.Contributor = radianAdmin.Contributor;
             radianApprovedViewModel.ContributorId = radianAdmin.Contributor.Id;
             radianApprovedViewModel.Name = radianAdmin.Contributor.TradeName;
@@ -309,6 +327,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.Files = radianAdmin.Files;
             radianApprovedViewModel.RadianState = radianAdmin.Contributor.RadianState;
             radianApprovedViewModel.RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId;
+            radianApprovedViewModel.Software = _radianAprovedService.GetSoftware(new Guid(softwareId));
 
             return View("GetSetTestResult", radianApprovedViewModel);
         }
@@ -347,6 +366,26 @@ namespace Gosocket.Dian.Web.Controllers
             };
 
             return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public ActionResult FileHistoyList(FileHistoryFilterViewModel filter)
+        {
+            PagedResult<RadianContributorFileHistory> data = _radianAprovedService.FileHistoryFilter(filter.FileName, filter.Initial, filter.End, filter.Page, filter.PageSize);
+            FileHistoryListViewModel result = new FileHistoryListViewModel()
+            {
+                Page = filter.Page,
+                RowCount = data.RowCount,
+                items = data.Results.Select(t => new FileHistoryItemViewModel()
+                {
+                    FileName = t.FileName,
+                    Comments = t.Comments,
+                    CreatedBy = t.CreatedBy,
+                    Status = t.RadianContributorFileStatus?.Name,
+                    Updated = t.Timestamp.ToString("yyyy-MM-dd")
+                }).ToList()
+            };
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
     }
