@@ -286,6 +286,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
+        public async Task<List<ValidateListResponse>> StartValidateCune(RequestObjectCune cune)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(cune.trackId);
+            var xmlParser = new XmlParseNomina(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var objCune = xmlParser.Fields.ToObject<CuneModel>();
+
+            // Validator instance
+            var validator = new Validator();
+            validateResponses.Add(validator.ValidateCune(objCune, cune));
+            return validateResponses;
+        }
+
         public async Task<List<ValidateListResponse>> StartValidateParty(RequestObjectParty party)
         {
             var validateResponses = new List<ValidateListResponse>();
