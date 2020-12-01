@@ -281,9 +281,9 @@ th {
 .input-general {
     height: 41px !important;
     background: #F7F7F7;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #CCCCCC !important;
     box-sizing: border-box;
-    border-radius: 4px;
+    border-radius: 4px !important;
 }
 
 .radian-conventions i, #table-contributor-files i {
@@ -1274,10 +1274,13 @@ button.selectpicker .fa-caret-down {
     background-repeat: no-repeat;
     background-position: 20% 50%;
     display: inline-flex;
-    width: 45%;
+    width: 40%;
+}
+#dateFrom {
+    margin-right: 10px;
 }
 
-.ui-datepicker {
+    .ui-datepicker {
     width: auto;
 }
 

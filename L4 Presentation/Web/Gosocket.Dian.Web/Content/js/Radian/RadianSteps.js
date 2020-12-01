@@ -22,7 +22,7 @@ function RenderSteps(index) {
         enablePagination: false,
         enableKeyNavigation: false
     });
-
+    //hideLoading();
     $(".radian-file").click(function () {
         $(this).val("");
         $(this).parents(".custom-file").children("label").html("");
