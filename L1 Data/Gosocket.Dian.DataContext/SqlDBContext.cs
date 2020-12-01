@@ -1,9 +1,6 @@
 ﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
-<<<<<<< HEAD
-=======
 using Gosocket.Dian.Domain.Sql;
->>>>>>> dev-indra-test
 using Gosocket.Dian.Infrastructure;
 using System;
 using System.Data.Entity;
