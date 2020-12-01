@@ -1224,6 +1224,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validate Reference Attorney
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
         {
+            NitModel nitModel = new NitModel();
             int attorneyLimit = Properties.Settings.Default.MAX_Attorney;
             bool validate = true;
             string validateCufeErrorCode = "89";
@@ -1335,7 +1336,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                 attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 //Valida CUFE referenciado existe en sistema DIAN
-                var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference);
+                nitModel.DocumentKey = attorneyModel.cufe;
+                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference);
                 if (resultValidateCufe[0].IsValid)
                     attorney.Add(attorneyModel);
                 else
@@ -1886,24 +1888,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validación de la Sección DocumentReference - CUFE Informado
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
-        public List<ValidateListResponse> ValidateDocumentReferencePrev(string trackId, string idDocumentReference)
+        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference)
         {
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
             //Valida exista CUFE/CUDE en sistema DIAN
-            var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(trackId.ToLower()).FirstOrDefault();
+            var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(nitModel.DocumentKey.ToLower()).FirstOrDefault();
             if (documentMeta == null)
             {
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "Regla: AAH07, Rechazo: ",
+                    ErrorCode = "AAH07",
                     ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
-
-                return responses;
             }
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
@@ -1912,12 +1912,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "Regla: AAH06, Rechazo: ",
-                    ErrorMessage = "El número de documento electrónico referenciado no coinciden con un mandato reportado",
+                    ErrorCode = "AAH06 ",
+                    ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
-                return responses;
+            }
+            //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
+            if (documentMeta.ReceiverCode != nitModel.IssuerPartyCode)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAH26b",
+                    ErrorMessage = "El documento de identidad no corresponde al del documento electronico referenciado",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
 
+            //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
+            if (documentMeta.ReceiverName != nitModel.IssuerPartyName)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAH25b",
+                    ErrorMessage = "El nombre o razon social no corresponde al del documento electronico referenciado",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
 
             responses.Add(new ValidateListResponse

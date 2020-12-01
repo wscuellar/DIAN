@@ -46,7 +46,7 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
             
             try
             {
-                var validateResponses =  ValidatorEngine.Instance.StartValidateDocumentReferenceAsync(trackId, idDocumentReference);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateDocumentReferenceAsync(trackId, idDocumentReference);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -54,8 +54,7 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"VALIDATEDOCUMENTREFERENCECUFEPLGNS-{DateTime.UtcNow:yyyyMMdd}-Cufe {trackId}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 await tableManagerGlobalLogger.InsertOrUpdateAsync(logger);
-                var error = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
-
+                
                 var validateResponses = new List<ValidateListResponse>
                 {
                     new ValidateListResponse
@@ -63,7 +62,7 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "VALIDATEDOCUMENTREFERENCECUFEPLGNS",
-                        ErrorMessage = $"No se pudo validar Validación de la Sección DocumentReference - CUFE Informado, error: {error}"
+                        ErrorMessage = $"No se pudo validar la Sección DocumentReference - CUFE Informado"
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);

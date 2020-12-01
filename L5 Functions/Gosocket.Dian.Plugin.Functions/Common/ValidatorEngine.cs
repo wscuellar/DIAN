@@ -116,10 +116,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public List<ValidateListResponse> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
+        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
         {
+            var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
-            return validator.ValidateDocumentReferencePrev(trackId, idDocumentReference);
+            //Obtiene XML Factura electronica CUFE
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParserCude = new XmlParser(xmlBytes);
+            if (!xmlParserCude.Parser())
+                throw new Exception(xmlParserCude.ParserError);
+
+            var nitModel = xmlParserCude.Fields.ToObject<NitModel>();
+
+            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference));
+
+            return validateResponses;
         }
 
 
