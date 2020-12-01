@@ -2659,6 +2659,9 @@
     <Content Include="Scripts\numeral.min.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Templates\CertificadoExistencia.html" />
+    <Content Include="Templates\CertificadoExistenciaFinal.html" />
+    <Content Include="Templates\CertificadoExistenciaInterna.html" />
     <Content Include="Templates\ElectronicInvoiceExistenceCertificateReport.html" />
     <Content Include="Templates\RadianEventsTemplate.html" />
     <Content Include="w3c\p3p.xml" />

@@ -49,8 +49,10 @@ namespace Gosocket.Dian.Application
         public byte[] GetElectronicInvoicePdf(string eventItemIdentifier)
         {
             // Load Templates
-            StringBuilder template = new StringBuilder(File.ReadAllText("../../Templates/ElectronicInvoiceExistenceCertificateReport.html"));
-            StringBuilder eventTemplate = new StringBuilder(File.ReadAllText("../../Templates/RadianEventsTemplate.html"));
+            StringBuilder templateFirstPage = new StringBuilder(File.ReadAllText("../../Templates/CertificadoExistencia.html"));
+            StringBuilder eventTemplate = new StringBuilder(File.ReadAllText("../../Templates/CertificadoExistenciaInterna.html"));
+            StringBuilder templateLastPage = new StringBuilder(File.ReadAllText("../../Templates/CertificadoExistenciaFinal.html"));
+
 
             // Load Document Data
             GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
@@ -63,36 +65,54 @@ namespace Gosocket.Dian.Application
 
             // Set Variables
             DateTime expeditionDate = DateTime.Now;
-            var qrCode = GenerateQR(string.Format("{0}{1}", this.RadianReportQRCodeRadianReportQRCodeUrl, documentMeta.PartitionKey));
+            Bitmap qrCode = GenerateQR(string.Format("{0}{1}", this.RadianReportQRCodeRadianReportQRCodeUrl, documentMeta.PartitionKey));
+            int page = 1;
+            int eventNumber = 1;
 
-            // Mapping Labels
-            template = template.Replace("{PrintDay}", expeditionDate.Day.ToString());
-            template = template.Replace("{PrintMonth}", expeditionDate.Month.ToString());
-            template = template.Replace("{PrintYear}", expeditionDate.Year.ToString());
-            template = template.Replace("{PrintTime}", expeditionDate.TimeOfDay.ToString());
-            template = template.Replace("{InvoiceNumber}", documentMeta.SerieAndNumber);
-            template = template.Replace("{CUFE}", documentMeta.PartitionKey);
-            template = template.Replace("{EInvoiceGenerationDate}", documentMeta.EmissionDate.ToString("yyyy-mm-dd HH:mm:ss.sss"));
-            template = template.Replace("{SenderBusinessName}", documentMeta.SenderName);
-            template = template.Replace("{EInvoiceNit}", documentMeta.SenderCode);
+            // Mapping Labels common data
+            templateFirstPage = templateFirstPage.Replace("{PrintDay}", expeditionDate.Day.ToString());
+            templateFirstPage = templateFirstPage.Replace("{PrintMonth}", expeditionDate.Month.ToString());
+            templateFirstPage = templateFirstPage.Replace("{PrintYear}", expeditionDate.Year.ToString());
+            templateFirstPage = templateFirstPage.Replace("{PrintTime}", expeditionDate.TimeOfDay.ToString());
+            templateFirstPage = templateFirstPage.Replace("{PrintPage}", page.ToString());
+            templateFirstPage = templateFirstPage.Replace("{InvoiceNumber}", documentMeta.SerieAndNumber);
+            templateFirstPage = templateFirstPage.Replace("{CUFE}", documentMeta.PartitionKey);
+            templateFirstPage = templateFirstPage.Replace("{EInvoiceGenerationDate}", documentMeta.EmissionDate.ToString("yyyy-mm-dd HH:mm:ss.sss"));
+            templateFirstPage = templateFirstPage.Replace("{Status}", string.Empty);
 
-            template = template.Replace("{InvoiceValue}", Convert.ToString(documentMeta.TotalAmount));
-            template = template.Replace("{Badge}", string.Empty);
-            template = template.Replace("{PaymentMethod}", string.Empty);
-            template = template.Replace("{Expiration}", string.Empty);
-            template = template.Replace("{Acquirer}", documentMeta.ReceiverName);
-            template = template.Replace("{AcquirerNit}", documentMeta.ReceiverCode);
-            template = template.Replace("{DocumentsTotal}", $"{documents.Count}");
-            template = template.Replace("{EventsTotal}", string.Empty);
-            template = template.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
-            template = template.Replace("{QRCode}", qrCode.ToString());
+            // Mapping firts page
+            templateFirstPage = templateFirstPage.Replace("{SenderBusinessName}", documentMeta.SenderName);
+            templateFirstPage = templateFirstPage.Replace("{SenderNit}", documentMeta.SenderCode);
+            templateFirstPage = templateFirstPage.Replace("{InvoiceValue}", Convert.ToString(documentMeta.TotalAmount));
+            templateFirstPage = templateFirstPage.Replace("{Badge}", string.Empty);
+            templateFirstPage = templateFirstPage.Replace("{Currency}", string.Empty);
+            templateFirstPage = templateFirstPage.Replace("{PaymentMethod}", string.Empty);
+            templateFirstPage = templateFirstPage.Replace("{Expiration}", string.Empty);
+            templateFirstPage = templateFirstPage.Replace("{ReceiverBusinessName}", documentMeta.ReceiverName);
+            templateFirstPage = templateFirstPage.Replace("{ReceiverNit}", documentMeta.ReceiverCode);
+
+            //Mapping last page
+            templateLastPage = templateLastPage.Replace("{PrintDay}", expeditionDate.Day.ToString());
+            templateLastPage = templateLastPage.Replace("{PrintMonth}", expeditionDate.Month.ToString());
+            templateLastPage = templateLastPage.Replace("{PrintYear}", expeditionDate.Year.ToString());
+            templateLastPage = templateLastPage.Replace("{PrintTime}", expeditionDate.TimeOfDay.ToString());
+            templateLastPage = templateLastPage.Replace("{PrintPage}", page.ToString());
+            templateLastPage = templateLastPage.Replace("{InvoiceNumber}", documentMeta.SerieAndNumber);
+            templateLastPage = templateLastPage.Replace("{CUFE}", documentMeta.PartitionKey);
+            templateLastPage = templateLastPage.Replace("{EInvoiceGenerationDate}", documentMeta.EmissionDate.ToString("yyyy-mm-dd HH:mm:ss.sss"));
+            templateLastPage = templateLastPage.Replace("{Status}", string.Empty);
+
+            templateLastPage = templateLastPage.Replace("{DocumentsTotal}", $"{documents.Count}");
+            templateLastPage = templateLastPage.Replace("{EventsTotal}", string.Empty);
+            templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
+            templateLastPage = templateLastPage.Replace("{QRCode}", qrCode.ToString());
 
             // Mapping Events
-
-            
+                        
 
             // Render Pdf
-            byte[] report = GetPdfBytes(template.ToString());
+            byte[] report = GetPdfBytes(templateFirstPage.ToString());
+            //
 
             return report;
         } 
