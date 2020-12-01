@@ -21,7 +21,7 @@
     <ProjectReference Include="..\..\Gosocket.Dian.Services\Gosocket.Dian.Services.csproj" />
     <ProjectReference Include="..\..\L0 Infrastructure\Gosocket.Dian.Infrastructure\Gosocket.Dian.Infrastructure.csproj" />
     <ProjectReference Include="..\..\L3 Application\Gosocket.Dian.Application\Gosocket.Dian.Application.csproj" />
-    <ProjectReference Include="..\..\L2 Domain\Gosocket.Dian.Domain\Gosocket.Dian.Domain.csproj">      
+    <ProjectReference Include="..\..\L2 Domain\Gosocket.Dian.Domain\Gosocket.Dian.Domain.csproj" />    
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
