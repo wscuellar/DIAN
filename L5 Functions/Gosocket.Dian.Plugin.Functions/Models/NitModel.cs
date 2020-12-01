@@ -27,6 +27,7 @@
         public string TasaDescuento { get; set; }
         public string MedioPago { get; set; }
         public string DocumentKey { get; set; }
+        public string ResponseCode { get; set; }
 
     }
 }

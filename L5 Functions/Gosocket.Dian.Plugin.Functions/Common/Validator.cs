@@ -1917,32 +1917,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
-            //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
-            if (documentMeta.ReceiverCode != nitModel.IssuerPartyCode)
-            {
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "AAH26b",
-                    ErrorMessage = "El documento de identidad no corresponde al del documento electronico referenciado",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
 
-            //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
-            if (documentMeta.ReceiverName != nitModel.IssuerPartyName)
+            if ( Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoPropiedad ||
+               Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ||
+               Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoProcuracion )
             {
-                responses.Add(new ValidateListResponse
+                //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
+                if (documentMeta.ReceiverCode != nitModel.IssuerPartyCode)
                 {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "AAH25b",
-                    ErrorMessage = "El nombre o razon social no corresponde al del documento electronico referenciado",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "AAH26b",
+                        ErrorMessage = "El documento de identidad no corresponde al del documento electronico referenciado",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
+                if (documentMeta.ReceiverName != nitModel.IssuerPartyName)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "AAH25b",
+                        ErrorMessage = "El nombre o razon social no corresponde al del documento electronico referenciado",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
             }
-
+            
             responses.Add(new ValidateListResponse
             {
                 IsValid = true,
