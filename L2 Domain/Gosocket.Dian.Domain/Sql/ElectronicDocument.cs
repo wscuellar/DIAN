@@ -1,8 +1,13 @@
-﻿namespace Gosocket.Dian.Domain.Sql
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Gosocket.Dian.Domain.Sql
 {
+    [Table("ElectronicDocument")]
     public class ElectronicDocument
     {
-        public string Id { get; set; }
+        [Key]
+        public int Id { get; set; }
         public string Name { get; set; }
     }
 }

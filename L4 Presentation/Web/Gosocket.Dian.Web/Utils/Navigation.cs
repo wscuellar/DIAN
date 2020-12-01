@@ -56,16 +56,8 @@ namespace Gosocket.Dian.Web.Utils
             RadianContributorFileType,
             RadianSetPruebas,
             AdminRadian,
-            /// <summary>
-<<<<<<< HEAD
-            /// Opción de menu. Set de pruebas - Otros documentos
-            /// </summary>
-            TestSetOtherDocuments
-=======
-            /// Opción de Menu, creación de Usuarios externos
-            /// </summary>
+            TestSetOtherDocuments,
             ExternalUsersCreate
->>>>>>> dev-indra-test
         }
     }
 }

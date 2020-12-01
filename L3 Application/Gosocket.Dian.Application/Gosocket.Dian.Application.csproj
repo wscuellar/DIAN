@@ -188,7 +188,7 @@
   <ItemGroup>
     <Compile Include="Common\CertificateExtensions.cs" />
     <Compile Include="Common\RedisExtensions.cs" />
-    <Compile Include="ElectronicDocumentService.cs" />        
+    <Compile Include="ElectronicDocumentService.cs" />
     <Compile Include="Managers\TestSetOthersDocumentsManager.cs" />
     <Compile Include="IdentificationTypeService.cs" />
     <Compile Include="GlobalDocValidationDocumentMetaService.cs" />
@@ -242,11 +242,11 @@
       <Name>Gosocket.Dian.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\L1 Data\Gosocket.Dian.DataContext\Gosocket.Dian.DataContext.csproj">
-      <Project>{CBAA925A-695B-41B2-90B9-5C061A9CC30E}</Project>
+      <Project>{cbaa925a-695b-41b2-90b9-5c061a9cc30e}</Project>
       <Name>Gosocket.Dian.DataContext</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\L2 Domain\Gosocket.Dian.Domain\Gosocket.Dian.Domain.csproj">
-      <Project>{FBA40283-71DF-4B48-8E64-663468E6E0C6}</Project>
+      <Project>{fba40283-71df-4b48-8e64-663468e6e0c6}</Project>
       <Name>Gosocket.Dian.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\Gosocket.Dian.Logger\Gosocket.Dian.Logger.csproj">

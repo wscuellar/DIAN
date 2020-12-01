@@ -315,7 +315,6 @@ namespace Gosocket.Dian.Functions.Activation
                                     ContributorCode = contributor.Code,
                                     ContributorTypeId = contributor.ContributorTypeId,
                                     OperationModeId = radianTesSetResult.OperationModeId,
-                                    OperationModeId =   radianTesSetResult.OperationModeId,
                                     OperationModeName = radianTesSetResult.OperationModeName,
                                     SentToActivateBy = "Function",
                                     SoftwareId = radianTesSetResult.SoftwareId,

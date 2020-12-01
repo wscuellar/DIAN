@@ -1,5 +1,5 @@
 ﻿using Gosocket.Dian.DataContext;
-using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace Gosocket.Dian.Application
         /// Listar los documentos electronicos registrados
         /// </summary>
         /// <returns></returns>
-        public List<Domain.Entity.ElectronicDocument> GetElectronicDocuments()
+        public List<ElectronicDocument> GetElectronicDocuments()
         {
             return new SqlDBContext().ElectronicDocuments.ToList();
         }

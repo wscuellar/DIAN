@@ -172,7 +172,7 @@ namespace Gosocket.Dian.DataContext
         /// <summary>
         /// Otros documentos. Utilizado por el momento para la Opción/Vista de Set de Pruebas - Otros Documentos
         /// </summary>
-        public DbSet<ElectronicDocument> ElectronicDocuments { set; get; }
+        public DbSet<Domain.Sql.ElectronicDocument> ElectronicDocuments { set; get; }
 
     }
 

@@ -160,7 +160,6 @@
     <Compile Include="Entity\DianEmailTracker.cs" />
     <Compile Include="Entity\DianNsuControl.cs" />
     <Compile Include="Entity\DianOfeControl.cs" />
-    <Compile Include="Entity\ElectronicDocument.cs" />
     <Compile Include="Entity\GlobalAttorneyFacultity.cs" />
     <Compile Include="Entity\GlobalAuthorization.cs" />
     <Compile Include="Entity\GlobalBatchFileFailed.cs" />

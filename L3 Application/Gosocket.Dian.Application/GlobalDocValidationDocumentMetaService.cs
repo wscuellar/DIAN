@@ -17,7 +17,7 @@ namespace Gosocket.Dian.Application
         public List<GlobalDocReferenceAttorney> ReferenceAttorneys(string documentKey, string documentReferencedKey, string receiverCode, string senderCode)
         {
             return documentMetaTableManager
-                .FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(documentKey, documentReferencedKey, receiverCode, senderCode);
+                .FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(documentReferencedKey, senderCode);
         }
 
         public List<GlobalDocValidatorDocumentMeta> GetAssociatedDocuments(string documentKey, string eventCode)
