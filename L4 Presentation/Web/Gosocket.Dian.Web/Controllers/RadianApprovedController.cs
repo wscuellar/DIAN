@@ -286,7 +286,7 @@ namespace Gosocket.Dian.Web.Controllers
             var result = _radianAprovedService.OperationDelete(Convert.ToInt32(Id));
             return Json(new
             {
-                message = "Modo de operación eliminado.",
+                message = result.Message,
                 success = true,
             }, JsonRequestBehavior.AllowGet);
         }
