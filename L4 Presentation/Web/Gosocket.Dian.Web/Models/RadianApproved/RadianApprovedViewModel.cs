@@ -66,5 +66,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         public RadianUtil.UserStates RadianStateSelect { get; set; }
         public int PageTable { get; set; }
         public int CustomerTotalCount { get; internal set; }
+        public List<RadianContributorFileHistory> FileHistories { get; internal set; }
+        public int FileHistoriesRowCount { get; internal set; }
     }
 }
