@@ -114,18 +114,18 @@ function RenderTable(paramsObject) {
     changeToSpanish();
 }
 
-function LoadEventsToSearch(paramsObject) {debugger
+function LoadEventsToSearch(paramsObject) {
     $(".search-data").click(function (e) {
         e.preventDefault();
         SearchData(paramsObject);
     })
 }
 
-function SearchData(paramsObject) {debugger
+function SearchData(paramsObject) {
     var arrayToMap = Object.entries(paramsObject.ajaxData);
     arrayToMap.forEach((element) => {
-        if (element[1].includes("#")) {
-            paramsObject.ajaxData[element[0]] = $(element[1]).val;
+        if (typeof element[1] === 'string' && element[1].includes("#")) {
+            paramsObject.ajaxData[element[0]] = $(element[1]).val();
         }
     });
 
@@ -134,7 +134,8 @@ function SearchData(paramsObject) {debugger
         paramsObject.data = response;
         RenderTable(paramsObject);
     }
-    ajaxFunction(paramsObject.url, 'POST', paramsObject.ajaxData, actionError, actionSuccess);
+    debugger
+    ajaxFunction(paramsObject.urlSearch, 'POST', paramsObject.ajaxData, actionError, actionSuccess);
 }
 
 function LoadEventsToPagiantion(paramsObject) {debugger

@@ -118,6 +118,13 @@
                         { data: 'Status' },
                         { data: 'Comments' }
                     ]
+                    var ajaxData = {
+                        radianContributorId: @Model.Contributor.RadianContributorId,
+                        code: "#NitSearch",
+                        radianState: "#RadianStateSelect",
+                        page: page,
+                        pagesize: 10
+                    };
                     var paramsObject = {
                         element: element,
                         data: dataTable,
@@ -127,7 +134,8 @@
                         page: page,
                         tableRendered: null,
                         customersTotalCount: customersTotalCount,
-                        columns: columns
+                        columns: columns,
+                        ajaxData: ajaxData
                     }
                     RenderTable(paramsObject);
                 })
