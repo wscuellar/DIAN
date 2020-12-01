@@ -48,5 +48,6 @@ namespace Gosocket.Dian.Interfaces.Services
         PagedResult<RadianContributor> CustormerList(int radianContributorId, string code, RadianState radianState, int page, int pagesize);
 
         PagedResult<RadianContributorFileHistory> FileHistoryFilter(string fileName, string initial, string end, int page, int pagesize);
+        RadianSoftware GetSoftware(Guid id);
     }
 }

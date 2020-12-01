@@ -300,6 +300,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.RadianTestSetResult =
                _radianTestSetResultService.GetTestSetResultByNit(radianAdmin.Contributor.Code).FirstOrDefault();
 
+
             radianApprovedViewModel.Contributor = radianAdmin.Contributor;
             radianApprovedViewModel.ContributorId = radianAdmin.Contributor.Id;
             radianApprovedViewModel.Name = radianAdmin.Contributor.TradeName;
@@ -309,6 +310,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.Files = radianAdmin.Files;
             radianApprovedViewModel.RadianState = radianAdmin.Contributor.RadianState;
             radianApprovedViewModel.RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId;
+            radianApprovedViewModel.Software = _radianAprovedService.GetSoftware(new Guid(softwareId));
 
             return View("GetSetTestResult", radianApprovedViewModel);
         }
