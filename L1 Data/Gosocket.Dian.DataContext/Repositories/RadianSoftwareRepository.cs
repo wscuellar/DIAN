@@ -51,11 +51,13 @@ namespace Gosocket.Dian.DataContext.Repositories
                     radianSoftwareInstance.Status = radianSoftware.Status;
                     radianSoftwareInstance.Deleted = radianSoftware.Deleted;
                     radianSoftwareInstance.Updated = radianSoftware.Updated;
+                    radianSoftwareInstance.RadianSoftwareStatusId = radianSoftware.RadianSoftwareStatusId;
                     context.Entry(radianSoftwareInstance).State = EntityState.Modified;
                 }
                 else
                 {
                     radianSoftware.Id = Guid.NewGuid();
+                    radianSoftware.RadianSoftwareStatusId = 1;
                     radianSoftware.Updated = DateTime.Now;
                     context.Entry(radianSoftware).State = EntityState.Added;
                 }
