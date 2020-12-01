@@ -146,7 +146,7 @@ namespace Gosocket.Dian.Application
             if (software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted && operation.SoftwareType == (int)RadianOperationModeTestSet.OwnSoftware)
                 return new ResponseMessage() { Message = "El software ya se encuentra en uso" };
 
-            if (software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted)
+            if (software.RadianSoftwareStatusId != (int)RadianSoftwareStatus.Accepted)
                 _ = _radianCallSoftwareService.DeleteSoftware(software.Id);
 
             return _radianContributorOperationRepository.Update(radianContributorOperationId);
