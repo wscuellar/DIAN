@@ -34,8 +34,13 @@ namespace Gosocket.Dian.Web.Models
     public class RadianContributorFileTypeViewModel
     {
         public int Id { get; set; }
+
+        public bool HideDelete { get; set; }
+
+        [Required (ErrorMessage = "El campo nombre es requerido")]
         [Display(Name = "Nombre")]
         public string Name { get; set; }
+
         public DateTime Timestamp { get; set; }
         public DateTime Updated { get; set; }
 

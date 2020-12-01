@@ -1,4 +1,6 @@
-﻿using Gosocket.Dian.Web.Models;
+﻿using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
+using Gosocket.Dian.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,6 +88,102 @@ namespace Gosocket.Dian.Web.Utils
         public string GetRolName(string id)
         {
             return _sqlDBContext.Roles.FirstOrDefault(r => r.Id == id)?.Name;
+        }
+
+        /// <summary>
+        /// Activando o Inactivando al Usario externo
+        /// </summary>
+        /// <param name="userId">Id del Usuario externo a actualizar</param>
+        /// <param name="active">1: Activar, 0: Inactivar</param>
+        /// <param name="updatedBy">Usuario que realiza la acción</param>
+        /// <param name="activeDescription">Motivo por el cual se realiza la acción</param>
+        /// <returns></returns>
+        public int UpdateActive(string userId, byte active, string updatedBy, string activeDescription)
+        {
+            int result = 0;
+            try
+            {
+                using (var db = new ApplicationDbContext())
+                {
+                    var user = db.Users.FirstOrDefault(u => u.Id == userId);
+                    if (user != null)
+                    {
+                        user.Active = active;
+                        user.LastUpdated = DateTime.Now;
+                        user.UpdatedBy = updatedBy;
+                        user.ActiveDescription = activeDescription;
+                        result = db.SaveChanges();
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                result = -1;
+                System.Diagnostics.Debug.WriteLine("UserService:UpdateActive: " + ex);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Actualizar los campos basicos del Usuario Externo
+        /// </summary>
+        /// <param name="user"><see cref="ExternalUserViewModel"/></param>
+        /// <returns></returns>
+        public int UpdateExternalUser(ExternalUserViewModel user)
+        {
+            int result = 0;
+            try
+            {
+                using (var db = new ApplicationDbContext())
+                {
+                    var userDB = db.Users.FirstOrDefault(u => u.Id == user.Id);
+                    if (userDB != null)
+                    {
+                        userDB.IdentificationTypeId = user.IdentificationTypeId;
+                        userDB.IdentificationId = user.IdentificationId;
+                        userDB.Name = user.Names;
+                        userDB.Email = user.Email;
+                        userDB.LastUpdated = user.LastUpdated;
+                        userDB.UpdatedBy = user.UpdatedBy;
+
+                        result = db.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result = -1;
+                System.Diagnostics.Debug.WriteLine("UserService:UpdateExternalUser: " + ex);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Registrar trazabilidad de Usuarios externos
+        /// </summary>
+        /// <param name="message">Datos del usuario</param>
+        /// <param name="actionName">Crear,Actualizar, Asignar/Actualizar permisos</param>
+        public void RegisterExternalUserTrazability(string message, string actionName)
+        {
+            var requestId = Guid.NewGuid();
+
+            var logger = new GlobalLogger(requestId.ToString(), requestId.ToString())
+            {
+                Action = actionName,
+                Controller = "ExternalUsers",
+                Message = message,
+                RouteData = null,
+                StackTrace = null
+            };
+
+            new TableManager("GlobalLogger").InsertOrUpdate(logger); 
+        }
+
+        public ApplicationUser FindUserByIdentificationAndTypeId(int identificationTypeId, string identificationId)
+        {
+            return _sqlDBContext.Users.FirstOrDefault(u => u.IdentificationTypeId == identificationTypeId && u.IdentificationId == identificationId);
         }
 
     }

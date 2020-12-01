@@ -34,7 +34,9 @@ namespace Gosocket.Dian.Web.Controllers
                 Mandatory = ft.Mandatory,
                 Timestamp = ft.Timestamp,
                 Updated = ft.Updated,
-                RadianContributorType = ft.RadianContributorType
+                RadianContributorType = ft.RadianContributorType,
+                HideDelete = ft.HideDelete
+
             }).ToList();
         }
 
@@ -81,19 +83,27 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult Add(RadianContributorFileTypeViewModel model)
         {
-            var fileType = new RadianContributorFileType
+            if (ModelState.IsValid)
             {
-                Mandatory = model.Mandatory,
-                Name = model.Name,
-                CreatedBy = User.Identity.Name,
-                Timestamp = DateTime.Now,
-                RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
-            };
+                var fileType = new RadianContributorFileType
+                {
+                    Mandatory = model.Mandatory,
+                    Name = model.Name,
+                    CreatedBy = User.Identity.Name,
+                    Timestamp = DateTime.Now,
+                    RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
+                };
 
-            _ = _radianContributorFileTypeService.Update(fileType);
+                _ = _radianContributorFileTypeService.Update(fileType);
 
-            ViewBag.CurrentPage = Navigation.NavigationEnum.ContributorFileType;
-            return RedirectToAction("List");
+                ViewBag.CurrentPage = Navigation.NavigationEnum.ContributorFileType;
+                return RedirectToAction("List");
+            }
+            else
+            {
+                return RedirectToAction("List", model);
+            }
+
         }
 
         public PartialViewResult GetEditRadianContributorFileTypePartialView(int id)
@@ -129,20 +139,26 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult Edit(RadianContributorFileTypeViewModel model)
         {
-            var fileType = new RadianContributorFileType
+            if (ModelState.IsValid)
             {
-                Id = model.Id,
-                Mandatory = model.Mandatory,
-                Name = model.Name,
-                CreatedBy = User.Identity.Name,
-                Updated = DateTime.Now,
-                RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
-                RadianContributorType = model.RadianContributorType
-            };
-            _ = _radianContributorFileTypeService.Update(fileType);
-            ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
-
-            return RedirectToAction("List");
+                var fileType = new RadianContributorFileType
+                {
+                    Id = model.Id,
+                    Mandatory = model.Mandatory,
+                    Name = model.Name,
+                    CreatedBy = User.Identity.Name,
+                    Updated = DateTime.Now,
+                    RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
+                    RadianContributorType = model.RadianContributorType
+                };
+                _ = _radianContributorFileTypeService.Update(fileType);
+                ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
+                return RedirectToAction("List");
+            }
+            else
+            {
+                return RedirectToAction("List", model);
+            }
         }
 
         public PartialViewResult GetDeleteRadianContributorFileTypePartialView(int id)

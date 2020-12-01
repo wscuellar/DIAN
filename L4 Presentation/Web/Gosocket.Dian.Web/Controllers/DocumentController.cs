@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.Cosmos;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
@@ -23,6 +24,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.Mvc;
+using EnumHelper = Gosocket.Dian.Web.Models.EnumHelper;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -60,9 +62,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         public async Task<ActionResult> Sent(SearchDocumentViewModel model)
-        {
-            return await GetDocuments(model, 2);
-        }
+            => await GetDocuments(model, 2);
 
         public async Task<ActionResult> Received(SearchDocumentViewModel model)
         {
@@ -121,6 +121,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             document.DocumentTags = globalDataDocument.DocumentTags.Select(t => new DocumentTagViewModel()
             {
+
                 Code = t.Value,
                 Description = t.Description,
                 Value = t.Value,
@@ -129,6 +130,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             document.Events = globalDataDocument.Events.Select(e => new EventViewModel()
             {
+                DocumentKey = e.DocumentKey,
                 Code = e.Code,
                 Date = e.Date,
                 DateNumber = e.DateNumber,
@@ -161,6 +163,38 @@ namespace Gosocket.Dian.Web.Controllers
                 Document = document,
                 Validations = validations
             };
+
+
+            model.Events = new List<EventsViewModel>();
+            List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
+            if (eventsByInvoice.Any())
+            {
+
+                foreach (var eventItem in eventsByInvoice)
+                {
+                    if (!string.IsNullOrEmpty(eventItem.EventCode))
+                    {
+                        GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
+                        if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
+                        {
+                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                            model.Events.Add(new EventsViewModel()
+                            {
+                                DocumentKey = eventItem.DocumentKey,
+                                EventCode = eventItem.EventCode,
+                                Description = eventcodetext,
+                                EventDate = eventItem.SigningTimeStamp,
+                                SenderCode = eventItem.SenderCode,
+                                Sender = eventItem.SenderName,
+                                ReceiverCode = eventItem.ReceiverCode,
+                                Receiver = eventItem.ReceiverName
+                            });
+                            model.Events = model.Events.OrderBy(t => t.EventCode).ToList();
+                        }
+
+                    }
+                }
+            }
 
 
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
@@ -421,6 +455,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
+
         #region Private methods
 
         private bool IsValidCaptcha(string token)
@@ -558,7 +593,6 @@ namespace Gosocket.Dian.Web.Controllers
                     Number = d.Number,
                     Serie = d.Serie,
                     SerieAndNumber = d.SerieAndNumber,
-                    //TechProviderName = d?.TechProviderInfo?.TechProviderName,
                     TechProviderCode = d?.TechProviderInfo?.TechProviderCode,
                     ReceiverName = d.ReceiverName,
                     ReceiverCode = d.ReceiverCode,
@@ -569,13 +603,54 @@ namespace Gosocket.Dian.Web.Controllers
                     StatusName = d.ValidationResultInfo.StatusName,
                     TaxAmountIva = d.TaxAmountIva,
                     TotalAmount = d.TotalAmount,
+                    Events = d.Events.Select(
+                        e => new EventViewModel()
+                        {
+                            Code = e.Code,
+                            Date = e.Date,
+                            Description = e.Description
+                        }).ToList()
                 }).ToList();
+
+                foreach (DocumentViewModel docView in model.Documents)
+                    docView.RadianStatusName = DeterminateRadianStatus(docView.Events);
             }
 
             model.IsNextPage = result.Item1;
             this.Session["Continuation_Token_" + (model.Page + 1)] = result.Item2;
 
             return View("Index", model);
+        }
+
+        private string DeterminateRadianStatus(List<EventViewModel> events)
+        {
+            if (events.Count() == 0)
+                return "NO APLICA";
+
+            if (events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Received.ToString()))
+                && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Receipt.ToString()))
+                && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Accepted.ToString())))
+                return "TÍTULO VALOR";
+
+            int lastEventCode = int.Parse(events.Last().Code);
+
+            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.SolicitudDisponibilizacion.ToString()))
+                return "DISPONIBILIZADA";
+
+            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.EndosoPropiedad.ToString())
+                || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.EndosoGarantia.ToString())
+                || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.EndosoProcuracion.ToString())
+                || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.InvoiceOfferedForNegotiation.ToString()))
+                return "ENDOSADA";
+
+            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NotificacionPagoTotalParcial.ToString()))
+                return "PAGADA";
+
+            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NegotiatedInvoice.ToString())
+                || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.AnulacionLimitacionCirculacion.ToString()))
+                return "LIMITADA";
+
+            return "NO APLICA";
         }
 
         private void SetView(int filterType)

@@ -67,22 +67,22 @@ namespace Gosocket.Dian.Web.Controllers
             RadianTestSetViewModel model = new RadianTestSetViewModel
             {
                 OperationModes = list,
-                TotalDocumentRequired = 14,
+                TotalDocumentRequired = 0,
                 TotalDocumentAcceptedRequired = 0,
-                ReceiptNoticeTotalRequired = 1,
-                ReceiptServiceTotalRequired = 1,
-                ExpressAcceptanceTotalRequired = 1,
-                AutomaticAcceptanceTotalRequired = 1,
-                RejectInvoiceTotalRequired = 1,
-                ApplicationAvailableTotalRequired = 1,
-                EndorsementTotalRequired = 1,
-                EndorsementCancellationTotalRequired = 1,
-                GuaranteeTotalRequired = 1,
-                ElectronicMandateTotalRequired = 1,
-                EndMandateTotalRequired = 1,
-                PaymentNotificationTotalRequired = 1,
-                CirculationLimitationTotalRequired = 1,
-                EndCirculationLimitationTotalRequired = 1
+                ReceiptNoticeTotalRequired = 0,
+                ReceiptServiceTotalRequired = 0,
+                ExpressAcceptanceTotalRequired = 0,
+                AutomaticAcceptanceTotalRequired = 0,
+                RejectInvoiceTotalRequired = 0,
+                ApplicationAvailableTotalRequired = 0,
+                EndorsementTotalRequired =0,
+                EndorsementCancellationTotalRequired = 0,
+                GuaranteeTotalRequired =0,
+                ElectronicMandateTotalRequired = 0,
+                EndMandateTotalRequired = 0,
+                PaymentNotificationTotalRequired = 0,
+                CirculationLimitationTotalRequired = 0,
+                EndCirculationLimitationTotalRequired = 0
             };
             ViewBag.CurrentPage = Navigation.NavigationEnum.RadianSetPruebas;
             return View(model);
@@ -155,7 +155,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         private List<OperationModeViewModel> LoadSoftwareOperationMode()
         {
-            List<RadianOperationMode> list = _radianTestSetService.OperationModeList();
+            List<RadianOperationMode> list = _radianTestSetService.OperationModeList( Domain.Common.RadianOperationMode.None);
             List<OperationModeViewModel> OperationModes = list.Select(t => new OperationModeViewModel() { Id = t.Id, Name = t.Name }).ToList();
             return OperationModes;
         }
