@@ -1,12 +1,16 @@
-﻿using Gosocket.Dian.Interfaces.Services;
+﻿using Gosocket.Dian.Application.Cosmos;
+using Gosocket.Dian.Domain.Cosmos;
+using Gosocket.Dian.Interfaces.Services;
 using OpenHtmlToPdf;
 using QRCoder;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application
 {
@@ -15,7 +19,6 @@ namespace Gosocket.Dian.Application
         #region Properties
 
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
-
 
         #region RadianReportQRCodeRadianReportQRCodeUrl
 
@@ -29,7 +32,7 @@ namespace Gosocket.Dian.Application
                 }
                 return string.Empty;
             }
-        } 
+        }
 
         #endregion
 
@@ -40,7 +43,7 @@ namespace Gosocket.Dian.Application
         public RadianPDFCreationService(IQueryAssociatedEventsService queryAssociatedEventsService)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
-        } 
+        }
 
         #endregion
 
@@ -61,7 +64,8 @@ namespace Gosocket.Dian.Application
             List<GlobalDocReferenceAttorney> documents = _queryAssociatedEventsService.ReferenceAttorneys(documentMeta.DocumentKey, documentMeta.DocumentReferencedKey, documentMeta.ReceiverCode, documentMeta.SenderCode);
 
             //Load Events
-            
+            GlobalDataDocument cosmosDocument = DocumentInfoFromCosmos(documentMeta);
+            List<Event> events = cosmosDocument.Events;
 
             // Set Variables
             DateTime expeditionDate = DateTime.Now;
@@ -108,14 +112,14 @@ namespace Gosocket.Dian.Application
             templateLastPage = templateLastPage.Replace("{QRCode}", qrCode.ToString());
 
             // Mapping Events
-                        
+
 
             // Render Pdf
             byte[] report = GetPdfBytes(templateFirstPage.ToString());
             //
 
             return report;
-        } 
+        }
 
         #endregion
 
@@ -147,8 +151,25 @@ namespace Gosocket.Dian.Application
             QRCode qrCode = new QRCode(qrCodeData);
             Bitmap qrCodeImage = qrCode.GetGraphic(20);
             return qrCodeImage;
-        } 
+        }
 
         #endregion
+
+        private GlobalDataDocument DocumentInfoFromCosmos(GlobalDocValidatorDocumentMeta documentMeta)
+        {
+            string emissionDateNumber = documentMeta.EmissionDate.ToString("yyyyMMdd");
+            string partitionKey = $"co|{emissionDateNumber.Substring(6, 2)}|{documentMeta.DocumentKey.Substring(0, 2)}";
+
+            DateTime date = DateNumberToDateTime(emissionDateNumber);
+
+            GlobalDataDocument globalDataDocument = CosmosDBService.Instance(date).ReadDocumentAsync(documentMeta.DocumentKey, partitionKey, date).Result;
+
+            return globalDataDocument;
+        }
+
+        private DateTime DateNumberToDateTime(string date)
+        {
+            return DateTime.ParseExact(date, "yyyyMMdd", CultureInfo.InvariantCulture);
+        }
     }
 }

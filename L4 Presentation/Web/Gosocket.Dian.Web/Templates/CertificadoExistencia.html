@@ -16,6 +16,10 @@
             color: #028BB8;
         }
 
+        footer {
+            bottom: 0;
+        }
+
         .event {
             margin-top: 20px;
         }
@@ -92,7 +96,8 @@
 
         .container-info {
             margin: 20px;
-            display: flex;
+            display: grid;
+            grid-template-columns: auto auto;
         }
 
         .container-div {
@@ -107,11 +112,21 @@
             border-color: #62C7AB;
         }
 
+        .separator-vertical {
+            border-color: #62C7AB;
+        }
+
         .footer-close {
             font-weight: normal;
             font-size: 8px;
             line-height: 9px;
             text-align: center;
+        }
+
+        .qr-content {
+            margin: 0 auto;
+            width: 100px;
+            height: 100px;
         }
     </style>
 
@@ -264,7 +279,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- ZONA CONTENIDO EVENTOS -->
         <div class="event">
             <div class="text-centered text-header">

@@ -263,6 +263,48 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region Evento Cune
+
+        public ValidateListResponse ValidateCune(CuneModel objCune, RequestObjectCune data)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            data.trackId = data.trackId.ToLower();
+            var ValDev = objCune.ValDev?.Trim();
+            var ValDesc = objCune.ValDesc?.Trim();
+            var ValTol = objCune.ValTol?.Trim();
+            var errorCode = "FAD06";
+            var prop = "CUFE";
+            string errorMessarge = string.Empty;
+            errorMessarge = $"Valor del { prop} no está calculado correctamente.";
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessarge };
+
+            if (string.IsNullOrEmpty(ValDev)) ValDev = "0.00"; else ValDev = TruncateDecimal(decimal.Parse(ValDev), 2).ToString("F2");
+            if (string.IsNullOrEmpty(ValDesc)) ValDesc = "0.00"; else ValDesc = TruncateDecimal(decimal.Parse(ValDesc), 2).ToString("F2");
+            if (string.IsNullOrEmpty(ValTol)) ValTol = "0.00"; else ValTol = TruncateDecimal(decimal.Parse(ValTol), 2).ToString("F2");
+
+            var NumNIE = objCune.NumNIE;
+            var FechNIE = objCune.FecNIE;
+            var HorNIE = objCune.HorNIE;
+            var NitNIE = objCune.NitNIE;
+            var DocEmp = objCune.DocEmp;
+            var SoftwarePin = objCune.SoftwarePin;
+            var TipAmb = objCune.TipAmb;           
+            
+            var numberSha384 = $"{NumNIE}{FechNIE}{HorNIE}{ValDev}{ValDesc}{ValTol}{NitNIE}{DocEmp}{SoftwarePin}{TipAmb}";
+
+            var hash = numberSha384.EncryptSHA384();
+
+            if (objCune.Cune == hash)
+            {
+                response.IsValid = true;
+                response.ErrorMessage = $"Valor del {prop} calculado correctamente.";
+            }
+
+            response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+            return response;
+        }
+        #endregion
+
         #region Document
         public ValidateListResponse ValidateDocumentDuplicity(string trackId)
         {

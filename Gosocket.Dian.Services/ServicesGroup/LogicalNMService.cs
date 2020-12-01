@@ -820,7 +820,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// </summary>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        public DianResponse SendNominaUpdateStatus(byte[] contentFile, string authCode)
+        //public async Task<DianResponse> SendNominaUpdateStatusAsync(byte[] contentFile, string authCode)
+        public DianResponse SendNominaUpdateStatusAsync(byte[] contentFile, string authCode)
         {
             var start = DateTime.UtcNow;
             var globalStart = DateTime.UtcNow;
@@ -890,30 +891,108 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 }
                 return dianResponse;
             }
-            
-            GlobalDocPayroll.NominaIndividualDeAjuste docReferenceAttorney = new GlobalDocPayroll.NominaIndividualDeAjuste(xmlParser.globalDocPayrolls.InformacionGeneral.CUNE, xmlParser.globalDocPayrolls.InformacionGeneral.CUNE)
+
+
+            GlobalDocPayroll docGlobalPayroll = new GlobalDocPayroll(xmlParser.globalDocPayrolls.CUNE, xmlParser.globalDocPayrolls.CUNE)
             {
-                CodigoQR = xmlParser.globalDocPayrolls.CodigoQR,
-                ComprobanteTotal = xmlParser.globalDocPayrolls.ComprobanteTotal,
-                Deducciones = xmlParser.globalDocPayrolls.Deducciones,
-                Devengados = xmlParser.globalDocPayrolls.Devengados,
-                DevengadosTotal = xmlParser.globalDocPayrolls.DevengadosTotal,
-                DeduccionesTotal = xmlParser.globalDocPayrolls.DeduccionesTotal,
-                Empleador = xmlParser.globalDocPayrolls.Empleador,
+                FechaIngreso = xmlParser.globalDocPayrolls.FechaIngreso,
+                FechaPagoInicio = xmlParser.globalDocPayrolls.FechaPagoInicio,
+                FechaGen = xmlParser.globalDocPayrolls.FechaGen,
+                FechaLiquidacion = xmlParser.globalDocPayrolls.FechaLiquidacion,
+                FechaPagoFin = xmlParser.globalDocPayrolls.FechaPagoFin,
                 ETag = xmlParser.globalDocPayrolls.ETag,
-                InformacionGeneral = xmlParser.globalDocPayrolls.InformacionGeneral,
-                LugarGeneracionXML = xmlParser.globalDocPayrolls.LugarGeneracionXML,
+                CodigoTrabajador = xmlParser.globalDocPayrolls.CodigoTrabajador,
+                Consecutivo = xmlParser.globalDocPayrolls.Consecutivo,
+                DepartamentoEstado = xmlParser.globalDocPayrolls.DepartamentoEstado,
+                Idioma = xmlParser.globalDocPayrolls.Idioma,
+                MunicipioCiudad = xmlParser.globalDocPayrolls.MunicipioCiudad,
+                Numero = xmlParser.globalDocPayrolls.Numero,
+                Pais = xmlParser.globalDocPayrolls.Pais,
+                Prefijo = xmlParser.globalDocPayrolls.Prefijo,
+                TiempoLaborado = xmlParser.globalDocPayrolls.TiempoLaborado,
+                Ambiente = xmlParser.globalDocPayrolls.Ambiente,
+                CodigoQR = xmlParser.globalDocPayrolls.CodigoQR,
+                CUNE = xmlParser.globalDocPayrolls.CUNE,
+                DV = xmlParser.globalDocPayrolls.DV,
+                EncripCUNE = xmlParser.globalDocPayrolls.EncripCUNE,
+                HoraGen = xmlParser.globalDocPayrolls.HoraGen,
+                Info_FechaGen = xmlParser.globalDocPayrolls.Info_FechaGen,
+                NIT = xmlParser.globalDocPayrolls.NIT,
+                SoftwareID = xmlParser.globalDocPayrolls.SoftwareID,
+                SoftwareSC = xmlParser.globalDocPayrolls.SoftwareSC,
+                TipoNomina = xmlParser.globalDocPayrolls.TipoNomina,
+                TipoMoneda = xmlParser.globalDocPayrolls.TipoMoneda,
+                Version = xmlParser.globalDocPayrolls.Version,
+                AFC = xmlParser.globalDocPayrolls.AFC,
+                AltoRiesgoPension = xmlParser.globalDocPayrolls.AltoRiesgoPension,
+                Banco = xmlParser.globalDocPayrolls.Banco,
+                BonificacionNS = xmlParser.globalDocPayrolls.BonificacionNS,
+                Cantidad = xmlParser.globalDocPayrolls.Cantidad,
+                Celular = xmlParser.globalDocPayrolls.Celular,
+                CodigoArea = xmlParser.globalDocPayrolls.CodigoArea,
+                CodigoCargo = xmlParser.globalDocPayrolls.CodigoCargo,
+                Correo = xmlParser.globalDocPayrolls.Correo,
+                CUNEPred = xmlParser.globalDocPayrolls.CUNEPred,
+                Deuda = xmlParser.globalDocPayrolls.Deuda,
+                DiasTrabajados = xmlParser.globalDocPayrolls.DiasTrabajados,
+                Emp_Celular = xmlParser.globalDocPayrolls.Emp_Celular,
+                Emp_Correo = xmlParser.globalDocPayrolls.Emp_Correo,
+                Emp_DepartamentoEstado = xmlParser.globalDocPayrolls.Emp_DepartamentoEstado,
+                Emp_Direccion = xmlParser.globalDocPayrolls.Emp_Direccion,
+                Emp_DV = xmlParser.globalDocPayrolls.Emp_DV,
+                Emp_MunicipioCiudad = xmlParser.globalDocPayrolls.Emp_MunicipioCiudad,
+                Emp_NIT = xmlParser.globalDocPayrolls.Emp_NIT,
+                Emp_Pais = xmlParser.globalDocPayrolls.Emp_Pais,
+                Emp_RazonSocial = xmlParser.globalDocPayrolls.Emp_RazonSocial,
+                FechaFin = xmlParser.globalDocPayrolls.FechaFin,
+                FechaGenPred = xmlParser.globalDocPayrolls.FechaGenPred,
+                FechaInicio = xmlParser.globalDocPayrolls.FechaInicio,
+                Forma = xmlParser.globalDocPayrolls.Forma,
+                FP_Deduccion = xmlParser.globalDocPayrolls.FP_Deduccion,
+                FP_Porcentaje = xmlParser.globalDocPayrolls.FP_Porcentaje,
+                FP_ValorBase = xmlParser.globalDocPayrolls.FP_ValorBase,
+                FSP_Deduccion = xmlParser.globalDocPayrolls.FSP_Deduccion,
+                FSP_Porcentaje = xmlParser.globalDocPayrolls.FSP_Porcentaje,
+                LugarTrabajoDepartamentoEstado = xmlParser.globalDocPayrolls.LugarTrabajoDepartamentoEstado,
+                LugarTrabajoDireccion = xmlParser.globalDocPayrolls.LugarTrabajoDireccion,
+                LugarTrabajoMunicipioCiudad = xmlParser.globalDocPayrolls.LugarTrabajoMunicipioCiudad,
+                LugarTrabajoPais = xmlParser.globalDocPayrolls.LugarTrabajoPais,
+                Metodo = xmlParser.globalDocPayrolls.Metodo,
+                NombreArea = xmlParser.globalDocPayrolls.NombreArea,
+                NombreCargo = xmlParser.globalDocPayrolls.NombreCargo,
                 Notas = xmlParser.globalDocPayrolls.Notas,
-                NumeroSecuenciaXML = xmlParser.globalDocPayrolls.NumeroSecuenciaXML,
+                NumeroCuenta = xmlParser.globalDocPayrolls.NumeroCuenta,
+                NumeroDocumento = xmlParser.globalDocPayrolls.NumeroDocumento,
+                NumeroPred = xmlParser.globalDocPayrolls.NumeroPred,
+                OtrosNombres = xmlParser.globalDocPayrolls.OtrosNombres,
                 Pago = xmlParser.globalDocPayrolls.Pago,
-                Periodo = xmlParser.globalDocPayrolls.Periodo,
-                ProveedorXML = xmlParser.globalDocPayrolls.ProveedorXML,
-                ReemplazandoPredecesor = xmlParser.globalDocPayrolls.ReemplazandoPredecesor,
-                SchemaLocation = xmlParser.globalDocPayrolls.SchemaLocation,
-                Trabajador = xmlParser.globalDocPayrolls.Trabajador,
-                Timestamp = new DateTime().ToUniversalTime()
+                PeriodoNomina = xmlParser.globalDocPayrolls.PeriodoNomina,
+                PrimerApellido = xmlParser.globalDocPayrolls.PrimerApellido,
+                PrimerNombre = xmlParser.globalDocPayrolls.PrimerNombre,
+                RetencionFuente = xmlParser.globalDocPayrolls.RetencionFuente,
+                Salario = xmlParser.globalDocPayrolls.Salario,
+                SalarioIntegral = xmlParser.globalDocPayrolls.SalarioIntegral,
+                SalarioTrabajado = xmlParser.globalDocPayrolls.SalarioTrabajado,
+                SegundoApellido = xmlParser.globalDocPayrolls.SegundoApellido,
+                SubTipoTrabajador = xmlParser.globalDocPayrolls.SubTipoTrabajador,
+                s_Deduccion = xmlParser.globalDocPayrolls.s_Deduccion,
+                s_Porcentaje = xmlParser.globalDocPayrolls.s_Porcentaje,
+                s_ValorBase = xmlParser.globalDocPayrolls.s_ValorBase,
+                TipoContrato = xmlParser.globalDocPayrolls.TipoContrato,
+                TipoCuenta = xmlParser.globalDocPayrolls.TipoCuenta,
+                TipoDocumento = xmlParser.globalDocPayrolls.TipoDocumento,
+                TipoTrabajador = xmlParser.globalDocPayrolls.TipoTrabajador,
+                Trab_CodigoTrabajador = xmlParser.globalDocPayrolls.Trab_CodigoTrabajador,
+                Timestamp = new DateTime()
             };
-            TableManagerGlobalDocPayroll.InsertOrUpdate(docReferenceAttorney);
+            //docReferenceAttorney.LugarGeneracionXML = new GlobalDocPayroll.NominaIndividualDeAjusteLugarGeneracionXML() 
+            //{
+            //    DepartamentoEstado = xmlParser.globalDocPayrolls.LugarGeneracionXML.DepartamentoEstado,
+            //    Idioma = xmlParser.globalDocPayrolls.LugarGeneracionXML.Idioma,
+            //    MunicipioCiudad = xmlParser.globalDocPayrolls.LugarGeneracionXML.MunicipioCiudad,
+            //    Pais = xmlParser.globalDocPayrolls.LugarGeneracionXML.Pais
+            //};
+
 
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
             DocumentParsed.SetValues(ref documentParsed);
@@ -924,9 +1003,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var docTypeCode = documentParsed.DocumentTypeId;
             var serie = documentParsed.Serie;
             var serieAndNumber = documentParsed.SerieAndNumber;
-            var trackId = "67890";
+            var trackId = xmlParser.globalDocPayrolls.CUNE;
             var eventCode = documentParsed.ResponseCode;
-            var trackIdCude = "67890";
+            var trackIdCude = xmlParser.globalDocPayrolls.CUNE;  
             var receiverCode = documentParsed.ReceiverCode;
             var signingTime = xmlParser.SigningTime;
             var customizationID = documentParsed.CustomizationId;
@@ -935,8 +1014,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE 3
             start = DateTime.UtcNow;
 
+            //var validatorCuneRequest = validatorCune(trackId);
+
             var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = "11", trackId, eventNomina = true };
-            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
+            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>("http://localhost:7071/api/UploadXml", uploadXmlRequest);
             if (!uploadXmlResponse.Success)
             {
                 //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
@@ -1087,20 +1168,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     TableManagerGlobalLogger.InsertOrUpdateAsync(unzip),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(parser),
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(auth),
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(duplicity),
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(upload),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validate),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(application),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone1),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone2),
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(zone3),
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(mapper),
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(validateSerie),
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(validateEventCode),
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(validateParty),
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(validateSinginTime)
+                    TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll)
                 };
+
                 if (dianResponse.IsValid && !existDocument)
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
 
@@ -1118,6 +1192,32 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
         }
 
+        public DianResponse validatorCune(string trackId)
+        {
+            var data = new { trackId };
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateCune", new { trackId });
+            DianResponse response = new DianResponse();
+            if (validations.Count > 0)
+            {
+                response = new DianResponse()
+                {
+                    StatusMessage = validations[0].ErrorMessage,
+                    StatusCode = Properties.Settings.Default.Code_89,
+                    IsValid = validations[0].IsValid
+                };
+                response.ErrorMessage = new List<string>();
+                if (!response.IsValid)
+                {
+                    foreach (var item in validations)
+                    {
+                        response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                    }
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                }
+            }
+            return response;
+        }
+
         private void UpdateInTransactions(string trackId, string eventCode)
         {
             //validation if is an endoso of endorsement (Code 038)
@@ -1131,19 +1231,18 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
         }
 
-        public bool ValdiateWorkedCode(GlobalDocPayroll.NominaIndividualDeAjuste globaldoc)
+        public bool ValdiateWorkedCode(GlobalDocPayroll globaldoc)
         {
-            
-            var codJob = globaldoc.Trabajador.CodigoTrabajador;
-            var numDoc = Convert.ToString(globaldoc.Trabajador.NumeroDocumento).Length;
-            var codArea = globaldoc.Trabajador.CodigoArea;
-            var codCargo = globaldoc.Trabajador.CodigoCargo;
+            var codJob = globaldoc.CodigoTrabajador;
+            var numDoc = Convert.ToString(globaldoc.NumeroDocumento).Length;
+            var codArea = globaldoc.CodigoArea;
+            var codCargo = globaldoc.CodigoCargo;
 
             var subCodJob = codJob.ToString().Substring(0, numDoc);
             var subCodArea = codJob.ToString().Substring(numDoc, 2);
             var subCodCargo = codJob.ToString().Substring(numDoc + 2, 2);
 
-            var vNumbDoc = Int32.Parse(subCodJob) == Convert.ToInt32(globaldoc.Trabajador.NumeroDocumento) ? true : false;
+            var vNumbDoc = Int32.Parse(subCodJob) == Convert.ToInt32(globaldoc.NumeroDocumento) ? true : false;
             var vCodArea = Int32.Parse(subCodArea) == Convert.ToInt32(codArea) ? true : false;
             var vCodCargo = Int32.Parse(subCodCargo) == Convert.ToInt32(codCargo) ? true : false;
 
