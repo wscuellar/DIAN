@@ -84,7 +84,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Comments = t.Comments,
                     CreatedBy = t.CreatedBy,
                     Status = t.RadianContributorFileStatus?.Name,
-                    Updated = t.Timestamp
+                    Updated = t.Timestamp.ToString("yyyy-MM-dd")
                 }).ToList()
             };
             model.FileHistories = resultH;
@@ -382,7 +382,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Comments = t.Comments,
                     CreatedBy = t.CreatedBy,
                     Status = t.RadianContributorFileStatus?.Name,
-                    Updated = t.Timestamp
+                    Updated = t.Timestamp.ToString("yyyy-MM-dd")
                 }).ToList()
             };
             return Json(result, JsonRequestBehavior.AllowGet);

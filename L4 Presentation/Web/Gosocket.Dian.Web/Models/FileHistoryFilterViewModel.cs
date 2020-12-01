@@ -22,7 +22,7 @@ namespace Gosocket.Dian.Web.Models
     public class FileHistoryItemViewModel
     {
         public string FileName { get; set; }
-        public DateTime Updated { get; set; }
+        public string Updated { get; set; }
         public string CreatedBy { get; set; }
         public string Status { get; set; }
         public string Comments { get; set; }
