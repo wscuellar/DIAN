@@ -94,7 +94,7 @@ function AlertExec(operation) {
 }
 
 
-function ajaxFunction(url,metod,data,actionError,actionSuccess) {
+function ajaxFunction(url,metod,data,actionError,actionSuccess) {debugger
     $.ajax({
         url: url,
         type: metod,
