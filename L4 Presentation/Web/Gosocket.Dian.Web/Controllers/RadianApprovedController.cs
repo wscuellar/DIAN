@@ -73,9 +73,22 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
             model.CustomerTotalCount = customers.RowCount;
 
-            var filesHistories = _radianAprovedService.FileHistoryFilter(string.Empty, string.Empty, string.Empty, 1, 10);
-            model.FileHistories = filesHistories.Results;
-            model.FileHistoriesRowCount = filesHistories.RowCount;
+            var data = _radianAprovedService.FileHistoryFilter(string.Empty, string.Empty, string.Empty, 1, 10);
+            FileHistoryListViewModel resultH = new FileHistoryListViewModel()
+            {
+                Page = 1,
+                RowCount = data.RowCount,
+                items = data.Results.Select(t => new FileHistoryItemViewModel()
+                {
+                    FileName = t.FileName,
+                    Comments = t.Comments,
+                    CreatedBy = t.CreatedBy,
+                    Status = t.RadianContributorFileStatus?.Name,
+                    Updated = t.Timestamp
+                }).ToList()
+            };
+            model.FileHistories = resultH;
+            model.FileHistoriesRowCount = data.RowCount;
             
             if ((int)registrationData.RadianOperationMode == 2)
             {
