@@ -106,8 +106,9 @@ function RenderTable(paramsObject) {
             }
         }
     });
-    $(paramsObject.element+"_filter > label").hide();
-    $(paramsObject.element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(paramsObject.page, paramsObject.customersTotalCount));
+    $(paramsObject.element + "_filter > label").hide();
+    debugger
+    $(paramsObject.element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.page, paramsObject.customersTotalCount));
     $(paramsObject.element + "_filter").append(paramsObject.form);
     LoadEventsToSearch(paramsObject);
     LoadEventsToPagiantion(paramsObject);
@@ -121,7 +122,7 @@ function LoadEventsToSearch(paramsObject) {
     })
 }
 
-function SearchData(paramsObject) {debugger
+function SearchData(paramsObject) {
     const cloneAjaxData = Object.assign({}, paramsObject.ajaxData);
     var arrayToMap = Object.entries(paramsObject.ajaxData);
     arrayToMap.forEach((element) => {
@@ -138,20 +139,20 @@ function SearchData(paramsObject) {debugger
     ajaxFunction(paramsObject.urlSearch, 'POST', paramsObject.ajaxData, actionError, actionSuccess);
 }
 
-function LoadEventsToPagiantion(paramsObject) {
+function LoadEventsToPagiantion(paramsObject) {debugger
     $(".next-page").click(function () {
-        paramsObject.page = parseInt($("#PageTable").val()) + 1;
-        $("#PageTable").val(paramsObject.page);
+        paramsObject.page = paramsObject.page + 1;
+        paramsObject.ajaxData.page = paramsObject.page
         SearchData(paramsObject);
     });
-    $(".prev-page").click(function () {
-        paramsObject.page = parseInt($("#PageTable").val()) + 1;
-        $("#PageTable").val(paramsObject.page);
+    $(".prev-page").click(function () {debugger
+        paramsObject.page = paramsObject.page - 1;
+        paramsObject.ajaxData.page = paramsObject.page
         SearchData(paramsObject);
     });
 }
 
-function TablePagination(page, totalCount) {
+function TablePagination(page, totalCount) {debugger
     var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : ""; 
     var disabledPrev = page == 1 ? 'disabled="disabled"' : "";
     var html = '<div class="pagination-controls pull-right"><span class="text-muted">\
