@@ -107,7 +107,6 @@ function RenderTable(paramsObject) {
         }
     });
     $(paramsObject.element + "_filter > label").hide();
-    debugger
     $(paramsObject.element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.page, paramsObject.customersTotalCount));
     $(paramsObject.element + "_filter").append(paramsObject.form);
     LoadEventsToSearch(paramsObject);
@@ -139,20 +138,20 @@ function SearchData(paramsObject) {
     ajaxFunction(paramsObject.urlSearch, 'POST', paramsObject.ajaxData, actionError, actionSuccess);
 }
 
-function LoadEventsToPagiantion(paramsObject) {debugger
+function LoadEventsToPagiantion(paramsObject) {
     $(".next-page").click(function () {
         paramsObject.page = paramsObject.page + 1;
         paramsObject.ajaxData.page = paramsObject.page
         SearchData(paramsObject);
     });
-    $(".prev-page").click(function () {debugger
+    $(".prev-page").click(function () {
         paramsObject.page = paramsObject.page - 1;
         paramsObject.ajaxData.page = paramsObject.page
         SearchData(paramsObject);
     });
 }
 
-function TablePagination(page, totalCount) {debugger
+function TablePagination(page, totalCount) {
     var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : ""; 
     var disabledPrev = page == 1 ? 'disabled="disabled"' : "";
     var html = '<div class="pagination-controls pull-right"><span class="text-muted">\
