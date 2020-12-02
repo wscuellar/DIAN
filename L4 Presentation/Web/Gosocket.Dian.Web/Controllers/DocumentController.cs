@@ -689,11 +689,18 @@ namespace Gosocket.Dian.Web.Controllers
                 }).ToList();
 
                 foreach (DocumentViewModel docView in model.Documents)
-                    docView.RadianStatusName = DeterminateRadianStatus(docView.Events);
+                    docView.RadianStatusName = DeterminateRadianStatus(docView.Events, model.DocumentTypeId);
             }
 
             if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
                 model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
+
+            if (model.RadianStatus == 8)
+            {
+                string statusName = model.RadianStatusList.First(rl => rl.Code.Equals(model.RadianStatus.ToString())).Name.ToUpper();
+                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(statusName,StringComparison.OrdinalIgnoreCase));
+            }
+             
 
             if (model.RadianStatus != 0)
             {
@@ -707,7 +714,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View("Index", model);
         }
 
-        private string DeterminateRadianStatus(List<EventViewModel> events)
+        private string DeterminateRadianStatus(List<EventViewModel> events, string documentTypeId)
         {
             if (events.Count() == 0)
                 return "NO APLICA";
@@ -734,6 +741,10 @@ namespace Gosocket.Dian.Web.Controllers
                 && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Receipt.ToString()))
                 && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Accepted.ToString())))
                 return "TÍTULO VALOR";
+
+            if(documentTypeId =="01")
+                return "FACTURA ELECTRONICA";
+
 
             return "NO APLICA";
         }
