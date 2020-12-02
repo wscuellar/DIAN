@@ -9,6 +9,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
     public class CuneModel
     {
         public string Cune { get; set; }
+        public string SoftwareId { get; set; }
         public string NumNIE { get; set; }
 
         public string FecNIE { get; set; }

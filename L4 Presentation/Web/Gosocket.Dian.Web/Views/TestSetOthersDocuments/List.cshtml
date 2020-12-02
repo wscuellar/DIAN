@@ -16,38 +16,43 @@
     <!--Bootstrap Select [ OPTIONAL ]-->
     <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
-
+    <style>
+    </style>
 }
 
 <div class="page-content margin-15">
-    <div class="row margin-horizontal-0">
+    <div class="row title-container" style="margin-left: 1px;">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="row margin-horizontal-0" style="margin-top: 37px;">
         <div class="tab-base">
-            <!--Tabs Content-->
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
                     <div class="panel">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">@ViewBag.Title</h3>
-                        </div>
 
                         <div class="panel-body padding-top-20">
-                            @if (User.IsInAnyRole("Administrador", "Super"))
-                            {
-                                <div class="pad-btm form-inline padding-bottom-0">
-                                    <div class="row margin-horizontal-0">
-                                        <div class="col-md-10 table-toolbar-left padding-left-0">
-                                            <a href="@Url.Action("Add", "TestSetOthersDocuments")" class="btn btn-default btn-default btn-hover-gosocket btn-labeled fa fa-plus margin-right-10">Agregar Set de Pruebas - Otros documentos</a>
-                                        </div>
+                            <div class="padding-0 padding-bottom-30" style="border: 1px solid #348441">
+                                @if (User.IsInAnyRole("Administrador", "Super"))
+                                {
+                                    <div class="form-inline padding-bottom-0">
+                                        <div class="row margin-horizontal-0">
+                                            <div class="col-md-12 table-toolbar-left padding-left-0 button-top-left-radian">
+                                                <a href="@Url.Action("Add", "TestSetOthersDocuments")" class="btn btn-success btn-radian-success pull-right">Configurar Nuevo Set de Pruebas</a>
+                                            </div>
 
-                                        <div class="col-md-2 table-toolbar-right padding-right-0">
+                                            <div class="col-md-2 table-toolbar-right padding-right-0">
 
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            }
+                                }
 
-                            @Html.Partial("_items")
+                                @Html.Partial("_items")
 
+                            </div>
                         </div>
                     </div>
                 </div>
