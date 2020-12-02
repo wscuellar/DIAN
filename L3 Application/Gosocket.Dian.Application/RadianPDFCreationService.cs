@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application
 {
-    public class RadianPDFCreationService : IRadianPDFCreationService
+    public class RadianPdfCreationService : IRadianPdfCreationService
     {
         #region Properties
 
@@ -27,7 +27,7 @@ namespace Gosocket.Dian.Application
 
         #region Constructor
 
-        public RadianPDFCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager)
+        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
@@ -68,9 +68,7 @@ namespace Gosocket.Dian.Application
             string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
             string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
 
-
             // Mapping Labels common data
-
             templateFirstPage = CommonDataTemplateMapping(templateFirstPage, expeditionDate, page, documentMeta);
 
             // Mapping firts page
