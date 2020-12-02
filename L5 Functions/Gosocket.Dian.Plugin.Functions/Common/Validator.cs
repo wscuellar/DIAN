@@ -397,13 +397,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Sender
             var sender = GetContributorInstanceCache(senderCode);
             string senderDvErrorCode = "FAJ24";
-            if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
+            string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
+            if (documentMeta.DocumentTypeId == "05")
+            {
+                senderDvErrorCode = "DSAJ24b";
+                senderDvrErrorDescription = "El DV del NIT no es correcto";
+            }
+            else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
             else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
             else if (documentMeta.DocumentTypeId == "96") senderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ24;
             if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
             if ((documentMeta.EventCode=="037" && nitModel.listID=="2") || ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-            else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = senderDvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             // Sender2
             GlobalContributor sender2 = null;
@@ -422,7 +428,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             // Software provider
             string softwareproviderDvErrorCode = "FAB22";
-            if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
+            if (documentMeta.DocumentTypeId == "05") softwareproviderDvErrorCode = "DSAB22b";
+            else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
             else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
             var softwareProvider = (documentMeta.DocumentTypeId == "96") ? GetContributorInstanceCache(providerCode) : GetContributorInstanceCache(softwareProviderCode);
@@ -433,7 +440,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareproviderDvErrorCode, ErrorMessage = "DV del NIT del Prestador de Servicios no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             string senderErrorCode = "FAJ21";
-            if (documentMeta.DocumentTypeId == "91") senderErrorCode = "CAJ21";
+            if (documentMeta.DocumentTypeId == "05") senderErrorCode = "DSAJ21";
+            else if (documentMeta.DocumentTypeId == "91") senderErrorCode = "CAJ21";
             else if (documentMeta.DocumentTypeId == "92") senderErrorCode = "DAJ21";
             else if (documentMeta.DocumentTypeId == "96") senderErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ21;
 
@@ -443,7 +451,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "96") sender2ErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ44;
 
             string softwareProviderErrorCode = "FAB19b";
-            if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
+            if (documentMeta.DocumentTypeId == "05") softwareProviderErrorCode = "DSAB19b";
+            else if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
             else if (documentMeta.DocumentTypeId == "92") softwareProviderErrorCode = "DAB19b";
             else if (documentMeta.DocumentTypeId == "96") softwareProviderErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB19b;
 
