@@ -205,10 +205,54 @@ namespace Gosocket.Dian.Application
 
         public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, string url, string softwareName, string pin, string createdBy)
         {
+            int result = 0;
             if (!string.IsNullOrEmpty(softwareName))
                 radianContributorOperation.SoftwareId = _radianCallSoftwareService.CreateSoftware(radianContributorOperation.RadianContributorId, softwareName, url, pin, createdBy);
+
             RadianContributorOperation existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == radianContributorOperation.SoftwareId && !t.Deleted);
-            return (existingsoft == null) ? _radianContributorOperationRepository.Add(radianContributorOperation) : 0;
+            if (existingsoft == null)
+                result = _radianContributorOperationRepository.Add(radianContributorOperation);
+
+            if (result > 0)
+            {
+                RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorOperation.RadianContributorId);
+                RadianTestSet testSet = _radianTestSetService.GetTestSet(radianContributor.RadianContributorTypeId.ToString(), radianContributor.RadianContributorTypeId.ToString());
+                if (testSet != null)
+                {
+                    Contributor contributor = radianContributor.Contributor;
+                    string key = radianContributor.RadianContributorTypeId.ToString() + "|" + radianContributorOperation.SoftwareId;
+                    RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
+                    {
+                        TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
+                        ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
+                        ReceiptServiceTotalRequired = testSet.ReceiptServiceTotalAcceptedRequired,
+                        ExpressAcceptanceTotalRequired = testSet.ExpressAcceptanceTotalAcceptedRequired,
+                        AutomaticAcceptanceTotalRequired = testSet.AutomaticAcceptanceTotalAcceptedRequired,
+                        RejectInvoiceTotalRequired = testSet.RejectInvoiceTotalAcceptedRequired,
+                        ApplicationAvailableTotalRequired = testSet.ApplicationAvailableTotalRequired,
+                        ApplicationAvailableTotalAcceptedRequired = testSet.ApplicationAvailableTotalAcceptedRequired,
+                        EndorsementTotalRequired = testSet.EndorsementTotalRequired,
+                        EndorsementTotalAcceptedRequired = testSet.EndorsementTotalAcceptedRequired,
+                        EndorsementCancellationTotalRequired = testSet.EndorsementCancellationTotalRequired,
+                        EndorsementCancellationTotalAcceptedRequired = testSet.EndorsementCancellationTotalAcceptedRequired,
+                        GuaranteeTotalRequired = testSet.GuaranteeTotalRequired,
+                        GuaranteeTotalAcceptedRequired = testSet.GuaranteeTotalAcceptedRequired,
+                        ElectronicMandateTotalRequired = testSet.ElectronicMandateTotalRequired,
+                        ElectronicMandateTotalAcceptedRequired = testSet.ElectronicMandateTotalAcceptedRequired,
+                        EndMandateTotalRequired = testSet.EndMandateTotalRequired,
+                        EndMandateTotalAcceptedRequired = testSet.EndMandateTotalAcceptedRequired,
+                        PaymentNotificationTotalRequired = testSet.PaymentNotificationTotalRequired,
+                        PaymentNotificationTotalAcceptedRequired = testSet.PaymentNotificationTotalAcceptedRequired,
+                        CirculationLimitationTotalRequired = testSet.CirculationLimitationTotalRequired,
+                        CirculationLimitationTotalAcceptedRequired = testSet.CirculationLimitationTotalAcceptedRequired,
+                        EndCirculationLimitationTotalRequired = testSet.EndCirculationLimitationTotalRequired,
+                        EndCirculationLimitationTotalAcceptedRequired = testSet.EndCirculationLimitationTotalAcceptedRequired
+                    };
+                    _ = _radianTestSetResultService.InsertTestSetResult(setResult);
+                }
+            }
+
+            return result;
         }
 
         public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
@@ -242,6 +286,11 @@ namespace Gosocket.Dian.Application
                 list.AddRange(source.Where(t => t.RadianSoftwareStatusId == softwareStatus));
                 return list;
             }).Distinct().ToList();
+        }
+
+        public RadianSoftware GetSoftware(Guid id)
+        {
+            return _radianCallSoftwareService.Get(id);
         }
 
         public List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
@@ -279,8 +328,6 @@ namespace Gosocket.Dian.Application
 
             return customers;
         }
-<<<<<<< HEAD
-=======
 
         public PagedResult<RadianContributorFileHistory> FileHistoryFilter(string fileName, string initial, string end, int page, int pagesize)
         {
@@ -297,6 +344,5 @@ namespace Gosocket.Dian.Application
             return _radianContributorFileHistoryRepository.List(t => true, page, pagesize);
         }
 
->>>>>>> b0be498704ad62d14476f2711232abbe156d8e0d
     }
 }

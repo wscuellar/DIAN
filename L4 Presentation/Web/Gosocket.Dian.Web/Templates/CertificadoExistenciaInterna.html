@@ -3,6 +3,118 @@
 <head>
     <meta charset="utf-8" />
     <title></title>
+    <style>
+        body {
+            font-family: Arial;
+            font-style: normal;
+            word-wrap: break-word;
+        }
+
+        a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #028BB8;
+        }
+
+        .event {
+            margin-top: 20px;
+        }
+
+        .header {
+            position: relative;
+            height: 47px;
+            left: 0px;
+            top: 0px;
+        }
+
+            .header img {
+                position: relative;
+                height: 24px;
+                margin: 10px 18px 13px;
+                float: right;
+            }
+
+        .check {
+            margin-bottom: 6px;
+        }
+
+        .text-green {
+            color: #348441;
+        }
+
+        .text-small {
+            font-family: Arial;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 11px;
+        }
+
+        .text-margin-01 {
+            margin-top: 10px;
+            margin-left: 20px;
+        }
+
+        .text-margin-02 {
+            margin-top: 5px;
+            margin-left: 20px;
+        }
+
+        .text-header {
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 16px;
+        }
+
+        .text-centered {
+            text-align: center;
+        }
+
+        .text-info {
+            font-weight: normal;
+            font-size: 12px;
+            line-height: 14px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-weight: 500;
+            font-size: 12px;
+            line-height: 14px;
+        }
+
+        .subtext {
+            padding-bottom: 10px;
+        }
+
+        .padding-line {
+            padding: 0 0 12px 0;
+        }
+
+        .container-info {
+            margin: 20px;
+            display: flex;
+        }
+
+        .container-div {
+            width: 50%;
+        }
+
+        .separator {
+            width: 90%;
+        }
+
+        .separator-green {
+            border-color: #62C7AB;
+        }
+
+        .footer-close {
+            font-weight: normal;
+            font-size: 8px;
+            line-height: 9px;
+            text-align: center;
+        }
+    </style>
+
 </head>
 <body>
     <header class="header">
@@ -67,7 +179,7 @@
                             Fecha de generación de la factura electrónica de Venta:(fecha de la firma electrónica):
                         </div>
                         <div class="text-info">
-                            {EInvoiceGenerationDate}
+                            2020-10-14 14:18:47.190 UTC-5
                         </div>
                     </div>
                     <div class="subtext">
@@ -85,7 +197,7 @@
             <!-- ZONA CONTENIDO EVENTOS -->
             <div class="event">
                 <div class="text-centered text-header">
-                    <span style="color:#747474">EVENTO {EventNumber}:</span> {DocumentTypeName}
+                    <span style="color:#747474">EVENTO {EventNumber1}:</span> VALIDACIÓN DE LA FACTURA ELECTRÓNICA DE VENTA
                 </div>
                 <hr class="separator" />
                 <div>
@@ -93,10 +205,10 @@
                         <div class="container-div">
                             <div class="subtext">
                                 <div class="subtitle">
-                                    CUDE:
+                                    CUFE:
                                 </div>
                                 <div class="text-info">
-                                    {CUDE}
+                                    {CUFE}
                                 </div>
                             </div>
                             <div class="subtext">
@@ -112,9 +224,6 @@
                             <div class="subtext">
                                 <div class="subtitle">
                                     PERSONAS QUE INTERVIENEN EN EL EVENTO:
-                                </div>
-                                <div class="text-info">
-                                    {SenderBusinessName}
                                 </div>
                                 <div>
                                     <strong>ENTIDAD QUE VALIDA EL EVENTO:</strong>
@@ -154,7 +263,7 @@
             </div>
             <div class="event">
                 <div class="text-centered text-header">
-                    <span style="color:#747474">EVENTO {EventNumber1}:</span> {DocumentTypeName1}
+                    <span style="color:#747474">EVENTO {EventNumber2}:</span> VALIDACIÓN DE LA FACTURA ELECTRÓNICA DE VENTA
                 </div>
                 <hr class="separator" />
                 <div>
@@ -162,10 +271,10 @@
                         <div class="container-div">
                             <div class="subtext">
                                 <div class="subtitle">
-                                    CUDE:
+                                    CUFE:
                                 </div>
                                 <div class="text-info">
-                                    {CUDE1}
+                                    {CUFE}
                                 </div>
                             </div>
                             <div class="subtext">
@@ -173,7 +282,7 @@
                                     FECHA DE VALIDACIÓN:
                                 </div>
                                 <div class="text-info">
-                                    {ValidationDate1}
+                                    ***2020-10-14 14:18:47.190 UTC-5
                                 </div>
                             </div>
                         </div>
@@ -182,14 +291,11 @@
                                 <div class="subtitle">
                                     PERSONAS QUE INTERVIENEN EN EL EVENTO:
                                 </div>
-                                <div class="text-info">
-                                    {SenderBusinessName1}
-                                </div>
                                 <div>
                                     <strong>ENTIDAD QUE VALIDA EL EVENTO:</strong>
                                 </div>
                                 <div class="text-info">
-                                    UNIDAD ADMINISTRATIVA ESPECIAL DE IMPUESTOS Y ADUANAS NACIONALES.
+                                    ***UNIDAD ADMINISTRATIVA ESPECIAL DE IMPUESTOS Y ADUANAS NACIONALES.
                                 </div>
                             </div>
                             <div class="subtext">
@@ -197,7 +303,7 @@
                                     RECEPTOR DEL EVENTO:
                                 </div>
                                 <div class="text-info">
-                                    {ReceiverBusinessName1}
+                                    ***BAVARIA & CIA S. C. A.
                                 </div>
                             </div>
                         </div>

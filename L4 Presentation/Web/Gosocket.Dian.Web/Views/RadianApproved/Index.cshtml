@@ -27,7 +27,7 @@
         <div class="underline-title"></div>
     </div>
     <div class="row margin-horizontal-0 margin-top-50">
-        <div class="panel" data-target="#panel-form" data-toggle="panel-overlay">
+        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
             <div class="panel-body padding-top-20">
                 @if (operationMode == "2")
                 {
@@ -91,16 +91,17 @@
 
     <script>
         $(document).ready(function () {
+            //howLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
 
-            var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
-            RenderSteps(index);
+        var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
+        RenderSteps(index);
 
 
-            $(".show-history").click(function () {
+        $(".show-history").click(function () {
                 var page = @Model.PageTable;
                 var element = '#table-history';
                 var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
-                var urlSearch = '@Url.Action("filesHistoryList", "RadianApproved")';
+                var urlSearch = '@Url.Action("FileHistoyList", "RadianApproved")';
                 var form = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_formSearchHistory").ToString().Trim('"'))));
                 var radianId = "@Model.Contributor.RadianContributorId";
                 var dialog = bootbox.dialog({
@@ -109,8 +110,8 @@
                     size: 'large'
                 });
                 dialog.init(function (e) {
-                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.Customers))');
-                    var customersTotalCount = @Model.CustomerTotalCount;
+                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.FileHistories.items))');
+                    var customersTotalCount = @Model.FileHistoriesRowCount;
                     var columns = [
                         { data: 'FileName' },
                         { data: 'Updated' },
@@ -118,7 +119,26 @@
                         { data: 'Status' },
                         { data: 'Comments' }
                     ]
-                    RenderTable(element, dataTable, form, urlSearch, radianId, page, null, customersTotalCount, columns);
+                    var ajaxData = {
+                        FileName: "#NameSearch",
+                        Initial: "#dateFrom",
+                        End: "#dateTo",
+                        Page: page,
+                        PageSize: 10
+                    };
+                    var paramsObject = {
+                        element: element,
+                        data: dataTable,
+                        form: form,
+                        urlSearch: urlSearch,
+                        radianId: radianId,
+                        page: page,
+                        tableRendered: null,
+                        customersTotalCount: customersTotalCount,
+                        columns: columns,
+                        ajaxData: ajaxData
+                    }
+                    RenderTable(paramsObject);
                 })
             });
 
@@ -255,23 +275,39 @@
                         { data: 'BussinessName' },
                         { data: 'RadianState' }
                     ]
-                    RenderTable(element, dataTable, form, urlSearch, radianId, page, null, customersTotalCount, columns);
+                    var ajaxData = {
+                        radianContributorId: @Model.Contributor.RadianContributorId,
+                        code: "#NitSearch",
+                        radianState: "#RadianStateSelect",
+                        page: page,
+                        pagesize: 10
+                    };
+                    var paramsObject = {
+                        element: element,
+                        data: dataTable,
+                        form: form,
+                        urlSearch: urlSearch,
+                        radianId: radianId,
+                        page: page,
+                        tableRendered: null,
+                        customersTotalCount: customersTotalCount,
+                        columns: columns,
+                        ajaxData: ajaxData
+                    }
+                    RenderTable(paramsObject);
                 })
         });
 
         $(".cancel-register").click(function () {
-                var url = "@Url.Action("DeleteUser", "RadianApproved")";
-                var confirmationMessage = bootboxMessage.CONFIRMATION_MESSAGE;
-                var successAction = () => window.location.href = '@Url.Action("Index", "Radian")';
-                var dataAjax = {
+                var cancelData = {
+                    url: "@Url.Action("DeleteUser", "RadianApproved")",
+                    href: '@Url.Action("Index", "Radian")',
                     id: '@Model.ContributorId',
-                    newState: '4',
-                    radianContributorTypeId: @Model.RadianContributorTypeId,
-                    radianState: '@Model.RadianState'
+                    type: @Model.RadianContributorTypeId,
+                    state: '@Model.RadianState'
                 };
-                var label = bootboxMessage.CANCEL_DESCRIPTION;
-                CancelRegister(url, dataAjax, confirmationMessage, successAction, label);
-            });
+                cancelRegister(cancelData);
+        });
 
      });
 
