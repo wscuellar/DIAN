@@ -309,12 +309,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var xmlParser = new XmlParseNomina(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
+            CuneModel cmObject = new CuneModel();
+            cmObject.Cune = xmlParser.globalDocPayrolls.CUNE;
+            cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
 
-            var objCune = xmlParser.Fields.ToObject<CuneModel>();
+            cmObject.FecNIE = xmlParser.globalDocPayrolls.FechaGen.ToString("yyyy-MM-dd");
+            cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen.ToString("HH:MM:ss");
+            cmObject.SoftwareId = xmlParser.globalDocPayrolls.SoftwareID;
+            cmObject.ValDesc = Convert.ToString(xmlParser.globalDocPayrolls.deduccionesTotal);
+            cmObject.ValTol = Convert.ToString(xmlParser.globalDocPayrolls.comprobanteTotal);
+            cmObject.ValDev = Convert.ToString(xmlParser.globalDocPayrolls.devengadosTotal);
+            cmObject.NitNIE = Convert.ToString(xmlParser.globalDocPayrolls.Emp_NIT);
+            cmObject.DocEmp = Convert.ToString(xmlParser.globalDocPayrolls.NumeroDocumento);
+            cmObject.TipAmb = Convert.ToString(xmlParser.globalDocPayrolls.Ambiente);
+
 
             // Validator instance
             var validator = new Validator();
-            validateResponses.Add(validator.ValidateCune(objCune, cune));
+            validateResponses.Add(validator.ValidateCune(cmObject, cune));
             return validateResponses;
         }
 
