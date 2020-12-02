@@ -459,7 +459,7 @@ namespace Gosocket.Dian.Web.Services
                 }
 
                 if (!contentFile.ZipContainsXmlFiles())
-                {                
+                {
                     Log($"{authCode} {email} SendEventUpdateStatus", (int)InsightsLogType.Error, $"Archivo ZIP no contiene XML's.");
                     return new DianResponse { StatusCode = "89", StatusDescription = $"Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML válido." };
                 }
@@ -501,12 +501,18 @@ namespace Gosocket.Dian.Web.Services
             catch (Exception ex)
             {
                 Log("SendEventUpdateStatus", (int)InsightsLogType.Error, ex.Message);
-                var exception = new GlobalLogger($"SendEventUpdateStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) 
+                var exception = new GlobalLogger($"SendEventUpdateStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString())
                 { Action = $"SendEventUpdateStatus", Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(exception);
 
-                return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", 
-                    XmlFileName = "SendEventUpdateStatus", IsValid = false, StatusMessage = "Documento XML ApplicationResponse " + ex.Message };
+                return new DianResponse
+                {
+                    StatusCode = "500",
+                    StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.",
+                    XmlFileName = "SendEventUpdateStatus",
+                    IsValid = false,
+                    StatusMessage = "Documento XML ApplicationResponse " + ex.Message
+                };
             }
         }
 
@@ -545,7 +551,7 @@ namespace Gosocket.Dian.Web.Services
                 {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
-                    var result = customerNomina.SendNominaUpdateStatus(contentFile, authCode);
+                    var result = customerNomina.SendNominaUpdateStatusAsync(contentFile, authCode);
 
                     var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
                     if (!exist && result.IsValid && result.XmlBase64Bytes != null)
