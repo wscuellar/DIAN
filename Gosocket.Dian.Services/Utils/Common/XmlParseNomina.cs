@@ -80,13 +80,16 @@ namespace Gosocket.Dian.Services.Utils.Common
                     XmlDocument.XmlResolver = null;
                     XmlDocument.Load(sr);
                     var node = XmlDocument.GetElementsByTagName("xades:SigningTime")[0];
-                    // Create an instance of a serializer
-                    //var serializer = new XmlSerializer(typeof(GlobalDocPayroll.NominaIndividualDeAjuste));
-                    //Console.WriteLine(String.Format("{0}", sr.ReadToEnd()));
-                    //using (TextReader reader = new StringReader(XmlDocument.OuterXml))
-                    //{
-                    //    globalDocPayrolls = (GlobalDocPayroll.NominaIndividualDeAjuste)serializer.Deserialize(reader);
-                    //}
+                    var nodeDevengadoTotal = "//*[local-name()='DevengadosTotal']";
+                    var nodeDeduccionTotal = "//*[local-name()='DeduccionesTotal']";
+                    var nodeComprobanteTotal = "//*[local-name()='ComprobanteTotal']";
+                    var nodeNotas = "//*[local-name()='Notas']";
+
+                    globalDocPayrolls.devengadosTotal = Convert.ToDecimal(XmlDocument.SelectSingleNode(nodeDevengadoTotal)?.InnerText);
+                    globalDocPayrolls.deduccionesTotal = Convert.ToDecimal(XmlDocument.SelectSingleNode(nodeDeduccionTotal)?.InnerText);
+                    globalDocPayrolls.comprobanteTotal = Convert.ToDecimal(XmlDocument.SelectSingleNode(nodeComprobanteTotal)?.InnerText);
+                    globalDocPayrolls.Notas = XmlDocument.SelectSingleNode(nodeNotas)?.InnerText;
+
                     // Load xml document.
                     XmlNodeList xPersonas = XmlDocument.GetElementsByTagName("Periodo");
                     for (int i = 0; i < xPersonas.Count; i++) {
