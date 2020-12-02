@@ -240,7 +240,7 @@
                     className: "table-data modal-radian",
                     size: 'large'
                 });
-                dialog.init(function (e) {debugger
+                dialog.init(function (e) {
                     var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.Customers))');
                     var customersTotalCount = @Model.CustomerTotalCount;
                     var columns = [
