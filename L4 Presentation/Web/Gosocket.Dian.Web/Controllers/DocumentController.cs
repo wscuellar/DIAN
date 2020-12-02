@@ -6,6 +6,7 @@ using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
+using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Filters;
@@ -37,6 +38,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
+        private readonly IRadianPdfCreationService _radianPdfCreationService;
 
         private List<DocValidatorTrackingModel> GetValidatedRules(string trackId)
         {
@@ -53,6 +55,11 @@ namespace Gosocket.Dian.Web.Controllers
                 Priority = d.Priority,
                 Status = d.Status
             }).Where(d => d.IsNotification).OrderBy(d => d.Status).ToList();
+        }
+
+        public DocumentController(IRadianPdfCreationService radianPdfCreationService)
+        {
+            _radianPdfCreationService = radianPdfCreationService;
         }
 
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
@@ -455,6 +462,12 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
+        public async Task<ActionResult> PrintDocument(string cufe)
+        {
+            byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe);
+
+            return View(pdfDocument);
+        }
 
         #region Private methods
 
@@ -532,6 +545,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return client.PostAsync(url, byteContent).Result;
             }
         }
+
 
         /// <summary>
         /// 

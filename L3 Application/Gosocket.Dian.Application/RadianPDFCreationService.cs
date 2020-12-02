@@ -68,7 +68,9 @@ namespace Gosocket.Dian.Application
             string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
             string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
 
+
             // Mapping Labels common data
+
             templateFirstPage = CommonDataTemplateMapping(templateFirstPage, expeditionDate, page, documentMeta);
 
             // Mapping firts page
