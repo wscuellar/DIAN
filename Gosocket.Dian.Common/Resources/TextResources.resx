@@ -171,6 +171,9 @@
   <data name="ParticipantWithoutSoftware" xml:space="preserve">
     <value>El participante no cuenta con un software propio activo en el sistema</value>
   </data>
+  <data name="RadianReportQRCode" xml:space="preserve">
+    <value>https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey={CUFE}</value>
+  </data>
   <data name="Receipt" xml:space="preserve">
     <value>Constancia de Recibo de mercancia</value>
   </data>
