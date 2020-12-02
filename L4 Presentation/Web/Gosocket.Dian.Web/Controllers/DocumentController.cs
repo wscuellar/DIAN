@@ -696,8 +696,10 @@ namespace Gosocket.Dian.Web.Controllers
                 model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
 
             if (model.RadianStatus != 0)
-                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(
-                    model.RadianStatusList.First(rl => rl.Code.Equals(model.RadianStatus.ToString()))));
+            {
+                string statusName = model.RadianStatusList.First(rl => rl.Code.Equals(model.RadianStatus.ToString())).Name;
+                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(statusName,StringComparison.OrdinalIgnoreCase));
+            }
 
             model.IsNextPage = result.Item1;
             this.Session["Continuation_Token_" + (model.Page + 1)] = result.Item2;
@@ -709,8 +711,8 @@ namespace Gosocket.Dian.Web.Controllers
         {
             if (events.Count() == 0)
                 return "NO APLICA";
-            
-            int lastEventCode = int.Parse(events.Last().Code);
+
+            int lastEventCode = int.Parse(events.OrderBy(t => int.Parse(t.Code)).Last().Code);
 
             if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NegotiatedInvoice.ToString())
                 || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.AnulacionLimitacionCirculacion.ToString()))
