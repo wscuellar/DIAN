@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Interfaces.Repositories
         int AddOrUpdate(RadianContributor radianContributor);
         
         void RemoveRadianContributor(RadianContributor radianContributor);
+        PagedResult<RadianCustomerList> CustomerList(int id, string code, string radianState, int page = 0, int length = 0);
     }
 
 }

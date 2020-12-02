@@ -30,8 +30,32 @@ namespace Gosocket.Dian.DataContext.Repositories
                 .Include("RadianOperationMode")
                 .Include("RadianContributorFile")
                 .Include("RadianContributorOperations");
-            
+
             return query.FirstOrDefault();
+        }
+
+
+        
+        public PagedResult<RadianCustomerList> CustomerList(int id, string code, string radianState, int page = 0, int length = 0)
+        {
+            IQueryable<RadianCustomerList> query = from rc in sqlDBContext.RadianContributors
+                                                  join s in sqlDBContext.RadianSoftwares on rc.Id equals s.RadianContributorId
+                                                  join rco in sqlDBContext.RadianContributorOperations on s.Id equals rco.SoftwareId
+                                                  join rc2 in sqlDBContext.RadianContributors on rco.RadianContributorId equals rc2.Id
+                                                  join c in sqlDBContext.Contributors on rc2.ContributorId equals c.Id
+                                                  where rc.Id == id
+                                                  && (string.IsNullOrEmpty(code) || c.Code == code)
+                                                  && (string.IsNullOrEmpty(radianState) || rc2.RadianState == radianState)
+                                                  select new RadianCustomerList()
+                                                  {
+                                                        Id =  rc2.Id,
+                                                        BussinessName = c.BusinessName,
+                                                        Nit = c.Code,
+                                                        RadianState= rc2.RadianState,
+                                                        Page =page,
+                                                        Length = length 
+                                                  };
+            return query.Paginate(page, length, t => t.Id.ToString());
         }
 
         /// <summary>
