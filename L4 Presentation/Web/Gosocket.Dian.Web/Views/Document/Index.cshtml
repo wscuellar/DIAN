@@ -67,7 +67,7 @@
                                                 <div id="document-list" class="panel panel-bordered-dian">
 
                                                     <div class="panel-body padding-20 padding-bottom-0">
-                                                        <div class="row">
+                                                        <div id="divFirstRowDocFilter" class="row">
                                                             <div class="col-sm-@columnSize padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.DocumentKey, new { @class = "control-label" })
@@ -244,6 +244,17 @@
                 }
             );
             //Set radian status circle styles
+
+            //Resizing document filters
+            if ($('#divFirstRowDocFilter').children().length == 5) {
+                $('#divFirstRowDocFilter').children().eq(1).removeClass('col-sm-3');
+                $('#divFirstRowDocFilter').children().eq(1).addClass('col-sm-2');
+                $('#divFirstRowDocFilter').children().eq(2).removeClass('col-sm-3');
+                $('#divFirstRowDocFilter').children().eq(2).addClass('col-sm-2');
+                $('#divFirstRowDocFilter').children().eq(3).removeClass('col-sm-3');
+                $('#divFirstRowDocFilter').children().eq(3).addClass('col-sm-2');
+            }
+            //Resizing document filters
         });
 
         startDate = moment("@Model.StartDate.ToString("yyyy-MM-dd")");
