@@ -546,6 +546,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
+
         /// <summary>
         /// 
         /// </summary>
@@ -675,16 +676,9 @@ namespace Gosocket.Dian.Web.Controllers
                     Events = d.Events.Select(
                         e => new EventViewModel()
                         {
-                            DocumentKey = e.DocumentKey,
-                            Date = e.Date,
-                            DateNumber = e.DateNumber,
-                            TimeStamp = e.TimeStamp,
                             Code = e.Code,
-                            Description = e.Description,
-                            SenderCode = e.SenderCode,
-                            SenderName = e.SenderName,
-                            ReceiverCode = e.ReceiverCode,
-                            ReceiverName = e.ReceiverName
+                            Date = e.Date,
+                            Description = e.Description
                         }).ToList()
                 }).ToList();
 
@@ -735,7 +729,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             return "NO APLICA";
         }
-
         private void SetView(int filterType)
         {
             switch (filterType)
