@@ -310,15 +310,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             cmObject.Cune = xmlParser.globalDocPayrolls.CUNE;
             cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
 
-            cmObject.FecNIE = xmlParser.globalDocPayrolls.FechaGen.ToString("YYYY-MM-DD");
-            cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen.ToString("HH:MM:SS");
+            cmObject.FecNIE = xmlParser.globalDocPayrolls.FechaGen.ToString("yyyy-MM-dd");
+            cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen.ToString("HH:MM:ss");
             cmObject.SoftwareId = xmlParser.globalDocPayrolls.SoftwareID;
             cmObject.ValDesc = Convert.ToString(xmlParser.globalDocPayrolls.deduccionesTotal);
             cmObject.ValTol = Convert.ToString(xmlParser.globalDocPayrolls.comprobanteTotal);
             cmObject.ValDev = Convert.ToString(xmlParser.globalDocPayrolls.devengadosTotal);
             cmObject.NitNIE = Convert.ToString(xmlParser.globalDocPayrolls.Emp_NIT);
             cmObject.DocEmp = Convert.ToString(xmlParser.globalDocPayrolls.NumeroDocumento);
-            //cmObject.SoftwarePin = "";
             cmObject.TipAmb = Convert.ToString(xmlParser.globalDocPayrolls.Ambiente);
 
 
