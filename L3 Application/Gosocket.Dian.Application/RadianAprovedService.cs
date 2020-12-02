@@ -307,25 +307,10 @@ namespace Gosocket.Dian.Application
             return participants.Distinct().ToList();
         }
 
-        public PagedResult<RadianContributor> CustormerList(int radianContributorId, string code, RadianState radianState, int page, int pagesize)
+        public PagedResult<RadianCustomerList> CustormerList(int radianContributorId, string code, RadianState radianState, int page, int pagesize)
         {
-            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorId);
-            if (radianContributor == null)
-                return new PagedResult<RadianContributor>();
-
             string radianStateText = radianState != RadianState.none ? radianState.GetDescription() : string.Empty;
-            List<int> customersId = (
-                                    from s in radianContributor.RadianSoftwares
-                                    from c in s.RadianContributorOperations
-                                    where
-                                            c.SoftwareType != (int)RadianOperationModeTestSet.OwnSoftware
-                                        && (string.IsNullOrEmpty(code) || (c.RadianContributor != null && c.RadianContributor.Contributor.Code == code))
-                                    select c.RadianContributorId).ToList();
-
-            PagedResult<RadianContributor> customers = _radianContributorRepository.List(c => customersId.Any(x => x == c.Id)
-                  && (string.IsNullOrEmpty(radianStateText) || c.RadianState == radianStateText)
-            , page, pagesize);
-
+            PagedResult<RadianCustomerList> customers = _radianContributorRepository.CustomerList(radianContributorId, code, radianStateText, page, pagesize);
             return customers;
         }
 
