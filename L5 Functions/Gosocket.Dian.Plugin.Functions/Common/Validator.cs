@@ -1054,19 +1054,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = "El valor no es informado.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 };
-            }
-
-            if (!String.Equals(valueTotalEndoso, valueTotalInvoice))
-            {
-                return new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAI05b, Rechazo: ",
-                    ErrorMessage = $"{(string)null} Valor Total del Endoso no es igual al Valor total FEVTV .",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
-            }
+            }          
 
             if (eventCode == "037")
             {
