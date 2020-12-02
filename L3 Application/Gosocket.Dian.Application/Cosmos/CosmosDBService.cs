@@ -378,8 +378,19 @@ namespace Gosocket.Dian.Application.Cosmos
 
         }
 
-        public async Task<Tuple<bool, string, List<GlobalDataDocument>>> ReadDocumentsAsync(string continuationToken, DateTime? from, DateTime? to,
-    int status, string documentTypeId, string senderCode, string serieAndNumber, string receiverCode, string providerCode, int maxItemCount, string documentKey, string referenceType, List<string> pks = null)
+        public async Task<Tuple<bool, string, List<GlobalDataDocument>>> ReadDocumentsAsync(string continuationToken,
+                                                                                            DateTime? from,
+                                                                                            DateTime? to,
+                                                                                            int status,
+                                                                                            string documentTypeId,
+                                                                                            string senderCode,
+                                                                                            string serieAndNumber,
+                                                                                            string receiverCode,
+                                                                                            string providerCode,
+                                                                                            int maxItemCount,
+                                                                                            string documentKey,
+                                                                                            string referenceType,
+                                                                                            List<string> pks = null)
         {
 
             if (!from.HasValue || !to.HasValue)
@@ -390,9 +401,9 @@ namespace Gosocket.Dian.Application.Cosmos
 
             int fromNumber = int.Parse(from.Value.ToString("yyyyMMdd"));
             int toNumber = int.Parse(to.Value.ToString("yyyyMMdd"));
-
             string documentTypeOption1 = "";
             string documentTypeOption2 = "";
+
             switch (documentTypeId)
             {
                 case "01": documentTypeOption1 = "1"; documentTypeOption2 = "1"; break;
@@ -404,16 +415,17 @@ namespace Gosocket.Dian.Application.Cosmos
 
             string referenceTypeOption1 = "";
             string referenceTypeOption2 = "";
+
             switch (referenceType)
             {
                 case "07": referenceTypeOption1 = "7"; referenceTypeOption2 = "91"; break;
                 case "08": referenceTypeOption1 = "8"; referenceTypeOption2 = "92"; break;
             }
 
-            var collectionName = GetCollectionName(to.Value);
-            var collectionLink = collections[collectionName].SelfLink;
+            string collectionName = GetCollectionName(to.Value);
+            string collectionLink = collections[collectionName].SelfLink;
 
-            var options = new FeedOptions()
+            FeedOptions options = new FeedOptions()
             {
                 MaxItemCount = maxItemCount,
                 EnableCrossPartitionQuery = true,
@@ -431,23 +443,29 @@ namespace Gosocket.Dian.Application.Cosmos
             }
             else
             {
-                var partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
-                query = (IOrderedQueryable<GlobalDataDocument>)
-                client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
-                .Where(e => partitionKeys.Contains(e.PartitionKey)
-                && e.EmissionDateNumber >= fromNumber && e.EmissionDateNumber <= toNumber
-                && (status == 0 || e.ValidationResultInfo.Status == status)
-                && (documentTypeId == "00" || e.DocumentTypeId == documentTypeId || e.DocumentTypeId == documentTypeOption1 || e.DocumentTypeId == documentTypeOption2)
-                && (referenceType == "00" || e.References.Any(r => r.DocumentTypeId == referenceType) || e.References.Any(r => r.DocumentTypeId == referenceTypeOption1) || e.References.Any(r => r.DocumentTypeId == referenceTypeOption2))
-                && (senderCode == null || e.SenderCode == senderCode)
-                && (serieAndNumber == null || e.SerieAndNumber == serieAndNumber)
-                && (receiverCode == null || e.ReceiverCode == receiverCode)
-                && (providerCode == null || e.TechProviderInfo.TechProviderCode == providerCode)
+                List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
+
+                query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
+                .Where(
+                    e => partitionKeys.Contains(e.PartitionKey)
+                    && e.EmissionDateNumber >= fromNumber && e.EmissionDateNumber <= toNumber
+                    && (status == 0 || e.ValidationResultInfo.Status == status)
+                    && (documentTypeId == "00"
+                        || e.DocumentTypeId == documentTypeId
+                        || e.DocumentTypeId == documentTypeOption1
+                        || e.DocumentTypeId == documentTypeOption2)
+                    && (referenceType == "00"
+                        || e.References.Any(r => r.DocumentTypeId == referenceType)
+                        || e.References.Any(r => r.DocumentTypeId == referenceTypeOption1)
+                        || e.References.Any(r => r.DocumentTypeId == referenceTypeOption2))
+                    && (senderCode == null || e.SenderCode == senderCode)
+                    && (serieAndNumber == null || e.SerieAndNumber == serieAndNumber)
+                    && (receiverCode == null || e.ReceiverCode == receiverCode)
+                    && (providerCode == null || e.TechProviderInfo.TechProviderCode == providerCode)
                 ).OrderByDescending(e => e.Timestamp).AsDocumentQuery();
             }
 
-
-            var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+            FeedResponse<GlobalDataDocument> result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
             return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, result.ResponseContinuation, result.ToList());
         }
 

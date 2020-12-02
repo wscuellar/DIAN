@@ -542,38 +542,94 @@ namespace Gosocket.Dian.Web.Controllers
         private async Task<ActionResult> GetDocuments(SearchDocumentViewModel model, int filterType)
         {
             SetView(filterType);
-
             string continuationToken = (string)Session["Continuation_Token_" + model.Page];
-            if (string.IsNullOrEmpty(continuationToken)) continuationToken = "";
+
+            if (string.IsNullOrEmpty(continuationToken))
+                continuationToken = "";
 
             List<string> pks = null;
             model.DocumentKey = model.DocumentKey?.ToLower();
+
             if (!string.IsNullOrEmpty(model.DocumentKey))
             {
-                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
-                var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
-                if (globalDocValidatorDocument == null) return View("Index", model);
+                GlobalDocValidatorDocumentMeta documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
+                GlobalDocValidatorDocument globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
 
-                if (globalDocValidatorDocument.DocumentKey != model.DocumentKey) return View("Index", model);
+                if (globalDocValidatorDocument == null)
+                    return View("Index", model);
+
+                if (globalDocValidatorDocument.DocumentKey != model.DocumentKey)
+                    return View("Index", model);
 
                 pks = new List<string> { $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{model.DocumentKey.Substring(0, 2)}" };
             }
 
             Tuple<bool, string, List<GlobalDataDocument>> result = new Tuple<bool, string, List<GlobalDataDocument>>(false, null, null);
 
+            if (model.RadianStatus != 0 && model.RadianStatus != 7 && model.DocumentTypeId.Equals("00"))
+                model.DocumentTypeId = "01";
+
             switch (filterType)
             {
                 case 1:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, model.ReceiverCode, null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken,
+                                                                                              model.StartDate,
+                                                                                              model.EndDate,
+                                                                                              model.Status,
+                                                                                              model.DocumentTypeId,
+                                                                                              model.SenderCode,
+                                                                                              model.SerieAndNumber,
+                                                                                              model.ReceiverCode,
+                                                                                              null,
+                                                                                              model.MaxItemCount,
+                                                                                              model.DocumentKey,
+                                                                                              model.ReferencesType,
+                                                                                              pks);
                     break;
                 case 2:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, User.ContributorCode(), model.SerieAndNumber, model.ReceiverCode, null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken,
+                                                                                              model.StartDate,
+                                                                                              model.EndDate,
+                                                                                              model.Status,
+                                                                                              model.DocumentTypeId,
+                                                                                              User.ContributorCode(),
+                                                                                              model.SerieAndNumber,
+                                                                                              model.ReceiverCode,
+                                                                                              null,
+                                                                                              model.MaxItemCount,
+                                                                                              model.DocumentKey,
+                                                                                              model.ReferencesType,
+                                                                                              pks);
                     break;
                 case 3:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, User.ContributorCode(), null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken,
+                                                                                              model.StartDate,
+                                                                                              model.EndDate,
+                                                                                              model.Status,
+                                                                                              model.DocumentTypeId,
+                                                                                              model.SenderCode,
+                                                                                              model.SerieAndNumber,
+                                                                                              User.ContributorCode(),
+                                                                                              null,
+                                                                                              model.MaxItemCount,
+                                                                                              model.DocumentKey,
+                                                                                              model.ReferencesType,
+                                                                                              pks);
                     break;
                 case 4:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, model.ReceiverCode, User.ContributorCode(), model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken,
+                                                                                              model.StartDate,
+                                                                                              model.EndDate,
+                                                                                              model.Status,
+                                                                                              model.DocumentTypeId,
+                                                                                              model.SenderCode,
+                                                                                              model.SerieAndNumber,
+                                                                                              model.ReceiverCode,
+                                                                                              User.ContributorCode(),
+                                                                                              model.MaxItemCount,
+                                                                                              model.DocumentKey,
+                                                                                              model.ReferencesType,
+                                                                                              pks);
                     break;
                 default:
                     break;
@@ -616,6 +672,13 @@ namespace Gosocket.Dian.Web.Controllers
                     docView.RadianStatusName = DeterminateRadianStatus(docView.Events);
             }
 
+            if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
+                model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
+
+            if (model.RadianStatus != 0)
+                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(
+                    model.RadianStatusList.First(rl => rl.Code.Equals(model.RadianStatus.ToString()))));
+
             model.IsNextPage = result.Item1;
             this.Session["Continuation_Token_" + (model.Page + 1)] = result.Item2;
 
@@ -652,7 +715,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             return "NO APLICA";
         }
-
         private void SetView(int filterType)
         {
             switch (filterType)
