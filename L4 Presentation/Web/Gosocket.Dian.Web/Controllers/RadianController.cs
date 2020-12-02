@@ -217,7 +217,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult ViewDetails(List<FilesChangeStateViewModel> data, int id, string approveState, string radianState)
+        public JsonResult ViewDetails(List<FilesChangeStateViewModel> data, int id, string approveState, string radianState, string description)
         {
             try
             {
@@ -243,21 +243,45 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
-                foreach (var n in radianAdmin.Files)
+
+                if (approveState == "1")
                 {
-                    if (n.Status != 2)
+                    if ((radianAdmin.Contributor.RadianState == "Habilitado" || radianAdmin.Contributor.RadianState == "Registrado"))
+                    {
+                        _ = _radianContributorService.ChangeParticipantStatus(id, approveState, radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                        _ = SendMail(radianAdmin);
+                    }
+                    else
                     {
                         return Json(new
                         {
-                            messasge = "Todos los archivos deben estar en estado 'Aceptado' para poder cambiar el estado del participante.",
+                            messasge = "Los participantes 'En pruebas' no se pueden cancelar.",
                             success = true,
                             id = radianAdmin.Contributor.Id
                         }, JsonRequestBehavior.AllowGet);
                     }
                 }
 
-                _ = _radianContributorService.ChangeParticipantStatus(id, approveState, radianAdmin.Contributor.RadianContributorTypeId, radianState, string.Empty);
-                _ = SendMail(radianAdmin);
+                if (approveState == "0")
+                {
+                    foreach (var n in radianAdmin.Files)
+                    {
+                        if (n.Status != 2)
+                        {
+                            return Json(new
+                            {
+                                messasge = "Todos los archivos deben estar en estado 'Aceptado' para poder cambiar el estado del participante.",
+                                success = true,
+                                id = radianAdmin.Contributor.Id
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+                        else
+                        {
+                            _ = _radianContributorService.ChangeParticipantStatus(id, approveState, radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                            _ = SendMail(radianAdmin);
+                        }
+                    }
+                }
 
                 return Json(new
                 {

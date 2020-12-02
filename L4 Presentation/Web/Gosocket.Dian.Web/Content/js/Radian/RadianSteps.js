@@ -180,7 +180,11 @@ function changeToSpanish() {
 function cancelRegister(cancelData) {
     var url = cancelData.url;
     var confirmationMessage = bootboxMessage.CONFIRMATION_MESSAGE;
-    var successAction = () => window.location.href = cancelData.href;
+    var successAction = () => {
+        var message = bootboxMessage.CANCEL_RESPONSE_CORRECT;
+        var operation = () => window.location.href = cancelData.href
+        showConfirmation(message, AlertExec(operation), "cancel-confirmation"); 
+    };
     var dataAjax = {
         id: cancelData.id,
         newState: '4',

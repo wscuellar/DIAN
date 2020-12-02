@@ -10,7 +10,7 @@
         <div class="underline-title"></div>
     </div>
 
-    <div class="container-fluid RadianContainerBegin">
+    <div class="container-fluid RadianContainerBegin"  id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
 
         <p class="RadianTextSelected">Seleccione el modo de operación en el Registro de Facturas Electronicas :</p>
         <svg width="100%" height="2" viewBox="0 0 1110 2" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,7 +56,8 @@
             var contributorId = '@ViewBag.ContributorId';
             var operationClick = false;
 
-            $('.RadianCardContainer').click(function () {
+        $('.RadianCardContainer').click(function () {
+            showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
                 if (!operationClick) {
                     operationClick = true;
 
@@ -72,9 +73,9 @@
                                 function (param) {
                                     var url = "@Url.Action("Index", "RadianApproved")"+ "?ContributorId=" + param.ContributorId + "&RadianContributorType=" + param.RadianContributorType + "&RadianOperationMode=" + param.RadianOperationMode;
                                     window.location.href = url;
-                                }, false
+                                }, false, () => hideLoading('#panel-form')
                             );
-                        }, true
+                        }, true, () => hideLoading('#panel-form')
                     );
                 }
             });
