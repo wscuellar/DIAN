@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application
 {
-    public class RadianPDFCreationService : IRadianPDFCreationService
+    public class RadianPdfCreationService : IRadianPdfCreationService
     {
         #region Properties
 
@@ -27,7 +27,7 @@ namespace Gosocket.Dian.Application
 
         #region Constructor
 
-        public RadianPDFCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager)
+        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
