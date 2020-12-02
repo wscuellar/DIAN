@@ -546,7 +546,6 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -556,38 +555,94 @@ namespace Gosocket.Dian.Web.Controllers
         private async Task<ActionResult> GetDocuments(SearchDocumentViewModel model, int filterType)
         {
             SetView(filterType);
-
             string continuationToken = (string)Session["Continuation_Token_" + model.Page];
-            if (string.IsNullOrEmpty(continuationToken)) continuationToken = "";
+
+            if (string.IsNullOrEmpty(continuationToken))
+                continuationToken = "";
 
             List<string> pks = null;
             model.DocumentKey = model.DocumentKey?.ToLower();
+
             if (!string.IsNullOrEmpty(model.DocumentKey))
             {
-                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
-                var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
-                if (globalDocValidatorDocument == null) return View("Index", model);
+                GlobalDocValidatorDocumentMeta documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
+                GlobalDocValidatorDocument globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
 
-                if (globalDocValidatorDocument.DocumentKey != model.DocumentKey) return View("Index", model);
+                if (globalDocValidatorDocument == null)
+                    return View("Index", model);
+
+                if (globalDocValidatorDocument.DocumentKey != model.DocumentKey)
+                    return View("Index", model);
 
                 pks = new List<string> { $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{model.DocumentKey.Substring(0, 2)}" };
             }
 
             Tuple<bool, string, List<GlobalDataDocument>> result = new Tuple<bool, string, List<GlobalDataDocument>>(false, null, null);
 
+            if (model.RadianStatus != 0 && model.RadianStatus != 7 && model.DocumentTypeId.Equals("00"))
+                model.DocumentTypeId = "01";
+
             switch (filterType)
             {
                 case 1:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, model.ReceiverCode, null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken,
+                                                                                              model.StartDate,
+                                                                                              model.EndDate,
+                                                                                              model.Status,
+                                                                                              model.DocumentTypeId,
+                                                                                              model.SenderCode,
+                                                                                              model.SerieAndNumber,
+                                                                                              model.ReceiverCode,
+                                                                                              null,
+                                                                                              model.MaxItemCount,
+                                                                                              model.DocumentKey,
+                                                                                              model.ReferencesType,
+                                                                                              pks);
                     break;
                 case 2:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, User.ContributorCode(), model.SerieAndNumber, model.ReceiverCode, null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken,
+                                                                                              model.StartDate,
+                                                                                              model.EndDate,
+                                                                                              model.Status,
+                                                                                              model.DocumentTypeId,
+                                                                                              User.ContributorCode(),
+                                                                                              model.SerieAndNumber,
+                                                                                              model.ReceiverCode,
+                                                                                              null,
+                                                                                              model.MaxItemCount,
+                                                                                              model.DocumentKey,
+                                                                                              model.ReferencesType,
+                                                                                              pks);
                     break;
                 case 3:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, User.ContributorCode(), null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken,
+                                                                                              model.StartDate,
+                                                                                              model.EndDate,
+                                                                                              model.Status,
+                                                                                              model.DocumentTypeId,
+                                                                                              model.SenderCode,
+                                                                                              model.SerieAndNumber,
+                                                                                              User.ContributorCode(),
+                                                                                              null,
+                                                                                              model.MaxItemCount,
+                                                                                              model.DocumentKey,
+                                                                                              model.ReferencesType,
+                                                                                              pks);
                     break;
                 case 4:
-                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, model.ReceiverCode, User.ContributorCode(), model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken,
+                                                                                              model.StartDate,
+                                                                                              model.EndDate,
+                                                                                              model.Status,
+                                                                                              model.DocumentTypeId,
+                                                                                              model.SenderCode,
+                                                                                              model.SerieAndNumber,
+                                                                                              model.ReceiverCode,
+                                                                                              User.ContributorCode(),
+                                                                                              model.MaxItemCount,
+                                                                                              model.DocumentKey,
+                                                                                              model.ReferencesType,
+                                                                                              pks);
                     break;
                 default:
                     break;
@@ -620,14 +675,30 @@ namespace Gosocket.Dian.Web.Controllers
                     Events = d.Events.Select(
                         e => new EventViewModel()
                         {
-                            Code = e.Code,
+                            DocumentKey = e.DocumentKey,
                             Date = e.Date,
-                            Description = e.Description
+                            DateNumber = e.DateNumber,
+                            TimeStamp = e.TimeStamp,
+                            Code = e.Code,
+                            Description = e.Description,
+                            SenderCode = e.SenderCode,
+                            SenderName = e.SenderName,
+                            ReceiverCode = e.ReceiverCode,
+                            ReceiverName = e.ReceiverName
                         }).ToList()
                 }).ToList();
 
                 foreach (DocumentViewModel docView in model.Documents)
                     docView.RadianStatusName = DeterminateRadianStatus(docView.Events);
+            }
+
+            if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
+                model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
+
+            if (model.RadianStatus != 0)
+            {
+                string statusName = model.RadianStatusList.First(rl => rl.Code.Equals(model.RadianStatus.ToString())).Name;
+                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(statusName,StringComparison.OrdinalIgnoreCase));
             }
 
             model.IsNextPage = result.Item1;
@@ -641,15 +712,14 @@ namespace Gosocket.Dian.Web.Controllers
             if (events.Count() == 0)
                 return "NO APLICA";
 
-            if (events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Received.ToString()))
-                && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Receipt.ToString()))
-                && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Accepted.ToString())))
-                return "TÍTULO VALOR";
+            int lastEventCode = int.Parse(events.OrderBy(t => int.Parse(t.Code)).Last().Code);
 
-            int lastEventCode = int.Parse(events.Last().Code);
+            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NegotiatedInvoice.ToString())
+                || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.AnulacionLimitacionCirculacion.ToString()))
+                return "LIMITADA";
 
-            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.SolicitudDisponibilizacion.ToString()))
-                return "DISPONIBILIZADA";
+            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NotificacionPagoTotalParcial.ToString()))
+                return "PAGADA";
 
             if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.EndosoPropiedad.ToString())
                 || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.EndosoGarantia.ToString())
@@ -657,12 +727,13 @@ namespace Gosocket.Dian.Web.Controllers
                 || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.InvoiceOfferedForNegotiation.ToString()))
                 return "ENDOSADA";
 
-            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NotificacionPagoTotalParcial.ToString()))
-                return "PAGADA";
+            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.SolicitudDisponibilizacion.ToString()))
+                return "DISPONIBILIZADA";
 
-            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NegotiatedInvoice.ToString())
-                || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.AnulacionLimitacionCirculacion.ToString()))
-                return "LIMITADA";
+            if (events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Received.ToString()))
+                && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Receipt.ToString()))
+                && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Accepted.ToString())))
+                return "TÍTULO VALOR";
 
             return "NO APLICA";
         }

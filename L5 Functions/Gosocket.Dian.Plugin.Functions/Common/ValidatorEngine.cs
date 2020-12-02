@@ -160,6 +160,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.NegotiatedInvoice:
                     code = EventStatus.SolicitudDisponibilizacion;
                     break;
+                case (int)EventStatus.Avales:
+                    code = EventStatus.SolicitudDisponibilizacion;
+                    break;
                 default:
                     code = EventStatus.Receipt;
                     break;
@@ -172,7 +175,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.TerminacionMandato ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
                     "0"+ (int)code).FirstOrDefault();                
@@ -253,12 +257,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
-        
-            //DateTime dateReceived = DateTime.ParseExact(xmlParser.SigningTime, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-            //DateTime dateEntrie = DateTime.ParseExact(signingTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            string dateEntrie = Convert.ToDateTime(data.SigningTime).ToString("dd/MM/yyyy");
+
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser));
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel));
 
             return validateResponses;
         }
@@ -295,6 +298,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validator = new Validator();
             validateResponses.Add(validator.ValidateNoteReference(trackId));
 
+            return validateResponses;
+        }
+
+        public async Task<List<ValidateListResponse>> StartValidateCune(RequestObjectCune cune)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(cune.trackId);
+            var xmlParser = new XmlParseNomina(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var objCune = xmlParser.Fields.ToObject<CuneModel>();
+
+            // Validator instance
+            var validator = new Validator();
+            validateResponses.Add(validator.ValidateCune(objCune, cune));
             return validateResponses;
         }
 

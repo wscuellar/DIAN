@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ext:UBLExtensions>
+    <ext:UBLExtension>
+      <ext:ExtensionContent>
+        <sac:AdditionalInformation>
+          <sac:AdditionalMonetaryTotal>
+            <cbc:ID>1001</cbc:ID>
+            <cbc:PayableAmount currencyID="PEN">16.43</cbc:PayableAmount>
+          </sac:AdditionalMonetaryTotal>
+          <sac:AdditionalMonetaryTotal>
+            <cbc:ID>1002</cbc:ID>
+            <cbc:PayableAmount currencyID="PEN">0.00</cbc:PayableAmount>
+          </sac:AdditionalMonetaryTotal>
+          <sac:AdditionalMonetaryTotal>
+            <cbc:ID>1003</cbc:ID>
+            <cbc:PayableAmount currencyID="PEN">0.00</cbc:PayableAmount>
+          </sac:AdditionalMonetaryTotal>
+          <sac:AdditionalMonetaryTotal>
+            <cbc:ID>1004</cbc:ID>
+            <cbc:PayableAmount currencyID="PEN">0.00</cbc:PayableAmount>
+          </sac:AdditionalMonetaryTotal>
+          <sac:AdditionalProperty>
+            <cbc:ID>1000</cbc:ID>
+            <cbc:Value>DIEZ Y NUEVE Y 39/100 SOLES</cbc:Value>
+          </sac:AdditionalProperty>
+        </sac:AdditionalInformation>
+      </ext:ExtensionContent>
+    </ext:UBLExtension>
+  <ext:UBLExtension><ext:ExtensionContent><Signature Id="SignatureSP" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>g0YXUSqJ+sgwMIMtP+zCRDDKxOE=</DigestValue></Reference></SignedInfo><SignatureValue>de+oOvyLFlFrSBq9v1GDRCyXzrfjAX96g1PLqd6eu0osDW6R8FHTfxyjoV+7IfY1V0pp9FOIlr03DrfhcGB2XnPIdm5vChe5CYq1OJdn4VY65uulNEfjQJSe0tjtz1z4wj0gWGq/ag9QoOExJdA0SkuvImq3/OvcLMpJQtVAk9a24g+rovaFeOhTV/82EJnj0VsMEbQM7Hrtv3i6yCHposheqjf0br55+GsZHWtxIbeOT+BOEzxSEd1j4Ao+fZLqtF1kv82/e/j6HzCS1qOjKPD1nuyey9NGuaqsnt09IeIwILTYWNuyRfD8kNy8OCRMzqCA59BXEHumSKGLKo3twg==</SignatureValue><KeyInfo><X509Data><X509SubjectName>C=PE, CN=JUAN LUIS ALEMPARTE ROZAS, G=JUAN LUIS, SN=ALEMPARTE ROZAS, T=GERENTE, OU=20204844381, OU=FINZANZAS CORPORATIVAS, O=EL ROCIO S.A, OID.1.3.6.1.4.1.17326.30.4=DNI, OID.1.3.6.1.4.1.17326.30.3=20204844381, OID.1.3.6.1.4.1.17326.30.2=RUC, SERIALNUMBER=001039258, S=LA LIBERTAD-TRUJILLO, L=TRUJILLO, Description=Qualified Certificate: RACER-PFVP-SW-KPSC, E=jdarcourt@gruporocio.com</X509SubjectName><X509Certificate>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</X509Certificate></X509Data></KeyInfo></Signature></ext:ExtensionContent></ext:UBLExtension></ext:UBLExtensions>
+  <cbc:UBLVersionID>2.0</cbc:UBLVersionID>
+  <cbc:CustomizationID>1.0</cbc:CustomizationID>
+  <cbc:ID>F787-59096</cbc:ID>
+  <cbc:IssueDate>2018-10-18</cbc:IssueDate>
+  <cbc:InvoiceTypeCode>01</cbc:InvoiceTypeCode>
+  <cbc:DocumentCurrencyCode>PEN</cbc:DocumentCurrencyCode>
+  <cac:OrderReference>
+    <cbc:ID>2166539</cbc:ID>
+  </cac:OrderReference>
+  <cac:Signature>
+    <cbc:ID>IDSignCF</cbc:ID>
+    <cac:SignatoryParty>
+      <cac:PartyIdentification>
+        <cbc:ID>20204844381</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name>El Rocio S.A.</cbc:Name>
+      </cac:PartyName>
+    </cac:SignatoryParty>
+    <cac:DigitalSignatureAttachment>
+      <cac:ExternalReference>
+        <cbc:URI>#SignatureCF</cbc:URI>
+      </cac:ExternalReference>
+    </cac:DigitalSignatureAttachment>
+  </cac:Signature>
+  <cac:AccountingSupplierParty>
+    <cbc:CustomerAssignedAccountID>20204844381</cbc:CustomerAssignedAccountID>
+    <cbc:AdditionalAccountID>6</cbc:AdditionalAccountID>
+    <cac:Party>
+      <cac:PartyName>
+        <cbc:Name>El Rocio S.A.</cbc:Name>
+      </cac:PartyName>
+      <cac:PostalAddress>
+        <cbc:ID>130101</cbc:ID>
+        <cbc:StreetName>CAR. INDUSTRIAL LAREDO KM. NRO. 1.5 ZONA INDUSTRIAL</cbc:StreetName>
+        <cbc:CityName>TRUJILLO, LA LIBERTAD</cbc:CityName>
+        <cac:Country>
+          <cbc:IdentificationCode>PE</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>El Rocio S.A.</cbc:RegistrationName>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:AccountingCustomerParty>
+    <cbc:CustomerAssignedAccountID>20100070970</cbc:CustomerAssignedAccountID>
+    <cbc:AdditionalAccountID>6</cbc:AdditionalAccountID>
+    <cac:Party>
+      <cac:PostalAddress>
+        <cbc:ID>
+        </cbc:ID>
+        <cbc:StreetName>CAL MORELLI No 181 INT P2 LIMA - LIMA - SAN BORJA</cbc:StreetName>
+        <cbc:CityName>LIMA</cbc:CityName>
+        <cac:Country>
+          <cbc:IdentificationCode>PE</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>SUPERMERCADOS PERUANOS S.A. o SPSA</cbc:RegistrationName>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="PEN">2.96</cbc:TaxAmount>
+    <cac:TaxSubtotal>
+      <cbc:TaxAmount currencyID="PEN">2.96</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>1000</cbc:ID>
+          <cbc:Name>IGV</cbc:Name>
+          <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+  </cac:TaxTotal>
+  <cac:LegalMonetaryTotal>
+    <cbc:PayableAmount currencyID="PEN">19.39</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  <cac:InvoiceLine>
+    <cbc:ID>1</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="KGM">3.10</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="PEN">16.43</cbc:LineExtensionAmount>
+    <cac:PricingReference>
+      <cac:AlternativeConditionPrice>
+        <cbc:PriceAmount currencyID="PEN">6.25</cbc:PriceAmount>
+        <cbc:PriceTypeCode>01</cbc:PriceTypeCode>
+      </cac:AlternativeConditionPrice>
+    </cac:PricingReference>
+    <cac:TaxTotal>
+      <cbc:TaxAmount currencyID="PEN">2.96</cbc:TaxAmount>
+      <cac:TaxSubtotal>
+        <cbc:TaxAmount currencyID="PEN">2.96</cbc:TaxAmount>
+        <cac:TaxCategory>
+          <cbc:TaxExemptionReasonCode>10</cbc:TaxExemptionReasonCode>
+          <cac:TaxScheme>
+            <cbc:ID>1000</cbc:ID>
+            <cbc:Name>IGV</cbc:Name>
+            <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+          </cac:TaxScheme>
+        </cac:TaxCategory>
+      </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <cac:Item>
+      <cbc:Description>POLLO TROZADO CON MENUDENCIA (8 PIEZAS)</cbc:Description>
+      <cac:SellersItemIdentification>
+        <cbc:ID>025209</cbc:ID>
+      </cac:SellersItemIdentification>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="PEN">5.30</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+  
+<Personalizados>
+    <DocPersonalizado dteID="T0159096">
+      <campoString name="SIGEXT_InvoiceNumber" xmlns="">F787-59096</campoString><campoString name="SIGEXT_ResponseID" xmlns="">6107b8a6-884f-481c-8f12-dbbac2178f1a</campoString><campoString name="SIGEXT_ResponseCode" xmlns="">0</campoString><campoString name="SIGEXT_ResponseText" xmlns="">La Factura numero F787-59096 ha sido aceptada</campoString><campoString name="SIGEXT_SunatProcessNumber" xmlns="">201802842766227</campoString><campoString name="SIGEXT_RucReceiver" xmlns=""></campoString><campoString name="SIGEXT_ErrorCode" xmlns=""></campoString><campoString name="SIGEXT_ErrorText" xmlns=""></campoString><campoString name="SIGEXT_SunatDate" xmlns="">2018.10.18</campoString><campoString name="SIGEXT_SunatTime" xmlns="">15:23:50</campoString><campoString name="SIGEXT_SendDate" xmlns="">2018.10.18</campoString><campoString name="SIGEXT_SendTime" xmlns="">00:00:00</campoString><campoString name="PDF417">20204844381|01|F787-59096|2.96|19.39|2018-10-18|6|20100070970|g0YXUSqJ+sgwMIMtP+zCRDDKxOE=|de+oOvyLFlFrSBq9v1GDRCyXzrfjAX96g1PLqd6eu0osDW6R8FHTfxyjoV+7IfY1V0pp9FOIlr03DrfhcGB2XnPIdm5vChe5CYq1OJdn4VY65uulNEfjQJSe0tjtz1z4wj0gWGq/ag9QoOExJdA0SkuvImq3/OvcLMpJQtVAk9a24g+rovaFeOhTV/82EJnj0VsMEbQM7Hrtv3i6yCHposheqjf0br55+GsZHWtxIbeOT+BOEzxSEd1j4Ao+fZLqtF1kv82/e/j6HzCS1qOjKPD1nuyey9NGuaqsnt09IeIwILTYWNuyRfD8kNy8OCRMzqCA59BXEHumSKGLKo3twg==|</campoString>
+      <campoString name="DigestValue">g0YXUSqJ+sgwMIMtP+zCRDDKxOE=</campoString>
+      <campoString name="FechaVenc">02-DIC-18</campoString>
+      <campoString name="Documento">FF787 - 0059096</campoString>
+      <campoString name="Zona">CHIMBOTE</campoString>
+      <campoString name="OC">2166539</campoString>
+      <campoString name="Pedido">10930155</campoString>
+      <campoString name="Vendedor">Supermercados</campoString>
+      <campoString name="TipoOpe">FN</campoString>
+      <campoString name="TipoDirec1">Punto de Emision</campoString>
+      <campoString name="Direccion1">AV. HUARMEY Nro 262, NUEVO CHIMBOTE, SANTA, ANCASH</campoString>
+      <campoString name="Telefono1">Tel.: 51 44 48 2828</campoString>
+      <campoString name="Tipo">01</campoString>
+      <campoString name="Serie">F787</campoString>
+      <campoString name="Numero">59096</campoString>
+      <ImpresionDetalle>
+        <PersonNroLinDet>1</PersonNroLinDet>
+        <DetPersonAFN_01>902-0040241</DetPersonAFN_01>
+        <DetPersonAFN_02>KGS</DetPersonAFN_02>
+      </ImpresionDetalle>
+    </DocPersonalizado>
+  </Personalizados></Invoice>

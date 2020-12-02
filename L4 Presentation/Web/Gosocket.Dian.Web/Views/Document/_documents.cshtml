@@ -63,7 +63,6 @@
                 }
                 <tr data-id="@document.Id" data-partitionKey="@document.PartitionKey" class="document-row">
                     <td>
-                        @*<span class="fa fa fa-circle text-@status add-tooltip" data-original-title="@document.StatusName"></span>*@
                         @if (document.Status != 2)
                         {
                             <span class="fa fa fa-download add-tooltip" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
