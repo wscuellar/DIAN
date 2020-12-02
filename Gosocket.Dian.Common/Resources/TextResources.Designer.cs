@@ -223,6 +223,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey={CUFE}.
+        /// </summary>
+        public static string RadianReportQRCode {
+            get {
+                return ResourceManager.GetString("RadianReportQRCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Constancia de Recibo de mercancia.
         /// </summary>
         public static string Receipt {

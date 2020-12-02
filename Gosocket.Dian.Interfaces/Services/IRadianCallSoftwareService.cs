@@ -11,5 +11,6 @@ namespace Gosocket.Dian.Interfaces.Services
 
         Guid CreateSoftware(int radianContributorId, string softwareName, string url, string pin, string createdBy);
         Guid DeleteSoftware(Guid id);
+        void SetToProduction(RadianSoftware software);
     }
 }

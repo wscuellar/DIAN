@@ -47,7 +47,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         [Display(Name = "Estado de aprobación")]
         public string RadianState { get; set; }
 
-        public Software Software { get; set; }
+        public RadianSoftware Software { get; set; }
 
         public RadianContributorOperationWithSoftware RadianContributorOperations { get; set; }
 
@@ -59,9 +59,14 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         [Display(Name = "Nit Facturador")]
         public string NitSearch { get; set; }
 
+        [Display(Name = "Nombre archivo")]
+        public string NameSearch { get; set; }
+
         [Display(Name = "Estado de aprobación")]
         public RadianUtil.UserStates RadianStateSelect { get; set; }
         public int PageTable { get; set; }
         public int CustomerTotalCount { get; internal set; }
+        public FileHistoryListViewModel FileHistories { get; internal set; } 
+        public int FileHistoriesRowCount { get; internal set; }
     }
 }
