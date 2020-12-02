@@ -319,7 +319,7 @@ namespace Gosocket.Dian.Application
                                     from c in s.RadianContributorOperations
                                     where
                                             c.SoftwareType != (int)RadianOperationModeTestSet.OwnSoftware
-                                        && (string.IsNullOrEmpty(code) || c.RadianContributor.Contributor.Code == code)
+                                        && (string.IsNullOrEmpty(code) || (c.RadianContributor != null && c.RadianContributor.Contributor.Code == code))
                                     select c.RadianContributorId).ToList();
 
             PagedResult<RadianContributor> customers = _radianContributorRepository.List(c => customersId.Any(x => x == c.Id)

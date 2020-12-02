@@ -110,7 +110,7 @@
                     size: 'large'
                 });
                 dialog.init(function (e) {
-                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.FileHistories.items))');
+                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.FileHistories.Customers))');
                     var customersTotalCount = @Model.FileHistoriesRowCount;
                     var columns = [
                         { data: 'FileName' },

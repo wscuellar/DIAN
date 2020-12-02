@@ -16,7 +16,7 @@ namespace Gosocket.Dian.Web.Models
     {
         public int Page { get; set; }
         public int RowCount { get; set; }
-        public List<FileHistoryItemViewModel> items { get; set; }
+        public List<FileHistoryItemViewModel> Customers { get; set; }
     }
 
     public class FileHistoryItemViewModel

@@ -78,7 +78,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 Page = 1,
                 RowCount = data.RowCount,
-                items = data.Results.Select(t => new FileHistoryItemViewModel()
+                Customers = data.Results.Select(t => new FileHistoryItemViewModel()
                 {
                     FileName = t.FileName,
                     Comments = t.Comments,
@@ -376,7 +376,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 Page = filter.Page,
                 RowCount = data.RowCount,
-                items = data.Results.Select(t => new FileHistoryItemViewModel()
+                Customers = data.Results.Select(t => new FileHistoryItemViewModel()
                 {
                     FileName = t.FileName,
                     Comments = t.Comments,

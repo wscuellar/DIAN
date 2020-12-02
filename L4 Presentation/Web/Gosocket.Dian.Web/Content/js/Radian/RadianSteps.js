@@ -68,7 +68,7 @@ function RenderSteps(index) {
         if (isValid) {
             $(this).parent().children().html(actualFileObj.name + "  (" + actualFileSize + " Mb)");
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").toggle();
-            $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle(); debugger
+            $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle(); 
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").children("input").attr("value", actualFileObj.name);
         }
            
@@ -121,7 +121,8 @@ function LoadEventsToSearch(paramsObject) {
     })
 }
 
-function SearchData(paramsObject) {
+function SearchData(paramsObject) {debugger
+    const cloneAjaxData = Object.assign({}, paramsObject.ajaxData);
     var arrayToMap = Object.entries(paramsObject.ajaxData);
     arrayToMap.forEach((element) => {
         if (typeof element[1] === 'string' && element[1].includes("#")) {
@@ -129,51 +130,24 @@ function SearchData(paramsObject) {
         }
     });
     var actionError = () => { }
-    var actionSuccess = (response) => {debugger
-        paramsObject.data = response;
+    var actionSuccess = (response) => {
+        paramsObject.data = response.Customers;
+        paramsObject.ajaxData = cloneAjaxData;
         RenderTable(paramsObject);
     }
     ajaxFunction(paramsObject.urlSearch, 'POST', paramsObject.ajaxData, actionError, actionSuccess);
 }
 
-function LoadEventsToPagiantion(paramsObject) {debugger
+function LoadEventsToPagiantion(paramsObject) {
     $(".next-page").click(function () {
-        var newPage = parseInt($("#PageTable").val()) + 1;
-        $("#PageTable").val(paramsObject.newPage);
-        var nit = $("#NitSearch").val();
-        var state = $("#RadianStateSelect").val();
-        var data = {
-            radianContributorId: paramsObject.radianId,
-            code: nit,
-            radianState: state,
-            page: newPage,
-            pagesize: 10
-        };
-        var actionError = () => { }
-        var actionSuccess = (response) => {
-            paramsObject.data = response;
-            RenderTable(paramsObject)
-        }
-        ajaxFunction(urlSearch, 'POST', data, actionError, actionSuccess); 
+        paramsObject.page = parseInt($("#PageTable").val()) + 1;
+        $("#PageTable").val(paramsObject.page);
+        SearchData(paramsObject);
     });
     $(".prev-page").click(function () {
-        var newPage = parseInt($("#PageTable").val()) - 1;
-        $("#PageTable").val(paramsObject.newPage);
-        var nit = $("#NitSearch").val();
-        var state = $("#RadianStateSelect").val();
-        var data = {
-            radianContributorId: paramsObject.radianId,
-            code: nit,
-            radianState: state,
-            page: newPage,
-            pagesize: 10
-        };
-        var actionError = () => { }
-        var actionSuccess = (response) => {
-            paramsObject.data = response;
-            RenderTable(paramsObject)
-        }
-        ajaxFunction(url, 'POST', data, actionError, actionSuccess); 
+        paramsObject.page = parseInt($("#PageTable").val()) + 1;
+        $("#PageTable").val(paramsObject.page);
+        SearchData(paramsObject);
     });
 }
 
