@@ -671,6 +671,52 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     return responses;
+                case (int)EventStatus.Avales:
+                    //valida si existe los permisos del mandatario 
+                    var responseAval = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
+                        party.ResponseCode, xmlParserCude.NoteMandato);
+                    if (responseAval != null)
+                    {
+                        responses.Add(responseAval);
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = sender2DvErrorCode,
+                            ErrorMessage = "El receptor del documento transmitido no coincide con el Nit DIAN",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento receiverParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    return responses;
+
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     if (party.SenderParty != senderCode)
                     {
@@ -723,7 +769,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = true,
                             Mandatory = true,
                             ErrorCode = "100",
-                            ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                            ErrorMessage = "Evento receiverParty referenciado correctamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -782,7 +828,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = true,
                             Mandatory = true,
                             ErrorCode = "100",
-                            ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                            ErrorMessage = "Evento receiverParty referenciado correctamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -871,7 +917,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "100",
-                                ErrorMessage = "Evento senderParty/receiverParty referenciado correctamente",
+                                ErrorMessage = "Evento receiverParty referenciado correctamente",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -1360,7 +1406,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     throw new Exception(xmlParserCufe.ParserError);
 
                 //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-                var resultValidateSingInTime = ValidateSigningTime(data, xmlParserCufe);
+                var resultValidateSingInTime = ValidateSigningTime(data, xmlParserCufe, nitModel);
                 if (!resultValidateSingInTime[0].IsValid)
                 {
                     validate = false;
@@ -2237,11 +2283,70 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
 
                                 break;
+                            //Validacion de la existensia eventos previos Avales
+                            case (int)EventStatus.Avales:
+                                if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
+                                {
+                                    //Valida no tenga Limitaciones la FETV
+                                    if (documentMeta
+                                   .Where(t => t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                   .Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "89",
+                                            ErrorMessage = "No es posible transmitir el evento Aval, ya existe un evento 041 Limitación de circulación",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    //Valida Pago Total FETV     
+                                   else  if (documentMeta
+                                 .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                 .Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "89",
+                                            ErrorMessage = "No se pueda transmitir el evento Aval porque ya existe un pago total FETV",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }
+                                else
+                                {
+                                    validFor = true;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "LGC24",
+                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Solicitud de disponibilización",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                break;
                             //Validación de la existencia eventos previos Endoso
                             case (int)EventStatus.EndosoPropiedad:
                             case (int)EventStatus.EndosoGarantia:
                             case (int)EventStatus.EndosoProcuracion:
-                                //Valida Valores endoso electronico versus FEVTV                               
+                                //Valida Pago Total FETV                          
                                 if (documentMeta
                                  .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
                                  .Count > decimal.Zero)
@@ -2591,7 +2696,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateSigningTime
-        public List<ValidateListResponse> ValidateSigningTime(ValidateSigningTime.RequestObject data, XmlParser dataModel)
+        public List<ValidateListResponse> ValidateSigningTime(ValidateSigningTime.RequestObject data, XmlParser dataModel, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -2686,8 +2791,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.SolicitudDisponibilizacion:
                 case (int)EventStatus.NegotiatedInvoice:
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
-                    if (dataModel.CustomizationID == "361" || dataModel.CustomizationID == "362" ||
-                       dataModel.CustomizationID == "363" || dataModel.CustomizationID == "364")
+                    if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362" ||
+                       nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                     {
                         responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
@@ -2729,7 +2834,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }                    
-                    break;               
+                    break;
+                case (int)EventStatus.Avales:
+                    if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362")
+                    {
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                       ? new ValidateListResponse
+                       {
+                           IsValid = true,
+                           Mandatory = true,
+                           ErrorCode = "100",
+                           ErrorMessage = "Ok",
+                           ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                       }
+                       : new ValidateListResponse
+                       {
+                           IsValid = false,
+                           Mandatory = true,
+                           ErrorCode = "89",
+                           ErrorMessage =
+                               "La fecha de la firma del aval debe ser mayor a la Primera Disponibilización",
+                           ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                       });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "No existe un evento Primera Disponibilización",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                     responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
                        ? new ValidateListResponse
