@@ -1,7 +1,10 @@
 using Gosocket.Dian.Application;
+using Gosocket.Dian.DataContext.Repositories;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
+using Gosocket.Dian.Interfaces.Repositories;
+using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
@@ -19,6 +22,8 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly ContributorService contributorService = new ContributorService();
         private static readonly ContributorOperationsService contributorOperationService = new ContributorOperationsService();
         private static readonly SoftwareService softwareService = new SoftwareService();
+        private static readonly IRadianSoftwareRepository _radianSoftwareRepository = new RadianSoftwareRepository();
+        private static readonly IRadianCallSoftwareService radianSoftwareService = new RadianCallSoftwareService(_radianSoftwareRepository);
         private static readonly TableManager globalTestSetTableManager = new TableManager("GlobalTestSet");
         private static readonly TableManager globalTestSetResultTableManager = new TableManager("GlobalTestSetResult");
         private static readonly TableManager radianTestSetResultTableManager = new TableManager("RadianTestSetResult");
@@ -26,8 +31,9 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager contributorTableManager = new TableManager("GlobalContributor");
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
+        private static readonly TableManager radianSoftwareTableManager = new TableManager("RadianSoftware");
 
-        // Set queue name
+        // Set queue name 
         private const string queueName = "global-test-set-tracking-input%Slot%";
 
         [FunctionName("UpdateTestSetResult")]
@@ -96,14 +102,16 @@ namespace Gosocket.Dian.Functions.Activation
                             await contributorTableManager.InsertOrUpdateAsync(globalContributor);
                         }
 
+                        // Ubico el software
                         var software = softwareService.Get(Guid.Parse(globalTesSetResult.SoftwareId));
-                        if (software.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Test && globalTesSetResult.OperationModeId != (int)OperationMode.Free)
+                        if (software.AcceptanceStatusSoftwareId == (int)Domain.Common.OperationMode.Own && globalTesSetResult.OperationModeId != (int)Domain.Common.OperationMode.Free)
                         {
                             softwareService.SetToProduction(software);
                             var softwareId = software.Id.ToString();
                             var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
                             await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
                         }
+
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
@@ -132,7 +140,7 @@ namespace Gosocket.Dian.Functions.Activation
                                 };
                                 await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
 
-                                if (globalTesSetResult.OperationModeId == (int)OperationMode.Free)
+                                if (globalTesSetResult.OperationModeId == (int)SoftwareStatus.Production)
                                     await MigrateCertificate(contributor.Code);
 
                             }
@@ -291,13 +299,14 @@ namespace Gosocket.Dian.Functions.Activation
                         }
 
                         // Ubico el software
-                        var software = softwareService.Get(Guid.Parse(radianTesSetResult.SoftwareId));
-                        if (software.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Test && radianTesSetResult.OperationModeId != (int)OperationMode.Free)
+                        var software = radianSoftwareService.Get(Guid.Parse(radianTesSetResult.SoftwareId));
+                        if (software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted &&
+                                    radianTesSetResult.OperationModeId != (int)RadianSoftwareStatus.InProcess)
                         {
-                            softwareService.SetToProduction(software);
+                            radianSoftwareService.SetToProduction(software);
                             var softwareId = software.Id.ToString();
-                            var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
-                            await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
+                            var globalSoftware = new RadianTsSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.RadianSoftwareStatusId };
+                            await radianSoftwareTableManager.InsertOrUpdateAsync(globalSoftware);
                         }
 
                         // Send to activate contributor in production
@@ -327,7 +336,7 @@ namespace Gosocket.Dian.Functions.Activation
                                 };
                                 await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
 
-                                if (radianTesSetResult.OperationModeId == (int)OperationMode.Free)
+                                if (radianTesSetResult.Status == (int)RadianSoftwareStatus.Accepted)
                                     await MigrateCertificate(contributor.Code);
 
                             }

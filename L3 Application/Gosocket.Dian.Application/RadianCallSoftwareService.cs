@@ -1,8 +1,12 @@
-﻿using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.DataContext;
+using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Gosocket.Dian.Application
 {
@@ -54,5 +58,37 @@ namespace Gosocket.Dian.Application
             software.Deleted = true;
             return _RadianSoftwareRepository.AddOrUpdate(software);
         }
+
+        public void SetToProduction(RadianSoftware software)
+        {
+            try
+            {
+                using (var context = new SqlDBContext())
+                {
+                    var softwareInstance = context.RadianSoftwares.FirstOrDefault(c => c.Id == software.Id);
+                    softwareInstance.RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted;
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                var logger = new GlobalLogger("Radian - SetSoftwareToProduction", software.Id.ToString())
+                {
+                    Action = "SetToEnabled",
+                    Controller = "",
+                    Message = ex.Message,
+                    RouteData = "",
+                    StackTrace = ex.StackTrace
+                };
+                RegisterException(logger);
+            }
+        }
+
+        private void RegisterException(GlobalLogger logger)
+        {
+            var tableManager = new TableManager("GlobalLogger");
+            tableManager.InsertOrUpdate(logger);
+        }
+
     }
 }
