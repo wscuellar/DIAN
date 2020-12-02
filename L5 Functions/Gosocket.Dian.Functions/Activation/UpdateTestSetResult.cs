@@ -31,7 +31,6 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager contributorTableManager = new TableManager("GlobalContributor");
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
-        private static readonly TableManager radianSoftwareTableManager = new TableManager("RadianSoftware");
 
         // Set queue name 
         private const string queueName = "global-test-set-tracking-input%Slot%";
@@ -102,9 +101,9 @@ namespace Gosocket.Dian.Functions.Activation
                             await contributorTableManager.InsertOrUpdateAsync(globalContributor);
                         }
 
-                        // Ubico el software
                         var software = softwareService.Get(Guid.Parse(globalTesSetResult.SoftwareId));
-                        if (software.AcceptanceStatusSoftwareId == (int)Domain.Common.OperationMode.Own && globalTesSetResult.OperationModeId != (int)Domain.Common.OperationMode.Free)
+                        if (software.AcceptanceStatusSoftwareId == (int)Domain.Common.OperationMode.Own 
+                            && globalTesSetResult.OperationModeId != (int)Domain.Common.OperationMode.Free)
                         {
                             softwareService.SetToProduction(software);
                             var softwareId = software.Id.ToString();
@@ -305,8 +304,8 @@ namespace Gosocket.Dian.Functions.Activation
                         {
                             radianSoftwareService.SetToProduction(software);
                             var softwareId = software.Id.ToString();
-                            var globalSoftware = new RadianTsSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.RadianSoftwareStatusId };
-                            await radianSoftwareTableManager.InsertOrUpdateAsync(globalSoftware);
+                            var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.RadianSoftwareStatusId };
+                            await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
                         }
 
                         // Send to activate contributor in production

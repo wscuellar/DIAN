@@ -851,7 +851,7 @@ span.state-file {
     position: absolute;
     right: 0;
     background-repeat: no-repeat;
-    top: 0;
+    top: 27px;
     margin: 11px;
 }
 
@@ -1060,7 +1060,7 @@ span.close {
             position: absolute;
             height: 20px;
             left: 42%;
-            top: 24px;
+            top: 0%;
             background: white;
             border: solid 1px;
             width: 20px;
@@ -1223,6 +1223,13 @@ button.selectpicker .fa-caret-down {
     right: -30px;
 }
 
+.bootbox-close-button.close {
+    background: url(/Content/images/png/closeButton.png);
+    background-repeat: no-repeat;
+    text-indent: -9000px;
+    top: 21px;
+}
+
 .prompt-comment {
     font-size: 24px;
 }
@@ -1266,6 +1273,10 @@ button.selectpicker .fa-caret-down {
 
 .prompt-comment .modal-content{
     padding-right: 40px;
+}
+
+.cancel-confirmation .modal-body {
+
 }
 
 #dateFrom, #dateTo {
