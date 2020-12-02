@@ -52,8 +52,9 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage) {
     });
 }
 
-function showConfirmation(confirmMessage, buttons) {
+function showConfirmation(confirmMessage, buttons, className) {
     bootbox.dialog({
+        className: className && className,
         message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
         buttons: buttons
     });
@@ -150,7 +151,11 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
             }
         },
         callback: function (result) {
-            result ? event(result) : operationCancel;
+            if (!result && result != "") {
+                operationCancel();
+            } else {
+                event(result);
+            }
         }
     });
 

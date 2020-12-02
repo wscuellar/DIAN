@@ -29,17 +29,14 @@
                     @*}*@
                 </div>
 
-                @if (true)
+                @if (Model.RadianContributorTestSetResults.Count > 0)
                 {
-                    if (true)
-                    {
-                        <div class="row margin-horizontal-0 margin-vertical-30">
-                            @Html.Partial("_testSetResults")
-                        </div>
-                    }
+                    <div class="row margin-horizontal-0 margin-vertical-30">
+                        @Html.Partial("_testSetResults")
+                    </div>
                 }
 
-                @if (true)
+                @if (Model.Users.Count > 0)
                 {
                     <div class="row margin-horizontal-0 margin-vertical-30">
                         @Html.Partial("_users")
@@ -122,7 +119,7 @@
                 $(this).html(string);
             })
 
-            $(".jqcs_option").click(function () {
+            $(".jqcs_option").click(function () {debugger
                 var element = this;
                 var confirmationMessage = bootboxMessage.CHANGE_STATE;
                 var idFile = $(element).parents("tr").attr("data-idFile");
@@ -134,7 +131,7 @@
                 var operation = (comment) => {debugger
                     documentsEdited.push({ ...objToAdd, comment });
                 }
-                var operationCancel = () => {
+                var operationCancel = () => {debugger
                     $(element).parents("tr").children(".init-show").toggle();
                     $(element).parents("tr").children(".init-hide").toggle();
                     var string = $(element).parents("tr").children("td.edit-state-td").children("button.edit-state").html() == "Editar" ? "Cancelar" : "Editar"
