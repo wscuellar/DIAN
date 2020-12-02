@@ -42,6 +42,8 @@ function RenderSteps(index) {
                 fileObj = files[i].files[0];
                 fileSize = fileObj ? Math.round(fileObj.size / 10000) / 100 : 0;
                 if (fileObj && fileSize > 10) {
+                    $(this).val("");
+                    $(this).parents(".custom-file").children("label").html("");
                     id == fileObj.name && (isValid = false);
                     messages = Object.assign(messages, {
                         [files[i].name]: {
@@ -50,6 +52,8 @@ function RenderSteps(index) {
                     });
                 }
                 else if (fileObj && fileObj.type != "application/pdf") {
+                    $(this).val("");
+                    $(this).parents(".custom-file").children("label").html("");
                     id == fileObj.name && (isValid = false);
                     messages = Object.assign(messages, {
                         [files[i].name]: {
