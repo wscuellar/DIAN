@@ -320,7 +320,7 @@ namespace Gosocket.Dian.Web.Controllers
             //Nombre del documento, estado, observaciones
             dic.Add("##CONTENT##", message.ToString());
 
-            emailService.SendEmail(radianAdmin.Contributor.Email, "Resultado Validación Documentos Requisitos RADIAN", dic);
+            //emailService.SendEmail(radianAdmin.Contributor.Email, "Resultado Validación Documentos Requisitos RADIAN", dic);
 
             return true;
         }
