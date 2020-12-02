@@ -22,7 +22,7 @@
                             @Html.Partial("_default")
                         </div>
                         <div class="panel-footer text-right">
-                            <button type="button" class="btn btn-default btn-radian-default">Cancelar</button>
+                            <button type="button"  onclick="location.href='@Url.Action("AdminRadianView", "Radian")'" class="btn btn-default btn-radian-default">Cancelar</button>
                             <button type="button" class="btn btn-success btn-radian-success button-change-state">Guardar cambios</button>
                         </div>
                     </div>
@@ -73,16 +73,15 @@
                 showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                 var radianApproveState = $("#RadianApprovalState").val();
                 e.preventDefault();
-                $.ajax({
-                    url: '@Url.Action("ViewDetails", "Radian")',
-                    type: "POST",
-                    data: {
+                    var confirmMessage = bootboxMessage.CANCEL_REGISTER;
+                    var url = '@Url.Action("ViewDetails", "Radian")';
+                    var dataAjax = {
                         data: documentsEdited,
                         id: id,
                         approveState: radianApproveState,
                         radianState: '@Model.RadianState'
-                    },
-                    error: function (error) {
+                    }
+                    var errorAction = (error) => {
                         var messageError = Object.values(error)[0];
                         var id = Object.values(error)[2];
                         bootbox.alert({
@@ -99,8 +98,8 @@
                                 window.location.href = "/Radian/ViewDetails/" + id;
                             }
                         });
-                    },
-                    success: function (data) {
+                    };
+                    var successAction = (data) => {
                         var messageSuccess = Object.values(data)[0];
                         var id = Object.values(data)[2];
                         var operation = () => {
@@ -108,8 +107,13 @@
                             window.location.href = "/Radian/ViewDetails/" + id;
                         }
                         showConfirmation(messageSuccess, AlertExec(operation));
-                    }
-                });
+                    };
+                    var label = "";
+                if (radianApproveState == "1") {
+                    CancelRegister(url, dataAjax, confirmMessage, successAction, label, errorAction);
+                } else {
+                    ajaxFunction(url, "POST", dataAjax, errorAction, successAction);
+                }
             });
 
             $(".edit-state").click(function () {
@@ -119,7 +123,7 @@
                 $(this).html(string);
             })
 
-            $(".jqcs_option").click(function () {debugger
+            $(".jqcs_option").click(function () {
                 var element = this;
                 var confirmationMessage = bootboxMessage.CHANGE_STATE;
                 var idFile = $(element).parents("tr").attr("data-idFile");
@@ -128,10 +132,10 @@
                     Id: idFile,
                     NewState: Number(newState)
                 };
-                var operation = (comment) => {debugger
+                var operation = (comment) => {
                     documentsEdited.push({ ...objToAdd, comment });
                 }
-                var operationCancel = () => {debugger
+                var operationCancel = () => {
                     $(element).parents("tr").children(".init-show").toggle();
                     $(element).parents("tr").children(".init-hide").toggle();
                     var string = $(element).parents("tr").children("td.edit-state-td").children("button.edit-state").html() == "Editar" ? "Cancelar" : "Editar"

@@ -1275,10 +1275,6 @@ button.selectpicker .fa-caret-down {
     padding-right: 40px;
 }
 
-.cancel-confirmation .modal-footer{
-    display: none;
-}
-
 .cancel-confirmation .modal-body {
 
 }
