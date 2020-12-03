@@ -8,7 +8,8 @@
 //    page: 0,
 //    tableRendered: "",
 //    customersTotalCount: 0,
-//    columns: []
+//    columns: [],
+//    ajaxData: {}
 //}
 
 function RenderSteps(index) {
@@ -21,39 +22,57 @@ function RenderSteps(index) {
         enablePagination: false,
         enableKeyNavigation: false
     });
-
+    //hideLoading();
     $(".radian-file").click(function () {
         $(this).val("");
         $(this).parents(".custom-file").children("label").html("");
     });
     $(".radian-file").change(function (file) {
-        var form = $(this).parents("form");
-        var messages = new Object();
+        var isValid = true;
         var id = $(this).attr('name');
-        var fileObj = file.target.files[0];
-        var fileSize = Math.round(fileObj.size / 10000) / 100;
-        if (fileSize > 10) {
-            $(this).parents(".custom-file").children("label").html("");
-            messages = Object.assign(messages, {
-                [id]: {
-                    required: "Tamaño máximo 10 Mb."
+        var form = $(this).parents("form");
+        var files = form[0];
+        var messages = new Object();
+        var actualFileObj = file.target.files[0];
+        var actualFileSize = Math.round(actualFileObj.size / 10000) / 100;
+        var fileObj = "";
+        var fileSize = "";
+        for (var i = 0; i < files.length; i++) {   
+            if (files[i].type == "file" && files[i].id == "") {
+                fileObj = files[i].files[0];
+                fileSize = fileObj ? Math.round(fileObj.size / 10000) / 100 : 0;
+                if (fileObj && fileSize > 10) {
+                    id == fileObj.name && (isValid = false);
+                    messages = Object.assign(messages, {
+                        [files[i].name]: {
+                            required: "Tamaño máximo 10 Mb."
+                        }
+                    });
                 }
-            });
+                else if (fileObj && fileObj.type != "application/pdf") {
+                    id == fileObj.name && (isValid = false);
+                    messages = Object.assign(messages, {
+                        [files[i].name]: {
+                            required: "Solo documentos .PDF"
+                        }
+                    });
+                } else {
+                    messages = Object.assign(messages, {
+                        [files[i].name]: {
+                            required: "Archivo requerido"
+                        }
+                    });
+                }
+            }
         }
-        else if (fileObj.type != "application/pdf") {
-            $(this).parents(".custom-file").children("label").html("");
-            messages = Object.assign(messages, {
-                [id]: {
-                    required: "Solo documentos .PDF"
-                }
-            });
-        } else {
-            $(this).parent().children().html(fileObj.name + "  (" + fileSize + " Mb)");
+        if (isValid) {
+            $(this).parent().children().html(actualFileObj.name + "  (" + actualFileSize + " Mb)");
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").toggle();
-            $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();debugger
-            $(this).parents(".inputs-dinamics").children(".file-input-disabled").children("input").attr("value",fileObj.name);
-            //$(this).parents(".inputs-dinamics").children(".file-input-enabled").children("input").val();
+            $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle(); 
+            $(this).parents(".inputs-dinamics").children(".file-input-disabled").children("input").attr("value", actualFileObj.name);
         }
+           
+
         form.validate({
             messages: messages
         });
@@ -66,14 +85,14 @@ function RenderSteps(index) {
     })
 }
 
-function RenderTable(element, data, form, urlSearch, radianId, page, tableRendered, customersTotalCount, columns) {
-    var totalPages = Math.round(customersTotalCount / 10) + 1 ;
-    tableRendered && tableRendered.destroy();
-    var table = $(element).DataTable({
+function RenderTable(paramsObject) {
+    var totalPages = Math.round(paramsObject.customersTotalCount / 10) + 1 ;
+    paramsObject.tableRendered && paramsObject.tableRendered.destroy();
+    paramsObject.tableRendered = $(paramsObject.element).DataTable({
         paging: false,
         info: false,
-        data: data,
-        columns: columns,
+        data: paramsObject.data,
+        columns: paramsObject.columns,
         language: {
             "lengthMenu": "Mostrar _MENU_ elementos por página",
             "zeroRecords": "No se encontraron datos",
@@ -87,91 +106,50 @@ function RenderTable(element, data, form, urlSearch, radianId, page, tableRender
             }
         }
     });
-    $(element+"_filter > label").hide();
-    $(element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(page, customersTotalCount));
-    $(element + "_filter").append(form);
-    LoadEventsToSearch(urlSearch, radianId, form, page, table, customersTotalCount, columns);
-    LoadEventsToPagiantion(element, data, form, urlSearch, radianId, page, table, customersTotalCount, columns);
+    $(paramsObject.element + "_filter > label").hide();
+    $(paramsObject.element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.page, paramsObject.customersTotalCount));
+    $(paramsObject.element + "_filter").append(paramsObject.form);
+    LoadEventsToSearch(paramsObject);
+    LoadEventsToPagiantion(paramsObject);
     changeToSpanish();
 }
 
-function LoadEventsToSearch(url, radianContributorId, form, page, table, customersTotalCount, columns) {
-    $("#search-customers").click(function (e) {
+function LoadEventsToSearch(paramsObject) {
+    $(".search-data").click(function (e) {
         e.preventDefault();
-        var nit = $("#NitSearch").val();
-        var state = $("#RadianStateSelect").val();
-        var data = {
-            radianContributorId,
-            code: nit,
-            radianState: state,
-            page: page,
-            pagesize: 10
-        };
-        var actionError = () => {}
-        var actionSuccess = (response) => {
-            RenderTable('#table-customers', response, form, url, radianContributorId, page, table, customersTotalCount, columns)
-        }
-        ajaxFunction(url, 'POST', data, actionError, actionSuccess); 
+        SearchData(paramsObject);
     })
 }
 
-function LoadEventsToPagiantion(element, data, form, urlSearch, radianId, page, table, customersTotalCount, columns) {
-    $(".next-page").click(function () {
-        var newPage = parseInt($("#PageTable").val()) + 1;
-        $("#PageTable").val(newPage);
-        var nit = $("#NitSearch").val();
-        var state = $("#RadianStateSelect").val();
-        var data = {
-            radianContributorId: radianId,
-            code: nit,
-            radianState: state,
-            page: newPage,
-            pagesize: 10
-        };
-        var actionError = () => { }
-        var actionSuccess = (response) => {
-            RenderTable(element, response, form, urlSearch, radianId, newPage, table, customersTotalCount, columns)
+function SearchData(paramsObject) {
+    const cloneAjaxData = Object.assign({}, paramsObject.ajaxData);
+    var arrayToMap = Object.entries(paramsObject.ajaxData);
+    arrayToMap.forEach((element) => {
+        if (typeof element[1] === 'string' && element[1].includes("#")) {
+            paramsObject.ajaxData[element[0]] = $(element[1]).val();
         }
-        ajaxFunction(urlSearch, 'POST', data, actionError, actionSuccess); 
+    });
+    var actionError = () => { }
+    var actionSuccess = (response) => {
+        paramsObject.data = response.Customers;
+        paramsObject.ajaxData = cloneAjaxData;
+        RenderTable(paramsObject);
+    }
+    ajaxFunction(paramsObject.urlSearch, 'POST', paramsObject.ajaxData, actionError, actionSuccess);
+}
+
+function LoadEventsToPagiantion(paramsObject) {
+    $(".next-page").click(function () {
+        paramsObject.page = paramsObject.page + 1;
+        paramsObject.ajaxData.page = paramsObject.page
+        SearchData(paramsObject);
     });
     $(".prev-page").click(function () {
-        var newPage = parseInt($("#PageTable").val()) - 1;
-        $("#PageTable").val(newPage);
-        var nit = $("#NitSearch").val();
-        var state = $("#RadianStateSelect").val();
-        var data = {
-            radianContributorId: radianId,
-            code: nit,
-            radianState: state,
-            page: newPage,
-            pagesize: 10
-        };
-        var actionError = () => { }
-        var actionSuccess = (response) => {
-            RenderTable(element, response, form, urlSearch, radianId, newPage, table, customersTotalCount, columns)
-        }
-        ajaxFunction(url, 'POST', data, actionError, actionSuccess); 
+        paramsObject.page = paramsObject.page - 1;
+        paramsObject.ajaxData.page = paramsObject.page
+        SearchData(paramsObject);
     });
 }
-
-function SearchCustomers() {
-    var nit = $("#NitSearch").val();
-    var state = $("#RadianStateSelect").val();
-    var data = {
-        radianContributorId: radianId,
-        code: nit,
-        radianState: state,
-        page: newPage,
-        pagesize: 10
-    };
-    var actionError = (error) => { showConfirmation(error.messages, AlertExec()); }
-    var actionSuccess = (response) => {
-        RenderTable(element, response, form, urlSearch, radianId, newPage, table)
-    }
-    ajaxFunction(url, 'POST', data, actionError, actionSuccess); 
-}
-
-
 
 function TablePagination(page, totalCount) {
     var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : ""; 
@@ -197,4 +175,18 @@ function changeToSpanish() {
     $(".input-daterange input").change(function(){
         $(".datepicker-dropdown").css("display","none");
     });
+}
+
+function cancelRegister(cancelData) {
+    var url = cancelData.url;
+    var confirmationMessage = bootboxMessage.CONFIRMATION_MESSAGE;
+    var successAction = () => window.location.href = cancelData.href;
+    var dataAjax = {
+        id: cancelData.id,
+        newState: '4',
+        radianContributorTypeId: cancelData.type,
+        radianState: cancelData.state
+                };
+    var label = bootboxMessage.CANCEL_DESCRIPTION;
+    CancelRegister(url, dataAjax, confirmationMessage, successAction, label);
 }

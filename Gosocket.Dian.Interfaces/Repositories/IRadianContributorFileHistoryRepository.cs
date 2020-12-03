@@ -1,5 +1,7 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using System;
+using System.Linq.Expressions;
 
 namespace Gosocket.Dian.Interfaces.Repositories
 {
@@ -7,5 +9,7 @@ namespace Gosocket.Dian.Interfaces.Repositories
     {
         Guid AddRegisterHistory(RadianContributorFileHistory radianContributorFileHistory);
 
+        PagedResult<RadianContributorFileHistory> List(Expression<Func<RadianContributorFileHistory, bool>> expression, int page, int pagesize);
+        
     }
 }

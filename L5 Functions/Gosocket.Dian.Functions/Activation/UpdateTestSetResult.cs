@@ -31,6 +31,7 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager contributorTableManager = new TableManager("GlobalContributor");
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
+        private static readonly TableManager radianSoftwareTableManager = new TableManager("RadianSoftware");
 
         // Set queue name 
         private const string queueName = "global-test-set-tracking-input%Slot%";
@@ -101,6 +102,7 @@ namespace Gosocket.Dian.Functions.Activation
                             await contributorTableManager.InsertOrUpdateAsync(globalContributor);
                         }
 
+                        // Ubico el software
                         var software = softwareService.Get(Guid.Parse(globalTesSetResult.SoftwareId));
                         if (software.AcceptanceStatusSoftwareId == (int)Domain.Common.OperationMode.Own
                             && globalTesSetResult.OperationModeId != (int)Domain.Common.OperationMode.Free)
