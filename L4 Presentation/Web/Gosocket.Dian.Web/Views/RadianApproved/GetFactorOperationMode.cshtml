@@ -10,6 +10,8 @@
 
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
     <script src="~/Content/js/Radian/RadianOperationMode.js"></script>
+    <script src="~/Content/js/Radian/constants.js"></script>
+    <script src="~/Content/js/Radian/RadianSteps.js"></script>
 
     <script>
         $(document).ready(function () {
@@ -20,7 +22,6 @@
             "@operationMode" != "2" && $("#OperationModeSelected").attr("disabled", "disabled");
             if ("@operationMode" != "2") {
                 $("#OperationModeSelectedId").val(1);
-
             } else {
                   $("#OperationModeSelectedId").change(function (value) {
                     var software = $("#OperationModeSelectedId").val();
@@ -28,7 +29,7 @@
                 })
             }
 
-            $("#save-operation-mode").click(function (e) {debugger
+            $("#save-operation-mode").click(function (e) {
                 e.preventDefault();
                 var SetOperationViewModel = {
                     RadianContributorId: @Model.Contributor.RadianContributorId,
@@ -44,6 +45,17 @@
             $("#combobox").combobox();
             $("#toggle").on("click", function () {
                 $("#combobox").toggle();
+            });
+
+            $(".cancel-register").click(function () {
+                var cancelData = {
+                    url: "@Url.Action("DeleteUser", "RadianApproved")",
+                    href: '@Url.Action("Index", "Radian")',
+                    id: '@Model.Contributor.Id',
+                    type: @Model.Contributor.RadianContributorTypeId,
+                    state: '@Model.Contributor.RadianState'
+                };
+                cancelRegister(cancelData);
             });
         })
     </script>
