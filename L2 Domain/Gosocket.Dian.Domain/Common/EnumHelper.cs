@@ -313,5 +313,9 @@ namespace Gosocket.Dian.Domain.Common
     {
         [Description("Registro cancelado")]
         Cancelled = 12310324,
+        [Description("Registro inactivo")]
+        Inactive = 12310343,
+        [Description("Registro suspension")]
+        Suspension = 12310396,
     }
 }
