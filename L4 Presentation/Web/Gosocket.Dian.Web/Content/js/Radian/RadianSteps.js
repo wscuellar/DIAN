@@ -21,7 +21,11 @@ function RenderSteps(index) {
         autoFocus: true,
         startIndex: index,
         enablePagination: false,
-        enableKeyNavigation: false
+        enableKeyNavigation: false,
+        onInit: () => {
+            var tooltip = $('.add-tooltip');
+            if (tooltip.length) tooltip.tooltip();
+        }
     });
     //hideLoading();
     $(".radian-file").click(function () {
