@@ -80,11 +80,9 @@ namespace Gosocket.Dian.Application
             templateFirstPage = templateFirstPage.Replace("{Badge}", string.Empty);
             templateFirstPage = templateFirstPage.Replace("{Currency}", string.Empty);
             templateFirstPage = templateFirstPage.Replace("{PaymentMethod}", string.Empty);
-            templateFirstPage = templateFirstPage.Replace("{Expiration}", string.Empty);
+            templateFirstPage = templateFirstPage.Replace("{ExpirationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
             templateFirstPage = templateFirstPage.Replace("{ReceiverBusinessName}", documentMeta.ReceiverName);
             templateFirstPage = templateFirstPage.Replace("{ReceiverNit}", documentMeta.ReceiverCode);
-
-
 
             // Mapping Events
 
@@ -201,15 +199,13 @@ namespace Gosocket.Dian.Application
 
         private StringBuilder CommonDataTemplateMapping(StringBuilder template, DateTime expeditionDate, int page, GlobalDocValidatorDocumentMeta documentMeta)
         {
-            template = template.Replace("{PrintDay}", expeditionDate.Day.ToString());
-            template = template.Replace("{PrintMonth}", expeditionDate.Month.ToString());
-            template = template.Replace("{PrintYear}", expeditionDate.Year.ToString());
+            template = template.Replace("{PrintDate}", $"Impreso el {expeditionDate:d 'de' MM 'de' yyyy 'a las' hh:mm:ss tt}");
             template = template.Replace("{PrintTime}", expeditionDate.TimeOfDay.ToString());
             template = template.Replace("{PrintPage}", page.ToString());
             template = template.Replace("{InvoiceNumber}", documentMeta.SerieAndNumber);
             template = template.Replace("{CUFE}", documentMeta.PartitionKey);
-            template = template.Replace("{EInvoiceGenerationDate}", documentMeta.EmissionDate.ToString("yyyy-mm-dd HH:mm:ss.sss"));
-            template = template.Replace("{Status}", string.Empty);
+            template = template.Replace("{EInvoiceGenerationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
+            template = template.Replace("{Status}", documentMeta.EventCode);
             return template;
         }
 
@@ -222,7 +218,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EventNumber" + subEvent + "}", eventObj.Code);
             template = template.Replace("{DocumentTypeName" + subEvent + "}", eventObj.Description);
             template = template.Replace("{CUDE" + subEvent + "}", eventObj.DocumentKey);
-            template = template.Replace("{ValidationDate" + subEvent + "}", eventObj.Date.ToString("yyyy-mm-dd HH:mm:ss.sss"));
+            template = template.Replace("{ValidationDate}", $"{eventObj.Date:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
             template = template.Replace("{SenderBusinessName" + subEvent + "}", eventObj.SenderName);
             template = template.Replace("{ReceiverBusinessName" + subEvent + "}", eventObj.ReceiverName);
 
