@@ -1014,7 +1014,20 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE 3
             start = DateTime.UtcNow;
 
-            //var validatorCuneRequest = validatorCune(trackId);
+            var validatorCuneRequest = validatorCune(trackId);
+            if (!validatorCuneRequest.IsValid)
+            {
+                //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
+                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
+                dianResponse.StatusDescription = validatorCuneRequest.ErrorMessage[0];
+                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
+                if (globalEnd >= 10)
+                {
+                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
+                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                }
+                return dianResponse;
+            }
 
             var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = "11", trackId, eventNomina = true };
             var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>("http://localhost:7071/api/UploadXml", uploadXmlRequest);
