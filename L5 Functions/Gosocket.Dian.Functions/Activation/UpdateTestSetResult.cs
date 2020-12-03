@@ -102,7 +102,7 @@ namespace Gosocket.Dian.Functions.Activation
                         }
 
                         var software = softwareService.Get(Guid.Parse(globalTesSetResult.SoftwareId));
-                        if (software.AcceptanceStatusSoftwareId == (int)Domain.Common.OperationMode.Own 
+                        if (software.AcceptanceStatusSoftwareId == (int)Domain.Common.OperationMode.Own
                             && globalTesSetResult.OperationModeId != (int)Domain.Common.OperationMode.Free)
                         {
                             softwareService.SetToProduction(software);
