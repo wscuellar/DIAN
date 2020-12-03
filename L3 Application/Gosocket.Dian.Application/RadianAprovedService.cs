@@ -211,16 +211,19 @@ namespace Gosocket.Dian.Application
 
             RadianContributorOperation existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == radianContributorOperation.SoftwareId && !t.Deleted);
             if (existingsoft == null)
+            {
                 result = _radianContributorOperationRepository.Add(radianContributorOperation);
-
+                existingsoft = _radianContributorOperationRepository.Get(t => t.Id == result);
+            }
+                
             if (result > 0)
             {
                 RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorOperation.RadianContributorId);
-                RadianTestSet testSet = _radianTestSetService.GetTestSet(radianContributor.RadianContributorTypeId.ToString(), radianContributor.RadianContributorTypeId.ToString());
+                RadianTestSet testSet = _radianTestSetService.GetTestSet(existingsoft.SoftwareType.ToString(), existingsoft.SoftwareType.ToString());
                 if (testSet != null)
                 {
                     Contributor contributor = radianContributor.Contributor;
-                    string key = radianContributor.RadianContributorTypeId.ToString() + "|" + radianContributorOperation.SoftwareId;
+                    string key = existingsoft.SoftwareType.ToString() + "|" + radianContributorOperation.SoftwareId;
                     RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                     {
                         TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
@@ -291,6 +294,12 @@ namespace Gosocket.Dian.Application
         public RadianSoftware GetSoftware(Guid id)
         {
             return _radianCallSoftwareService.Get(id);
+        }
+
+        public RadianSoftware GetSoftware(int radianContributorId, int softwareType)
+        {
+            RadianContributorOperation radianContributorOperation = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorId && t.SoftwareType == softwareType);
+            return GetSoftware(radianContributorOperation.SoftwareId);              
         }
 
         public List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
