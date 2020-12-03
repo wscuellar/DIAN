@@ -32,8 +32,10 @@
     }
 
     .title-container {
-        margin-bottom: 20px !important;
+        margin-bottom: 50px !important;
+        margin-top: 30px !important;
     }
+
 </style>
 
 <div class="page-content margin-15">
@@ -101,6 +103,7 @@
                                                                     </div>
                                                                 </div>
                                                             }
+
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     <label class="control-label">Rango de fechas</label>
@@ -341,11 +344,11 @@
         $(document).on('mouseenter', ".iffyTip", function () {
             var $this = $(this);
             if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
-                $this.tooltip({
-                    title: $this.text(),
-                    placement: "top"
-                });
-                $this.tooltip('show');
+                //$this.tooltip({
+                //    title: $this.text(),
+                //    placement: "left"
+                //});
+                //$this.tooltip('show');
             }
         });
         $('.hideText').css('width', $('.hideText').parent().width());
