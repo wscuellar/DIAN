@@ -21,16 +21,16 @@ namespace Gosocket.Dian.Web.Models
         //public string UserName { get; set; }
 
         [DataType(DataType.Text)]
-        [Display(Name = "Nombres")]
+        [Display(Name = "Nombre")]
         [Required(ErrorMessage = "{0} es requerido.")]
         public string Names { get; set; }
 
-        [Display(Name = "Tipo de Identificación")]
+        [Display(Name = "Tipo de documento")]
         [Required(ErrorMessage = "{0} es requerido.")]
         public int IdentificationTypeId { get; set; }
 
         [DataType(DataType.Text)]
-        [Display(Name = "Número de documento")]
+        [Display(Name = "Número de identificaión")]
         [Required(ErrorMessage = "{0} es requerido.")]
         public string IdentificationId { get; set; }
 

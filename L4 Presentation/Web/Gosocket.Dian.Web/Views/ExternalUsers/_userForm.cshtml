@@ -1,7 +1,16 @@
 ﻿@model Gosocket.Dian.Web.Models.ExternalUserViewModel
 
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general fields captureFields" } };}
+
 <div class="panel-body padding-20">
     <div class="row">
+        <div class="col-sm-3 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Names, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Names, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.Names, "", new { @class = "text-danger" })
+            </div>
+        </div>
         <div class="col-sm-3 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.IdentificationTypeId, new { @class = "control-label" })
@@ -11,23 +20,14 @@
         <div class="col-sm-3 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.IdentificationId, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.IdentificationId, new { @class="form-control" })
+                @Html.TextBoxFor(m => m.IdentificationId, defaultHtmlAttr)
                 @Html.ValidationMessageFor(m => m.IdentificationId, "", new { @class = "text-danger" })
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-4 padding-xs-0">
-            <div class="form-group">
-                @Html.LabelFor(m => m.Names, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Names, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Names, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        <div class="col-sm-6 padding-xs-0">
+        <div class="col-sm-3 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.TextBoxFor(m => m.Email, defaultHtmlAttr)
                 @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
             </div>
         </div>
