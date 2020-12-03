@@ -293,6 +293,31 @@ namespace Gosocket.Dian.Application
             return _radianCallSoftwareService.Get(id);
         }
 
+        public RadianSoftware GetSoftware(int radianContributorId, int radiancontributorTypeId, int operationModeId)
+        {
+
+            int softwareType = 0;
+            if (operationModeId == 1)
+                softwareType = (int)RadianOperationModeTestSet.OwnSoftware;
+            else
+            {
+                switch (radiancontributorTypeId)
+                {
+                    case 2: 
+                        softwareType = (int)RadianOperationModeTestSet.SoftwareTechnologyProvider;
+                        break;
+                    case 3:
+                        softwareType = (int)RadianOperationModeTestSet.SoftwareTradingSystem;
+                        break;
+                    case 4:
+                        softwareType = (int)RadianOperationModeTestSet.SoftwareFactor;
+                        break;
+                }
+            }
+            RadianContributorOperation radianContributorOperation = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorId && t.SoftwareType == softwareType);
+            return GetSoftware(radianContributorOperation.SoftwareId);              
+        }
+
         public List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
         {
             List<RadianContributor> participants;

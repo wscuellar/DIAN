@@ -216,11 +216,12 @@ namespace Gosocket.Dian.Web.Controllers
 
 
         [HttpPost]
-        public ActionResult GetSetTestResult(RadianApprovedViewModel radianApprovedViewModel)
+        public ActionResult GetSetTestResult(RadianApprovedViewModel model)
         {
-            radianApprovedViewModel.RadianTestSetResult =
-                _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
-            return View(radianApprovedViewModel);
+            RadianSoftware software = _radianAprovedService.GetSoftware(model.Contributor.RadianContributorId, model.RadianContributorTypeId, model.Contributor.RadianOperationModeId);
+            string key = model.RadianContributorTypeId.ToString() + "|" + software.Id;
+            model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(model.Nit, key);
+            return View(model);
         }
 
         [HttpPost]
