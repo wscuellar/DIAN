@@ -13,6 +13,7 @@
 //}
 
 function RenderSteps(index) {
+    var validator;
     $("#steps-approved").steps({
         headerTag: "h3",
         bodyTag: "section",
@@ -28,6 +29,7 @@ function RenderSteps(index) {
         $(this).parents(".custom-file").children("label").html("");
     });
     $(".radian-file").change(function (file) {
+        validator && validator.destroy();
         var isValid = true;
         var id = $(this).attr('name');
         var form = $(this).parents("form");
@@ -42,7 +44,11 @@ function RenderSteps(index) {
                 fileObj = files[i].files[0];
                 fileSize = fileObj ? Math.round(fileObj.size / 10000) / 100 : 0;
                 if (fileObj && fileSize > 10) {
-                    id == fileObj.name && (isValid = false);
+                    $($("input[name='" + files[i].name + "']")[0]).val("");
+                    $($("input[name='" + files[i].name + "']")[0]).parents(".custom-file").children("label").html("");
+                    if (id == files[i].name)
+                        isValid = false;
+
                     messages = Object.assign(messages, {
                         [files[i].name]: {
                             required: "Tamaño máximo 10 Mb."
@@ -50,7 +56,11 @@ function RenderSteps(index) {
                     });
                 }
                 else if (fileObj && fileObj.type != "application/pdf") {
-                    id == fileObj.name && (isValid = false);
+                    $($("input[name='" + files[i].name + "']")[0]).val("");
+                    $($("input[name='" + files[i].name + "']")[0]).parents(".custom-file").children("label").html("");
+                    if (id == files[i].name)
+                        isValid = false;
+
                     messages = Object.assign(messages, {
                         [files[i].name]: {
                             required: "Solo documentos .PDF"
@@ -72,11 +82,10 @@ function RenderSteps(index) {
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").children("input").attr("value", actualFileObj.name);
         }
            
-
-        form.validate({
+        validator = form.validate({
             messages: messages
         });
-        form.valid();
+        $(form).valid();
     });
 
     $(".close").click(function () {
@@ -180,7 +189,11 @@ function changeToSpanish() {
 function cancelRegister(cancelData) {
     var url = cancelData.url;
     var confirmationMessage = bootboxMessage.CONFIRMATION_MESSAGE;
-    var successAction = () => window.location.href = cancelData.href;
+    var successAction = () => {
+        var message = bootboxMessage.CANCEL_RESPONSE_CORRECT;
+        var operation = () => window.location.href = cancelData.href
+        showConfirmation(message, AlertExec(operation), "cancel-confirmation"); 
+    };
     var dataAjax = {
         id: cancelData.id,
         newState: '4',

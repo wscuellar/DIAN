@@ -29,7 +29,7 @@
                 })
             }
 
-            $("#save-operation-mode").click(function (e) {debugger
+            $("#save-operation-mode").click(function (e) {
                 e.preventDefault();
                 var SetOperationViewModel = {
                     RadianContributorId: @Model.Contributor.RadianContributorId,
@@ -47,7 +47,7 @@
                 $("#combobox").toggle();
             });
 
-            $(".cancel-register").click(function () {debugger
+            $(".cancel-register").click(function () {
                 var cancelData = {
                     url: "@Url.Action("DeleteUser", "RadianApproved")",
                     href: '@Url.Action("Index", "Radian")',

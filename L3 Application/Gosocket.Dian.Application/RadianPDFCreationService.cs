@@ -219,9 +219,9 @@ namespace Gosocket.Dian.Application
 
         private StringBuilder EventTemplateMapping(StringBuilder template, Event eventObj, string subEvent)
         {
-            template = template.Replace("{EventNumber" + subEvent + "}", eventObj.DateNumber.ToString());
+            template = template.Replace("{EventNumber" + subEvent + "}", eventObj.Code);
             template = template.Replace("{DocumentTypeName" + subEvent + "}", eventObj.Description);
-            template = template.Replace("{CUDE" + subEvent + "}", eventObj.Code);
+            template = template.Replace("{CUDE" + subEvent + "}", eventObj.DocumentKey);
             template = template.Replace("{ValidationDate" + subEvent + "}", eventObj.Date.ToString("yyyy-mm-dd HH:mm:ss.sss"));
             template = template.Replace("{SenderBusinessName" + subEvent + "}", eventObj.SenderName);
             template = template.Replace("{ReceiverBusinessName" + subEvent + "}", eventObj.ReceiverName);
