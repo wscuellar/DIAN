@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Web.Models
 
         public SearchDocumentViewModel()
         {
-            MaxItemCount = 15;
+            MaxItemCount = 10;
             IsNextPage = false;
             Page = 0;
             StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); ;
