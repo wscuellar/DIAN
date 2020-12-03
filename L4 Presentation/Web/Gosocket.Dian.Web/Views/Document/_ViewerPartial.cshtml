@@ -22,20 +22,6 @@
     <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 }
 
-@section scripts{
-    <script>
-        //src="~/Content/js/Radian/RadianPrintDocumentPdf.js"
-        function showPdfModal(htmlPartial) {
-            debugger;
-            bootbox.dialog({
-                message: htmlPartial,
-                className: "table-data modal-radian",
-                size: 'large'
-            });
-        }
-    </script>
-}
-
 <!--Message-->
 <!--===================================================-->
 <div class="mar-top pad-no bg-white" id="html-gdoc">
@@ -111,10 +97,10 @@
 <div>
     @*Abre PDF*@
     <br />
-    <a href="#" onclick='showPdfModal()'>Certificado de existencia</a>
+    <button id="show-document" class="btn btn-link">Certificado de existencia</button>
 
     @*<a href="@Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey })">Certificado de existencia</a>
-        @(Html.Raw(JsonConvert.SerializeObject(Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey }).ToString().Trim('"'))))
+        
 
         @(Html.Raw(JsonConvert.SerializeObject(Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey }).ToString().Trim('"'))))
     *@

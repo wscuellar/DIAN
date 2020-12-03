@@ -462,11 +462,11 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
-        public async Task<ActionResult> PrintDocument(string cufe)
+        public async Task<JsonResult> PrintDocument(string cufe)
         {
             byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe);
-
-            return View(pdfDocument);
+            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
+            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet );
         }
 
         #region Private methods
