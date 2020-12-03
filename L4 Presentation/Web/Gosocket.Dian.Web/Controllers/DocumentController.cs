@@ -546,7 +546,6 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -741,6 +740,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             return "NO APLICA";
         }
+
         private void SetView(int filterType)
         {
             switch (filterType)
