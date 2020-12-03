@@ -462,11 +462,11 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
-        public async Task<ActionResult> PrintDocument(string cufe)
+        public async Task<JsonResult> PrintDocument(string cufe)
         {
             byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe);
-
-            return View(pdfDocument);
+            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
+            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet );
         }
 
         #region Private methods
@@ -545,6 +545,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return client.PostAsync(url, byteContent).Result;
             }
         }
+
 
         /// <summary>
         /// 
@@ -675,16 +676,9 @@ namespace Gosocket.Dian.Web.Controllers
                     Events = d.Events.Select(
                         e => new EventViewModel()
                         {
-                            DocumentKey = e.DocumentKey,
-                            Date = e.Date,
-                            DateNumber = e.DateNumber,
-                            TimeStamp = e.TimeStamp,
                             Code = e.Code,
-                            Description = e.Description,
-                            SenderCode = e.SenderCode,
-                            SenderName = e.SenderName,
-                            ReceiverCode = e.ReceiverCode,
-                            ReceiverName = e.ReceiverName
+                            Date = e.Date,
+                            Description = e.Description
                         }).ToList()
                 }).ToList();
 
@@ -747,7 +741,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             return "NO APLICA";
         }
-
         private void SetView(int filterType)
         {
             switch (filterType)

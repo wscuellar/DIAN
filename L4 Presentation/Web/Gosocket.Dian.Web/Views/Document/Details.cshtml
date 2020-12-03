@@ -62,10 +62,13 @@
     <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
+    <script src="~/Content/js/Radian/RadianPrintDocumentPdf.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
 
     <script>
         $(document).ready(function () {
+            showPdfModal("#show-document","@Model.Document.DocumentKey",'@Url.Action("PrintDocument", "Document")');
             $('#container1-title').hide();
             $('.document-row').click('onClick', function () {
                 if (!$(this).hasClass('not-redirect')) {

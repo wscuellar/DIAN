@@ -1,4 +1,5 @@
 ﻿@model Gosocket.Dian.Web.Models.DocValidatorModel
+@using Newtonsoft.Json
 
 @{
     ViewBag.Title = "Ver Documento";
@@ -94,8 +95,15 @@
     </div>
 </div>
 <div>
+    @*Abre PDF*@
     <br />
-    <a href="@Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey })">Certificado de existencia</a>
+    <button id="show-document" class="btn btn-link">Certificado de existencia</button>
+
+    @*<a href="@Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey })">Certificado de existencia</a>
+        
+
+        @(Html.Raw(JsonConvert.SerializeObject(Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey }).ToString().Trim('"'))))
+    *@
     <br />
     <br />
 </div>
@@ -219,7 +227,3 @@ else
         </table>
     </div>
 }
-
-
-
-

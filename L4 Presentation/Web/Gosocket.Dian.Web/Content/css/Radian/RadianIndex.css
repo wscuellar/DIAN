@@ -851,7 +851,7 @@ span.state-file {
     position: absolute;
     right: 0;
     background-repeat: no-repeat;
-    top: 27px;
+    bottom: 0px;
     margin: 11px;
 }
 
