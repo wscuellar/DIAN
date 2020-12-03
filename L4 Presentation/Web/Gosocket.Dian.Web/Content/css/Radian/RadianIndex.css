@@ -785,7 +785,7 @@ h4.text-thin {
     box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.12);
     width: 38%;
     position: absolute;
-    top: 30px;
+    bottom: 3px;
     right: 21px;
 }
 
@@ -851,7 +851,7 @@ span.state-file {
     position: absolute;
     right: 0;
     background-repeat: no-repeat;
-    top: 27px;
+    bottom: 0px;
     margin: 11px;
 }
 
@@ -956,8 +956,7 @@ span.close {
     color: #565B64;
     opacity: 1;
     font-weight: 100 !important;
-    position: absolute;
-    top: 27px;
+    bottom: 3px;
     right: 0;
     margin: 10px;
 }
@@ -966,6 +965,7 @@ span.close {
     color: #348441;
     cursor: pointer;
     opacity: 1;
+    display: inline-block;
 }
 
 .custom-file {
@@ -1032,50 +1032,9 @@ span.close {
     margin: 12px 0px 17px 0px;
 }
 
-.tooltip {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-    z-index: 1;
-}
-
-    /* Tooltip text */
-    .tooltip .tooltiptext {
-        visibility: hidden;
-        width: 120px;
-        background-color: white;
-        color: black;
-        text-align: center;
-        padding: 5px 0;
-        border-radius: 6px;
-        position: absolute;
-        bottom: 100%;
-        right: 15px;
-        border: solid 1px;
-    }
-
-        .tooltip .tooltiptext::after {
-            content: "";
-            font-size: 60px;
-            position: absolute;
-            height: 20px;
-            left: 42%;
-            top: 0%;
-            background: white;
-            border: solid 1px;
-            width: 20px;
-            transform: rotate(46deg);
-            z-index: -1;
-        }
-
-.underline-reject-text.tooltip img{
+.underline-reject-text img{
     margin: 0 4px;
 }
-
-    /* Show the tooltip text when you mouse over the tooltip container */
-    .tooltip:hover .tooltiptext {
-        visibility: visible;
-    }
 
 .dataTable td {
     text-align: center;
