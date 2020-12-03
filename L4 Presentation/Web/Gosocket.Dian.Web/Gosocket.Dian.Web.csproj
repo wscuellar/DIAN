@@ -722,6 +722,7 @@
     <Content Include="Content\js\Radian\DownloadFile.js" />
     <Content Include="Content\js\Radian\RadianIndex.js" />
     <Content Include="Content\js\Radian\RadianOperationMode.js" />
+    <Content Include="Content\js\Radian\RadianPrintDocumentPdf.js" />
     <Content Include="Content\js\Radian\RadianSteps.js" />
     <Content Include="Content\js\Radian\RadianTestSet.js" />
     <Content Include="Content\js\user\user.js" />
