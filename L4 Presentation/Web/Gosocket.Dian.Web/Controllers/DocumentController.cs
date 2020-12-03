@@ -692,14 +692,13 @@ namespace Gosocket.Dian.Web.Controllers
             if (model.RadianStatus == 8)
             {
                 string statusName = model.RadianStatusList.First(rl => rl.Code.Equals(model.RadianStatus.ToString())).Name.ToUpper();
-                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(statusName,StringComparison.OrdinalIgnoreCase));
+                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(statusName, StringComparison.OrdinalIgnoreCase));
             }
-             
 
             if (model.RadianStatus != 0)
             {
                 string statusName = model.RadianStatusList.First(rl => rl.Code.Equals(model.RadianStatus.ToString())).Name;
-                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(statusName,StringComparison.OrdinalIgnoreCase));
+                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(statusName, StringComparison.OrdinalIgnoreCase));
             }
 
             model.IsNextPage = result.Item1;
@@ -736,7 +735,7 @@ namespace Gosocket.Dian.Web.Controllers
                 && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Accepted.ToString())))
                 return "TÍTULO VALOR";
 
-            if(documentTypeId =="01")
+            if (documentTypeId == "01")
                 return "FACTURA ELECTRONICA";
 
 

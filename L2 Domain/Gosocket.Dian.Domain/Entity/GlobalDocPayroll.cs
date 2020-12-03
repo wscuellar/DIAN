@@ -8,6 +8,8 @@ namespace Gosocket.Dian.Domain.Entity
     public class GlobalDocPayroll : TableEntity
     {
 
+        public Dictionary<string, object> Fields { get; set; }
+
         public GlobalDocPayroll() { }
 
         public GlobalDocPayroll(string pk, string rk) : base(pk, rk)
@@ -215,6 +217,12 @@ namespace Gosocket.Dian.Domain.Entity
         public decimal AFC { get; set; }
 
         public decimal Deuda { get; set; }
+
+        public decimal devengadosTotal { get; set; }
+
+        public decimal deduccionesTotal { get; set; }
+
+        public decimal comprobanteTotal { get; set; }
 
     }
 }
