@@ -49,6 +49,6 @@ namespace Gosocket.Dian.Interfaces.Services
 
         PagedResult<RadianContributorFileHistory> FileHistoryFilter(string fileName, string initial, string end, int page, int pagesize);
         RadianSoftware GetSoftware(Guid id);
-        RadianSoftware GetSoftware(int radianContributorId, int radiancontributorTypeId, int operationModeId);
+        RadianSoftware GetSoftware(int radianContributorId, int softwareType);
     }
 }

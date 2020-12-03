@@ -218,9 +218,16 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult GetSetTestResult(RadianApprovedViewModel model)
         {
-            RadianSoftware software = _radianAprovedService.GetSoftware(model.Contributor.RadianContributorId, model.RadianContributorTypeId, model.Contributor.RadianOperationModeId);
-            string key = model.RadianContributorTypeId.ToString() + "|" + software.Id;
+
+            const int softwareType = 1;
+            string sType = softwareType.ToString();
+            RadianSoftware software = _radianAprovedService.GetSoftware(model.Contributor.RadianContributorId, softwareType);
+            string key = softwareType.ToString() + "|" + software.Id.ToString();
             model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(model.Nit, key);
+            RadianTestSet testSet = _radianTestSetService.GetTestSet(sType, sType);
+            model.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), sType)));
+            model.RadianTestSetResult.StatusDescription = testSet.Description;
+            model.Software = software;
             return View(model);
         }
 
@@ -311,14 +318,16 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-        public ActionResult ViewTestSet(int id, int radianTypeId, string softwareId)
+        public ActionResult ViewTestSet(int id, int radianTypeId, string softwareId, int softwareType)
         {
             RadianApprovedViewModel radianApprovedViewModel = new RadianApprovedViewModel();
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(id, radianTypeId);
-            radianApprovedViewModel.RadianTestSetResult =
-               _radianTestSetResultService.GetTestSetResultByNit(radianAdmin.Contributor.Code).FirstOrDefault();
-
-
+            string key = softwareType.ToString() + "|" + softwareId;
+            radianApprovedViewModel.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(radianAdmin.Contributor.Code, key);
+            RadianTestSet testSet = _radianTestSetService.GetTestSet(softwareType.ToString(), softwareType.ToString());
+           
+            radianApprovedViewModel.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), softwareType.ToString())));
+            radianApprovedViewModel.RadianTestSetResult.StatusDescription = testSet.Description;
             radianApprovedViewModel.Contributor = radianAdmin.Contributor;
             radianApprovedViewModel.ContributorId = radianAdmin.Contributor.Id;
             radianApprovedViewModel.Name = radianAdmin.Contributor.TradeName;

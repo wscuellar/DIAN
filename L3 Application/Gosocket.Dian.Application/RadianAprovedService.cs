@@ -211,16 +211,19 @@ namespace Gosocket.Dian.Application
 
             RadianContributorOperation existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == radianContributorOperation.SoftwareId && !t.Deleted);
             if (existingsoft == null)
+            {
                 result = _radianContributorOperationRepository.Add(radianContributorOperation);
-
+                existingsoft = _radianContributorOperationRepository.Get(t => t.Id == result);
+            }
+                
             if (result > 0)
             {
                 RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorOperation.RadianContributorId);
-                RadianTestSet testSet = _radianTestSetService.GetTestSet(radianContributor.RadianContributorTypeId.ToString(), radianContributor.RadianContributorTypeId.ToString());
+                RadianTestSet testSet = _radianTestSetService.GetTestSet(existingsoft.SoftwareType.ToString(), existingsoft.SoftwareType.ToString());
                 if (testSet != null)
                 {
                     Contributor contributor = radianContributor.Contributor;
-                    string key = radianContributor.RadianContributorTypeId.ToString() + "|" + radianContributorOperation.SoftwareId;
+                    string key = existingsoft.SoftwareType.ToString() + "|" + radianContributorOperation.SoftwareId;
                     RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                     {
                         TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
@@ -293,27 +296,8 @@ namespace Gosocket.Dian.Application
             return _radianCallSoftwareService.Get(id);
         }
 
-        public RadianSoftware GetSoftware(int radianContributorId, int radiancontributorTypeId, int operationModeId)
+        public RadianSoftware GetSoftware(int radianContributorId, int softwareType)
         {
-
-            int softwareType = 0;
-            if (operationModeId == 1)
-                softwareType = (int)RadianOperationModeTestSet.OwnSoftware;
-            else
-            {
-                switch (radiancontributorTypeId)
-                {
-                    case 2: 
-                        softwareType = (int)RadianOperationModeTestSet.SoftwareTechnologyProvider;
-                        break;
-                    case 3:
-                        softwareType = (int)RadianOperationModeTestSet.SoftwareTradingSystem;
-                        break;
-                    case 4:
-                        softwareType = (int)RadianOperationModeTestSet.SoftwareFactor;
-                        break;
-                }
-            }
             RadianContributorOperation radianContributorOperation = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorId && t.SoftwareType == softwareType);
             return GetSoftware(radianContributorOperation.SoftwareId);              
         }
