@@ -2986,7 +2986,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: 89-(R): ",,
+                            ErrorCode = "Regla: 89-(R): ",
                             ErrorMessage = "Error en el Instrumento Mandato 043",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
