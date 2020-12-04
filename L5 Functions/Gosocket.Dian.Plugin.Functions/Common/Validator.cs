@@ -571,8 +571,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var senderCode = nitModel.SenderCode;
             var receiverCode = nitModel.ReceiverCode;
-            string receiver2DvErrorCode = "89";
-            string sender2DvErrorCode = "89";
+            string receiver2DvErrorCode = "Regla: 89-(R): ";
+            string sender2DvErrorCode = "Regla: 89-(R): ";
             switch (Convert.ToInt16(party.ResponseCode))
             {
                 case (int)EventStatus.Received:
@@ -1074,58 +1074,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             string valueTotalInvoice = xmlParserCufe.TotalInvoice;
 
-            //Valida informacion Endoso 
-
-            if (valueTotalEndoso == null || valueTotalEndoso == "")
-            {
-                return new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAI05, Rechazo: ",
-                    ErrorMessage = "El valor no es informado.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
-            }          
+            //Valida informacion Endoso               
 
             if (eventCode == "037")
             {
-                if (valueTotalEndoso == null)
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAI05a, Rechazo: ",
-                        ErrorMessage = $"{(string)null} El valor no es informado .",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
-
-                if (valuePriceToPay == null)
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAI07a, Rechazo: ",
-                        ErrorMessage = $"{(string)null} El valor no es informado .",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
-
-                if (valueDiscountRateEndoso == null)
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAI09, Rechazo: ",
-                        ErrorMessage = $"{(string)null} No fue informado la tasa de descuento.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
-
+              
                 //Valida precio a pagar endoso
                 int resultValuePriceToPay = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
                 resultValuePriceToPay = resultValuePriceToPay / 100;
@@ -1136,7 +1089,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: AAI07b, Rechazo: ",
+                        ErrorCode = "Regla: AAI07b-(R): ",
                         ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
@@ -1158,7 +1111,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: 89, Rechazo: ",
+                            ErrorCode = "Regla: 89-(R): ",
                             ErrorMessage = $"{(string)null} El valor total del endoso es diferente a los valores reportados .",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         };
@@ -1335,7 +1288,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             NitModel nitModel = new NitModel();
             int attorneyLimit = Properties.Settings.Default.MAX_Attorney;
             bool validate = true;
-            string validateCufeErrorCode = "89";
+            string validateCufeErrorCode = "Regla: 89-(R): ";
             string startDateAttorney = string.Empty;
             string endDate = string.Empty;
             DateTime startDate = DateTime.UtcNow;
@@ -1376,7 +1329,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: AAH84, Rechazo:",
+                        ErrorCode = "Regla: AAH84-(R): ",
                         ErrorMessage = "Debe ser informado el contrato del mandato en base64",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1434,7 +1387,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "089",
+                            ErrorCode = "Regla: 89-(R): ",
                             ErrorMessage = "Error en el tipo de mandatario",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1445,7 +1398,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 //Valida CUFE referenciado existe en sistema DIAN
                 nitModel.DocumentKey = attorneyModel.cufe;
-                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference);
+                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference, "043");
                 if (resultValidateCufe[0].IsValid)
                     attorney.Add(attorneyModel);
                 else
@@ -1455,7 +1408,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: AAL07, Rechazo: ",
+                        ErrorCode = "Regla: AAL07-(R): ",
                         ErrorMessage = "Error en la validación del CUFE referenciado, No existe en sistema DIAN",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1476,7 +1429,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "089",
+                        ErrorCode = "Regla: 89-(R): ",
                         ErrorMessage = "La fecha debe ser mayor o igual al evento de la factura referenciada",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1996,9 +1949,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validación de la Sección DocumentReference - CUFE Informado
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
-        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference)
+        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference, string eventCode)
         {
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            string documentTypeIdRef = ((Convert.ToInt32(eventCode)) == (int)EventStatus.TerminacionMandato ||
+                (Convert.ToInt32(eventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)) ? nitModel.DocumentTypeIdRef : nitModel.DocumentTypeId;
+
+            List <ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
             //Valida exista CUFE/CUDE en sistema DIAN
             var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(nitModel.DocumentKey.ToLower()).FirstOrDefault();
@@ -2008,7 +1964,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "AAH07",
+                    ErrorCode = "Regla: AAH07-(R): ",
                     ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -2016,14 +1972,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
             {
-                responses.Add(new ValidateListResponse
+                if(nitModel.ResponseCode == "043")
                 {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "AAH06 ",
-                    ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAH06-(R) ",
+                        ErrorMessage = "El número de documento electrónico referenciado no coinciden con un mandato reportado.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                }
+                else
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "AAH06 ",
+                        ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
             }
 
             if (Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoPropiedad ||
@@ -2037,7 +2008,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "AAH26b",
+                        ErrorCode = "Regla: AAH26b-(R): ",
                         ErrorMessage = "El documento de identidad no corresponde al del documento electronico referenciado",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -2049,7 +2020,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "AAH25b",
+                        ErrorCode = "Regla: AAH25b-(R): ",
                         ErrorMessage = "El nombre o razon social no corresponde al del documento electronico referenciado",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -2094,7 +2065,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "LGC01",
+                            ErrorCode = "Regla: LGC01-(R): ",
                             ErrorMessage = "Evento registrado previamente",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2113,7 +2084,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "LGC03",
+                                            ErrorCode = "Regla: LGC03-(R): ",
                                             ErrorMessage = "No se puede recibir un rechazo si previamente no se ha recibido los eventos " +
                                             "Acuse de recibo de la factura electrónica y un recibo de bien y prestación de servicio ",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2128,7 +2099,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "202",
+                                                ErrorCode = "Regla: 202-(R): ",
                                                 ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
                                                 "ya existe un evento (033) Aceptación Expresaa",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2141,7 +2112,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "202",
+                                                ErrorCode = "Regla: 202-(R): ",
                                                 ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
                                                 "ya existe un evento (034) Aceptación Tacita de la factura",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2169,7 +2140,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "89",
+                                        ErrorCode = "Regla: 89-(R): ",
                                         ErrorMessage = "Solo se pueda transmitir el evento (032) recibo del bien o aceptacion de la prestacion del servicio," +
                                         " después de haber transmitido el evento (030) de acuse de recibo",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2200,7 +2171,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "LGC04",
+                                                ErrorCode = "Regla: LGC04-(R): ",
                                                 ErrorMessage = "No se puede aceptar (expresa o tácitamente) un documento que ha sido rechazado previamente",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
@@ -2212,7 +2183,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "89",
+                                                ErrorCode = "REgla: 89-(R): ",
                                                 ErrorMessage = "No se pueda transmitir el evento (033) Aceptación expresa de la factura," +
                                                 " Cuando ya existe un evento (034) Aceptación Tacita de la factura",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2237,7 +2208,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "89",
+                                            ErrorCode = "Regla:  89-(R): ",
                                             ErrorMessage = "Solo se pueda transmitir el evento (033) Aceptacion Expresa de la factura," +
                                             " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2258,7 +2229,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "LGC04",
+                                                ErrorCode = "Regla: LGC04-(R): ",
                                                 ErrorMessage = "No se puede aceptar (expresa o tácitamente) un documento que ha sido rechazado previamente",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
@@ -2270,7 +2241,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "LGC05",
+                                                ErrorCode = "Regla: LGC05-(R): ",
                                                 ErrorMessage = "No se puede generar una aceptación tácita sobre un documento que haya sido aceptada expresamente previamente",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
@@ -2294,7 +2265,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "89",
+                                            ErrorCode = "Regla: 89-(R): ",
                                             ErrorMessage = "Solo se pueda transmitir el evento (034) Aceptacion Tácita de la factura," +
                                             " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2315,7 +2286,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "89",
+                                            ErrorCode = "Regla: 89-(R): ",
                                             ErrorMessage = "Ya existe un tipo de instrumento de limitación registrado en el sistema",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
@@ -2359,7 +2330,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "89",
+                                            ErrorCode = "Regla: 89-(R): ",
                                             ErrorMessage = "No es posible transmitir el evento Aval, ya existe un evento 041 Limitación de circulación",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
@@ -2374,7 +2345,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "89",
+                                            ErrorCode = "Regla: 89-(R): ",
                                             ErrorMessage = "No se pueda transmitir el evento Aval porque ya existe un pago total FETV",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
@@ -2398,7 +2369,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "LGC24",
+                                        ErrorCode = "Regla: LGC24-(R): ",
                                         ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Solicitud de disponibilización",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -2418,7 +2389,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "89",
+                                        ErrorCode = "Regla: 89-(R): ",
                                         ErrorMessage = "No se pueda transmitir el evento porque ya existe un pago total.",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -2446,7 +2417,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = "89",
+                                                    ErrorCode = "Regla: 89-(R): ",
                                                     ErrorMessage = "No se pueda transmitir el evento 038-Endoso en Garantía ya existen asociados los eventos 039 Endoso en Procuración o 041 Limitación de circulación.",
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
@@ -2475,7 +2446,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = "89",
+                                                    ErrorCode = "Regla: 89-(R): ",
                                                     ErrorMessage = "No se pueda transmitir el evento 039-Endoso en Procuración ya existen asociados los eventos 038 Endoso en Garantía o 041 Limitación de circulación.",
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
@@ -2504,7 +2475,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = "LGC25",
+                                                    ErrorCode = "Regla: LGC25-(R): ",
                                                     ErrorMessage = "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: " +
                                                     "Endoso en garantía, Endoso en procuración o Limitación de circulación",
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2519,7 +2490,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = "LGC26",
+                                                    ErrorCode = "Regla: LGC26-(R): ",
                                                     ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento Notificación de Pago total",
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
@@ -2545,7 +2516,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "LGC24",
+                                        ErrorCode = "Regla: LGC24-(R): ",
                                         ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Solicitud de disponibilización",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -2562,7 +2533,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "89",
+                                        ErrorCode = "Regla: 89-(R): ",
                                         ErrorMessage = "No es posible realizar la Anulación de Endoso, ya existe un evento 037 Endoso en Propiedad" +
                                         "y/o un evento 041 Limitación de circulación",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2589,7 +2560,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "89",
+                                        ErrorCode = "Regla: 89-(R): ",
                                         ErrorMessage = "No es posible realizar la Anulación de Endoso, no existe un evento 038 Endoso en Garantía y/o 039 Endoso en Procuración",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -2629,7 +2600,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "89",
+                                            ErrorCode = "Regla: 89-(R): ",
                                             ErrorMessage = "El evento 045- Notificación de pago parcial o total tiene una limitación previa (041), no es posible realziar el pago",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
@@ -2645,7 +2616,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "89",
+                                        ErrorCode = "Regla: 89-(R): ",
                                         ErrorMessage = "Ya existe un Pago Total de la Factura",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -2676,7 +2647,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "89",
+                        ErrorCode = "Regla: 89-(R): ",
                         ErrorMessage = "Solo se pueda transmitir el evento (" + eventPrev.EventCode + ")," +
                                         " después de haber transmitido el evento (030) de acuse de recibo.",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2785,7 +2756,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
+                            ErrorCode = "Regla: 89-(R): ",
                             ErrorMessage =
                                 "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2797,7 +2768,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                          {
                              IsValid = false,
                              Mandatory = true,
-                             ErrorCode = "89",
+                             ErrorCode = "Regla: 89-(R): ",
                              ErrorMessage =
                                 "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento Recibo del Bien, se rechaza la transmisión de este evento 31",
                              ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2817,7 +2788,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
+                            ErrorCode = "Regla: 89-(R): ",
                             ErrorMessage = "Se ha superado los 3 días hábiles siguientes a la fecha de firma del evento Recibo del Bien, se rechaza la transmisión de este evento 33",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
@@ -2845,7 +2816,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "DC24e",
+                            ErrorCode = "Regla: DC24e-(R): ",
                             ErrorMessage = "No se puede generar el evento antes de los 3 días hábiles de la fecha de generación del evento Recibo del bien y prestación del servicio.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2869,7 +2840,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
+                            ErrorCode = "Regla: 89-(R): ",
                             ErrorMessage =
                                 "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE/CUDE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2890,7 +2861,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
+                            ErrorCode = "Regla: 89-(R): ",
                             ErrorMessage =
                                 "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE/CUDE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2913,7 +2884,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        {
                            IsValid = false,
                            Mandatory = true,
-                           ErrorCode = "89",
+                           ErrorCode = "Regla: 89-(R): ",
                            ErrorMessage =
                                "La fecha de la firma del aval debe ser mayor a la Primera Disponibilización",
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2925,7 +2896,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
+                            ErrorCode = "Regla: 89-(R): ",
                             ErrorMessage = "No existe un evento Primera Disponibilización",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2945,7 +2916,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        {
                            IsValid = false,
                            Mandatory = true,
-                           ErrorCode = "89",
+                           ErrorCode = "Regla: 89-(R): ",
                            ErrorMessage =
                                "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2966,7 +2937,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
+                            ErrorCode = "Regla: 89-(R): ",
                             ErrorMessage = "Fecha de endoso es superior a la fecha de vencimiento de la factura electrónica",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2994,7 +2965,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "89",
+                                ErrorCode = "Regla: 89-(R): ",
                                 ErrorMessage = "La fecha Terminación del mandato es menor a la fecha de registro del Instrumento Mandato 043",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -3021,7 +2992,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "89",
+                                ErrorCode = "Regla: 89-(R): ",
                                 ErrorMessage = "La fecha Terminación del mandato es mayor a la fecha de registro del Instrumento Mandato 043",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -3033,7 +3004,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
+                            ErrorCode = "Regla: 89-(R): ",
                             ErrorMessage = "Error en el Instrumento Mandato 043",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -3072,7 +3043,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = "AAD05b",
+                                ErrorCode = "Regla: AAD05b-(R): ",
                                 ErrorMessage = "No se puede repetir el numero para el tipo de evento.",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
