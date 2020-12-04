@@ -921,7 +921,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var validateEventCode = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             // Valida fechas y dia habil SigningTime
-
             var validationAcceptanceTacitaExpresa = ValidationSigningTime(documentParsed.DocumentKey.ToLower(), eventCode, signingTime, docTypeCode, customizationID);
             if (!validationAcceptanceTacitaExpresa.IsValid)
             {
