@@ -6,6 +6,8 @@
 
 @section css
 {
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
     <style type="text/css">
 
         .input-general {
@@ -15,6 +17,43 @@
         .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
             cursor: not-allowed;
             background-color: #eee !important;
+        }
+
+        .btnCloseUE {
+            color: #fff;
+            background: #348441 !important;
+            background-color: #348441 !important;
+            /*border-radius: 10px !important;*/
+            float: right;
+            cursor: pointer;
+            opacity: 100 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
+            font-weight: normal !important;
+            font-family: auto !important;
+        }
+
+        .footerRectangle {
+            padding: 10px !important;
+        }
+
+        .UEText {
+            font-family: Arial;
+            font-style: normal;
+            font-weight: bold;
+            font-size: 24px;
+            line-height: 30px;
+            align-items: center;
+            text-align: center;
+            color: #348441;
+        }
+ 
+
+        .row-fluid {
+            display: flex;
+            align-items: flex-end;
         }
     </style>
 }
@@ -37,6 +76,7 @@
                             @Html.HiddenFor(m => m.Id)
                             <input type="hidden" id="listMenu" value="@Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Menu)" />
                             <input type="hidden" id="hddPermissions" name="hddPermissions" />
+                            <input type="hidden" id="hddMessage" name="hddMessage" value="@ViewBag.messageAction" />
                             <input type="hidden" id="hddPermissionsAsigned" name="hddPermissionsAsigned"
                                    value="@(ViewBag.PermissionList != null ? Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.PermissionList) : null)" />
 
@@ -73,83 +113,198 @@
                                     </div>
                                 }
                             </div>
-                            <div class="panel-footer text-right">
-                                @*@Html.ActionLink("Nuevo", "AddUser", "ExternalUsers", null, new { @class = "btn btn-default" })
-        <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>*@
-                                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>
+                            <div class="panel-footer footerRectangle text-right">
+                                @*@Html.ActionLink("Nuevo", "Add@*User", "ExternalUsers", null, new { @class = "btn btn-default" })
+                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
+                                <div class="footerRectangle">
+                                    <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-success btn-hover-gosocket btn-radian-success">
+                                        Crear Usuario
+                                    </button>
 
+                                </div>
                             </div>
-                            <br />
 
-                            <br />
-                            @*<div class="panel-footer text-center">
-                                    @Html.ActionLink("Nuevo", "AddUser", null, new { @class = "btn btn-secondary btn-hover-gosocket" })
-                                    <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-                                    <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>
-                                </div>*@
+
+
+                            <div class="modal fade ModalSave" id="ModalSave" name="ModalSave" tabindex='-1' data-keyboard="false">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+
+                                        <div class="modal-body">
+                                            <div class="row">
+
+
+                                                <div class="col-md-12 col-lg-12">
+                                                    <button type="button" class="close btnCloseUE" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>asd
+                                                    <br /><br /><br />
+                                                </div>
+
+                                                <div class="col-md-12 col-lg-12">
+                                                    <div class="UEText">
+                                                        ¿Desea creal al usuario
+                                                        <br /> xxxx?<br />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <br />
+                                                </div>
+                                                <div class="col-md-6 col-lg-6 col-xs-6">
+                                                    <button type="submit" class="btn btn-hover-gosocket btn-radian-success pull-right btn-save">Aceptar</button>
+                                                </div>
+                                                <div class="col-md-6 col-lg-6 col-xs-6">
+                                                    <button type="button" class="btn btn-success btn-hover-gosocket btn-radian-success" data-dismiss="modal" aria-label="Close">
+                                                        Cancelar
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-6 col-lg-6">
+                                                    <br /><br /><br />
+
+
+                                                    <div style="font-size: 80px;">
+                                                        <i class="fa fa-check-circle"></i>
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="modal fade ModalConfirSave" id="ModalConfirSave" name="ModalConfirSave" tabindex='-1' data-keyboard="false">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+
+                                        <div class="modal-body">
+                                            <div class="row">
+
+
+                                                <div class="col-md-12 col-lg-12">
+                                                    <button type="button" class="close btnCloseUE" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>asd
+                                                    <br /><br /><br />
+                                                </div>
+
+                                                <div class="col-md-12 col-lg-12">
+                                                    <div class="UEText">
+                                                        ¿Desea creal al usuario
+                                                        <br /> xxxx?<br />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <br />
+                                                </div>
+                                                <div class="col-md-6 col-lg-6 col-xs-6">
+                                                    <button type="submit" class="btn btn-hover-gosocket btn-radian-success pull-right btn-save">Aceptar</button>
+                                                </div>
+                                                <div class="col-md-6 col-lg-6 col-xs-6">
+                                                    <button type="button" class="btn btn-success btn-hover-gosocket btn-radian-success" data-dismiss="modal" aria-label="Close">
+                                                        Cancelar
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-6 col-lg-6">
+                                                    <br /><br /><br />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         }
                     </div>
                 </div>
 
             </div>
+            <div class="panel-body padding-top-20">
+                <div class="row">
+                    <div class="col-lg-12  col-md-12  col-xs-12"> 
+                        <h4> Usuarios Configurados</h4>
+                    </div>
+                    <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line"> 
+                    </div>
+                    <div class="col-lg-offset-1 col-md-offset-1  col-lg-10 col-md-10  col-xs-12">
+                        <div class="table-responsive">
 
+                            <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo de documento</th>
+                                        <th>Documento</th>
+                                        <th>Nombres</th>
+                                        <th>Email</th>
+                                        <th class="text-center">Activo</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.ExternalUsersList != null)
+                                    {
+                                        List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                                        foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
+                                        {
+                                            <tr>
+                                                <td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>
+                                                <td>@item.IdentificationId</td>
+                                                <td>@item.Names</td>
+                                                <td>@item.Email</td>
+                                                <td class="text-center">@(item.Active == 1 ? "Activo" : "Inactivo")</td>
+                                                <td class="text-center">
 
-            <table class="table table-sm table-bordered">
-                <thead>
-                    <tr>
-                        <th>Tipo de documento</th>
-                        <th>Documento</th>
-                        <th>Nombres</th>
-                        <th>Email</th>
-                        <th class="text-center">Activo?</th>
-                        <th class="text-center">Editar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (ViewBag.ExternalUsersList != null)
-                    {
-                        List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
-                        foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
-                        {
-                            <tr>
-                                <td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>
-                                <td>@item.IdentificationId</td>
-                                <td>@item.Names</td>
-                                <td>@item.Email</td>
-                                <td class="text-center">@(item.Active == 1 ? "Sí" : "No")</td>
-                                <td class="text-center">
-                                    @Html.ActionLink("Editar", "AddUser", new { id = item.Id }, new { @class = "btn btn-primary" })
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
+                                                    @Html.ActionLink(" ", "AddUser", new { id = item.Id }, new { @class = "fa fa-pencil" })
+                                                    &nbsp;
 
+                                                    @if (item.Active == 1)
+                                                    {
+                                                        <a class="fa fa-toggle-on" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive(1)"></a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a class="fa fa-toggle-off" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive(2)"> </a>
+                                                    }
+
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+
 
 <div class="modal fade" id="dialogConfirmActive" tabindex='-1' data-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Confirmar Acción</h4>
+                <h4 class="modal-title">¿Desea inactivar al usuario?</h4>
             </div>
             <div class="modal-body">
-
-                <h3>Esta seguro de <span style="font-weight:bold">@ViewBag.txtActive</span> el Usuario?</h3>
-                <br />
-                <div class="form-group">
-                    <label for="txtActiveDescription" class="control-label">Escriba la razon por la cual realiza esta acción:</label>
-                    <textarea type="text" id="txtActiveDescription" cols="3" rows="3" maxlength="150" class="form-control"></textarea>
+                <div class="row row-fluid">
+                     
+                    <div class="form-group col-lg-10  col-md-10  col-xs-12">
+                            <span class="control-label accion-title"></span>
+                         <br />
+                        <textarea type="text" id="txtActiveDescription" cols="3" rows="6" maxlength="150" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group col-lg-2  col-md-2  col-xs-12 align-items-end">
+                        <button id="btnOkActive" type="button" data-dismiss="modal" class="btn btn-success btn-hover-gosocket btn-radian-success">Aceptar</button>
+                    </div>
                 </div>
-
             </div>
-            <div class="modal-footer">
-                <button id="btnOkActive" type="button" data-dismiss="modal" class="btn btn-success">Aceptar</button>
-                <button id="btnCancelActive" type="button" data-dismiss="modal" class="btn btn-danger">Cancelar</button>
-            </div>
+             
         </div>
     </div>
 </div>
@@ -183,7 +338,7 @@
                     var permissions = getPermissions();
 
                     $('#hddPermissions').val(permissions);
-
+                    HideModalSave();
                     //form.submit();
                 }
             });
@@ -194,12 +349,31 @@
 
             //});
 
-            function confirmActive() {
-                $("#dialogConfirmActive").alert('show');
-            }
+
+            $('#btnAbrirModalConfirmacion').click(function () {
+                var form = $('#add-user-form');
+                console.log(form.valid());
+                if (form.valid()) {
+                    var permissions = getPermissions();
+                    if (permissions === "[]")
+                    {
+                        $.niftyNoty({
+                            type:  "danger",
+                            container: "floating",
+                            title: "Permisos",
+                            message: "No ha seleccionado los Permisos para el Usuario",
+                            closeBtn: false,
+                            timer: 5000
+                        });
+                    }
+                    else
+                        showModalSave();
+                }
+            });
+             
 
             $("#btnOkActive").click(function () {
-
+                debugger;
                 $.ajax({
                     url: "@Url.Action("UpdateActive","ExternalUsers")",
                     type: "POST",
@@ -275,6 +449,11 @@
                         }
                     }
                 }
+            }
+
+            debugger;
+            if ($("#hddMessage").val() != null && $("#hddMessage").val() != '') { 
+                alert($("#hddMessage").val());
             }
 
         });
@@ -363,5 +542,18 @@
             location.href = "@Url.Action("AddUser","ExternalUsers")";
         }
 
+        function showModalSave() {
+            $("#ModalSave").modal('show');
+        }
+
+        function confirmActive(accion) { 
+
+            if (accion == 2)  $('span.accion-title').text('Describa el motivo de la activación');
+            else  $('span.accion-title').text('Describa el motivo de la inactivación');
+        }
+
+        function HideModalSave() {
+            $("#ModalSave").modal('hide');
+        }
     </script>
 }

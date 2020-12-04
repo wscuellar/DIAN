@@ -382,7 +382,7 @@ namespace Gosocket.Dian.Web.Controllers
                         Email = model.Email
                     }) + ", permisos: " + JsonConvert.SerializeObject(permissions), "Creación de Permisos");
 
-                    return RedirectToAction("AddUser");
+                    return View();
                 }
                 else
                 {
@@ -440,7 +440,8 @@ namespace Gosocket.Dian.Web.Controllers
 
                     //Envio de notificacion por correo
                     _ = SendMailUpdate(model);
-                    return RedirectToAction("AddUser");
+
+                    return View();
                 }
                 else
                     ViewBag.messageAction = "No se pudo actualizar el Usuario!";
