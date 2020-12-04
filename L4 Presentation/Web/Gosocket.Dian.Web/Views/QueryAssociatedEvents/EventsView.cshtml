@@ -144,6 +144,12 @@
     .th-left-align {
         text-align: left !important;
     }
+
+    .second-section-align {
+        margin-left: 12px;
+        margin-top: 37px;
+    }
+
 </style>
 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
@@ -224,8 +230,8 @@
                             <span>NIT: @Model.Endoso.SenderCode</span>
                             <span>ENDOSANTE: @Model.Endoso.SenderName</span>
 
-                            <div class="row aditional-data-section">
-                                <div class="col-sm-4 second-section">
+                            <div class="row">
+                                <div class="second-section-align">
                                     <h5>Tipo de Endoso</h5>
                                     <span>@Model.Endoso.EndosoType</span>
                                 </div>
