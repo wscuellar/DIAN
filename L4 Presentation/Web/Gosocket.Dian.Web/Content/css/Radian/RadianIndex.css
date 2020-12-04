@@ -281,9 +281,9 @@ th {
 .input-general {
     height: 41px !important;
     background: #F7F7F7;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #CCCCCC !important;
     box-sizing: border-box;
-    border-radius: 4px;
+    border-radius: 4px !important;
 }
 
 .radian-conventions i, #table-contributor-files i {
@@ -851,7 +851,7 @@ span.state-file {
     position: absolute;
     right: 0;
     background-repeat: no-repeat;
-    top: 0;
+    top: 27px;
     margin: 11px;
 }
 
@@ -1060,7 +1060,7 @@ span.close {
             position: absolute;
             height: 20px;
             left: 42%;
-            top: 24px;
+            top: 0%;
             background: white;
             border: solid 1px;
             width: 20px;
@@ -1223,6 +1223,13 @@ button.selectpicker .fa-caret-down {
     right: -30px;
 }
 
+.bootbox-close-button.close {
+    background: url(/Content/images/png/closeButton.png);
+    background-repeat: no-repeat;
+    text-indent: -9000px;
+    top: 21px;
+}
+
 .prompt-comment {
     font-size: 24px;
 }
@@ -1268,16 +1275,23 @@ button.selectpicker .fa-caret-down {
     padding-right: 40px;
 }
 
+.cancel-confirmation .modal-body {
+
+}
+
 #dateFrom, #dateTo {
     padding-left: 20px;
     background-image: url(/Content/images/png/calendarAlt.png);
     background-repeat: no-repeat;
     background-position: 20% 50%;
     display: inline-flex;
-    width: 45%;
+    width: 40%;
+}
+#dateFrom {
+    margin-right: 10px;
 }
 
-.ui-datepicker {
+    .ui-datepicker {
     width: auto;
 }
 
@@ -1287,4 +1301,8 @@ button.selectpicker .fa-caret-down {
 
 .input-daterange label {
     width: 100%;
+}
+
+.table-contributor {
+    text-align: center;
 }

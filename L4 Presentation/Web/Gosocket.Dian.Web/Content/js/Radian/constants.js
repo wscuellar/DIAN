@@ -4,5 +4,6 @@
     CANCEL_DESCRIPTION: "Describa el motivo de la cancelación del registro.",
     LABEL_PROMPT: "Describa el motivo de la cancelación del registro.",
     CANCEL_REGISTER: "Cancelar registro",
-    ACEPTAR: "Aceptar"
+    ACEPTAR: "Aceptar",
+    CANCEL_RESPONSE_CORRECT: "Se canceló el registro exitosamente"
 };

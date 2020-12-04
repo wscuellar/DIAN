@@ -195,39 +195,39 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Gosocket.Dian.Interfaces\Gosocket.Dian.Interfaces.csproj">
+    <ProjectReference Include="..\..\Gosocket.Dian.Interfaces\Gosocket.Dian.Interfaces.csproj">
       <Project>{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1}</Project>
       <Name>Gosocket.Dian.Interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Gosocket.Dian.Services\Gosocket.Dian.Services.csproj">
+    <ProjectReference Include="..\..\Gosocket.Dian.Services\Gosocket.Dian.Services.csproj">
       <Project>{2f8875c4-bdb5-4bf7-a667-c78ccd254343}</Project>
       <Name>Gosocket.Dian.Services</Name>
     </ProjectReference>
-    <ProjectReference Include="..\L0 Infrastructure\Gosocket.Dian.Infrastructure\Gosocket.Dian.Infrastructure.csproj">
+    <ProjectReference Include="..\..\L0 Infrastructure\Gosocket.Dian.Infrastructure\Gosocket.Dian.Infrastructure.csproj">
       <Project>{72e3852a-75d8-4007-93a5-8ee16bdfb5d7}</Project>
       <Name>Gosocket.Dian.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\L1 Data\Gosocket.Dian.DataContext\Gosocket.Dian.DataContext.csproj">
+    <ProjectReference Include="..\..\L1 Data\Gosocket.Dian.DataContext\Gosocket.Dian.DataContext.csproj">
       <Project>{cbaa925a-695b-41b2-90b9-5c061a9cc30e}</Project>
       <Name>Gosocket.Dian.DataContext</Name>
     </ProjectReference>
-    <ProjectReference Include="..\L2 Domain\Gosocket.Dian.Domain\Gosocket.Dian.Domain.csproj">
+    <ProjectReference Include="..\..\L2 Domain\Gosocket.Dian.Domain\Gosocket.Dian.Domain.csproj">
       <Project>{fba40283-71df-4b48-8e64-663468e6e0c6}</Project>
       <Name>Gosocket.Dian.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\L3 Application\Gosocket.Dian.Application\Gosocket.Dian.Application.csproj">
+    <ProjectReference Include="..\..\L3 Application\Gosocket.Dian.Application\Gosocket.Dian.Application.csproj">
       <Project>{319e3a78-ed5c-463a-a323-fe1037f38aea}</Project>
       <Name>Gosocket.Dian.Application</Name>
     </ProjectReference>
-    <ProjectReference Include="..\L4 Presentation\Web\Gosocket.Dian.Web\Gosocket.Dian.Web.csproj">
+    <ProjectReference Include="..\..\L4 Presentation\Web\Gosocket.Dian.Web\Gosocket.Dian.Web.csproj">
       <Project>{A9E54CF2-ED1D-4844-B21C-10CFBF8EDB40}</Project>
       <Name>Gosocket.Dian.Web</Name>
     </ProjectReference>
-    <ProjectReference Include="..\L5 Functions\Gosocket.Dian.Functions\Gosocket.Dian.Functions.csproj">
+    <ProjectReference Include="..\..\L5 Functions\Gosocket.Dian.Functions\Gosocket.Dian.Functions.csproj">
       <Project>{6894d337-e518-4100-a583-9c3faed6feda}</Project>
       <Name>Gosocket.Dian.Functions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\L5 Functions\Gosocket.Dian.Plugin.Functions\Gosocket.Dian.Plugin.Functions.csproj">
+    <ProjectReference Include="..\..\L5 Functions\Gosocket.Dian.Plugin.Functions\Gosocket.Dian.Plugin.Functions.csproj">
       <Project>{D09EB261-6BCC-47C4-9CA0-38126A7D22ED}</Project>
       <Name>Gosocket.Dian.Plugin.Functions</Name>
     </ProjectReference>
@@ -241,12 +241,5 @@
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.props'))" />
-    <Error Condition="!Exists('..\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.targets'))" />
-  </Target>
-  <Import Project="..\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.targets" Condition="Exists('..\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.targets')" />
+  <Import Project="..\..\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.targets" Condition="Exists('..\..\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.targets')" />
 </Project>

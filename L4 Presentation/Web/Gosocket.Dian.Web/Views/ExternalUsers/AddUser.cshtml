@@ -1,15 +1,33 @@
 ﻿@model Gosocket.Dian.Web.Models.ExternalUserViewModel
 
 @{
-    ViewBag.Title = "Agregar usuarios Externos";
+    ViewBag.Title = "Crear usuario";
+}
+
+@section css
+{
+    <style type="text/css">
+
+        .input-general {
+            background: #fff !important;
+        }
+
+        .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+            cursor: not-allowed;
+            background-color: #eee !important;
+        }
+    </style>
 }
 
 <div class="page-content margin-15">
-    <div class="row margin-horizontal-0">
+    <div class="row title-container" style="margin-left: 1px;">
+        <p class="title-view">
+            @ViewBag.Title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="row margin-horizontal-0 margin-top-35">
         <div class="panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">@ViewBag.Title</h3>
-            </div>
 
             <div class="panel-body padding-top-20">
                 <div class="row margin-horizontal-0">
@@ -24,6 +42,10 @@
 
                             @Html.Partial("_userForm")
                             @Html.ValidationSummary("", new { @class = "text-center text-danger" })
+                            <div class="row margin-left-20 margin-right-20">
+                                <h4 class="panel-title-radian padding-0"><strong>Permisos</strong></h4>
+                                <hr class="margin-5 margin-bottom-20" />
+                            </div>
                             <div class="padding-20">
                                 @foreach (Gosocket.Dian.Web.Models.MenuViewModel menu in ((List<Gosocket.Dian.Web.Models.MenuViewModel>)ViewBag.Menu))
                                 {
@@ -51,44 +73,14 @@
                                     </div>
                                 }
                             </div>
-                            <br />
-                            <div class="form-group text-center">
-                                @Html.ActionLink("Nuevo", "AddUser", "ExternalUsers", null, new { @class = "btn btn-default" })
-                                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                            <div class="panel-footer text-right">
+                                @*@Html.ActionLink("Nuevo", "AddUser", "ExternalUsers", null, new { @class = "btn btn-default" })
+        <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>*@
                                 <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>
+
                             </div>
                             <br />
-                            <table class="table table-sm table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Tipo de documento</th>
-                                        <th>Documento</th>
-                                        <th>Nombres</th>
-                                        <th>Email</th>
-                                        <th class="text-center">Activo?</th>
-                                        <th class="text-center">Editar</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (ViewBag.ExternalUsersList != null)
-                                    {
-                                        List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
-                                        foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
-                                        {
-                                            <tr>
-                                                <td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>
-                                                <td>@item.IdentificationId</td>
-                                                <td>@item.Names</td>
-                                                <td>@item.Email</td>
-                                                <td class="text-center">@(item.Active == 1 ? "Sí" : "No")</td>
-                                                <td class="text-center">
-                                                    @Html.ActionLink("Editar", "AddUser", new { id = item.Id }, new { @class = "btn btn-primary" })
-                                                </td>
-                                            </tr>
-                                        }
-                                    }
-                                </tbody>
-                            </table>
+
                             <br />
                             @*<div class="panel-footer text-center">
                                     @Html.ActionLink("Nuevo", "AddUser", null, new { @class = "btn btn-secondary btn-hover-gosocket" })
@@ -100,6 +92,39 @@
                 </div>
 
             </div>
+
+
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Tipo de documento</th>
+                        <th>Documento</th>
+                        <th>Nombres</th>
+                        <th>Email</th>
+                        <th class="text-center">Activo?</th>
+                        <th class="text-center">Editar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.ExternalUsersList != null)
+                    {
+                        List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                        foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
+                        {
+                            <tr>
+                                <td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>
+                                <td>@item.IdentificationId</td>
+                                <td>@item.Names</td>
+                                <td>@item.Email</td>
+                                <td class="text-center">@(item.Active == 1 ? "Sí" : "No")</td>
+                                <td class="text-center">
+                                    @Html.ActionLink("Editar", "AddUser", new { id = item.Id }, new { @class = "btn btn-primary" })
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
 
         </div>
     </div>

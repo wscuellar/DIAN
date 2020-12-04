@@ -62,17 +62,34 @@ namespace Gosocket.Dian.Web.Controllers
             };
 
             //aqui se adiciona los clientes asociados.
-            PagedResult<RadianContributor> customers = _radianAprovedService.CustormerList(radianAdmin.Contributor.RadianContributorId, string.Empty, RadianState.none, 1, 10);
+            PagedResult<RadianCustomerList> customers = _radianAprovedService.CustormerList(radianAdmin.Contributor.RadianContributorId, string.Empty, RadianState.none, 1, 10);
             model.Customers = customers.Results.Select(t => new RadianCustomerViewModel()
             {
-                BussinessName = t.Contributor.BusinessName,
-                Nit = t.Contributor.Code,
+                BussinessName = t.BussinessName,
+                Nit = t.Nit,
                 RadianState = t.RadianState,
-                Page = 1,
-                Lenght = 10
+                Page = t.Page,
+                Lenght =t.Length
             }).ToList();
             model.CustomerTotalCount = customers.RowCount;
 
+            var data = _radianAprovedService.FileHistoryFilter(string.Empty, string.Empty, string.Empty, 1, 10);
+            FileHistoryListViewModel resultH = new FileHistoryListViewModel()
+            {
+                Page = 1,
+                RowCount = data.RowCount,
+                Customers = data.Results.Select(t => new FileHistoryItemViewModel()
+                {
+                    FileName = t.FileName,
+                    Comments = t.Comments,
+                    CreatedBy = t.CreatedBy,
+                    Status = t.RadianContributorFileStatus?.Name,
+                    Updated = t.Timestamp.ToString("yyyy-MM-dd")
+                }).ToList()
+            };
+            model.FileHistories = resultH;
+            model.FileHistoriesRowCount = data.RowCount;
+            
             if ((int)registrationData.RadianOperationMode == 2)
             {
                 if (model.RadianState == "Habilitado")
@@ -300,6 +317,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.RadianTestSetResult =
                _radianTestSetResultService.GetTestSetResultByNit(radianAdmin.Contributor.Code).FirstOrDefault();
 
+
             radianApprovedViewModel.Contributor = radianAdmin.Contributor;
             radianApprovedViewModel.ContributorId = radianAdmin.Contributor.Id;
             radianApprovedViewModel.Name = radianAdmin.Contributor.TradeName;
@@ -309,6 +327,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.Files = radianAdmin.Files;
             radianApprovedViewModel.RadianState = radianAdmin.Contributor.RadianState;
             radianApprovedViewModel.RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId;
+            radianApprovedViewModel.Software = _radianAprovedService.GetSoftware(new Guid(softwareId));
 
             return View("GetSetTestResult", radianApprovedViewModel);
         }
@@ -329,15 +348,15 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult CustomersList(int radianContributorId, string code, RadianState radianState, int page, int pagesize)
         {
-            PagedResult<RadianContributor> customers = _radianAprovedService.CustormerList(radianContributorId, code, radianState, page, pagesize);
+            PagedResult<RadianCustomerList> customers = _radianAprovedService.CustormerList(radianContributorId, code, radianState, page, pagesize);
 
             List<RadianCustomerViewModel> customerModel = customers.Results.Select(t => new RadianCustomerViewModel()
             {
-                BussinessName = t.Contributor.BusinessName,
-                Nit = t.Contributor.Code,
+                BussinessName = t.BussinessName,
+                Nit = t.Nit,
                 RadianState = t.RadianState,
-                Page = page,
-                Lenght = pagesize
+                Page = t.Page,
+                Lenght = t.Length
             }).ToList();
 
             RadianApprovedViewModel model = new RadianApprovedViewModel()
@@ -347,6 +366,26 @@ namespace Gosocket.Dian.Web.Controllers
             };
 
             return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public ActionResult FileHistoyList(FileHistoryFilterViewModel filter)
+        {
+            PagedResult<RadianContributorFileHistory> data = _radianAprovedService.FileHistoryFilter(filter.FileName, filter.Initial, filter.End, filter.Page, filter.PageSize);
+            FileHistoryListViewModel result = new FileHistoryListViewModel()
+            {
+                Page = filter.Page,
+                RowCount = data.RowCount,
+                Customers = data.Results.Select(t => new FileHistoryItemViewModel()
+                {
+                    FileName = t.FileName,
+                    Comments = t.Comments,
+                    CreatedBy = t.CreatedBy,
+                    Status = t.RadianContributorFileStatus?.Name,
+                    Updated = t.Timestamp.ToString("yyyy-MM-dd")
+                }).ToList()
+            };
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
     }

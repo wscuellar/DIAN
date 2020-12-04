@@ -68,10 +68,10 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.ExternalUsersCreate;
 
-            ViewBag.txtAccion = "Guardar";
+            ViewBag.txtAccion = "Crear usuario";
 
             if (!string.IsNullOrEmpty(id))
-                ViewBag.txtAccion = "Actualizar";
+                ViewBag.txtAccion = "Editar usuario";
 
             var uCompany = userService.Get(User.Identity.GetUserId());
 
@@ -261,10 +261,10 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> AddUser(ExternalUserViewModel model, FormCollection fc)
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.ExternalUsersCreate;
-            ViewBag.txtAccion = "Guardar";
+            ViewBag.txtAccion = "Crear usuario";
 
             if (!string.IsNullOrEmpty(model.Id))
-                ViewBag.txtAccion = "Actualizar";
+                ViewBag.txtAccion = "Editar usuario";
 
             this.LoadViewBags();
 

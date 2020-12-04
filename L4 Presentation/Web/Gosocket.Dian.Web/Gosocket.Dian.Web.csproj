@@ -367,6 +367,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdminRadianViewModel.cs" />
     <Compile Include="Models\AutoListModel.cs" />
+    <Compile Include="Models\FileHistoryFilterViewModel.cs" />
     <Compile Include="Models\ParametersDataViewModel.cs" />
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
@@ -2883,6 +2884,7 @@
     <Content Include="Views\RadianApproved\_formSearch.cshtml" />
     <Content Include="Views\RadianApproved\_certificatesThirdStep.cshtml" />
     <Content Include="Views\RadianApproved\_formSearchHistory.cshtml" />
+    <Content Include="Views\Document\PrintDocument.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

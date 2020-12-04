@@ -116,19 +116,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
+        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference, string eventCode)
         {
-            var validateResponses = new List<ValidateListResponse>();
+             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
-            //Obtiene XML Factura electronica CUFE
+            //Obtiene XML CUFE - CUDE
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
-            var xmlParserCude = new XmlParser(xmlBytes);
-            if (!xmlParserCude.Parser())
-                throw new Exception(xmlParserCude.ParserError);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
 
-            var nitModel = xmlParserCude.Fields.ToObject<NitModel>();
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
 
-            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference));
+            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference, eventCode));
 
             return validateResponses;
         }
@@ -176,7 +176,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                )
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
                     "0"+ (int)code).FirstOrDefault();                
@@ -229,9 +231,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     validateResponses.Add(response);
                     return validateResponses;
                 }
-            }
-            else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice ||
-                    Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
+            }           
+            else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice)                   
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), 
                     data.DocumentTypeId, "0" + (int)code, data.CustomizationID).FirstOrDefault();
@@ -241,8 +242,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
-                    string msg = Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice ? "No se encontró evento referenciado CUDE para evaluar fecha Limitación de circulación"
-                        : "No se encontró evento referenciado CUDE para evaluar fecha Notificación del pago total o parcial";
+                    string msg = "No se encontró evento referenciado CUDE para evaluar fecha Limitación de circulación";           
                     ValidateListResponse response = new ValidateListResponse();
                     response.ErrorMessage = msg;
                     response.IsValid = false;

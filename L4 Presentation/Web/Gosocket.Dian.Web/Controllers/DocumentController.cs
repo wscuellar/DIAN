@@ -6,6 +6,7 @@ using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
+using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Filters;
@@ -37,6 +38,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
+        private readonly IRadianPdfCreationService _radianPdfCreationService;
 
         private List<DocValidatorTrackingModel> GetValidatedRules(string trackId)
         {
@@ -53,6 +55,11 @@ namespace Gosocket.Dian.Web.Controllers
                 Priority = d.Priority,
                 Status = d.Status
             }).Where(d => d.IsNotification).OrderBy(d => d.Status).ToList();
+        }
+
+        public DocumentController(IRadianPdfCreationService radianPdfCreationService)
+        {
+            _radianPdfCreationService = radianPdfCreationService;
         }
 
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
@@ -455,6 +462,12 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
+        public async Task<ActionResult> PrintDocument(string cufe)
+        {
+            byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe);
+
+            return View(pdfDocument);
+        }
 
         #region Private methods
 
@@ -662,22 +675,37 @@ namespace Gosocket.Dian.Web.Controllers
                     Events = d.Events.Select(
                         e => new EventViewModel()
                         {
-                            Code = e.Code,
+                            DocumentKey = e.DocumentKey,
                             Date = e.Date,
-                            Description = e.Description
+                            DateNumber = e.DateNumber,
+                            TimeStamp = e.TimeStamp,
+                            Code = e.Code,
+                            Description = e.Description,
+                            SenderCode = e.SenderCode,
+                            SenderName = e.SenderName,
+                            ReceiverCode = e.ReceiverCode,
+                            ReceiverName = e.ReceiverName
                         }).ToList()
                 }).ToList();
 
                 foreach (DocumentViewModel docView in model.Documents)
-                    docView.RadianStatusName = DeterminateRadianStatus(docView.Events);
+                    docView.RadianStatusName = DeterminateRadianStatus(docView.Events, model.DocumentTypeId);
             }
 
             if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
                 model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
 
+            if (model.RadianStatus == 8)
+            {
+                string statusName = model.RadianStatusList.First(rl => rl.Code.Equals(model.RadianStatus.ToString())).Name.ToUpper();
+                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(statusName, StringComparison.OrdinalIgnoreCase));
+            }
+
             if (model.RadianStatus != 0)
-                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(
-                    model.RadianStatusList.First(rl => rl.Code.Equals(model.RadianStatus.ToString()))));
+            {
+                string statusName = model.RadianStatusList.First(rl => rl.Code.Equals(model.RadianStatus.ToString())).Name;
+                model.Documents.RemoveAll(d => !d.RadianStatusName.Equals(statusName, StringComparison.OrdinalIgnoreCase));
+            }
 
             model.IsNextPage = result.Item1;
             this.Session["Continuation_Token_" + (model.Page + 1)] = result.Item2;
@@ -685,20 +713,19 @@ namespace Gosocket.Dian.Web.Controllers
             return View("Index", model);
         }
 
-        private string DeterminateRadianStatus(List<EventViewModel> events)
+        private string DeterminateRadianStatus(List<EventViewModel> events, string documentTypeId)
         {
             if (events.Count() == 0)
                 return "NO APLICA";
 
-            if (events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Received.ToString()))
-                && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Receipt.ToString()))
-                && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Accepted.ToString())))
-                return "TÍTULO VALOR";
+            int lastEventCode = int.Parse(events.OrderBy(t => int.Parse(t.Code)).Last().Code);
 
-            int lastEventCode = int.Parse(events.Last().Code);
+            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NegotiatedInvoice.ToString())
+                || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.AnulacionLimitacionCirculacion.ToString()))
+                return "LIMITADA";
 
-            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.SolicitudDisponibilizacion.ToString()))
-                return "DISPONIBILIZADA";
+            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NotificacionPagoTotalParcial.ToString()))
+                return "PAGADA";
 
             if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.EndosoPropiedad.ToString())
                 || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.EndosoGarantia.ToString())
@@ -706,15 +733,21 @@ namespace Gosocket.Dian.Web.Controllers
                 || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.InvoiceOfferedForNegotiation.ToString()))
                 return "ENDOSADA";
 
-            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NotificacionPagoTotalParcial.ToString()))
-                return "PAGADA";
+            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.SolicitudDisponibilizacion.ToString()))
+                return "DISPONIBILIZADA";
 
-            if (lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.NegotiatedInvoice.ToString())
-                || lastEventCode == (int)Enum.Parse(typeof(EventStatus), EventStatus.AnulacionLimitacionCirculacion.ToString()))
-                return "LIMITADA";
+            if (events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Received.ToString()))
+                && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Receipt.ToString()))
+                && events.Any(e => int.Parse(e.Code) == (int)Enum.Parse(typeof(EventStatus), EventStatus.Accepted.ToString())))
+                return "TÍTULO VALOR";
+
+            if (documentTypeId == "01")
+                return "FACTURA ELECTRONICA";
+
 
             return "NO APLICA";
         }
+
         private void SetView(int filterType)
         {
             switch (filterType)
