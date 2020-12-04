@@ -733,7 +733,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
             //Validation of the DocumentReference Section - Informed CUFE and CUDE         
-            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackIdCude, documentReferenceId);
+            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode);
             if (!documentReferenceCufe.IsValid)
             {
                 dianResponse = documentReferenceCufe;
@@ -1587,10 +1587,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             return response;
         }
-        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference)
+        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, IdDocumentReference = idDocumentReference });
-
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode });
+            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

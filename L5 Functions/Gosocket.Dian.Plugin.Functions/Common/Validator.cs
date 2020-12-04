@@ -1398,7 +1398,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 //Valida CUFE referenciado existe en sistema DIAN
                 nitModel.DocumentKey = attorneyModel.cufe;
-                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference);
+                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference, "043");
                 if (resultValidateCufe[0].IsValid)
                     attorney.Add(attorneyModel);
                 else
@@ -1949,9 +1949,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validación de la Sección DocumentReference - CUFE Informado
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
-        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference)
+        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference, string eventCode)
         {
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            string documentTypeIdRef = ((Convert.ToInt32(eventCode)) == (int)EventStatus.TerminacionMandato ||
+                (Convert.ToInt32(eventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)) ? nitModel.DocumentTypeIdRef : nitModel.DocumentTypeId;
+
+            List <ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
             //Valida exista CUFE/CUDE en sistema DIAN
             var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(nitModel.DocumentKey.ToLower()).FirstOrDefault();
@@ -1975,6 +1978,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     Mandatory = true,
                     ErrorCode = "Regla: AAH06-(R): ",
                     ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            //Valida DocumentTypeCode Invoice/AR coincida con el CUFE/CUDE referenciado
+            if (documentMeta.DocumentTypeId != documentTypeIdRef)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAH09-(R): ",
+                    ErrorMessage = "No corresponde a un tipo de documento valido.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
