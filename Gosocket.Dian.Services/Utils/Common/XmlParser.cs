@@ -113,7 +113,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                     }
 
                     //SigningTime
-                    SigningTime = SigningTime == null ? "0000-00-00T00:00:00.000-00:00" : SigningTime;
+                    SigningTime = SigningTime == null ? "0" : SigningTime;
                 }
             }
         }
