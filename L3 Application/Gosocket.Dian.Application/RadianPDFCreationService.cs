@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application.Cosmos;
 using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
@@ -43,10 +44,10 @@ namespace Gosocket.Dian.Application
 
             StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
             StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
-
-
+            
             // Load Document Data
             GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
+            EventStatus eventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), documentMeta.EventCode);
 
             //Load documents
             List<GlobalDocReferenceAttorney> documents =
@@ -205,7 +206,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{InvoiceNumber}", documentMeta.SerieAndNumber);
             template = template.Replace("{CUFE}", documentMeta.PartitionKey);
             template = template.Replace("{EInvoiceGenerationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
-            template = template.Replace("{Status}", documentMeta.EventCode);
+            template = template.Replace("{Status}", $"Estyado: {(EventStatus)Enum.Parse(typeof(EventStatus), documentMeta.EventCode)}");
             return template;
         }
 
