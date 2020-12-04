@@ -1074,58 +1074,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             string valueTotalInvoice = xmlParserCufe.TotalInvoice;
 
-            //Valida informacion Endoso 
-
-            if (valueTotalEndoso == null || valueTotalEndoso == "")
-            {
-                return new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAI05, Rechazo: ",
-                    ErrorMessage = "El valor no es informado.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
-            }          
+            //Valida informacion Endoso               
 
             if (eventCode == "037")
             {
-                if (valueTotalEndoso == null)
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAI05a, Rechazo: ",
-                        ErrorMessage = $"{(string)null} El valor no es informado .",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
-
-                if (valuePriceToPay == null)
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAI07a, Rechazo: ",
-                        ErrorMessage = $"{(string)null} El valor no es informado .",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
-
-                if (valueDiscountRateEndoso == null)
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAI09, Rechazo: ",
-                        ErrorMessage = $"{(string)null} No fue informado la tasa de descuento.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
-
+              
                 //Valida precio a pagar endoso
                 int resultValuePriceToPay = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
                 resultValuePriceToPay = resultValuePriceToPay / 100;
@@ -1136,7 +1089,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: AAI07b, Rechazo: ",
+                        ErrorCode = "Regla: AAI07b, (R): ",
                         ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
@@ -1158,7 +1111,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: 89, Rechazo: ",
+                            ErrorCode = "Regla: 89, (R): ",
                             ErrorMessage = $"{(string)null} El valor total del endoso es diferente a los valores reportados .",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         };
