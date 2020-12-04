@@ -29,6 +29,9 @@
         public string DocumentKey { get; set; }
         public string ResponseCode { get; set; }
         public string listID { get; set; }
+        public string DocumentTypeIdRef { get; set; }
+        public string DocumentTypeId { get; set; }
+        public string SerieAndNumber { get; set; }
 
     }
 }

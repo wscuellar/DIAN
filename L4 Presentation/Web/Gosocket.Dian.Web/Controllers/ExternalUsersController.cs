@@ -26,8 +26,8 @@ namespace Gosocket.Dian.Web.Controllers
     /// Quiero configurar usuarios
     /// Para que puedan ingresar al catalogo de validación sin necesidad(Facturando electrónicamente) de usar token
     /// </summary>
-    [AllowAnonymous]
-    //[CustomRoleAuthorization(CustomRoles = "Administrador, Super, UsuarioExterno")]
+    //[AllowAnonymous]
+    [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
     public class ExternalUsersController : Controller
     {
         ApplicationDbContext _context;
@@ -244,6 +244,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Name = m.Name,
                     Title = m.Title,
                     Description = m.Description,
+                    Icon = m.Icon,
                     Options = _permisionService.GetSubMenusByMenuId(m.Id).Select(s =>
                         new SubMenuViewModel()
                         {

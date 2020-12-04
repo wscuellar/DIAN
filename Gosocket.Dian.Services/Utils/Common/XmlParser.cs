@@ -39,6 +39,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string PrecioPagarseFEV { get; set; }
         public string TasaDescuento { get; set; }
         public string MedioPago { get; set; }
+        public string DocumentTypeIdRef { get; set; }
 
         public XmlParser()
         {
@@ -85,11 +86,11 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var nodePaymentMeansValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='ID']";                    
                     var nodePaymentDueDateValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='PaymentDueDate']";
                     var listIDValueXpath = XmlDocument.GetElementsByTagName("cbc:ResponseCode")[0];
-                    var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";                    
+                    var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";                 
                     var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
                     var valueNote = "//*[local-name()='Note']";
 
-                    var documentReferenceId = XmlDocument.SelectSingleNode(documentReferenceIdValueXpath)?.InnerText;
+                    var documentReferenceId = XmlDocument.SelectSingleNode(documentReferenceIdValueXpath)?.InnerText;          
                     var nodePaymentMeans = XmlDocument.SelectSingleNode(nodePaymentMeansValuesXpath)?.InnerText;
                     var nodePaymentDueDate = XmlDocument.SelectSingleNode(nodePaymentDueDateValuesXpath)?.InnerText;
                     var nodeTotalInvoice = XmlDocument.SelectSingleNode(valueTotalInvoice)?.InnerText;
