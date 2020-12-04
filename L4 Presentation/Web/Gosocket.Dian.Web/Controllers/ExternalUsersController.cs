@@ -148,11 +148,6 @@ namespace Gosocket.Dian.Web.Controllers
                 };
             }
 
-            if (model.Active == 1)
-                ViewBag.txtActive = "Desactivar";
-            else
-                ViewBag.txtActive = "Activar";
-
             return View(model);
         }
 
@@ -462,7 +457,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             byte accion;
 
-            if (active.Equals("Desactivar"))
+            if (active.Equals("Inactivar"))
                 accion = 0;
             else
                 accion = 1;
