@@ -117,19 +117,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
+        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference, string eventCode)
         {
-            var validateResponses = new List<ValidateListResponse>();
+             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
-            //Obtiene XML Factura electronica CUFE
+            //Obtiene XML CUFE - CUDE
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
-            var xmlParserCude = new XmlParser(xmlBytes);
-            if (!xmlParserCude.Parser())
-                throw new Exception(xmlParserCude.ParserError);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
 
-            var nitModel = xmlParserCude.Fields.ToObject<NitModel>();
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
 
-            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference));
+            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference, eventCode));
 
             return validateResponses;
         }
@@ -273,12 +273,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
 
             var xmlBytes = await GetXmlFromStorageAsync(p.TrackId);
-            var xmlParser = new XmlParser(xmlBytes);
+            var xmlParser = new XmlParseNomina(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateReplacePredecesor(p.TrackId));
+            validateResponses.AddRange(validator.ValidateReplacePredecesor(p, xmlParser));
             return validateResponses;
         }
 
