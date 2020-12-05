@@ -10,6 +10,14 @@
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
     <style type="text/css">
 
+        .prompt-comment .modal-title {
+            font-size: 24px;
+            width: fit-content;
+            border-bottom: 3px solid #62C7AB;
+            padding-right: 20px;
+            padding-bottom: 4px;
+        }
+
         .input-general {
             background: #fff !important;
         }
@@ -78,6 +86,37 @@
         .menuIcon {
             padding-left: 5px;
         }
+
+        .prompt-comment .modal-body {
+            width: 100%;
+        }
+
+        .modal-body .close, .modal-header .close {
+            background-color: #348441 !important;
+        }
+
+        .btnCloseOtherDocument {
+            color: #fff;
+            background: #348441 !important;
+            background-color: #348441 !important;
+            /*border-radius: 10px !important;*/
+            float: right;
+            cursor: pointer;
+            opacity: 100 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
+            font-weight: normal !important;
+            font-family: auto !important;
+        }
+
+        .btnSuccessOtherDocument {
+            height: 33px;
+            border-radius: 4px;
+            margin-top: 18px;
+        }
+
     </style>
 }
 
@@ -154,11 +193,11 @@
                             </div>
                             <div class="panel-footer footerRectangle text-right">
                                 @*@Html.ActionLink("Nuevo", "Add@*User", "ExternalUsers", null, new { @class = "btn btn-default" })
-                                    <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-                                    <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
+                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
                                 <div class="footerRectangle">
                                     <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-success btn-hover-gosocket btn-radian-success">
-                                        Crear Usuario
+                                        @ViewBag.txtAccion
                                     </button>
 
                                 </div>
@@ -287,11 +326,11 @@
 
                                                     @if (item.Active == 1)
                                                     {
-                                                        <a class="fa fa-toggle-on" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive(1)"></a>
+                                                        <a class="fa fa-toggle-on" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"></a>
                                                     }
                                                     else
                                                     {
-                                                        <a class="fa fa-toggle-off" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive(2)"> </a>
+                                                        <a class="fa fa-toggle-off" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"> </a>
                                                     }
 
                                                 </td>
@@ -309,30 +348,35 @@
 </div>
 
 
-
-<div class="modal fade" id="dialogConfirmActive" tabindex='-1' data-keyboard="false">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+<div class="modal fade prompt-comment" id="dialogConfirmActive" tabindex="-1" aria-labelledby="dialogConfirmActiveLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="padding-right: 12px;">
             <div class="modal-header">
-                <h4 class="modal-title">¿Desea inactivar al usuario?</h4>
+                <h5 class="modal-title" style="margin-left: 8px;" id="dialogConfirmActiveLabel">¿Desea inactivar/activar al usuario?</h5>
+                <button type="button" class="close btnCloseOtherDocument" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="modal-body">
-                <div class="row row-fluid">
+            <div class="modal-body" style="padding-left: 1px !important;display: block;">
 
-                    <div class="form-group col-lg-10  col-md-10  col-xs-12">
-                        <span class="control-label accion-title"></span>
-                        <br />
-                        <textarea type="text" id="txtActiveDescription" cols="3" rows="6" maxlength="150" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group col-lg-2  col-md-2  col-xs-12 align-items-end">
-                        <button id="btnOkActive" type="button" data-dismiss="modal" class="btn btn-success btn-hover-gosocket btn-radian-success">Aceptar</button>
-                    </div>
-                </div>
+                <table class="margin-top-3 margin-left-15">
+                    <tr>
+                        <td><label id="lblActionActive" class="control-label" style="margin-left: 7px;"></label></td></tr>
+                    <tr>
+                        <td class="col-md-12 col-lg-12">
+                            <textarea type="text" id="txtActiveDescription" cols="4" rows="4" maxlength="150" class="form-control"></textarea>
+                        </td>
+                        <td style="vertical-align: bottom;">
+                            <button id="btnOkActive" type="button" data-dismiss="modal" class="btn btn-success btn-radian-success btnSuccessOtherDocument">Activar</button>
+                        </td>
+                    </tr>
+                </table>
+
             </div>
-
         </div>
     </div>
 </div>
+
 
 @section scripts
 {
@@ -343,6 +387,9 @@
         var userId = "";
         var reloadView = false;
         var listPermisionsAsigned;
+        var userActive = "";
+        var userActiveEmail = "";
+
         $(document).ready(function ($) {
 
             userId = $("#Id").val();
@@ -417,22 +464,17 @@
             });
              
             $("#btnOkActive").click(function () {
-                debugger;
+
                 $.ajax({
                     url: "@Url.Action("UpdateActive","ExternalUsers")",
                     type: "POST",
                     data: {
-                        userId: $("#Id").val(), active: $(".btn-active").text(), activeDescription: $("#txtActiveDescription").val(), email: $("#Email").val() },
+                        userId: userActive, active: $("#btnOkActive").text(), activeDescription: $("#txtActiveDescription").val(), email: userActiveEmail },
                     datatype: "json",
                     success: function (res) {
 
                         if (res.StatusCode == 'OK') {
                             reloadView = true;
-
-                            if ($(".btn-active").text() == 'Activar')
-                                $(".btn-active").text('Desactivar');
-                            else
-                                $(".btn-active").text('Activar');
 
                             $.niftyNoty({
                                 type: res.StatusCode == 'OK' ? "success" : "danger",
@@ -586,18 +628,31 @@
 
             });
 
-            console.log('arrPermissions', arrPermissions);
             return JSON.stringify(arrPermissions);
         }
 
         function reloadPage() {
-            location.href = "@Url.Action("AddUser","ExternalUsers")";
+            location.href = "@Url.Action("AddUser","ExternalUsers", null)";
         }
 
         function showModalSave() {
+            $("#idUserEdicion").text($("#Names").val());
             $("#ModalSave").modal('show');
         }
 
+        function confirmActive(userActiveId, accionActive, emailActive) { 
+
+            userActive = userActiveId;
+            userActiveEmail = emailActive;
+
+            if (accionActive == 0) {
+                $('#lblActionActive').text('Describa el motivo de la activación');
+                $("#btnOkActive").text('Activar');
+            }
+            else {
+                $('#lblActionActive').text('Describa el motivo de la inactivación');
+                $("#btnOkActive").text('Inactivar');
+            }
         function clickOpenModalGenerico(TipoAfimacion) {
             if (TipoAfimacion == 'Creacion')
             {

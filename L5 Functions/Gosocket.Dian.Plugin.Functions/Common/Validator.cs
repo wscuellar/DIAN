@@ -2058,19 +2058,27 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //if (document != null)
                 if (documentMeta.Count >= 2)
                 {
-                    if (documentMeta.Where(t => t.EventCode == eventPrev.EventCode && document != null && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
+                    //No valida Evento registrado previamente para solictud de disponibilizacion posterior
+                    if ((eventPrev.CustomizationID != "363" && eventPrev.CustomizationID != "364"))
                     {
-                        validFor = true;
-                        responses.Add(new ValidateListResponse
+                       if (documentMeta.Where(t => t.EventCode == eventPrev.EventCode
+                       && document != null
+                       && t.Identifier == document.PartitionKey                      
+                       ).ToList().Count > decimal.Zero)
                         {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: LGC01-(R): ",
-                            ErrorMessage = "Evento registrado previamente",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    else
+                            validFor = true;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "Regla: LGC01-(R): ",
+                                ErrorMessage = "Evento registrado previamente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }                   
+                    
+                    if(!validFor)
                     {
                         switch (Convert.ToInt32(eventPrev.EventCode))
                         {
@@ -2277,9 +2285,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
                                 if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                                 {
-                                    if (documentMeta
-                                   .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
-                                   .Count > decimal.Zero)
+                                    //Valida que exista una Primera Disponibilizacion
+                                    if (documentMeta.Where(t => t.EventCode == "036" && 
+                                    (t.CustomizationID == "361" || t.CustomizationID == "362" )).ToList().Count > decimal.Zero)
+                                    {
+                                       if (documentMeta
+                                         .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                         .Count > decimal.Zero)
+                                        {
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = "Regla: 89-(R): ",
+                                                ErrorMessage = "Ya existe un tipo de instrumento de limitación registrado en el sistema",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                        else
+                                        {
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = true,
+                                                Mandatory = true,
+                                                ErrorCode = "100",
+                                                ErrorMessage = "Evento referenciado correctamente",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                    }
+                                    else
                                     {
                                         validFor = true;
                                         responses.Add(new ValidateListResponse
@@ -2287,21 +2323,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             IsValid = false,
                                             Mandatory = true,
                                             ErrorCode = "Regla: 89-(R): ",
-                                            ErrorMessage = "Ya existe un tipo de instrumento de limitación registrado en el sistema",
+                                            ErrorMessage = "No existe una Primera Disponibilización para este CUFE",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
-                                    else
-                                    {
-                                        responses.Add(new ValidateListResponse
-                                        {
-                                            IsValid = true,
-                                            Mandatory = true,
-                                            ErrorCode = "100",
-                                            ErrorMessage = "Evento referenciado correctamente",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
+
                                 }
                                 else
                                 {
