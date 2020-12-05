@@ -186,5 +186,21 @@ namespace Gosocket.Dian.Web.Utils
             return _sqlDBContext.Users.FirstOrDefault(u => u.IdentificationTypeId == identificationTypeId && u.IdentificationId == identificationId);
         }
 
+        /// <summary>
+        /// Buscar/Listar los Usuarios Externos
+        /// </summary>
+        /// <param name="creatorNit">Nit de empresa o persona natural registrada en el Rut que Creo a los Usuarios</param>
+        /// <param name="page">Número de pagina</param>
+        /// <param name="length">Número re registros</param>
+        /// <returns></returns>
+        public List<ApplicationUser> GetExternalUsersPaginated(string creatorNit, int page, int length)
+        {
+            var query = _sqlDBContext.Users.Where(c =>
+                         (string.IsNullOrEmpty(creatorNit) || c.CreatorNit == creatorNit)
+                         ).OrderByDescending(c => c.CreationDate).Skip(page * length).Take(length);
+
+            return query.ToList();
+        }
+
     }
 }

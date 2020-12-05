@@ -9,8 +9,12 @@ namespace Gosocket.Dian.Web.Models
     {
         public ExternalUserViewModel()
         {
+            Id = string.Empty;
+            Page = 0;
+            Length = 10;
             IdentificationTypes = new List<IdentificationTypeListViewModel>();
             Roles = new List<IdentityUserRole>();
+            Users = new List<ExternalUserViewModel>();
         }
 
         public string Id { get; set; }
@@ -52,10 +56,21 @@ namespace Gosocket.Dian.Web.Models
         public string ActiveDescription { get; set; }
         public DateTime LastUpdated { get; set; }
         public string CreatorNit { get; set; }
+        public DateTime? CreationDate { get; set; }
+
+        /// <summary>
+        /// Numero
+        /// </summary>
+        public int Page { get; set; }
+
+        //numero de registros en la tabla/busqueda
+        public int Length { get; set; }
+        public bool SearchFinished { get; set; }
 
         public List<IdentificationTypeListViewModel> IdentificationTypes { get; set; }
         
         public List<IdentityUserRole> Roles { get; set; }
+        public List<ExternalUserViewModel> Users { get; set; }
 
     }
 }
