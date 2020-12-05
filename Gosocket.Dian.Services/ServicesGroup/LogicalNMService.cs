@@ -985,14 +985,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 Trab_CodigoTrabajador = xmlParser.globalDocPayrolls.Trab_CodigoTrabajador,
                 Timestamp = new DateTime()
             };
-            //docReferenceAttorney.LugarGeneracionXML = new GlobalDocPayroll.NominaIndividualDeAjusteLugarGeneracionXML() 
-            //{
-            //    DepartamentoEstado = xmlParser.globalDocPayrolls.LugarGeneracionXML.DepartamentoEstado,
-            //    Idioma = xmlParser.globalDocPayrolls.LugarGeneracionXML.Idioma,
-            //    MunicipioCiudad = xmlParser.globalDocPayrolls.LugarGeneracionXML.MunicipioCiudad,
-            //    Pais = xmlParser.globalDocPayrolls.LugarGeneracionXML.Pais
-            //};
-
 
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
             DocumentParsed.SetValues(ref documentParsed);
@@ -1020,6 +1012,22 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
                 dianResponse.StatusCode = Properties.Settings.Default.Code_89;
                 dianResponse.StatusDescription = validatorCuneRequest.ErrorMessage[0];
+                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
+                if (globalEnd >= 10)
+                {
+                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
+                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                }
+                return dianResponse;
+            }
+
+            //Reemplazador Predecesor
+            var validatePredecesor = ValidateReplacePredecedor(trackId);
+            if (!validatePredecesor.IsValid)
+            {
+                //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
+                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
+                dianResponse.StatusDescription = validatePredecesor.StatusMessage;
                 var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
                 if (globalEnd >= 10)
                 {
@@ -1203,6 +1211,31 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 return dianResponse;
             }
+        }
+
+        public DianResponse ValidateReplacePredecedor(string trackId)
+        {
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidatePredecesor", new { trackId });
+            DianResponse response = new DianResponse();
+            if (validations.Count > 0)
+            {
+                response = new DianResponse()
+                {
+                    StatusMessage = validations[0].ErrorMessage,
+                    StatusCode = Properties.Settings.Default.Code_89,
+                    IsValid = validations[0].IsValid
+                };
+                response.ErrorMessage = new List<string>();
+                if (!response.IsValid)
+                {
+                    foreach (var item in validations)
+                    {
+                        response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                    }
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                }
+            }
+            return response;
         }
 
         public DianResponse validatorCune(string trackId)
