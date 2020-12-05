@@ -1196,6 +1196,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool valid = false;
             if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
             {
+                if(eventCode == "035")
+                {
+                    return null;
+                }
+
                 return new ValidateListResponse
                 {
                     IsValid = false,
