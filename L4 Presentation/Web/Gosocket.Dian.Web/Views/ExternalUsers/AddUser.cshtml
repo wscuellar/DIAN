@@ -19,6 +19,10 @@
             background-color: #eee !important;
         }
 
+        .modal-body .close, .modal-header .close {
+            background-color: #348441 !important;
+        }
+
         .btnCloseUE {
             color: #fff;
             background: #348441 !important;
@@ -49,7 +53,7 @@
             text-align: center;
             color: #348441;
         }
- 
+
 
         .row-fluid {
             display: flex;
@@ -70,6 +74,7 @@
             padding-left: 5px;
             padding-top: 4px;
         }
+
         .menuIcon {
             padding-left: 5px;
         }
@@ -101,7 +106,7 @@
                             @Html.Partial("_userForm")
                             @Html.ValidationSummary("", new { @class = "text-center text-danger" })
                             <div class="row margin-left-20 margin-right-20">
-                                <h4 class="panel-title-radian padding-0"><strong>Permisos</strong></h4>
+                                <h4 class="panel-title-radian padding-0">Permisos</h4>
                                 <hr class="margin-5 margin-bottom-20" />
                             </div>
                             <div class="panel-body padding-top-0">
@@ -149,8 +154,8 @@
                             </div>
                             <div class="panel-footer footerRectangle text-right">
                                 @*@Html.ActionLink("Nuevo", "Add@*User", "ExternalUsers", null, new { @class = "btn btn-default" })
-                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
+                                    <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                                    <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
                                 <div class="footerRectangle">
                                     <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-success btn-hover-gosocket btn-radian-success">
                                         Crear Usuario
@@ -164,20 +169,20 @@
                             <div class="modal fade ModalSave" id="ModalSave" name="ModalSave" tabindex='-1' data-keyboard="false">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
-
+                                         
                                         <div class="modal-body">
                                             <div class="row">
-                                                 
+
                                                 <div class="col-md-12 col-lg-12">
                                                     <button type="button" class="close btnCloseUE" data-dismiss="modal" aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
-                                                    </button>asd
-                                                    <br /><br /><br />
+                                                    </button>
+                                                    <br /><br /> <br />
                                                 </div>
 
                                                 <div class="col-md-12 col-lg-12">
                                                     <div class="UEText">
-                                                        ¿Desea creal al usuario<br />
+                                                        ¿Desea crear al usuario<br />
                                                         <span id="idUserEdicion"></span>?
                                                     </div>
                                                 </div>
@@ -193,8 +198,8 @@
                                                     </button>
                                                 </div>
                                                 <div class="col-md-12 col-lg-12">
-                                                    <br /><br /><br />
-                                                     
+                                                    <br /><br /> 
+
                                                 </div>
                                             </div>
                                         </div>
@@ -203,34 +208,33 @@
                             </div>
 
 
-                            <div class="modal fade ModalConfirSave" id="ModalConfirSave" name="ModalConfirSave" tabindex='-1' data-keyboard="false">
+                            <div class="modal fade ModalGenerico" id="ModalGenerico" name="ModalAfilmacion" tabindex='-1' data-keyboard="false">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
 
                                         <div class="modal-body">
-                                            <div class="row"> 
+                                            <div class="row">
                                                 <div class="col-md-12 col-lg-12">
                                                     <button type="button" class="close btnCloseUE" data-dismiss="modal" aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
-                                                    </button> 
-                                                    <br /><br /><br />
+                                                    </button>
+                                                    <br /><br />
                                                 </div>
 
                                                 <div class="col-md-12 col-lg-12">
-                                                     <div style="font-size: 80px;">
+                                                    <div style="font-size: 80px; text-align:center;">
                                                         <i class="fa fa-check-circle"></i>
-                                                    </div> 
+                                                    </div>
                                                 </div>
+                                                
                                                 <div class="col-md-12 col-lg-12">
-                                                    <br />
-                                                </div>
-                                                <div class="col-md-12 col-lg-12">
-                                                    <div class="UEText"> 
-                                                        <span id="idEstadoSave"></span>
+                                                    <div class="UEText">
+                                                        <span id="idTextoModal1"></span> <br />
+                                                        <span id="idTextoModal2"></span>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12 col-lg-12">
-                                                    <br /><br /><br />
+                                                    <br /><br /> 
                                                 </div>
                                             </div>
                                         </div>
@@ -245,10 +249,10 @@
             </div>
             <div class="panel-body padding-top-20">
                 <div class="row">
-                    <div class="col-lg-12  col-md-12  col-xs-12"> 
+                    <div class="col-lg-12  col-md-12  col-xs-12">
                         <h4> Usuarios Configurados</h4>
                     </div>
-                    <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line"> 
+                    <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
                     </div>
                     <div class="col-lg-offset-1 col-md-offset-1  col-lg-10 col-md-10  col-xs-12">
                         <div class="table-responsive">
@@ -314,10 +318,10 @@
             </div>
             <div class="modal-body">
                 <div class="row row-fluid">
-                     
+
                     <div class="form-group col-lg-10  col-md-10  col-xs-12">
-                            <span class="control-label accion-title"></span>
-                         <br />
+                        <span class="control-label accion-title"></span>
+                        <br />
                         <textarea type="text" id="txtActiveDescription" cols="3" rows="6" maxlength="150" class="form-control"></textarea>
                     </div>
                     <div class="form-group col-lg-2  col-md-2  col-xs-12 align-items-end">
@@ -325,7 +329,7 @@
                     </div>
                 </div>
             </div>
-             
+
         </div>
     </div>
 </div>
@@ -391,8 +395,27 @@
                         showModalSave();
                 }
             });
-             
 
+            $('#btnAbrirModalConfirmacion').click(function () {
+                var form = $('#add-user-form');
+                console.log(form.valid());
+                if (form.valid()) {
+                    var permissions = getPermissions();
+                    if (permissions === "[]") {
+                        $.niftyNoty({
+                            type: "danger",
+                            container: "floating",
+                            title: "Permisos",
+                            message: "No ha seleccionado los Permisos para el Usuario",
+                            closeBtn: false,
+                            timer: 5000
+                        });
+                    }
+                    else
+                        showModalSave();
+                }
+            });
+             
             $("#btnOkActive").click(function () {
                 debugger;
                 $.ajax({
@@ -472,11 +495,18 @@
                     }
                 }
             }
-
-            debugger;
-            if ($("#hddMessage").val() != null && $("#hddMessage").val() != '') { 
-                alert($("#hddMessage").val());
+             
+            if ($("#hddMessage").val() != null && $("#hddMessage").val() != '') {
+                debugger;
+                if  ($("#Id").val().length > 0) clickOpenModalGenerico('Edicion');
+                else clickOpenModalGenerico('Creacion');
+                document.getElementById("hddMessage").value = ''; 
             }
+
+
+            $("#ModalGenerico").on("hidden.bs.modal", function () {
+                reloadPage();
+            });
 
         });//ready
 
@@ -568,14 +598,47 @@
             $("#ModalSave").modal('show');
         }
 
-        function confirmActive(accion) { 
+        function clickOpenModalGenerico(TipoAfimacion) {
+            if (TipoAfimacion == 'Creacion')
+            {
+                $('#idTextoModal1').text('El usuario fue');
+                $('#idTextoModal2').text('creado exitosamente');
+            }
 
-            if (accion == 2)  $('span.accion-title').text('Describa el motivo de la activación');
-            else  $('span.accion-title').text('Describa el motivo de la inactivación');
+            if (TipoAfimacion == 'Edicion') {
+                $('#idTextoModal1').text('El usuario fue');
+                $('#idTextoModal2').text('actualizado Exitosamente');
+            }
+
+            if (TipoAfimacion == 'Activar') {
+                $('#idTextoModal1').text('El usuario fue');
+                $('#idTextoModal2').text('Activado correctamente');
+            }
+
+            if (TipoAfimacion == 'Desactivar') {
+                $('#idTextoModal1').text('El usuario fue');
+                $('#idTextoModal2').text('Inactivado correctamente');
+            }
+            showModalGenerico();
+        }
+
+        function confirmActive(accion) {
+            if (accion == 2) $('span.accion-title').text('Describa el motivo de la activación');
+            else $('span.accion-title').text('Describa el motivo de la inactivación');
         }
 
         function HideModalSave() {
             $("#ModalSave").modal('hide');
         }
+
+        function showModalGenerico() {
+            $("#ModalGenerico").modal('show');
+        }
+        function HideModalAfilmacion() {
+            $("#ModalGenerico").modal('hide');
+        }
+
+       
+
     </script>
 }
