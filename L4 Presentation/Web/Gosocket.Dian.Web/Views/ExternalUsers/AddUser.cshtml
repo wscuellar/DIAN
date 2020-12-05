@@ -6,7 +6,17 @@
 
 @section css
 {
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
     <style type="text/css">
+
+        .prompt-comment .modal-title {
+            font-size: 24px;
+            width: fit-content;
+            border-bottom: 3px solid #62C7AB;
+            padding-right: 20px;
+            padding-bottom: 4px;
+        }
 
         .input-general {
             background: #fff !important;
@@ -16,6 +26,92 @@
             cursor: not-allowed;
             background-color: #eee !important;
         }
+
+        .btnCloseUE {
+            color: #fff;
+            background: #348441 !important;
+            background-color: #348441 !important;
+            /*border-radius: 10px !important;*/
+            float: right;
+            cursor: pointer;
+            opacity: 100 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
+            font-weight: normal !important;
+            font-family: auto !important;
+        }
+
+        .footerRectangle {
+            padding: 10px !important;
+        }
+
+        .UEText {
+            font-family: Arial;
+            font-style: normal;
+            font-weight: bold;
+            font-size: 24px;
+            line-height: 30px;
+            align-items: center;
+            text-align: center;
+            color: #348441;
+        }
+ 
+
+        .row-fluid {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        /* [class^="col-"]:not(.pad-no) {
+            padding-left: 2px;
+            padding-right: 2px;
+        }*/
+
+        /*.col-xs-2, .col-md-2 {
+            padding-right: 2px;
+            padding-left: 2px;
+        }*/
+
+        .lblOptions {
+            padding-left: 5px;
+            padding-top: 4px;
+        }
+        .menuIcon {
+            padding-left: 5px;
+        }
+
+        .prompt-comment .modal-body {
+            width: 100%;
+        }
+
+        .modal-body .close, .modal-header .close {
+            background-color: #348441 !important;
+        }
+
+        .btnCloseOtherDocument {
+            color: #fff;
+            background: #348441 !important;
+            background-color: #348441 !important;
+            /*border-radius: 10px !important;*/
+            float: right;
+            cursor: pointer;
+            opacity: 100 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
+            font-weight: normal !important;
+            font-family: auto !important;
+        }
+
+        .btnSuccessOtherDocument {
+            height: 33px;
+            border-radius: 4px;
+            margin-top: 18px;
+        }
+
     </style>
 }
 
@@ -37,6 +133,7 @@
                             @Html.HiddenFor(m => m.Id)
                             <input type="hidden" id="listMenu" value="@Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Menu)" />
                             <input type="hidden" id="hddPermissions" name="hddPermissions" />
+                            <input type="hidden" id="hddMessage" name="hddMessage" value="@ViewBag.messageAction" />
                             <input type="hidden" id="hddPermissionsAsigned" name="hddPermissionsAsigned"
                                    value="@(ViewBag.PermissionList != null ? Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.PermissionList) : null)" />
 
@@ -46,113 +143,233 @@
                                 <h4 class="panel-title-radian padding-0"><strong>Permisos</strong></h4>
                                 <hr class="margin-5 margin-bottom-20" />
                             </div>
-                            <div class="padding-20">
+                            <div class="panel-body padding-top-0">
                                 @foreach (Gosocket.Dian.Web.Models.MenuViewModel menu in ((List<Gosocket.Dian.Web.Models.MenuViewModel>)ViewBag.Menu))
                                 {
-                                    <div class="btn-group" id="controlMenu">
-                                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            @menu.Name &nbsp;<span class="badge badge-light" style="color: #074fbb;">@(menu.Options != null ? (((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options).Count() : 0)</span>
-                                            &nbsp;<span class="caret"></span>
-                                        </button>
-                                        <div class="dropdown-menu" style="padding-left: 8px; padding-right: 8px;">
-                                            <div class="custom-control custom-checkbox dropdown-item">
-                                                <input type="checkbox" class="custom-control-input" id="@("menu" + menu.Id)" onchange="changeAllMenu(@menu.Id)">
-                                                <label class="custom-control-label" for="@("lblMenu" + menu.Id)">Todos...</label>
-                                            </div>
-                                            @if (menu.Options != null)
-                                            {
-                                                foreach (Gosocket.Dian.Web.Models.SubMenuViewModel subMenu in ((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options)
-                                                {
-                                                    <div class="custom-control custom-checkbox dropdown-item">
-                                                        <input type="checkbox" class="custom-control-input" id="@("submenu" + menu.Id + "_" + subMenu.Id)">
-                                                        <label class="custom-control-label" for="@("lblSubmenu" + menu.Id + "_" + subMenu.Id)">@subMenu.Name</label>
-                                                    </div>
-                                                }
-                                            }
+                                    <div id="@("divMenu" + menu.Id)" class="col-xs-2 col-md-2">
+                                        <div class="form-group form-check" style="margin-bottom: 0px;">
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" class="form-check-input" id="@("chkMenu" + menu.Id)" onchange="changeAllMenu(@menu.Id)" title="@menu.Title" />
+                                                    </td>
+                                                    @if (!string.IsNullOrEmpty(menu.Icon))
+                                                    {
+                                                        <td class="menuIcon">
+
+                                                            <i class="@menu.Icon"></i>
+
+                                                        </td>
+                                                    }
+                                                    <td>
+                                                        <label class="form-check-label lblOptions" for="@("chkMenu" + menu.Id)" title="@menu.Title">@menu.Name</label>
+                                                    </td>
+                                                </tr>
+                                            </table>
                                         </div>
+                                        @if (menu.Options != null)
+                                        {
+                                            foreach (Gosocket.Dian.Web.Models.SubMenuViewModel subMenu in ((Gosocket.Dian.Web.Models.MenuViewModel)menu).Options)
+                                            {
+                                                <div class="form-check">
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <input type="checkbox" class="form-check-input" id="@("chkSubmenu" + menu.Id + "_" + subMenu.Id)" title="@subMenu.Title">
+                                                            </td>
+                                                            <td><label class="form-check-label lblOptions" for="@("chkSubmenu" + menu.Id + "_" + subMenu.Id)" title="@subMenu.Title">@subMenu.Name</label></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            }
+                                        }
                                     </div>
                                 }
                             </div>
-                            <div class="panel-footer text-right">
-                                @*@Html.ActionLink("Nuevo", "AddUser", "ExternalUsers", null, new { @class = "btn btn-default" })
-        <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>*@
-                                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>
+                            <div class="panel-footer footerRectangle text-right">
+                                <div class="footerRectangle">
+                                    <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-success btn-hover-gosocket btn-radian-success">
+                                        @ViewBag.txtAccion
+                                    </button>
 
+                                </div>
                             </div>
-                            <br />
 
-                            <br />
-                            @*<div class="panel-footer text-center">
-                                    @Html.ActionLink("Nuevo", "AddUser", null, new { @class = "btn btn-secondary btn-hover-gosocket" })
-                                    <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-                                    <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>
-                                </div>*@
+
+
+                            <div class="modal fade ModalSave" id="ModalSave" name="ModalSave" tabindex='-1' data-keyboard="false">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                 
+                                                <div class="col-md-12 col-lg-12">
+                                                    <button type="button" class="close btnCloseUE" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>asd
+                                                    <br /><br /><br />
+                                                </div>
+
+                                                <div class="col-md-12 col-lg-12">
+                                                    <div class="UEText">
+                                                        ¿Desea creal al usuario<br />
+                                                        <span id="idUserEdicion"></span>?
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <br />
+                                                </div>
+                                                <div class="col-md-6 col-lg-6 col-xs-6">
+                                                    <button type="submit" class="btn btn-hover-gosocket btn-radian-success pull-right btn-save">Aceptar</button>
+                                                </div>
+                                                <div class="col-md-6 col-lg-6 col-xs-6">
+                                                    <button type="button" class="btn btn-success btn-hover-gosocket btn-radian-success" data-dismiss="modal" aria-label="Close">
+                                                        Cancelar
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <br /><br /><br />
+                                                     
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="modal fade ModalConfirSave" id="ModalConfirSave" name="ModalConfirSave" tabindex='-1' data-keyboard="false">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+
+                                        <div class="modal-body">
+                                            <div class="row"> 
+                                                <div class="col-md-12 col-lg-12">
+                                                    <button type="button" class="close btnCloseUE" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button> 
+                                                    <br /><br /><br />
+                                                </div>
+
+                                                <div class="col-md-12 col-lg-12">
+                                                     <div style="font-size: 80px;">
+                                                        <i class="fa fa-check-circle"></i>
+                                                    </div> 
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <br />
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <div class="UEText"> 
+                                                        <span id="idEstadoSave"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <br /><br /><br />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         }
                     </div>
                 </div>
 
             </div>
+            <div class="panel-body padding-top-20">
+                <div class="row">
+                    <div class="col-lg-12  col-md-12  col-xs-12"> 
+                        <h4> Usuarios Configurados</h4>
+                    </div>
+                    <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line"> 
+                    </div>
+                    <div class="col-lg-offset-1 col-md-offset-1  col-lg-10 col-md-10  col-xs-12">
+                        <div class="table-responsive">
 
+                            <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo de documento</th>
+                                        <th>Documento</th>
+                                        <th>Nombres</th>
+                                        <th>Email</th>
+                                        <th class="text-center">Activo</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.ExternalUsersList != null)
+                                    {
+                                        List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                                        foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
+                                        {
+                                            <tr>
+                                                <td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>
+                                                <td>@item.IdentificationId</td>
+                                                <td>@item.Names</td>
+                                                <td>@item.Email</td>
+                                                <td class="text-center">@(item.Active == 1 ? "Activo" : "Inactivo")</td>
+                                                <td class="text-center">
 
-            <table class="table table-sm table-bordered">
-                <thead>
-                    <tr>
-                        <th>Tipo de documento</th>
-                        <th>Documento</th>
-                        <th>Nombres</th>
-                        <th>Email</th>
-                        <th class="text-center">Activo?</th>
-                        <th class="text-center">Editar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (ViewBag.ExternalUsersList != null)
-                    {
-                        List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
-                        foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
-                        {
-                            <tr>
-                                <td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>
-                                <td>@item.IdentificationId</td>
-                                <td>@item.Names</td>
-                                <td>@item.Email</td>
-                                <td class="text-center">@(item.Active == 1 ? "Sí" : "No")</td>
-                                <td class="text-center">
-                                    @Html.ActionLink("Editar", "AddUser", new { id = item.Id }, new { @class = "btn btn-primary" })
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
+                                                    @Html.ActionLink(" ", "AddUser", new { id = item.Id }, new { @class = "fa fa-pencil" })
+                                                    &nbsp;
 
-        </div>
-    </div>
-</div>
+                                                    @if (item.Active == 1)
+                                                    {
+                                                        <a class="fa fa-toggle-on" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"></a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a class="fa fa-toggle-off" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"> </a>
+                                                    }
 
-<div class="modal fade" id="dialogConfirmActive" tabindex='-1' data-keyboard="false">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Confirmar Acción</h4>
-            </div>
-            <div class="modal-body">
-
-                <h3>Esta seguro de <span style="font-weight:bold">@ViewBag.txtActive</span> el Usuario?</h3>
-                <br />
-                <div class="form-group">
-                    <label for="txtActiveDescription" class="control-label">Escriba la razon por la cual realiza esta acción:</label>
-                    <textarea type="text" id="txtActiveDescription" cols="3" rows="3" maxlength="150" class="form-control"></textarea>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-            <div class="modal-footer">
-                <button id="btnOkActive" type="button" data-dismiss="modal" class="btn btn-success">Aceptar</button>
-                <button id="btnCancelActive" type="button" data-dismiss="modal" class="btn btn-danger">Cancelar</button>
             </div>
         </div>
     </div>
 </div>
+
+
+<div class="modal fade prompt-comment" id="dialogConfirmActive" tabindex="-1" aria-labelledby="dialogConfirmActiveLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="padding-right: 12px;">
+            <div class="modal-header">
+                <h5 class="modal-title" style="margin-left: 8px;" id="dialogConfirmActiveLabel">¿Desea inactivar/activar al usuario?</h5>
+                <button type="button" class="close btnCloseOtherDocument" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="padding-left: 1px !important;display: block;">
+
+                <table class="margin-top-3 margin-left-15">
+                    <tr>
+                        <td><label id="lblActionActive" class="control-label" style="margin-left: 7px;"></label></td></tr>
+                    <tr>
+                        <td class="col-md-12 col-lg-12">
+                            <textarea type="text" id="txtActiveDescription" cols="4" rows="4" maxlength="150" class="form-control"></textarea>
+                        </td>
+                        <td style="vertical-align: bottom;">
+                            <button id="btnOkActive" type="button" data-dismiss="modal" class="btn btn-success btn-radian-success btnSuccessOtherDocument">Activar</button>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section scripts
 {
@@ -163,6 +380,9 @@
         var userId = "";
         var reloadView = false;
         var listPermisionsAsigned;
+        var userActive = "";
+        var userActiveEmail = "";
+
         $(document).ready(function ($) {
 
             userId = $("#Id").val();
@@ -183,7 +403,7 @@
                     var permissions = getPermissions();
 
                     $('#hddPermissions').val(permissions);
-
+                    HideModalSave();
                     //form.submit();
                 }
             });
@@ -194,9 +414,28 @@
 
             //});
 
-            function confirmActive() {
-                $("#dialogConfirmActive").alert('show');
-            }
+
+            $('#btnAbrirModalConfirmacion').click(function () {
+                var form = $('#add-user-form');
+                console.log(form.valid());
+                if (form.valid()) {
+                    var permissions = getPermissions();
+                    if (permissions === "[]")
+                    {
+                        $.niftyNoty({
+                            type:  "danger",
+                            container: "floating",
+                            title: "Permisos",
+                            message: "No ha seleccionado los Permisos para el Usuario",
+                            closeBtn: false,
+                            timer: 5000
+                        });
+                    }
+                    else
+                        showModalSave();
+                }
+            });
+             
 
             $("#btnOkActive").click(function () {
 
@@ -204,17 +443,12 @@
                     url: "@Url.Action("UpdateActive","ExternalUsers")",
                     type: "POST",
                     data: {
-                        userId: $("#Id").val(), active: $(".btn-active").text(), activeDescription: $("#txtActiveDescription").val(), email: $("#Email").val() },
+                        userId: userActive, active: $("#btnOkActive").text(), activeDescription: $("#txtActiveDescription").val(), email: userActiveEmail },
                     datatype: "json",
                     success: function (res) {
 
                         if (res.StatusCode == 'OK') {
                             reloadView = true;
-
-                            if ($(".btn-active").text() == 'Activar')
-                                $(".btn-active").text('Desactivar');
-                            else
-                                $(".btn-active").text('Activar');
 
                             $.niftyNoty({
                                 type: res.StatusCode == 'OK' ? "success" : "danger",
@@ -258,32 +492,38 @@
                 listPermisionsAsigned = JSON.parse($("#hddPermissionsAsigned").val());
 
                 for (i = 0; i < listMenu.length; i++) {
-                    console.log('Menu: ' + listMenu[i].Id + listMenu[i].Name);
+                    console.log('Menu: ' + listMenu[i].Id + ' ' + listMenu[i].Name);
                     if (listMenu[i].Options != null && listMenu[i].Options.length > 0) {
                         for (j = 0; j < listMenu[i].Options.length; j++) {
 
                             var asigned = validSubMenuAsigned(listMenu[i].Options[j].Id);
 
                             if (asigned) {
-                                $("#submenu" + listMenu[i].Id + "_" + listMenu[i].Options[j].Id).prop("checked", "checked");
+                                $("#chkSubmenu" + listMenu[i].Id + "_" + listMenu[i].Options[j].Id).prop("checked", "checked");
+                                $("#chkMenu" + listMenu[i].Id).prop("checked", "checked");
                             }
                         }
                     }
                     else {
                         if (validMenuWithoutSubMenu(listMenu[i].Id)) {
-                            $("#menu" + listMenu[i].Id).prop("checked", "checked")
+                            $("#chkMenu" + listMenu[i].Id).prop("checked", "checked")
                         }
                     }
                 }
             }
 
-        });
+
+            if ($("#hddMessage").val() != null && $("#hddMessage").val() != '') { 
+                alert($("#hddMessage").val());
+            }
+
+        });//ready
 
         function validMenuWithoutSubMenu(menuId) {
             var menuSelected = false;
 
             for (z = 0; z < listPermisionsAsigned.length; z++) {
-                if (menuId == listPermisionsAsigned[z].MenuId && (listPermisionsAsigned[z].SubMenuId == 0)) {
+                if (menuId == listPermisionsAsigned[z].MenuId && (listPermisionsAsigned[z].SubMenuId == 0 || listPermisionsAsigned[z].SubMenuId == null)) {
                     menuSelected = true;
                     break;
                 }
@@ -309,13 +549,13 @@
 
         function changeAllMenu(menuId) {
 
-            var checked = $("#menu" + menuId).prop("checked");
+            var checked = $("#chkMenu" + menuId).prop("checked");
 
             for (i = 0; i < listMenu.length; i++) {
 
                 if (listMenu[i].Id == menuId && listMenu[i].Options != null) {
                     for (j = 0; j < listMenu[i].Options.length; j++) {
-                        $("#submenu" + menuId + "_" + listMenu[i].Options[j].Id).prop("checked", checked);
+                        $("#chkSubmenu" + menuId + "_" + listMenu[i].Options[j].Id).prop("checked", checked);
                     }
                 }
             }
@@ -330,7 +570,7 @@
                 if (value.Options != null && value.Options.length > 0) {
                     for (j = 0; j < listMenu[index].Options.length; j++) {
 
-                        if ($("#submenu" + listMenu[index].Id + "_" + listMenu[index].Options[j].Id).prop("checked")) {
+                        if ($("#chkSubmenu" + listMenu[index].Id + "_" + listMenu[index].Options[j].Id).prop("checked")) {
 
                             arrPermissions.push({
                                 MenuId: listMenu[index].Id,
@@ -345,7 +585,7 @@
                     console.log("menuId: " + listMenu[index].Id + ', checked: ' +  $("#menu" + listMenu[index].Id).prop("checked"));
 
                     //Valido si la opcion de Menu que NO tiene SubMenu tiene la opción Todos seleccionada
-                    if($("#menu" + listMenu[index].Id).prop("checked")){
+                    if($("#chkMenu" + listMenu[index].Id).prop("checked")){
                         arrPermissions.push({
                             MenuId: listMenu[index].Id,
                             SubMenuId: 0
@@ -355,13 +595,35 @@
 
             });
 
-            console.log('arrPermissions', arrPermissions);
             return JSON.stringify(arrPermissions);
         }
 
         function reloadPage() {
-            location.href = "@Url.Action("AddUser","ExternalUsers")";
+            location.href = "@Url.Action("AddUser","ExternalUsers", null)";
         }
 
+        function showModalSave() {
+            $("#idUserEdicion").text($("#Names").val());
+            $("#ModalSave").modal('show');
+        }
+
+        function confirmActive(userActiveId, accionActive, emailActive) { 
+
+            userActive = userActiveId;
+            userActiveEmail = emailActive;
+
+            if (accionActive == 0) {
+                $('#lblActionActive').text('Describa el motivo de la activación');
+                $("#btnOkActive").text('Activar');
+            }
+            else {
+                $('#lblActionActive').text('Describa el motivo de la inactivación');
+                $("#btnOkActive").text('Inactivar');
+            }
+        }
+
+        function HideModalSave() {
+            $("#ModalSave").modal('hide');
+        }
     </script>
 }

@@ -1972,26 +1972,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
             {
-                responses.Add(new ValidateListResponse
+                if(nitModel.ResponseCode == "043")
                 {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAH06-(R): ",
-                    ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
-            //Valida DocumentTypeCode Invoice/AR coincida con el CUFE/CUDE referenciado
-            if (documentMeta.DocumentTypeId != documentTypeIdRef)
-            {
-                responses.Add(new ValidateListResponse
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAH06-(R) ",
+                        ErrorMessage = "El número de documento electrónico referenciado no coinciden con un mandato reportado.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                }
+                else
                 {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAH09-(R): ",
-                    ErrorMessage = "No corresponde a un tipo de documento valido.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "AAH06 ",
+                        ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
             }
 
             if (Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoPropiedad ||

@@ -26,8 +26,8 @@ namespace Gosocket.Dian.Web.Controllers
     /// Quiero configurar usuarios
     /// Para que puedan ingresar al catalogo de validación sin necesidad(Facturando electrónicamente) de usar token
     /// </summary>
-    [AllowAnonymous]
-    //[CustomRoleAuthorization(CustomRoles = "Administrador, Super, UsuarioExterno")]
+    //[AllowAnonymous]
+    [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
     public class ExternalUsersController : Controller
     {
         ApplicationDbContext _context;
@@ -148,11 +148,6 @@ namespace Gosocket.Dian.Web.Controllers
                 };
             }
 
-            if (model.Active == 1)
-                ViewBag.txtActive = "Desactivar";
-            else
-                ViewBag.txtActive = "Activar";
-
             return View(model);
         }
 
@@ -244,6 +239,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Name = m.Name,
                     Title = m.Title,
                     Description = m.Description,
+                    Icon = m.Icon,
                     Options = _permisionService.GetSubMenusByMenuId(m.Id).Select(s =>
                         new SubMenuViewModel()
                         {
@@ -382,7 +378,7 @@ namespace Gosocket.Dian.Web.Controllers
                         Email = model.Email
                     }) + ", permisos: " + JsonConvert.SerializeObject(permissions), "Creación de Permisos");
 
-                    return RedirectToAction("AddUser");
+                    return View();
                 }
                 else
                 {
@@ -440,7 +436,8 @@ namespace Gosocket.Dian.Web.Controllers
 
                     //Envio de notificacion por correo
                     _ = SendMailUpdate(model);
-                    return RedirectToAction("AddUser");
+
+                    return View();
                 }
                 else
                     ViewBag.messageAction = "No se pudo actualizar el Usuario!";
@@ -460,7 +457,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             byte accion;
 
-            if (active.Equals("Desactivar"))
+            if (active.Equals("Inactivar"))
                 accion = 0;
             else
                 accion = 1;
