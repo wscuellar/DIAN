@@ -14,6 +14,7 @@ using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.Event;
 using static Gosocket.Dian.Domain.Common.EnumHelper;
 using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
+using Gosocket.Dian.Plugin.Functions.Predecesor;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -265,6 +266,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
+
+        public async Task<List<ValidateListResponse>> StartValidatePredecesor(RequestObjectPredecesor p)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+            DateTime startDate = DateTime.UtcNow;
+
+            var xmlBytes = await GetXmlFromStorageAsync(p.TrackId);
+            var xmlParser = new XmlParseNomina(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateReplacePredecesor(p, xmlParser));
+            return validateResponses;
+        }
+
         public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId, string number, string documentTypeId)
         {
             var validateResponses = new List<ValidateListResponse>();
