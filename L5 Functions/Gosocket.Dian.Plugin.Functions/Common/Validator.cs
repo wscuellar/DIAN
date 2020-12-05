@@ -430,7 +430,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
             else if (documentMeta.DocumentTypeId == "96") senderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ24;
             if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
-            if (((documentMeta.EventCode=="037" || documentMeta.EventCode == "038" || documentMeta.EventCode == "039") && nitModel.listID=="2") || ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
+            if (((documentMeta.EventCode == "037" || documentMeta.EventCode == "038" || documentMeta.EventCode == "039") && nitModel.listID == "2") || ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = senderDvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
@@ -1086,7 +1086,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = "El valor no es informado.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 };
-            }          
+            }
 
             if (eventCode == "037")
             {
@@ -2365,7 +2365,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         });
                                     }
                                     //Valida Pago Total FETV     
-                                   else  if (documentMeta
+                                    else if (documentMeta
                                  .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
                                  .Count > decimal.Zero)
                                     {
@@ -2895,7 +2895,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE/CUDE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
-                    }                    
+                    }
                     break;
                 case (int)EventStatus.Avales:
                     if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362")
@@ -3224,5 +3224,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region Reemplazado Predecesor
+        public List<ValidateListResponse> ValidateReplacePredecesor(string trackId)
+        {
+            return null;
+        }
+
+        #endregion
     }
 }
