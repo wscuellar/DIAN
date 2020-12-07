@@ -250,7 +250,7 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     if ((radianAdmin.Contributor.RadianState == "Habilitado" || radianAdmin.Contributor.RadianState == "Registrado"))
                     {
-                        _ = _radianContributorService.ChangeParticipantStatus(id, approveState, radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                        _ = _radianContributorService.ChangeParticipantStatus(id, RadianState.Cancelado.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
                         _ = SendMail(radianAdmin);
                     }
                     else
@@ -279,7 +279,7 @@ namespace Gosocket.Dian.Web.Controllers
                         }
                         else
                         {
-                            _ = _radianContributorService.ChangeParticipantStatus(id, approveState, radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                            _ = _radianContributorService.ChangeParticipantStatus(id, RadianState.Test.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
                             _ = SendMail(radianAdmin);
                         }
                     }

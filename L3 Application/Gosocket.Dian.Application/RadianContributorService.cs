@@ -228,22 +228,24 @@ namespace Gosocket.Dian.Application
             if (contributors.Any())
             {
                 RadianContributor radianContributor = contributors.FirstOrDefault();
-
-                if (newState != "")
-                    radianContributor.RadianState = newState == "0" ? RadianState.Test.GetDescription() : RadianState.Cancelado.GetDescription();
+                radianContributor.RadianState = newState;
                 radianContributor.Description = description;
+
+                if (newState == RadianState.Test.GetDescription())
+                    radianContributor.Step = 3;
+                if (newState == RadianState.Habilitado.GetDescription())
+                    radianContributor.Step = 4;
+                _radianContributorRepository.AddOrUpdate(radianContributor);
 
                 if (radianContributor.RadianState == RadianState.Test.GetDescription() || radianContributor.RadianState == RadianState.Cancelado.GetDescription())
                 {
                     List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(radianContributor.Contributor.Code);
-                    string radianStatus = RadianState.Registrado.GetDescription();
-                    GlobalRadianOperations operations = radianOperations.FirstOrDefault(t => t.RadianStatus == radianStatus);
+                    GlobalRadianOperations operations = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
                     operations.Deleted = radianContributor.RadianState == RadianState.Cancelado.GetDescription();
                     operations.RadianStatus = radianContributor.RadianState;
                     _globalRadianOperationService.Update(operations);
                 }
 
-                _radianContributorRepository.AddOrUpdate(radianContributor);
                 return true;
             }
 
