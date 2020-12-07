@@ -14,6 +14,21 @@
         .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
             width: 135px !important;
         }
+
+        .tab-base .tab-content {
+            margin-left: 20px;
+            margin-right: 20px;
+            padding-bottom: 20px;
+        }
+
+        .tab-base .tab-content {
+            margin-top: 50px;
+        }
+
+        .title-container {
+            margin-left: 20px;
+            margin-top: 19px;
+        }
     </style>
 }
 
@@ -22,26 +37,40 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 <div class="page-content margin-15">
-    <div class="row margin-horizontal-0">
+    <div id="divPageContent" class="row margin-horizontal-0">
 
         <div class="tab-base">
             <!-- Navs Tabs -->
 
-            <ul class="nav nav-tabs">
-                <li class="active"><a>@Model.Document.DocumentTypeName</a></li>
-                @foreach (var item in Model.Document.References)
+            @{
+                if (Model.Document.References.Count() > 0 || Model.Document.DocumentTags.Count() > 0)
                 {
-                    <li><a href="@Url.Action("Details", "Document", new { trackId = item.DocumentKey })">@item.DocumenTypeName</a></li>
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a>@Model.Document.DocumentTypeName</a></li>
+                        @foreach (var item in Model.Document.References)
+                        {
+                            <li><a href="@Url.Action("Details", "Document", new { trackId = item.DocumentKey })">@item.DocumenTypeName</a></li>
+                        }
+                        @foreach (var t in Model.Document.DocumentTags)
+                        {
+                            <li><a href="@Url.Action("Details", "Document", new { trackId = t.Value })">@t.Description</a></li>
+                        }
+                    </ul>
                 }
-                @foreach (var t in Model.Document.DocumentTags)
+                else
                 {
-                    <li><a href="@Url.Action("Details", "Document", new { trackId = t.Value })">@t.Description</a></li>
+                    <div class="title-container">
+                        <p class="title-view">
+                            @Model.Document.DocumentTypeName
+                        </p>
+                        <div class="underline-title"></div>
+                    </div>
                 }
-            </ul>
+            }
 
             <!--Navs Content -->
             <div class="tab-content">
-                <div class="panel-body padding-top-20">
+                <div id="divViewerPartial" class="panel-body padding-top-20">
                     @Html.Partial("_ViewerPartial")
                 </div>
             </div>
@@ -82,7 +111,13 @@
 
             $(".eventView").click(function () {
                 var documentKey = $(this).parent().find("#DocumentKey").val()
+                $('#container1').fadeOut(200);
                 GetEventsPartialView(documentKey);
+
+                setTimeout(function () {
+                    $('#divViewerPartial').css("height", "540px");
+                    $('#divPageContent').css('max-height', '623px');
+                }, 200)
             })
 
             $('#divViewMoreQueryList').hide();
@@ -100,11 +135,8 @@
                     var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
                     if (injectingPartialView == "true") {
                         $('#modifyWrapper').html(data);
-                        setTimeout(function () {
-                            $('#modifyWrapper').fadeIn(500);
-                            $('#container1-title').fadeIn(300);
-                        }, 500);
-                        $('#container1').fadeOut(300);
+                        $('#modifyWrapper').fadeIn(300);
+                        $('#container1-title').fadeIn(300);
                     }
                     else {
                         window.location.href = '/User/Login';
@@ -121,16 +153,20 @@
         function darClick() {
             $('#modifyWrapper').fadeOut(300);
             $('#container1-title').fadeOut(300);
+            $('#divViewerPartial').css('height', '');
+            $('#divPageContent').css('max-height', '');
             setTimeout(function () {
-                $('#container1').fadeIn(500);
+                $('#container1').fadeIn(300);
             }, 500);
         }
 
         function showMore() {
             $('#modifyWrapper').fadeOut(300);
             $('#container1-title').fadeOut(300);
+            $('#divViewerPartial').css('height', '');
+            $('#divPageContent').css('max-height', '');
             setTimeout(function () {
-                $('#container1').fadeIn(500);
+                $('#container1').fadeIn(300);
             }, 500);
         }
 

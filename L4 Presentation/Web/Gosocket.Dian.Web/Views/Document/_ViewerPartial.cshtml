@@ -22,21 +22,22 @@
     <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 }
 
+<style>
+    .cufe-text {
+        overflow-wrap: break-word;
+        width: auto;
+    }
+</style>
+
 <!--Message-->
 <!--===================================================-->
 <div class="mar-top pad-no bg-white" id="html-gdoc">
 
-    <div style="display: none;" id="viewer-company-options">
-
-
-    </div>
+    <div style="display: none;" id="viewer-company-options"> </div>
 
     <div class="fab-shadow"></div>
     <div>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <style>
-        </style>
-
 
         <div>
             <div class="row render-row">
@@ -44,7 +45,9 @@
                     <img class="img-responsive" style="max-height: 130px;" src="~/Content/img/LogoDian.png">
                 </div>
                 <div class="col-md-5" style="padding-top: 7px; padding-left: 0">
-                    CUFE: @Model.Document.DocumentKey<br>
+                    <span class="cufe-text">
+                        CUFE: @Model.Document.DocumentKey<br>
+                    </span>
                 </div>
                 <div class="col-md-4" style="padding-top: 7px; padding-left: 0;">
                     <p style="text-align: right;">
@@ -55,7 +58,7 @@
                             @Html.Raw($"Serie: {Model.Document.Serie}<br>");
                         }
                         Folio: @Model.Document.Number<br>
-                        Fecha emisión: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br>
+                        Fecha de emisión de la factura Electrónica: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br>
                     </p>
                 </div>
             </div>
@@ -99,9 +102,8 @@
     <br />
     <button id="show-document" class="btn btn-link">Certificado de existencia</button>
 
-    @*<a href="@Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey })">Certificado de existencia</a>
-        
-
+    @*
+        <a href="@Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey })">Certificado de existencia</a>
         @(Html.Raw(JsonConvert.SerializeObject(Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey }).ToString().Trim('"'))))
     *@
     <br />
@@ -145,48 +147,6 @@ else
 
 <br />
 @Html.Partial("QueryEventsList", Model)
-@*<div class="row mar-no" style="border-bottom: 2px solid #348441;">
-        <div class="col-sm-6 pad-no">
-            <h4 class="margin-top-10">Eventos del documento</h4>
-        </div>
-    </div>
-    @if (Model.Document.Events.Count() == 0)
-    {
-        <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i>  No existen eventos para el documento.</h5>
-    }
-    else
-    {
-        <div class="table-responsive">
-
-            <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Descripción</th>
-                        <th>Fecha</th>
-                        <th>Nit Emisor</th>
-                        <th>Emisor</th>
-                        <th>Nit Receptor</th>
-                        <th>Receptor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Document.Events)
-                    {
-                        <tr>
-                            <td>@item.Code</td>
-                            <td>@item.Description</td>
-                            <td>@item.Date.ToString("yyyy-MM-dd")</td>
-                            <td>@item.SenderCode</td>
-                            <td>@item.SenderName</td>
-                            <td>@item.ReceiverCode</td>
-                            <td>@item.ReceiverName</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }*@
 <br />
 <br />
 @if (Model.Document.References.Where(x => x.ShowAsReference).Count() > 0)
