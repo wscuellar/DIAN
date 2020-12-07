@@ -169,7 +169,7 @@
                 messages: messages
             });
             e.preventDefault();
-        if (filteredFiles.length > 0) {
+            if (filteredFiles.length > 0) {
 
                 if (form.valid()) {
                     var formdata = new FormData();
@@ -178,7 +178,7 @@
                     for (var i = 0; i < limit; i++) {
                         formdata.append(filteredFiles[i].files[0].name, filteredFiles[i].files[0]);
                         formdata.append("TypeId_" + numberFiles, filteredFiles[i].dataset.typeid);
-                            numberFiles++;
+                        numberFiles++;
                     };
                     formdata.append("nit", "@Model.Nit");
                     formdata.append("email", "@Model.Email");
@@ -226,6 +226,8 @@
                         },
                     });
                 }
+            } else {
+                hideLoading('#panel-form');
             }
         });
 

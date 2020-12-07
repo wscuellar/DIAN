@@ -1,3 +1,4 @@
+using Gosocket.Dian.Application;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
@@ -30,7 +31,7 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerGlobalBigContributorRequestAuthorization = new TableManager("GlobalBigContributorRequestAuthorization");
         private static readonly TableManager tableManagerGlobalTestSetResult = new TableManager("GlobalTestSetResult");
         private static readonly TableManager tableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
-
+        private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
         // Set queue name
         private const string queueName = "global-process-batch-zip-input%Slot%";
 
@@ -315,6 +316,13 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else
                         {
+                            bool isActive = globalRadianOperationService.IsActive(code, new Guid(softwareId));
+                            if (isActive)
+                            {
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} ya esta autorizado con el software {softwareId}." });
+                                return result;
+                            }
+
                             // Validations to RADIAN  
                             var radianTestSetResults = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
                             RadianTestSetResult radianTestSetResultEntity = null;
@@ -363,7 +371,6 @@ namespace Gosocket.Dian.Functions.Batch
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Accepted)}." });
                             else if (radianTestSetResultEntity.Status == (int)TestSetStatus.Rejected)
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
-
                         }
                     }
                 }

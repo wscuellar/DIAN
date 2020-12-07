@@ -98,7 +98,7 @@ function RenderSteps(index) {
     })
 }
 
-function RenderTable(paramsObject) {
+function RenderTable(paramsObject) {debugger
     var totalPages = Math.round(paramsObject.customersTotalCount / 10) + 1 ;
     paramsObject.tableRendered && paramsObject.tableRendered.destroy();
     paramsObject.tableRendered = $(paramsObject.element).DataTable({
@@ -120,7 +120,7 @@ function RenderTable(paramsObject) {
         }
     });
     $(paramsObject.element + "_filter > label").hide();
-    $(paramsObject.element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.page, paramsObject.customersTotalCount));
+    $(paramsObject.element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.Page, paramsObject.customersTotalCount));
     $(paramsObject.element + "_filter").append(paramsObject.form);
     LoadEventsToSearch(paramsObject);
     LoadEventsToPagiantion(paramsObject);
@@ -164,7 +164,7 @@ function LoadEventsToPagiantion(paramsObject) {
     });
 }
 
-function TablePagination(page, totalCount) {
+function TablePagination(page, totalCount) {debugger
     var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : ""; 
     var disabledPrev = page == 1 ? 'disabled="disabled"' : "";
     var html = '<div class="pagination-controls pull-right"><span class="text-muted">\
@@ -196,7 +196,7 @@ function cancelRegister(cancelData) {
     var successAction = () => {
         var message = bootboxMessage.CANCEL_RESPONSE_CORRECT;
         var operation = () => window.location.href = cancelData.href
-        showConfirmation(message, AlertExec(operation), "cancel-confirmation"); 
+        showConfirmation(message, AlertExec(operation), "cancel-confirmation", operation); 
     };
     var dataAjax = {
         id: cancelData.id,
