@@ -2849,9 +2849,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.Received:
                 case (int)EventStatus.Receipt:
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
-                case (int)EventStatus.Mandato:
-                case (int)EventStatus.EndosoProcuracion:
-                case (int)EventStatus.EndosoPropiedad:
+                case (int)EventStatus.Mandato:                
                     responses.Add(Convert.ToDateTime(data.SigningTime) >= Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
@@ -3030,9 +3028,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
-                    break;
-                //Validación fecha emite evento AR menor a fecha de vencimiento factura
+                    break;          
                 case (int)EventStatus.EndosoGarantia:
+                case (int)EventStatus.EndosoProcuracion:
+                case (int)EventStatus.EndosoPropiedad:
                     responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModel.PaymentDueDate)
                         ? new ValidateListResponse
                         {
