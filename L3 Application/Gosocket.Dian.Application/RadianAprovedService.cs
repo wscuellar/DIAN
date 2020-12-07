@@ -123,10 +123,10 @@ namespace Gosocket.Dian.Application
 
         public RadianAdmin ContributorSummary(int contributorId, int radianContributorType)
         {
-            RadianAdmin result =  _radianContributorService.ContributorSummary(contributorId, radianContributorType);
+            RadianAdmin result = _radianContributorService.ContributorSummary(contributorId, radianContributorType);
             List<GlobalRadianOperations> operations = _globalRadianOperationService.OperationList(result.Contributor.Code);
             GlobalRadianOperations currentOperation = operations.OrderByDescending(t => t.Timestamp).FirstOrDefault();
-            if(currentOperation.RadianStatus == RadianState.Habilitado.GetDescription())
+            if (currentOperation != null && currentOperation.RadianStatus == RadianState.Habilitado.GetDescription())
             {
                 result.Step = 4;
                 result.Contributor.RadianState = RadianState.Habilitado.GetDescription();
