@@ -2118,3 +2118,13 @@ text-white {
 .panel-bordered-dian, .panel-dian.panel-bordered {
     border: 1px solid #348441;
 }
+
+.btn-default-gosocket {
+    background: #FFFFFF;
+    border: 2px solid #B4B4B4;
+    box-sizing: border-box;
+    border-radius: 10px; 
+    padding: 8px 20px;
+    font-size: 14px;
+    line-height: 16px;
+}
