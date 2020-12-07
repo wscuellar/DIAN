@@ -23,16 +23,17 @@ namespace Gosocket.Dian.Application
 
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly FileManager _fileManager;
-
+        private readonly CosmosDBService _cosmosDBService;
 
         #endregion
 
         #region Constructor
 
-        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager)
+        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, CosmosDBService cosmosDBService)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
+            _cosmosDBService = cosmosDBService;
         }
 
         #endregion
@@ -41,7 +42,7 @@ namespace Gosocket.Dian.Application
 
         public async Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier)
         {
-            // Load Templates           
+            // Load Templates            
 
             StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
             StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
@@ -49,6 +50,8 @@ namespace Gosocket.Dian.Application
             // Load Document Data
             GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
             EventStatus eventStatus;
+
+            var x = await _cosmosDBService.ReadDocumentAsync(documentMeta.DocumentKey, documentMeta.PartitionKey, documentMeta.EmissionDate);
 
             //if (documentMeta.EventCode != null)
             //    eventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), documentMeta.EventCode);
@@ -204,10 +207,13 @@ namespace Gosocket.Dian.Application
 
         private StringBuilder CommonDataTemplateMapping(StringBuilder template, DateTime expeditionDate, int page, GlobalDocValidatorDocumentMeta documentMeta)
         {
-            byte[] fileStream = _fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg");
+            byte[] bytesLogo = _fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg");
+            byte[] bytesFooter = _fileManager.GetBytes("radian-dian-logos", "GroupFooter.png");
+            string imgLogo = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesLogo)}'>";
+            string imgFooter = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesFooter)}' class='img-footer'>";
 
-            string imgLogo = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(fileStream)}'>";
             template = template.Replace("{Logo}", $"{imgLogo}");
+            template = template.Replace("{ImgFooter}", $"{imgFooter}");
             template = template.Replace("{PrintDate}", $"Impreso el {expeditionDate:d 'de' MM 'de' yyyy 'a las' hh:mm:ss tt}");
             template = template.Replace("{PrintTime}", expeditionDate.TimeOfDay.ToString());
             template = template.Replace("{PrintPage}", page.ToString());
