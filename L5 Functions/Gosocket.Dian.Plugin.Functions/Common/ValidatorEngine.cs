@@ -92,7 +92,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
             if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.SolicitudDisponibilizacion || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoGarantia 
-                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoProcuracion)
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoProcuracion
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales)
             {
                 //Obtiene XML Factura electronica CUFE
                 var xmlBytes = await GetXmlFromStorageAsync(eventPrev.TrackId);
