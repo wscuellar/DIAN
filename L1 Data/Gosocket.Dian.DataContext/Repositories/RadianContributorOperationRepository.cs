@@ -60,14 +60,13 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public int Add(RadianContributorOperation contributorOperation)
         {
-            int result = 0;
+            int affectedRecords = 0;
             using (var context = new SqlDBContext())
             {
                 context.RadianContributorOperations.Add(contributorOperation);
-                result = context.SaveChanges();
+                affectedRecords = context.SaveChanges();
             }
-
-            return result;
+            return affectedRecords > 0 ? contributorOperation.Id : 0;
         }
     }
 }

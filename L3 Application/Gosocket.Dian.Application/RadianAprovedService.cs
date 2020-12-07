@@ -25,6 +25,8 @@ namespace Gosocket.Dian.Application
         private readonly IContributorOperationsService _contributorOperationsService;
         private readonly IRadianTestSetResultService _radianTestSetResultService;
         private readonly IRadianCallSoftwareService _radianCallSoftwareService;
+        private readonly IGlobalRadianOperationService _globalRadianOperationService;
+
 
         public RadianAprovedService(IRadianContributorRepository radianContributorRepository,
                                     IRadianTestSetService radianTestSetService,
@@ -34,7 +36,10 @@ namespace Gosocket.Dian.Application
                                     IRadianContributorFileRepository radianContributorFileRepository,
                                     IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository,
                                     IContributorOperationsService contributorOperationsService,
-                                    IRadianTestSetResultService radianTestSetResultService, IContributorService contributorService, IRadianCallSoftwareService radianCallSoftwareService)
+                                    IRadianTestSetResultService radianTestSetResultService,
+                                    IContributorService contributorService,
+                                    IRadianCallSoftwareService radianCallSoftwareService,
+                                    IGlobalRadianOperationService globalRadianOperationService)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
@@ -47,6 +52,7 @@ namespace Gosocket.Dian.Application
             _radianTestSetResultService = radianTestSetResultService;
             _contributorService = contributorService;
             _radianCallSoftwareService = radianCallSoftwareService;
+            _globalRadianOperationService = globalRadianOperationService;
         }
 
         /// <summary>
@@ -117,7 +123,15 @@ namespace Gosocket.Dian.Application
 
         public RadianAdmin ContributorSummary(int contributorId, int radianContributorType)
         {
-            return _radianContributorService.ContributorSummary(contributorId, radianContributorType);
+            RadianAdmin result = _radianContributorService.ContributorSummary(contributorId, radianContributorType);
+            List<GlobalRadianOperations> operations = _globalRadianOperationService.OperationList(result.Contributor.Code);
+            GlobalRadianOperations currentOperation = operations.OrderByDescending(t => t.Timestamp).FirstOrDefault();
+            if (currentOperation != null && currentOperation.RadianStatus == RadianState.Habilitado.GetDescription())
+            {
+                result.Step = 4;
+                result.Contributor.RadianState = RadianState.Habilitado.GetDescription();
+            }
+            return result;
         }
 
         public Software SoftwareByContributor(int contributorId)
@@ -203,24 +217,38 @@ namespace Gosocket.Dian.Application
             return _radianContributorRepository.Get(c => c.ContributorId == contributorId && c.RadianContributorTypeId == contributorTypeId && c.RadianState == state).Id;
         }
 
-        public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, string url, string softwareName, string pin, string createdBy)
+        public int AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, bool isInsert)
         {
             int result = 0;
-            if (!string.IsNullOrEmpty(softwareName))
-                radianContributorOperation.SoftwareId = _radianCallSoftwareService.CreateSoftware(radianContributorOperation.RadianContributorId, softwareName, url, pin, createdBy);
-
-            RadianContributorOperation existingsoft = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == radianContributorOperation.SoftwareId && !t.Deleted);
-            if (existingsoft == null)
-                result = _radianContributorOperationRepository.Add(radianContributorOperation);
-
-            if (result > 0)
+            if (isInsert)
             {
-                RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorOperation.RadianContributorId);
-                RadianTestSet testSet = _radianTestSetService.GetTestSet(radianContributor.RadianContributorTypeId.ToString(), radianContributor.RadianContributorTypeId.ToString());
+                RadianSoftware soft = _radianCallSoftwareService.CreateSoftware(software);
+                radianContributorOperation.SoftwareId = soft.Id;
+            }
+
+            RadianContributorOperation existingOperation = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == radianContributorOperation.SoftwareId && !t.Deleted);
+            if (existingOperation == null)
+            {
+                result = _radianContributorOperationRepository.Add(radianContributorOperation);
+                existingOperation = _radianContributorOperationRepository.Get(t => t.Id == result);
+            }
+
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorOperation.RadianContributorId);
+            Contributor contributor = radianContributor.Contributor;
+            GlobalRadianOperations item = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString())
+            {
+                RadianStatus = existingOperation.RadianContributor.RadianState,
+                SoftwareType = existingOperation.SoftwareType,
+                RadianContributorTypeId = radianContributor.RadianContributorTypeId,
+                Deleted = false
+            };
+
+            if (_globalRadianOperationService.Insert(item, existingOperation.Software))
+            {
+                RadianTestSet testSet = _radianTestSetService.GetTestSet(existingOperation.SoftwareType.ToString(), existingOperation.SoftwareType.ToString());
                 if (testSet != null)
                 {
-                    Contributor contributor = radianContributor.Contributor;
-                    string key = radianContributor.RadianContributorTypeId.ToString() + "|" + radianContributorOperation.SoftwareId;
+                    string key = existingOperation.SoftwareType.ToString() + "|" + radianContributorOperation.SoftwareId;
                     RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                     {
                         TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
@@ -293,6 +321,12 @@ namespace Gosocket.Dian.Application
             return _radianCallSoftwareService.Get(id);
         }
 
+        public RadianSoftware GetSoftware(int radianContributorId, int softwareType)
+        {
+            RadianContributorOperation radianContributorOperation = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorId && t.SoftwareType == softwareType);
+            return GetSoftware(radianContributorOperation.SoftwareId);
+        }
+
         public List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
         {
             List<RadianContributor> participants;
@@ -319,7 +353,7 @@ namespace Gosocket.Dian.Application
             DateTime initialDate, endDate;
             if (!string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(initial) && DateTime.TryParse(initial, out initialDate) && !string.IsNullOrEmpty(end) && DateTime.TryParse(end, out endDate))
                 return _radianContributorFileHistoryRepository.List(t => t.FileName.Contains(fileName) && t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
-            
+
             if (string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(initial) && DateTime.TryParse(initial, out initialDate) && !string.IsNullOrEmpty(end) && DateTime.TryParse(end, out endDate))
                 return _radianContributorFileHistoryRepository.List(t => t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
 
