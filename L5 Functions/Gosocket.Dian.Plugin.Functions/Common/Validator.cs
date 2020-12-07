@@ -1071,8 +1071,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             string valueTotalEndoso = nitModel.ValorTotalEndoso;
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
-            string valueDiscountRateEndoso = nitModel.TasaDescuento;
-            string valueTotalInvoice = xmlParserCufe.TotalInvoice;
+            string valueDiscountRateEndoso = nitModel.TasaDescuento;            
 
             //Valida informacion Endoso                           
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
@@ -1123,7 +1122,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         };
                     }
 
-                    if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
+                    if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
                     {
                         return new ValidateListResponse
                         {
