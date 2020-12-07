@@ -153,6 +153,7 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatedDate = radianAdmin.Contributor.CreatedDate,
                 UpdatedDate = radianAdmin.Contributor.Update,
                 RadianState = radianAdmin.Contributor.RadianState,
+                RadianContributorFilesType = radianAdmin.FileTypes,
                 RadianContributorFiles = radianAdmin.Files.Count > 0 ? radianAdmin.Files.Select(f => new RadianContributorFileViewModel
                 {
                     Id = f.Id,

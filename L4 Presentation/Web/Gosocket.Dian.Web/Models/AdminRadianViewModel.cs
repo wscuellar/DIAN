@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using System.Linq;
 using System.Web;
+using Gosocket.Dian.Domain;
 
 namespace Gosocket.Dian.Web.Models
 {
@@ -103,6 +104,7 @@ namespace Gosocket.Dian.Web.Models
         public List<TestSetResultViewModel> RadianContributorTestSetResults { get; set; }
         [Display(Name = "Estado de aprobación")]
         public RadianUtil.UserApprovalStates? RadianApprovalState { get; set; }
+        public List<RadianContributorFileType> RadianContributorFilesType { get; set; }
         public List<RadianContributorFileViewModel> RadianContributorFiles { get; set; }
         public RadianContributorFileStatusViewModel RadianContributorFileStatus { get; set; }
         public bool CanEdit { get; set; }
