@@ -89,10 +89,8 @@ namespace Gosocket.Dian.Web.Controllers
                 return View();
             }
 
-            this.LoadExternalUsersViewBags(uCompany.Code);
-
             ExternalUserViewModel model = null;
-            ViewBag.PermissionList = null;
+
 
             if (!string.IsNullOrEmpty(id))
             {
@@ -136,6 +134,7 @@ namespace Gosocket.Dian.Web.Controllers
                         IdentificationTypes = identificationTypeService.List()
                         .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList(),
                     };
+                    model.Id = string.Empty;
                 }
 
             }
@@ -146,78 +145,60 @@ namespace Gosocket.Dian.Web.Controllers
                     IdentificationTypes = identificationTypeService.List()
                         .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList(),
                 };
+                model.Id = string.Empty;
             }
+
+            model.Users = this.LoadExternalUsersViewBags(uCompany.Code, model.Page, 10);
+            ViewBag.ExternalUsersList = model.Users;
 
             return View(model);
         }
 
         /// <summary>
-        /// Moock del menu de la aplicación
+        /// 
         /// </summary>
+        /// <param name="nit">Nit de la empresa del Representante Legal o Nit de la persona Natural registrada en el Rut que crea al Usuario Externo</param>
+        /// <param name="page">Número de la pagina</param>
+        /// <param name="length">Número de registros por pagina</param>
         /// <returns></returns>
-        private List<MenuViewModel> MenuApp()
-        {
-            return new List<MenuViewModel>()
-            {
-                new MenuViewModel() { Id=1, Name= "Tablero", Title="Dashboard" },
-                new MenuViewModel() { Id=2, Name= "Vallidador", Title="Validator", Options =  new List<SubMenuViewModel>()
-                        {
-                        new SubMenuViewModel() { MenuId = 2, Id=1, Title="Reglas", Name = "Reglas" },
-                        new SubMenuViewModel() { MenuId = 2, Id=2, Title="Configuraciones", Name = "Configuraciones" },
-                        new SubMenuViewModel() { MenuId = 2, Id=3, Title="Validar Documento", Name = "Validar Documento" },
-                        new SubMenuViewModel() { MenuId = 2, Id=4, Title="Consultar Validación", Name = "Consultar Validación" }
-                        }
-                    },
-                new MenuViewModel() { Id=3, Name= "Documentos", Title="Document", Options = new List<SubMenuViewModel>()
-                    {
-                        new SubMenuViewModel() { MenuId = 3, Id=5, Title="Consultar", Name = "Consultar" },
-                        new SubMenuViewModel() { MenuId = 3, Id=6, Title="Rango de Númeración", Name = "Rango de Númeración" },
-                        new SubMenuViewModel() { MenuId = 3, Id=7, Title="Exportar", Name = "Exportar" }
-                    }
-                },
-                new MenuViewModel() { Id=4, Name= "Participantes", Title="Participants", Options = new List<SubMenuViewModel>(){
-                        new SubMenuViewModel() { MenuId = 4, Id=8, Name="Proveedores Tecnológicos", Title="Proveedores Tecnológicos" },
-                        new SubMenuViewModel() { MenuId = 4, Id=9, Name="Proveedores Autorizados", Title="Proveedores Autorizados" },
-                        new SubMenuViewModel() { MenuId = 4, Id=10, Name="Facturadores Electrónicos", Title="Facturadores Electrónicos" },
-                        new SubMenuViewModel() { MenuId = 4, Id=11, Name="Representantes Legales", Title="Representantes Legales" },
-                        new SubMenuViewModel() { MenuId = 4, Id=12, Name="Softwares", Title="Softwares" },
-                        new SubMenuViewModel() { MenuId = 4, Id=13, Name="Contribuyentes", Title="Contribuyentes" },
-                        new SubMenuViewModel() { MenuId = 4, Id=14, Name="Gestionar Solicitudes Recepción por Lote - Asíncrono", Title="Gestionar Solicitudes Recepción por Lote - Asíncrono" }
-                    }
-                },
-                new MenuViewModel() { Id=5, Name= "Configuración", Title="Settings", Options = new List<SubMenuViewModel>(){
-                        new SubMenuViewModel() { MenuId = 5, Id=15, Name="Tipos de Ficheros", Title="Tipos de Ficheros" },
-                        new SubMenuViewModel() { MenuId = 5, Id=16, Name="Set de Pruebas", Title="Set de Pruebas" },
-                        new SubMenuViewModel() { MenuId = 5, Id=17, Name="Administrar Contingencias", Title="Administrar Contingencias" },
-                        new SubMenuViewModel() { MenuId = 5, Id=18, Name="Usuarios", Title="Usuarios" }
-                    }
-                },
-                new MenuViewModel() { Id=6, Name= "Business Intelligence", Title="Business Intelligence"},
-                new MenuViewModel() { Id=7, Name= "Facturador Gratuito", Title="Facturador Gratuito"},
-            };
-        }
-
-        /// <summary>
-        /// Listas para llenar el Modelo de la Vista
-        /// </summary>
-        /// <param name="nit">Nit de la empresa del Representante Legal o Nit de la persona Natural registrada en el Rut</param>
-        private void LoadExternalUsersViewBags(string nit)
+        private List<ExternalUserViewModel> LoadExternalUsersViewBags(string nit, int page, int length)
         {
             //ViewBag.ExternalUsersList = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id) && u.Code == nit).ToList()
-            ViewBag.ExternalUsersList = _context.Users.Where(u => u.CreatorNit == nit).ToList()
-                .Select(u =>
-                new ExternalUserViewModel
+            //ViewBag.ExternalUsersList = _context.Users.Where(u => u.CreatorNit == nit).ToList()
+            //    .Select(u =>
+            //    new ExternalUserViewModel
+            //    {
+            //        Id = u.Id,
+            //        IdentificationTypeId = u.IdentificationTypeId,
+            //        IdentificationId = u.IdentificationId,
+            //        Names = u.Name,
+            //        Email = u.Email,
+            //        //Roles = u.Roles.ToList(),
+            //        Active = u.Active,
+            //        CreationDate = u.CreationDate.Value,
+            //        IdentificationTypes = identificationTypeService.List()
+            //            .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList()
+            //    }).ToList();
+
+            var users = userService.GetExternalUsersPaginated(nit, page, length);
+            if (users != null)
+            {
+                return users.Select(u => new ExternalUserViewModel
                 {
                     Id = u.Id,
                     IdentificationTypeId = u.IdentificationTypeId,
                     IdentificationId = u.IdentificationId,
                     Names = u.Name,
                     Email = u.Email,
-                    //Roles = u.Roles.ToList(),
+                    LastUpdated = u.LastUpdated.Value,
+                    CreationDate = u.CreationDate.Value,
                     Active = u.Active,
                     IdentificationTypes = identificationTypeService.List()
                         .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList()
                 }).ToList();
+            }
+            else
+                return new List<ExternalUserViewModel>();
         }
 
         public void LoadViewBags()
@@ -266,19 +247,29 @@ namespace Gosocket.Dian.Web.Controllers
 
             var uCompany = userService.Get(User.Identity.GetUserId());
 
+            model.Users = this.LoadExternalUsersViewBags(uCompany.Code, model.Page, model.Length);
+            ViewBag.ExternalUsersList = model.Users;
+
+            if (!ModelState.IsValid)
+            {
+                IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var item in allErrors)
+                    ModelState.AddModelError("", item.ErrorMessage);
+
+                return View(model);
+            }
+
             if (uCompany == null)
             {
                 ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
-                return View();
+                return View(model);
             }
 
             if (string.IsNullOrEmpty(uCompany.Code))
             {
                 ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
-                return View();
+                return View(model);
             }
-
-            this.LoadExternalUsersViewBags(uCompany.Code);
 
             var user = new ApplicationUser
             {
@@ -342,6 +333,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 if (result.Succeeded)
                 {
+                    model.Id = user.Id;
                     ViewBag.messageAction = "Usuario Registrado exitosamente!";
 
                     userService.RegisterExternalUserTrazability(JsonConvert.SerializeObject(new ExternalUserViewModel()
@@ -378,7 +370,7 @@ namespace Gosocket.Dian.Web.Controllers
                         Email = model.Email
                     }) + ", permisos: " + JsonConvert.SerializeObject(permissions), "Creación de Permisos");
 
-                    return View();
+                    return View(model);
                 }
                 else
                 {
@@ -437,7 +429,7 @@ namespace Gosocket.Dian.Web.Controllers
                     //Envio de notificacion por correo
                     _ = SendMailUpdate(model);
 
-                    return View();
+                    return View(model);
                 }
                 else
                     ViewBag.messageAction = "No se pudo actualizar el Usuario!";

@@ -135,6 +135,7 @@
                         @using (Html.BeginForm("AddUser", "ExternalUsers", FormMethod.Post, new { id = "add-user-form" }))
                         {
                             @Html.HiddenFor(m => m.Id)
+                            <input id="page" name="Page" type="hidden" value="@Model.Page" />
                             <input type="hidden" id="listMenu" value="@Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Menu)" />
                             <input type="hidden" id="hddPermissions" name="hddPermissions" />
                             <input type="hidden" id="hddMessage" name="hddMessage" value="@ViewBag.messageAction" />
@@ -192,8 +193,8 @@
                             </div>
                             <div class="panel-footer footerRectangle text-right">
                                 @*@Html.ActionLink("Nuevo", "Add@*User", "ExternalUsers", null, new { @class = "btn btn-default" })
-                                    <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-                                    <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
+                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
                                 <div class="footerRectangle">
                                     <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-success btn-hover-gosocket btn-radian-success">
                                         @ViewBag.txtAccion
@@ -298,25 +299,33 @@
                             <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
                                 <thead>
                                     <tr>
-                                        <th>Tipo de documento</th>
-                                        <th>Documento</th>
-                                        <th>Nombres</th>
-                                        <th>Email</th>
-                                        <th class="text-center">Activo</th>
+                                        <th class="text-left">Nombre</th>
+                                        <th class="text-center">No de documento</th>
+                                        <th class="text-center">Fecha de creación</th>
+                                        <th class="text-center">Ultima modificación</th>
+                                        <th class="text-center">Estado</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @if (ViewBag.ExternalUsersList != null)
                                     {
-                                        List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                                        //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
                                         foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
                                         {
                                             <tr>
-                                                <td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>
-                                                <td>@item.IdentificationId</td>
-                                                <td>@item.Names</td>
-                                                <td>@item.Email</td>
+                                                <td class="text-left">@item.Names</td>
+                                                @*<td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>*@
+                                                <td class="text-center">@item.IdentificationId</td>
+                                                @if (item.CreationDate.HasValue)
+                                                {
+                                                    <td class="text-center">@item.CreationDate.Value.ToString("dd-MM-yyyy")</td>
+                                                }
+                                                else
+                                                {
+                                                    <td> </td>
+                                                }
+                                                <td class="text-center">@item.LastUpdated.ToString("dd-MM-yyyy")</td>
                                                 <td class="text-center">@(item.Active == 1 ? "Activo" : "Inactivo")</td>
                                                 <td class="text-center">
 
@@ -339,6 +348,25 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!--Paginacón de la tabla-->
+                        <div class="pull-right table-pagination padding-top-10">
+                            @if (Model.Users.Count > 0)
+                            {
+                                <span class="text-muted">
+                                    <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.Users.Count ? (Model.Page) * Model.Length + Model.Users.Count : (Model.Page + 1) * Model.Length)</strong>
+                                </span>
+                                <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
+                                    <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                                        <span class="fa fa-chevron-left"></span>
+                                    </a>
+                                    <a class="btn btn-default paginate-btn next-page" @(Model.Users.Count < Model.Length ? "disabled=\"disabled\"" : "")>
+                                        <span class="fa fa-chevron-right"></span>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -382,7 +410,7 @@
 {
     @Scripts.Render("~/bundles/jqueryval")
 
-    <script>
+<script>
         var listMenu;
         var userId = "";
         var reloadView = false;
@@ -405,6 +433,7 @@
             $('.btn-save').click(function () {
                 var form = $('#add-user-form');
                 if (form.valid()) {
+                    $('#page').val(0);
                     showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
 
                     var permissions = getPermissions();
@@ -549,6 +578,19 @@
             $("#ModalGenerico").on("hidden.bs.modal", function () {
                 reloadPage();
             });
+
+
+            // Pagination
+            $('.next-page').click(function () {
+                $('#page').val(@Model.Page + 1);
+                form.submit();
+            });
+
+            $('.prev-page').click(function () {
+                $('#page').val(@Model.Page - 1);
+                form.submit();
+            });
+            // Pagination
 
         });//ready
 
@@ -697,5 +739,5 @@
 
 
 
-    </script>
+</script>
 }

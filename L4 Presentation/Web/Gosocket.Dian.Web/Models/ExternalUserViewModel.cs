@@ -9,8 +9,12 @@ namespace Gosocket.Dian.Web.Models
     {
         public ExternalUserViewModel()
         {
+            Id = string.Empty;
+            Page = 0;
+            Length = 10;
             IdentificationTypes = new List<IdentificationTypeListViewModel>();
             Roles = new List<IdentityUserRole>();
+            Users = new List<ExternalUserViewModel>();
         }
 
         public string Id { get; set; }
@@ -23,6 +27,7 @@ namespace Gosocket.Dian.Web.Models
         [DataType(DataType.Text)]
         [Display(Name = "Nombre")]
         [Required(ErrorMessage = "{0} es requerido.")]
+        [RegularExpression(@"^[0-9a-zA-Z\sñÑáéíóú]+$", ErrorMessage = "Solo se permiten caracteres 0-9 y a-z")]
         public string Names { get; set; }
 
         [Display(Name = "Tipo de documento")]
@@ -32,6 +37,7 @@ namespace Gosocket.Dian.Web.Models
         [DataType(DataType.Text)]
         [Display(Name = "Número de identificaión")]
         [Required(ErrorMessage = "{0} es requerido.")]
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "Solo se permiten números 0-9")]
         public string IdentificationId { get; set; }
 
         [Display(Name = "Correo electrónico")]
@@ -52,10 +58,21 @@ namespace Gosocket.Dian.Web.Models
         public string ActiveDescription { get; set; }
         public DateTime LastUpdated { get; set; }
         public string CreatorNit { get; set; }
+        public DateTime? CreationDate { get; set; }
+
+        /// <summary>
+        /// Numero
+        /// </summary>
+        public int Page { get; set; }
+
+        //numero de registros en la tabla/busqueda
+        public int Length { get; set; }
+        public bool SearchFinished { get; set; }
 
         public List<IdentificationTypeListViewModel> IdentificationTypes { get; set; }
         
         public List<IdentityUserRole> Roles { get; set; }
+        public List<ExternalUserViewModel> Users { get; set; }
 
     }
 }
