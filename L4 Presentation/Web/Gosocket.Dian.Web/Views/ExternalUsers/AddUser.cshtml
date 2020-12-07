@@ -420,6 +420,7 @@
 
         $(document).ready(function ($) {
 
+            var formu = $('#add-user-form');
             userId = $("#Id").val();
             reloadView = false;
 
@@ -573,12 +574,12 @@
             // Pagination
             $('.next-page').click(function () {
                 $('#page').val(@Model.Page + 1);
-                form.submit();
+                formu.submit();
             });
 
             $('.prev-page').click(function () {
                 $('#page').val(@Model.Page - 1);
-                form.submit();
+                formu.submit();
             });
             // Pagination
 
