@@ -2741,6 +2741,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
 
+            if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+            {
+                return new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: 89-(R): ",
+                    ErrorMessage = $"{(string)null} El valor reportado del elemento SenderParty supera el valor total del Título Valor.",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
+            }
+
             XmlNodeList valueListIssuerParty = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']");
             // En caso de no indicarlo quedan garantizadas las obligaciones de todas las partes del título.
             if (valueListIssuerParty.Count <= 0) return null;
@@ -2762,19 +2774,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 };
-            }
-
-            if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
-            {
-                return new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: 89-(R): ",
-                    ErrorMessage = $"{(string)null} El valor reportado del elemento SenderParty supera el valor total del Título Valor.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
-            }
+            }           
           
             return null;
         }
