@@ -168,6 +168,9 @@
   <data name="NonExistentParticipant" xml:space="preserve">
     <value>El usuario no habilitado para el sistema!!!</value>
   </data>
+  <data name="OnlyActiveProcess" xml:space="preserve">
+    <value>Tiene otro proceso activo con software propio.</value>
+  </data>
   <data name="ParticipantWithoutSoftware" xml:space="preserve">
     <value>El participante no cuenta con un software propio activo en el sistema</value>
   </data>

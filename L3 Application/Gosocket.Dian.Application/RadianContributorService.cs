@@ -12,7 +12,6 @@ using System.Collections.Specialized;
 using System.Data.Entity;
 using System.Linq;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace Gosocket.Dian.Application
 {
@@ -25,16 +24,16 @@ namespace Gosocket.Dian.Application
         private readonly IRadianTestSetResultManager _radianTestSetResultManager;
         private readonly IRadianOperationModeRepository _radianOperationModeRepository;
         private readonly IRadianContributorFileHistoryRepository _radianContributorFileHistoryRepository;
-        private readonly IRadianSoftwareRepository _radianSoftwareRepository;
+        private readonly IGlobalRadianOperationService _globalRadianOperationService;
 
         public RadianContributorService(IContributorService contributorService,
-            IRadianContributorRepository radianContributorRepository, 
-            IRadianContributorTypeRepository radianContributorTypeRepository, 
-            IRadianContributorFileRepository radianContributorFileRepository, 
-            IRadianTestSetResultManager radianTestSetResultManager, 
-            IRadianOperationModeRepository radianOperationModeRepository, 
+            IRadianContributorRepository radianContributorRepository,
+            IRadianContributorTypeRepository radianContributorTypeRepository,
+            IRadianContributorFileRepository radianContributorFileRepository,
+            IRadianTestSetResultManager radianTestSetResultManager,
+            IRadianOperationModeRepository radianOperationModeRepository,
             IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository,
-            IRadianSoftwareRepository radianSoftwareRepository)
+            IGlobalRadianOperationService globalRadianOperationService)
         {
             _contributorService = contributorService;
             _radianContributorRepository = radianContributorRepository;
@@ -43,7 +42,7 @@ namespace Gosocket.Dian.Application
             _radianTestSetResultManager = radianTestSetResultManager;
             _radianOperationModeRepository = radianOperationModeRepository;
             _radianContributorFileHistoryRepository = radianContributorFileHistoryRepository;
-            _radianSoftwareRepository = radianSoftwareRepository;
+            _globalRadianOperationService = globalRadianOperationService;
         }
 
         #region Registro de participantes
@@ -80,6 +79,15 @@ namespace Gosocket.Dian.Application
                 if (ownSoftware == null)
                     return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
             }
+
+            if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
+            {
+                List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(userCode);
+                string enabledStatus = RadianState.Habilitado.GetDescription();
+                string cancelStatus = RadianState.Cancelado.GetDescription();
+                if (radianOperations.Any(t => t.RadianStatus != enabledStatus && t.RadianStatus != cancelStatus &&   t.RadianContributorTypeId != (int)radianContributorType))
+                    return new ResponseMessage(TextResources.OnlyActiveProcess, TextResources.alertType);
+            }   
 
             string cancelEvent = RadianState.Cancelado.GetDescription();
             int radianType = (int)radianContributorType;
@@ -159,7 +167,7 @@ namespace Gosocket.Dian.Application
                 Types = radianContributorType,
                 RowCount = radianContributors.RowCount,
                 CurrentPage = radianContributors.CurrentPage
-        };
+            };
             return radianAdmin;
         }
 
@@ -167,7 +175,7 @@ namespace Gosocket.Dian.Application
         {
             List<RadianContributor> radianContributors;
 
-            if(radianContributorType!=0)
+            if (radianContributorType != 0)
                 radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorType).Results;
             else
                 radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId).Results;
@@ -181,9 +189,10 @@ namespace Gosocket.Dian.Application
             {
                 radianAdmin = new RadianAdmin()
                 {
+
                     Contributor = new RedianContributorWithTypes()
                     {
-                        RadianContributorId =  c.Id,
+                        RadianContributorId = c.Id,
                         Id = c.Contributor.Id,
                         Code = c.Contributor.Code,
                         TradeName = c.Contributor.Name,
@@ -214,11 +223,21 @@ namespace Gosocket.Dian.Application
 
             if (contributors.Any())
             {
-                var radianContributor = contributors.FirstOrDefault();
+                RadianContributor radianContributor = contributors.FirstOrDefault();
 
                 if (newState != "")
                     radianContributor.RadianState = newState == "0" ? RadianState.Test.GetDescription() : RadianState.Cancelado.GetDescription();
                 radianContributor.Description = description;
+
+                if (radianContributor.RadianState == RadianState.Test.GetDescription() || radianContributor.RadianState == RadianState.Cancelado.GetDescription())
+                {
+                    List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(radianContributor.Contributor.Code);
+                    string radianStatus = RadianState.Registrado.GetDescription();
+                    GlobalRadianOperations operations = radianOperations.FirstOrDefault(t => t.RadianStatus == radianStatus);
+                    operations.Deleted = radianContributor.RadianState == RadianState.Cancelado.GetDescription();
+                    operations.RadianStatus = radianContributor.RadianState;
+                    _globalRadianOperationService.Update(operations);
+                }
 
                 _radianContributorRepository.AddOrUpdate(radianContributor);
                 return true;
@@ -234,7 +253,6 @@ namespace Gosocket.Dian.Application
             if (radianContributor != null)
             {
                 radianContributor.Step = step;
-
                 _radianContributorRepository.AddOrUpdate(radianContributor);
                 return true;
             }
@@ -262,13 +280,13 @@ namespace Gosocket.Dian.Application
                 CreatedDate = existing != null ? existing.CreatedDate : System.DateTime.Now
             };
             newRadianContributor.Id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
-            if(radianOperationMode == Domain.Common.RadianOperationMode.Direct)
+            if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
                 Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributorId);
                 RadianSoftware radianSoftware = new RadianSoftware(ownSoftware, newRadianContributor.Id, createdBy);
                 newRadianContributor.RadianSoftwares = new List<RadianSoftware>() { radianSoftware };
             }
-            
+
             return newRadianContributor;
         }
 
@@ -303,7 +321,7 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
         }
 
-        public string getXmlBase64Report ()
+        public string getXmlBase64Report()
         {
             //Header 
             XmlDocument report = new XmlDocument();

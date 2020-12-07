@@ -5,6 +5,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
@@ -31,6 +32,7 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager contributorTableManager = new TableManager("GlobalContributor");
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
+        private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
 
         // Set queue name 
         private const string queueName = "global-test-set-tracking-input%Slot%";
@@ -52,6 +54,8 @@ namespace Gosocket.Dian.Functions.Activation
 
                 if (testSetResults != null)  // Roberto Alvarado --> Esto es para mantener lo de Factura Electronica tal cual esta actualmente 2020/11/25
                 {
+                    #region Factura Electronica 
+
                     var globalTesSetResult = testSetResults.SingleOrDefault(t => !t.Deleted && t.Id == globalTestSetTracking.TestSetId && t.Status == (int)TestSetStatus.InProcess);
 
                     if (globalTesSetResult == null)
@@ -150,20 +154,31 @@ namespace Gosocket.Dian.Functions.Activation
                             }
                         }
                     }
+                    #endregion 
                 }
                 else
                 {
                     // Roberto Alvarado 20202/11/25
                     // Proceso de RADIAN TestSetResults
+                    #region Proceso Documentos RADIAN
+
+                    var result = new List<XmlParamsResponseTrackId>();
 
                     // traigo los datos de RadianTestSetResult
                     var radianTestSetResults = radianTestSetResultTableManager.FindByPartition<RadianTestSetResult>(globalTestSetTracking.SenderCode);
 
                     // Valido que este en Process el registro de Set de pruebas
-                    var radianTesSetResult = radianTestSetResults.SingleOrDefault(t => !t.Deleted && t.Id == globalTestSetTracking.TestSetId && t.Status == (int)TestSetStatus.InProcess);
+                    var radianTesSetResult = radianTestSetResults.SingleOrDefault(t => !t.Deleted &&
+                                                                                t.Id == globalTestSetTracking.TestSetId &&
+                                                                                t.Status == (int)TestSetStatus.InProcess);
 
                     if (radianTesSetResult == null)
                         return;
+
+                    // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
+                    bool isActive = globalRadianOperationService.IsActive(globalTestSetTracking.SenderCode, new Guid(globalTestSetTracking.SoftwareId));
+                    if (isActive)
+                        return ;
 
                     // busco el registro del set de pruebas a actualizar
                     var radianTestSet = radianTestSetResultTableManager.Find<RadianTestSetResult>(radianTesSetResult.TestSetReference, radianTesSetResult.TestSetReference);
@@ -346,6 +361,8 @@ namespace Gosocket.Dian.Functions.Activation
                             }
                         }
                     }
+
+                    #endregion
                 }
             }
             catch (Exception ex)

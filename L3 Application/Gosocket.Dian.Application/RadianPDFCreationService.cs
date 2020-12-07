@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application.Cosmos;
 using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,16 +23,17 @@ namespace Gosocket.Dian.Application
 
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly FileManager _fileManager;
-
+        private readonly CosmosDBService _cosmosDBService;
 
         #endregion
 
         #region Constructor
 
-        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager)
+        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, CosmosDBService cosmosDBService)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
+            _cosmosDBService = cosmosDBService;
         }
 
         #endregion
@@ -39,14 +42,19 @@ namespace Gosocket.Dian.Application
 
         public async Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier)
         {
-            // Load Templates           
+            // Load Templates            
 
             StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
             StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
 
-
             // Load Document Data
             GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
+            EventStatus eventStatus;
+
+            var x = await _cosmosDBService.ReadDocumentAsync(documentMeta.DocumentKey, documentMeta.PartitionKey, documentMeta.EmissionDate);
+
+            //if (documentMeta.EventCode != null)
+            //    eventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), documentMeta.EventCode);
 
             //Load documents
             List<GlobalDocReferenceAttorney> documents =
@@ -80,11 +88,9 @@ namespace Gosocket.Dian.Application
             templateFirstPage = templateFirstPage.Replace("{Badge}", string.Empty);
             templateFirstPage = templateFirstPage.Replace("{Currency}", string.Empty);
             templateFirstPage = templateFirstPage.Replace("{PaymentMethod}", string.Empty);
-            templateFirstPage = templateFirstPage.Replace("{Expiration}", string.Empty);
+            templateFirstPage = templateFirstPage.Replace("{ExpirationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
             templateFirstPage = templateFirstPage.Replace("{ReceiverBusinessName}", documentMeta.ReceiverName);
             templateFirstPage = templateFirstPage.Replace("{ReceiverNit}", documentMeta.ReceiverCode);
-
-
 
             // Mapping Events
 
@@ -148,11 +154,11 @@ namespace Gosocket.Dian.Application
 
             // Convert
             pdf = Pdf
-                    .From(htmlContent)
-                    .WithGlobalSetting("orientation", "Portrait")
-                    .WithObjectSetting("web.defaultEncoding", "utf-8")
-                    .OfSize(PaperSize.A4)
-                    .Content();
+                .From(htmlContent)
+                .OfSize(PaperSize.A4)
+                .WithTitle("Factura Electrónica")
+                .WithMargins(0.0.Centimeters())
+                .Content();
 
             return pdf;
         }
@@ -201,15 +207,20 @@ namespace Gosocket.Dian.Application
 
         private StringBuilder CommonDataTemplateMapping(StringBuilder template, DateTime expeditionDate, int page, GlobalDocValidatorDocumentMeta documentMeta)
         {
-            template = template.Replace("{PrintDay}", expeditionDate.Day.ToString());
-            template = template.Replace("{PrintMonth}", expeditionDate.Month.ToString());
-            template = template.Replace("{PrintYear}", expeditionDate.Year.ToString());
+            byte[] bytesLogo = _fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg");
+            byte[] bytesFooter = _fileManager.GetBytes("radian-dian-logos", "GroupFooter.png");
+            string imgLogo = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesLogo)}'>";
+            string imgFooter = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesFooter)}' class='img-footer'>";
+
+            template = template.Replace("{Logo}", $"{imgLogo}");
+            template = template.Replace("{ImgFooter}", $"{imgFooter}");
+            template = template.Replace("{PrintDate}", $"Impreso el {expeditionDate:d 'de' MM 'de' yyyy 'a las' hh:mm:ss tt}");
             template = template.Replace("{PrintTime}", expeditionDate.TimeOfDay.ToString());
             template = template.Replace("{PrintPage}", page.ToString());
             template = template.Replace("{InvoiceNumber}", documentMeta.SerieAndNumber);
             template = template.Replace("{CUFE}", documentMeta.PartitionKey);
-            template = template.Replace("{EInvoiceGenerationDate}", documentMeta.EmissionDate.ToString("yyyy-mm-dd HH:mm:ss.sss"));
-            template = template.Replace("{Status}", string.Empty);
+            template = template.Replace("{EInvoiceGenerationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
+            template = template.Replace("{Status}", $": ");
             return template;
         }
 
@@ -222,7 +233,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EventNumber" + subEvent + "}", eventObj.Code);
             template = template.Replace("{DocumentTypeName" + subEvent + "}", eventObj.Description);
             template = template.Replace("{CUDE" + subEvent + "}", eventObj.DocumentKey);
-            template = template.Replace("{ValidationDate" + subEvent + "}", eventObj.Date.ToString("yyyy-mm-dd HH:mm:ss.sss"));
+            template = template.Replace("{ValidationDate}", $"{eventObj.Date:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
             template = template.Replace("{SenderBusinessName" + subEvent + "}", eventObj.SenderName);
             template = template.Replace("{ReceiverBusinessName" + subEvent + "}", eventObj.ReceiverName);
 

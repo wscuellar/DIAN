@@ -39,6 +39,8 @@ namespace Gosocket.Dian.Web.Controllers
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId, (int)registrationData.RadianContributorType);
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
 
+            
+
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
                 Contributor = radianAdmin.Contributor,
@@ -142,9 +144,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
                 Timestamp = DateTime.Now
             };
-            _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software.Url, software.Name, software.Pin, User.UserName());
-
-
+            _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, true);
         }
 
         [HttpPost]
@@ -216,11 +216,19 @@ namespace Gosocket.Dian.Web.Controllers
 
 
         [HttpPost]
-        public ActionResult GetSetTestResult(RadianApprovedViewModel radianApprovedViewModel)
+        public ActionResult GetSetTestResult(RadianApprovedViewModel model)
         {
-            radianApprovedViewModel.RadianTestSetResult =
-                _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
-            return View(radianApprovedViewModel);
+
+            const int softwareType = 1;
+            string sType = softwareType.ToString();
+            RadianSoftware software = _radianAprovedService.GetSoftware(model.Contributor.RadianContributorId, softwareType);
+            string key = softwareType.ToString() + "|" + software.Id.ToString();
+            model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(model.Nit, key);
+            RadianTestSet testSet = _radianTestSetService.GetTestSet(sType, sType);
+            model.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), sType)));
+            model.RadianTestSetResult.StatusDescription = testSet.Description;
+            model.Software = software;
+            return View(model);
         }
 
         [HttpPost]
@@ -249,17 +257,32 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult UpdateFactorOperationMode(SetOperationViewModel data)
         {
             int result = -1;
-            result = _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
+
+            RadianContributorOperation contributorOperation = new RadianContributorOperation()
             {
                 RadianContributorId = data.RadianContributorId,
                 Deleted = false,
                 Timestamp = DateTime.Now,
                 SoftwareType = data.SoftwareType,
                 SoftwareId = data.SoftwareId != null ? new Guid(data.SoftwareId) : Guid.Empty,
-            }, data.Url,
-            data.SoftwareName,
-            data.Pin,
-            User.UserName());
+            };
+            RadianSoftware software = new RadianSoftware()
+            {
+                Url = data.Url,
+                Name = data.SoftwareName,
+                Pin = data.Pin,
+                CreatedBy = User.UserName(),
+                Deleted = false,
+                Status = true,
+                RadianSoftwareStatusId =  (int)RadianSoftwareStatus.InProcess,
+                SoftwareDate = System.DateTime.Now,
+                Timestamp = System.DateTime.Now,
+                Updated = System.DateTime.Now,
+                RadianContributorId = data.RadianContributorId
+            };
+
+            result = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, !string.IsNullOrEmpty(data.SoftwareName));
+
 
             string message;
             if (result == -1)
@@ -310,14 +333,16 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-        public ActionResult ViewTestSet(int id, int radianTypeId, string softwareId)
+        public ActionResult ViewTestSet(int id, int radianTypeId, string softwareId, int softwareType)
         {
             RadianApprovedViewModel radianApprovedViewModel = new RadianApprovedViewModel();
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(id, radianTypeId);
-            radianApprovedViewModel.RadianTestSetResult =
-               _radianTestSetResultService.GetTestSetResultByNit(radianAdmin.Contributor.Code).FirstOrDefault();
-
-
+            string key = softwareType.ToString() + "|" + softwareId;
+            radianApprovedViewModel.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(radianAdmin.Contributor.Code, key);
+            RadianTestSet testSet = _radianTestSetService.GetTestSet(softwareType.ToString(), softwareType.ToString());
+           
+            radianApprovedViewModel.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), softwareType.ToString())));
+            radianApprovedViewModel.RadianTestSetResult.StatusDescription = testSet.Description;
             radianApprovedViewModel.Contributor = radianAdmin.Contributor;
             radianApprovedViewModel.ContributorId = radianAdmin.Contributor.Id;
             radianApprovedViewModel.Name = radianAdmin.Contributor.TradeName;
