@@ -39,6 +39,8 @@ namespace Gosocket.Dian.Web.Controllers
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId, (int)registrationData.RadianContributorType);
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
 
+            
+
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
                 Contributor = radianAdmin.Contributor,
@@ -142,9 +144,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
                 Timestamp = DateTime.Now
             };
-            _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software.Url, software.Name, software.Pin, User.UserName());
-
-
+            _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, true);
         }
 
         [HttpPost]
@@ -257,17 +257,32 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult UpdateFactorOperationMode(SetOperationViewModel data)
         {
             int result = -1;
-            result = _radianAprovedService.AddRadianContributorOperation(new RadianContributorOperation()
+
+            RadianContributorOperation contributorOperation = new RadianContributorOperation()
             {
                 RadianContributorId = data.RadianContributorId,
                 Deleted = false,
                 Timestamp = DateTime.Now,
                 SoftwareType = data.SoftwareType,
                 SoftwareId = data.SoftwareId != null ? new Guid(data.SoftwareId) : Guid.Empty,
-            }, data.Url,
-            data.SoftwareName,
-            data.Pin,
-            User.UserName());
+            };
+            RadianSoftware software = new RadianSoftware()
+            {
+                Url = data.Url,
+                Name = data.SoftwareName,
+                Pin = data.Pin,
+                CreatedBy = User.UserName(),
+                Deleted = false,
+                Status = true,
+                RadianSoftwareStatusId =  (int)RadianSoftwareStatus.InProcess,
+                SoftwareDate = System.DateTime.Now,
+                Timestamp = System.DateTime.Now,
+                Updated = System.DateTime.Now,
+                RadianContributorId = data.RadianContributorId
+            };
+
+            result = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, !string.IsNullOrEmpty(data.SoftwareName));
+
 
             string message;
             if (result == -1)

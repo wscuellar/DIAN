@@ -214,6 +214,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Tiene otro proceso activo con software propio..
+        /// </summary>
+        public static string OnlyActiveProcess {
+            get {
+                return ResourceManager.GetString("OnlyActiveProcess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El participante no cuenta con un software propio activo en el sistema.
         /// </summary>
         public static string ParticipantWithoutSoftware {

@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain.Entity;
+﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
 using System;
@@ -14,9 +15,17 @@ namespace Gosocket.Dian.Application
 
         #region GlobalRadianOperation
 
-        public bool Insert(GlobalRadianOperations item)
+        public bool Insert(GlobalRadianOperations item, RadianSoftware software )
         {
-            return globalRadianOperations.Insert(item);
+            GlobalSoftware soft = new GlobalSoftware(software.Id.ToString(), software.Id.ToString())
+            {
+                Id = software.Id,
+                Pin = software.Pin,
+                Timestamp = DateTime.Now,
+                StatusId = 1
+            };
+            ;
+            return SoftwareAdd(soft) && globalRadianOperations.InsertOrUpdate(item);
         }
 
         public bool Update(GlobalRadianOperations item)

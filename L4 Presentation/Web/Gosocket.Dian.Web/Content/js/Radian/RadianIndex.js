@@ -27,6 +27,7 @@
 
 
 function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFunction) {
+    debugger;
     $.ajax({
         url: url,
         type: callMethod,
@@ -61,7 +62,8 @@ function showConfirmation(confirmMessage, buttons, className, onShow) {
             window.location.reload();
         }
     }).init(() => {
-        onShow();
+        debugger;
+       // onShow();
     });
 
 }

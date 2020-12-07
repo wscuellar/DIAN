@@ -50,6 +50,7 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IGlobalDocValidatorTrackingService, GlobalDocValidatorTrackingService>();
             container.RegisterType<IQueryAssociatedEventsService, QueryAssociatedEventsService>();
             container.RegisterType<IRadianPdfCreationService, RadianPdfCreationService>();
+            container.RegisterType<IGlobalRadianOperationService, GlobalRadianOperationService>();
 
             #endregion
 

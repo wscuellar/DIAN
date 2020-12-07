@@ -18,6 +18,7 @@ namespace Gosocket.Dian.Domain
 
         public RadianSoftware(Software software, int radianContributorId, string createdBy)
         {
+            Id = software.Id;
             Name = software.Name;
             Pin = software.Pin;
             RadianContributorId = radianContributorId;
