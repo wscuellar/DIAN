@@ -132,7 +132,8 @@ namespace Gosocket.Dian.Application
                    Code = c.Contributor.Code,
                    TradeName = c.Contributor.Name,
                    BusinessName = c.Contributor.BusinessName,
-                   AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name
+                   AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name,
+                   RadianState = c.RadianState
                }).ToList(),
                 Types = radianContributorType,
                 RowCount = radianContributors.RowCount,
