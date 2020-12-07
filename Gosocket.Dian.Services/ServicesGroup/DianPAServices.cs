@@ -739,7 +739,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse = documentReferenceCufe;
                 dianResponse.XmlDocumentKey = trackIdCude;
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                dianResponse.IsValid = false;                
+                dianResponse.IsValid = false;
+                return dianResponse;
             }
 
             //validation if is an endoso of endorsement (Code 037-038-039)
@@ -1591,6 +1592,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             return response;
         }
+
+
         private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode)
         {
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode });
