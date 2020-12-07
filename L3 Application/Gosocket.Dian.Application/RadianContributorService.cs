@@ -21,6 +21,7 @@ namespace Gosocket.Dian.Application
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
         private readonly IRadianContributorFileRepository _radianContributorFileRepository;
+        private readonly IRadianContributorFileTypeRepository _radianContributorFileTypeRepository;
         private readonly IRadianTestSetResultManager _radianTestSetResultManager;
         private readonly IRadianOperationModeRepository _radianOperationModeRepository;
         private readonly IRadianContributorFileHistoryRepository _radianContributorFileHistoryRepository;
@@ -33,7 +34,8 @@ namespace Gosocket.Dian.Application
             IRadianTestSetResultManager radianTestSetResultManager,
             IRadianOperationModeRepository radianOperationModeRepository,
             IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository,
-            IGlobalRadianOperationService globalRadianOperationService)
+            IGlobalRadianOperationService globalRadianOperationService,
+            IRadianContributorFileTypeRepository radianContributorFileTypeRepository)
         {
             _contributorService = contributorService;
             _radianContributorRepository = radianContributorRepository;
@@ -43,6 +45,7 @@ namespace Gosocket.Dian.Application
             _radianOperationModeRepository = radianOperationModeRepository;
             _radianContributorFileHistoryRepository = radianContributorFileHistoryRepository;
             _globalRadianOperationService = globalRadianOperationService;
+            _radianContributorFileTypeRepository = radianContributorFileTypeRepository;
         }
 
         #region Registro de participantes
@@ -85,9 +88,9 @@ namespace Gosocket.Dian.Application
                 List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(userCode);
                 string enabledStatus = RadianState.Habilitado.GetDescription();
                 string cancelStatus = RadianState.Cancelado.GetDescription();
-                if (radianOperations.Any(t => t.RadianStatus != enabledStatus && t.RadianStatus != cancelStatus &&   t.RadianContributorTypeId != (int)radianContributorType))
+                if (radianOperations.Any(t => t.RadianStatus != enabledStatus && t.RadianStatus != cancelStatus && t.RadianContributorTypeId != (int)radianContributorType))
                     return new ResponseMessage(TextResources.OnlyActiveProcess, TextResources.alertType);
-            }   
+            }
 
             string cancelEvent = RadianState.Cancelado.GetDescription();
             int radianType = (int)radianContributorType;
@@ -187,9 +190,9 @@ namespace Gosocket.Dian.Application
 
             radianContributors.ForEach(c =>
             {
+                List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(t => t.RadianContributorTypeId == c.RadianContributorTypeId && !t.Deleted);
                 radianAdmin = new RadianAdmin()
                 {
-
                     Contributor = new RedianContributorWithTypes()
                     {
                         RadianContributorId = c.Id,
@@ -208,6 +211,7 @@ namespace Gosocket.Dian.Application
                         RadianOperationModeId = c.RadianOperationModeId
                     },
                     Files = c.RadianContributorFile.ToList(),
+                    FileTypes = fileTypes,
                     Tests = testSet,
                     LegalRepresentativeIds = userIds,
                     Type = c.RadianContributorType

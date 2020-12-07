@@ -68,6 +68,6 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         public int CustomerTotalCount { get; internal set; }
         public FileHistoryListViewModel FileHistories { get; internal set; } 
         public int FileHistoriesRowCount { get; internal set; }
-       
+        public List<RadianContributorFileType> FileTypes { get; internal set; }
     }
 }

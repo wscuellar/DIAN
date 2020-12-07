@@ -48,7 +48,7 @@ namespace Gosocket.Dian.Domain.Entity
         public int Step { get; set; }
         public int CurrentPage { get; set; }
         public int RowCount { get; set; }
-
+        public List<RadianContributorFileType> FileTypes { get; set; }
     }
 
     public class RedianContributorWithTypes

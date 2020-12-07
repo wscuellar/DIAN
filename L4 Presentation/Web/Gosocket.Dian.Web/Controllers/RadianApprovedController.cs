@@ -350,6 +350,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.BusinessName = radianAdmin.Contributor.BusinessName;
             radianApprovedViewModel.Email = radianAdmin.Contributor.Email;
             radianApprovedViewModel.Files = radianAdmin.Files;
+            radianApprovedViewModel.FileTypes = radianAdmin.FileTypes;
             radianApprovedViewModel.RadianState = radianAdmin.Contributor.RadianState;
             radianApprovedViewModel.RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId;
             radianApprovedViewModel.Software = _radianAprovedService.GetSoftware(new Guid(softwareId));
