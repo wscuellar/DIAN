@@ -462,15 +462,6 @@ h4.text-thin {
     color: #348441;
 }
 
-.modal-radian .bootbox-close-button {
-    margin-top: -10px;
-    width: 28px;
-    height: 28px;
-    background-color: #348441 !important;
-    opacity: 1;
-    color: white;
-    font-weight: lighter !important;
-}
 
 .bootbox-close-button {
     margin-top: -10px;
@@ -1017,12 +1008,12 @@ span.close {
     width: calc(95% + 5%) !important
 }
 
-.modal-radian .bootbox-close-button {
+/*.bootbox-close-button {
     background-color: #348441 !important;
     width: 20px;
     height: 20px;
     margin: 0px 8px !important;
-}
+}*/
 
 #table-history .btn-radian-success {
     width: 10%;
@@ -1297,7 +1288,24 @@ button.selectpicker {
     }
 
 
-    /* Show the tooltip text when you mouse over the tooltip container */
-    .tooltip-custom:hover .tooltiptext {
-        visibility: visible;
-    }
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip-custom:hover .tooltiptext {
+    visibility: visible;
+}
+
+.underline-reject-text img{
+    margin: 0 1px;
+}
+
+.cancel-confirmation .modal-body {
+    background: url(/Content/images/png/check-circle.png);
+    background-repeat: no-repeat;
+    background-position: center 35px;
+    padding-top: 111px;
+    margin-bottom: 54px;
+    margin-top: 12px;
+}
+
+.cancel-confirmation .modal-footer {
+    display: none;
+}
