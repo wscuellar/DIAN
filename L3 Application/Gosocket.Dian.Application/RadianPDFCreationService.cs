@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,10 +45,13 @@ namespace Gosocket.Dian.Application
 
             StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
             StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
-            
+
             // Load Document Data
             GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
-            EventStatus eventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), documentMeta.EventCode);
+            EventStatus eventStatus;
+
+            //if (documentMeta.EventCode != null)
+            //    eventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), documentMeta.EventCode);
 
             //Load documents
             List<GlobalDocReferenceAttorney> documents =
@@ -147,11 +151,11 @@ namespace Gosocket.Dian.Application
 
             // Convert
             pdf = Pdf
-                    .From(htmlContent)
-                    .WithGlobalSetting("orientation", "Portrait")
-                    .WithObjectSetting("web.defaultEncoding", "utf-8")
-                    .OfSize(PaperSize.A4)
-                    .Content();
+                .From(htmlContent)
+                .OfSize(PaperSize.A4)
+                .WithTitle("Factura Electrónica")
+                .WithMargins(0.0.Centimeters())
+                .Content();
 
             return pdf;
         }
@@ -200,13 +204,17 @@ namespace Gosocket.Dian.Application
 
         private StringBuilder CommonDataTemplateMapping(StringBuilder template, DateTime expeditionDate, int page, GlobalDocValidatorDocumentMeta documentMeta)
         {
+            byte[] fileStream = _fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg");
+
+            string imgLogo = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(fileStream)}'>";
+            template = template.Replace("{Logo}", $"{imgLogo}");
             template = template.Replace("{PrintDate}", $"Impreso el {expeditionDate:d 'de' MM 'de' yyyy 'a las' hh:mm:ss tt}");
             template = template.Replace("{PrintTime}", expeditionDate.TimeOfDay.ToString());
             template = template.Replace("{PrintPage}", page.ToString());
             template = template.Replace("{InvoiceNumber}", documentMeta.SerieAndNumber);
             template = template.Replace("{CUFE}", documentMeta.PartitionKey);
             template = template.Replace("{EInvoiceGenerationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
-            template = template.Replace("{Status}", $"Estyado: {(EventStatus)Enum.Parse(typeof(EventStatus), documentMeta.EventCode)}");
+            template = template.Replace("{Status}", $": ");
             return template;
         }
 

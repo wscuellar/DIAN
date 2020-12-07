@@ -27,7 +27,6 @@
 
 
 function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFunction) {
-    debugger;
     $.ajax({
         url: url,
         type: callMethod,
@@ -35,10 +34,10 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFu
         success: function (data) {
             if (showMessage) {
                 if (data.MessageType === "alert") {
-                    showConfirmation(data.Message, AlertExec(cancelFunction), null, cancelFunction);
+                    showConfirmation(data.Message, AlertExec(cancelFunction), null);
                 }
                 if (data.MessageType === "confirm") {
-                    showConfirmation(data.Message, ConfirmExec(method, jsonvalue, null, cancelFunction), cancelFunction);
+                    showConfirmation(data.Message, ConfirmExec(method, jsonvalue, null, cancelFunction), null);
                 }
                 if (data.MessageType === "redirect") {
                     operationClick = false;
@@ -53,17 +52,14 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFu
     });
 }
 
-function showConfirmation(confirmMessage, buttons, className, onShow) {
+function showConfirmation(confirmMessage, buttons, className, onScapeFunction) {
     bootbox.dialog({
         className: className && className,
         message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
         buttons: buttons,
         onEscape: () => {
-            window.location.reload();
+            onScapeFunction ? onScapeFunction() : window.location.reload();
         }
-    }).init(() => {
-        debugger;
-       // onShow();
     });
 
 }
@@ -134,7 +130,7 @@ function SetIconsList(fileId) {
 function CancelRegister(url, dataAjax, confirmMessage, successAction, label, errorAction) {
         var metod = 'POST';
         var operation = (description) => ajaxFunction(url, metod, { ...dataAjax, description }, errorAction, successAction);
-        ShowPromptCancel(confirmMessage, operation, label, null, bootboxMessage.CANCEL_REGISTER);
+    ShowPromptCancel(confirmMessage, operation, label, errorAction, bootboxMessage.CANCEL_REGISTER);
 }
 
 function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText) {

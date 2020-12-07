@@ -462,15 +462,6 @@ h4.text-thin {
     color: #348441;
 }
 
-.modal-radian .bootbox-close-button {
-    margin-top: -10px;
-    width: 28px;
-    height: 28px;
-    background-color: #348441 !important;
-    opacity: 1;
-    color: white;
-    font-weight: lighter !important;
-}
 
 .bootbox-close-button {
     margin-top: -10px;
@@ -525,19 +516,19 @@ h4.text-thin {
     position: relative;
 }
 
-    #steps-approved .steps li.done::after {
-        content: "";
-        width: 108px;
-        height: 130px;
-        background: transparent;
-        position: absolute;
-        top: 0px;
-    }
+#steps-approved .steps li.done::after {
+    content: "";
+    width: 108px;
+    height: 130px;
+    background: transparent;
+    position: absolute;
+    top: 0px;
+}
 
-    #steps-approved .steps li.done::before {
-        width: 20px;
-        height: 20px;
-    }
+#steps-approved .steps li.done::before {
+    width: 20px;
+    height: 20px;
+}
 
 #steps-approved .steps li:nth-child(3).disabled a {
     background: url(../../images/png/validado3.png);
@@ -791,20 +782,20 @@ h4.text-thin {
     right: 21px;
 }
 
-    #progress-wrp .progress-bar {
-        height: 11px;
-        border-radius: 3px;
-        background-color: #348441;
-        box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.11);
-    }
+#progress-wrp .progress-bar {
+    height: 11px;
+    border-radius: 3px;
+    background-color: #348441;
+    box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.11);
+}
 
-    #progress-wrp .status {
-        top: 3px;
-        left: 50%;
-        position: absolute;
-        display: inline-block;
-        color: #000000;
-    }
+#progress-wrp .status {
+    top: 3px;
+    left: 50%;
+    position: absolute;
+    display: inline-block;
+    color: #000000;
+}
 
 .event-section .cude-section span {
     display: block;
@@ -857,21 +848,21 @@ span.state-file {
     margin: 11px;
 }
 
-    span.state-file.status-1 {
-        background-image: url(../../images/Svg/Loaded.svg);
-    }
+span.state-file.status-1 {
+    background-image: url(../../images/Svg/Loaded.svg);
+}
 
-    span.state-file.status-2 {
-        background-image: url(../../images/aproved.png);
-    }
+span.state-file.status-2 {
+    background-image: url(../../images/aproved.png);
+}
 
-    span.state-file.status-3 {
-        background-image: url(../../images/reject.png);
-    }
+span.state-file.status-3 {
+    background-image: url(../../images/reject.png);
+}
 
-    span.state-file.status-4 {
-        background-image: url(../../images/observations.png);
-    }
+span.state-file.status-4 {
+    background-image: url(../../images/observations.png);
+}
 
 .file-input-disabled {
     position: relative;
@@ -1017,12 +1008,12 @@ span.close {
     width: calc(95% + 5%) !important
 }
 
-.modal-radian .bootbox-close-button {
+/*.bootbox-close-button {
     background-color: #348441 !important;
     width: 20px;
     height: 20px;
     margin: 0px 8px !important;
-}
+}*/
 
 #table-history .btn-radian-success {
     width: 10%;
@@ -1129,10 +1120,10 @@ button.selectpicker {
     border-radius: 4px;
 }
 
-    button.selectpicker .fa-caret-down {
-        right: 15px;
-        position: absolute;
-    }
+button.selectpicker .fa-caret-down {
+    right: 15px;
+    position: absolute;
+}
 
 .custom-combobox {
     position: relative;
@@ -1198,48 +1189,48 @@ button.selectpicker {
     font-size: 24px;
 }
 
-    .prompt-comment .modal-title {
-        font-size: 24px;
-        width: fit-content;
-        border-bottom: 2px solid #62C7AB;
-        padding-right: 20px;
-        padding-bottom: 4px;
-    }
+.prompt-comment .modal-title {
+    font-size: 24px;
+    width: fit-content;
+    border-bottom: 2px solid #62C7AB;
+    padding-right: 20px;
+    padding-bottom: 4px;
+}
 
-    .prompt-comment .modal-header:after {
-        display: none;
-    }
+.prompt-comment .modal-header:after {
+    display: none;
+}
 
-    .prompt-comment .modal-body {
-        display: inline-flex;
-        width: 80%;
-        padding-top: 0px;
-        padding-bottom: 20px;
-    }
+.prompt-comment .modal-body {
+    display: inline-flex;
+    width: 80%;
+    padding-top: 0px;
+    padding-bottom: 20px;
+}
 
-    .prompt-comment .modal-footer {
-        position: absolute;
-        display: inline-flex;
-        width: 20%;
-        padding-bottom: 0px;
-        bottom: 21px;
-    }
+.prompt-comment .modal-footer {
+    position: absolute;
+    display: inline-flex;
+    width: 20%;
+    padding-bottom: 0px;
+    bottom: 21px;
+}
 
-    .prompt-comment button.btn-radian-default {
-        display: none;
-    }
+.prompt-comment button.btn-radian-default {
+    display: none;
+}
 
-    .prompt-comment .bootbox-body {
-        width: 100%;
-    }
+.prompt-comment .bootbox-body {
+    width: 100%;
+}
 
-    .prompt-comment .modal-header {
-        padding-bottom: 5px;
-    }
+.prompt-comment .modal-header {
+    padding-bottom: 5px;
+}
 
-    .prompt-comment .modal-content {
-        padding-right: 40px;
-    }
+.prompt-comment .modal-content {
+    padding-right: 40px;
+}
 
 .cancel-confirmation .modal-body {
 }
@@ -1280,24 +1271,41 @@ button.selectpicker {
     z-index: 1;
 }
 
-    /* Tooltip text */
-    .tooltip-custom .tooltiptext {
-        font-size: 9px;
-        visibility: hidden;
-        width: auto;
-        background: #F2ECE7;
-        color: black;
-        text-align: justify;
-        padding: 14px;
-        border-radius: 6px;
-        position: absolute;
-        bottom: 100%;
-        right: 15px;
-        border: solid 1px;
-    }
+/* Tooltip text */
+.tooltip-custom .tooltiptext {
+    font-size: 9px;
+    visibility: hidden;
+    width: auto;
+    background: #F2ECE7;
+    color: black;
+    text-align: justify;
+    padding: 14px;
+    border-radius: 6px;
+    position: absolute;
+    bottom: 100%;
+    right: 15px;
+    border: solid 1px;
+}
 
 
-    /* Show the tooltip text when you mouse over the tooltip container */
-    .tooltip-custom:hover .tooltiptext {
-        visibility: visible;
-    }
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip-custom:hover .tooltiptext {
+    visibility: visible;
+}
+
+.underline-reject-text img{
+    margin: 0 1px;
+}
+
+.cancel-confirmation .modal-body {
+    background: url(/Content/images/png/check-circle.png);
+    background-repeat: no-repeat;
+    background-position: center 35px;
+    padding-top: 111px;
+    margin-bottom: 54px;
+    margin-top: 12px;
+}
+
+.cancel-confirmation .modal-footer {
+    display: none;
+}

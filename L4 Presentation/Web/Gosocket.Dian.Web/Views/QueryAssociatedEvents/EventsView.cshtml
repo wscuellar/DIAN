@@ -40,6 +40,7 @@
         font-size: 14px;
         line-height: 14px;
         color: #348441;
+        cursor: pointer;
     }
 
     .titlecs {
@@ -47,7 +48,7 @@
         font-family: Arial;
         font-style: normal;
         font-weight: bold;
-        font-size: 20px;
+        font-size: 30px;
         line-height: 23px;
         /* identical to box height */
         color: #2C323C;
@@ -105,10 +106,6 @@
         padding-bottom: 12px;
     }
 
-    .titlecs {
-        font-size: 22px;
-    }
-
     .underline-title {
         width: calc(34% + 5%) !important;
     }
@@ -118,6 +115,41 @@
         margin-left: 0px !important;
     }
 
+    .tab-content .panel {
+        margin-left: 20px;
+        margin-right: 20px;
+        margin-top: 70px;
+    }
+
+    .panel-event {
+        border-left-width: 20px;
+        border-right-width: 20px;
+        border-top-width: 20px;
+        border-bottom-width: 20px;
+    }
+
+    .fa-download {
+        padding-right: 5px;
+    }
+
+    i.fa-info-circle {
+        color: #348441 !important;
+        padding-right: 3px;
+    }
+
+    .green-text-color {
+        color: #348441;
+    }
+
+    .th-left-align {
+        text-align: left !important;
+    }
+
+    .second-section-align {
+        margin-left: 12px;
+        margin-top: 37px;
+    }
+
 </style>
 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
@@ -125,7 +157,7 @@
 <div class="event-section page-content radian-view margin-15">
 
     <div class="row margin-horizontal-0">
-        <div class="panel">
+        <div class="panel panel-event">
             <div class="panel-heading padding-15">
                 <div class="row">
                     <div class="col-sm-8 left-section">
@@ -145,7 +177,7 @@
                         <span>CUDE:</span>
                         <span class="cude-text">@Model.CUDE</span>
                         <div class="left-section ContainerDownload">
-                            <p><i class="fa fa-download"></i><um><ins> Descarga</ins></um></p>
+                            <p><i class="fa fa-download"></i><um><ins>Descarga</ins></um></p>
                         </div>
                     </div>
                     <div class="col-sm-8 text-right right-section">
@@ -198,8 +230,8 @@
                             <span>NIT: @Model.Endoso.SenderCode</span>
                             <span>ENDOSANTE: @Model.Endoso.SenderName</span>
 
-                            <div class="row aditional-data-section">
-                                <div class="col-sm-4 second-section">
+                            <div class="row">
+                                <div class="second-section-align">
                                     <h5>Tipo de Endoso</h5>
                                     <span>@Model.Endoso.EndosoType</span>
                                 </div>
@@ -229,7 +261,7 @@
                             <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
                                 <thead>
                                     <tr>
-                                        <th>Nombre</th>
+                                        <th class="th-left-align">Nombre</th>
                                         <th class="text-right right-section">Resultados</th>
                                     </tr>
                                 </thead>
@@ -239,13 +271,15 @@
                                         <tr>
                                             <td>@item.RuleName</td>
                                             <td class="text-right right-section">
-                                                <u class="underline-reject-text tooltip-custom">
-                                                    <span><i class="fa fa-info-circle"> </i> @item.Status</span>
+                                                <p class="underline-reject-text tooltip-custom">
+                                                    <span class="green-text-color">
+                                                        <i class="fa fa-info-circle"></i>@item.Status
+                                                    </span>
                                                     <span class="tooltiptext">
                                                         <i class="fa fa-exclamation-circle"></i>
                                                         @item.Message
                                                     </span>
-                                                </u>
+                                                </p>
                                             </td>
                                         </tr>
                                     }
@@ -269,11 +303,11 @@
                     <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
                         <thead>
                             <tr>
-                                <th>Tipo de documento</th>
+                                <th class="th-left-align">Tipo de documento</th>
                                 <th>Fecha</th>
-                                <th>Descripción</th>
+                                <th class="th-left-align">Descripción</th>
                                 <th>NIT del Emisor</th>
-                                <th>Emisor</th>
+                                <th class="th-left-align">Emisor</th>
                                 <th>NIT del Receptor</th>
                                 <th>Receptor</th>
                             </tr>
@@ -283,12 +317,12 @@
                             {
                                 <tr>
                                     <td>@item.Document</td>
-                                    <td>@item.DateOfIssue.ToString("yyyy-MM-dd")</td>
+                                    <td class="text-center">@item.DateOfIssue.ToString("yyyy-MM-dd")</td>
                                     <td>@item.Description</td>
-                                    <td>@item.SenderCode</td>
+                                    <td class="text-center">@item.SenderCode</td>
                                     <td>@item.SenderName</td>
-                                    <td>@item.ReceiverCode</td>
-                                    <td>@item.ReceiverName</td>
+                                    <td class="text-center">@item.ReceiverCode</td>
+                                    <td class="text-center">@item.ReceiverName</td>
 
                                 </tr>
                             }
