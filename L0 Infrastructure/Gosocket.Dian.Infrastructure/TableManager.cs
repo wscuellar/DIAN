@@ -780,6 +780,26 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+        public DynamicTableEntity FindhByGlobalDocumentId(string globalDocumentId, string documentKey)
+        {
+            var query = new TableQuery();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("GlobalDocumentId",
+                    QueryComparisons.Equal,
+                    globalDocumentId),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentKey",
+                    QueryComparisons.Equal,
+                    documentKey));
+
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
+
         public Tuple<IEnumerable<T>, TableContinuationToken> GetRangeRows<T>(int take, TableContinuationToken continuationToken) where T : ITableEntity, new()
         {
             var query = CloudTable.CreateQuery<T>().Where(x => x.PartitionKey != "").Take(take).AsTableQuery();
