@@ -221,15 +221,15 @@
 
                                                 <div class="col-md-12 col-lg-12">
                                                     <div class="UEText">
-                                                        ¿Desea crear al usuario<br />
-                                                        <span id="idUserEdicion"></span>?
+                                                        ¿<span id="idUserEdicion1"></span><br />
+                                                        <span id="idUserEdicion2"></span>?
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12 col-lg-12">
                                                     <br />
                                                 </div>
                                                 <div class="col-md-6 col-lg-6 col-xs-6">
-                                                    <button type="submit" class="btn btn-hover-gosocket btn-radian-success pull-right btn-save">Aceptar</button>
+                                                    <button type="submit" class="btn btn-hover-gosocket btn-radian-default pull-right btn-save">Aceptar</button>
                                                 </div>
                                                 <div class="col-md-6 col-lg-6 col-xs-6">
                                                     <button type="button" class="btn btn-success btn-hover-gosocket btn-radian-success" data-dismiss="modal" aria-label="Close">
@@ -388,7 +388,7 @@
 
                 <table class="margin-top-3 margin-left-15">
                     <tr>
-                        <td><label id="lblActionActive" class="control-label" style="margin-left: 7px;"></label></td>
+                        <td><label id="lblActionActive" name="lblActionActive" class="control-label" style="margin-left: 7px;"></label></td>
                     </tr>
                     <tr>
                         <td class="col-md-12 col-lg-12">
@@ -420,6 +420,7 @@
 
         $(document).ready(function ($) {
 
+            var formu = $('#add-user-form');
             userId = $("#Id").val();
             reloadView = false;
 
@@ -501,20 +502,11 @@
                         userId: userActive, active: $("#btnOkActive").text(), activeDescription: $("#txtActiveDescription").val(), email: userActiveEmail },
                     datatype: "json",
                     success: function (res) {
-
+                        debugger;
                         if (res.StatusCode == 'OK') {
                             reloadView = true;
 
-                            $.niftyNoty({
-                                type: res.StatusCode == 'OK' ? "success" : "danger",
-                                container: "floating",
-                                title: "Mensaje...",
-                                message: res.Message,
-                                closeBtn: false,
-                                timer: 5000
-                            });
-
-                            reloadPage();
+                            clickOpenModalGenerico($("#btnOkActive").text());
                         }
                         else
                             reload = false;
@@ -568,7 +560,6 @@
             }
 
             if ($("#hddMessage").val() != null && $("#hddMessage").val() != '') {
-                debugger;
                 if  ($("#Id").val().length > 0) clickOpenModalGenerico('Edicion');
                 else clickOpenModalGenerico('Creacion');
                 document.getElementById("hddMessage").value = '';
@@ -583,12 +574,12 @@
             // Pagination
             $('.next-page').click(function () {
                 $('#page').val(@Model.Page + 1);
-                form.submit();
+                formu.submit();
             });
 
             $('.prev-page').click(function () {
                 $('#page').val(@Model.Page - 1);
-                form.submit();
+                formu.submit();
             });
             // Pagination
 
@@ -678,12 +669,17 @@
         }
 
         function showModalSave() {
-            $("#idUserEdicion").text($("#Names").val());
+            if ($("#Id").val().length > 0)
+                $("#idUserEdicion1").text("Desea editar el usuario");
+            else
+                $("#idUserEdicion1").text("Desea crear al usuario");
+            $("#idUserEdicion2").text($("#Names").val());
             $("#ModalSave").modal('show');
         }
 
         function confirmActive(userActiveId, accionActive, emailActive) {
 
+            debugger;
             userActive = userActiveId;
             userActiveEmail = emailActive;
 
@@ -714,17 +710,14 @@
                 $('#idTextoModal2').text('Activado correctamente');
             }
 
-            if (TipoAfimacion == 'Desactivar') {
+            if (TipoAfimacion == 'Inactivar') {
                 $('#idTextoModal1').text('El usuario fue');
                 $('#idTextoModal2').text('Inactivado correctamente');
             }
             showModalGenerico();
         }
 
-        function confirmActive(accion) {
-            if (accion == 2) $('span.accion-title').text('Describa el motivo de la activación');
-            else $('span.accion-title').text('Describa el motivo de la inactivación');
-        }
+ 
 
         function HideModalSave() {
             $("#ModalSave").modal('hide');
