@@ -247,21 +247,29 @@ namespace Gosocket.Dian.Web.Controllers
 
             var uCompany = userService.Get(User.Identity.GetUserId());
 
+            model.Users = this.LoadExternalUsersViewBags(uCompany.Code, model.Page, model.Length);
+            ViewBag.ExternalUsersList = model.Users;
+
+            if (!ModelState.IsValid)
+            {
+                IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var item in allErrors)
+                    ModelState.AddModelError("", item.ErrorMessage);
+
+                return View(model);
+            }
+
             if (uCompany == null)
             {
                 ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
-                return View();
+                return View(model);
             }
 
             if (string.IsNullOrEmpty(uCompany.Code))
             {
                 ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
-                return View();
+                return View(model);
             }
-
-            //this.LoadExternalUsersViewBags(uCompany.Code, model.Page, model.Length);
-            model.Users = this.LoadExternalUsersViewBags(uCompany.Code, model.Page, model.Length);
-            ViewBag.ExternalUsersList = model.Users;
 
             var user = new ApplicationUser
             {
@@ -325,6 +333,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 if (result.Succeeded)
                 {
+                    model.Id = user.Id;
                     ViewBag.messageAction = "Usuario Registrado exitosamente!";
 
                     userService.RegisterExternalUserTrazability(JsonConvert.SerializeObject(new ExternalUserViewModel()
@@ -361,7 +370,7 @@ namespace Gosocket.Dian.Web.Controllers
                         Email = model.Email
                     }) + ", permisos: " + JsonConvert.SerializeObject(permissions), "Creación de Permisos");
 
-                    return View();
+                    return View(model);
                 }
                 else
                 {
@@ -420,7 +429,7 @@ namespace Gosocket.Dian.Web.Controllers
                     //Envio de notificacion por correo
                     _ = SendMailUpdate(model);
 
-                    return View();
+                    return View(model);
                 }
                 else
                     ViewBag.messageAction = "No se pudo actualizar el Usuario!";

@@ -27,6 +27,7 @@ namespace Gosocket.Dian.Web.Models
         [DataType(DataType.Text)]
         [Display(Name = "Nombre")]
         [Required(ErrorMessage = "{0} es requerido.")]
+        [RegularExpression(@"^[0-9a-zA-Z\sñÑáéíóú]+$", ErrorMessage = "Solo se permiten caracteres 0-9 y a-z")]
         public string Names { get; set; }
 
         [Display(Name = "Tipo de documento")]
@@ -36,6 +37,7 @@ namespace Gosocket.Dian.Web.Models
         [DataType(DataType.Text)]
         [Display(Name = "Número de identificaión")]
         [Required(ErrorMessage = "{0} es requerido.")]
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "Solo se permiten números 0-9")]
         public string IdentificationId { get; set; }
 
         [Display(Name = "Correo electrónico")]

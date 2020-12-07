@@ -1074,11 +1074,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             string valueTotalInvoice = xmlParserCufe.TotalInvoice;
 
-            //Valida informacion Endoso               
-
-            if (eventCode == "037")
+            //Valida informacion Endoso                           
+            if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
             {
-
                 //Valida precio a pagar endoso
                 int resultValuePriceToPay = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
                 resultValuePriceToPay = resultValuePriceToPay / 100;
@@ -1216,11 +1214,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool valid = false;
             if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
             {
-                if(eventCode == "035")
-                {
-                    return null;
-                }
-
+                //Aplica si el emisor es el avalista evento Aval
+                if (Convert.ToInt32(eventCode) == (int)EventStatus.Avales)  return null;
+          
                 return new ValidateListResponse
                 {
                     IsValid = false,
@@ -2371,47 +2367,56 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             case (int)EventStatus.Avales:
                                 if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
                                 {
-                                    //Valida no tenga Limitaciones la FETV
-                                    if (documentMeta
-                                   .Where(t => t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
-                                   .Count > decimal.Zero)
+                                    var response = ValidateAval(xmlParserCufe, xmlParserCude);
+                                    if (response != null)
                                     {
                                         validFor = true;
-                                        responses.Add(new ValidateListResponse
-                                        {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = "Regla: 89-(R): ",
-                                            ErrorMessage = "No es posible transmitir el evento Aval, ya existe un evento 041 Limitación de circulación",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
-                                    //Valida Pago Total FETV     
-                                    else if (documentMeta
-                                 .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
-                                 .Count > decimal.Zero)
-                                    {
-                                        validFor = true;
-                                        responses.Add(new ValidateListResponse
-                                        {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = "Regla: 89-(R): ",
-                                            ErrorMessage = "No se pueda transmitir el evento Aval porque ya existe un pago total FETV",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
+                                        responses.Add(response);
                                     }
                                     else
                                     {
-                                        responses.Add(new ValidateListResponse
+                                        //Valida no tenga Limitaciones la FETV
+                                        if (documentMeta
+                                           .Where(t => t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                           .Count > decimal.Zero)
                                         {
-                                            IsValid = true,
-                                            Mandatory = true,
-                                            ErrorCode = "100",
-                                            ErrorMessage = "Evento referenciado correctamente",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = "Regla: 89-(R): ",
+                                                ErrorMessage = "No es posible transmitir el evento Aval, ya existe un evento 041 Limitación de circulación",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                        //Valida Pago Total FETV     
+                                        else if (documentMeta
+                                             .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                             .Count > decimal.Zero)
+                                        {
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = "Regla: 89-(R): ",
+                                                ErrorMessage = "No se pueda transmitir el evento Aval porque ya existe un pago total FETV",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                        else
+                                        {
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = true,
+                                                Mandatory = true,
+                                                ErrorCode = "100",
+                                                ErrorMessage = "Evento referenciado correctamente",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                    }                                 
                                 }
                                 else
                                 {
@@ -2719,9 +2724,57 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             return responses;
         }
+
+        private ValidateListResponse ValidateAval(XmlParser xmlParserCufe, XmlParser xmlParserCude)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            string valueTotalInvoice = xmlParserCufe.TotalInvoice;
+
+                XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+                int totalValueSender = 0;
+                for (int i = 0; i < valueListSender.Count; i++)
+                {
+                    string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                    totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                }
+
+                XmlNodeList valueListIssuerParty = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']");
+                int totalValueIssuerParty = 0;
+                for (int i = 0; i < valueListIssuerParty.Count; i++)
+                {
+                    string valueStockAmount = valueListIssuerParty.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                    totalValueIssuerParty += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                }
+
+                if (totalValueIssuerParty != totalValueSender)
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAH32c-(R): ",
+                        ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+
+                if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: 89-(R): ",
+                        ErrorMessage = $"{(string)null} El valor reportado del elemento SenderParty supera el valor total del Título Valor.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+          
+            return null;
+        }
         #endregion
 
-        # region Validación de la Sección prerrequisitos Solicitud Disponibilizacion
+        #region Validación de la Sección prerrequisitos Solicitud Disponibilizacion
         public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, EventApproveCufeObjectParty data)
         {
             DateTime startDate = DateTime.UtcNow;
