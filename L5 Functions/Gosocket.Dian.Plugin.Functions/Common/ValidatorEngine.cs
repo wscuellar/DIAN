@@ -14,6 +14,7 @@ using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.Event;
 using static Gosocket.Dian.Domain.Common.EnumHelper;
 using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
+using Gosocket.Dian.Plugin.Functions.Predecesor;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -91,7 +92,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
             if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.SolicitudDisponibilizacion || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoGarantia 
-                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoProcuracion)
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoProcuracion
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales)
             {
                 //Obtiene XML Factura electronica CUFE
                 var xmlBytes = await GetXmlFromStorageAsync(eventPrev.TrackId);
@@ -116,19 +118,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference)
+        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference, string eventCode)
         {
-            var validateResponses = new List<ValidateListResponse>();
+             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
-            //Obtiene XML Factura electronica CUFE
+            //Obtiene XML CUFE - CUDE
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
-            var xmlParserCude = new XmlParser(xmlBytes);
-            if (!xmlParserCude.Parser())
-                throw new Exception(xmlParserCude.ParserError);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
 
-            var nitModel = xmlParserCude.Fields.ToObject<NitModel>();
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
 
-            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference));
+            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference, eventCode));
 
             return validateResponses;
         }
@@ -176,7 +178,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                )
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
                     "0"+ (int)code).FirstOrDefault();                
@@ -229,9 +233,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     validateResponses.Add(response);
                     return validateResponses;
                 }
-            }
-            else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice ||
-                    Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
+            }           
+            else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice)                   
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), 
                     data.DocumentTypeId, "0" + (int)code, data.CustomizationID).FirstOrDefault();
@@ -241,8 +244,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
-                    string msg = Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice ? "No se encontró evento referenciado CUDE para evaluar fecha Limitación de circulación"
-                        : "No se encontró evento referenciado CUDE para evaluar fecha Notificación del pago total o parcial";
+                    string msg = "No se encontró evento referenciado CUDE para evaluar fecha Limitación de circulación";           
                     ValidateListResponse response = new ValidateListResponse();
                     response.ErrorMessage = msg;
                     response.IsValid = false;
@@ -265,6 +267,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
+
+        public async Task<List<ValidateListResponse>> StartValidatePredecesor(RequestObjectPredecesor p)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+            DateTime startDate = DateTime.UtcNow;
+
+            var xmlBytes = await GetXmlFromStorageAsync(p.TrackId);
+            var xmlParser = new XmlParseNomina(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateReplacePredecesor(p, xmlParser));
+            return validateResponses;
+        }
+
         public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId, string number, string documentTypeId)
         {
             var validateResponses = new List<ValidateListResponse>();

@@ -20,7 +20,7 @@ namespace Gosocket.Dian.Application
             _RadianSoftwareRepository = radianSoftwareRepository;
         }
 
-        
+
 
         public RadianSoftware Get(Guid id)
         {

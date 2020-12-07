@@ -348,6 +348,24 @@ i.fa-info-circle {
     cursor: pointer;
 }
 
+.fa-toggle-on {
+    font-style: normal;
+    font-weight: 900;
+    font-size: 14px;
+    line-height: 14px;
+    color: #348441;
+    cursor: pointer;
+}
+
+.fa-toggle-off {
+    font-style: normal;
+    font-weight: 900;
+    font-size: 14px;
+    line-height: 14px;
+    color: #348441;
+    cursor: pointer;
+}
+
 .download-contributor-files {
     color: #348441;
     margin: 0px 6px;

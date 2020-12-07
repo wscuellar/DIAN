@@ -34,19 +34,23 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
             if (string.IsNullOrEmpty(data.IdDocumentReference))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an IdDocumentReference in the request body");
-          
-            var trackId = data.TrackId;
+            if (string.IsNullOrEmpty(data.EventCode))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an EventCode in the request body");
 
+            var trackId = data.TrackId;
+            var eventCode = data.EventCode;
             var idDocumentReference = data.IdDocumentReference;
 
             if (trackId == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
             if (idDocumentReference == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an IdDocumentReference on the query string or in the request body");
-            
+            if (eventCode == null)
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an eventCode on the query string or in the request body");
+
             try
             {
-                var validateResponses = await ValidatorEngine.Instance.StartValidateDocumentReferenceAsync(trackId, idDocumentReference);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateDocumentReferenceAsync(trackId, idDocumentReference, eventCode);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -73,8 +77,10 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
         {
             [JsonProperty(PropertyName = "trackId")]
             public string TrackId { get; set; }
-            [JsonProperty(PropertyName = "IdDocumentReference")]
+            [JsonProperty(PropertyName = "idDocumentReference")]
             public string IdDocumentReference { get; set; }
+            [JsonProperty(PropertyName = "eventCode")]
+            public string EventCode { get; set; }
         }
     }
 }
