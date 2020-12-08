@@ -127,7 +127,7 @@ namespace Gosocket.Dian.Application
                 Contributors = radianContributors.Results.Select(c =>
                new RedianContributorWithTypes()
                {
-                   Id = c.Contributor.Id,
+                   Id = c.Id,
                    Code = c.Contributor.Code,
                    TradeName = c.Contributor.Name,
                    BusinessName = c.Contributor.BusinessName,
@@ -161,7 +161,7 @@ namespace Gosocket.Dian.Application
                 Contributors = radianContributors.Results.Select(c =>
                new RedianContributorWithTypes()
                {
-                   Id = c.Contributor.Id,
+                   Id = c.Id,
                    Code = c.Contributor.Code,
                    TradeName = c.Contributor.Name,
                    BusinessName = c.Contributor.BusinessName,
