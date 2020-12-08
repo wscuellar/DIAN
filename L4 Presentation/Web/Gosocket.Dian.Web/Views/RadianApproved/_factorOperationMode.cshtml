@@ -35,7 +35,7 @@
                                         <div class="panel-body padding-20 padding-bottom-0">
 
                                             <div class="row">
-                                                <div class="col-sm-3 padding-xs-0">
+                                                <div class="col-sm-6 col-md-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.OperationModeSelectedId, new { @class = "control-label" })
                                                         @Html.DropDownListFor(m => m.OperationModeSelectedId, Model.OperationModes, " ", new { @class = "form-control selectpicker input-general" })
@@ -55,14 +55,14 @@
 
                                                 @if (operationMode == "2")
                                                 {
-                                                    <div class="col-sm-3 padding-xs-0">
+                                                    <div class="col-sm-6 col-md-3 padding-xs-0">
                                                         <div class="form-group input-arrow">
                                                             @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
                                                             @Html.TextBoxFor(model => Model.CustomerName, new { @class = "form-control input-general " })
                                                             @Html.HiddenFor(model => Model.CustomerID)
                                                         </div>
                                                     </div>
-                                                    <div class="col-sm-3 padding-xs-0">
+                                                    <div class="col-sm-5 col-md-3 padding-xs-0">
                                                         <div class="form-group">
                                                             @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
                                                             <select id="SoftwareNameList" class="form-control input-general"></select>

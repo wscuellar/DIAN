@@ -81,23 +81,27 @@
                         approveState: radianApproveState,
                         radianState: '@Model.RadianState'
                     }
-                    var errorAction = (error) => {
-                        var messageError = Object.values(error)[0];
-                        var id = Object.values(error)[2];
-                        bootbox.alert({
-                            title: "Advertencia",
-                            message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + messageError + "</strong></h4></div></div>",
-                            buttons: {
-                                ok: {
-                                    label: 'Aceptar',
-                                    className: 'btn-success'
+                    var errorAction = (error) => {debugger
+                        if (error) {
+                            var messageError = Object.values(error)[0];
+                            var id = Object.values(error)[2];
+                            bootbox.alert({
+                                title: "Advertencia",
+                                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + messageError + "</strong></h4></div></div>",
+                                buttons: {
+                                    ok: {
+                                        label: 'Aceptar',
+                                        className: 'btn-success'
+                                    }
+                                },
+                                callback: function () {
+                                    showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                    window.location.href = "/Radian/ViewDetails/" + id;
                                 }
-                            },
-                            callback: function () {
-                                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
-                                window.location.href = "/Radian/ViewDetails/" + id;
-                            }
-                        });
+                            });
+                        } else{
+                            hideLoading('#panel-form');
+                        }
                     };
                     var successAction = (data) => {
                         var messageSuccess = Object.values(data)[0];
@@ -106,7 +110,12 @@
                             showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                             window.location.href = "/Radian/ViewDetails/" + id;
                         }
-                        showConfirmation(messageSuccess, AlertExec(operation));
+                        if (radianApproveState == "1") {
+                            showConfirmation(bootboxMessage.CANCEL_RESPONSE_CORRECT, AlertExec(operation), "cancel-confirmation", operation);
+                        } else {
+                            showConfirmation(messageSuccess, AlertExec(operation));
+                        }
+                        
                     };
                     var label = "";
                 if (radianApproveState == "1") {
