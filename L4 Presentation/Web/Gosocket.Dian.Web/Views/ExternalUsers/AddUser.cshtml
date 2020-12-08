@@ -122,7 +122,7 @@
 <div class="page-content margin-15">
     <div class="row title-container" style="margin-left: 1px;">
         <p class="title-view">
-            @ViewBag.Title
+            @ViewBag.txtAccion
         </p>
         <div class="underline-title"></div>
     </div>
@@ -135,7 +135,7 @@
                         @using (Html.BeginForm("AddUser", "ExternalUsers", FormMethod.Post, new { id = "add-user-form" }))
                         {
                             @Html.HiddenFor(m => m.Id)
-                            <input id="page" name="Page" type="hidden" value="@Model.Page" />
+                            <input id="Page" name="Page" type="hidden" value="@Model.Page" />
                             <input type="hidden" id="listMenu" value="@Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Menu)" />
                             <input type="hidden" id="hddPermissions" name="hddPermissions" />
                             <input type="hidden" id="hddMessage" name="hddMessage" value="@ViewBag.messageAction" />
@@ -143,6 +143,9 @@
                                    value="@(ViewBag.PermissionList != null ? Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.PermissionList) : null)" />
 
                             @Html.Partial("_userForm")
+
+                            <div id="IdSinPermisos" class="text-center text-danger"></div>
+
                             @Html.ValidationSummary("", new { @class = "text-center text-danger" })
                             <div class="row margin-left-20 margin-right-20">
                                 <h4 class="panel-title-radian padding-0">Permisos</h4>
@@ -193,8 +196,8 @@
                             </div>
                             <div class="panel-footer footerRectangle text-right">
                                 @*@Html.ActionLink("Nuevo", "Add@*User", "ExternalUsers", null, new { @class = "btn btn-default" })
-                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
+                                    <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                                    <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
                                 <div class="footerRectangle">
                                     <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-success btn-hover-gosocket btn-radian-success">
                                         @ViewBag.txtAccion
@@ -202,7 +205,6 @@
 
                                 </div>
                             </div>
-
 
 
                             <div class="modal fade ModalSave" id="ModalSave" name="ModalSave" tabindex='-1' data-keyboard="false">
@@ -228,11 +230,14 @@
                                                 <div class="col-md-12 col-lg-12">
                                                     <br />
                                                 </div>
-                                                <div class="col-md-6 col-lg-6 col-xs-6">
-                                                    <button type="submit" class="btn btn-hover-gosocket btn-radian-default pull-right btn-save">Aceptar</button>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <br />
                                                 </div>
                                                 <div class="col-md-6 col-lg-6 col-xs-6">
-                                                    <button type="button" class="btn btn-success btn-hover-gosocket btn-radian-success" data-dismiss="modal" aria-label="Close">
+                                                    <button type="submit" class="btn btn-hover-gosocket btn-default-gosocket pull-right btn-save" style="margin-right:10px">Aceptar</button>
+                                                </div>
+                                                <div class="col-md-6 col-lg-6 col-xs-6">
+                                                    <button type="button" class="btn btn-success btn-hover-gosocket btn-radian-success" style="margin-left:10px" data-dismiss="modal" aria-label="Close">
                                                         Cancelar
                                                     </button>
                                                 </div>
@@ -245,7 +250,6 @@
                                     </div>
                                 </div>
                             </div>
-
 
                             <div class="modal fade ModalGenerico" id="ModalGenerico" name="ModalAfilmacion" tabindex='-1' data-keyboard="false">
                                 <div class="modal-dialog">
@@ -280,96 +284,102 @@
                                     </div>
                                 </div>
                             </div>
-
                         }
                     </div>
                 </div>
 
             </div>
-            <div class="panel-body padding-top-20">
-                <div class="row">
-                    <div class="col-lg-12  col-md-12  col-xs-12">
-                        <h4> Usuarios Configurados</h4>
-                    </div>
-                    <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
-                    </div>
-                    <div class="col-lg-offset-1 col-md-offset-1  col-lg-10 col-md-10  col-xs-12">
-                        <div class="table-responsive">
+            @if (Model.Id == null || Model.Id == "")
+            {
 
-                            <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
-                                <thead>
-                                    <tr>
-                                        <th class="text-left">Nombre</th>
-                                        <th class="text-center">No de documento</th>
-                                        <th class="text-center">Fecha de creación</th>
-                                        <th class="text-center">Ultima modificación</th>
-                                        <th class="text-center">Estado</th>
-                                        <th class="text-center">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (ViewBag.ExternalUsersList != null)
-                                    {
-                                        //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
-                                        foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
+                <div class="panel-body padding-top-20">
+                    <div class="row">
+                        <div class="col-lg-12  col-md-12  col-xs-12">
+                            <h4> Usuarios Configurados</h4>
+                        </div>
+                        <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
+                        </div>
+                        <div class="col-lg-offset-1 col-md-offset-1  col-lg-10 col-md-10  col-xs-12">
+                            <div class="table-responsive">
+
+                                <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left">Nombre</th>
+                                            <th class="text-center">No de documento</th>
+                                            <th class="text-center">Fecha de creación</th>
+                                            <th class="text-center">Ultima modificación</th>
+                                            <th class="text-center">Estado</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ViewBag.ExternalUsersList != null)
                                         {
-                                            <tr>
-                                                <td class="text-left">@item.Names</td>
-                                                @*<td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>*@
-                                                <td class="text-center">@item.IdentificationId</td>
-                                                @if (item.CreationDate.HasValue)
-                                                {
-                                                    <td class="text-center">@item.CreationDate.Value.ToString("dd-MM-yyyy")</td>
-                                                }
-                                                else
-                                                {
-                                                    <td> </td>
-                                                }
-                                                <td class="text-center">@item.LastUpdated.ToString("dd-MM-yyyy")</td>
-                                                <td class="text-center">@(item.Active == 1 ? "Activo" : "Inactivo")</td>
-                                                <td class="text-center">
-
-                                                    @Html.ActionLink(" ", "AddUser", new { id = item.Id }, new { @class = "fa fa-pencil" })
-                                                    &nbsp;
-
-                                                    @if (item.Active == 1)
+                                            //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                                            foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
+                                            {
+                                                <tr>
+                                                    <td class="text-left">@item.Names</td>
+                                                    @*<td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>*@
+                                                    <td class="text-center">@item.IdentificationId</td>
+                                                    @if (item.CreationDate.HasValue)
                                                     {
-                                                        <a class="fa fa-toggle-on" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"></a>
+                                                        <td class="text-center">@item.CreationDate.Value.ToString("dd-MM-yyyy")</td>
                                                     }
                                                     else
                                                     {
-                                                        <a class="fa fa-toggle-off" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"> </a>
+                                                        <td> </td>
                                                     }
+                                                    <td class="text-center">@item.LastUpdated.ToString("dd-MM-yyyy")</td>
+                                                    <td class="text-center">@(item.Active == 1 ? "Activo" : "Inactivo")</td>
+                                                    <td class="text-center">
 
-                                                </td>
-                                            </tr>
+                                                        @Html.ActionLink(" ", "AddUser", new { id = item.Id }, new { @class = "fa fa-pencil" })
+                                                        &nbsp;
+
+                                                        @if (item.Active == 1)
+                                                        {
+                                                            <a class="fa fa-toggle-on" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"></a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a class="fa fa-toggle-off" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"> </a>
+                                                        }
+
+                                                    </td>
+                                                </tr>
+                                            }
                                         }
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                    </tbody>
+                                </table>
+                            </div>
 
-                        <!--Paginacón de la tabla-->
-                        <div class="pull-right table-pagination padding-top-10">
-                            @if (Model.Users.Count > 0)
-                            {
-                                <span class="text-muted">
-                                    <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.Users.Count ? (Model.Page) * Model.Length + Model.Users.Count : (Model.Page + 1) * Model.Length)</strong>
-                                </span>
-                                <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
-                                    <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
-                                        <span class="fa fa-chevron-left"></span>
-                                    </a>
-                                    <a class="btn btn-default paginate-btn next-page" @(Model.Users.Count < Model.Length ? "disabled=\"disabled\"" : "")>
-                                        <span class="fa fa-chevron-right"></span>
-                                    </a>
-                                </div>
-                            }
-                        </div>
+                            <!--Paginacón de la tabla-->
+                            <div class="pull-right table-pagination padding-top-10">
+                                @if (Model.Users.Count > 0)
+                                {
+                                    <span class="text-muted">
+                                        <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.Users.Count ? (Model.Page) * Model.Length + Model.Users.Count : (Model.Page + 1) * Model.Length)</strong>
+                                    </span>
+                                    <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
+                                        <a class="btn btn-default paginate-btn prev-page"
+                                           href="@Url.Action("AddUser", "ExternalUsers", new { id = Model.Id, Page = Model.Page - 1 })"
+                                           @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                                            <span class="fa fa-chevron-left"></span>
+                                        </a>
+                                        <a class="btn btn-default paginate-btn next-page"
+                                           href="@Url.Action("AddUser", "ExternalUsers", new { id = Model.Id, Page = Model.Page + 1 })"
+                                           @(Model.Users.Count < Model.Length ? "disabled=\"disabled\"" : "")>
+                                            <span class="fa fa-chevron-right"></span>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
 
+                        </div>
                     </div>
-                </div>
-            </div>
+                </div>}
         </div>
     </div>
 </div>
@@ -410,7 +420,7 @@
 {
     @Scripts.Render("~/bundles/jqueryval")
 
-<script>
+    <script>
         var listMenu;
         var userId = "";
         var reloadView = false;
@@ -455,43 +465,16 @@
             $('#btnAbrirModalConfirmacion').click(function () {
                 var form = $('#add-user-form');
                 console.log(form.valid());
+                $("#IdSinPermisos").text("");
                 if (form.valid()) {
                     var permissions = getPermissions();
-                    if (permissions === "[]")
-                    {
-                        $.niftyNoty({
-                            type:  "danger",
-                            container: "floating",
-                            title: "Permisos",
-                            message: "No ha seleccionado los Permisos para el Usuario",
-                            closeBtn: false,
-                            timer: 5000
-                        });
-                    }
+                    if (permissions === "[]") 
+                        $("#IdSinPermisos").text("No ha seleccionado los Permisos para el Usuario");
                     else
                         showModalSave();
                 }
             });
 
-            $('#btnAbrirModalConfirmacion').click(function () {
-                var form = $('#add-user-form');
-                console.log(form.valid());
-                if (form.valid()) {
-                    var permissions = getPermissions();
-                    if (permissions === "[]") {
-                        $.niftyNoty({
-                            type: "danger",
-                            container: "floating",
-                            title: "Permisos",
-                            message: "No ha seleccionado los Permisos para el Usuario",
-                            closeBtn: false,
-                            timer: 5000
-                        });
-                    }
-                    else
-                        showModalSave();
-                }
-            });
 
             $("#btnOkActive").click(function () {
 
@@ -501,7 +484,7 @@
                     data: {
                         userId: userActive, active: $("#btnOkActive").text(), activeDescription: $("#txtActiveDescription").val(), email: userActiveEmail },
                     datatype: "json",
-                    success: function (res) {
+                    success: function (res) { 
                         if (res.StatusCode == 'OK') {
                             reloadView = true;
 
@@ -558,10 +541,12 @@
                 }
             }
 
-            if ($("#hddMessage").val() != null && $("#hddMessage").val() != '') {
-                if  ($("#Id").val().length > 0) clickOpenModalGenerico('Edicion');
-                else clickOpenModalGenerico('Creacion');
-                document.getElementById("hddMessage").value = '';
+            if ($("#hddMessage").val() != null && $("#hddMessage").val() != '') { 
+                if ($("#hddMessage").val() == "Usuario actualizado exitosamente!" || $("#hddMessage").val() == "Usuario Registrado exitosamente!") {
+                    if  ($("#Id").val().length > 0) clickOpenModalGenerico('Edicion');
+                    else clickOpenModalGenerico('Creacion');
+                    document.getElementById("hddMessage").value = '';
+                }
             }
 
 
@@ -572,13 +557,11 @@
 
             // Pagination
             $('.next-page').click(function () {
-                $('#page').val(@Model.Page + 1);
-                formu.submit();
+                $('#Page').val(@Model.Page + 1); 
             });
-
+            
             $('.prev-page').click(function () {
-                $('#page').val(@Model.Page - 1);
-                formu.submit();
+                $('#Page').val(@Model.Page - 1); 
             });
             // Pagination
 
@@ -663,8 +646,8 @@
             return JSON.stringify(arrPermissions);
         }
 
-        function reloadPage() {
-            location.href = "@Url.Action("AddUser","ExternalUsers", new { id = "" })";
+        function reloadPage() { 
+            location.href = "@Url.Action("AddUser","ExternalUsers", new { id = "" , Page = Model.Page })";
         }
 
         function showModalSave() {
@@ -676,8 +659,7 @@
             $("#ModalSave").modal('show');
         }
 
-        function confirmActive(userActiveId, accionActive, emailActive) {
-
+        function confirmActive(userActiveId, accionActive, emailActive) { 
             userActive = userActiveId;
             userActiveEmail = emailActive;
 
@@ -715,7 +697,7 @@
             showModalGenerico();
         }
 
- 
+
 
         function HideModalSave() {
             $("#ModalSave").modal('hide');
@@ -730,5 +712,5 @@
 
 
 
-</script>
+    </script>
 }

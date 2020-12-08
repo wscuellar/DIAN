@@ -12,6 +12,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
@@ -64,7 +65,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
-        public ActionResult AddUser(string id = "")
+        public ActionResult AddUser(string id = "", int Page = 0)
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.ExternalUsersCreate;
 
@@ -148,7 +149,9 @@ namespace Gosocket.Dian.Web.Controllers
                 model.Id = string.Empty;
             }
 
+            model.Page = Page;
             model.Users = this.LoadExternalUsersViewBags(uCompany.Code, model.Page, 10);
+            
             ViewBag.ExternalUsersList = model.Users;
 
             return View(model);
@@ -271,6 +274,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return View(model);
             }
 
+            model.Names = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(model.Names);
             var user = new ApplicationUser
             {
                 CreatorNit = uCompany.Code,
@@ -425,6 +429,7 @@ namespace Gosocket.Dian.Web.Controllers
                         Names = model.Names,
                         Email = model.Email
                     }) + ", permisos: " + JsonConvert.SerializeObject(permissions), "Actualización de Permisos");
+                    //model.Page = 0;
 
                     //Envio de notificacion por correo
                     _ = SendMailUpdate(model);
