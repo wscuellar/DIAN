@@ -40,7 +40,7 @@ namespace Gosocket.Dian.Web.Controllers
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
             if (radianAdmin.Contributor.RadianState == "Cancelado")
             {
-                return RedirectToAction("ElectronicInvoiceView", "RadianController");
+                return RedirectToAction("Index", "Radian");
             }
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
