@@ -502,7 +502,6 @@
                         userId: userActive, active: $("#btnOkActive").text(), activeDescription: $("#txtActiveDescription").val(), email: userActiveEmail },
                     datatype: "json",
                     success: function (res) {
-                        debugger;
                         if (res.StatusCode == 'OK') {
                             reloadView = true;
 
@@ -679,7 +678,6 @@
 
         function confirmActive(userActiveId, accionActive, emailActive) {
 
-            debugger;
             userActive = userActiveId;
             userActiveEmail = emailActive;
 

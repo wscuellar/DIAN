@@ -84,6 +84,7 @@ function RenderSteps(index) {
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").toggle();
             $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle(); 
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").children("input").attr("value", actualFileObj.name);
+            $(this).parents(".inputs-dinamics").children(".file-input-disabled").children(".file-size").html("(" + actualFileSize + " Mb)");
         }
            
         validator = form.validate({
@@ -98,7 +99,7 @@ function RenderSteps(index) {
     })
 }
 
-function RenderTable(paramsObject) {debugger
+function RenderTable(paramsObject) {
     var totalPages = Math.round(paramsObject.customersTotalCount / 10) + 1 ;
     paramsObject.tableRendered && paramsObject.tableRendered.destroy();
     paramsObject.tableRendered = $(paramsObject.element).DataTable({
@@ -164,7 +165,7 @@ function LoadEventsToPagiantion(paramsObject) {
     });
 }
 
-function TablePagination(page, totalCount) {debugger
+function TablePagination(page, totalCount) {
     var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : ""; 
     var disabledPrev = page == 1 ? 'disabled="disabled"' : "";
     var html = '<div class="pagination-controls pull-right"><span class="text-muted">\

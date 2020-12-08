@@ -793,12 +793,12 @@ h4.text-thin {
 #progress-wrp {
     border: 1px solid #0099CC;
     padding: 1px;
-    border-radius: 3px;
+    border-radius: 4px;
     margin: 10px;
     text-align: left;
     background: #fff;
     box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.12);
-    width: 38%;
+    width: 93px;
     position: absolute;
     bottom: 3px;
     right: 21px;
@@ -1330,4 +1330,13 @@ button.selectpicker .fa-caret-down {
 
 .cancel-confirmation .modal-footer {
     display: none;
+}
+
+.file-size {
+    font-weight: bold;
+    font-size: 12px;
+    color: #717171;
+    position: absolute;
+    right: 130px;
+    bottom: 11px;
 }

@@ -224,6 +224,9 @@
                             }
                             showConfirmation(data.message, AlertExec(operation));
                         },
+                        error: (error) => {
+                            showConfirmation(error, AlertExec());
+                        }
                     });
                 }
             } else {
