@@ -126,10 +126,15 @@ namespace Gosocket.Dian.Application
             RadianAdmin result = _radianContributorService.ContributorSummary(contributorId, radianContributorType);
             List<GlobalRadianOperations> operations = _globalRadianOperationService.OperationList(result.Contributor.Code);
             GlobalRadianOperations currentOperation = operations.OrderByDescending(t => t.Timestamp).FirstOrDefault();
-            if (currentOperation != null && currentOperation.RadianStatus == RadianState.Habilitado.GetDescription())
+            if (result.Contributor.RadianState == RadianState.Test.GetDescription() && currentOperation != null && currentOperation.RadianStatus == RadianState.Habilitado.GetDescription())
             {
                 result.Step = 4;
                 result.Contributor.RadianState = RadianState.Habilitado.GetDescription();
+                _radianContributorService.ChangeParticipantStatus(result.Contributor.Id,
+                                                                  result.Contributor.RadianState,
+                                                                  result.Contributor.RadianContributorTypeId,
+                                                                  RadianState.Test.GetDescription(),
+                                                                  "Participante Habilitado");
             }
             return result;
         }
