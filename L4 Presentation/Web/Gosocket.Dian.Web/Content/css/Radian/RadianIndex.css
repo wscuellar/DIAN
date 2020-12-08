@@ -800,7 +800,7 @@ h4.text-thin {
     box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.12);
     width: 38%;
     position: absolute;
-    top: 30px;
+    bottom: 3px;
     right: 21px;
 }
 
@@ -972,7 +972,7 @@ span.close {
     opacity: 1;
     font-weight: 100 !important;
     position: absolute;
-    top: 27px;
+    bottom: 3px;
     right: 0;
     margin: 10px;
 }

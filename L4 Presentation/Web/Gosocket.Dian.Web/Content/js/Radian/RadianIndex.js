@@ -34,10 +34,10 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFu
         success: function (data) {
             if (showMessage) {
                 if (data.MessageType === "alert") {
-                    showConfirmation(data.Message, AlertExec(cancelFunction), null);
+                    showConfirmation(data.Message, AlertExec(cancelFunction));
                 }
                 if (data.MessageType === "confirm") {
-                    showConfirmation(data.Message, ConfirmExec(method, jsonvalue, null, cancelFunction), null);
+                    showConfirmation(data.Message, ConfirmExec(method, jsonvalue, cancelFunction));
                 }
                 if (data.MessageType === "redirect") {
                     operationClick = false;
@@ -52,13 +52,13 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFu
     });
 }
 
-function showConfirmation(confirmMessage, buttons, className, onScapeFunction) {
+function showConfirmation(confirmMessage, buttons, className) {
     bootbox.dialog({
         className: className && className,
         message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
         buttons: buttons,
         onEscape: () => {
-            onScapeFunction ? onScapeFunction() : window.location.reload();
+            window.location.reload();
         }
     });
 
