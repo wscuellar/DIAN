@@ -52,13 +52,13 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFu
     });
 }
 
-function showConfirmation(confirmMessage, buttons, className) {
+function showConfirmation(confirmMessage, buttons, className, operationCancel) {
     bootbox.dialog({
         className: className && className,
         message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
         buttons: buttons,
         onEscape: () => {
-            window.location.reload();
+            operationCancel ? operationCancel() : window.location.reload();
         }
     });
 
