@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.Entity;
 using System.Linq;
-using System.Xml;
 
 namespace Gosocket.Dian.Application
 {
@@ -120,7 +119,7 @@ namespace Gosocket.Dian.Application
 
         public RadianAdmin ListParticipants(int page, int size)
         {
-            string cancelState = Domain.Common.RadianState.Cancelado.GetDescription();
+            string cancelState = RadianState.Cancelado.GetDescription();
             PagedResult<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.RadianState != cancelState, page, size);
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
@@ -211,7 +210,7 @@ namespace Gosocket.Dian.Application
                         RadianContributorTypeId = c.RadianContributorTypeId,
                         RadianOperationModeId = c.RadianOperationModeId
                     },
-                    Files = c.RadianContributorFile.ToList(),
+                    Files = c.RadianContributorFile.Where(t=> !t.Deleted).ToList(),
                     FileTypes = fileTypes,
                     Tests = testSet,
                     LegalRepresentativeIds = userIds,
@@ -238,7 +237,7 @@ namespace Gosocket.Dian.Application
 
             if (competitor.RadianState != RadianState.Test.GetDescription() && competitor.RadianState != RadianState.Cancelado.GetDescription())
                 return true;
-            
+
             if (competitor.RadianState == RadianState.Cancelado.GetDescription())
             {
                 List<RadianContributorFile> files = _radianContributorFileRepository.List(t => t.RadianContributorId == competitor.Id);
@@ -263,14 +262,12 @@ namespace Gosocket.Dian.Application
         {
             RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorId);
 
-            if (radianContributor != null)
-            {
-                radianContributor.Step = step;
-                _radianContributorRepository.AddOrUpdate(radianContributor);
-                return true;
-            }
+            if (radianContributor == null)
+                return false;
 
-            return false;
+            radianContributor.Step = step;
+            _radianContributorRepository.AddOrUpdate(radianContributor);
+            return true;
         }
 
         public Guid UpdateRadianContributorFile(RadianContributorFile radianContributorFile)
@@ -282,7 +279,7 @@ namespace Gosocket.Dian.Application
         {
             RadianContributor existing = _radianContributorRepository.Get(t => t.ContributorId == contributorId && t.RadianContributorTypeId == (int)radianContributorType);
 
-            RadianContributor newRadianContributor = new Domain.RadianContributor()
+            RadianContributor newRadianContributor = new RadianContributor()
             {
                 Id = existing != null ? existing.Id : 0,
                 ContributorId = contributorId,
@@ -290,7 +287,7 @@ namespace Gosocket.Dian.Application
                 RadianContributorTypeId = (int)radianContributorType,
                 RadianOperationModeId = (int)radianOperationMode,
                 RadianState = radianState.GetDescription(),
-                CreatedDate = existing != null ? existing.CreatedDate : System.DateTime.Now
+                CreatedDate = existing != null ? existing.CreatedDate : DateTime.Now
             };
             newRadianContributor.Id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
             if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
@@ -332,31 +329,6 @@ namespace Gosocket.Dian.Application
             }
 
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
-        }
-
-        public string getXmlBase64Report()
-        {
-            //Header 
-            XmlDocument report = new XmlDocument();
-            XmlDeclaration xmlDeclaration = report.CreateXmlDeclaration("1.0", "UTF-8", null);
-            XmlElement root = report.DocumentElement;
-            report.InsertBefore(xmlDeclaration, root);
-            XmlElement element1 = report.CreateElement(string.Empty, "cuerpo", string.Empty);
-            report.AppendChild(element1);
-            XmlElement element2 = report.CreateElement(string.Empty, "nivel1", string.Empty);
-            element1.AppendChild(element2);
-            XmlElement element3 = report.CreateElement(string.Empty, "nivel2", string.Empty);
-            XmlText text1 = report.CreateTextNode("texto");
-            element3.AppendChild(text1);
-            element2.AppendChild(element3);
-            XmlElement element4 = report.CreateElement(string.Empty, "nivel3", string.Empty);
-            XmlText text2 = report.CreateTextNode("más texto");
-            element4.AppendChild(text2);
-            element2.AppendChild(element4);
-            report.Save("C://ruta//xml_ejemplo.xml");
-
-
-            return string.Empty;
         }
 
     }
