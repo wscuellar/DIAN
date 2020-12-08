@@ -9,13 +9,8 @@ namespace Gosocket.Dian.Interfaces.Services
 {
     public interface IRadianApprovedService
     {
-       // List<Domain.RadianOperationMode> ListSoftwareModeOperation();
 
         List<RadianContributor> ListContributorByType(int radianContributorTypeId);
-
-        List<Software> ListSoftwareByContributor(int radianContributorId);
-
-       Tuple<string,string> FindNamesContributorAndSoftware(int radianContributorId, string softwareId);
 
         RadianContributor GetRadianContributor(int radianContributorId);
 
@@ -44,11 +39,15 @@ namespace Gosocket.Dian.Interfaces.Services
         RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId);
 
         List<RadianSoftware> SoftwareList(int radianContributorId);
+
         List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term);
+
         PagedResult<RadianCustomerList> CustormerList(int radianContributorId, string code, RadianState radianState, int page, int pagesize);
 
         PagedResult<RadianContributorFileHistory> FileHistoryFilter(string fileName, string initial, string end, int page, int pagesize);
+
         RadianSoftware GetSoftware(Guid id);
+
         RadianSoftware GetSoftware(int radianContributorId, int softwareType);
     }
 }
