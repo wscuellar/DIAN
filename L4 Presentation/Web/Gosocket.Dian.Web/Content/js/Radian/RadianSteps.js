@@ -200,7 +200,6 @@ function cancelRegister(cancelData) {
     };
     var dataAjax = {
         id: cancelData.id,
-        newState: '4',
         radianContributorTypeId: cancelData.type,
         radianState: cancelData.state
                 };

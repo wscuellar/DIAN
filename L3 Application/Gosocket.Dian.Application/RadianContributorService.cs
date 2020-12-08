@@ -145,7 +145,7 @@ namespace Gosocket.Dian.Application
 
         public RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size)
         {
-            string cancelState = Domain.Common.RadianState.Cancelado.GetDescription();
+            string cancelState = RadianState.Cancelado.GetDescription();
             string stateDescriptionFilter = filter.RadianState == null ? string.Empty : filter.RadianState.GetDescription();
             DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
             DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
@@ -226,31 +226,42 @@ namespace Gosocket.Dian.Application
         {
             List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorTypeId && t.RadianState == actualState).Results;
 
-            if (contributors.Any())
+            if (!contributors.Any())
+                return false;
+
+            RadianContributor competitor = contributors.FirstOrDefault();
+            competitor.RadianState = newState;
+            competitor.Description = description;
+
+            if (newState == RadianState.Test.GetDescription()) competitor.Step = 3;
+            if (newState == RadianState.Habilitado.GetDescription()) competitor.Step = 4;
+            if (newState == RadianState.Cancelado.GetDescription()) competitor.Step = 1;
+
+            _radianContributorRepository.AddOrUpdate(competitor);
+
+            if (competitor.RadianState == RadianState.Test.GetDescription() || competitor.RadianState == RadianState.Cancelado.GetDescription())
             {
-                RadianContributor radianContributor = contributors.FirstOrDefault();
-                radianContributor.RadianState = newState;
-                radianContributor.Description = description;
-
-                if (newState == RadianState.Test.GetDescription())
-                    radianContributor.Step = 3;
-                if (newState == RadianState.Habilitado.GetDescription())
-                    radianContributor.Step = 4;
-                _radianContributorRepository.AddOrUpdate(radianContributor);
-
-                if (radianContributor.RadianState == RadianState.Test.GetDescription() || radianContributor.RadianState == RadianState.Cancelado.GetDescription())
+                if (competitor.RadianState == RadianState.Cancelado.GetDescription())
                 {
-                    List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(radianContributor.Contributor.Code);
-                    GlobalRadianOperations operations = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
-                    operations.Deleted = radianContributor.RadianState == RadianState.Cancelado.GetDescription();
-                    operations.RadianStatus = radianContributor.RadianState;
-                    _globalRadianOperationService.Update(operations);
+                    List<RadianContributorFile> files = _radianContributorFileRepository.List(t => t.RadianContributorId == competitor.Id);
+                    if (files.Any())
+                        foreach (RadianContributorFile file in files)
+                        {
+                            file.Deleted = true;
+                            _radianContributorFileRepository.AddOrUpdate(file);
+                        }
                 }
-
-                return true;
+                List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(competitor.Contributor.Code);
+                GlobalRadianOperations operations = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
+                operations.Deleted = competitor.RadianState == RadianState.Cancelado.GetDescription();
+                operations.RadianStatus = competitor.RadianState;
+                _globalRadianOperationService.Update(operations);
             }
 
-            return false;
+            return true;
+
+
+
         }
 
         public bool ChangeContributorStep(int radianContributorId, int step)

@@ -39,8 +39,6 @@ namespace Gosocket.Dian.Web.Controllers
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId, (int)registrationData.RadianContributorType);
             List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
 
-            
-
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
                 Contributor = radianAdmin.Contributor,
@@ -311,9 +309,10 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult DeleteUser(int id, string newState, int radianContributorTypeId, string radianState, string description)
+        public ActionResult DeleteUser(int id, int radianContributorTypeId, string radianState, string description)
         {
-            _radianContributorService.ChangeParticipantStatus(id, newState, radianContributorTypeId, radianState, description);
+            string state = RadianState.Cancelado.GetDescription();
+            _radianContributorService.ChangeParticipantStatus(id, state, radianContributorTypeId, radianState, description);
             return Json(new
             {
                 message = "Datos actualizados",

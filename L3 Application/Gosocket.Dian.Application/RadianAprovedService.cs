@@ -16,7 +16,6 @@ namespace Gosocket.Dian.Application
     {
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianTestSetService _radianTestSetService;
-        private readonly IContributorService _contributorService;
         private readonly IRadianContributorService _radianContributorService;
         private readonly IRadianContributorFileTypeService _radianContributorFileTypeService;
         private readonly IRadianContributorOperationRepository _radianContributorOperationRepository;
@@ -37,7 +36,6 @@ namespace Gosocket.Dian.Application
                                     IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository,
                                     IContributorOperationsService contributorOperationsService,
                                     IRadianTestSetResultService radianTestSetResultService,
-                                    IContributorService contributorService,
                                     IRadianCallSoftwareService radianCallSoftwareService,
                                     IGlobalRadianOperationService globalRadianOperationService)
         {
@@ -50,7 +48,6 @@ namespace Gosocket.Dian.Application
             _radianContributorFileHistoryRepository = radianContributorFileHistoryRepository;
             _contributorOperationsService = contributorOperationsService;
             _radianTestSetResultService = radianTestSetResultService;
-            _contributorService = contributorService;
             _radianCallSoftwareService = radianCallSoftwareService;
             _globalRadianOperationService = globalRadianOperationService;
         }
@@ -150,10 +147,10 @@ namespace Gosocket.Dian.Application
             return contributorOperations.FirstOrDefault(t => !t.Deleted && t.OperationModeId == (int)Domain.Common.OperationMode.Own && t.Software != null && t.Software.Status)?.Software ?? default;
         }
 
-        public List<RadianContributorFileType> ContributorFileTypeList(int radianContributorTypeId)
+        public List<RadianContributorFileType> ContributorFileTypeList(int typeId)
         {
             List<RadianContributorFileType> contributorTypeList = _radianContributorFileTypeService.FileTypeList()
-                .Where(ft => ft.RadianContributorTypeId == radianContributorTypeId && !ft.Deleted).ToList();
+                .Where(ft => ft.RadianContributorTypeId == typeId && !ft.Deleted).ToList();
 
             return contributorTypeList;
         }
@@ -242,7 +239,7 @@ namespace Gosocket.Dian.Application
             Contributor contributor = radianContributor.Contributor;
             GlobalRadianOperations item = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString())
             {
-                RadianStatus = existingOperation.RadianContributor.RadianState,
+                RadianStatus = RadianState.Test.GetDescription(),
                 SoftwareType = existingOperation.SoftwareType,
                 RadianContributorTypeId = radianContributor.RadianContributorTypeId,
                 Deleted = false
