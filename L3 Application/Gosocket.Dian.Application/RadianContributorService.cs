@@ -181,7 +181,7 @@ namespace Gosocket.Dian.Application
             if (radianContributorType != 0)
                 radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorType).Results;
             else
-                radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId).Results;
+                radianContributors = _radianContributorRepository.List(t => t.Id == contributorId).Results;
 
             List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(contributorId).ToList();
             List<string> userIds = _contributorService.GetUserContributors(contributorId).Select(u => u.UserId).ToList();
