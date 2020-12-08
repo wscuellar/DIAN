@@ -1340,3 +1340,11 @@ button.selectpicker .fa-caret-down {
     right: 130px;
     bottom: 11px;
 }
+
+.dis-flex{
+    display: flex;
+}
+
+.dis-flex img{
+    margin: 0 9px;
+}
