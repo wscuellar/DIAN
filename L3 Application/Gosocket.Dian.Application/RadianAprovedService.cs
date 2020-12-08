@@ -52,53 +52,10 @@ namespace Gosocket.Dian.Application
             _globalRadianOperationService = globalRadianOperationService;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="radianContributorId"></param>
-        /// <param name="softwareId"></param>
-        /// <returns></returns>
-        public Tuple<string, string> FindNamesContributorAndSoftware(int radianContributorId, string softwareId)
-        {
-            string radianContributorName = "No se encontró el contribuyente";
-            string softwareName = "No hay software asociado al contribuyente";
-
-            RadianContributor radianContributor = _radianContributorRepository
-                .Get(rc => rc.ContributorId == radianContributorId);
-
-            if (radianContributor != null)
-            {
-                radianContributorName = radianContributor.Contributor.Name;
-                Software software = radianContributor
-                    .Contributor
-                    .Softwares
-                    .FirstOrDefault(s => s.Id.ToString() == softwareId);
-
-                if (software != null)
-                {
-                    softwareName = software.Name;
-                }
-            }
-
-            Tuple<string, string> data = Tuple.Create(radianContributorName, softwareName);
-
-            return data;
-        }
 
         public List<RadianContributor> ListContributorByType(int radianContributorTypeId)
         {
             return _radianContributorRepository.List(t => t.RadianContributorTypeId == radianContributorTypeId).Results;
-        }
-
-        // Manquip
-        public List<Software> ListSoftwareByContributor(int radianContributorId)
-        {
-            List<Software> softwares = _radianContributorRepository
-                .Get(rc => rc.ContributorId == radianContributorId)
-                .Contributor
-                .Softwares.ToList();
-
-            return softwares;
         }
 
 
@@ -121,18 +78,6 @@ namespace Gosocket.Dian.Application
         public RadianAdmin ContributorSummary(int contributorId, int radianContributorType)
         {
             RadianAdmin result = _radianContributorService.ContributorSummary(contributorId, radianContributorType);
-            List<GlobalRadianOperations> operations = _globalRadianOperationService.OperationList(result.Contributor.Code);
-            GlobalRadianOperations currentOperation = operations.OrderByDescending(t => t.Timestamp).FirstOrDefault();
-            if (result.Contributor.RadianState == RadianState.Test.GetDescription() && currentOperation != null && currentOperation.RadianStatus == RadianState.Habilitado.GetDescription())
-            {
-                result.Step = 4;
-                result.Contributor.RadianState = RadianState.Habilitado.GetDescription();
-                _radianContributorService.ChangeParticipantStatus(result.Contributor.Id,
-                                                                  result.Contributor.RadianState,
-                                                                  result.Contributor.RadianContributorTypeId,
-                                                                  RadianState.Test.GetDescription(),
-                                                                  "Participante Habilitado");
-            }
             return result;
         }
 

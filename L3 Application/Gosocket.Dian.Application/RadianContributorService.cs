@@ -225,42 +225,37 @@ namespace Gosocket.Dian.Application
         public bool ChangeParticipantStatus(int contributorId, string newState, int radianContributorTypeId, string actualState, string description)
         {
             List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorTypeId && t.RadianState == actualState).Results;
-
             if (!contributors.Any())
                 return false;
 
             RadianContributor competitor = contributors.FirstOrDefault();
             competitor.RadianState = newState;
             competitor.Description = description;
-
             if (newState == RadianState.Test.GetDescription()) competitor.Step = 3;
             if (newState == RadianState.Habilitado.GetDescription()) competitor.Step = 4;
             if (newState == RadianState.Cancelado.GetDescription()) competitor.Step = 1;
-
             _radianContributorRepository.AddOrUpdate(competitor);
 
-            if (competitor.RadianState == RadianState.Test.GetDescription() || competitor.RadianState == RadianState.Cancelado.GetDescription())
+            if (competitor.RadianState != RadianState.Test.GetDescription() && competitor.RadianState != RadianState.Cancelado.GetDescription())
+                return true;
+            
+            if (competitor.RadianState == RadianState.Cancelado.GetDescription())
             {
-                if (competitor.RadianState == RadianState.Cancelado.GetDescription())
-                {
-                    List<RadianContributorFile> files = _radianContributorFileRepository.List(t => t.RadianContributorId == competitor.Id);
-                    if (files.Any())
-                        foreach (RadianContributorFile file in files)
-                        {
-                            file.Deleted = true;
-                            _radianContributorFileRepository.AddOrUpdate(file);
-                        }
-                }
-                List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(competitor.Contributor.Code);
-                GlobalRadianOperations operations = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
-                operations.Deleted = competitor.RadianState == RadianState.Cancelado.GetDescription();
-                operations.RadianStatus = competitor.RadianState;
-                _globalRadianOperationService.Update(operations);
+                List<RadianContributorFile> files = _radianContributorFileRepository.List(t => t.RadianContributorId == competitor.Id);
+                if (files.Any())
+                    foreach (RadianContributorFile file in files)
+                    {
+                        file.Deleted = true;
+                        _radianContributorFileRepository.AddOrUpdate(file);
+                    }
             }
+            List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(competitor.Contributor.Code);
+            GlobalRadianOperations operations = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
+            operations.Deleted = competitor.RadianState == RadianState.Cancelado.GetDescription();
+            operations.RadianStatus = competitor.RadianState;
+            _globalRadianOperationService.Update(operations);
 
             return true;
-
-
 
         }
 
