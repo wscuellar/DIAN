@@ -156,7 +156,7 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
         },
         callback: function (result) {
             if (!result && result != "") {
-                operationCancel();
+                operationCancel && operationCancel();
             } else {
                 event(result);
             }
