@@ -268,10 +268,32 @@ namespace Gosocket.Dian.Services.Utils
         {
             var ticketId = processResultEntity.DocumentKey;
 
-            return new XElement(cac + "DocumentReference",
-                        new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
-                        new XElement(cbc + "UUID", ticketId,
-                            new XAttribute("schemeName", "CUFE-SHA384")));
+            switch (processResultEntity.DocumentTypeId)
+            {
+                case "11":
+                case "12":
+                    {
+                        return new XElement(cac + "DocumentReference",
+                               new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
+                               new XElement(cbc + "UUID", ticketId,
+                                new XAttribute("schemeName", "CUNE-SHA384")));
+                    }
+                case "96":
+                    {
+                        return new XElement(cac + "DocumentReference",
+                              new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
+                              new XElement(cbc + "UUID", ticketId,
+                                  new XAttribute("schemeName", "CUDE-SHA384")));
+                    }
+                default:
+                    {
+                        return new XElement(cac + "DocumentReference",
+                               new XElement(cbc + "ID", $"{processResultEntity.SerieAndNumber}"),
+                               new XElement(cbc + "UUID", ticketId,
+                                   new XAttribute("schemeName", "CUFE-SHA384")));
+                    }
+            }
+
         }
 
         public static XElement BuildResponseLineResponse(int line, long nsu)

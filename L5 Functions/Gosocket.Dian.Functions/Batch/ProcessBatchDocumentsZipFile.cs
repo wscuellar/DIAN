@@ -1,3 +1,4 @@
+using Gosocket.Dian.Application;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
@@ -29,12 +30,13 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerGlobalBatchFileRuntime = new TableManager("GlobalBatchFileRuntime");
         private static readonly TableManager tableManagerGlobalBigContributorRequestAuthorization = new TableManager("GlobalBigContributorRequestAuthorization");
         private static readonly TableManager tableManagerGlobalTestSetResult = new TableManager("GlobalTestSetResult");
-
+        private static readonly TableManager tableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
+        private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
         // Set queue name
         private const string queueName = "global-process-batch-zip-input%Slot%";
 
         [FunctionName("ProcessBatchDocumentsZipFile")]
-        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             var testSetId = string.Empty;
@@ -92,7 +94,7 @@ namespace Gosocket.Dian.Functions.Batch
                         return;
                     }
                 }
-                
+
                 var threads = int.Parse(ConfigurationManager.GetValue("BatchThreads"));
 
                 BlockingCollection<ResponseXpathDataValue> xPathDataValueResponses = new BlockingCollection<ResponseXpathDataValue>();
@@ -281,32 +283,95 @@ namespace Gosocket.Dian.Functions.Batch
                         GlobalTestSetResult testSetResultEntity = null;
                         var testSetResults = tableManagerGlobalTestSetResult.FindByPartition<GlobalTestSetResult>(code);
 
-                        if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
-                            testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
+                        if (testSetResults != null)  // Roberto Alvarado 2020-11-24 
+                        {
+                            if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
+                                testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
 
-                        else if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
-                            testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
+                            else if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
+                                testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
 
-                        else if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
-                            testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
+                            else if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
+                                testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
 
-                        else if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
-                            testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
+                            else if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
+                                testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
 
-                        else if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
-                            testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
+                            else if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
+                                testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
 
-                        else if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
-                            testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
+                            else if (testSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
+                                testSetResultEntity = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
 
-                        if (testSetResultEntity == null)
-                            result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} no tiene habilitado set de prueba para software con id {softwareId}" });
-                        else if (testSetResultEntity.Id != testSetId)
-                            result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} es incorrecto." });
-                        else if (testSetResultEntity.Status == (int)TestSetStatus.Accepted)
-                            result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Accepted)}." });
-                        else if (testSetResultEntity.Status == (int)TestSetStatus.Rejected)
-                            result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
+
+                            if (testSetResultEntity == null)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} no tiene habilitado set de prueba para software con id {softwareId}" });
+                            else if (testSetResultEntity.Id != testSetId)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} es incorrecto." });
+                            else if (testSetResultEntity.Status == (int)TestSetStatus.Accepted)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Accepted)}." });
+                            else if (testSetResultEntity.Status == (int)TestSetStatus.Rejected)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
+
+                        }
+                        else
+                        {
+                            bool isActive = globalRadianOperationService.IsActive(code, new Guid(softwareId));
+                            if (isActive)
+                            {
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} ya esta autorizado con el software {softwareId}." });
+                                return result;
+                            }
+
+                            // Validations to RADIAN  
+                            var radianTestSetResults = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
+                            RadianTestSetResult radianTestSetResultEntity = null;
+
+                            if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
+
+                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
+
+                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
+
+                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
+
+                            if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
+
+                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
+
+                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
+
+                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
+
+                            if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
+
+                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
+
+                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
+
+                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
+                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
+
+                            if (radianTestSetResultEntity == null)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} no tiene habilitado set de prueba para software con id {softwareId}" });
+                            else if (radianTestSetResultEntity.Id != testSetId)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} es incorrecto." });
+                            else if (radianTestSetResultEntity.Status == (int)TestSetStatus.Accepted)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Accepted)}." });
+                            else if (radianTestSetResultEntity.Status == (int)TestSetStatus.Rejected)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
+                        }
                     }
                 }
             }

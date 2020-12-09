@@ -11,13 +11,16 @@ namespace Gosocket.Dian.Functions.Utils
     public class HtmlGDoc
     {
         readonly XmlDocument _xml;
+        readonly XmlDocument _xmlApplication;
         readonly XmlNamespaceManager _nsmgr;
         readonly byte[] _document;
 
-        public HtmlGDoc(byte[] document)
+        public HtmlGDoc(byte[] document, byte[] application)
         {
             _document = document;
             _xml = new XmlDocument();
+            _xmlApplication = new XmlDocument();
+
             using (var ms = new MemoryStream(document))
             {
                 using (var sr = new StreamReader(ms, Encoding.UTF8))
@@ -26,12 +29,48 @@ namespace Gosocket.Dian.Functions.Utils
                     _xml.Load(sr);
                 }
             }
+
+            if (application != null)
+            {
+                using (var ms = new MemoryStream(application))
+                {
+                    using (var sr = new StreamReader(ms, Encoding.UTF8))
+                    {
+                        _xmlApplication.XmlResolver = null;
+                        _xmlApplication.Load(sr);
+                    }
+                }
+            }
+
             _nsmgr = new XmlNamespaceManager(_xml.NameTable);
             _nsmgr.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
             _nsmgr.AddNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
             _nsmgr.AddNamespace("ext", "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2");
             _nsmgr.AddNamespace("sts", "http://www.dian.gov.co/contratos/facturaelectronica/v1/Structures");
             _nsmgr.AddNamespace("fe", _xml.DocumentElement.NamespaceURI);
+
+            //Add new element to XML after validation
+            if (_xmlApplication.OuterXml != null && _xmlApplication.OuterXml != "")
+            {
+                var stringDescription = _xmlApplication.SelectSingleNode(@"/descendant::*[local-name()='ApplicationResponse']/descendant::*[local-name()='DocumentResponse']/descendant::*[local-name()='Response']/descendant::*[local-name()='Description']", _nsmgr)?.InnerText;
+                var stringIssueDate = _xmlApplication.SelectSingleNode(@"/descendant::*[local-name()='ApplicationResponse']/descendant::*[local-name()='IssueDate']", _nsmgr)?.InnerText;
+                var stringIssueTime = _xmlApplication.SelectSingleNode(@"/descendant::*[local-name()='ApplicationResponse']/descendant::*[local-name()='IssueTime']", _nsmgr)?.InnerText;
+                var stringSigningTime = _xml.SelectSingleNode(@"/descendant::*[local-name()='UBLExtension']/descendant::*[local-name()='ExtensionContent']/descendant::*[local-name()='Signature']/descendant::*[local-name()='Object']/descendant::*[local-name()='QualifyingProperties']/descendant::*[local-name()='SignedProperties']/descendant::*[local-name()='SignedSignatureProperties']/descendant::*[local-name()='SigningTime']", _nsmgr)?.InnerText;
+                var stringDocument = "Documento generado el: ";
+                DateTime fecha = Convert.ToDateTime(stringIssueDate);
+                DateTime hora = Convert.ToDateTime(stringIssueTime);
+                DateTime signingTime = Convert.ToDateTime(stringSigningTime);
+                stringIssueDate = fecha.ToString("dd/MM/yyyy");
+                stringIssueTime = hora.ToString("HH:mm:ss");
+                stringSigningTime = signingTime.ToString("dd/MM/yyyy HH:mm:ss");
+
+                XmlNode createElementDocumentResponse = _xml.CreateElement("DocumentResponse", _xml.DocumentElement.NamespaceURI);
+                XmlNode createElementSigningTime = _xml.CreateElement("ConvertSigningTime", _xml.DocumentElement.NamespaceURI);
+                createElementDocumentResponse.InnerText = string.Concat(stringDescription + " " + stringIssueDate + " " + stringIssueTime);
+                createElementSigningTime.InnerText = string.Concat(stringDocument + stringSigningTime);
+                _xml.DocumentElement.AppendChild(createElementDocumentResponse);
+                _xml.DocumentElement.AppendChild(createElementSigningTime);
+            }
         }
 
         public string GetHtmlGDoc(Dictionary<string, string> parameters = null)
@@ -150,6 +189,36 @@ namespace Gosocket.Dian.Functions.Utils
             }
 
             return stringToQrCode;
+        }
+
+        //Get value of DocumentResponse
+        public string GetDocumentResponse()
+        {
+            string stringDocumentResponse;
+            try
+            {
+                stringDocumentResponse = _xml.SelectSingleNode(@"/descendant::*[local-name()='DocumentResponse'][1]", _nsmgr)?.InnerText;
+            }
+            catch (Exception)
+            {
+                stringDocumentResponse = "";
+            }
+            return stringDocumentResponse;
+        }
+
+        //Get value of SigningTime
+        public string GetSigningTime()
+        {
+            string stringSigningTime;
+            try
+            {
+                stringSigningTime = _xml.SelectSingleNode(@"/descendant::*[local-name()='ConvertSigningTime'][1]", _nsmgr)?.InnerText;
+            }
+            catch (Exception)
+            {
+                stringSigningTime = "";
+            }
+            return stringSigningTime;
         }
     }
 }

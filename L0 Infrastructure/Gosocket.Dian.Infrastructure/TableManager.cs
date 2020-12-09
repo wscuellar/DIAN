@@ -99,7 +99,7 @@ namespace Gosocket.Dian.Infrastructure
                 await CloudTable.ExecuteAsync(operationToInsert);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
                 return false;
             }
@@ -165,7 +165,7 @@ namespace Gosocket.Dian.Infrastructure
                 CloudTable.Execute(TableOperation.Replace(entity));
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return false;
             }
@@ -412,7 +412,124 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.FirstOrDefault();
         }
+        public List<T> FindDocumentReferenced<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
 
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                    QueryComparisons.Equal,
+                    documentReferencedKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
+              QueryComparisons.NotEqual,
+              null));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+        public List<T> FindpartitionKey<T>(string partitionKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+
+            var entities = CloudTable.ExecuteQuery(query);
+
+            return entities.ToList();
+        }
+        public List<T> FindDocumentReferenceAttorneyFaculitity<T>(string partitionKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+
+            var entities = CloudTable.ExecuteQuery(query);
+
+            return entities.ToList();
+        }
+
+        public List<T> FindDocumentReferenced_TypeId<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                    QueryComparisons.Equal,
+                    documentReferencedKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+
+
+        public List<T> FindDocumentReferenced_EventCode_TypeId<T>(string documentReferencedKey, string documentTypeId, string eventCode) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                    QueryComparisons.Equal,
+                    documentReferencedKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
+               QueryComparisons.Equal,
+               eventCode));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+        public List<T> FindDocumentReferenced_EventCode_TypeId_CustomizationID<T>(string documentReferencedKey, string documentTypeId, string eventCode, string customizationId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                    QueryComparisons.Equal,
+                    documentReferencedKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
+                QueryComparisons.Equal,
+                eventCode));
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("CustomizationID",
+                QueryComparisons.Equal,
+                customizationId));
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+        public List<T> FindDocumentReferenceAttorney<T>(string rowKey, string senderCode) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    rowKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("SenderCode",
+                    QueryComparisons.Equal,
+                    senderCode));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
         public List<T> FindByPartition<T>(string partitionKey, DateTime timeStampFrom, DateTime timeStampTo)
             where T : ITableEntity, new()
         {
@@ -428,6 +545,31 @@ namespace Gosocket.Dian.Infrastructure
             var query =
                 new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal,
                     partitionKey)).Take(1000).AsTableQuery();
+
+            var results = new List<T>();
+            var queryResult = CloudTable.ExecuteQuerySegmented(query, null,
+                new TableRequestOptions { PayloadFormat = TablePayloadFormat.Json });
+
+            while (queryResult.Results.Any())
+            {
+                results.AddRange(queryResult.Results);
+                if (queryResult.ContinuationToken == null) break;
+
+                queryResult = CloudTable.ExecuteQuerySegmented(query, queryResult.ContinuationToken,
+                    new TableRequestOptions { PayloadFormat = TablePayloadFormat.Json });
+
+                Thread.Sleep(100);
+            }
+
+            return results;
+        }
+
+
+        public List<T> FindByContributorIdWithPagination<T>(int contributorId) where T : ITableEntity, new()
+        {
+            var query =
+                new TableQuery<T>().Where(TableQuery.GenerateFilterConditionForInt("ContributorId", QueryComparisons.Equal,
+                    contributorId)).Take(1000).AsTableQuery();
 
             var results = new List<T>();
             var queryResult = CloudTable.ExecuteQuerySegmented(query, null,
@@ -638,6 +780,26 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+        public DynamicTableEntity FindhByGlobalDocumentId(string globalDocumentId, string documentKey)
+        {
+            var query = new TableQuery();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("GlobalDocumentId",
+                    QueryComparisons.Equal,
+                    globalDocumentId),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentKey",
+                    QueryComparisons.Equal,
+                    documentKey));
+
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
+
         public Tuple<IEnumerable<T>, TableContinuationToken> GetRangeRows<T>(int take, TableContinuationToken continuationToken) where T : ITableEntity, new()
         {
             var query = CloudTable.CreateQuery<T>().Where(x => x.PartitionKey != "").Take(take).AsTableQuery();
@@ -654,7 +816,6 @@ namespace Gosocket.Dian.Infrastructure
             return new Tuple<IEnumerable<T>, TableContinuationToken>(tableQueryResult.Results, continuationToken);
         }
 
-
         public IEnumerable<T> GetRowsContainsInPartitionKeys<T>(IEnumerable<string> partitionKeys) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -662,5 +823,31 @@ namespace Gosocket.Dian.Infrastructure
             var entities = CloudTable.ExecuteQuery(query.Where(filter));
             return entities;
         }
+
+        /// <summary>
+        /// Buscar Set de Pruebas - Otros Documentos por Id del Documento Electronico y el Id del Modo de Operación
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="partitionKey">Id del documento electronico</param>
+        /// <param name="rowKey">Id del modo de operación</param>
+        /// <returns></returns>
+        public List<T> GetOthersDocuments<T>(string partitionKey, string rowKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey", //ElectronicDocumentId
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RowKey", //OperationModeId
+                    QueryComparisons.Equal,
+                    rowKey));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+
     }
 }

@@ -1,0 +1,52 @@
+﻿@model Gosocket.Dian.Web.Models.RadianTestSetViewModel
+@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Domain.Common
+@{
+
+    ViewBag.Title = "Editar set de pruebas Radian";
+}
+
+<div class="page-content margin-15">
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.Title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="row margin-horizontal-0 margin-top-50">
+        <div class="panel">
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("Edit", "RadianTestSet", FormMethod.Post, new { id = "edit-testset-form" }))
+                        {
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-right">
+                                <a href="@Url.Action("Index", "RadianTestSet")" class="btn btn-default btn-radian-default">Cancelar</a>
+                                <button type="submit" class="btn btn-success btn-radian-success">Guardar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script src="~/Content/js/Radian/RadianTestSet.js"></script>
+
+    <style type="text/css">
+        .claseLabel {
+            /* top: 10px;  */
+            position: relative;
+            height: 24px;
+        }
+    </style>
+}

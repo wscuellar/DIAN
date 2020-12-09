@@ -1,0 +1,51 @@
+﻿@model Gosocket.Dian.Web.Models.RadianTestSetTableViewModel
+
+
+<div class="table-responsive">
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        @if (Model.RadianTestSets.Count == 0)
+        {
+            <tr style="background-color: transparent !important;">
+                <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
+                    <div class="alert panel-footer-grey">
+                        Ningún set de pruebas disponible para mostrar.
+                    </div>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <thead>
+                <tr>
+                    <th class="col-md-2">Modo de operación</th>
+                    <th class="col-md-2">Descripción</th>
+                    <th class="col-md-2">Documentos</th>
+
+                    <th class="col-md-2">Estado</th>
+                    <th class="col-md-2">Creado por</th>
+                    <th class="col-md-2"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var set in Model.RadianTestSets)
+                {
+
+                <tr class='clickable-row' data-href="@Url.Action("Edit","RadianTestSet",new { operationModeId = set.OperationModeId})">
+                    <td class="text-nowrap"><a>@set.OperationModeName</a></td>
+                    <td class="text-nowrap"><a>@set.Description</a></td>
+                    <td class="text-nowrap"><a>@set.TotalDocumentRequired</a></td>
+                    <td class="text-nowrap">
+                        @{
+                            var text_color = set.Active ? "text-gosocket" : "text-red";
+                            var text_status = set.Active ? "Activo" : "Inactivo";
+                            <a>@text_status</a>
+                        }
+                    </td>
+                    <td class="text-nowrap"><a>@set.CreatedBy</a></td>
+                    <td class="text-nowrap"><i class="fa fa-pencil"></i></td>
+                </tr>
+                }
+            </tbody>
+        }
+    </table>
+</div>

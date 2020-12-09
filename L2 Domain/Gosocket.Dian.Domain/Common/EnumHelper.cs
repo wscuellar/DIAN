@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -188,19 +189,42 @@ namespace Gosocket.Dian.Domain.Common
 
     public enum EventStatus
     {
+        [Description("None")]
+        None = 000,
         [Description("Acuse de recibo")]
         Received = 030,
-        [Description("Rechazo de documento")]
+        [Description("Rechazo de la Factura Electrónica")]
         Rejected = 031,
-        [Description("Recibimiento de los bienes")]
+        [Description("Constancia de recibo del bien o aceptación de la prestación del servicio")]
         Receipt = 032,
-        [Description("Aceptación de documento")]
+        [Description("Aceptación Expresa")]
         Accepted = 033,
-        [Description("Factura ofrecida para negociación como título valor")]
+        [Description("Aceptación Tácita")]
+        AceptacionTacita = 034,
+        [Description("Avales")]
+        Avales = 035,
+        [Description("Solicitud de Disponibilizacion")]
+        SolicitudDisponibilizacion = 036,
+        [Description("Endoso en Propiedad")]
+        EndosoPropiedad = 037,
+        [Description("Endoso en Garantía")]
+        EndosoGarantia = 038,
+        [Description("Endoso en Procuración")]
+        EndosoProcuracion = 039,
+        [Description("Anulacion de endoso electrónico")]
         InvoiceOfferedForNegotiation = 040,
-        [Description("Factura negociada como título valor")]
+        [Description("Limitación de circulación")]
         NegotiatedInvoice = 041,
+        [Description("Anulación de limitación de circulación")]
+        AnulacionLimitacionCirculacion = 042,
+        [Description("Mandato")]
+        Mandato = 043,
+        [Description("Terminación del mandato")]
+        TerminacionMandato = 044,
+        [Description("Notificación del pago total o parcial")]
+        NotificacionPagoTotalParcial = 045
     }
+
 
     public enum ExportStatus
     {
@@ -237,7 +261,25 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Cédula de ciudadanía")]
         CC = 10910094,
         [Description("Cédula de extranjería")]
-        CE = 10910096
+        CE = 10910096,
+        [Description("Registro civil")]
+        RC = 10910097,
+        [Description("Tarjeta de identidad")]
+        TI =10910098,
+        [Description("Tarjeta de extranjería")]
+        TE=10910099,
+        [Description("Nit")]
+        Nit=10910100,
+        [Description("Pasaporte")]
+        Pasaporte=10910101	,
+        [Description("Documento de identificación de extranjero")]
+        DIE=10910102,
+        [Description("PEP")]
+        PEP=10910103,
+        [Description("Nit de otro país")]
+        NitOP=10910104,
+        [Description("NIUP")]
+        NIUP=10910105
     }
 
     public enum OperationMode
@@ -260,6 +302,8 @@ namespace Gosocket.Dian.Domain.Common
         Company = 2,
         [Description("Persona")]
         Person = 3,
+        [Description("Usuario Registrado")]
+        ExternalUser = 4,
     }
 
     public enum NumberRangeState
@@ -314,4 +358,97 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Registro cancelado")]
         Cancelled = 12310324,
     }
+
+
+   
+
+    public enum RadianOperationMode
+    {
+        None = 0,
+        [Description("Operación Directa")]
+        Direct = 1,
+        [Description("Operación Indirecta")]
+        Indirect = 2,
+    }
+
+
+    public enum RadianSoftwareStatus
+    {
+        None = 0,
+        [Description("En proceso")]
+        InProcess = 1,
+        [Description("Aceptado")]
+        Accepted = 2,
+        [Description("Rechazado")]
+        Rejected = 3,
+    }
+
+    public enum RadianState
+    {
+        none = 0,
+        [Display(Name = "Registrado")]
+        [Description("Registrado")]
+        Registrado = 1,
+        [Display(Name = "En pruebas")]
+        [Description("En pruebas")]
+        Test = 3,
+        [Display(Name = "Habilitado")]
+        [Description("Habilitado")]
+        Habilitado = 4,
+        [Display(Name = "Cancelado")]
+        [Description("Cancelado")]
+        Cancelado = 5
+    }
+
+    public enum RadianContributorType
+    {
+        [Description("Cero")]
+        Zero = 0,
+        [Description("Facturador Electronico")]
+        ElectronicInvoice = 1,
+        [Description("Proveedor Tecnologico")]
+        TechnologyProvider = 2,
+        [Description("Sistema de Negociacion")]
+        TradingSystem = 3,
+        [Description("Factor")]
+        Factor = 4
+    }
+
+    public enum RadianOperationModeTestSet
+    {
+        [Display(Name = "Software Propio")]
+        [Description("Software Propio")]
+        OwnSoftware = 1,
+        [Display(Name = "Software Proveedor Tecnológico")]
+        [Description("Software Proveedor Tecnológico")]
+        SoftwareTechnologyProvider = 2,
+        [Display(Name = "Software Sistema de Negociacion")]
+        [Description("Software Sistema de Negociacion")]
+        SoftwareTradingSystem = 3,
+        [Display(Name = "Software Factor")]
+        [Description("Software Factor")]
+        SoftwareFactor = 4
+    }
+
+    /// <summary>
+    /// Documentos Electronicos. Utilizados en la configuración de Set de Pruebas - Otros Documentos
+    /// </summary>
+    public enum ElectronicsDocuments
+    {
+        [Description("Nomina Electrónica y Nomina de Ajuste")]
+        ElectronicPayroll = 1,
+
+        [Description("Documento de Importación")]
+        ImportDocument = 2,
+        
+        [Description("Documento de Soporte")]
+        SupportDocument = 3,
+        
+        [Description("Documento equivalente electrónico")]
+        ElectronicEquivalent = 4,
+        
+        [Description("POS electrónico")]
+        ElectronicPOS = 5
+    }
+
 }

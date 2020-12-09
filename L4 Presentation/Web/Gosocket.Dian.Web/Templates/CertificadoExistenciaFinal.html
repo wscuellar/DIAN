@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+</head>
+<body>
+    <header class="header">
+        <img src="https://d31dn7nfpuwjnm.cloudfront.net/images/valoraciones/0028/7646/dian-citas.png?1511288120">
+    </header>
+    <div>
+        <hr />
+    </div>
+    <content>
+        <div id="base">
+            <div class="text-green text-small text-margin-01">
+                Impreso el {PrintDay} de {PrintMonth} de {PrintYear} a las {PrintTime}
+            </div>
+            <div class="text-small text-margin-02">
+                Página: {PrintPage}
+            </div>
+            <div class="text-centered check">
+                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.0001 0C5.83181 0 0 5.83173 0 12.9999C0 20.1681 5.83181 25.9999 13.0001 25.9999C20.1683 25.9999 26 20.1681 26 12.9999C26 5.83173 20.1683 0 13.0001 0ZM13.0001 23.8687C7.00692 23.8687 2.13114 18.9931 2.13114 12.9999C2.13114 7.00684 7.00692 2.13114 13.0001 2.13114C18.9932 2.13114 23.8689 7.00684 23.8689 12.9999C23.8689 18.9931 18.9932 23.8687 13.0001 23.8687Z" fill="#62C7AB" />
+                    <path d="M18.6239 8.01051L10.9053 15.7292L7.37628 12.2002C6.96011 11.7842 6.28548 11.7842 5.86931 12.2002C5.45323 12.6164 5.45323 13.291 5.86931 13.7072L10.1518 17.9897C10.3599 18.1977 10.6326 18.3018 10.9053 18.3018C11.178 18.3018 11.4507 18.1977 11.6588 17.9897L20.1309 9.51756C20.547 9.10139 20.547 8.42676 20.1309 8.01059C19.7147 7.59442 19.04 7.59442 18.6239 8.01051Z" fill="#62C7AB" />
+                </svg>
+            </div>
+            <div class="text-centered text-header">
+                DIRECCIÓN DE IMPUESTOS Y ADUANAS NACIONALES
+                <br />
+                CERTIFICADO DE EXISTENCIA DE FACTURA
+                <br />
+                ELECTRÓNICA COMO TÍTULO VALOR
+            </div>
+            <div class="text-centered padding-line">
+                <svg width="120" height="3" viewBox="0 0 120 3" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="120" height="3" rx="1.5" fill="#62C7AB" />
+                </svg>
+            </div>
+            <div class="text-centered subtitle" style="color:#000; font-weight: bold;">
+                "ESTE CERTIFICADO REFLEJA EL ESTADO ACTUAL DE  LA FACTURA ELECTRÓNICA
+                <br />
+                COMO TÍTULO VALOR HASTA LA FECHA Y HORA DE SU EXPEDICIÓN"
+            </div>
+            <div class="container-info">
+                <div class="container-div">
+                    <div class="subtext">
+                        <div class="subtitle">
+                            Factura electrónica de venta:
+                        </div>
+                        <div class="text-info">
+                            No. {InvoiceNumber}
+                        </div>
+                    </div>
+                    <div class="subtext">
+                        <div class="subtitle">
+                            Estado vigente:
+                        </div>
+                        <div class="text-info">
+                            {Status}
+                        </div>
+                    </div>
+                </div>
+                <div class="container-div">
+                    <div class="subtext">
+                        <div class="subtitle">
+                            Fecha de generación de la factura electrónica de Venta:(fecha de la firma electrónica):
+                        </div>
+                        <div class="text-info">
+                            2020-10-14 14:18:47.190 UTC-5
+                        </div>
+                    </div>
+                    <div class="subtext">
+                        <div class="subtitle">
+                            CUFE:
+                        </div>
+                        <div class="text-info">
+                            {CUFE}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="separator separator-green" />
+            <div class="container-info">
+                <div class="container-div">
+                    <div class="subtext">
+                        <div class="text-info">
+                            DOCUMENTOS Y EVENTOS ASOCIADOS A LA FACTURA ELECTRÓNICA DE VENTA COMO TÍTULO VALOR:
+                        </div>
+                    </div>
+                </div>
+                <div class="container-div">
+                    <div class="subtext">
+                        <div class="text-info">
+                            NRO. TOTAL DE DOCUMENTOS: {DocumentsTotal}
+                        </div>
+                    </div>
+                    <div class="subtext">
+                        <div class="text-info">
+                            NRO. TOTAL DE EVENTOS: {EventsTotal}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="separator separator-green" />
+            <div class="container-info">
+                <div class="container-div">
+                    <div class="subtext">
+                        <div>
+                            <strong>
+                                FIN DE ESTE DOCUMENTO
+                            </strong>
+                        </div>
+                        <div class="text-info">
+                            El interesado debe comunicar a la Dirección de Impuestos y Aduanas Nacionales, cualquier falla o error en el registro de los documentos o eventos.
+                        </div>
+                        <div class="text-info">
+                            FECHA: {ExpeditionDate} -EXPEDIDO EN: BOGOTÁ
+                        </div>
+                    </div>
+                </div>
+                <hr class="separator-vertical" />
+                <div class="container-div">
+                    <div class="qr-content">
+                        {QRCode}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </content>
+
+    <footer class="text-centered">
+        <div>
+            <img src="" alt="logos pie de página" />
+        </div>
+        <div class="footer-close">
+            La validez de este documento podrá verificarse en la página
+            <br />
+            <a href="=http://www.dian.gov.co">www.dian.gov.co</a>
+        </div>
+    </footer>
+</body>
+</html>

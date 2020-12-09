@@ -1,0 +1,43 @@
+﻿@model Gosocket.Dian.Web.Models.RadianContributorFileTypeTableViewModel
+@using Gosocket.Dian.Web.Utils
+<div class="table-responsive">
+
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Obligatorio</th>
+                <th>Tipo de Participante</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var fileType in Model.RadianContributorFileTypes)
+            {
+                <tr>
+                    <td class="text-nowrap"><a>@fileType.Name</a></td>
+                    <td class="text-nowrap">
+                        <a>
+                            @if (fileType.Mandatory)
+                            {
+                                @:Sí
+                            }
+                            else
+                            {
+                                @:No
+                            }
+                        </a>
+                    </td>
+                    <td class="text-nowrap"><a>@fileType.RadianContributorType.Name</a></td>
+                    <td class="text-nowrap" style="">
+                        <a onclick="editRadianContributorFileType(@fileType.Id)"><i class="fa fa-pencil" style="color: #348441; margin:1vh"></i></a>                        
+                        @if (!fileType.HideDelete)
+                        {
+                            <a onclick="deleteRadianContributorFileType(@fileType.Id)"><i class="fa fa-trash" style="color: #348441; margin:1vh"></i></a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

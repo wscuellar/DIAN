@@ -1,0 +1,60 @@
+﻿@model Gosocket.Dian.Web.Models.RadianContributorsViewModel
+
+<div class="panel-heading">
+    <h3 class="panel-title-radian padding-0">Listado de set de pruebas activos</h3>
+    <hr class="margin-0" />
+</div>
+
+<div class="table-responsive padding-top-15">
+    <table id="table-users" class="table-contributor table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Identificador del set</th>
+                <th>Identificador del software</th>
+                <th>Modo operación</th>
+                <th>Facturas</th>
+                <th>Notas de crédito</th>
+                <th>Notas de débito</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model.RadianContributorTestSetResults)
+            {
+                var label = "";
+                switch (t.Status)
+                {
+                    case 0:
+                        label = "custom-label-warning";
+                        break;
+                    case 1:
+                        label = "custom-label-success";
+                        break;
+                    case 2:
+                        label = "custom-label-danger";
+                        break;
+                    default:
+                        label = "custom-label-primary";
+                        break;
+                };
+                <tr class=''>
+                    <td class="text-nowrap"><a>@t.Id</a></td>
+                    <td class="text-nowrap"><a>@t.SoftwareId</a></td>
+                    <td class="text-nowrap"><a>@t.OperationModeName</a></td>
+                    <td>
+                        <a class="badge custom-badget-primary add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Mínimo de aceptadas requeridas">@t.TotalInvoicesAcceptedRequired</a> <a class="badge custom-badget-success add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Aceptadas">@t.TotalInvoicesAccepted</a> <a class="badge custom-badget-danger add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Rechazadas">@t.TotalInvoicesRejected</a>
+                    </td>
+                    <td>
+                        <a class="badge custom-badget-primary add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Mínimo de aceptadas requeridas">@t.TotalCreditNotesAcceptedRequired</a> <a class="badge custom-badget-success add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Aceptadas">@t.TotalCreditNotesAccepted</a> <a class="badge custom-badget-danger add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Rechazadas">@t.TotalCreditNotesRejected</a>
+                    </td>
+                    <td>
+                        <a class="badge custom-badget-primary add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Mínimo de aceptadas requeridas">@t.TotalDebitNotesAcceptedRequired</a> <a class="badge custom-badget-success add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Aceptadas">@t.TotalDebitNotesAccepted</a> <a class="badge custom-badget-danger add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Rechazadas">@t.TotalDebitNotesRejected</a>
+                    </td>
+                    <td class="text-nowrap"><a class="label label-table @label">@t.StatusDescription</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+

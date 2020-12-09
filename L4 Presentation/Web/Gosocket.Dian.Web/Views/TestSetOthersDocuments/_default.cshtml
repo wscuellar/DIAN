@@ -1,0 +1,97 @@
+﻿@model Gosocket.Dian.Web.Models.TestSetOthersDocumentsViewModel
+
+<div class="row">
+    <h4 class="panel-title-radian padding-0"><strong>Datos del Documento Electrónico: </strong></h4>
+    <hr class="margin-5 margin-bottom-20" />
+
+    <div class="col-sm-3 padding-xs-0 buttonAddRightOtherDoc">
+        <div class="form-group">
+            @Html.Label("Seleccione el Documento electronico", new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.ElectronicDocumentId, new SelectList(ViewBag.listElectronicDocuments, "Id", "Name"), new { @class = "form-control selectpicker" })
+        </div>
+    </div>
+    <div class="col-sm-1 padding-xs-0 buttonAddLeftOtherDoc">
+        <button type="button" id="addElectronicDocument" class="btn btn-success btnAddOthersDocs" data-toggle="modal"
+                data-target="#modalElectronicDocument" title="Agregar un nuevo documento eletrónico">
+            +
+        </button>
+    </div>
+</div>
+<div class="row">
+    <h4 class="panel-title-radian padding-0"><strong>Datos del modo de operación</strong></h4>
+    <hr class="margin-5 margin-bottom-20" />
+
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.Label("Seleccione el modo de operación", new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.OperationModeId, new SelectList(ViewBag.listOperationModes, "Id", "Name"), new { @class = "form-control selectpicker" })
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Description, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Description, new { @class = "form-control input-general fields captureFields" })
+            @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h4 class="panel-title-radian padding-0"><strong>Total de documentos requeridos</strong></h4>
+    <hr class="margin-5 margin-bottom-20" />
+
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.TotalDocumentRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.TotalDocumentRequired, new { @class = "form-control input-general fields captureFields", @readonly = "readonly" })
+            @Html.ValidationMessageFor(m => m.TotalDocumentRequired, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.OthersDocumentsRequired, new { @class = "control-label", @id = "lblOthersDocumentsRequired" })
+            @*<label id="OthersDocumentsRequired" for="OthersDocumentsRequired" class="control-label"></label>*@
+            <span class="text-danger">*</span>
+            @Html.TextBoxFor(m => m.OthersDocumentsRequired, new { @class = "form-control input-general fields captureFields" })
+            @Html.ValidationMessageFor(m => m.OthersDocumentsRequired, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0" id="divPayrollAjustment" style="display:none">
+        <div class="form-group">
+            @Html.LabelFor(m => m.ElectronicPayrollAjustmentRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ElectronicPayrollAjustmentRequired, new { @class = "form-control input-general fields captureFields" })
+            @Html.ValidationMessage("validpayrollAjustment", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h4 class="panel-title-radian padding-0"><strong>Total de documentos aceptados requeridos</strong></h4>
+    <hr class="margin-5 margin-bottom-20" />
+
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.TotalDocumentAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.TotalDocumentAcceptedRequired, new { @class = "form-control input-general fields captureFields", @readonly = "readonly" })
+            @Html.ValidationMessageFor(m => m.TotalDocumentAcceptedRequired, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.OthersDocumentsAcceptedRequired, new { @class = "control-label", @id = "lblOthersDocumentsAcceptedRequired" })
+            @*<label id="OthersDocumentsAccepted" form="OthersDocumentsRequired" class="control-label"></label>*@
+            <span class="text-danger">*</span>
+            @Html.TextBoxFor(m => m.OthersDocumentsAcceptedRequired, new { @class = "form-control input-general fields captureFields" })
+            @Html.ValidationMessageFor(m => m.OthersDocumentsAcceptedRequired, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0" id="divPayrollAjustmentAcepted" style="display:none">
+        <div class="form-group">
+            @Html.LabelFor(m => m.ElectronicPayrollAjustmentAcceptedRequired, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ElectronicPayrollAjustmentAcceptedRequired, new { @class = "form-control input-general fields captureFields" })
+            @Html.ValidationMessage("validpayrollAjustmentAccepted", new { @class = "text-danger" })
+        </div>
+    </div>
+
+</div>
+

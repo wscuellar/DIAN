@@ -1,0 +1,295 @@
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@using Newtonsoft.Json
+@{
+    ViewBag.title = "";
+    var operationMode = Request.Params["RadianOperationMode"];
+    switch (Request.Params["RadianContributorType"])
+    {
+        case "1":
+            ViewBag.Title = "Facturador Electrónico";
+            break;
+        case "2":
+            ViewBag.Title = "Proveedor Tecnológico";
+            break;
+        case "3":
+            ViewBag.Title = "Sistema de negociación";
+            break;
+        case "4":
+            ViewBag.Title = "Factor";
+            break;
+    }
+}
+<div class="page-content radian-view margin-20">
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="row margin-horizontal-0 margin-top-50">
+        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
+            <div class="panel-body padding-top-20">
+                @if (operationMode == "2")
+                {
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        <div class="panel-body padding-20 padding-bottom-10">
+                            <div class="radian-personal-info">
+                                @Html.Partial("_personalInfo")
+                            </div>
+                        </div>
+                        <div class="panel-footer text-right">
+                            <button type="button" class="btn btn-success btn-radian-success button-change-state">Configurar modo de operación</button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div id="steps-approved">
+                        <div class="radian-personal-info">
+                            @Html.Partial("_personalInfo")
+                        </div>
+                        <h3><span class="name-state">Ingreso de solicitud</span></h3>
+                        <section>
+                        </section>
+                        <h3><span class="name-state">Pendiente</span></h3>
+                        <section>
+                            @Html.Partial("_certificates")
+                        </section>
+                        <h3><span class="name-state">Validando documentos</span></h3>
+                        <section>
+                            @Html.Partial("_certificatesThirdStep")
+                        </section>
+                        <h3><span class="name-state">Pruebas de aceptación</span></h3>
+                        <section>
+                            @Html.Partial("_setTestRedirect")
+                        </section>
+                        <h3></h3>
+                        <section>
+                            @Html.Partial("_finalStep")
+                        </section>
+                    </div>
+                }
+
+                @if (Model.Step == 4 || operationMode == "2")
+                {
+                    <div class="footer-table">
+                        <div class="row margin-horizontal-0">
+                            @Html.Partial("_users")
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/Radian/constants.js"></script>
+    <script src="~/Content/js/Radian/RadianSteps.js"></script>
+    @**@<script src="~/Scripts/jquery.steps.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            //howLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
+
+        var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
+        RenderSteps(index);
+
+
+        $(".show-history").click(function () {
+                var page = @Model.PageTable;
+                var element = '#table-history';
+                var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_fileHistory").ToString().Trim('"'))));
+                var urlSearch = '@Url.Action("FileHistoyList", "RadianApproved")';
+                var form = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_formSearchHistory").ToString().Trim('"'))));
+                var radianId = "@Model.Contributor.RadianContributorId";
+                var dialog = bootbox.dialog({
+                    message: htmlPartial,
+                    className: "table-data modal-radian",
+                    size: 'large'
+                });
+                dialog.init(function (e) {
+                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.FileHistories.Customers))');
+                    var customersTotalCount = @Model.FileHistoriesRowCount;
+                    var columns = [
+                        { data: 'FileName' },
+                        { data: 'Updated' },
+                        { data: 'CreatedBy' },
+                        { data: 'Status' },
+                        { data: 'Comments' }
+                    ]
+                    var ajaxData = {
+                        FileName: "#NameSearch",
+                        Initial: "#dateFrom",
+                        End: "#dateTo",
+                        Page: page,
+                        PageSize: 10
+                    };
+                    var paramsObject = {
+                        element: element,
+                        data: dataTable,
+                        form: form,
+                        urlSearch: urlSearch,
+                        radianId: radianId,
+                        page: page,
+                        tableRendered: null,
+                        customersTotalCount: customersTotalCount,
+                        columns: columns,
+                        ajaxData: ajaxData
+                    }
+                    RenderTable(paramsObject);
+                })
+            });
+
+        $('.submit-button').click(function (e) {
+            showLoading('#panel-form', 'Cargando', 'Cargando archivos, por favor espere.');
+        var form = $(this).parents("form");
+        var files = $(form)[0];
+        var filteredFiles = [];
+        for (var i = 0 ; i < files.length ; i++) {
+            files[i].type == "file" && files[i].id == "" &&
+            files[i].files.length > 0 &&
+            filteredFiles.push(files[i]);
+        }
+            var messages = new Object();
+            var j = 0;
+            for (var i = 0; i < files.length; i++) {
+                if (files[i].type == "file" && files[i].id == "") {
+                    messages = Object.assign(messages, {
+                        ['file-' + j]: {
+                            required: "Archivo requerido."
+                        }
+                    });
+                    j++;
+                }
+            }
+            form.validate({
+                messages: messages
+            });
+            e.preventDefault();
+            if (filteredFiles.length > 0) {
+
+                if (form.valid()) {
+                    var formdata = new FormData();
+                    var numberFiles = 0;
+                    var limit = filteredFiles.length
+                    for (var i = 0; i < limit; i++) {
+                        formdata.append(filteredFiles[i].files[0].name, filteredFiles[i].files[0]);
+                        formdata.append("TypeId_" + numberFiles, filteredFiles[i].dataset.typeid);
+                        numberFiles++;
+                    };
+                    formdata.append("nit", "@Model.Nit");
+                    formdata.append("email", "@Model.Email");
+                    formdata.append("contributorId", "@Model.ContributorId");
+                    formdata.append("radianContributorType", '@Request.Params.Get("RadianContributorType")');
+                    formdata.append("radianContributorTypeiD", '@Model.RadianContributorTypeId');
+                    formdata.append("radianOperationMode", '@Request.Params.Get("RadianOperationMode")');
+                    formdata.append("filesNumber", numberFiles);
+                    formdata.append("step", @Model.Step);
+                    formdata.append("radianState", '@Model.RadianState');
+
+                    $.ajax({
+                        url: "@Url.Action("UploadFiles", "RadianApproved")",
+                        type: 'POST',
+                        data: formdata,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        enctype: 'multipart/form-data',
+                        xhr: function () {
+                            //upload Progress
+                            var xhr = $.ajaxSettings.xhr();
+                            if (xhr.upload) {
+                                xhr.upload.addEventListener('progress', function (event) {
+                                    var percent = 0;
+                                    var position = event.loaded || event.position;
+                                    var total = event.total;
+                                    if (event.lengthComputable) {
+                                        percent = Math.ceil(position / total * 100);
+                                    }
+                                    //update progressbar
+                                    $(".progress-bar").css("width", + percent + "%");
+                                    $(".status").text(percent + "%");
+                                }, true);
+                            }
+                            return xhr;
+                        },
+                        success: function (data) {
+                            var objData = data.data;
+                            var operation = () => {
+                                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                window.location.href = '@Url.Action("Index", "RadianApproved")' + "?ContributorId=" + objData.ContributorId + "&RadianContributorType=" + objData.RadianContributorType + "&RadianOperationMode=" + objData.RadianOperationMode;
+                            }
+                            showConfirmation(data.message, AlertExec(operation));
+                        },
+                        error: (error) => {
+                            showConfirmation(error, AlertExec());
+                        }
+                    });
+                }
+            } else {
+                hideLoading('#panel-form');
+            }
+        });
+
+        $("#view-costumers").click(function () {
+                var page = @Model.PageTable;
+                var element = '#table-customers';
+                var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));
+                var urlSearch = '@Url.Action("CustomersList", "RadianApproved")';
+                var form = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_formSearch").ToString().Trim('"'))));
+                var radianId = "@Model.Contributor.RadianContributorId";
+                var dialog = bootbox.dialog({
+                    message: htmlPartial,
+                    className: "table-data modal-radian",
+                    size: 'large'
+                });
+                dialog.init(function (e) {
+                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.Customers))');
+                    var customersTotalCount = @Model.CustomerTotalCount;
+                    var columns = [
+                        { data: 'Nit' },
+                        { data: 'BussinessName' },
+                        { data: 'RadianState' }
+                    ]
+                    var ajaxData = {
+                        radianContributorId: @Model.Contributor.RadianContributorId,
+                        code: "#NitSearch",
+                        radianState: "#RadianStateSelect",
+                        page: page,
+                        pagesize: 10
+                    };
+                    var paramsObject = {
+                        element: element,
+                        data: dataTable,
+                        form: form,
+                        urlSearch: urlSearch,
+                        radianId: radianId,
+                        page: page,
+                        tableRendered: null,
+                        customersTotalCount: customersTotalCount,
+                        columns: columns,
+                        ajaxData: ajaxData
+                    }
+                    RenderTable(paramsObject);
+                })
+        });
+
+        $(".cancel-register").click(function () {
+                var cancelData = {
+                    url: "@Url.Action("DeleteUser", "RadianApproved")",
+                    href: '@Url.Action("Index", "Radian")',
+                    id: '@Model.ContributorId',
+                    type: @Model.RadianContributorTypeId,
+                    state: '@Model.RadianState'
+                };
+                cancelRegister(cancelData);
+        });
+
+     });
+
+
+    </script>
+}

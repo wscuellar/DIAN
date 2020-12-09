@@ -25,6 +25,21 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string Namespace { get; set; }
         public string Encoding { get; set; }
         public string ParserError { get; set; }
+        public string SigningTime { get; set; }
+        public string CustomizationID { get; set; }
+        public string DocumentReferenceId { get; set; }
+        public string PaymentMeansID { get; set; }
+        public string PaymentDueDate { get; set; }                 
+        public string TotalInvoice { get; set; }
+        public string ListID { get; set; }
+        public string DocumentID { get; set; }
+        public string NoteMandato { get; set; }
+        public string UBLVersionID { get; set; }
+        public string ValorTotalEndoso { get; set; }
+        public string PrecioPagarseFEV { get; set; }
+        public string TasaDescuento { get; set; }
+        public string MedioPago { get; set; }
+        public string DocumentTypeIdRef { get; set; }
 
         public XmlParser()
         {
@@ -32,6 +47,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             AllXmlDefinitions = new XmlDocument();
             var xmlParserDefinitions = GetXmlParserDefinitions();
             AllXmlDefinitions.LoadXml(xmlParserDefinitions);
+            
         }
 
         public XmlParser(byte[] xmlContentBytes, XmlNode extensions = null)
@@ -66,10 +82,43 @@ namespace Gosocket.Dian.Services.Utils.Common
                 {
                     XmlDocument.XmlResolver = null;
                     XmlDocument.Load(sr);
+                    var node = XmlDocument.GetElementsByTagName("xades:SigningTime")[0];
+                    var nodePaymentMeansValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='ID']";                    
+                    var nodePaymentDueDateValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='PaymentDueDate']";
+                    var listIDValueXpath = XmlDocument.GetElementsByTagName("cbc:ResponseCode")[0];
+                    var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";                 
+                    var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
+                    var valueNote = "//*[local-name()='Note']";
+
+                    var documentReferenceId = XmlDocument.SelectSingleNode(documentReferenceIdValueXpath)?.InnerText;          
+                    var nodePaymentMeans = XmlDocument.SelectSingleNode(nodePaymentMeansValuesXpath)?.InnerText;
+                    var nodePaymentDueDate = XmlDocument.SelectSingleNode(nodePaymentDueDateValuesXpath)?.InnerText;
+                    var nodeTotalInvoice = XmlDocument.SelectSingleNode(valueTotalInvoice)?.InnerText;
+                    var valueNoteMandato = XmlDocument.SelectSingleNode(valueNote)?.InnerText;
+
+
+                    SigningTime = node?.InnerText;
+                    PaymentMeansID = nodePaymentMeans;
+                    DocumentReferenceId = documentReferenceId;
+                    PaymentDueDate = nodePaymentDueDate;    
+                    
+                    //Valor total factura
+                    if(nodeTotalInvoice != null)
+                    {
+                        TotalInvoice = nodeTotalInvoice;
+                    }
+                    //Nota del mandato
+                    if (valueNoteMandato != null)
+                    {
+                        NoteMandato = valueNoteMandato;
+                    }
+
+                    //SigningTime
+                    SigningTime = SigningTime == null ? "0" : SigningTime;
                 }
             }
         }
-
+        
         public virtual bool Parser(bool validate = true)
         {
             try

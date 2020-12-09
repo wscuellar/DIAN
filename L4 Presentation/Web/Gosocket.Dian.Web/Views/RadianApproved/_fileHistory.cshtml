@@ -1,0 +1,73 @@
+﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@using Gosocket.Dian.Web.Utils;
+@{
+    ViewBag.title = "Historial de carga";
+}
+<div class="page-content radian-view margin-15">
+    <div class="row title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+</div>
+
+<table id="table-history" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Estado</th>
+            <th>Detalle</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model.Files)
+        {
+            var label = "";
+            var statusId = "";
+            var test = "";
+            switch (d.Status)
+            {
+                case 0:
+                    label = "<i class='fa fa-exclamation-circle'></i>";
+                    statusId = "status-0";
+                    test = RadianUtil.DocumentStates.Pendiente.ToString();
+                    break;
+                case 1:
+                    label = "<img src='../../Content/images/Svg/Loaded.svg'>";
+                    statusId = "status-1";
+                    test = RadianUtil.DocumentStates.Cargado.ToString();
+                    break;
+                case 2:
+                    label = "<i class='fa fa-check-circle'></i>";
+                    statusId = "status-2";
+                    test = RadianUtil.DocumentStates.Aprobado.ToString();
+                    break;
+                case 3:
+                    label = "<i class='fa fa-times-circle'></i>";
+                    statusId = "status-3";
+                    test = RadianUtil.DocumentStates.Rechazado.ToString();
+                    break;
+                case 4:
+                    label = "<i class='fa fa-info-circle'></i>";
+                    statusId = "status-4";
+                    test = RadianUtil.DocumentStates.Observaciones.ToString();
+                    break;
+                default:
+                    label = "<i class='fa fa-exclamation-circle'></i>";
+                    statusId = "status-5";
+                    break;
+            };
+            <tr>
+                <td>@d.FileName</td>
+                <td>@d.Updated.ToString("MM/dd/yyyy")</td>
+                <td>@d.CreatedBy</td>
+                <td class="@statusId">@Html.Raw(label) @test</td>
+                <td>@d.Comments</td>
+
+            </tr>
+        }
+    </tbody>
+</table>

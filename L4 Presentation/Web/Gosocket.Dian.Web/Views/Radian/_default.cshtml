@@ -1,0 +1,156 @@
+﻿@model Gosocket.Dian.Web.Models.RadianContributorsViewModel
+
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" }, { "readonly", "true" } };}
+<div class="row">
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Code, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Code, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.TradeName, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.TradeName, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.BusinessName, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.BusinessName, defaultHtmlAttr)
+        </div>
+    </div>
+
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Email, defaultHtmlAttr)
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.ContributorTypeName, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ContributorTypeName, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.AcceptanceStatusName, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.AcceptanceStatusName, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.CreatedDate, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.CreatedDate, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.UpdatedDate, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.UpdatedDate, defaultHtmlAttr)
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_iconsState")
+
+<div id="row-provider" class="row padding-top-10">
+    <div class="col-sm-6 padding-xs-0">
+        <div class="form-group">
+            <div class="table-responsive">
+                <table id="table-contributor-files" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Archivo</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center"></th>
+                        </tr>
+                    </thead>
+                    @if (Model.RadianContributorFiles != null && Model.RadianContributorFiles.Count > 0)
+                    {
+                        <tbody>
+                            @{var index = 0;}
+                            @foreach (var f in Model.RadianContributorFiles.OrderByDescending(f => f.ContributorFileType.Id).ToList())
+                            {
+                                var label = "";
+                                var statusId = "";
+                                switch (f.ContributorFileStatus.Id)
+                                {
+                                    case 0:
+                                        label = "<i class='fa fa-exclamation-circle'></i>";
+                                        statusId = "status-0";
+                                        break;
+                                    case 1:
+                                        label = "<img src='../../Content/images/Svg/Loaded.svg'>";
+                                        statusId = "status-1";
+                                        break;
+                                    case 2:
+                                        label = "<i class='fa fa-check-circle'></i>";
+                                        statusId = "status-2";
+                                        break;
+                                    case 3:
+                                        label = "<i class='fa fa-times-circle'></i>";
+                                        statusId = "status-3";
+                                        break;
+                                    case 4:
+                                        label = "<i class='fa fa-info-circle'></i>";
+                                        statusId = "status-4";
+                                        break;
+                                    default:
+                                        label = "<i class='fa fa-exclamation-circle'></i>";
+                                        statusId = "status-5";
+                                        break;
+                                };
+                                <tr data-id="@f.ContributorFileType.Id" data-idFile="@f.Id" class="select-radian-contributor">
+                                    <td width="33%" class="text-left"><span class="fa fa fa-download download-contributor-files" title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span>@f.ContributorFileType.Name</td>
+                                    <td width="33%" class="text-left init-hide @statusId"><input type="hidden" class="list-change-status" id="status-file-@index" value=""></td>
+                                    <td width="33%" class="text-left init-show">
+                                        <div class="dis-flex">@Html.Raw(label)<span class=""> @f.ContributorFileStatus.Name</span></div>
+                                    </td>
+                                    <td width="33%" class="text-center edit-state-td"><i class="fa fa-pencil edit-state"></i><button type="button" class="btn btn-link edit-state">Editar</button></td>
+                                </tr>
+                                index++;
+                            }
+                        </tbody>
+                    }
+                    else
+                    {
+                        <tbody>
+                            @{var index = 0;}
+                            @foreach (var f in Model.RadianContributorFilesType.OrderByDescending(f => f.Id).ToList())
+                            {
+                                var label = "<i class='fa fa-exclamation-circle'></i>";
+                                var statusId = "status-0";
+
+                                <tr data-id="@f.Id" data-idFile="@f.Id" class="select-radian-contributor">
+                                    <td width="33%" class="text-left"><span class="fa fa-download" title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.Name" id="@f.Id"></span>@f.Name</td>
+                                    <td width="33%" class="text-left init-hide @statusId"><input type="hidden" class="list-change-status" id="status-file-@index" value=""></td>
+                                    <td width="33%" class="text-left init-show">
+                                        <div><span class="">@Html.Raw(label) @f.Name</span></div>
+                                    </td>
+                                    <td width="33%" class="text-center edit-state-td"><button type="button" class="btn btn-link edit-state" disabled>Editar</button></td>
+                                </tr>
+                                index++;
+                            }
+                        </tbody>
+
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="row dropdown-state">
+        <div class="col-sm-6 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.RadianApprovalState, new { @class = "control-label" })
+                @Html.EnumDropDownListFor(m => m.RadianApprovalState, "Seleccióne el estado de la aprobación", new { @class = "form-control input-general" })
+            </div>
+        </div>
+    </div>
+
+

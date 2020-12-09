@@ -1,0 +1,123 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Gosocket.Dian.Services.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Param_GlobalLogger" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">1 Unzip</Value>
+    </Setting>
+    <Setting Name="Msg_Error_XmlInvalid" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Error descomprimiendo el archivo ZIP: No fue encontrado ningun documento XML valido.</Value>
+    </Setting>
+    <Setting Name="Msg_Error_XmlOnlyFile" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Encontrados mas de un XML descomprimiendo el archivo ZIP: Se debe enviar solo un fichero XML.</Value>
+    </Setting>
+    <Setting Name="Code_89" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">89</Value>
+    </Setting>
+    <Setting Name="Param_ApplicationResponse" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ApplicationResponse</Value>
+    </Setting>
+    <Setting Name="Msg_Error_EventUpdateOnlyDocument" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">El método SendEventUpdateStatus solo puede recibir un documento.</Value>
+    </Setting>
+    <Setting Name="Param_Zone1" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Zone 1</Value>
+    </Setting>
+    <Setting Name="Param_Zone2" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Zone 2</Value>
+    </Setting>
+    <Setting Name="Param_Parser" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Parser</Value>
+    </Setting>
+    <Setting Name="Param_Zone3" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Zone 3</Value>
+    </Setting>
+    <Setting Name="Param_Auth" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Auth</Value>
+    </Setting>
+    <Setting Name="Param_Auth3" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">3 Auth</Value>
+    </Setting>
+    <Setting Name="Param_Duplicity" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Duplicity</Value>
+    </Setting>
+    <Setting Name="Symbol_Slash" Type="System.Char" Scope="Application">
+      <Value Profile="(Default)">/</Value>
+    </Setting>
+    <Setting Name="Code_66" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">66</Value>
+    </Setting>
+    <Setting Name="Param_Zone4Mapper" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Zone 4 Mapper</Value>
+    </Setting>
+    <Setting Name="Param_UoloadXml" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">UploadXmlUrl</Value>
+    </Setting>
+    <Setting Name="Param_Uoload" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Upload</Value>
+    </Setting>
+    <Setting Name="Param_Upload5" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">5 Upload</Value>
+    </Setting>
+    <Setting Name="Param_False" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">false</Value>
+    </Setting>
+    <Setting Name="Param_Validate6" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">6 Validate</Value>
+    </Setting>
+    <Setting Name="Param_ValidateDocumentUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateDocumentUrl</Value>
+    </Setting>
+    <Setting Name="Param_Validate" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Validate</Value>
+    </Setting>
+    <Setting Name="Msg_Error_FieldMandatori" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Documento con errores en campos mandatorios.</Value>
+    </Setting>
+    <Setting Name="Code_00" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">00</Value>
+    </Setting>
+    <Setting Name="Code_99" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">99</Value>
+    </Setting>
+    <Setting Name="Msg_Procees_Sucessfull" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Procesado Correctamente.</Value>
+    </Setting>
+    <Setting Name="Param_7AplicattionSendEvent" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">7 Aplication SendEventUpdateStatus</Value>
+    </Setting>
+    <Setting Name="Param_LastZone" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Last Zone</Value>
+    </Setting>
+    <Setting Name="Code_100" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="Param_ApplicationResponseProcessUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ApplicationResponseProcessUrl</Value>
+    </Setting>
+    <Setting Name="Param_ValidateSerie" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateSerieUrl</Value>
+    </Setting>
+    <Setting Name="Param_ValidateEventCode" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateEmitionEventUrl</Value>
+    </Setting>
+    <Setting Name="Param_ValidateParty" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidatePartyUrl</Value>
+    </Setting>
+    <Setting Name="Param_ValidateSigningTime" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateSigningTimeUrl</Value>
+    </Setting>
+    <Setting Name="Param_ValidateDocumentReferenceId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateDocumentReferenceIdUrl</Value>
+    </Setting>
+    <Setting Name="Param_EventApproveCufe" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateEventApproveCufeUrl</Value>
+    </Setting>
+    <Setting Name="Param_ValidateReferenceAttorney" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateReferenceAttorneyUrl</Value>
+    </Setting>
+    <Setting Name="Param_ValidateCufe" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidatorCufeUrl</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

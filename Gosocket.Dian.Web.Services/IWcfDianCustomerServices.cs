@@ -87,7 +87,16 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         [OperationContract]
         [CustomOperation]
-        List<EventResponse> SendEventUpdateStatus(byte[] contentFile);
+        DianResponse SendEventUpdateStatus(byte[] contentFile);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="contentFile"></param>
+        /// <returns></returns>
+        [OperationContract]
+        [CustomOperation]
+        DianResponse SendNominaSync(byte[] contentFile);
 
         /// <summary>
         /// 

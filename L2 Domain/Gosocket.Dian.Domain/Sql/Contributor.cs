@@ -67,7 +67,7 @@ namespace Gosocket.Dian.Domain
 
         public virtual List<ContributorOperations> ContributorOperations { get; set; }
 
-
+        public virtual ICollection<RadianContributor> RadiantContributors { get; set; }
 
     }
 }

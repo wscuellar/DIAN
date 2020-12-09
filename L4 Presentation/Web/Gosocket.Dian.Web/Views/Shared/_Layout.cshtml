@@ -1,4 +1,5 @@
 ﻿@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Web.Common;
 @using Gosocket.Dian.Web.Utils
 @using Gosocket.Dian.Domain.Common
 @using Gosocket.Dian.Infrastructure
@@ -21,6 +22,7 @@
 
     <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
     <!--Bootstrap Stylesheet [ REQUIRED ]-->
+    <link href="~/Content/jquery-ui.css" rel="stylesheet">
     <link href="~/Content/css/bootstrap.min.css" rel="stylesheet">
     <!--Nifty Stylesheet [ REQUIRED ]-->
     <link href="~/Content/css/nifty.min.css" rel="stylesheet">
@@ -37,9 +39,15 @@
     <link href="~/Content/css/gosocket/typeahead.css" rel="stylesheet" />
     <link href="~/Content/css/daterangepicker.min.css" rel="stylesheet" />
     <link href="~/Content/plugins/bootstrap-datepicker/bootstrap-datepicker.css" rel="stylesheet" />
+    <link href="~/Content/jquery.steps.css" rel="stylesheet" />
+    <link href="~/Content/css/custom-form.css" rel="stylesheet" />
+    <link href="~/Content/plugins/data-tables/datatables.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/custom-select/customSelect.jquery.css" rel="stylesheet" />
+
     @*<link href="~/Content/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker-standalone.min.css" rel="stylesheet">*@
     <!--Gosocket Stylesheet [ REQUIRED ]-->
-
+    <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet">
+    <link href="~/Content/css/Radian/RadianResponsive.css" rel="stylesheet">
     <link href="~/Content/css/gosocket/gosocket.css?v=3.2.3" rel="stylesheet">
     <link href="~/Content/css/gosocket/gosocket-specific.css" rel="stylesheet">
     <link href="~/Scripts/font-awesome-animation.min.css" rel="stylesheet" />
@@ -297,6 +305,12 @@
                                             <!--Rol Administrador-->
                                             @if (User.IsInAnyRole("Administrador", "Super"))
                                             {
+                                                <!--RADIAN Administrador-->
+                                                if (User.IsInAnyRole("Administrador", "Super"))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.AdminRadian"><a href="@Url.Action("AdminRadianView", "Radian")">Habilitación</a></li>
+                                                }
+                                                <!--RADIAN Administrador-->
                                                 <li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("List", "Contributor", new {type = 2 })">Proveedores Tecnológicos</a></li>
                                                 <li id="@Navigation.NavigationEnum.ProviderAuthorized"><a href="@Url.Action("List", "Contributor", new {type = 3 })">Proveedores Autorizados</a></li>
                                                 <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor", new {type = 1 })">Facturadores Electrónicos</a></li>
@@ -350,11 +364,35 @@
                                                 <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor")">Facturadores</a></li>
                                             }
                                             <!--Rol Proveedor-->
+                                            <!--  RADIAN -->
+                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                            {
+                                                <li id="@Navigation.NavigationEnum.RADIAN">
+                                                    <a href="@Url.Action("Index", "Radian")">RADIAN</a>
+                                                </li>
+                                            }
+
                                         </ul>
                                     </li>
+
                                     <!--Rol Administrador-->
                                     @if (User.IsInAnyRole("Administrador", "Super"))
                                     {
+                                        <li id="@Navigation.NavigationEnum.ExternalUsersCreate">
+                                            <a href="@Url.Action("AddUser", "ExternalUsers")">
+                                                <i class="fa fa-user-circle-o"></i>
+                                                <span class="menu-title">
+                                                    Crear Usuario
+                                                </span>
+                                            </a>
+                                        </li>
+                                    }
+
+                                    <!--Rol Administrador-->
+                                    @if (User.IsInAnyRole("Administrador", "Super"))
+                                    {
+                                        <!--  RADIAN -->
+
                                         <li>
                                             <a id="@Navigation.NavigationEnum.ConfigurationIndex" class="parent-link" href="#">
 
@@ -370,13 +408,14 @@
                                                 {
                                                     <li id="@Navigation.NavigationEnum.ContributorFileType"><a href="@Url.Action("List", "ContributorFileType")">Tipos de Ficheros</a></li>
                                                     <li id="@Navigation.NavigationEnum.TestSet"><a href="@Url.Action("List", "TestSet")">Set de Pruebas</a></li>
+                                                    <li id="@Navigation.NavigationEnum.TestSetOtherDocuments"><a href="@Url.Action("List", "TestSetOthersDocuments")">Set de pruebas - Otros Documentos</a></li>
                                                 }
+                                                <!-- Configuracion RADIAN -->
                                                 @if (User.IsInAnyRole("Administrador", "Super"))
                                                 {
+                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("List", "RadianContributorFileType")">Tipos de Ficheros Radian</a></li>
+                                                    <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas Radian</a></li>
                                                     <li id="@Navigation.NavigationEnum.Contingencies"><a href="@Url.Action("Contingencies", "Settings")">Administrar Contingencias</a></li>
-                                                }
-                                                @if (User.IsInAnyRole("Administrador", "Super"))
-                                                {
                                                     <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("Users", "Settings")">Usuarios</a></li>
                                                 }
                                             </ul>
@@ -415,16 +454,16 @@
                                             </a>
                                         </li>
                                         @*if (ConfigurationManager.GetValue("Environment") == "Test")
-                                        {
-                                            <li id="@Navigation.NavigationEnum.Invoice">
-                                                <a href="@Url.Action("RedirectToBiller2", "User")" target="_blank">
-                                                    <i class="fa fa-dollar"></i>
-                                                    <span class="menu-title">
-                                                        Facturador Gratuito 2
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        }*@
+                                            {
+                                                <li id="@Navigation.NavigationEnum.Invoice">
+                                                    <a href="@Url.Action("RedirectToBiller2", "User")" target="_blank">
+                                                        <i class="fa fa-dollar"></i>
+                                                        <span class="menu-title">
+                                                            Facturador Gratuito 2
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            }*@
                                     }
 
                                     @if (User.IsInAnyRole("Administrador", "Super"))
@@ -513,6 +552,9 @@
     <!--jQuery [ REQUIRED ]-->
 
     <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Scripts/jquery-ui.js"></script>
+    <script src="~/Content/js/combobox-autocomplete.js"></script>
+
     <!--BootstrapJS [ RECOMMENDED ]-->
     <script src="~/Content/js/bootstrap.min.js"></script>
     <!--Nifty Admin [ RECOMMENDED ]-->
@@ -532,18 +574,25 @@
     <script type="text/javascript" src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
     <script src="~/Content/js/daterangepicker.min.js"></script>
     <script src="~/Content/plugins/bootstrap-datepicker/bootstrap-datepicker.js"></script>
-    <script src="~/Content/js/bootstrap-datepicker.es.min.js"></script>
+    <script src="~/Content/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.es.js"></script>
+    @*<script src="~/Content/js/bootstrap-datepicker.es.min.js"></script>*@
+    <script src="~/Content/plugins/custom-select/customSelect.jquery.js"></script>
 
     <script type="text/javascript" src="~/Content/plugins/masked-input/jquery.maskedinput.js"></script>
-    @*<script type="text/javascript" src="~/Content/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js"></script>*@
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
     <script src="~/Content/plugins/switchery/switchery.min.js"></script>
-
+    <script src="~/Content/plugins/data-tables/datatables.min.js"></script>
     <!--Gosocket Js [ REQUIRED ]-->
     <script src="~/Content/js/gosocket/gosocket.js?1.6.11"></script>
     <script src="~/Content/js/gosocket/typeahead.js"></script>
     <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
     <script src="~/Content/js/common/common.js?1.2.0"></script>
+
+    <!-- highchart-->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
     <script>
         $(function () {

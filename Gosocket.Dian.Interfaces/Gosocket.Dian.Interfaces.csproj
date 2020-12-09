@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\L2 Domain\Gosocket.Dian.Domain\Gosocket.Dian.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Gosocket.Dian.DataContext">
+      <HintPath>..\Gosocket.Dian.Web.Services\Bin\Gosocket.Dian.DataContext.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

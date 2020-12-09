@@ -10,6 +10,8 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
 
     }
 
+    public string CustomizationID { get; set; }
+
     public string FileName { get; set; }
     public DateTime EmissionDate { get; set; }
     public string DocumentTypeId { get; set; }
@@ -42,4 +44,7 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string TestSetId { get; set; }
     public string UblVersion { get; set; }
     public string ZipKey { get; set; }
+    public string EventCode { get; set; }
+    public bool InTransaction { get; set; }
+    public DateTime SigningTimeStamp { get; set; }
 }

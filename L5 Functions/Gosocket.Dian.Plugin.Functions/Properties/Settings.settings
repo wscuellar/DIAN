@@ -1,0 +1,33 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Gosocket.Dian.Plugin.Functions.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="COD_VN_DocumentMeta_AAK24" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AAK24</Value>
+    </Setting>
+    <Setting Name="COD_VN_DocumentMeta_AAK47" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AAK47</Value>
+    </Setting>
+    <Setting Name="COD_VN_DocumentMeta_AAJ24" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AAJ24</Value>
+    </Setting>
+    <Setting Name="COD_VN_DocumentMeta_AAJ47" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AAJ47</Value>
+    </Setting>
+    <Setting Name="COD_VN_DocumentMeta_AAB22" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AAB22b</Value>
+    </Setting>
+    <Setting Name="COD_VN_DocumentMeta_AAJ21" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AAJ21</Value>
+    </Setting>
+    <Setting Name="COD_VN_DocumentMeta_AAJ44" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AAJ44</Value>
+    </Setting>
+    <Setting Name="COD_VN_DocumentMeta_AAB19b" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AAB19b</Value>
+    </Setting>
+    <Setting Name="MAX_Attorney" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

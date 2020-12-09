@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        body {
+            font-family: "Calibri",sans-serif;
+        }
+
+        table {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+            flex-wrap: wrap;
+        }
+
+        /*strong {
+            font-size: 15px;
+            line-height: 107%;
+            font-family: "Calibri",sans-serif;
+        }
+
+        .inner_strong {
+            color: rgb(65, 65, 65);
+            font-family: Calibri, sans-serif;
+            font-size: 15px;
+            font-style: normal;
+            font-variant-ligatures: normal;
+            font-variant-caps: normal;
+            font-weight: 400;
+            letter-spacing: normal;
+            orphans: 2;
+            text-align: left;
+            text-indent: 0px;
+            text-transform: none;
+            white-space: normal;
+            widows: 2;
+            word-spacing: 0px;
+            -webkit-text-stroke-width: 0px;
+            background-color: rgb(255, 255, 255);
+            text-decoration-style: initial;
+            text-decoration-color: initial;
+            display: inline !important;
+            float: none;
+        }*/
+
+        .th-number {
+            width: 40px;
+        }
+
+        .td-cude {
+            width: 100px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <section>
+    </section>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="th-number">EVENTO No</th>
+                <th>Fecha de Validación</th>
+                <th>CUDE</th>
+                <th>RESPUESTA DE VALIDACIÓN POR LA DIAN</th>
+                <th>PERSONAS QUE INTERVIENEN EN EL EVENTO</th>
+                <th>ENTIDAD QUE VALIDAD EL EVENTO</th>
+                <th>RECEPTOR DEL EVENTO</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{EventNo}</td>
+                <td>{ValidationDate}</td>
+                <td class="td-cude">{CUFE}</td>
+                <td>{DianValidationResponse}</td>
+                <td>{SenderBusinessName}</td>
+                <td>DIAN</td>
+                <td>{ReceiverBusinessName}</td>
+            </tr>
+        </tbody>
+    </table>
+    <!--<br />
+    <br />
+    <section>
+        <div>
+            <strong>EVENTO No</strong> . {EventNo}
+        </div>
+        <div>
+            <strong>Fecha de Validación:</strong> {ValidationDate}
+        </div>
+        <div>
+            <strong>CUDE:</strong> {4b3f5bdb4037a0fef0de0456410926e2adc6d9cf969f871c4ae243751e9ae8fdd3b2d0c1d1b44d97ee535dd1dda1ed92}
+        </div>
+        <div>
+            <strong>RESPUESTA DE VALIDACIÓN POR LA DIAN:</strong> {DianValidationResponse}
+        </div>
+        <div>
+            <strong>PERSONAS QUE INTERVIENEN EN EL EVENTO:</strong> {SenderBusinessName}
+        </div>
+        <div>
+            <strong>ENTIDAD VALIDADORA:</strong> UNIDAD ADMINISTRATIVA ESPECIAL DE IMPUESTOS Y ADUANAS NACIONALES.
+        </div>
+        <div>
+            <strong>RECEPTOR DEL EVENTO:</strong> {ReceiverBusinessName}
+        </div>
+    </section>-->
+</body>
+</html>
