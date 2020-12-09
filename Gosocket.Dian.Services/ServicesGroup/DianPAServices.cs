@@ -729,12 +729,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var listId = documentParsed.listID == "" ? "1": documentParsed.listID;
             var UBLVersionID = documentParsed.UBLVersionID;
             var documentTypeIdRef = documentParsed.DocumentTypeIdRef;
+            var issuerPartyCode = documentParsed.IssuerPartyCode;
+            var IssuerPartyName = documentParsed.IssuerPartyName;
 
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
             //Validation of the DocumentReference Section - Informed CUFE and CUDE         
-            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode, documentTypeIdRef);
+            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode, documentTypeIdRef, issuerPartyCode, IssuerPartyName);
             if (!documentReferenceCufe.IsValid)
             {
                 dianResponse = documentReferenceCufe;
@@ -1595,9 +1597,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
         }
 
        
-        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef)
+        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef, string issuerPartyCode, string issuerPartyName)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef });            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName });            
+            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
