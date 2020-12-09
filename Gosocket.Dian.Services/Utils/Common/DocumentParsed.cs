@@ -24,6 +24,7 @@
             documentParsed.CustomizationId = documentParsed?.CustomizationId;
             documentParsed.listID = documentParsed?.listID;
             documentParsed.DocumentID = documentParsed?.DocumentID;
+            documentParsed.DocumentTypeIdRef = documentParsed?.DocumentTypeIdRef;
         }
     }
 }

@@ -118,7 +118,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference, string eventCode)
+        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef)
         {
             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
@@ -143,7 +143,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
 
-            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference, eventCode));
+            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference, eventCode, documentTypeIdRef));
 
             return validateResponses;
         }

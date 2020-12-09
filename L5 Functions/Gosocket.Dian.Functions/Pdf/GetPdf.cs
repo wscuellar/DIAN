@@ -99,12 +99,19 @@ namespace Gosocket.Dian.Functions.Pdf
                 Html_Content = Html_Content.Replace("#123logo", logoBase64);
                 Html_Content = Html_Content.Replace("#1qrcode", qrBase64);
 
-                // Sustituir en el HTML la respuesta de la validación del documento
+                // Sustituir en el HTML la respuesta de la validación del documento y SigningTime
                 var documentApplication = htmlGDoc.GetDocumentResponse();
+                var documentSigningTime = htmlGDoc.GetSigningTime();
                 if (documentApplication != null)
+                {
                     Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication);
+                    Html_Content = Html_Content.Replace("#SigningTime", documentSigningTime);
+                }
                 else
+                {
                     Html_Content = Html_Content.Replace("#ApplicationResponse", "");
+                    Html_Content = Html_Content.Replace("#SigningTime", "");
+                }
 
                 //-------------------------------------------------------------------------------------------------------------------------
 
