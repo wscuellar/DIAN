@@ -49,11 +49,17 @@ namespace Gosocket.Dian.DataContext.Repositories
             {
                 radianContributorFile.Id = radianContributorFileInstance.Id;
                 radianContributorFileInstance.Status = radianContributorFile.Status;
+                radianContributorFileInstance.FileName = radianContributorFile.FileName;
+                radianContributorFileInstance.FileType = radianContributorFile.FileType;
+                radianContributorFileInstance.Deleted = radianContributorFile.Deleted;
+                radianContributorFileInstance.Updated = System.DateTime.Now;
                 _sqlDBContext.Entry(radianContributorFileInstance).State = System.Data.Entity.EntityState.Modified;
             }
             else
             {
                 radianContributorFile.Id = Guid.NewGuid();
+                radianContributorFile.Timestamp = System.DateTime.Now;
+                radianContributorFile.Updated = System.DateTime.Now;
                 _sqlDBContext.Entry(radianContributorFile).State = System.Data.Entity.EntityState.Added;
             }
 
