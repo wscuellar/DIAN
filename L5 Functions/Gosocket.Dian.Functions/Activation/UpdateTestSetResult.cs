@@ -313,7 +313,11 @@ namespace Gosocket.Dian.Functions.Activation
                         }
 
                         // Ubico el software
-                        var software = radianSoftwareService.Get(Guid.Parse(radianTesSetResult.SoftwareId));
+                        // var software = radianSoftwareService.Get(Guid.Parse(radianTesSetResult.SoftwareId));
+                        var software = globalRadianOperationService.Get( 
+                                                                    radianTesSetResult.TestSetReference, 
+                                                                    radianTesSetResult.SoftwareId);
+
                         if (software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted &&
                                     radianTesSetResult.OperationModeId != (int)RadianSoftwareStatus.InProcess)
                         {

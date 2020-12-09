@@ -15,7 +15,7 @@ namespace Gosocket.Dian.Application
 
         #region GlobalRadianOperation
 
-        public bool Insert(GlobalRadianOperations item, RadianSoftware software )
+        public bool Insert(GlobalRadianOperations item, RadianSoftware software)
         {
             GlobalSoftware soft = new GlobalSoftware(software.Id.ToString(), software.Id.ToString())
             {
@@ -47,6 +47,11 @@ namespace Gosocket.Dian.Application
         {
             GlobalRadianOperations item = globalRadianOperations.Find<GlobalRadianOperations>(code, softwareId.ToString());
             return item.RadianStatus == Domain.Common.RadianState.Habilitado.ToString();
+        }
+
+        public GlobalSoftware Get(string code, string softwareId)
+        {
+            return globalRadianOperations.Find<GlobalRadianOperations>(code, softwareId.ToString());
         }
 
         #endregion
