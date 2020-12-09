@@ -730,13 +730,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var UBLVersionID = documentParsed.UBLVersionID;
             var documentTypeIdRef = documentParsed.DocumentTypeIdRef;
             var issuerPartyCode = documentParsed.IssuerPartyCode;
-            var IssuerPartyName = documentParsed.IssuerPartyName;
+            var issuerPartyName = documentParsed.IssuerPartyName;
 
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
             //Validation of the DocumentReference Section - Informed CUFE and CUDE         
-            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode, documentTypeIdRef, issuerPartyCode, IssuerPartyName);
+            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName);
             if (!documentReferenceCufe.IsValid)
             {
                 dianResponse = documentReferenceCufe;
