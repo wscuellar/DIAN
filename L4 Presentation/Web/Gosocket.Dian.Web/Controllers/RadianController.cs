@@ -116,7 +116,7 @@ namespace Gosocket.Dian.Web.Controllers
                 Page = model.Page,
                 RadianContributors = radianAdmin.Contributors.Select(c => new RadianContributorsViewModel()
                 {
-                    Id = c.Id,
+                    Id = c.RadianContributorId,
                     Code = c.Code,
                     TradeName = c.TradeName,
                     BusinessName = c.BusinessName,
@@ -143,7 +143,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             RadianContributorsViewModel model = new RadianContributorsViewModel
             {
-                Id = radianAdmin.Contributor.Id,
+                Id = radianAdmin.Contributor.RadianContributorId,
                 Code = radianAdmin.Contributor.Code,
                 TradeName = radianAdmin.Contributor.TradeName,
                 BusinessName = radianAdmin.Contributor.BusinessName,
@@ -260,7 +260,7 @@ namespace Gosocket.Dian.Web.Controllers
                         {
                             messasge = "Los participantes 'En pruebas' no se pueden cancelar.",
                             success = true,
-                            id = radianAdmin.Contributor.Id
+                            id = radianAdmin.Contributor.RadianContributorId
                         }, JsonRequestBehavior.AllowGet);
                     }
                 }
@@ -275,12 +275,12 @@ namespace Gosocket.Dian.Web.Controllers
                             {
                                 messasge = "Todos los archivos deben estar en estado 'Aceptado' para poder cambiar el estado del participante.",
                                 success = true,
-                                id = radianAdmin.Contributor.Id
+                                id = radianAdmin.Contributor.RadianContributorId
                             }, JsonRequestBehavior.AllowGet);
                         }
                         else
                         {
-                            _ = _radianContributorService.ChangeParticipantStatus(id, RadianState.Test.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                            _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, RadianState.Test.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
                             _ = SendMail(radianAdmin);
                         }
                     }
@@ -290,7 +290,7 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     messasge = "Datos actualizados correctamente.",
                     success = true,
-                    id = radianAdmin.Contributor.Id
+                    id = radianAdmin.Contributor.RadianContributorId
                 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)

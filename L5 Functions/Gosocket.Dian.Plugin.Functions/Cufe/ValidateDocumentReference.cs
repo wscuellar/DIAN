@@ -36,10 +36,13 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an IdDocumentReference in the request body");
             if (string.IsNullOrEmpty(data.EventCode))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an EventCode in the request body");
+            if (string.IsNullOrEmpty(data.DocumentTypeIdRef))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an DocumentTypeIdRef in the request body");
 
             var trackId = data.TrackId;
             var eventCode = data.EventCode;
             var idDocumentReference = data.IdDocumentReference;
+            var documentTypeIdRef = data.DocumentTypeIdRef;
 
             if (trackId == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
@@ -47,10 +50,12 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an IdDocumentReference on the query string or in the request body");
             if (eventCode == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an eventCode on the query string or in the request body");
+            if (documentTypeIdRef == null)
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an documentTypeIdRef on the query string or in the request body");
 
             try
             {
-                var validateResponses = await ValidatorEngine.Instance.StartValidateDocumentReferenceAsync(trackId, idDocumentReference, eventCode);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateDocumentReferenceAsync(trackId, idDocumentReference, eventCode, documentTypeIdRef);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -81,6 +86,8 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
             public string IdDocumentReference { get; set; }
             [JsonProperty(PropertyName = "eventCode")]
             public string EventCode { get; set; }
+            [JsonProperty(PropertyName = "documentTypeIdRef")]
+            public string DocumentTypeIdRef { get; set; }
         }
     }
 }

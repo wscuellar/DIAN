@@ -1416,9 +1416,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                 attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                attorneyModel.idTypeDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
                 //Valida CUFE referenciado existe en sistema DIAN
                 nitModel.DocumentKey = attorneyModel.cufe;
-                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference, "043");
+                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference);
                 if (resultValidateCufe[0].IsValid)
                     attorney.Add(attorneyModel);
                 else
@@ -1969,10 +1970,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validación de la Sección DocumentReference - CUFE Informado
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
-        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference, string eventCode)
+        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference, string eventCode, string documentTypeIdRef)
         {
-            string documentTypeIdRef = ((Convert.ToInt32(eventCode)) == (int)EventStatus.TerminacionMandato ||
-                (Convert.ToInt32(eventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)) ? nitModel.DocumentTypeIdRef : nitModel.DocumentTypeId;
+            string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato) 
+                ? "No corresponde a un tipo de documento valido"
+                : "El tipo de identificador no coincide con el informado en el documento electrónico.";
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
@@ -1992,34 +1994,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
             {
-                if (nitModel.ResponseCode == "043")
-                {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAH06-(R) ",
-                        ErrorMessage = "El número de documento electrónico referenciado no coinciden con un mandato reportado.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                string message = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.Mandato
+                    ? "El número de documento electrónico referenciado no coinciden con un mandato reportado." 
+                    : "El número de documento electrónico referenciado no coinciden con reportado.";
 
-                }
-                else
+                responses.Add(new ValidateListResponse
                 {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "AAH06 ",
-                        ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAH06-(R) ",
+                    ErrorMessage = message,
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });              
+            }
+            //Valida DocumentTypeCode coincida con el documento informado
+            if(documentMeta.DocumentTypeId != documentTypeIdRef)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAH09-(R): ",
+                    ErrorMessage = messageTypeId,
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
 
-            if (Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoPropiedad ||
-               Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ||
-               Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoProcuracion)
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad ||
+               Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia ||
+               Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
             {
                 //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
                 if (documentMeta.ReceiverCode != nitModel.IssuerPartyCode)
