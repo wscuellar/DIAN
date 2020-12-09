@@ -118,14 +118,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public List<ValidateListResponse> StartValidateDocumentReference(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef)
+        public List<ValidateListResponse> StartValidateDocumentReference(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef, string issuerPartyCode, string issuerPartyName)
         {
             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
             DateTime startDate = DateTime.UtcNow;
 
 
-            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(trackId, idDocumentReference, eventCode, documentTypeIdRef));
+            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName));
 
             return validateResponses;
         }

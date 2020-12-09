@@ -16,6 +16,8 @@
         public string DocumentID { get; set; }
         public string UBLVersionID { get; set; }
         public string DocumentTypeIdRef { get; set; }
+        public string IssuerPartyCode { get; set; }
+        public string IssuerPartyName { get; set; }
 
         public static void SetValues(ref DocumentParsed documentParsed)
         {
@@ -25,6 +27,8 @@
             documentParsed.listID = documentParsed?.listID;
             documentParsed.DocumentID = documentParsed?.DocumentID;
             documentParsed.DocumentTypeIdRef = documentParsed?.DocumentTypeIdRef;
+            documentParsed.IssuerPartyName = documentParsed?.IssuerPartyName;
+            documentParsed.IssuerPartyCode = documentParsed?.IssuerPartyCode;
         }
     }
 }

@@ -1,8 +1,148 @@
-﻿
-@{
-    ViewBag.Title = "AddOrUpdate";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocumentsViewModel
+
+
+@section css
+{
+    <style type="text/css">
+
+        .btnAddOthersDocs {
+            height: 41px !important;
+            width: 22px;
+            font-size: 14pt;
+            color: #fff;
+            background-color: #348441;
+            border-right-width: 0px !important;
+            border-right-style: none;
+            border-top-right-radius: 6px !important;
+            border-bottom-right-radius: 6px !important;
+            border-top-left-radius: 0px !important;
+            border-bottom-left-radius: 0px !important;
+            text-align: center;
+            padding-left: 0px;
+            padding-right: 0px;
+            margin-left: -3px;
+        }
+
+
+        .input-general {
+            background: #fff !important;
+        }
+
+        .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+            cursor: not-allowed;
+            background-color: #eee !important;
+        }
+
+        .btnCloseOtherDocument {
+            color: #fff;
+            background: #348441 !important;
+            background-color: #348441 !important;
+            /*border-radius: 10px !important;*/
+            float: right;
+            cursor: pointer;
+            opacity: 100 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
+            font-weight: normal !important;
+            font-family: auto !important;
+        }
+
+        .prompt-comment .modal-body {
+            width: 100%;
+        }
+
+        .modal-body .close, .modal-header .close {
+            background-color: #348441 !important;
+        }
+
+        .divBackTop{
+            padding-top: 15px;
+        }
+
+        .iconBackTop {
+            color: #348441;
+            font-size: 13pt;
+        }
+
+        .btnBackTop {
+            color: #348441;
+            font-size: 14pt;
+            text-decoration:underline;
+        }
+
+
+        
+    </style>
 }
+<div class="page-content margin-15">
+    <div class="row title-container" style="margin-left: 1px;">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+        <div class="divBackTop">
+            <span class="glyphicon glyphicon-chevron-left iconBackTop"></span>
+            &nbsp;<a href="@Url.Action("Index", "OthersElectronicDocuments")" class="btnBackTop">Volver</a>
+        </div>
+    </div>
+    <div class="row margin-horizontal-0" style="margin-top: 15px;">
+        <div class="tab-base">
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel">
 
-<h2>AddOrUpdate</h2>
+                        <div class="panel-body padding-top-20">
+                            <div class="row margin-horizontal-0">
+                                <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                                    @using (Html.BeginForm("AddOrUpdate", "OthersElectronicDocuments", FormMethod.Post, new { id = "frmOthersElectronicDocuments" }))
+                                    {
+                                        @Html.Partial("_form")
 
+                                        <div class="panel-footer text-right">
+                                            <button id="btnSave" type="button" class="btn btn-success btn-radian-success">Asociar</button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+
+        var enumElectronicsDocuments =
+        {
+            ElectronicPayroll: 1, //Nomina electronica y Nomina de ajuste
+            ImportDocument: 2,
+            SupportDocument: 3,
+        };
+
+        $(document).ready(function ($) {
+
+
+            $('#btn-save').click(function () {
+                var form = $('#add-testset-form');
+                if (form.valid()) {
+                    showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+                    form.submit();
+                }
+            });
+
+
+        });//ready
+
+    </script>
+
+}
