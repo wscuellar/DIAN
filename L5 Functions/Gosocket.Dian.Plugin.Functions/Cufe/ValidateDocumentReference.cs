@@ -55,7 +55,7 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
 
             try
             {
-                var validateResponses = await ValidatorEngine.Instance.StartValidateDocumentReferenceAsync(trackId, idDocumentReference, eventCode, documentTypeIdRef);
+                var validateResponses = ValidatorEngine.Instance.StartValidateDocumentReference(trackId, idDocumentReference, eventCode, documentTypeIdRef);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
