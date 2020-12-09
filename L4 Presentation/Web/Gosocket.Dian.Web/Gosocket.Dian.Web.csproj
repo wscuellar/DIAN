@@ -398,6 +398,7 @@
     <Compile Include="Models\RadianTestSetTableViewModel.cs" />
     <Compile Include="Models\RadianTestSetTrackingViewModel.cs" />
     <Compile Include="Models\RadianTestSetViewModel.cs" />
+    <Compile Include="Models\ValidacionOtherElectronicDocumentsViewModel.cs" />
     <Compile Include="Models\RegistrationDataViewModel.cs" />
     <Compile Include="Models\RequestAuthorizationBigContributorViewModel.cs" />
     <Compile Include="Models\Role\RoleModel.cs" />
@@ -582,10 +583,12 @@
     <Content Include="Content\images\puerbas-2.png" />
     <Content Include="Content\images\reject.png" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\Emisor.svg" />
     <Content Include="Content\images\Svg\Loaded.svg" />
     <Content Include="Content\images\Svg\Factor.svg" />
     <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
     <Content Include="Content\images\Svg\OperacionDirecta.svg" />
+    <Content Include="Content\images\Svg\ProveedorTecnologicoII.svg" />
     <Content Include="Content\images\Svg\SistemaNegociacion.svg" />
     <Content Include="Content\images\Svg\ProveedorTecnologico.svg" />
     <Content Include="Content\images\Svg\FacturadorElectronico.svg" />
@@ -2890,6 +2893,7 @@
     <Content Include="Views\Document\PrintDocument.cshtml" />
     <Content Include="Views\OthersElectronicDocuments\Index.cshtml" />
     <Content Include="Views\OthersElectronicDocuments\AddOrUpdate.cshtml" />
+    <Content Include="Views\OthersElectronicDocuments\AddParticipants.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

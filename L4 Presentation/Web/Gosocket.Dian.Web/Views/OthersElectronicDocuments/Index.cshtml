@@ -1,8 +1,82 @@
-﻿
-@{
-    ViewBag.Title = "Index";
+﻿@{
+    ViewBag.Title = "Otros Documentos Electrónicos";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Gosocket.Dian.Web.Models.AutoListModel> ListDocs = (List<Gosocket.Dian.Web.Models.AutoListModel>
+                   )ViewBag.ListElectronicDocuments;
 }
 
-<h2>Index</h2>
+
+<div class="page-content radian-view margin-20">
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="container-fluid RadianContainerBegin" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
+
+        <div class="row">
+            <div class="col-lg-12  col-md-12  col-xs-12" style="margin-top:30px">
+                <h4><b>Seleccione el tipo de documento:</b></h4>
+            </div>
+            <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
+            </div>
+
+
+            <div class="row-fluid">
+                @foreach (var item in ListDocs)
+                {
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="card RadianCardContainer" style="width: 80% !important; height: 240px !important;" idElectronicDocument="@item.value" textElectronicDocument="@item.text">
+                            <div class="RadianImgContainer">
+                                sin img
+                            </div>
+                            <div class="card-body">
+                                <p class="RadianTittleCard" style="margin: 20px;">@item.text</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+
+    <script>
+        var operationClick = false;
+
+        $('.RadianCardContainer').click(function () { 
+            showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
+
+                if (!operationClick) {
+                    operationClick = true;
+
+                    var electronicDocumentId = $(this).attr('idElectronicDocument');
+                    var ValidacionOtherElectronicDocumentsViewModel = {
+                        UserCode: '@ViewBag.UserCode',
+                        Accion: 'SeleccionElectronicDocument',
+                        ElectronicDocument: $(this).attr('idElectronicDocument'),
+                        complementoTexto: $(this).attr('textElectronicDocument'),
+                    };
+
+                    CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
+                        function (param) {
+                            var url = "@Url.Action("AddParticipants", "OthersElectronicDocuments")" + "?electronicDocumentId=" + electronicDocumentId;
+                            window.location.href = url;
+                         }, true, () => hideLoading('#panel-form')
+                    );
+                }
+
+        });
+    </script>
+}
+
 
