@@ -1970,7 +1970,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validación de la Sección DocumentReference - CUFE Informado
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
-        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference, string eventCode, string documentTypeIdRef)
+        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference, string eventCode, 
+            string documentTypeIdRef, string IssuerPartyCode = null, string IssuerPartyName = null)
         {
             string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato) 
                 ? "No corresponde a un tipo de documento valido"
@@ -1994,7 +1995,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
             {
-                string message = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.Mandato
+                string message = Convert.ToInt32(eventCode) == (int)EventStatus.Mandato
                     ? "El número de documento electrónico referenciado no coinciden con un mandato reportado." 
                     : "El número de documento electrónico referenciado no coinciden con reportado.";
 
@@ -2025,7 +2026,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
             {
                 //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
-                if (documentMeta.ReceiverCode != nitModel.IssuerPartyCode)
+                if (documentMeta.ReceiverCode != IssuerPartyCode)
                 {
                     responses.Add(new ValidateListResponse
                     {
@@ -2037,7 +2038,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
                 //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
-                if (documentMeta.ReceiverName != nitModel.IssuerPartyName)
+                if (documentMeta.ReceiverName != IssuerPartyName)
                 {
                     responses.Add(new ValidateListResponse
                     {
