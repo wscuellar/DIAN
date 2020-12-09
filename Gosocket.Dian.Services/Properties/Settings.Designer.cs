@@ -375,5 +375,23 @@ namespace Gosocket.Dian.Services.Properties {
                 return ((string)(this["Param_ValidateCufe"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidateCuneUrl")]
+        public string Param_ValidateCune {
+            get {
+                return ((string)(this["Param_ValidateCune"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ValidatePredecesorUrl")]
+        public string Param_ValidatePredecesor {
+            get {
+                return ((string)(this["Param_ValidatePredecesor"]));
+            }
+        }
     }
 }

@@ -1006,6 +1006,22 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE 3
             start = DateTime.UtcNow;
 
+            var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = "11", trackId, eventNomina = true };
+            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
+            if (!uploadXmlResponse.Success)
+            {
+                //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
+                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
+                dianResponse.StatusDescription = uploadXmlResponse.Message;
+                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
+                if (globalEnd >= 10)
+                {
+                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
+                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                }
+                return dianResponse;
+            }
+
             var validatorCuneRequest = validatorCune(trackId);
             if (!validatorCuneRequest.IsValid)
             {
@@ -1028,22 +1044,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
                 dianResponse.StatusCode = Properties.Settings.Default.Code_89;
                 dianResponse.StatusDescription = validatePredecesor.StatusMessage;
-                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-                if (globalEnd >= 10)
-                {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
-                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
-                }
-                return dianResponse;
-            }
-
-            var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = "11", trackId, eventNomina = true };
-            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>("http://localhost:7071/api/UploadXml", uploadXmlRequest);
-            if (!uploadXmlResponse.Success)
-            {
-                //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
-                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
-                dianResponse.StatusDescription = uploadXmlResponse.Message;
                 var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
                 if (globalEnd >= 10)
                 {
@@ -1215,7 +1215,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         public DianResponse ValidateReplacePredecedor(string trackId)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidatePredecesor", new { trackId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidatePredecesor), new { trackId });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1241,7 +1241,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         public DianResponse validatorCune(string trackId)
         {
             var data = new { trackId };
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateCune", new { trackId });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateCune), new { trackId });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
