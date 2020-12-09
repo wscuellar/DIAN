@@ -1,5 +1,6 @@
 using Gosocket.Dian.Application;
 using Gosocket.Dian.DataContext.Repositories;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
@@ -303,64 +304,30 @@ namespace Gosocket.Dian.Functions.Activation
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (radianTesSetResult.Status == (int)TestSetStatus.Accepted)
                     {
-                        // partition key are sender code.
-                        var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
-                        if (contributor.AcceptanceStatusId == (int)ContributorStatus.Registered)
-                        {
-                            contributorService.SetToEnabled(contributor);
-                            var globalContributor = new GlobalContributor(contributor.Code, contributor.Code) { Code = contributor.Code, StatusId = contributor.AcceptanceStatusId, TypeId = contributor.ContributorTypeId };
-                            await contributorTableManager.InsertOrUpdateAsync(globalContributor);
-                        }
-
-                        // Ubico el software
-                        // var software = radianSoftwareService.Get(Guid.Parse(radianTesSetResult.SoftwareId));
-                        var software = globalRadianOperationService.Get( 
-                                                                    radianTesSetResult.TestSetReference, 
-                                                                    radianTesSetResult.SoftwareId);
-
-                        if (software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted &&
-                                    radianTesSetResult.OperationModeId != (int)RadianSoftwareStatus.InProcess)
-                        {
-                            radianSoftwareService.SetToProduction(software);
-                            var softwareId = software.Id.ToString();
-                            var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.RadianSoftwareStatusId };
-                            await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
-                        }
-
+                       
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
                         {
                             try
                             {
-                                var requestObject = new { contributorId = contributor.Id };
-                                var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), requestObject);
+                                #region Proceso Radian
 
-                                var guid = Guid.NewGuid().ToString();
-                                var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
+                                Contributor contributor = contributorService.GetByCode(globalTestSetTracking.SenderCode);
+                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
+                                if (!string.IsNullOrEmpty(isPartipantActive.RadianStatus))
                                 {
-                                    Success = activation.Success,
-                                    ContributorCode = contributor.Code,
-                                    ContributorTypeId = contributor.ContributorTypeId,
-                                    OperationModeId = radianTesSetResult.OperationModeId,
-                                    OperationModeName = radianTesSetResult.OperationModeName,
-                                    SentToActivateBy = "Function",
-                                    SoftwareId = radianTesSetResult.SoftwareId,
-                                    SendDate = DateTime.UtcNow,
-                                    TestSetId = radianTesSetResult.Id,
-                                    Trace = activation.Trace,
-                                    Message = activation.Message,
-                                    Detail = activation.Detail,
-                                    Request = JsonConvert.SerializeObject(requestObject)
-                                };
-                                await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
+                                    contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey);
+                                }
+                                #endregion
 
-                                if (radianTesSetResult.Status == (int)RadianSoftwareStatus.Accepted)
-                                    await MigrateCertificate(contributor.Code);
+                                #region Pendiente migracion
+
+                                #endregion
 
                             }
                             catch (Exception ex)
                             {
-                                log.Error($"Error al enviar a activar RADIAN contribuyente con id {contributor.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                               // log.Error($"Error al enviar a activar RADIAN contribuyente con id {contributor.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                                 throw;
                             }
                         }
