@@ -57,7 +57,11 @@ namespace Gosocket.Dian.Web.Utils
             RadianSetPruebas,
             AdminRadian,
             TestSetOtherDocuments,
-            ExternalUsersCreate
+            ExternalUsersCreate,
+            /// <summary>
+            /// Otros documentos
+            /// </summary>
+            OthersEletronicDocuments
         }
     }
 }
