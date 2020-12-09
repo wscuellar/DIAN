@@ -1654,8 +1654,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private void UpdateInTransactions(string trackId, string eventCode)
         {
-            //validation if is an endoso of endorsement (Code 038)
-
+            //valida InTransaction eventos Endoso en propeidad, Garantia y procuración
             var arrayTasks = new List<Task>();
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             
