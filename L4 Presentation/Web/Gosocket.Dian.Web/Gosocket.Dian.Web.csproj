@@ -562,6 +562,7 @@
     <Content Include="Content\images\pendiente-2.png" />
     <Content Include="Content\images\pendiente-3.png" />
     <Content Include="Content\images\png\calendarAlt.png" />
+    <Content Include="Content\images\png\check-circle.png" />
     <Content Include="Content\images\png\closeButton.png" />
     <Content Include="Content\images\png\commet-doots.png" />
     <Content Include="Content\images\png\done.png" />
@@ -722,6 +723,7 @@
     <Content Include="Content\js\Radian\DownloadFile.js" />
     <Content Include="Content\js\Radian\RadianIndex.js" />
     <Content Include="Content\js\Radian\RadianOperationMode.js" />
+    <Content Include="Content\js\Radian\RadianPrintDocumentPdf.js" />
     <Content Include="Content\js\Radian\RadianSteps.js" />
     <Content Include="Content\js\Radian\RadianTestSet.js" />
     <Content Include="Content\js\user\user.js" />

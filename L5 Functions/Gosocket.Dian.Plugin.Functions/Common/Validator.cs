@@ -1071,8 +1071,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             string valueTotalEndoso = nitModel.ValorTotalEndoso;
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
-            string valueDiscountRateEndoso = nitModel.TasaDescuento;
-            string valueTotalInvoice = xmlParserCufe.TotalInvoice;
+            string valueDiscountRateEndoso = nitModel.TasaDescuento;            
 
             //Valida informacion Endoso                           
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
@@ -1123,7 +1122,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         };
                     }
 
-                    if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
+                    if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
                     {
                         return new ValidateListResponse
                         {
@@ -1417,9 +1416,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                 attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                attorneyModel.idTypeDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
                 //Valida CUFE referenciado existe en sistema DIAN
                 nitModel.DocumentKey = attorneyModel.cufe;
-                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference, "043");
+                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference);
                 if (resultValidateCufe[0].IsValid)
                     attorney.Add(attorneyModel);
                 else
@@ -1970,10 +1970,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validación de la Sección DocumentReference - CUFE Informado
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
-        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference, string eventCode)
+        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference, string eventCode, string documentTypeIdRef)
         {
-            string documentTypeIdRef = ((Convert.ToInt32(eventCode)) == (int)EventStatus.TerminacionMandato ||
-                (Convert.ToInt32(eventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)) ? nitModel.DocumentTypeIdRef : nitModel.DocumentTypeId;
+            string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato) 
+                ? "No corresponde a un tipo de documento valido"
+                : "El tipo de identificador no coincide con el informado en el documento electrónico.";
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
@@ -1993,34 +1994,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
             {
-                if (nitModel.ResponseCode == "043")
-                {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAH06-(R) ",
-                        ErrorMessage = "El número de documento electrónico referenciado no coinciden con un mandato reportado.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                string message = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.Mandato
+                    ? "El número de documento electrónico referenciado no coinciden con un mandato reportado." 
+                    : "El número de documento electrónico referenciado no coinciden con reportado.";
 
-                }
-                else
+                responses.Add(new ValidateListResponse
                 {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "AAH06 ",
-                        ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAH06-(R) ",
+                    ErrorMessage = message,
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });              
+            }
+            //Valida DocumentTypeCode coincida con el documento informado
+            if(documentMeta.DocumentTypeId != documentTypeIdRef)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAH09-(R): ",
+                    ErrorMessage = messageTypeId,
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
 
-            if (Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoPropiedad ||
-               Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ||
-               Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoProcuracion)
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad ||
+               Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia ||
+               Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
             {
                 //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
                 if (documentMeta.ReceiverCode != nitModel.IssuerPartyCode)
@@ -2730,45 +2732,51 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             string valueTotalInvoice = xmlParserCufe.TotalInvoice;
 
-                XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-                int totalValueSender = 0;
-                for (int i = 0; i < valueListSender.Count; i++)
-                {
-                    string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-                }
+            XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+            int totalValueSender = 0;
+            for (int i = 0; i < valueListSender.Count; i++)
+            {
+                string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                // Si no se reporta, el Avalista asume el valor del monto de quien respalda...
+                if (string.IsNullOrWhiteSpace(valueStockAmount)) return null;
 
-                XmlNodeList valueListIssuerParty = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']");
-                int totalValueIssuerParty = 0;
-                for (int i = 0; i < valueListIssuerParty.Count; i++)
-                {
-                    string valueStockAmount = valueListIssuerParty.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    totalValueIssuerParty += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-                }
+                totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+            }
 
-                if (totalValueIssuerParty != totalValueSender)
+            if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+            {
+                return new ValidateListResponse
                 {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAH32c-(R): ",
-                        ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: 89-(R): ",
+                    ErrorMessage = $"{(string)null} El valor reportado del elemento SenderParty supera el valor total del Título Valor.",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
+            }
 
-                if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+            XmlNodeList valueListIssuerParty = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']");
+            // En caso de no indicarlo quedan garantizadas las obligaciones de todas las partes del título.
+            if (valueListIssuerParty.Count <= 0) return null;
+
+            int totalValueIssuerParty = 0;
+            for (int i = 0; i < valueListIssuerParty.Count; i++)
+            {
+                string valueStockAmount = valueListIssuerParty.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                if (!string.IsNullOrWhiteSpace(valueStockAmount)) totalValueIssuerParty += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+            }
+
+            if (totalValueIssuerParty != totalValueSender)
+            {
+                return new ValidateListResponse
                 {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: 89-(R): ",
-                        ErrorMessage = $"{(string)null} El valor reportado del elemento SenderParty supera el valor total del Título Valor.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAH32c-(R): ",
+                    ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                };
+            }           
           
             return null;
         }
@@ -2844,9 +2852,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.Received:
                 case (int)EventStatus.Receipt:
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
-                case (int)EventStatus.Mandato:
-                case (int)EventStatus.EndosoProcuracion:
-                case (int)EventStatus.EndosoPropiedad:
+                case (int)EventStatus.Mandato:                
                     responses.Add(Convert.ToDateTime(data.SigningTime) >= Convert.ToDateTime(dataModel.SigningTime)
                         ? new ValidateListResponse
                         {
@@ -3025,9 +3031,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
-                    break;
-                //Validación fecha emite evento AR menor a fecha de vencimiento factura
+                    break;          
                 case (int)EventStatus.EndosoGarantia:
+                case (int)EventStatus.EndosoProcuracion:
+                case (int)EventStatus.EndosoPropiedad:
                     responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModel.PaymentDueDate)
                         ? new ValidateListResponse
                         {

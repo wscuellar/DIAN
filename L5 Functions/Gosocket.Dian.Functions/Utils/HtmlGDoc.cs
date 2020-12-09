@@ -55,12 +55,21 @@ namespace Gosocket.Dian.Functions.Utils
                 var stringDescription = _xmlApplication.SelectSingleNode(@"/descendant::*[local-name()='ApplicationResponse']/descendant::*[local-name()='DocumentResponse']/descendant::*[local-name()='Response']/descendant::*[local-name()='Description']", _nsmgr)?.InnerText;
                 var stringIssueDate = _xmlApplication.SelectSingleNode(@"/descendant::*[local-name()='ApplicationResponse']/descendant::*[local-name()='IssueDate']", _nsmgr)?.InnerText;
                 var stringIssueTime = _xmlApplication.SelectSingleNode(@"/descendant::*[local-name()='ApplicationResponse']/descendant::*[local-name()='IssueTime']", _nsmgr)?.InnerText;
+                var stringSigningTime = _xml.SelectSingleNode(@"/descendant::*[local-name()='UBLExtension']/descendant::*[local-name()='ExtensionContent']/descendant::*[local-name()='Signature']/descendant::*[local-name()='Object']/descendant::*[local-name()='QualifyingProperties']/descendant::*[local-name()='SignedProperties']/descendant::*[local-name()='SignedSignatureProperties']/descendant::*[local-name()='SigningTime']", _nsmgr)?.InnerText;
+                var stringDocument = "Documento generado el: ";
                 DateTime fecha = Convert.ToDateTime(stringIssueDate);
+                DateTime hora = Convert.ToDateTime(stringIssueTime);
+                DateTime signingTime = Convert.ToDateTime(stringSigningTime);
                 stringIssueDate = fecha.ToString("dd/MM/yyyy");
+                stringIssueTime = hora.ToString("HH:mm:ss");
+                stringSigningTime = signingTime.ToString("dd/MM/yyyy HH:mm:ss");
 
                 XmlNode createElementDocumentResponse = _xml.CreateElement("DocumentResponse", _xml.DocumentElement.NamespaceURI);
+                XmlNode createElementSigningTime = _xml.CreateElement("ConvertSigningTime", _xml.DocumentElement.NamespaceURI);
                 createElementDocumentResponse.InnerText = string.Concat(stringDescription + " " + stringIssueDate + " " + stringIssueTime);
+                createElementSigningTime.InnerText = string.Concat(stringDocument + stringSigningTime);
                 _xml.DocumentElement.AppendChild(createElementDocumentResponse);
+                _xml.DocumentElement.AppendChild(createElementSigningTime);
             }
         }
 
@@ -195,6 +204,21 @@ namespace Gosocket.Dian.Functions.Utils
                 stringDocumentResponse = "";
             }
             return stringDocumentResponse;
+        }
+
+        //Get value of SigningTime
+        public string GetSigningTime()
+        {
+            string stringSigningTime;
+            try
+            {
+                stringSigningTime = _xml.SelectSingleNode(@"/descendant::*[local-name()='ConvertSigningTime'][1]", _nsmgr)?.InnerText;
+            }
+            catch (Exception)
+            {
+                stringSigningTime = "";
+            }
+            return stringSigningTime;
         }
     }
 }

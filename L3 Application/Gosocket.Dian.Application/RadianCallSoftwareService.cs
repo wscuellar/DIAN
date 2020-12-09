@@ -32,22 +32,10 @@ namespace Gosocket.Dian.Application
             return _softwareService.GetSoftwares(contributorId);
         }
 
-        public Guid CreateSoftware(int radianContributorId, string softwareName, string url, string pin, string createdBy)
+        public RadianSoftware CreateSoftware(RadianSoftware software)
         {
-            RadianSoftware radianSoftware = new RadianSoftware()
-            {
-                Name = softwareName,
-                Pin = pin,
-                Deleted = false,
-                Status = true,
-                CreatedBy = createdBy,
-                SoftwareDate = System.DateTime.Now,
-                Timestamp = System.DateTime.Now,
-                Updated = System.DateTime.Now,
-                Url = url,
-                RadianContributorId = radianContributorId
-            };
-            return _RadianSoftwareRepository.AddOrUpdate(radianSoftware);
+            software.Id = _RadianSoftwareRepository.AddOrUpdate(software);
+            return software;
         }
 
 

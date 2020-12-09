@@ -187,6 +187,7 @@
     <Compile Include="Entity\GlobalLogger.cs" />
     <Compile Include="Entity\GlobalNumberRange.cs" />
     <Compile Include="Entity\GlobalBatchFileResult.cs" />
+    <Compile Include="Entity\GlobalRadianOperations.cs" />
     <Compile Include="Entity\GlobalRejectedDocument.cs" />
     <Compile Include="Entity\GlobalSoftware.cs" />
     <Compile Include="Entity\GlobalTask.cs" />

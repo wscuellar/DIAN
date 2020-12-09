@@ -94,8 +94,6 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-
-
         [HttpPost]
         public ActionResult AdminRadianView(AdminRadianViewModel model)
         {
@@ -138,7 +136,10 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult ViewDetails(int id)
         {
             RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
-
+            if (radianAdmin.Contributor.RadianState == "Cancelado")
+            {
+                return RedirectToAction("AdminRadianView");
+            }
             RadianContributorsViewModel model = new RadianContributorsViewModel
             {
                 Id = radianAdmin.Contributor.Id,

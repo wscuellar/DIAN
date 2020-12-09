@@ -728,18 +728,20 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var customizationID = documentParsed.CustomizationId;
             var listId = documentParsed.listID == "" ? "1": documentParsed.listID;
             var UBLVersionID = documentParsed.UBLVersionID;
+            var documentTypeIdRef = documentParsed.DocumentTypeIdRef;
 
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
             //Validation of the DocumentReference Section - Informed CUFE and CUDE         
-            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode);
+            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode, documentTypeIdRef);
             if (!documentReferenceCufe.IsValid)
             {
                 dianResponse = documentReferenceCufe;
                 dianResponse.XmlDocumentKey = trackIdCude;
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                dianResponse.IsValid = false;                
+                dianResponse.IsValid = false;
+                return dianResponse;
             }
 
             //validation if is an endoso of endorsement (Code 037-038-039)
@@ -1036,6 +1038,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.XmlDocumentKey = trackIdCude;
                         dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                         dianResponse.IsValid = false;
+                        var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                        TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
+                        var documentValidatorDocument = TableManagerGlobalDocValidatorDocument.FindhByGlobalDocumentId(trackIdCude, trackIdCude);
+                        TableManagerGlobalDocValidatorDocument.Delete(documentValidatorDocument);
                         return dianResponse;
                     }
                 }
@@ -1587,10 +1593,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             return response;
         }
-        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode)
+
+       
+        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode });
-            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef });            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1618,7 +1625,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidationReferenceAttorney(string trackId)
         {
 
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });           
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });
 
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
@@ -1647,8 +1654,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private void UpdateInTransactions(string trackId, string eventCode)
         {
-            //validation if is an endoso of endorsement (Code 038)
-
+            //valida InTransaction eventos Endoso en propeidad, Garantia y procuración
             var arrayTasks = new List<Task>();
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             
