@@ -728,12 +728,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var customizationID = documentParsed.CustomizationId;
             var listId = documentParsed.listID == "" ? "1": documentParsed.listID;
             var UBLVersionID = documentParsed.UBLVersionID;
+            var documentTypeIdRef = documentParsed.DocumentTypeIdRef;
 
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
             //Validation of the DocumentReference Section - Informed CUFE and CUDE         
-            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode);
+            var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode, documentTypeIdRef);
             if (!documentReferenceCufe.IsValid)
             {
                 dianResponse = documentReferenceCufe;
@@ -1593,11 +1594,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-
-        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode)
+       
+        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode });
-            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef });            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
