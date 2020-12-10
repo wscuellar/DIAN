@@ -51,6 +51,7 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IQueryAssociatedEventsService, QueryAssociatedEventsService>();
             container.RegisterType<IRadianPdfCreationService, RadianPdfCreationService>();
             container.RegisterType<IGlobalRadianOperationService, GlobalRadianOperationService>();
+            container.RegisterType<IOthersElectronicDocumentsService, OthersElectronicDocumentsService>();
 
             #endregion
 

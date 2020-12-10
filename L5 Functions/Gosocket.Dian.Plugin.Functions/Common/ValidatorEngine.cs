@@ -15,6 +15,7 @@ using Gosocket.Dian.Plugin.Functions.Event;
 using static Gosocket.Dian.Domain.Common.EnumHelper;
 using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
+using Gosocket.Dian.Plugin.Functions.Cufe;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -118,14 +119,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public List<ValidateListResponse> StartValidateDocumentReference(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef)
+        public List<ValidateListResponse> StartValidateDocumentReference(ValidateDocumentReference.RequestObject validateReference)
         {
             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
             DateTime startDate = DateTime.UtcNow;
 
 
-            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(trackId, idDocumentReference, eventCode, documentTypeIdRef));
+            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(validateReference.TrackId,
+                validateReference.IdDocumentReference, validateReference.EventCode, validateReference.DocumentTypeIdRef,
+                validateReference.IssuerPartyCode, validateReference.IssuerPartyName));
 
             return validateResponses;
         }
