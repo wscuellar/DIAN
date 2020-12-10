@@ -28,9 +28,12 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-        #region Registro de participantes
+        #region MODOS DE OPERACION RADIAN
 
-        // GET: Radian
+        /// <summary>
+        /// Action GET encargada de inicializar la vista de ingreso a RADIAN, Consulta la informacion del contribuyente postulante.
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Index()
         {
             NameValueCollection result = _radianContributorService.Summary(User.UserCode());
@@ -46,11 +49,20 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Action GET encargada de inicializar la vista de ingreso a RADIAN, Consulta la informacion del contribuyente postulante, para los modos de Facturador Electronico.
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ElectronicInvoiceView()
         {
             return Index();
         }
 
+        /// <summary>
+        /// Metodo POST, encargado de realizar las validaciones de registro en la seleccion de modos de operacion de RADIAN.
+        /// </summary>
+        /// <param name="registrationData">Estructura con la informacion a validar</param>
+        /// <returns>Json con la respuesta de la validacion</returns>
         [HttpPost]
         public JsonResult RegistrationValidation(RegistrationDataViewModel registrationData)
         {
@@ -62,7 +74,10 @@ namespace Gosocket.Dian.Web.Controllers
 
         #endregion
 
-
+        /// <summary>
+        /// Metodo GET para la consulta de participantes en la habilitacion RADIAN
+        /// </summary>
+        /// <returns>Modelo con la informacion para graficar la vista de Habilitacion</returns>
         public ActionResult AdminRadianView()
         {
             int page = 1, size = 10;
@@ -95,6 +110,11 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult AdminRadianView(AdminRadianViewModel model)
         {

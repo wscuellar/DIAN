@@ -34,12 +34,12 @@ namespace Gosocket.Dian.TestProject.Fucntions.Plugins
             Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
         }
 
-        [TestMethod]
-        public async Task TestSuccessInvoiceSignatureValidations()
-        {
-            var responses = await ValidatorEngine.Instance.StartSignValidationAsync(trackIdInvoiceHab);
-            Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
-        }
+        //[TestMethod]
+        //public async Task TestSuccessInvoiceSignatureValidations()
+        //{
+        //    var responses = await ValidatorEngine.Instance.StartSignValidationAsync(trackIdInvoiceHab);
+        //    Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
+        //}
 
         [TestMethod]
         public async Task TestSuccessInvoiceSoftwareValidations()
@@ -72,12 +72,12 @@ namespace Gosocket.Dian.TestProject.Fucntions.Plugins
             Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
         }
 
-        [TestMethod]
-        public async Task TestSuccessCreditNoteSignatureValidations()
-        {
-            var responses = await ValidatorEngine.Instance.StartSignValidationAsync(trackIdCreditNoteHab);
-            Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
-        }
+        //[TestMethod]
+        //public async Task TestSuccessCreditNoteSignatureValidations()
+        //{
+        //    var responses = await ValidatorEngine.Instance.StartSignValidationAsync(trackIdCreditNoteHab);
+        //    Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
+        //}
 
         [TestMethod]
         public async Task TestSuccessCreditNoteSoftwareValidations()
@@ -103,12 +103,12 @@ namespace Gosocket.Dian.TestProject.Fucntions.Plugins
             Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
         }
 
-        [TestMethod]
-        public async Task TestSuccessDebitNoteSignatureValidations()
-        {
-            var responses = await ValidatorEngine.Instance.StartSignValidationAsync(trackIdDebitNoteHab);
-            Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
-        }
+        //[TestMethod]
+        //public async Task TestSuccessDebitNoteSignatureValidations()
+        //{
+        //    var responses = await ValidatorEngine.Instance.StartSignValidationAsync(trackIdDebitNoteHab);
+        //    Assert.IsTrue(responses.Count(r => !r.IsValid) == 0);
+        //}
 
         [TestMethod]
         public async Task TestSuccessDebitNoteSoftwareValidations()
