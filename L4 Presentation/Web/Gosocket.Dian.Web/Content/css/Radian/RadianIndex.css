@@ -1377,3 +1377,8 @@ button.selectpicker .fa-caret-down {
 .full-width{
     width: 100%;
 }
+
+.select-radian-contributor td:first-child{
+    display: inline-flex;
+    width: 100%;
+}
