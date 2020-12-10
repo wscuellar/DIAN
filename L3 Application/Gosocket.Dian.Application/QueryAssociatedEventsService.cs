@@ -122,6 +122,13 @@ namespace Gosocket.Dian.Application
             return EventStatus.None;
         }
 
+        public Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>> InvoiceAndNotes(string documentKey)
+        {
+            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>> tuple = Tuple.Create(GlobalDocValidatorDocumentByGlobalId(documentKey), CreditAndDebitNotes(documentKey));
+
+            return tuple;
+        }
+
         public List<GlobalDocValidatorDocumentMeta> CreditAndDebitNotes(string documentReferencedKey)
         {
             List<GlobalDocValidatorDocumentMeta> creditNotes = FindCreditNotes(documentReferencedKey);
@@ -139,6 +146,11 @@ namespace Gosocket.Dian.Application
         public List<GlobalDocValidatorDocumentMeta> FindDebitNotes(string documentReferencedKey)
         {
             return _radianGlobalDocValidationDocumentMeta.FindReferencedDocuments(documentReferencedKey, DEBITNOTE);
+        }
+
+        public GlobalDocValidatorDocument GlobalDocValidatorDocumentByGlobalId(string globalDocumentId)
+        {
+            return _globalDocValidatorDocument.FindByGlobalDocumentId(globalDocumentId);
         }
     }
 }

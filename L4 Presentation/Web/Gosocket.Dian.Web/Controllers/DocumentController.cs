@@ -487,28 +487,13 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
 
-        public string Test(string Id)
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult ShowDocumentToPublic(string Id)
         {
-            var data = _queryAssociatedEventsService.CreditAndDebitNotes(Id);
-            string showData = "<div class='card'>";
-            
-            foreach (var item in data)
-            {
-                showData += "<div class='card card-title'>";
-                showData += $"DocumentTypeName: {item.DocumentTypeName}";
-                showData += "</div>";
-                showData += "<div card card-Body>";
-                showData += $"DocumentKey: {item.DocumentKey}";                
-                showData += "</div>";
-                showData += "<div card card-footer>";
-                showData += $"EmissionDate: {item.EmissionDate}";
-                showData += "</div>";
-                showData += "<hr/>";
-            }
+            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(Id);
+            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(invoiceAndNotes.Item1, invoiceAndNotes.Item2);
 
-            showData += "</div>";
-
-            return showData;
+            return View(invoiceNotes);
         }
 
         #region Private methods
