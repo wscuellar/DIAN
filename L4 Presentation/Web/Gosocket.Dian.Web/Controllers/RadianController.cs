@@ -120,8 +120,8 @@ namespace Gosocket.Dian.Web.Controllers
                     Code = c.Code,
                     TradeName = c.TradeName,
                     BusinessName = c.BusinessName,
-                    AcceptanceStatusName = c.AcceptanceStatusName
-
+                    AcceptanceStatusName = c.AcceptanceStatusName,
+                    RadianState =c.RadianState
                 }).ToList(),
                 RadianType = radianAdmin.Types.Select(c => new SelectListItem
                 {
