@@ -4,7 +4,49 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section css
+{
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+    <style type="text/css">
+        .modal-body .close, .modal-header .close {
+            background-color: #348441 !important;
+        }
+        .btnCloseOtherDocument {
+            color: #fff;
+            background: #348441 !important;
+            background-color: #348441 !important;
+            /*border-radius: 10px !important;*/
+            float: right;
+            cursor: pointer;
+            opacity: 100 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
+            font-weight: normal !important;
+            font-family: auto !important;
+        }
 
+        .btn-success:focus, .btn-hover-success:active, .btn-hover-success.active, .btn.btn-active-success:active, .btn.btn-active-success.active, .dropdown.open > .btn.btn-active-success, .btn-group.open .dropdown-toggle.btn.btn-active-success {
+            ​​​​​​ background-color: #348441 !important;
+            border-color: #348441 !important;
+            color: #fff !important;
+        }
+
+        ​​​​​​
+
+        .btn-success:hover, btn-radian-success:hover {
+            ​​​​​​ background-color: #62C7AB;
+            background: #62C7AB;
+            border-color: #62C7AB;
+            color: #fff;
+        }
+
+        ​​​​​​
+
+    </style>
+}
 <div class="page-content radian-view margin-20">
     <div class="title-container">
         <p class="title-view">
@@ -24,7 +66,7 @@
             <div class="row-fluid">
 
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="card RadianCardContainer" style="width: 80% !important; height: 240px !important;" id="1" ParticipanteId="1" Participantetexto="Emisor">
+                    <div class="card RadianCardContainer pull-left" style="width: 92% !important; height: 240px !important;" id="1" ParticipanteId="1" Participantetexto="Emisor">
                         <div class="RadianImgContainer">
                             <img class="RadianimgSvg" src="~/Content/images/Svg/Emisor.svg" />
                         </div>
@@ -36,7 +78,7 @@
                 </div>
 
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="card RadianCardContainer" style="width: 80% !important; height: 240px !important;" ParticipanteId="2" Participantetexto="Proveedor Tecnológico">
+                    <div class="card RadianCardContainer pull-right" style="width: 92% !important; height: 240px !important;" ParticipanteId="2" Participantetexto="Proveedor Tecnológico">
                         <div class="RadianImgContainer">
                             <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologicoII.svg" />
                         </div>
@@ -50,7 +92,7 @@
 
         </div>
 
-       
+
 
         <div class="modal fade prompt-comment" id="dialogModeOperation" tabindex="-1" aria-labelledby="dialogModeOperationActiveLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -62,15 +104,19 @@
                         </button>
                     </div>
                     <div class="modal-body" style="padding-left: 1px !important;display: block; width: 95% !important;">
-                        <div class="row" style="margin-left: 8px; margin-top: 20px;" >
-                                <div class="col-md-10 col-lg-10">
-                                    @Html.DropDownList("OperationMode", (IEnumerable<SelectListItem>)ViewBag.ListOperationMode, "Seleccione un modo de operación", new { @class = "form-control selectpicker" })
-                                </div>
-                                <div class="col-md-2 col-lg-2">
-                                    <button id="btnOkActive" type="button" data-dismiss="modal" class="btn btn-success btn-radian-success btnSuccessOtherDocument">Seleccionar</button>
-                                </div>
+                        <div class="row" style="margin-left: 8px; margin-top: 20px;">
+                            <div class="col-md-10 col-lg-10">
+                                @Html.DropDownList("OperationMode", (IEnumerable<SelectListItem>)ViewBag.ListOperationMode, "Seleccione un modo de operación", new { @class = "form-control selectpicker" })
+
                             </div>
-                        
+                            <div class="col-md-2 col-lg-2">
+                                <button id="btnOperationMode" type="button" class="btn btn-success btn-radian-success" style="padding: 12px">Seleccionar</button>
+                            </div>
+                            <div class="col-md-12 col-lg-12" style="font-size:12px;margin-top:5px; margin-left:3px;">
+                                <div id="sinSeleccionarOM" class="text-danger"></div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -89,21 +135,27 @@
     <script>
         var operationClick = false;
         var electronicDocumentId = 0;
+        var complementoTexto = '';
         var ParticipanteId =0;
+        var requeridoOperationMode = "Seleccionar un modo de operación";
+
 
         $('.RadianCardContainer').click(function () {
-            showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.'); 
+            showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
                 if (!operationClick) {
                     operationClick = true;
+                    $("#sinSeleccionarOM").text('');
+
 
                     electronicDocumentId = @ViewBag.electronicDocumentId;
                     ParticipanteId = $(this).attr('ParticipanteId');
+                    complementoTexto= $(this).attr('Participantetexto');
 
                     var ValidacionOtherElectronicDocumentsViewModel = {
                         UserCode: '@ViewBag.UserCode',
                         Accion: 'SeleccionParticipante',
                         ElectronicDocument: electronicDocumentId,
-                        complementoTexto: $(this).attr('Participantetexto'),
+                        complementoTexto: complementoTexto,
                         ParticipanteId: ParticipanteId
                     };
 
@@ -116,6 +168,44 @@
                 }
 
         });
+
+
+        $("#btnOperationMode").click(function () {
+
+            var OperationMode = $("#OperationMode").val();
+
+            if (OperationMode == -1 || OperationMode == undefined || OperationMode == '') {
+                $("#sinSeleccionarOM").text(requeridoOperationMode);
+            }
+            else {
+                $("#dialogModeOperation").modal('hide');
+                showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
+
+                var ValidacionOtherElectronicDocumentsViewModel = {
+                    UserCode: '@ViewBag.UserCode',
+                    Accion: 'SeleccionOperationMode',
+                    ElectronicDocument: electronicDocumentId,
+                    complementoTexto: complementoTexto,
+                    ParticipanteId: ParticipanteId
+                };
+
+                CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
+                    function (param) {
+
+                        var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
+                            + "?electronicDocumentId=" + electronicDocumentId
+                            + "&operationModeId=" + OperationMode
+                            + "&ParticipanteId=" + ParticipanteId;
+                        window.location.href = url;
+
+
+                    }, true, () => hideLoading('#panel-form')
+                );
+            }
+
+        });
+
+
     </script>
 
 }
