@@ -38,11 +38,17 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an EventCode in the request body");
             if (string.IsNullOrEmpty(data.DocumentTypeIdRef))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an DocumentTypeIdRef in the request body");
+            if (string.IsNullOrEmpty(data.IssuerPartyCode))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an IssuerPartyCode in the request body");
+            if (string.IsNullOrEmpty(data.IssuerPartyName))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an IssuerPartyName in the request body");
 
             var trackId = data.TrackId;
             var eventCode = data.EventCode;
             var idDocumentReference = data.IdDocumentReference;
             var documentTypeIdRef = data.DocumentTypeIdRef;
+            var issuerPartyCode = data.IssuerPartyCode;
+            var issuerPartyName = data.IssuerPartyName;
 
             if (trackId == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
@@ -52,10 +58,14 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an eventCode on the query string or in the request body");
             if (documentTypeIdRef == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an documentTypeIdRef on the query string or in the request body");
+            if (issuerPartyCode == null)
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an issuerPartyCode on the query string or in the request body");
+            if (issuerPartyName == null)
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an issuerPartyName on the query string or in the request body");
 
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateDocumentReference(trackId, idDocumentReference, eventCode, documentTypeIdRef);
+                var validateResponses = ValidatorEngine.Instance.StartValidateDocumentReference(trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -88,6 +98,10 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
             public string EventCode { get; set; }
             [JsonProperty(PropertyName = "documentTypeIdRef")]
             public string DocumentTypeIdRef { get; set; }
+            [JsonProperty(PropertyName = "issuerPartyCode")]
+            public string IssuerPartyCode { get; set; }
+            [JsonProperty(PropertyName = "issuerPartyName")]
+            public string IssuerPartyName { get; set; }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
@@ -40,9 +41,20 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
-        public ActionResult AddOrUpdate()
+        public ActionResult AddOrUpdate(int electronicDocumentId = 0, int operationModeId = 0)
         {
-            return View();
+            List<ElectronicDocument> listED = new ElectronicDocumentService().GetElectronicDocuments();
+            List<OperationModeViewModel> listOM = new TestSetViewModel().GetOperationModes();
+            OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
+
+            var opeMode = listOM.FirstOrDefault(o => o.Id == operationModeId);
+            if (opeMode != null)
+                model.OperationMode = opeMode.Name;
+
+            ViewBag.Title = $"Asociar modo de operación {model.OperationMode}";
+
+
+            return View(model);
         }
 
         public ActionResult AddParticipants(int electronicDocumentId)

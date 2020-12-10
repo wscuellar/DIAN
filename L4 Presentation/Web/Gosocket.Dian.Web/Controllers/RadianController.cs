@@ -251,7 +251,7 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     if ((radianAdmin.Contributor.RadianState == "Habilitado" || radianAdmin.Contributor.RadianState == "Registrado"))
                     {
-                        _ = _radianContributorService.ChangeParticipantStatus(id, RadianState.Cancelado.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                        _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, RadianState.Cancelado.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
                         _ = SendMail(radianAdmin);
                     }
                     else

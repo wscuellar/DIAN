@@ -119,5 +119,11 @@
     <Setting Name="Param_ValidateCufe" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ValidatorCufeUrl</Value>
     </Setting>
+    <Setting Name="Param_ValidateCune" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidateCuneUrl</Value>
+    </Setting>
+    <Setting Name="Param_ValidatePredecesor" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ValidatePredecesorUrl</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

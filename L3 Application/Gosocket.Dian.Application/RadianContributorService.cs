@@ -230,9 +230,11 @@ namespace Gosocket.Dian.Application
             RadianContributor competitor = contributors.FirstOrDefault();
             competitor.RadianState = newState;
             competitor.Description = description;
+            
             if (newState == RadianState.Test.GetDescription()) competitor.Step = 3;
             if (newState == RadianState.Habilitado.GetDescription()) competitor.Step = 4;
-            if (newState == RadianState.Cancelado.GetDescription()) competitor.Step = 1;
+            if(newState == RadianState.Cancelado.GetDescription()) competitor.Step = 1;
+
             _radianContributorRepository.AddOrUpdate(competitor);
 
             if (competitor.RadianState != RadianState.Test.GetDescription() && competitor.RadianState != RadianState.Cancelado.GetDescription())

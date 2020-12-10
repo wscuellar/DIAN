@@ -238,7 +238,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 fakeData = $"{cufeModel.SerieAndNumber}---{cufeModel.EmissionDate}---{cufeModel.HourEmission}---{cufeModel.SenderCode}---{cufeModel.ReceiverCode}---{cufeModel.ResponseCode}---{cufeModel.ReferenceId}---{cufeModel.ReferenceTypeCode}---{key}";
 
-                if (cufeModel.ResponseCode == "038" && cufeModel.ResponseCodeListID == "2")
+                if ( (cufeModel.ResponseCode == "037" || cufeModel.ResponseCode == "038" || cufeModel.ResponseCode == "039") && cufeModel.ResponseCodeListID == "2")
                 {
                     //Endoso en garantia en blanco
                     data = $"{cufeModel.SerieAndNumber}{cufeModel.EmissionDate}{cufeModel.HourEmission}{cufeModel.ReceiverCode}{cufeModel.ResponseCode}{cufeModel.ResponseCodeListID}{cufeModel.ReferenceId}{cufeModel.ReferenceTypeCode}{key}";
@@ -1971,7 +1971,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
         public List<ValidateListResponse> ValidateDocumentReferencePrev(string trackId, string idDocumentReference, string eventCode, 
-            string documentTypeIdRef, string IssuerPartyCode = null, string IssuerPartyName = null)
+            string documentTypeIdRef, string issuerPartyCode = null, string issuerPartyName = null)
         {
             string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato) 
                 ? "No corresponde a un tipo de documento valido"
@@ -2026,7 +2026,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
             {
                 //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
-                if (documentMeta.ReceiverCode != IssuerPartyCode)
+                if (documentMeta.ReceiverCode != issuerPartyCode)
                 {
                     responses.Add(new ValidateListResponse
                     {
@@ -2038,7 +2038,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
                 //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
-                if (documentMeta.ReceiverName != IssuerPartyName)
+                if (documentMeta.ReceiverName != issuerPartyName)
                 {
                     responses.Add(new ValidateListResponse
                     {
