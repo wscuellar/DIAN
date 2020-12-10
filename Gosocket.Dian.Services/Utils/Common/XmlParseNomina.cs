@@ -93,144 +93,144 @@ namespace Gosocket.Dian.Services.Utils.Common
                     // Load xml document.
                     XmlNodeList xPersonas = XmlDocument.GetElementsByTagName("Periodo");
                     for (int i = 0; i < xPersonas.Count; i++) {
-                        globalDocPayrolls.FechaIngreso = Convert.ToDateTime(xPersonas[i].Attributes["FechaIngreso"].Value);
-                        globalDocPayrolls.FechaPagoInicio = Convert.ToDateTime(xPersonas[i].Attributes["FechaPagoInicio"].Value);
-                        globalDocPayrolls.FechaPagoFin = Convert.ToDateTime(xPersonas[i].Attributes["FechaPagoFin"].Value);
-                        globalDocPayrolls.TiempoLaborado = xPersonas[i].Attributes["TiempoLaborado"].Value;
-                        globalDocPayrolls.FechaLiquidacion = Convert.ToDateTime(xPersonas[i].Attributes["FechaLiquidacion"].Value);
-                        globalDocPayrolls.FechaGen = Convert.ToDateTime(xPersonas[i].Attributes["FechaGen"].Value);
+                        globalDocPayrolls.FechaIngreso = Convert.ToDateTime(xPersonas[i].Attributes["FechaIngreso"]?.InnerText);
+                        globalDocPayrolls.FechaPagoInicio = Convert.ToDateTime(xPersonas[i].Attributes["FechaPagoInicio"]?.InnerText);
+                        globalDocPayrolls.FechaPagoFin = Convert.ToDateTime(xPersonas[i].Attributes["FechaPagoFin"]?.InnerText);
+                        globalDocPayrolls.TiempoLaborado = xPersonas[i].Attributes["TiempoLaborado"]?.InnerText;
+                        globalDocPayrolls.FechaLiquidacion = Convert.ToDateTime(xPersonas[i].Attributes["FechaLiquidacion"]?.InnerText);
+                        globalDocPayrolls.FechaGen = Convert.ToDateTime(xPersonas[i].Attributes["FechaGen"]?.InnerText);
                     }
                     XmlNodeList xNumeroSecuenciaXML = XmlDocument.GetElementsByTagName("NumeroSecuenciaXML");
                     for (int j = 0; j < xNumeroSecuenciaXML.Count; j++)
                     {
-                        globalDocPayrolls.CodigoTrabajador = Convert.ToUInt64(xNumeroSecuenciaXML[j].Attributes["CodigoTrabajador"].Value);
-                        globalDocPayrolls.Prefijo = xNumeroSecuenciaXML[j].Attributes["Prefijo"].Value;
-                        globalDocPayrolls.Consecutivo = Convert.ToByte(xNumeroSecuenciaXML[j].Attributes["Consecutivo"].Value);
-                        globalDocPayrolls.Numero = xNumeroSecuenciaXML[j].Attributes["Numero"].Value;
+                        globalDocPayrolls.CodigoTrabajador = Convert.ToUInt64(xNumeroSecuenciaXML[j].Attributes["CodigoTrabajador"]?.InnerText);
+                        globalDocPayrolls.Prefijo = xNumeroSecuenciaXML[j].Attributes["Prefijo"]?.InnerText;
+                        globalDocPayrolls.Consecutivo = Convert.ToByte(xNumeroSecuenciaXML[j].Attributes["Consecutivo"]?.InnerText);
+                        globalDocPayrolls.Numero = xNumeroSecuenciaXML[j].Attributes["Numero"]?.InnerText;
                     }
                     XmlNodeList xLugarGeneracionXML = XmlDocument.GetElementsByTagName("LugarGeneracionXML");
                     for (int j = 0; j < xLugarGeneracionXML.Count; j++)
                     {
-                        globalDocPayrolls.Pais = xLugarGeneracionXML[j].Attributes["Pais"].Value;
-                        globalDocPayrolls.DepartamentoEstado = Convert.ToByte(xLugarGeneracionXML[j].Attributes["DepartamentoEstado"].Value);
-                        globalDocPayrolls.MunicipioCiudad = Convert.ToUInt16(xLugarGeneracionXML[j].Attributes["MunicipioCiudad"].Value);
-                        globalDocPayrolls.Idioma = xLugarGeneracionXML[j].Attributes["Idioma"].Value;
+                        globalDocPayrolls.Pais = xLugarGeneracionXML[j].Attributes["Pais"]?.InnerText;
+                        globalDocPayrolls.DepartamentoEstado = Convert.ToByte(xLugarGeneracionXML[j].Attributes["DepartamentoEstado"]?.InnerText);
+                        globalDocPayrolls.MunicipioCiudad = Convert.ToUInt16(xLugarGeneracionXML[j].Attributes["MunicipioCiudad"]?.InnerText);
+                        globalDocPayrolls.Idioma = xLugarGeneracionXML[j].Attributes["Idioma"]?.InnerText;
                     }
                     XmlNodeList xProveedorXML = XmlDocument.GetElementsByTagName("ProveedorXML");
                     for (int j = 0; j < xProveedorXML.Count; j++)
                     {
-                        globalDocPayrolls.NIT = Convert.ToUInt32(xProveedorXML[j].Attributes["NIT"].Value);
-                        globalDocPayrolls.DV = Convert.ToByte(xProveedorXML[j].Attributes["DV"].Value);
-                        globalDocPayrolls.SoftwareID = xProveedorXML[j].Attributes["SoftwareID"].Value;
-                        globalDocPayrolls.SoftwareSC = xProveedorXML[j].Attributes["SoftwareSC"].Value;
+                        globalDocPayrolls.NIT = Convert.ToUInt32(xProveedorXML[j].Attributes["NIT"]?.InnerText);
+                        globalDocPayrolls.DV = Convert.ToByte(xProveedorXML[j].Attributes["DV"]?.InnerText);
+                        globalDocPayrolls.SoftwareID = xProveedorXML[j].Attributes["SoftwareID"]?.InnerText;
+                        globalDocPayrolls.SoftwareSC = xProveedorXML[j].Attributes["SoftwareSC"]?.InnerText;
                     }
                     XmlNodeList xInformacionGeneral = XmlDocument.GetElementsByTagName("InformacionGeneral");
                     for (int j = 0; j < xInformacionGeneral.Count; j++)
                     {
-                        globalDocPayrolls.Version = xInformacionGeneral[j].Attributes["Version"].Value;
-                        globalDocPayrolls.Ambiente = Convert.ToByte(xInformacionGeneral[j].Attributes["Ambiente"].Value);
-                        globalDocPayrolls.CUNE = xInformacionGeneral[j].Attributes["CUNE"].Value;
-                        globalDocPayrolls.EncripCUNE = xInformacionGeneral[j].Attributes["EncripCUNE"].Value;
-                        globalDocPayrolls.Info_FechaGen = Convert.ToDateTime(xInformacionGeneral[j].Attributes["FechaGen"].Value);
-                        globalDocPayrolls.HoraGen = Convert.ToDateTime(xInformacionGeneral[j].Attributes["HoraGen"].Value);
-                        globalDocPayrolls.TipoNomina = Convert.ToByte(xInformacionGeneral[j].Attributes["TipoNomina"].Value);
-                        globalDocPayrolls.PeriodoNomina = Convert.ToByte(xInformacionGeneral[j].Attributes["PeriodoNomina"].Value);
-                        globalDocPayrolls.TipoMoneda = xInformacionGeneral[j].Attributes["TipoMoneda"].Value;
+                        globalDocPayrolls.Version = xInformacionGeneral[j].Attributes["Version"]?.InnerText;
+                        globalDocPayrolls.Ambiente = Convert.ToByte(xInformacionGeneral[j].Attributes["Ambiente"]?.InnerText);
+                        globalDocPayrolls.CUNE = xInformacionGeneral[j].Attributes["CUNE"]?.InnerText;
+                        globalDocPayrolls.EncripCUNE = xInformacionGeneral[j].Attributes["EncripCUNE"]?.InnerText;
+                        globalDocPayrolls.Info_FechaGen = Convert.ToDateTime(xInformacionGeneral[j].Attributes["FechaGen"]?.InnerText);
+                        globalDocPayrolls.HoraGen = Convert.ToDateTime(xInformacionGeneral[j].Attributes["HoraGen"]?.InnerText);
+                        globalDocPayrolls.TipoNomina = Convert.ToByte(xInformacionGeneral[j].Attributes["TipoNomina"]?.InnerText);
+                        globalDocPayrolls.PeriodoNomina = Convert.ToByte(xInformacionGeneral[j].Attributes["PeriodoNomina"]?.InnerText);
+                        globalDocPayrolls.TipoMoneda = xInformacionGeneral[j].Attributes["TipoMoneda"]?.InnerText;
                     }
                     XmlNodeList xReemplazandoPredecesor = XmlDocument.GetElementsByTagName("ReemplazandoPredecesor");
                     for (int j = 0; j < xReemplazandoPredecesor.Count; j++)
                     {
-                        globalDocPayrolls.NumeroPred = xReemplazandoPredecesor[j].Attributes["NumeroPred"].Value;
-                        globalDocPayrolls.CUNEPred = xReemplazandoPredecesor[j].Attributes["CUNEPred"].Value;
-                        globalDocPayrolls.FechaGenPred = Convert.ToDateTime(xReemplazandoPredecesor[j].Attributes["FechaGenPred"].Value);
+                        globalDocPayrolls.NumeroPred = xReemplazandoPredecesor[j].Attributes["NumeroPred"]?.InnerText;
+                        globalDocPayrolls.CUNEPred = xReemplazandoPredecesor[j].Attributes["CUNEPred"]?.InnerText;
+                        globalDocPayrolls.FechaGenPred = Convert.ToDateTime(xReemplazandoPredecesor[j].Attributes["FechaGenPred"]?.InnerText);
                     }
                     XmlNodeList xEmpleador = XmlDocument.GetElementsByTagName("Empleador");
                     for (int j = 0; j < xEmpleador.Count; j++)
                     {
-                        globalDocPayrolls.Emp_RazonSocial = xEmpleador[j].Attributes["RazonSocial"].Value;
-                        globalDocPayrolls.Emp_NIT = Convert.ToUInt32(xEmpleador[j].Attributes["NIT"].Value);
-                        globalDocPayrolls.Emp_DV = Convert.ToByte(xEmpleador[j].Attributes["DV"].Value);
-                        globalDocPayrolls.Emp_Pais = xEmpleador[j].Attributes["Pais"].Value;
-                        globalDocPayrolls.Emp_DepartamentoEstado = Convert.ToByte(xEmpleador[j].Attributes["DepartamentoEstado"].Value);
-                        globalDocPayrolls.Emp_MunicipioCiudad = Convert.ToUInt16(xEmpleador[j].Attributes["MunicipioCiudad"].Value);
-                        globalDocPayrolls.Emp_Direccion = xEmpleador[j].Attributes["Direccion"].Value;
-                        globalDocPayrolls.Emp_Celular = Convert.ToUInt32(xEmpleador[j].Attributes["Celular"].Value);
-                        globalDocPayrolls.Emp_Correo = xEmpleador[j].Attributes["Correo"].Value;
+                        globalDocPayrolls.Emp_RazonSocial = xEmpleador[j].Attributes["RazonSocial"]?.InnerText;
+                        globalDocPayrolls.Emp_NIT = Convert.ToUInt32(xEmpleador[j].Attributes["NIT"]?.InnerText);
+                        globalDocPayrolls.Emp_DV = Convert.ToByte(xEmpleador[j].Attributes["DV"]?.InnerText);
+                        globalDocPayrolls.Emp_Pais = xEmpleador[j].Attributes["Pais"]?.InnerText;
+                        globalDocPayrolls.Emp_DepartamentoEstado = Convert.ToByte(xEmpleador[j].Attributes["DepartamentoEstado"]?.InnerText);
+                        globalDocPayrolls.Emp_MunicipioCiudad = Convert.ToUInt16(xEmpleador[j].Attributes["MunicipioCiudad"]?.InnerText);
+                        globalDocPayrolls.Emp_Direccion = xEmpleador[j].Attributes["Direccion"]?.InnerText;
+                        globalDocPayrolls.Emp_Celular = Convert.ToUInt32(xEmpleador[j].Attributes["Celular"]?.InnerText);
+                        globalDocPayrolls.Emp_Correo = xEmpleador[j].Attributes["Correo"]?.InnerText;
                     }
                     XmlNodeList xTrabajador = XmlDocument.GetElementsByTagName("Trabajador");
                     for (int j = 0; j < xTrabajador.Count; j++)
                     {
-                        globalDocPayrolls.TipoTrabajador = Convert.ToByte(xTrabajador[j].Attributes["TipoTrabajador"].Value);
-                        globalDocPayrolls.SubTipoTrabajador = Convert.ToByte(xTrabajador[j].Attributes["SubTipoTrabajador"].Value);
-                        globalDocPayrolls.AltoRiesgoPension = Convert.ToBoolean(xTrabajador[j].Attributes["AltoRiesgoPension"].Value);
-                        globalDocPayrolls.TipoDocumento = Convert.ToByte(xTrabajador[j].Attributes["TipoDocumento"].Value);
-                        globalDocPayrolls.NumeroDocumento = Convert.ToUInt32(xTrabajador[j].Attributes["NumeroDocumento"].Value);
-                        globalDocPayrolls.PrimerApellido = xTrabajador[j].Attributes["PrimerApellido"].Value;
-                        globalDocPayrolls.SegundoApellido = xTrabajador[j].Attributes["SegundoApellido"].Value;
-                        globalDocPayrolls.PrimerNombre = xTrabajador[j].Attributes["PrimerNombre"].Value;
-                        globalDocPayrolls.OtrosNombres = xTrabajador[j].Attributes["OtrosNombres"].Value;
-                        globalDocPayrolls.LugarTrabajoPais = xTrabajador[j].Attributes["LugarTrabajoPais"].Value;
-                        globalDocPayrolls.LugarTrabajoDepartamentoEstado = Convert.ToByte(xTrabajador[j].Attributes["LugarTrabajoDepartamentoEstado"].Value);
-                        globalDocPayrolls.LugarTrabajoMunicipioCiudad = Convert.ToUInt16(xTrabajador[j].Attributes["LugarTrabajoMunicipioCiudad"].Value);
-                        globalDocPayrolls.LugarTrabajoDireccion = xTrabajador[j].Attributes["LugarTrabajoDireccion"].Value;
-                        globalDocPayrolls.Celular = Convert.ToUInt32(xTrabajador[j].Attributes["Celular"].Value);
-                        globalDocPayrolls.Correo = xTrabajador[j].Attributes["Correo"].Value;
-                        globalDocPayrolls.SalarioIntegral = Convert.ToBoolean(xTrabajador[j].Attributes["SalarioIntegral"].Value);
-                        globalDocPayrolls.CodigoArea = Convert.ToByte(xTrabajador[j].Attributes["CodigoArea"].Value);
-                        globalDocPayrolls.NombreArea = xTrabajador[j].Attributes["NombreArea"].Value;
-                        globalDocPayrolls.CodigoCargo = Convert.ToByte(xTrabajador[j].Attributes["CodigoCargo"].Value);
-                        globalDocPayrolls.NombreCargo = xTrabajador[j].Attributes["NombreCargo"].Value;
-                        globalDocPayrolls.TipoContrato = Convert.ToByte(xTrabajador[j].Attributes["TipoContrato"].Value);
-                        globalDocPayrolls.Salario = Convert.ToDecimal(xTrabajador[j].Attributes["Salario"].Value);
-                        globalDocPayrolls.CodigoTrabajador = Convert.ToUInt64(xTrabajador[j].Attributes["CodigoTrabajador"].Value);
+                        globalDocPayrolls.TipoTrabajador = Convert.ToByte(xTrabajador[j].Attributes["TipoTrabajador"]?.InnerText);
+                        globalDocPayrolls.SubTipoTrabajador = Convert.ToByte(xTrabajador[j].Attributes["SubTipoTrabajador"]?.InnerText);
+                        globalDocPayrolls.AltoRiesgoPension = Convert.ToBoolean(xTrabajador[j].Attributes["AltoRiesgoPension"]?.InnerText);
+                        globalDocPayrolls.TipoDocumento = Convert.ToByte(xTrabajador[j].Attributes["TipoDocumento"]?.InnerText);
+                        globalDocPayrolls.NumeroDocumento = Convert.ToUInt32(xTrabajador[j].Attributes["NumeroDocumento"]?.InnerText);
+                        globalDocPayrolls.PrimerApellido = xTrabajador[j].Attributes["PrimerApellido"]?.InnerText;
+                        globalDocPayrolls.SegundoApellido = xTrabajador[j].Attributes["SegundoApellido"]?.InnerText;
+                        globalDocPayrolls.PrimerNombre = xTrabajador[j].Attributes["PrimerNombre"]?.InnerText;
+                        globalDocPayrolls.OtrosNombres = xTrabajador[j].Attributes["OtrosNombres"]?.InnerText;
+                        globalDocPayrolls.LugarTrabajoPais = xTrabajador[j].Attributes["LugarTrabajoPais"]?.InnerText;
+                        globalDocPayrolls.LugarTrabajoDepartamentoEstado = Convert.ToByte(xTrabajador[j].Attributes["LugarTrabajoDepartamentoEstado"]?.InnerText);
+                        globalDocPayrolls.LugarTrabajoMunicipioCiudad = Convert.ToUInt16(xTrabajador[j].Attributes["LugarTrabajoMunicipioCiudad"]?.InnerText);
+                        globalDocPayrolls.LugarTrabajoDireccion = xTrabajador[j].Attributes["LugarTrabajoDireccion"]?.InnerText;
+                        globalDocPayrolls.Celular = Convert.ToUInt32(xTrabajador[j].Attributes["Celular"]?.InnerText);
+                        globalDocPayrolls.Correo = xTrabajador[j].Attributes["Correo"]?.InnerText;
+                        globalDocPayrolls.SalarioIntegral = Convert.ToBoolean(xTrabajador[j].Attributes["SalarioIntegral"]?.InnerText);
+                        globalDocPayrolls.CodigoArea = Convert.ToByte(xTrabajador[j].Attributes["CodigoArea"]?.InnerText);
+                        globalDocPayrolls.NombreArea = xTrabajador[j].Attributes["NombreArea"]?.InnerText;
+                        globalDocPayrolls.CodigoCargo = Convert.ToByte(xTrabajador[j].Attributes["CodigoCargo"]?.InnerText);
+                        globalDocPayrolls.NombreCargo = xTrabajador[j].Attributes["NombreCargo"]?.InnerText;
+                        globalDocPayrolls.TipoContrato = Convert.ToByte(xTrabajador[j].Attributes["TipoContrato"]?.InnerText);
+                        globalDocPayrolls.Salario = Convert.ToDecimal(xTrabajador[j].Attributes["Salario"]?.InnerText);
+                        globalDocPayrolls.CodigoTrabajador = Convert.ToUInt64(xTrabajador[j].Attributes["CodigoTrabajador"]?.InnerText);
                     }
                     XmlNodeList xPago = XmlDocument.GetElementsByTagName("Pago");
                     for (int j = 0; j < xPago.Count; j++)
                     {
-                        globalDocPayrolls.Forma = Convert.ToByte(xPago[j].Attributes["Forma"].Value);
-                        globalDocPayrolls.Metodo = Convert.ToByte(xPago[j].Attributes["Metodo"].Value);
-                        globalDocPayrolls.Banco = xPago[j].Attributes["Banco"].Value;
-                        globalDocPayrolls.TipoCuenta = xPago[j].Attributes["TipoCuenta"].Value;
-                        globalDocPayrolls.NumeroCuenta = xPago[j].Attributes["NumeroCuenta"].Value;
+                        globalDocPayrolls.Forma = Convert.ToByte(xPago[j].Attributes["Forma"]?.InnerText);
+                        globalDocPayrolls.Metodo = Convert.ToByte(xPago[j].Attributes["Metodo"]?.InnerText);
+                        globalDocPayrolls.Banco = xPago[j].Attributes["Banco"]?.InnerText;
+                        globalDocPayrolls.TipoCuenta = xPago[j].Attributes["TipoCuenta"]?.InnerText;
+                        globalDocPayrolls.NumeroCuenta = xPago[j].Attributes["NumeroCuenta"]?.InnerText;
                     }
                     XmlNodeList xBasico = XmlDocument.GetElementsByTagName("Basico");
                     for (int j = 0; j < xBasico.Count; j++)
                     {
-                        globalDocPayrolls.DiasTrabajados = Convert.ToByte(xBasico[j].Attributes["DiasTrabajados"].Value);
-                        globalDocPayrolls.SalarioTrabajado = Convert.ToDecimal(xBasico[j].Attributes["SalarioTrabajado"].Value);
+                        globalDocPayrolls.DiasTrabajados = Convert.ToByte(xBasico[j].Attributes["DiasTrabajados"]?.InnerText);
+                        globalDocPayrolls.SalarioTrabajado = Convert.ToDecimal(xBasico[j].Attributes["SalarioTrabajado"]?.InnerText);
                     }
                     XmlNodeList xVacacionesComunes = XmlDocument.GetElementsByTagName("VacacionesComunes");
                     for (int j = 0; j < xVacacionesComunes.Count; j++)
                     {
-                        globalDocPayrolls.FechaInicio = Convert.ToDateTime(xVacacionesComunes[j].Attributes["FechaInicio"].Value);
-                        globalDocPayrolls.FechaFin = Convert.ToDateTime(xVacacionesComunes[j].Attributes["FechaFin"].Value);
-                        globalDocPayrolls.Cantidad = Convert.ToByte(xVacacionesComunes[j].Attributes["Cantidad"].Value);
-                        globalDocPayrolls.Pago = Convert.ToDecimal(xVacacionesComunes[j].Attributes["Pago"].Value);
+                        globalDocPayrolls.FechaInicio = Convert.ToDateTime(xVacacionesComunes[j].Attributes["FechaInicio"]?.InnerText);
+                        globalDocPayrolls.FechaFin = Convert.ToDateTime(xVacacionesComunes[j].Attributes["FechaFin"]?.InnerText);
+                        globalDocPayrolls.Cantidad = Convert.ToByte(xVacacionesComunes[j].Attributes["Cantidad"]?.InnerText);
+                        globalDocPayrolls.Pago = Convert.ToDecimal(xVacacionesComunes[j].Attributes["Pago"]?.InnerText);
                     }
                     XmlNodeList xBonificacion = XmlDocument.GetElementsByTagName("Bonificacion");
                     for (int j = 0; j < xBonificacion.Count; j++)
                     {
-                        globalDocPayrolls.BonificacionNS = Convert.ToDecimal(xBonificacion[j].Attributes["BonificacionNS"].Value);
+                        globalDocPayrolls.BonificacionNS = Convert.ToDecimal(xBonificacion[j].Attributes["BonificacionNS"]?.InnerText);
                     }
                     XmlNodeList xSalud = XmlDocument.GetElementsByTagName("Salud");
                     for (int j = 0; j < xSalud.Count; j++)
                     {
-                        globalDocPayrolls.s_Porcentaje = Convert.ToDecimal(xSalud[j].Attributes["Porcentaje"].Value);
-                        globalDocPayrolls.s_ValorBase = Convert.ToDecimal(xSalud[j].Attributes["ValorBase"].Value);
-                        globalDocPayrolls.s_Deduccion = Convert.ToDecimal(xSalud[j].Attributes["Deduccion"].Value);
+                        globalDocPayrolls.s_Porcentaje = Convert.ToDecimal(xSalud[j].Attributes["Porcentaje"]?.InnerText);
+                        globalDocPayrolls.s_ValorBase = Convert.ToDecimal(xSalud[j].Attributes["ValorBase"]?.InnerText);
+                        globalDocPayrolls.s_Deduccion = Convert.ToDecimal(xSalud[j].Attributes["Deduccion"]?.InnerText);
                     }
                     XmlNodeList xFondoPension = XmlDocument.GetElementsByTagName("FondoPension");
                     for (int j = 0; j < xFondoPension.Count; j++)
                     {
-                        globalDocPayrolls.FP_Porcentaje = Convert.ToDecimal(xFondoPension[j].Attributes["Porcentaje"].Value);
-                        globalDocPayrolls.FP_ValorBase = Convert.ToDecimal(xFondoPension[j].Attributes["ValorBase"].Value);
-                        globalDocPayrolls.FP_Deduccion = Convert.ToDecimal(xFondoPension[j].Attributes["Deduccion"].Value);
+                        globalDocPayrolls.FP_Porcentaje = Convert.ToDecimal(xFondoPension[j].Attributes["Porcentaje"]?.InnerText);
+                        globalDocPayrolls.FP_ValorBase = Convert.ToDecimal(xFondoPension[j].Attributes["ValorBase"]?.InnerText);
+                        globalDocPayrolls.FP_Deduccion = Convert.ToDecimal(xFondoPension[j].Attributes["Deduccion"]?.InnerText);
                     }
                     XmlNodeList xFondoSP = XmlDocument.GetElementsByTagName("FondoSP");
                     for (int j = 0; j < xFondoSP.Count; j++)
                     {
-                        globalDocPayrolls.FSP_Porcentaje = Convert.ToDecimal(xFondoSP[j].Attributes["Porcentaje"].Value);
-                        globalDocPayrolls.FSP_Porcentaje = Convert.ToDecimal(xFondoSP[j].Attributes["Deduccion"].Value);
+                        globalDocPayrolls.FSP_Porcentaje = Convert.ToDecimal(xFondoSP[j].Attributes["Porcentaje"]?.InnerText);
+                        globalDocPayrolls.FSP_Porcentaje = Convert.ToDecimal(xFondoSP[j].Attributes["Deduccion"]?.InnerText);
                     }
 
                 }
