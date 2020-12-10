@@ -216,4 +216,7 @@
   <data name="OthersElectronicDocumentsSelectParticipante_Confirm" xml:space="preserve">
     <value>¿Desea iniciar el proceso como para @Participante de otros documentos electrónicos?</value>
   </data>
+  <data name="OthersElectronicDocumentsSelectOperationMode_Confirm" xml:space="preserve">
+    <value>¿Desea habilitar la trasmisión de "Otros Documentos Electrónicos" en el sistema como @Participante de otros documentos electrónicos?</value>
+  </data>
 </root>

@@ -6,6 +6,50 @@
 }
 
 
+@section css
+{
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+    <style type="text/css">
+        .modal-body .close, .modal-header .close {
+            background-color: #348441 !important;
+        }
+
+        .btnCloseOtherDocument {
+            color: #fff;
+            background: #348441 !important;
+            background-color: #348441 !important;
+            /*border-radius: 10px !important;*/
+            float: right;
+            cursor: pointer;
+            opacity: 100 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
+            font-weight: normal !important;
+            font-family: auto !important;
+        }
+
+        .btn-success:focus, .btn-hover-success:active, .btn-hover-success.active, .btn.btn-active-success:active, .btn.btn-active-success.active, .dropdown.open > .btn.btn-active-success, .btn-group.open .dropdown-toggle.btn.btn-active-success {
+            ​​​​​​ background-color: #348441 !important;
+            border-color: #348441 !important;
+            color: #fff !important;
+        }
+
+
+
+        .btn-success:hover, btn-radian-success:hover {
+            ​​​​​​ background-color: #62C7AB;
+            background: #62C7AB;
+            border-color: #62C7AB;
+            color: #fff;
+        }
+
+
+    </style>
+}
+
 <div class="page-content radian-view margin-20">
     <div class="title-container">
         <p class="title-view">
@@ -27,7 +71,7 @@
                 @foreach (var item in ListDocs)
                 {
                     <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                        <div class="card RadianCardContainer" style="width: 80% !important; height: 230px !important;" idElectronicDocument="@item.value" textElectronicDocument="@item.text">
+                        <div class="card RadianCardContainer" style="width: 95% !important; height: 230px !important;" idElectronicDocument="@item.value" textElectronicDocument="@item.text">
                             <div class="RadianImgContainer">
                                 <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
                             </div>

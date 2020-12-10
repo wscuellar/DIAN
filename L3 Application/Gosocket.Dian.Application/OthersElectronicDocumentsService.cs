@@ -40,6 +40,9 @@ namespace Gosocket.Dian.Application
             if (Accion == "SeleccionParticipante")
                 return new ResponseMessage(TextResources.OthersElectronicDocumentsSelectParticipante_Confirm.Replace("@Participante", complementeTexto), TextResources.confirmType);
 
+            if (Accion == "SeleccionOperationMode")
+                return new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", complementeTexto), TextResources.confirmType);
+
             return new ResponseMessage(TextResources.FailedValidation, TextResources.alertType);
         }
 

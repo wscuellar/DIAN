@@ -7,7 +7,7 @@
         public string Accion { get; set; }
 
         public int ElectronicDocument { get; set; }
-        public string complementoTexto { get; set; }
+        public string ComplementoTexto { get; set; }
 
         public int ParticipanteId { get; set; }
 

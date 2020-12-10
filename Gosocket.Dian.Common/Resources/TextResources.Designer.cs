@@ -232,6 +232,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a ¿Desea habilitar la trasmisión de &quot;Otros Documentos Electrónicos&quot; en el sistema como @Participante de otros documentos electrónicos?.
+        /// </summary>
+        public static string OthersElectronicDocumentsSelectOperationMode_Confirm {
+            get {
+                return ResourceManager.GetString("OthersElectronicDocumentsSelectOperationMode_Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a ¿Desea iniciar el proceso como para @Participante de otros documentos electrónicos?.
         /// </summary>
         public static string OthersElectronicDocumentsSelectParticipante_Confirm {
