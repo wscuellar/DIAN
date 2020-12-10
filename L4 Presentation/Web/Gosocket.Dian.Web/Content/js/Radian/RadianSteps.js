@@ -96,6 +96,9 @@ function RenderSteps(index) {
     $(".close").click(function () {
         $(this).parent().toggle();
         $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
+        $(this).parents(".inputs-dinamics").children(".file-input-enabled").children(".custom-file").children("input").val("");
+        $(this).parents(".inputs-dinamics").children(".file-input-enabled").children(".custom-file").children("label").html("");
+
     })
 }
 
