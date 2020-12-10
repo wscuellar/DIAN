@@ -39,6 +39,20 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
+        private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
+
+        #region Constructor
+
+        public DocumentController(
+           IRadianPdfCreationService radianPdfCreationService
+           , IRadianGraphicRepresentationService radianGraphicRepresentationService
+           )
+        {
+            _radianPdfCreationService = radianPdfCreationService;
+            _radianGraphicRepresentationService = radianGraphicRepresentationService;
+        }
+
+        #endregion
 
         private List<DocValidatorTrackingModel> GetValidatedRules(string trackId)
         {
@@ -55,11 +69,6 @@ namespace Gosocket.Dian.Web.Controllers
                 Priority = d.Priority,
                 Status = d.Status
             }).Where(d => d.IsNotification).OrderBy(d => d.Status).ToList();
-        }
-
-        public DocumentController(IRadianPdfCreationService radianPdfCreationService)
-        {
-            _radianPdfCreationService = radianPdfCreationService;
         }
 
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
@@ -467,6 +476,13 @@ namespace Gosocket.Dian.Web.Controllers
             byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe);
             String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet );
+        }
+
+        public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
+        {
+            byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
+            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
+            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
 
         #region Private methods

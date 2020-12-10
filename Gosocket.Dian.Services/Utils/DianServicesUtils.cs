@@ -838,7 +838,7 @@ namespace Gosocket.Dian.Services.Utils
                         stringBuilder.Clear();
                         isValid = false;
                     }
-                    else if (!(Convert.ToInt32(eventCode) >= 36 && Convert.ToInt32(eventCode) <= 38) && string.IsNullOrEmpty(senderCode) && flagEvento)
+                    else if ((Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 46) && string.IsNullOrEmpty(senderCode) && flagEvento)
                     {
                         if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34)
                         {

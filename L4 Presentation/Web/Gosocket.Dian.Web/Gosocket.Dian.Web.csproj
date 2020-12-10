@@ -328,6 +328,7 @@
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ExternalUsersController.cs" />
+    <Compile Include="Controllers\OthersElectronicDocumentsController.cs" />
     <Compile Include="Controllers\QueryAssociatedEventsController.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
     <Compile Include="Controllers\ContributorFileTypeController.cs" />
@@ -368,6 +369,7 @@
     <Compile Include="Models\AdminRadianViewModel.cs" />
     <Compile Include="Models\AutoListModel.cs" />
     <Compile Include="Models\FileHistoryFilterViewModel.cs" />
+    <Compile Include="Models\OthersElectronicDocumentsViewModel.cs" />
     <Compile Include="Models\ParametersDataViewModel.cs" />
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
@@ -2887,6 +2889,10 @@
     <Content Include="Views\RadianApproved\_certificatesThirdStep.cshtml" />
     <Content Include="Views\RadianApproved\_formSearchHistory.cshtml" />
     <Content Include="Views\Document\PrintDocument.cshtml" />
+    <Content Include="Views\OthersElectronicDocuments\Index.cshtml" />
+    <Content Include="Views\OthersElectronicDocuments\AddOrUpdate.cshtml" />
+    <Content Include="Views\OthersElectronicDocuments\_form.cshtml" />
+    <Content Include="Views\OthersElectronicDocuments\_default.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

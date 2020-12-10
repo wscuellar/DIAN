@@ -118,32 +118,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef)
+        public List<ValidateListResponse> StartValidateDocumentReference(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef, string issuerPartyCode, string issuerPartyName)
         {
             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
             DateTime startDate = DateTime.UtcNow;
-            //Obtiene XML CUFE - CUDE
-            var xmlBytes = await GetXmlFromStorageAsync(trackId);
-           
-            if(xmlBytes == null)
-            {
-                ValidateListResponse response = new ValidateListResponse();
-                response.ErrorMessage = $"esta UUID no existe en la base de datos de la DIAN.";
-                response.IsValid = false;
-                response.ErrorCode = "Regla: AAH07-(R): ";
-                response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                validateResponses.Add(response);
-                return validateResponses;
-            }
-            var xmlParser = new XmlParser(xmlBytes);
 
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
 
-            var nitModel = xmlParser.Fields.ToObject<NitModel>();
-
-            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference, eventCode, documentTypeIdRef));
+            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName));
 
             return validateResponses;
         }

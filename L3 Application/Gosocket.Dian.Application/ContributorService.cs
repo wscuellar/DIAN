@@ -453,5 +453,19 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        public void SetToEnabledRadian(int contributorId, int contributorTypeId, string softwareId)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var radianc = context.RadianContributors.FirstOrDefault(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId);
+                radianc.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
+                Guid softId = new Guid(softwareId);
+
+                RadianSoftware soft =  context.RadianSoftwares.FirstOrDefault(t => t.Id == softId);
+                soft.RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted;
+
+                context.SaveChanges();
+            }
+        }
     }
 }

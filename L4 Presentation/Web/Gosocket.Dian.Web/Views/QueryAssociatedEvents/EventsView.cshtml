@@ -149,7 +149,6 @@
         margin-left: 12px;
         margin-top: 37px;
     }
-
 </style>
 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
@@ -177,7 +176,11 @@
                         <span>CUDE:</span>
                         <span class="cude-text">@Model.CUDE</span>
                         <div class="left-section ContainerDownload">
-                            <p><i class="fa fa-download"></i><um><ins>Descarga</ins></um></p>
+                            <p><i class="fa fa-download"></i>
+                                <um>
+                                    <button id="show-graphic-document" class="btn btn-link">Descarga</button>
+                                </um>
+                            </p>
                         </div>
                     </div>
                     <div class="col-sm-8 text-right right-section">
@@ -377,5 +380,4 @@
     <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
-
 }
