@@ -133,12 +133,13 @@ namespace Gosocket.Dian.Application
                    BusinessName = c.Contributor.BusinessName,
                    AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name,
                    RadianState = c.RadianState,
-                   RadianContributorId  = c.Id
+                   RadianContributorId = c.Id
                }).ToList(),
                 Types = radianContributorType,
                 RowCount = radianContributors.RowCount,
                 CurrentPage = radianContributors.CurrentPage
             };
+
             return radianAdmin;
         }
 
@@ -194,6 +195,22 @@ namespace Gosocket.Dian.Application
             radianContributors.ForEach(c =>
             {
                 List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(t => t.RadianContributorTypeId == c.RadianContributorTypeId && !t.Deleted);
+                List<RadianContributorFile> newFiles = (from t in fileTypes
+                                                        join f in c.RadianContributorFile.Where(t => !t.Deleted) on t.Id equals f.FileType into files
+                                                        from fl in files.DefaultIfEmpty(new RadianContributorFile()
+                                                        {
+                                                            FileName = t.Name,
+                                                            FileType = t.Id,
+                                                            Status = 0,
+                                                            RadianContributorFileType = t,
+                                                            RadianContributorFileStatus = new RadianContributorFileStatus()
+                                                            {
+                                                                Id=0,
+                                                                Name = "Pendiente"
+                                                            }
+                                                        })
+                                                        select fl).ToList();
+
                 radianAdmin = new RadianAdmin()
                 {
                     Contributor = new RedianContributorWithTypes()
@@ -213,7 +230,7 @@ namespace Gosocket.Dian.Application
                         RadianContributorTypeId = c.RadianContributorTypeId,
                         RadianOperationModeId = c.RadianOperationModeId
                     },
-                    Files = c.RadianContributorFile.Where(t=> !t.Deleted).ToList(),
+                    Files = newFiles,
                     FileTypes = fileTypes,
                     Tests = testSet,
                     LegalRepresentativeIds = userIds,
@@ -233,10 +250,10 @@ namespace Gosocket.Dian.Application
             RadianContributor competitor = contributors.FirstOrDefault();
             competitor.RadianState = newState;
             competitor.Description = description;
-            
+
             if (newState == RadianState.Test.GetDescription()) competitor.Step = 3;
             if (newState == RadianState.Habilitado.GetDescription()) competitor.Step = 4;
-            if(newState == RadianState.Cancelado.GetDescription()) competitor.Step = 1;
+            if (newState == RadianState.Cancelado.GetDescription()) competitor.Step = 1;
 
             _radianContributorRepository.AddOrUpdate(competitor);
 

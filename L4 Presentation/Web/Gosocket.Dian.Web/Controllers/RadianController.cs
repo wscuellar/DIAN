@@ -124,7 +124,7 @@ namespace Gosocket.Dian.Web.Controllers
                 Code = model.Code,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
-                Type= model.Type,
+                Type = model.Type,
                 RadianState = model.RadianState != null ? model.RadianState.Value.GetDescription() : null
             };
             RadianAdmin radianAdmin = _radianContributorService.ListParticipantsFilter(filter, model.Page, model.Length);
@@ -141,7 +141,7 @@ namespace Gosocket.Dian.Web.Controllers
                     TradeName = c.TradeName,
                     BusinessName = c.BusinessName,
                     AcceptanceStatusName = c.AcceptanceStatusName,
-                    RadianState =c.RadianState
+                    RadianState = c.RadianState
                 }).ToList(),
                 RadianType = radianAdmin.Types.Select(c => new SelectListItem
                 {
@@ -289,21 +289,16 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     foreach (var n in radianAdmin.Files)
                     {
-                        if (n.Status != 2)
-                        {
+                        if (n.Status != 2 && n.RadianContributorFileType.Mandatory)
                             return Json(new
                             {
                                 messasge = "Todos los archivos deben estar en estado 'Aceptado' para poder cambiar el estado del participante.",
                                 success = true,
                                 id = radianAdmin.Contributor.RadianContributorId
                             }, JsonRequestBehavior.AllowGet);
-                        }
-                        else
-                        {
-                            _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, RadianState.Test.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
-                            _ = SendMail(radianAdmin);
-                        }
                     }
+                    _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, RadianState.Test.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                    _ = SendMail(radianAdmin);
                 }
 
                 return Json(new
