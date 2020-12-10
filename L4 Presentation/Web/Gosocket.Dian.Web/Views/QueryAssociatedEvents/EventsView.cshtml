@@ -178,7 +178,7 @@
                         <div class="left-section ContainerDownload">
                             <p><i class="fa fa-download"></i>
                                 <um>
-                                    <button id="show-graphic-document" class="btn btn-link">Descarga</button>
+                                    <button id="show-graphic-document" class="btn btn-link" onclick="showModal('@Model.CUDE')">Descarga</button>
                                 </um>
                             </p>
                         </div>
@@ -226,7 +226,7 @@
 
                         @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia ||
                              Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
-                        {
+                        { 
                             <h5>Datos del Mandato </h5>
                             <span>NIT: @Model.Endoso.ReceiverCode</span>
                             <span>ENDOSATARIO: @Model.Endoso.ReceiverName</span>
@@ -380,4 +380,5 @@
     <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
+
 }
