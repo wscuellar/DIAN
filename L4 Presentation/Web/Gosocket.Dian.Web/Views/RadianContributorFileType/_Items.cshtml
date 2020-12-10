@@ -1,8 +1,8 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianContributorFileTypeTableViewModel
 @using Gosocket.Dian.Web.Utils
-<div class="table-responsive table-set-files">
+<div class="table-responsive table-set-files margin-bottom-40">
 
-    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0 custom-styles-files" data-int="0">
         <thead>
             <tr>
                 <th>Nombre</th>
@@ -40,20 +40,25 @@
             }
         </tbody>
     </table>
-    <div class="pull-right table-pagination padding-top-10">
+    <div class="pull-right table-pagination padding-top-10 full-width">
         @if (Model.RadianContributorFileTypes.Count > 0)
         {
-            <span class="text-muted">
-                <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.RadianContributorFileTypes.Count ? (Model.Page) * Model.Length + Model.RadianContributorFileTypes.Count : (Model.Page + 1) * Model.Length)</strong>
-            </span>
-            <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
-                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
-                    <span class="fa fa-chevron-left"></span>
-                </a>
-                <a class="btn btn-default paginate-btn next-page" @(Model.RadianContributorFileTypes.Count < Model.Length ? "disabled=\"disabled\"" : "")>
-                    <span class="fa fa-chevron-right"></span>
-                </a>
+            <div class="pull-left">
+                <span>Mostrando @(Model.Page + 1) de @(Model.RadianContributorFileTypes.Count) páginas</span>
             </div>
-        }
-    </div>
-</div>
+            <div class="pull-right">
+                <span class="text-muted">
+                    <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.RadianContributorFileTypes.Count ? (Model.Page) * Model.Length + Model.RadianContributorFileTypes.Count : (Model.Page + 1) * Model.Length)</strong>
+                </span>
+                <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
+                    <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                        <span class="fa fa-chevron-left"></span>
+                    </a>
+                    <a class="btn btn-default paginate-btn next-page" @(Model.RadianContributorFileTypes.Count < Model.Length ? "disabled=\"disabled\"" : "")>
+                        <span class="fa fa-chevron-right"></span>
+                    </a>
+                </div>
+            </div>
+         }
+            </div>
+        </div>

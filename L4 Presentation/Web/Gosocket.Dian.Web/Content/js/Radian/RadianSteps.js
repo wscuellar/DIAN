@@ -102,7 +102,7 @@ function RenderSteps(index) {
     })
 }
 
-function RenderTable(paramsObject) {
+function RenderTable(paramsObject) {debugger
     var totalPages = Math.round(paramsObject.customersTotalCount / 10) + 1 ;
     paramsObject.tableRendered && paramsObject.tableRendered.destroy();
     paramsObject.tableRendered = $(paramsObject.element).DataTable({
