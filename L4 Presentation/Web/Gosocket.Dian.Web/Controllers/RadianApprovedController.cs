@@ -269,8 +269,6 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult UpdateFactorOperationMode(SetOperationViewModel data)
         {
-            int result = -1;
-
             RadianContributorOperation contributorOperation = new RadianContributorOperation()
             {
                 RadianContributorId = data.RadianContributorId,
