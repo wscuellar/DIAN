@@ -1363,3 +1363,14 @@ button.selectpicker .fa-caret-down {
     white-space: inherit;
     text-align: left;
 }
+
+.underline-subrow {
+    border-bottom: 2px solid #E9E8E8;
+}
+
+.custom-styles-files {
+    font-size: 14px;
+}
+.custom-styles-files {
+    font-size: 18px !important;
+}
