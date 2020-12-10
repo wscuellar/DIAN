@@ -132,7 +132,8 @@ namespace Gosocket.Dian.Application
                    TradeName = c.Contributor.Name,
                    BusinessName = c.Contributor.BusinessName,
                    AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name,
-                   RadianState = c.RadianState
+                   RadianState = c.RadianState,
+                   RadianContributorId  = c.Id
                }).ToList(),
                 Types = radianContributorType,
                 RowCount = radianContributors.RowCount,
@@ -145,7 +146,7 @@ namespace Gosocket.Dian.Application
         public RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size)
         {
             string cancelState = RadianState.Cancelado.GetDescription();
-            string stateDescriptionFilter = filter.RadianState == null ? string.Empty : filter.RadianState.GetDescription();
+            string stateDescriptionFilter = filter.RadianState == null ? string.Empty : filter.RadianState;
             DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
             DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
 
@@ -165,7 +166,9 @@ namespace Gosocket.Dian.Application
                    Code = c.Contributor.Code,
                    TradeName = c.Contributor.Name,
                    BusinessName = c.Contributor.BusinessName,
-                   AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name
+                   AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name,
+                   RadianState = c.RadianState,
+                   RadianContributorId = c.Id
                }).ToList(),
                 Types = radianContributorType,
                 RowCount = radianContributors.RowCount,

@@ -365,7 +365,7 @@
                                             }
                                             <!--Rol Proveedor-->
                                             <!--  RADIAN -->
-                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                            @if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
                                             {
                                                 <li id="@Navigation.NavigationEnum.RADIAN">
                                                     <a href="@Url.Action("Index", "Radian")">RADIAN</a>
