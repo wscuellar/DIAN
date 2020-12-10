@@ -73,21 +73,18 @@ namespace Gosocket.Dian.Application
             Contributor contributor = _contributorService.GetByCode(userCode);
             if (contributor == null || contributor.AcceptanceStatusId != 4)
                 return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
-
+            
             bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
-            if (!indirectElectronicBiller)
-            {
-                Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributor.Id);
-                if (ownSoftware == null)
-                    return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
-            }
+            Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributor.Id);
+            if (!indirectElectronicBiller && ownSoftware == null)
+                return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
 
             if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
                 List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(userCode);
                 string enabledStatus = RadianState.Habilitado.GetDescription();
                 string cancelStatus = RadianState.Cancelado.GetDescription();
-                if (radianOperations.Any(t => t.RadianStatus != enabledStatus && t.RadianStatus != cancelStatus && t.RadianContributorTypeId != (int)radianContributorType))
+                if (radianOperations.Any(t => t.RowKey.Equals(ownSoftware.Id.ToString(), StringComparison.OrdinalIgnoreCase) && t.RadianStatus != enabledStatus && t.RadianStatus != cancelStatus && t.RadianContributorTypeId != (int)radianContributorType))
                     return new ResponseMessage(TextResources.OnlyActiveProcess, TextResources.alertType);
             }
 
@@ -120,7 +117,7 @@ namespace Gosocket.Dian.Application
         public RadianAdmin ListParticipants(int page, int size)
         {
             string cancelState = RadianState.Cancelado.GetDescription();
-            PagedResult<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.RadianState != cancelState, page, size);
+            PagedResult<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.RadianState != cancelState , page, size);
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
             {
@@ -133,12 +130,13 @@ namespace Gosocket.Dian.Application
                    BusinessName = c.Contributor.BusinessName,
                    AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name,
                    RadianState = c.RadianState,
-                   RadianContributorId  = c.Id
+                   RadianContributorId = c.Id
                }).ToList(),
                 Types = radianContributorType,
                 RowCount = radianContributors.RowCount,
                 CurrentPage = radianContributors.CurrentPage
             };
+
             return radianAdmin;
         }
 
@@ -150,7 +148,7 @@ namespace Gosocket.Dian.Application
             DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
             DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
 
-            var radianContributors = _radianContributorRepository.List(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
+            var radianContributors = _radianContributorRepository.List(t =>  (t.Contributor.Code == filter.Code || filter.Code == null) &&
                                                                              (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
                                                                              ((filter.RadianState == null && t.RadianState != cancelState) || t.RadianState == stateDescriptionFilter) &&
                                                                              (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) &&
@@ -186,14 +184,39 @@ namespace Gosocket.Dian.Application
             else
                 radianContributors = _radianContributorRepository.List(t => t.Id == contributorId).Results;
 
-            List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(contributorId).ToList();
-            List<string> userIds = _contributorService.GetUserContributors(contributorId).Select(u => u.UserId).ToList();
 
             RadianAdmin radianAdmin = null;
 
             radianContributors.ForEach(c =>
             {
+
+                List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(c.Id).ToList();
+                foreach(var item in testSet)
+                {
+                    string[] parts = item.RowKey.Split('|');
+                    item.SoftwareId = parts[1];
+                    item.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription(Enum.Parse(typeof(RadianOperationModeTestSet), parts[0]));
+                }
+
+                List<string> userIds = _contributorService.GetUserContributors(c.Contributor.Id).Select(u => u.UserId).ToList();
+
                 List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(t => t.RadianContributorTypeId == c.RadianContributorTypeId && !t.Deleted);
+                List<RadianContributorFile> newFiles = (from t in fileTypes
+                                                        join f in c.RadianContributorFile.Where(t => !t.Deleted) on t.Id equals f.FileType into files
+                                                        from fl in files.DefaultIfEmpty(new RadianContributorFile()
+                                                        {
+                                                            FileName = t.Name,
+                                                            FileType = t.Id,
+                                                            Status = 0,
+                                                            RadianContributorFileType = t,
+                                                            RadianContributorFileStatus = new RadianContributorFileStatus()
+                                                            {
+                                                                Id = 0,
+                                                                Name = "Pendiente"
+                                                            }
+                                                        })
+                                                        select fl).ToList();
+
                 radianAdmin = new RadianAdmin()
                 {
                     Contributor = new RedianContributorWithTypes()
@@ -213,7 +236,7 @@ namespace Gosocket.Dian.Application
                         RadianContributorTypeId = c.RadianContributorTypeId,
                         RadianOperationModeId = c.RadianOperationModeId
                     },
-                    Files = c.RadianContributorFile.Where(t=> !t.Deleted).ToList(),
+                    Files = newFiles,
                     FileTypes = fileTypes,
                     Tests = testSet,
                     LegalRepresentativeIds = userIds,
@@ -233,10 +256,10 @@ namespace Gosocket.Dian.Application
             RadianContributor competitor = contributors.FirstOrDefault();
             competitor.RadianState = newState;
             competitor.Description = description;
-            
+
             if (newState == RadianState.Test.GetDescription()) competitor.Step = 3;
             if (newState == RadianState.Habilitado.GetDescription()) competitor.Step = 4;
-            if(newState == RadianState.Cancelado.GetDescription()) competitor.Step = 1;
+            if (newState == RadianState.Cancelado.GetDescription()) competitor.Step = 1;
 
             _radianContributorRepository.AddOrUpdate(competitor);
 

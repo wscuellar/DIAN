@@ -45,7 +45,13 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFu
                 }
             }
             else {
-                method(jsonvalue);
+                if (data.Code == "500" && data.MessageType === "alert") {
+                    showConfirmation(data.Message, AlertExec(cancelFunction));
+                }
+                else {
+                    method(jsonvalue);
+                }
+                
             }
 
         }

@@ -14,6 +14,14 @@
             Code = 200;
         }
 
+        public ResponseMessage(string message, string messageType, int code)
+        {
+            Message = message;
+            MessageType = messageType;
+            Code = code;
+        }
+
+        public string data { get; set; }
         public string RedirectTo { get; set; }
         public string Message { get; set; }
         public string MessageType { get; set; }
