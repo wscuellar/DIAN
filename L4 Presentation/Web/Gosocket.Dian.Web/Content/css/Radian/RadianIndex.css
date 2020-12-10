@@ -436,6 +436,16 @@ button.edit-state {
     border-color: #348441;
 }
 
+.btn-radian-default:hover, btn-radian-success:hover {
+    background: #62C7AB;
+    border-radius: 10px;
+    color: white;
+    padding: 8px 20px;
+    font-size: 14px;
+    line-height: 16px;
+    border-color: #62C7AB;
+}
+
 .dropdown-state #RadianState {
     height: 41px;
     background: #FFFFFF;
