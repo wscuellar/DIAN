@@ -63,7 +63,7 @@ namespace Gosocket.Dian.Application
         public RadianContributor GetRadianContributor(int radianContributorId)
         {
             RadianContributor radianContributor = _radianContributorRepository
-                .Get(rc => rc.ContributorId == radianContributorId);
+                .Get(rc => rc.Id == radianContributorId);
 
             return radianContributor;
         }
@@ -110,11 +110,11 @@ namespace Gosocket.Dian.Application
                 if (software != null && software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted)
                     return new ResponseMessage() { Message = "El software encuentra en estado aceptado." };
 
-                _radianCallSoftwareService.DeleteSoftware(operationToDelete.SoftwareId);
-
-                RadianContributor participant = _radianContributorRepository.Get(t => t.Id == operationToDelete.RadianContributorId);
-                _globalRadianOperationService.Delete(participant.Contributor.Code, software.Id.ToString());
+                _radianCallSoftwareService.DeleteSoftware(operationToDelete.SoftwareId);               
             }
+
+            RadianContributor participant = _radianContributorRepository.Get(t => t.Id == operationToDelete.RadianContributorId);
+            _globalRadianOperationService.Delete(participant.Contributor.Code, operationToDelete.SoftwareId.ToString());
             return _radianContributorOperationRepository.Update(operationToDelete.Id);
         }
 
@@ -209,6 +209,9 @@ namespace Gosocket.Dian.Application
                 string key = existingOperation.SoftwareType.ToString() + "|" + radianContributorOperation.SoftwareId;
                 RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                 {
+                    Id = Guid.NewGuid().ToString(),
+                    ContributorId= radianContributor.Id,
+                    ContributorTypeId = radianContributor.RadianContributorTypeId.ToString(),
                     TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
                     ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
                     ReceiptServiceTotalRequired = testSet.ReceiptServiceTotalAcceptedRequired,

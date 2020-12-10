@@ -117,7 +117,7 @@ namespace Gosocket.Dian.Application
         public RadianAdmin ListParticipants(int page, int size)
         {
             string cancelState = RadianState.Cancelado.GetDescription();
-            PagedResult<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.RadianState != cancelState, page, size);
+            PagedResult<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.RadianState != cancelState , page, size);
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
             {
@@ -148,7 +148,7 @@ namespace Gosocket.Dian.Application
             DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
             DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
 
-            var radianContributors = _radianContributorRepository.List(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
+            var radianContributors = _radianContributorRepository.List(t =>  (t.Contributor.Code == filter.Code || filter.Code == null) &&
                                                                              (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
                                                                              ((filter.RadianState == null && t.RadianState != cancelState) || t.RadianState == stateDescriptionFilter) &&
                                                                              (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) &&
@@ -184,13 +184,22 @@ namespace Gosocket.Dian.Application
             else
                 radianContributors = _radianContributorRepository.List(t => t.Id == contributorId).Results;
 
-            List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(contributorId).ToList();
-            List<string> userIds = _contributorService.GetUserContributors(contributorId).Select(u => u.UserId).ToList();
 
             RadianAdmin radianAdmin = null;
 
             radianContributors.ForEach(c =>
             {
+
+                List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(c.Id).ToList();
+                foreach(var item in testSet)
+                {
+                    string[] parts = item.RowKey.Split('|');
+                    item.SoftwareId = parts[1];
+                    item.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription(Enum.Parse(typeof(RadianOperationModeTestSet), parts[0]));
+                }
+
+                List<string> userIds = _contributorService.GetUserContributors(c.Contributor.Id).Select(u => u.UserId).ToList();
+
                 List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(t => t.RadianContributorTypeId == c.RadianContributorTypeId && !t.Deleted);
                 List<RadianContributorFile> newFiles = (from t in fileTypes
                                                         join f in c.RadianContributorFile.Where(t => !t.Deleted) on t.Id equals f.FileType into files
