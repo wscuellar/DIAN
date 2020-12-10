@@ -72,7 +72,7 @@ namespace Gosocket.Dian.Web.Controllers
                 Nit = t.Nit,
                 RadianState = t.RadianState,
                 Page = t.Page,
-                Lenght =t.Length
+                Lenght = t.Length
             }).ToList();
             model.CustomerTotalCount = customers.RowCount;
 
@@ -92,7 +92,7 @@ namespace Gosocket.Dian.Web.Controllers
             };
             model.FileHistories = resultH;
             model.FileHistoriesRowCount = data.RowCount;
-            
+
             if ((int)registrationData.RadianOperationMode == 2)
             {
                 if (model.RadianState == "Habilitado")
@@ -126,16 +126,27 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public void Add(RegistrationDataViewModel registrationData)
+        public JsonResult Add(RegistrationDataViewModel registrationData)
         {
+            RadianTestSet testSet = null;
+            if (registrationData.RadianOperationMode == Domain.Common.RadianOperationMode.Direct)
+            {
+                testSet = _radianAprovedService.GetTestResult(((int)RadianOperationModeTestSet.OwnSoftware).ToString());
+                if (testSet == null)
+                    return Json(new ResponseMessage(TextResources.ModeWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+            }
+
             RadianContributor radianContributor = _radianContributorService.CreateContributor(registrationData.ContributorId,
-                                                        RadianState.Registrado,
-                                                        registrationData.RadianContributorType,
-                                                        registrationData.RadianOperationMode,
-                                                        User.UserName());
+                                                RadianState.Registrado,
+                                                registrationData.RadianContributorType,
+                                                registrationData.RadianOperationMode,
+                                                User.UserName());
+
+            if (registrationData.RadianOperationMode == Domain.Common.RadianOperationMode.Indirect)
+                return Json(new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType), JsonRequestBehavior.AllowGet);
 
             if (radianContributor.RadianSoftwares == null || radianContributor.RadianSoftwares.Count == 0)
-                return;
+                return Json(new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
             RadianSoftware software = radianContributor.RadianSoftwares.FirstOrDefault();
             RadianContributorOperation radianContributorOperation = new RadianContributorOperation()
@@ -145,7 +156,8 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
                 Timestamp = DateTime.Now
             };
-            _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, true);
+            ResponseMessage result = _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, testSet, true);
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -275,27 +287,17 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatedBy = User.UserName(),
                 Deleted = false,
                 Status = true,
-                RadianSoftwareStatusId =  (int)RadianSoftwareStatus.InProcess,
+                RadianSoftwareStatusId = (int)RadianSoftwareStatus.InProcess,
                 SoftwareDate = System.DateTime.Now,
                 Timestamp = System.DateTime.Now,
                 Updated = System.DateTime.Now,
                 RadianContributorId = data.RadianContributorId
             };
 
-            result = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, !string.IsNullOrEmpty(data.SoftwareName));
+            RadianTestSet testSet = _radianAprovedService.GetTestResult(data.SoftwareType.ToString());
+            ResponseMessage response = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, testSet, !string.IsNullOrEmpty(data.SoftwareName));
 
-
-            string message;
-            if (result == -1)
-                message = TextResources.RequiredSoftware;
-            else
-                message = result == 0 ? TextResources.ExistingSoftware : TextResources.SuccessSoftware;
-            return Json(
-                new
-                {
-                    message,
-                    success = true,
-                }, JsonRequestBehavior.AllowGet);
+            return Json(response, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult SetTestDetails(RadianApprovedViewModel radianApprovedViewModel)
@@ -342,7 +344,7 @@ namespace Gosocket.Dian.Web.Controllers
             string key = softwareType.ToString() + "|" + softwareId;
             radianApprovedViewModel.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(radianAdmin.Contributor.Code, key);
             RadianTestSet testSet = _radianTestSetService.GetTestSet(softwareType.ToString(), softwareType.ToString());
-           
+
             radianApprovedViewModel.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), softwareType.ToString())));
             radianApprovedViewModel.RadianTestSetResult.StatusDescription = testSet.Description;
             radianApprovedViewModel.Contributor = radianAdmin.Contributor;

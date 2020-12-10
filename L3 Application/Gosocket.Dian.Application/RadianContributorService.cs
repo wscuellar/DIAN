@@ -73,21 +73,18 @@ namespace Gosocket.Dian.Application
             Contributor contributor = _contributorService.GetByCode(userCode);
             if (contributor == null || contributor.AcceptanceStatusId != 4)
                 return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
-
+            
             bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
-            if (!indirectElectronicBiller)
-            {
-                Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributor.Id);
-                if (ownSoftware == null)
-                    return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
-            }
+            Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributor.Id);
+            if (!indirectElectronicBiller && ownSoftware == null)
+                return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
 
             if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
                 List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(userCode);
                 string enabledStatus = RadianState.Habilitado.GetDescription();
                 string cancelStatus = RadianState.Cancelado.GetDescription();
-                if (radianOperations.Any(t => t.RadianStatus != enabledStatus && t.RadianStatus != cancelStatus && t.RadianContributorTypeId != (int)radianContributorType))
+                if (radianOperations.Any(t => t.RowKey.Equals(ownSoftware.Id.ToString(), StringComparison.OrdinalIgnoreCase) && t.RadianStatus != enabledStatus && t.RadianStatus != cancelStatus && t.RadianContributorTypeId != (int)radianContributorType))
                     return new ResponseMessage(TextResources.OnlyActiveProcess, TextResources.alertType);
             }
 
@@ -205,7 +202,7 @@ namespace Gosocket.Dian.Application
                                                             RadianContributorFileType = t,
                                                             RadianContributorFileStatus = new RadianContributorFileStatus()
                                                             {
-                                                                Id=0,
+                                                                Id = 0,
                                                                 Name = "Pendiente"
                                                             }
                                                         })
