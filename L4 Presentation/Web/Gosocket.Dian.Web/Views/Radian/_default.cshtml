@@ -115,29 +115,7 @@
                                 index++;
                             }
                         </tbody>
-                    }
-                    else
-                    {
-                        <tbody>
-                            @{var index = 0;}
-                            @foreach (var f in Model.RadianContributorFilesType.OrderByDescending(f => f.Id).ToList())
-                            {
-                                var label = "<i class='fa fa-exclamation-circle'></i>";
-                                var statusId = "status-0";
-
-                                <tr data-id="@f.Id" data-idFile="@f.Id" class="select-radian-contributor">
-                                    <td width="33%" class="text-left"><span class="fa fa-download" title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.Name" id="@f.Id"></span>@f.Name</td>
-                                    <td width="33%" class="text-left init-hide @statusId"><input type="hidden" class="list-change-status" id="status-file-@index" value=""></td>
-                                    <td width="33%" class="text-left init-show">
-                                        <div><span class="">@Html.Raw(label) @f.Name</span></div>
-                                    </td>
-                                    <td width="33%" class="text-center edit-state-td"><button type="button" class="btn btn-link edit-state" disabled>Editar</button></td>
-                                </tr>
-                                index++;
-                            }
-                        </tbody>
-
-                    }
+                     }
                 </table>
             </div>
         </div>
