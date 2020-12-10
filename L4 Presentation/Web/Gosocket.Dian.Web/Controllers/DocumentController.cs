@@ -40,16 +40,18 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
+        private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
 
         #region Constructor
 
         public DocumentController(
            IRadianPdfCreationService radianPdfCreationService
-           , IRadianGraphicRepresentationService radianGraphicRepresentationService
+           , IRadianGraphicRepresentationService radianGraphicRepresentationService, IQueryAssociatedEventsService queryAssociatedEventsService
            )
         {
             _radianPdfCreationService = radianPdfCreationService;
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
+            _queryAssociatedEventsService = queryAssociatedEventsService;
         }
 
         #endregion
@@ -483,6 +485,15 @@ namespace Gosocket.Dian.Web.Controllers
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
             String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult ShowDocumentToPublic(string Id)
+        {
+            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(Id);
+            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(invoiceAndNotes.Item1, invoiceAndNotes.Item2);
+
+            return View(invoiceNotes);
         }
 
         #region Private methods
