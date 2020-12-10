@@ -1371,6 +1371,14 @@ button.selectpicker .fa-caret-down {
 .custom-styles-files {
     font-size: 14px;
 }
-.custom-styles-files {
+.custom-styles-files i{
     font-size: 18px !important;
+}
+.full-width{
+    width: 100%;
+}
+
+.select-radian-contributor td:first-child{
+    display: inline-flex;
+    width: 100%;
 }

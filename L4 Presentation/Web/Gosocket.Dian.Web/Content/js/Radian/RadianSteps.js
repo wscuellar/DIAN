@@ -102,8 +102,8 @@ function RenderSteps(index) {
     })
 }
 
-function RenderTable(paramsObject) {debugger
-    var totalPages = Math.round(paramsObject.customersTotalCount / 10) + 1 ;
+function RenderTable(paramsObject) {
+    var totalPages = Math.trunc(paramsObject.customersTotalCount / 10) + 1 ;
     paramsObject.tableRendered && paramsObject.tableRendered.destroy();
     paramsObject.tableRendered = $(paramsObject.element).DataTable({
         paging: false,
@@ -124,7 +124,7 @@ function RenderTable(paramsObject) {debugger
         }
     });
     $(paramsObject.element + "_filter > label").hide();
-    $(paramsObject.element + "_wrapper").append("<div><span>Mostrando " + paramsObject.ajaxData.Page+" de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.Page, paramsObject.customersTotalCount));
+    $(paramsObject.element + "_wrapper").append("<div><span>Mostrando " + paramsObject.ajaxData.Page + " de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.Page, paramsObject.customersTotalCount, paramsObject.data.length));
     $(paramsObject.element + "_filter").append(paramsObject.form);
     LoadEventsToSearch(paramsObject);
     LoadEventsToPagiantion(paramsObject);
@@ -168,11 +168,13 @@ function LoadEventsToPagiantion(paramsObject) {
     });
 }
 
-function TablePagination(page, totalCount) {
+function TablePagination(page, totalCount, countPage) {
     var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : ""; 
     var disabledPrev = page == 1 ? 'disabled="disabled"' : "";
+    var min = (page - 1) * 10 + 1;
+    var max = 10 > countPage ? (page - 1) * 10 + countPage : (page) * 10;
     var html = '<div class="pagination-controls pull-right"><span class="text-muted">\
-                <strong>1-1</strong >\
+                <strong>'+ min + '-' + max+'</strong >\
                 </span >\
                 <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">\
                 <a class="btn btn-default paginate-btn prev-page" '+ disabledPrev +'>\

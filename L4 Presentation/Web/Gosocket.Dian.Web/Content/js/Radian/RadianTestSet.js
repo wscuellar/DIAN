@@ -1,8 +1,4 @@
-﻿$('#OperationModeId').change(function () {
-    $('.captureFields').val('0');
-});
-
-$('#TotalDocumentRequired').attr('readonly', true);
+﻿$('#TotalDocumentRequired').attr('readonly', true);
 $('#TotalDocumentAcceptedRequired').attr('redonly', true);
 
 $("#ReceiptNoticeTotalRequired").change(function () {

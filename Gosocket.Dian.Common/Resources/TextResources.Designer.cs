@@ -205,6 +205,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Este modo de operación carece de Set de Pruebas!!!.
+        /// </summary>
+        public static string ModeWithoutTestSet {
+            get {
+                return ResourceManager.GetString("ModeWithoutTestSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El usuario no habilitado para el sistema!!!.
         /// </summary>
         public static string NonExistentParticipant {

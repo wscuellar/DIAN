@@ -165,6 +165,9 @@
   <data name="Mandato" xml:space="preserve">
     <value>Inscripción de Mandato Electrónico</value>
   </data>
+  <data name="ModeWithoutTestSet" xml:space="preserve">
+    <value>Este modo de operación carece de Set de Pruebas!!!</value>
+  </data>
   <data name="NonExistentParticipant" xml:space="preserve">
     <value>El usuario no habilitado para el sistema!!!</value>
   </data>
