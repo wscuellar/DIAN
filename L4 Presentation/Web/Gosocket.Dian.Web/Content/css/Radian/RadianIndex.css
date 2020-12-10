@@ -1348,3 +1348,18 @@ button.selectpicker .fa-caret-down {
 .dis-flex img{
     margin: 0 9px;
 }
+
+.table-set-files {
+    width: 70%;
+    margin: auto;
+}
+
+.table-set-files table{
+    table-layout: fixed;
+    text-align: center;
+}
+
+.table-set-files table td:first-child {
+    white-space: inherit;
+    text-align: left;
+}
