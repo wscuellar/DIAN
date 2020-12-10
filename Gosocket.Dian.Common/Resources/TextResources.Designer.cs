@@ -223,6 +223,24 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a ¿Desea iniciar el proceso de habilitación para @docume?.
+        /// </summary>
+        public static string OthersElectronicDocumentsSelect_Confirm {
+            get {
+                return ResourceManager.GetString("OthersElectronicDocumentsSelect_Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a ¿Desea iniciar el proceso como para @Participante de otros documentos electrónicos?.
+        /// </summary>
+        public static string OthersElectronicDocumentsSelectParticipante_Confirm {
+            get {
+                return ResourceManager.GetString("OthersElectronicDocumentsSelectParticipante_Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El participante no cuenta con un software propio activo en el sistema.
         /// </summary>
         public static string ParticipantWithoutSoftware {
