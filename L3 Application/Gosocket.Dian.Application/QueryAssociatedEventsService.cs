@@ -4,6 +4,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Gosocket.Dian.Application
 {
@@ -21,6 +22,9 @@ namespace Gosocket.Dian.Application
         const string ENDOSOCODES = "037,038,039";
         const string LIMITACIONCODES = "041";
         const string MANDATOCODES = "043";
+
+        const string CREDITNOTE = "91";
+        const string DEBITNOTE = "92";
 
         public QueryAssociatedEventsService(IGlobalDocValidationDocumentMetaService radianGlobalDocValidationDocumentMeta, IGlobalDocValidatorDocumentService globalDocValidatorDocument, IGlobalDocValidatorTrackingService globalDocValidatorTracking)
         {
@@ -52,7 +56,7 @@ namespace Gosocket.Dian.Application
 
         public string EventTitle(EventStatus eventStatus, string customizationId, string eventCode)
         {
-            string title = string.Empty;            
+            string title = string.Empty;
 
             switch (eventStatus)
             {
@@ -95,7 +99,7 @@ namespace Gosocket.Dian.Application
 
             GlobalDocValidatorDocument eventVerification = EventVerification(otherEvent.Identifier);
 
-            return eventVerification != null 
+            return eventVerification != null
                 && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10);
         }
 
@@ -116,6 +120,25 @@ namespace Gosocket.Dian.Application
                 return EventStatus.AnulacionLimitacionCirculacion;
 
             return EventStatus.None;
+        }
+
+        public List<GlobalDocValidatorDocumentMeta> CreditAndDebitNotes(string documentReferencedKey)
+        {
+            List<GlobalDocValidatorDocumentMeta> creditNotes = FindCreditNotes(documentReferencedKey);
+            List<GlobalDocValidatorDocumentMeta> debitNotes = FindDebitNotes(documentReferencedKey);
+            List<GlobalDocValidatorDocumentMeta> joinNotes = creditNotes.Concat(debitNotes).ToList();
+
+            return joinNotes.OrderBy(n => n.EmissionDate).ToList();
+        }
+
+        public List<GlobalDocValidatorDocumentMeta> FindCreditNotes(string documentReferencedKey)
+        {
+            return _radianGlobalDocValidationDocumentMeta.FindReferencedDocuments(documentReferencedKey, CREDITNOTE);
+        }
+
+        public List<GlobalDocValidatorDocumentMeta> FindDebitNotes(string documentReferencedKey)
+        {
+            return _radianGlobalDocValidationDocumentMeta.FindReferencedDocuments(documentReferencedKey, DEBITNOTE);
         }
     }
 }

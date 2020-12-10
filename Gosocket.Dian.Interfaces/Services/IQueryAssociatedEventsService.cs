@@ -5,6 +5,7 @@ namespace Gosocket.Dian.Interfaces.Services
 {
     public interface IQueryAssociatedEventsService
     {
+        List<GlobalDocValidatorDocumentMeta> CreditAndDebitNotes(string documentReferencedKey);
         GlobalDocValidatorDocumentMeta DocumentValidation(string reference);
         string EventTitle(EventStatus eventStatus, string customizationId, string eventCode);
         Domain.Entity.GlobalDocValidatorDocument EventVerification(string eventItemIdentifier);

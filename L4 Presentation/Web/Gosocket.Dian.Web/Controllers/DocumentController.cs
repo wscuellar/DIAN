@@ -40,16 +40,18 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
+        private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
 
         #region Constructor
 
         public DocumentController(
            IRadianPdfCreationService radianPdfCreationService
-           , IRadianGraphicRepresentationService radianGraphicRepresentationService
+           , IRadianGraphicRepresentationService radianGraphicRepresentationService, IQueryAssociatedEventsService queryAssociatedEventsService
            )
         {
             _radianPdfCreationService = radianPdfCreationService;
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
+            _queryAssociatedEventsService = queryAssociatedEventsService;
         }
 
         #endregion
@@ -483,6 +485,30 @@ namespace Gosocket.Dian.Web.Controllers
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
             String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
+        }
+
+        public string Test(string Id)
+        {
+            var data = _queryAssociatedEventsService.CreditAndDebitNotes(Id);
+            string showData = "<div class='card'>";
+            
+            foreach (var item in data)
+            {
+                showData += "<div class='card card-title'>";
+                showData += $"DocumentTypeName: {item.DocumentTypeName}";
+                showData += "</div>";
+                showData += "<div card card-Body>";
+                showData += $"DocumentKey: {item.DocumentKey}";                
+                showData += "</div>";
+                showData += "<div card card-footer>";
+                showData += $"EmissionDate: {item.EmissionDate}";
+                showData += "</div>";
+                showData += "<hr/>";
+            }
+
+            showData += "</div>";
+
+            return showData;
         }
 
         #region Private methods
