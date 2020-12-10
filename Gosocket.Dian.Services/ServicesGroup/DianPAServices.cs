@@ -906,7 +906,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             var validateParty = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_ValidateParty) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
-
             // Validate EventCode
             var eventCodeResponse = ValidateEventCode(documentParsed.DocumentKey.ToLower(), eventCode, docTypeCode, trackIdCude, customizationID, listId);
             if (!eventCodeResponse.IsValid)
@@ -1041,9 +1040,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                         dianResponse.IsValid = false;
                         var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-                        TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
-                        //var documentValidatorDocument = TableManagerGlobalDocValidatorDocument.FindhByGlobalDocumentId(trackIdCude, trackIdCude);
-                        //TableManagerGlobalDocValidatorDocument.Delete(documentValidatorDocument);
+                        TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);                      
                         return dianResponse;
                     }
                 }
