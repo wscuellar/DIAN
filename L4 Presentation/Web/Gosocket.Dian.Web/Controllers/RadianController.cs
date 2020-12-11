@@ -278,7 +278,7 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     string clientsData = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
                     if (!string.IsNullOrEmpty(clientsData))
-                        return Json(new { messasge = clientsData, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                        return Json(new { messasge = clientsData, success = true, id = radianAdmin.Contributor.RadianContributorId,  html="html" }, JsonRequestBehavior.AllowGet);
                 }
 
                 _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, stateProcess.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
