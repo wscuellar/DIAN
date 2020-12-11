@@ -123,6 +123,9 @@
   <data name="alertType" xml:space="preserve">
     <value>alert</value>
   </data>
+  <data name="AllSoftware" xml:space="preserve">
+    <value>Todos los archivos deben estar en estado 'Aceptado' para poder cambiar el estado del participante.</value>
+  </data>
   <data name="confirmType" xml:space="preserve">
     <value>confirm</value>
   </data>
@@ -210,7 +213,13 @@
   <data name="TechnologyProvider_Confirm" xml:space="preserve">
     <value>¿Está seguro que desea habilitar la trasmisión de eventos al RADIAN como Proveedor Tecnológico?</value>
   </data>
+  <data name="TestNotRemove" xml:space="preserve">
+    <value>Los participantes 'En pruebas' no se pueden cancelar.</value>
+  </data>
   <data name="TradingSystem_Confirm" xml:space="preserve">
     <value>¿Está seguro que desea operar como Sistema de Negociación?</value>
+  </data>
+  <data name="WithCustomerList" xml:space="preserve">
+    <value>El software de la operación tiene clientes asociados.</value>
   </data>
 </root>
