@@ -321,11 +321,27 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult GetSetTestByContributor(string code, string softwareId, string softwareType)
         {
             RadianTestSetResult result = _radianContributorService.GetSetTestResult(code, softwareId, softwareType);
+
             List<EventCountersViewModel> events = new List<EventCountersViewModel>();
-            for(int i=0; i<14; i++)
-            {
-                events.Add(new EventCountersViewModel() { EventName = "Event name " + i.ToString(), Counter1 = i, Counter2 = i, Counter3 = 3 });
-            }
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Received.GetDescription(), Counter1 = result.ReceiptNoticeTotalAcceptedRequired, Counter2 = result.ReceiptNoticeAccepted, Counter3 = result.ReceiptNoticeRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Rejected.GetDescription(), Counter1 = result.ReceiptServiceTotalAcceptedRequired, Counter2 = result.ReceiptServiceAccepted, Counter3 = result.ReceiptServiceRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Receipt.GetDescription(), Counter1 = result.ReceiptServiceTotalAcceptedRequired, Counter2 = result.ReceiptServiceAccepted, Counter3 = result.ReceiptServiceRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Accepted.GetDescription(), Counter1 = result.ExpressAcceptanceTotalAcceptedRequired, Counter2 = result.ExpressAcceptanceAccepted, Counter3 = result.ExpressAcceptanceRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.AceptacionTacita.GetDescription(), Counter1 = result.AutomaticAcceptanceTotalAcceptedRequired, Counter2 = result.AutomaticAcceptanceAccepted, Counter3 = result.AutomaticAcceptanceRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Avales.GetDescription(), Counter1 = result.GuaranteeTotalAcceptedRequired, Counter2 = result.GuaranteeAccepted, Counter3 = result.GuaranteeRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.SolicitudDisponibilizacion.GetDescription(), Counter1 = result.ApplicationAvailableTotalAcceptedRequired, Counter2 = result.ApplicationAvailableAccepted, Counter3 = result.ApplicationAvailableRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.NegotiatedInvoice.GetDescription(), Counter1 = result.CirculationLimitationTotalAcceptedRequired, Counter2 = result.CirculationLimitationAccepted, Counter3 = result.CirculationLimitationRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.AnulacionLimitacionCirculacion.GetDescription(), Counter1 = result.EndCirculationLimitationTotalAcceptedRequired, Counter2 = result.EndCirculationLimitationAccepted, Counter3 = result.EndCirculationLimitationRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Mandato.GetDescription(), Counter1 = result.ElectronicMandateTotalAcceptedRequired, Counter2 = result.ElectronicMandateAccepted, Counter3 = result.ElectronicMandateRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.TerminacionMandato.GetDescription(), Counter1 = result.EndMandateTotalAcceptedRequired, Counter2 = result.EndMandateAccepted, Counter3 = result.EndMandateRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.NotificacionPagoTotalParcial.GetDescription(), Counter1 = result.PaymentNotificationTotalAcceptedRequired, Counter2 = result.PaymentNotificationAccepted, Counter3 = result.PaymentNotificationRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.InvoiceOfferedForNegotiation.GetDescription(), Counter1 = result.EndorsementCancellationTotalAcceptedRequired, Counter2 = result.EndorsementCancellationAccepted, Counter3 = result.EndorsementCancellationRejected });
+
+            //to do: hablar con roberto sobre el servicio y estos endosos que no estan mapeados.
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoPropiedad.GetDescription(), Counter1 = result.EndorsementTotalAcceptedRequired, Counter2 = result.EndorsementAccepted, Counter3 = result.EndorsementRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoGarantia.GetDescription(), Counter1 = result.EndorsementTotalAcceptedRequired, Counter2 = result.EndorsementAccepted, Counter3 = result.EndorsementRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoProcuracion.GetDescription(), Counter1 = result.EndorsementTotalAcceptedRequired, Counter2 = result.EndorsementAccepted, Counter3 = result.EndorsementRejected });
+            
             return Json(events, JsonRequestBehavior.AllowGet);
         }
 
