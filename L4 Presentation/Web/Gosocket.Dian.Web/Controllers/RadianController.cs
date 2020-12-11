@@ -321,8 +321,22 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult GetSetTestByContributor(string code, string softwareId, string softwareType)
         {
             RadianTestSetResult result = _radianContributorService.GetSetTestResult(code, softwareId, softwareType);
-            return Json(result, JsonRequestBehavior.AllowGet);
+            List<EventCountersViewModel> events = new List<EventCountersViewModel>();
+            for(int i=0; i<14; i++)
+            {
+                events.Add(new EventCountersViewModel() { EventName = "Event name " + i.ToString(), Counter1 = i, Counter2 = i, Counter3 = 3 });
+            }
+            return Json(events, JsonRequestBehavior.AllowGet);
         }
 
+
+    }
+
+    public class EventCountersViewModel
+    {
+        public  string EventName { get; set; }
+        public int Counter1 { get; set; }
+        public int Counter2 { get; set; }
+        public int Counter3 { get; set; }
     }
 }
