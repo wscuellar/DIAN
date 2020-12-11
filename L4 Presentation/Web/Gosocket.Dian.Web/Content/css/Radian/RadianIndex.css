@@ -102,7 +102,7 @@ th {
         font-family: Arial;
         font-style: normal;
         font-weight: bold;
-        font-size: 1.5vw;
+        font-size: 1.3vw;
         align-items: center;
         text-align: center;
         color: #2C323C;
@@ -124,11 +124,10 @@ th {
         font-family: Arial;
         font-style: normal;
         font-weight: bold;
-        font-size: 1.5vw;
-        line-height: 25px;
+        font-size: 1.3vw;
         align-items: center;
         text-align: center;
-        letter-spacing: 0.4px;
+        letter-spacing: 0.2px;
         color: #348441;
         cursor: pointer;
     }
@@ -434,6 +433,17 @@ button.edit-state {
     padding: 8px 20px;
     font-size: 14px;
     line-height: 16px;
+    border-color: #348441;
+}
+
+.btn-radian-default:hover, btn-radian-success:hover {
+    background: #62C7AB;
+    border-radius: 10px;
+    color: white;
+    padding: 8px 20px;
+    font-size: 14px;
+    line-height: 16px;
+    border-color: #62C7AB;
 }
 
 .dropdown-state #RadianState {
@@ -471,7 +481,7 @@ button.edit-state {
     width: 100%;
     margin: auto;
     text-align: center;
-    padding: 10px 10px 50px;
+    padding: 10px 10px 80px;
 }
 
 h4.text-thin {
@@ -480,7 +490,7 @@ h4.text-thin {
     width: 80%;
     margin: auto;
     line-height: 30px;
-    font-size: 21px;
+    font-size: 22px;
     color: #348441;
 }
 
@@ -500,7 +510,7 @@ h4.text-thin {
 }
 
 .modal-dialog .media-body {
-    padding: 30px 30px 0px 30px;
+    padding: 80px 30px 0px 30px;
 }
 
 .RadianImgContainer {
@@ -1204,7 +1214,8 @@ button.selectpicker .fa-caret-down {
     background: url(/Content/images/png/closeButton.png);
     background-repeat: no-repeat;
     text-indent: -9000px;
-    top: 21px;
+    top: 28px;
+    right: 20px;
 }
 
 .prompt-comment {

@@ -1,0 +1,203 @@
+﻿
+@{
+    ViewBag.Title = "Participantes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+    <style type="text/css">
+        .modal-body .close, .modal-header .close {
+            background-color: #348441 !important;
+        }
+        .btnCloseOtherDocument {
+            color: #fff;
+            background: #348441 !important;
+            background-color: #348441 !important;
+            /*border-radius: 10px !important;*/
+            float: right;
+            cursor: pointer;
+            opacity: 100 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
+            font-weight: normal !important;
+            font-family: auto !important;
+        }
+
+        .btn-success:hover, btn-radian-success:hover {
+            ​​​​​​background-color: #62C7AB !important;
+            background: #62C7AB !important;
+            border-color: #62C7AB !important;
+            color: #fff !important;
+        }
+
+        ​​​​​​
+
+    </style>
+}
+<div class="page-content radian-view margin-20">
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="container-fluid RadianContainerBegin" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
+
+        <div class="row">
+            <div class="col-lg-12  col-md-12  col-xs-12" style="margin-top:30px">
+                <h4><b>Seleccione el participante que va a emitir otros documentos electrónicos</b></h4>
+            </div>
+            <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
+            </div>
+
+            <div class="row-fluid">
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="card RadianCardContainer pull-left" style="width: 92% !important; height: 240px !important;" id="1" ParticipanteId="1" Participantetexto="Emisor">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/Emisor.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Emisor</p>
+                            <p class="RadianTittleCard2">Otros documentos electrónicos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="card RadianCardContainer pull-right" style="width: 92% !important; height: 240px !important;" ParticipanteId="2" Participantetexto="Proveedor Tecnológico">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologicoII.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Proveedor Tecnológico</p>
+                            <p class="RadianTittleCard2">Otros Documentos Electrónicos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <div class="modal fade prompt-comment" id="dialogModeOperation" tabindex="-1" aria-labelledby="dialogModeOperationActiveLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="padding-right: 12px;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" style="margin-left: 8px; border-bottom: 3px solid #62C7AB !important;" id="dialogModeOperationActiveLabel">Configurar Modos de operación </h5>
+                        <button type="button" class="close btnCloseOtherDocument" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="padding-left: 1px !important;display: block; width: 95% !important;">
+                        <div class="row" style="margin-left: 8px; margin-top: 20px;">
+                            <div class="col-md-10 col-lg-10">
+                                @Html.DropDownList("OperationMode", (IEnumerable<SelectListItem>)ViewBag.ListOperationMode, "Seleccione un modo de operación", new { @class = "form-control selectpicker" })
+
+                            </div>
+                            <div class="col-md-2 col-lg-2">
+                                <button id="btnOperationMode" type="button" class="btn btn-success btn-radian-success" style="padding: 12px">Seleccionar</button>
+                            </div>
+                            <div class="col-md-12 col-lg-12" style="font-size:12px;margin-top:5px; margin-left:3px;">
+                                <div id="sinSeleccionarOM" class="text-danger"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+
+    <script>
+        var operationClick = false;
+        var electronicDocumentId = 0;
+        var complementoTexto = '';
+        var ParticipanteId =0;
+        var requeridoOperationMode = "Seleccionar un modo de operación";
+
+
+        $('.RadianCardContainer').click(function () {
+            showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
+                if (!operationClick) {
+                    operationClick = true;
+                    $("#sinSeleccionarOM").text('');
+
+
+                    electronicDocumentId = @ViewBag.electronicDocumentId;
+                    ParticipanteId = $(this).attr('ParticipanteId');
+                    complementoTexto= $(this).attr('Participantetexto');
+
+                    var ValidacionOtherElectronicDocumentsViewModel = {
+                        UserCode: '@ViewBag.UserCode',
+                        Accion: 'SeleccionParticipante',
+                        ElectronicDocument: electronicDocumentId,
+                        complementoTexto: complementoTexto,
+                        ParticipanteId: ParticipanteId
+                    };
+
+                    CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
+                        function (param) {
+                            hideLoading('#panel-form');
+                            $("#dialogModeOperation").modal('show');
+                         }, true, () => hideLoading('#panel-form')
+                    );
+                }
+
+        });
+
+
+        $("#btnOperationMode").click(function () {
+
+            var OperationMode = $("#OperationMode").val();
+
+            if (OperationMode == -1 || OperationMode == undefined || OperationMode == '') {
+                $("#sinSeleccionarOM").text(requeridoOperationMode);
+            }
+            else {
+                $("#dialogModeOperation").modal('hide');
+                showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
+
+                var ValidacionOtherElectronicDocumentsViewModel = {
+                    UserCode: '@ViewBag.UserCode',
+                    Accion: 'SeleccionOperationMode',
+                    ElectronicDocument: electronicDocumentId,
+                    complementoTexto: complementoTexto,
+                    ParticipanteId: ParticipanteId
+                };
+
+                CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
+                    function (param) {
+
+                        var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
+                            + "?electronicDocumentId=" + electronicDocumentId
+                            + "&operationModeId=" + OperationMode
+                            + "&ParticipanteId=" + ParticipanteId;
+                        window.location.href = url;
+
+
+                    }, true, () => hideLoading('#panel-form')
+                );
+            }
+
+        });
+
+
+    </script>
+
+}

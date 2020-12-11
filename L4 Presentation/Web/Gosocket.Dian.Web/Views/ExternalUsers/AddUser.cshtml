@@ -10,12 +10,29 @@
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
     <style type="text/css">
 
+        .btn-success:focus, .btn-hover-success:active, .btn-hover-success.active, .btn.btn-active-success:active, .btn.btn-active-success.active, .dropdown.open > .btn.btn-active-success, .btn-group.open .dropdown-toggle.btn.btn-active-success {
+            background-color: #348441 !important;
+            border-color: #348441 !important;
+            color: #fff !important;
+        }
+
+        .btn-success:hover, btn-radian-success:hover {
+            background-color: #62C7AB;
+            background: #62C7AB;
+            border-color: #62C7AB;
+            color: #fff;
+        }
+
         .prompt-comment .modal-title {
             font-size: 24px;
-            width: fit-content;
+            width: 96%;
             border-bottom: 3px solid #62C7AB;
             padding-right: 20px;
             padding-bottom: 4px;
+        }
+
+        .prompt-comment .modal-body {
+            width: 98%!important;
         }
 
         .input-general {
@@ -25,10 +42,6 @@
         .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
             cursor: not-allowed;
             background-color: #eee !important;
-        }
-
-        .modal-body .close, .modal-header .close {
-            background-color: #348441 !important;
         }
 
         .btnCloseUE {
@@ -87,10 +100,6 @@
             padding-left: 5px;
         }
 
-        .prompt-comment .modal-body {
-            width: 100%;
-        }
-
         .modal-body .close, .modal-header .close {
             background-color: #348441 !important;
         }
@@ -114,7 +123,7 @@
         .btnSuccessOtherDocument {
             height: 33px;
             border-radius: 4px;
-            margin-top: 18px;
+            margin-top: 8px;
         }
     </style>
 }
@@ -389,8 +398,14 @@
     <div class="modal-dialog">
         <div class="modal-content" style="padding-right: 12px;">
             <div class="modal-header">
-                <h5 class="modal-title" style="margin-left: 8px;" id="dialogConfirmActiveLabel">¿Desea inactivar/activar al usuario?</h5>
-                <button type="button" class="close btnCloseOtherDocument" data-dismiss="modal" aria-label="Close">
+                <!--<h5 class="modal-title" style="margin-left: 8px;" id="dialogConfirmActiveLabel">¿Desea inactivar/activar al usuario?</h5>-->
+                <div class="row title-container" style="margin-left: 8px;">
+                    <p class="title-view" id="dialogConfirmActiveLabel">
+                        ¿Desea inactivar/activar al usuario?
+                    </p>
+                    <div class="underline-title"></div>
+                </div>
+                <button type="button" class="close btnCloseOtherDocument" data-dismiss="modal" aria-label="Close" style="margin-top:4px">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -401,8 +416,8 @@
                         <td><label id="lblActionActive" name="lblActionActive" class="control-label" style="margin-left: 7px;"></label></td>
                     </tr>
                     <tr>
-                        <td class="col-md-12 col-lg-12">
-                            <textarea type="text" id="txtActiveDescription" cols="4" rows="4" maxlength="150" class="form-control"></textarea>
+                        <td class="col-md-12 col-lg-12" style="padding-right: 23px;">
+                            <textarea type="text" id="txtActiveDescription" cols="4" rows="4" maxlength="150" class="form-control input-general fields captureFields" style="min-height: 96px;" placeholder="Escriba aquí..."></textarea>
                         </td>
                         <td style="vertical-align: bottom;">
                             <button id="btnOkActive" type="button" data-dismiss="modal" class="btn btn-success btn-radian-success btnSuccessOtherDocument">Activar</button>

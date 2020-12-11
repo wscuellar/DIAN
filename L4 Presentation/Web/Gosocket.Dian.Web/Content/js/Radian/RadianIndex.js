@@ -75,7 +75,7 @@ function ConfirmExec(operation, param, operationCancel) {
     return {
         del: {
             label: "Aceptar",
-            className: "btn-radian-default btn-radian-success",
+            className: "btn-radian-default",
             callback: function () {
                 operation(param);
                 operationClick = false;
@@ -83,7 +83,7 @@ function ConfirmExec(operation, param, operationCancel) {
         },
         del1: {
             label: "Cancelar",
-            className: "btn-radian-default",
+            className: "btn-radian-default btn-radian-success",
             callback: function () {
                 operationCancel != null && operationCancel();
                 operationClick = false;

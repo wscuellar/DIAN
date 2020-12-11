@@ -338,9 +338,9 @@ namespace Gosocket.Dian.Web.Controllers
             events.Add(new EventCountersViewModel() { EventName = EventStatus.InvoiceOfferedForNegotiation.GetDescription(), Counter1 = result.EndorsementCancellationTotalAcceptedRequired, Counter2 = result.EndorsementCancellationAccepted, Counter3 = result.EndorsementCancellationRejected });
 
             //to do: hablar con roberto sobre el servicio y estos endosos que no estan mapeados.
-            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoPropiedad.GetDescription(), Counter1 = result.EndorsementTotalAcceptedRequired, Counter2 = result.EndorsementAccepted, Counter3 = result.EndorsementRejected });
-            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoGarantia.GetDescription(), Counter1 = result.EndorsementTotalAcceptedRequired, Counter2 = result.EndorsementAccepted, Counter3 = result.EndorsementRejected });
-            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoProcuracion.GetDescription(), Counter1 = result.EndorsementTotalAcceptedRequired, Counter2 = result.EndorsementAccepted, Counter3 = result.EndorsementRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoPropiedad.GetDescription(), Counter1 =      result.EndorsementPropertyTotalAcceptedRequired, Counter2 = result.EndorsementPropertyAccepted, Counter3 = result.EndorsementPropertyRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoGarantia.GetDescription(), Counter1 =       result.EndorsementGuaranteeTotalAcceptedRequired, Counter2 = result.EndorsementGuaranteeAccepted, Counter3 = result.EndorsementGuaranteeRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoProcuracion.GetDescription(), Counter1 =    result.EndorsementProcurementTotalAcceptedRequired, Counter2 = result.EndorsementProcurementAccepted, Counter3 = result.EndorsementProcurementRejected });
             
             return Json(events, JsonRequestBehavior.AllowGet);
         }
@@ -348,11 +348,5 @@ namespace Gosocket.Dian.Web.Controllers
 
     }
 
-    public class EventCountersViewModel
-    {
-        public  string EventName { get; set; }
-        public int Counter1 { get; set; }
-        public int Counter2 { get; set; }
-        public int Counter3 { get; set; }
-    }
+    
 }
