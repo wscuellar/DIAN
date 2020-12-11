@@ -809,7 +809,7 @@ namespace Gosocket.Dian.Services.Utils
                         stringBuilder.Clear();
                         isValid = false;
                     }
-                    else if ((Convert.ToInt32(eventCode) >= 36 && Convert.ToInt32(eventCode) <= 38) && string.IsNullOrEmpty(receiverCode) && flagEvento)
+                    else if ((Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(receiverCode) && flagEvento)
                     {
                         stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el documento del endosatario");
                         errors.Add(stringBuilder.ToString());
@@ -831,7 +831,7 @@ namespace Gosocket.Dian.Services.Utils
                         isValid = false;
                     }
 
-                    if (listID == "1" && (Convert.ToInt32(eventCode) >= 36 && Convert.ToInt32(eventCode) <= 38) && string.IsNullOrEmpty(senderCode) && flagEvento)
+                    if (listID == "1" && (Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(senderCode) && flagEvento)
                     {
                         stringBuilder.AppendLine($"{codeMessage}F04-(R): No fue informado el Nit.");
                         errors.Add(stringBuilder.ToString());
@@ -848,7 +848,7 @@ namespace Gosocket.Dian.Services.Utils
                             stringBuilder.Clear();
                             isValid = false;
                         }
-                        else
+                        else if(!(listID == "2" && (eventCode == "037" || eventCode == "038" || eventCode =="039")))
                         {
                             stringBuilder.AppendLine($"{codeMessage}F04-(R): No fue informado el Nit.");
                             errors.Add(stringBuilder.ToString());
