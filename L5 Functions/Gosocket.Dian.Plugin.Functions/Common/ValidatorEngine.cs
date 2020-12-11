@@ -173,8 +173,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.TerminacionMandato ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
