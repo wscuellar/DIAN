@@ -113,7 +113,7 @@
                             showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                             window.location.href = "/Radian/ViewDetails/" + id;
                         }
-                        if (data.html && radianApproveState == "1") {
+                        if (!data.html && radianApproveState == "1") {
                             showConfirmation(bootboxMessage.CANCEL_RESPONSE_CORRECT, AlertExec(operation), "cancel-confirmation", operation);
                         } else {
                             showConfirmation(messageSuccess, AlertExec(operation));
