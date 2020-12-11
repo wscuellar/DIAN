@@ -370,7 +370,7 @@ namespace Gosocket.Dian.Application
             if (!customerLists.Any())
                 return string.Empty;
             StringBuilder message = new StringBuilder();
-            message.AppendFormat("<div><p>{0}</p>", TextResources.WithCustomerList);
+            message.AppendFormat("<div class='htmlalert'><p>{0}</p>", TextResources.WithCustomerList);
             message.Append("<ul>");
             foreach(RadianCustomerList customer in customerLists)
             {
