@@ -1,4 +1,5 @@
-﻿(document.querySelectorAll('img.RadianimgSvg').forEach(function (img) {
+﻿
+(document.querySelectorAll('img.RadianimgSvg').forEach(function (img) {
     var imgID = img.id;
     var imgClass = img.className;
     var imgURL = img.src;
@@ -189,7 +190,20 @@ function customDialog(htmlPartial, code, softwareId, operation, url) {
         console.log(success);
     }
     var actionSuccess = (success) => {
-        console.log(success);
+        var html = "";
+        var columns = 0;
+        success.forEach((element, index) => {
+            html += '<li>\
+            <span>' + element.EventName + '</span> <a class="badge custom-badget-primary">' + element.Counter1 + '</a> <a class="badge custom-badget-success">' + element.Counter2 + '</a> <a class="badge custom-badget-danger">' + element.Counter3 + '</a>\
+            </li >';
+            if ((index + 1) % 5 == 0) {
+                $(".list-unstyled-" + columns).append(html);
+                columns++;
+                html = "";
+            }
+        });
+        $(".list-unstyled-" + columns).append(html);
+
     }
     bootbox.dialog({
         message: htmlPartial,
