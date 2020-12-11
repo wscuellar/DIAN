@@ -1413,3 +1413,7 @@ button.selectpicker .fa-caret-down {
 .set-details-conventions span{
     margin-right: 6px;
 }
+.show-details-set {
+    color: #348441;
+    font-size: 13px;
+}
