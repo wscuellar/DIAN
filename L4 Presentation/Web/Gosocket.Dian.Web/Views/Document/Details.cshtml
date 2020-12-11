@@ -125,7 +125,7 @@
                 GetEventsPartialView(documentKey);
 
                 setTimeout(function () {
-                    $('#divViewerPartial').css("height", "540px");
+                    $('#divViewerPartial').css("height", "635px");
                     $('#divPageContent').css('max-height', '623px');
                 }, 200)
             })
@@ -147,6 +147,7 @@
                         $('#modifyWrapper').html(data);
                         $('#modifyWrapper').fadeIn(300);
                         $('#container1-title').fadeIn(300);
+                        $('#divChildrenModifyWrapper').css("padding-top", "100px");
                     }
                     else {
                         window.location.href = '/User/Login';
@@ -165,6 +166,7 @@
             $('#container1-title').fadeOut(300);
             $('#divViewerPartial').css('height', '');
             $('#divPageContent').css('max-height', '');
+            $('#divChildrenModifyWrapper').css('padding-top', '');
             setTimeout(function () {
                 $('#container1').fadeIn(300);
             }, 500);
@@ -175,6 +177,7 @@
             $('#container1-title').fadeOut(300);
             $('#divViewerPartial').css('height', '');
             $('#divPageContent').css('max-height', '');
+            $('#divChildrenModifyWrapper').css('padding-top', '');
             setTimeout(function () {
                 $('#container1').fadeIn(300);
             }, 500);
