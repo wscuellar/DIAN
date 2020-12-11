@@ -88,7 +88,6 @@
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
     <script src="~/Content/js/Radian/constants.js"></script>
     <script src="~/Content/js/Radian/RadianSteps.js"></script>
-    @**@<script src="~/Scripts/jquery.steps.js"></script>
 
     <script>
         $(document).ready(function () {
@@ -145,14 +144,9 @@
 
         $('.submit-button').click(function (e) {
             showLoading('#panel-form', 'Cargando', 'Cargando archivos, por favor espere.');
-        var form = $(this).parents("form");
-        var files = $(form)[0];
-        var filteredFiles = [];
-        for (var i = 0 ; i < files.length ; i++) {
-            files[i].type == "file" && files[i].id == "" &&
-            files[i].files.length > 0 &&
-            filteredFiles.push(files[i]);
-        }
+            var form = $(this).parents("form");
+            var files = $(form)[0];
+            var filteredFiles = [];
             var messages = new Object();
             var j = 0;
             for (var i = 0; i < files.length; i++) {
@@ -165,13 +159,16 @@
                     j++;
                 }
             }
+            for (var i = 0; i < files.length; i++) {
+                files[i].type == "file" && files[i].id == "" &&
+                    files[i].files.length > 0 &&
+                    filteredFiles.push(files[i]);
+            }
             form.validate({
                 messages: messages
             });
             e.preventDefault();
-            if (filteredFiles.length > 0) {
-
-                if (form.valid()) {
+            if (filteredFiles.length > 0 && form.valid()) {
                     var formdata = new FormData();
                     var numberFiles = 0;
                     var limit = filteredFiles.length
@@ -228,7 +225,6 @@
                             showConfirmation(error, AlertExec());
                         }
                     });
-                }
             } else {
                 hideLoading('#panel-form');
             }

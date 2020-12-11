@@ -1,0 +1,55 @@
+﻿@model Gosocket.Dian.Web.Models.InvoiceNotesViewModel
+
+@{
+    ViewBag.Title = "Detalles del documento";
+    Layout = "~/Views/Shared/_LayoutPublicInfo.cshtml";
+}
+
+@section css
+{
+
+    <style>
+        .container {
+            background-color: #fff;
+        }
+
+        .text-wrap {
+            word-wrap: break-word;
+        }
+    </style>
+}
+
+<div class="container">
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#home"><span class="h5">Factura Electrónica</span></a></li>
+        @foreach (var item in Model.ListGlobalDocValidatorDocumentMetas)
+        {
+            <li><a data-toggle="tab" href="#@item.DocumentKey"><span class="h5">@item.DocumentTypeName</span></a></li>
+        }
+    </ul>
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane fade in active">
+            <div>
+                <div>CUFE:</div>
+                <div>@Model.GlobalDocValidatorDocument.GlobalDocumentId</div>
+            </div>
+        </div>
+
+        @foreach (var item in Model.ListGlobalDocValidatorDocumentMetas)
+        {
+            <div id="@item.DocumentKey" class="tab-pane fade">
+                <div>
+                    <div class="title h3">@item.DocumentTypeName</div>
+                    <div>CUDE:</div>
+                    <div>@item.DocumentKey</div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Content/js/bootstrap.min.js"></script>
+}

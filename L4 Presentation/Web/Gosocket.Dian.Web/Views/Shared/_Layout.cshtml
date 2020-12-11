@@ -365,7 +365,7 @@
                                             }
                                             <!--Rol Proveedor-->
                                             <!--  RADIAN -->
-                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                            @if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
                                             {
                                                 <li id="@Navigation.NavigationEnum.RADIAN">
                                                     <a href="@Url.Action("Index", "Radian")">RADIAN</a>
@@ -421,8 +421,8 @@
                                                 <!-- Configuracion RADIAN -->
                                                 @if (User.IsInAnyRole("Administrador", "Super"))
                                                 {
-                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("List", "RadianContributorFileType")">Tipos de Ficheros Radian</a></li>
-                                                    <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas Radian</a></li>
+                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("List", "RadianContributorFileType")">Tipos de Ficheros RADIAN</a></li>
+                                                    <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas RADIAN</a></li>
                                                     <li id="@Navigation.NavigationEnum.Contingencies"><a href="@Url.Action("Contingencies", "Settings")">Administrar Contingencias</a></li>
                                                     <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("Users", "Settings")">Usuarios</a></li>
                                                 }
@@ -595,6 +595,8 @@
     <script src="~/Content/js/gosocket/typeahead.js"></script>
     <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
     <script src="~/Content/js/common/common.js?1.2.0"></script>
+
+    <script src="~/Scripts/jquery.steps.js"></script>
 
     <!-- highchart-->
     <script src="https://code.highcharts.com/highcharts.js"></script>

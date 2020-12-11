@@ -12,5 +12,10 @@ namespace Gosocket.Dian.Application
         {
             return globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItemIdentifier, eventItemIdentifier);
         }
+
+        public GlobalDocValidatorDocument FindByGlobalDocumentId(string globalDocumentId)
+        {
+            return globalDocValidatorDocumentTableManager.FindByGlobalDocumentId<GlobalDocValidatorDocument>(globalDocumentId);
+        }
     }
 }

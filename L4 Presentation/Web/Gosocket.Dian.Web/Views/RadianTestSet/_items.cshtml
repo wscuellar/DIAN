@@ -2,7 +2,7 @@
 
 
 <div class="table-responsive">
-    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+    <table class="documents-table text-center table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         @if (Model.RadianTestSets.Count == 0)
         {
             <tr style="background-color: transparent !important;">
@@ -20,7 +20,7 @@
                     <th class="col-md-2">Modo de operación</th>
                     <th class="col-md-2">Descripción</th>
                     <th class="col-md-2">Documentos</th>
-
+                    <th class="col-md-2">Documentos por Eventos</th>
                     <th class="col-md-2">Estado</th>
                     <th class="col-md-2">Creado por</th>
                     <th class="col-md-2"></th>
@@ -34,6 +34,7 @@
                     <td class="text-nowrap"><a>@set.OperationModeName</a></td>
                     <td class="text-nowrap"><a>@set.Description</a></td>
                     <td class="text-nowrap"><a>@set.TotalDocumentRequired</a></td>
+                    <td class="text-nowrap"><a>@set.TotalDocumentAcceptedRequired</a></td>
                     <td class="text-nowrap">
                         @{
                             var text_color = set.Active ? "text-gosocket" : "text-red";

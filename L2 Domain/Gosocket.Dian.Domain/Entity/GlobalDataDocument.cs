@@ -30,5 +30,7 @@ namespace Gosocket.Dian.Domain.Entity
         public double TaxAmountIca { get; set; }
         public double TaxAmountIpc { get; set; }
         public string FileName { get; set; }
+        public string EventCode { get; set; }
+        public DateTime SigningTimeStamp { get; set; }
     }
 }

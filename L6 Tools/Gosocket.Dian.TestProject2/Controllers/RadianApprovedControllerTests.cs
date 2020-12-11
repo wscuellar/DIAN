@@ -1,10 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 using Moq;
 using Gosocket.Dian.Interfaces.Services;
-using System.Web.Mvc;
-using Gosocket.Dian.Web.Models;
-using Gosocket.Dian.Domain.Common;
 
 namespace Gosocket.Dian.Web.Controllers.Tests
 {
