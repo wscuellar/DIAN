@@ -116,9 +116,6 @@
     <Setting Name="Param_ValidateReferenceAttorney" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ValidateReferenceAttorneyUrl</Value>
     </Setting>
-    <Setting Name="Param_ValidateCufe" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidatorCufeUrl</Value>
-    </Setting>
     <Setting Name="Param_ValidateCune" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ValidateCuneUrl</Value>
     </Setting>
