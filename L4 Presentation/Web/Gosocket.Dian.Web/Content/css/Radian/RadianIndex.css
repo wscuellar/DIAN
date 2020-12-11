@@ -1382,3 +1382,12 @@ button.selectpicker .fa-caret-down {
     display: inline-flex;
     width: 100%;
 }
+
+.htmlalert p {
+    font-size: 22px;
+}
+
+.htmlalert ul{
+    text-align: left;
+    font-size: 14px;
+}

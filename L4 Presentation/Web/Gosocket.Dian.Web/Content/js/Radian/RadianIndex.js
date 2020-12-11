@@ -175,16 +175,27 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
 
 }
 
-function ShowDetailsTestSet(html) {debugger
-    $(".show-details-set").click(() => {
-        customDialog(html);
-    });
+function ShowDetailsTestSet(htmlPartial, id, softwareId, operation) {
+        customDialog(htmlPartial, id, softwareId, operation);
 }
 
-function customDialog(htmlPartial) {
+function customDialog(htmlPartial, code, softwareId, operation) {
+    var data = {
+        code: code,
+        softwareId: softwareId,
+        operation: operation
+    }
+    var actionError = (error) => {
+
+    }
+    var actionSuccess = (success) => {
+
+    }
     bootbox.dialog({
         message: htmlPartial,
         className: "table-data modal-radian",
         size: 'large'
+    }).init(() => {
+        ajaxFunction(url, "POST", data, actionError, actionSuccess);
     });
 }
