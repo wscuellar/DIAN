@@ -107,13 +107,13 @@
                         }
                     };
                     var successAction = (data) => {
-                        var messageSuccess = Object.values(data)[0];
-                        var id = Object.values(data)[2];
+                        var messageSuccess = data.message;
+                        var id = data.id;
                         var operation = () => {
                             showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                             window.location.href = "/Radian/ViewDetails/" + id;
                         }
-                        if (radianApproveState == "1" && '@Model.RadianState' != "En pruebas") {
+                        if (data.html && radianApproveState == "1") {
                             showConfirmation(bootboxMessage.CANCEL_RESPONSE_CORRECT, AlertExec(operation), "cancel-confirmation", operation);
                         } else {
                             showConfirmation(messageSuccess, AlertExec(operation));
