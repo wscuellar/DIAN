@@ -2895,6 +2895,7 @@
     <Content Include="Views\OthersElectronicDocuments\_form.cshtml" />
     <Content Include="Views\OthersElectronicDocuments\_default.cshtml" />
     <Content Include="Views\Document\ShowDocumentToPublic.cshtml" />
+    <Content Include="Views\Radian\_detailsTestSet.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
