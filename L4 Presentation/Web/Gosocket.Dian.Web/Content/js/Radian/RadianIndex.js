@@ -174,3 +174,17 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
     });
 
 }
+
+function ShowDetailsTestSet(html) {debugger
+    $(".show-details-set").click(() => {
+        customDialog(html);
+    });
+}
+
+function customDialog(htmlPartial) {
+    bootbox.dialog({
+        message: htmlPartial,
+        className: "table-data modal-radian",
+        size: 'large'
+    });
+}
