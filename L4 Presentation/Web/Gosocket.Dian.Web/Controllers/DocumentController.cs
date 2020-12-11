@@ -728,7 +728,8 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             model.IsNextPage = result.Item1;
-            this.Session["Continuation_Token_" + (model.Page + 1)] = result.Item2;
+            Session["Continuation_Token_" + (model.Page + 1)] = result.Item2;
+            model.Documents = model.Documents.OrderByDescending(d => d.ReceptionDate).ToList();
 
             return View("Index", model);
         }
