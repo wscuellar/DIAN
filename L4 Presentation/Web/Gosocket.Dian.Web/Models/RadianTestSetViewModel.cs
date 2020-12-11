@@ -103,16 +103,40 @@ namespace Gosocket.Dian.Web.Models
         public int ApplicationAvailableTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Endoso electrónico          ")]
+        [Display(Name = "Endoso en Propiedad          ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Endoso electrónico          "      )]
+        [Display(Name = "Endoso en Propiedad         ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementTotalAcceptedRequired { get; set; }
+
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Endoso en Garantía          ")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int EndorsementWarrantyTotalRequired { get; set; }
+
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Endoso en Garantía         ")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int EndorsementWarrantyTotalAcceptedRequired { get; set; }
+
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Endoso en Procuración         ")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int EndorsementProcurationTotalRequired { get; set; }
+
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Endoso en Procuración        ")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int EndorsementProcurationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Cancelación de endoso       ")]
