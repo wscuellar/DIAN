@@ -2906,7 +2906,8 @@
     <Content Include="Views\Document\ShowDocumentToPublic.cshtml" />
     <Content Include="Views\Radian\_detailsTestSet.cshtml" />
     <Content Include="Views\OthersElectronicDocuments\AddParticipants.cshtml" />
-    <Content Include="Views\FreeBiller\Index.cshtml" />
+    <Content Include="Views\FreeBiller\_CreateUser.cshtml" />
+    <Content Include="Views\FreeBiller\FreeBillerUser.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
