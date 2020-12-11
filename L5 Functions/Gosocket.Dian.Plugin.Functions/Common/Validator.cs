@@ -2082,8 +2082,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //if (document != null)
                 if (documentMeta.Count >= 2)
                 {
-                    //No valida Evento registrado previamente para solictud de disponibilizacion posterior
-                    if ((eventPrev.CustomizationID != "363" && eventPrev.CustomizationID != "364"))
+                    //No valida Evento registrado previamente para solictud de disponibilizacion posterior y Aval
+                    if ((eventPrev.CustomizationID != "363" && eventPrev.CustomizationID != "364" 
+                        && eventPrev.EventCode != "035"))
                     {
                         if (documentMeta.Where(t => t.EventCode == eventPrev.EventCode
                         && document != null
