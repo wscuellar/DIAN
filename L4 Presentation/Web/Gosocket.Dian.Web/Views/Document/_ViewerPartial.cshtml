@@ -27,20 +27,58 @@
         overflow-wrap: break-word;
         width: auto;
     }
+
+    .ContainerDownload {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        font-style: normal;
+        font-size: 14px;
+        line-height: 14px;
+        color: #348441;
+        cursor: pointer;
+    }
+
+    .render-row {
+        border: hidden !important;
+    }
+
+    .subtitle-radian-status {
+        font-weight: normal !important;
+    }
+
+    .line-bottom {
+        border-bottom: 2px solid #E9E8E8;
+    }
+
+    .row-fe-details {
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+    }
+
+    .row-fe-states {
+        display: grid;
+        font-size: 16px;
+    }
+
+    .radian-state-ef-line {
+        width: 33px;
+        height: 0px;
+        border: 1px dashed #2C323C;
+        margin-top: 20px;
+    }
 </style>
 
 <!--Message-->
 <!--===================================================-->
 <div class="mar-top pad-no bg-white" id="html-gdoc">
 
-    <div style="display: none;" id="viewer-company-options"> </div>
-
+    <div style="display: none;" id="viewer-company-options"></div>
     <div class="fab-shadow"></div>
+
     <div>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
         <div>
-            <div class="row render-row">
+            <div class="row line-bottom row-fe-details" style="padding-bottom:14px">
                 <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
                     <img class="img-responsive" style="max-height: 130px;" src="~/Content/img/LogoDian.png">
                 </div>
@@ -62,7 +100,8 @@
                     </p>
                 </div>
             </div>
-            <div class="row render-row">
+
+            <div class="row line-bottom row-fe-details" style="padding-bottom:24px; padding-top:14px;">
                 <div class="col-md-4" style="padding: 0">
                     <p>
                         <span class="datos-receptor">DATOS DEL EMISOR</span>
@@ -86,30 +125,57 @@
                             TOTALES E IMPUESTOS<br>
                         </p>
                         <p style="text-align: right;font-weight: bold;">
-                            @*IVA 5%: @Model.Document.TaxesDetail.TaxAmountIva5Percent.ToString("C0")<br>
-                                IVA 19%: @Model.Document.TaxesDetail.TaxAmountIva19Percent.ToString("C0")<br>*@
                             IVA: @Model.Document.TaxAmountIva.ToString("C0")<br>
                             Total: @Model.Document.TotalAmount.ToString("C0")<br>
                         </p>
                     </div>
                 }
             </div>
+
         </div>
     </div>
 </div>
-<div>
-    @*Abre PDF*@
-    <br />
-    <button id="show-document" class="btn btn-link">Certificado de existencia</button>
 
-    @*
-        <a href="@Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey })">Certificado de existencia</a>
-        @(Html.Raw(JsonConvert.SerializeObject(Url.Action("PrintDocument", "Document", new { cufe = Model.Document.DocumentKey }).ToString().Trim('"'))))
-    *@
-    <br />
-    <br />
+<div class="container-fluid">
+    <div class="row" style="padding-top:24px">
+        <h4 class="subtitle-radian-status">ESTADO EN EL REGISTRO DE FACTURAS ELECTRÓNICAS</h4>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <div style="display:inline-flex">
+                <div style="display:grid">
+                    <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
+                    <span>Título Valor</span>
+                </div>
+                <div class="radian-state-ef-line"></div>
+                <div style="display: grid; padding-left: 21px; padding-top: 4px;">
+                    <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
+                    <span>Registrada</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 row-fe-states">
+            <span class="cufe-text">
+                Legítimo Tenedor actual: <s>COMPAÑÍA EJEMPLO S.A.S</s>
+            </span>
+            <span class="cufe-text">
+                Fecha de autorización para circulación: <s>08/08/2020</s>
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="ContainerDownload">
+            <p>
+                <i class="fa fa-download"></i>
+                <um id="show-document">
+                    <ins>Certificado de existencia</ins>
+                </um>
+            </p>
+        </div>
+    </div>
 </div>
-<div class="row mar-no" style="border-bottom: 2px solid #E9E8E8;">
+
+<div class="row mar-no line-bottom">
     <div class="col-sm-6 pad-no">
         <h4 class="margin-top-10">Validaciones del documento</h4>
     </div>
@@ -151,7 +217,7 @@ else
 <br />
 @if (Model.Document.References.Where(x => x.ShowAsReference).Count() > 0)
 {
-    <div class="row mar-no" style="border-bottom: 2px solid #348441;">
+    <div class="row mar-no line-bottom">
         <div class="col-sm-6 pad-no">
             <h4 class="margin-top-10">Referencias del documento</h4>
         </div>
