@@ -7,6 +7,13 @@
 @section css
 {
     <style type="text/css">
+
+        .btn-success:focus, .btn-hover-success:active, .btn-hover-success.active, .btn.btn-active-success:active, .btn.btn-active-success.active, .dropdown.open > .btn.btn-active-success, .btn-group.open .dropdown-toggle.btn.btn-active-success {
+            background-color: #348441!important;
+            border-color: #348441!important;
+            color: #fff!important;
+        }
+
         .buttonAddRightOtherDoc {
             padding-right: 0px !important;
             margin-right: 0px !important;
@@ -34,6 +41,20 @@
             padding-left: 0px;
             padding-right: 0px;
             margin-left: -3px;
+        }
+
+            .btnAddOthersDocs:hover {
+                background-color: #62C7AB;
+                background: #62C7AB;
+                border-color: #62C7AB;
+                color: #fff;
+            }
+
+        .btn-success:hover, btn-radian-success:hover {
+            background-color: #62C7AB;
+            background: #62C7AB;
+            border-color: #62C7AB;
+            color: #fff;
         }
 
         .button.selectpicker {
@@ -77,10 +98,12 @@
             padding-bottom: 2px !important;
             font-weight: normal !important;
             font-family: auto !important;
+            margin-top: 3px!important;
+            margin-right: 1px!important;
         }
 
         .prompt-comment .modal-body {
-            width: 100%;
+            width: 96%;
         }
 
         .modal-body .close, .modal-header .close {
@@ -91,14 +114,14 @@
             height: 33px;
             border-radius: 4px;
             margin-top: 18px;
+            height: 36px;
         }
 
         #validNewElectronicDocument {
             display: none;
             font-size: 12px;
-            padding-left: 7px;
+            padding-left: 17px;
         }
-
     </style>
 }
 <div class="page-content margin-15">
@@ -139,7 +162,7 @@
     <div class="modal fade prompt-comment" id="modalElectronicDocument" tabindex="-1" aria-labelledby="modalElectronicDocumentLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content" style="padding-right: 12px;">
-                <div class="modal-header">
+                <div class="modal-header" style="padding-left: 27px;">
                     <h5 class="modal-title" id="modalElectronicDocumentLabel">Añadir Documento Electrónico</h5>
                     <button type="button" class="close btnCloseOtherDocument" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -149,9 +172,8 @@
 
                     <table>
                         <tr>
-                            <td class="col-md-12 col-lg-12">
-                                <!--<div class="form-group ">-->
-                                <input type="text" id="txtElectronicDocumentName" class="form-control margin-top-20" maxlength="50" />
+                            <td class="col-md-12 col-lg-12" style="padding-right: 30px;">
+                                <input type="text" id="txtElectronicDocumentName" class="form-control margin-top-20 input-general fields captureFields" maxlength="50" style="margin-left: 8px;" />
                             </td>
                             <td>
                                 <button type="button" class="btn btn-success btn-radian-success btnSuccessOtherDocument" onclick="addNewElectronicDocument()">Añadir</button>

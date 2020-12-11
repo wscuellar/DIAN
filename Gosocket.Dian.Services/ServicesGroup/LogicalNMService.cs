@@ -881,8 +881,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var response = ValdiateWorkedCode(xmlParser.globalDocPayrolls);
             if (!response) {
+
                 dianResponse.StatusCode = Properties.Settings.Default.Code_89;
-                dianResponse.StatusDescription = "Error en el sistema";
+                dianResponse.StatusDescription = "Metodo del Trabajador Mal Calculado.";
                 var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
                 if (globalEnd >= 10)
                 {
