@@ -379,5 +379,14 @@ namespace Gosocket.Dian.Application
             message.Append("</ul></div>");
             return message.ToString();
         }
+
+
+    
+        public RadianTestSetResult GetSetTestResult(string code, string softwareId, string softwareType)
+        {
+            RadianOperationModeTestSet softwareTypeEnum =EnumHelper.GetValueFromDescription<RadianOperationModeTestSet>(softwareType);
+            string key =  softwareTypeEnum.ToString() + "|" + softwareId;
+            return _radianTestSetResultManager.GetTestSetResult(code, key);
+        }
     }
 }

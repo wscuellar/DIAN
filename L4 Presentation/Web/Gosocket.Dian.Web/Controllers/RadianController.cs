@@ -278,7 +278,7 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     string clientsData = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
                     if (!string.IsNullOrEmpty(clientsData))
-                        return Json(new { message = clientsData, success = true, id = radianAdmin.Contributor.RadianContributorId,  html="html" }, JsonRequestBehavior.AllowGet);
+                        return Json(new { message = clientsData, success = true, id = radianAdmin.Contributor.RadianContributorId, html = "html" }, JsonRequestBehavior.AllowGet);
                 }
 
                 _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, stateProcess.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
@@ -316,5 +316,13 @@ namespace Gosocket.Dian.Web.Controllers
 
             return true;
         }
+
+        [HttpPost]
+        public JsonResult GetSetTestByContributor(string code, string softwareId, string softwareType)
+        {
+            RadianTestSetResult result = _radianContributorService.GetSetTestResult(code, softwareId, softwareType);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }
