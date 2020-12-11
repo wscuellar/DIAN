@@ -1,4 +1,5 @@
-﻿(document.querySelectorAll('img.RadianimgSvg').forEach(function (img) {
+﻿
+(document.querySelectorAll('img.RadianimgSvg').forEach(function (img) {
     var imgID = img.id;
     var imgClass = img.className;
     var imgURL = img.src;
@@ -175,16 +176,40 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
 
 }
 
-function ShowDetailsTestSet(html) {debugger
-    $(".show-details-set").click(() => {
-        customDialog(html);
-    });
+function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {
+    customDialog(htmlPartial, id, softwareId, operation, url);
 }
 
-function customDialog(htmlPartial) {
+function customDialog(htmlPartial, code, softwareId, operation, url) {
+    var data = {
+        code: code,
+        softwareId: softwareId,
+        softwareType: operation
+    }
+    var actionError = (error) => {
+        console.log(success);
+    }
+    var actionSuccess = (success) => {
+        var html = "";
+        var columns = 0;
+        success.forEach((element, index) => {
+            html += '<li>\
+            <div class="set-details"><span>' + element.EventName + '</span><div> <div><a class="badge custom-badget-primary">' + element.Counter1 + '</a> <a class="badge custom-badget-success">' + element.Counter2 + '</a> <a class="badge custom-badget-danger">' + element.Counter3 + '</a></div>\
+            </li >';
+            if ((index + 1) % 5 == 0) {
+                $(".list-unstyled-" + columns).append(html);
+                columns++;
+                html = "";
+            }
+        });
+        $(".list-unstyled-" + columns).append(html);
+
+    }
     bootbox.dialog({
         message: htmlPartial,
         className: "table-data modal-radian",
         size: 'large'
+    }).init(() => {
+        ajaxFunction(url, "POST", data, actionError, actionSuccess);
     });
 }
