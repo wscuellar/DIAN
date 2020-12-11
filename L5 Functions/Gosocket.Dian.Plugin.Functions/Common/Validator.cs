@@ -2728,6 +2728,59 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return responses;
         }
 
+        //private ValidateListResponse ValidateAval(XmlParser xmlParserCufe, XmlParser xmlParserCude)
+        //{
+        //    DateTime startDate = DateTime.UtcNow;
+        //    string valueTotalInvoice = xmlParserCufe.TotalInvoice;
+
+        //    XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+        //    int totalValueSender = 0;
+        //    for (int i = 0; i < valueListSender.Count; i++)
+        //    {
+        //        string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+        //        // Si no se reporta, el Avalista asume el valor del monto de quien respalda...
+        //        if (string.IsNullOrWhiteSpace(valueStockAmount)) return null;
+
+        //        totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+        //    }
+
+        //    if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+        //    {
+        //        return new ValidateListResponse
+        //        {
+        //            IsValid = false,
+        //            Mandatory = true,
+        //            ErrorCode = "Regla: 89-(R): ",
+        //            ErrorMessage = $"{(string)null} El valor reportado del elemento SenderParty supera el valor total del Título Valor.",
+        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+        //        };
+        //    }
+
+        //    XmlNodeList valueListIssuerParty = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']");
+        //    // En caso de no indicarlo quedan garantizadas las obligaciones de todas las partes del título.
+        //    if (valueListIssuerParty.Count <= 0) return null;
+
+        //    int totalValueIssuerParty = 0;
+        //    for (int i = 0; i < valueListIssuerParty.Count; i++)
+        //    {
+        //        string valueStockAmount = valueListIssuerParty.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+        //        if (!string.IsNullOrWhiteSpace(valueStockAmount)) totalValueIssuerParty += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+        //    }
+
+        //    if (totalValueIssuerParty != totalValueSender)
+        //    {
+        //        return new ValidateListResponse
+        //        {
+        //            IsValid = false,
+        //            Mandatory = true,
+        //            ErrorCode = "Regla: AAH32c-(R): ",
+        //            ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
+        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+        //        };
+        //    }           
+
+        //    return null;
+        //}
         private ValidateListResponse ValidateAval(XmlParser xmlParserCufe, XmlParser xmlParserCude)
         {
             DateTime startDate = DateTime.UtcNow;
@@ -2742,6 +2795,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (string.IsNullOrWhiteSpace(valueStockAmount)) return null;
 
                 totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+
+                // Si se reporta, pero en ceros (0), el Avalista asume el valor del monto de quien respalda...
+                if (totalValueSender == 0) return null;
             }
 
             if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
@@ -2767,6 +2823,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (!string.IsNullOrWhiteSpace(valueStockAmount)) totalValueIssuerParty += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
 
+            if (totalValueIssuerParty == 0) return null;
+
             if (totalValueIssuerParty != totalValueSender)
             {
                 return new ValidateListResponse
@@ -2777,8 +2835,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 };
-            }           
-          
+            }
+
             return null;
         }
         #endregion
