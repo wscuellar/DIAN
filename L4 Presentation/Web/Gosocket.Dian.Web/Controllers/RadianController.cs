@@ -13,6 +13,7 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using System.Text;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Common.Resources;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -124,7 +125,7 @@ namespace Gosocket.Dian.Web.Controllers
                 Code = model.Code,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
-                Type= model.Type,
+                Type = model.Type,
                 RadianState = model.RadianState != null ? model.RadianState.Value.GetDescription() : null
             };
             RadianAdmin radianAdmin = _radianContributorService.ListParticipantsFilter(filter, model.Page, model.Length);
@@ -141,7 +142,7 @@ namespace Gosocket.Dian.Web.Controllers
                     TradeName = c.TradeName,
                     BusinessName = c.BusinessName,
                     AcceptanceStatusName = c.AcceptanceStatusName,
-                    RadianState =c.RadianState
+                    RadianState = c.RadianState
                 }).ToList(),
                 RadianType = radianAdmin.Types.Select(c => new SelectListItem
                 {
@@ -266,61 +267,29 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
+                RadianState stateProcess = approveState == "1" ? RadianState.Cancelado : RadianState.Test;
+                if (radianAdmin.Contributor.RadianState == RadianState.Test.GetDescription() && stateProcess == RadianState.Cancelado)
+                    return Json(new { message = TextResources.TestNotRemove, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
 
-                if (approveState == "1")
+                if (stateProcess == RadianState.Test && radianAdmin.Files.Any(n => n.Status != 2 && n.RadianContributorFileType.Mandatory))
+                    return Json(new { message = TextResources.AllSoftware, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+
+                if (radianAdmin.Contributor.RadianState == RadianState.Habilitado.GetDescription())
                 {
-                    if ((radianAdmin.Contributor.RadianState == "Habilitado" || radianAdmin.Contributor.RadianState == "Registrado"))
-                    {
-                        _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, RadianState.Cancelado.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
-                        _ = SendMail(radianAdmin);
-                    }
-                    else
-                    {
-                        return Json(new
-                        {
-                            messasge = "Los participantes 'En pruebas' no se pueden cancelar.",
-                            success = true,
-                            id = radianAdmin.Contributor.RadianContributorId
-                        }, JsonRequestBehavior.AllowGet);
-                    }
+                    string clientsData = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
+                    if (!string.IsNullOrEmpty(clientsData))
+                        return Json(new { message = clientsData, success = true, id = radianAdmin.Contributor.RadianContributorId, html = "html" }, JsonRequestBehavior.AllowGet);
                 }
 
-                if (approveState == "0")
-                {
-                    foreach (var n in radianAdmin.Files)
-                    {
-                        if (n.Status != 2)
-                        {
-                            return Json(new
-                            {
-                                messasge = "Todos los archivos deben estar en estado 'Aceptado' para poder cambiar el estado del participante.",
-                                success = true,
-                                id = radianAdmin.Contributor.RadianContributorId
-                            }, JsonRequestBehavior.AllowGet);
-                        }
-                        else
-                        {
-                            _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, RadianState.Test.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
-                            _ = SendMail(radianAdmin);
-                        }
-                    }
-                }
+                _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, stateProcess.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                _ = SendMail(radianAdmin);
 
-                return Json(new
-                {
-                    messasge = "Datos actualizados correctamente.",
-                    success = true,
-                    id = radianAdmin.Contributor.RadianContributorId
-                }, JsonRequestBehavior.AllowGet);
+                return Json(new { message = TextResources.SuccessSoftware, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    messasge = "Tenemos problemas al actualizar los datos.",
-                    success = false,
-                    error = ex
-                }, JsonRequestBehavior.AllowGet);
+                return Json(new { messasge = "Tenemos problemas al actualizar los datos.", success = false, error = ex }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -347,5 +316,13 @@ namespace Gosocket.Dian.Web.Controllers
 
             return true;
         }
+
+        [HttpPost]
+        public JsonResult GetSetTestByContributor(string code, string softwareId, string softwareType)
+        {
+            RadianTestSetResult result = _radianContributorService.GetSetTestResult(code, softwareId, softwareType);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

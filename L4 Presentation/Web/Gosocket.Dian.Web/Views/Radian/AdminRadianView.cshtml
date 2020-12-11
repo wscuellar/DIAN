@@ -110,6 +110,7 @@
 
     <script>
         $(document).ready(function () {
+            $("#RadianState option[value='0']").remove();
             var form = $('#radian-contributors-form');
             $('input[name="DateInterval"]').on('apply.daterangepicker', function (ev, picker) {
                 $(this).val(picker.startDate.format('DD-MMMM-yyyy') + ' al ' + picker.endDate.format('DD-MMMM-yyyy'));

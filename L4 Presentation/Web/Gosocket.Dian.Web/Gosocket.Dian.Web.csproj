@@ -378,6 +378,7 @@
     <Compile Include="Models\ExternalUserViewModel.cs" />
     <Compile Include="Models\GeneralResponseModel.cs" />
     <Compile Include="Models\PermissionViewModel.cs" />
+    <Compile Include="Models\InvoiceNotesViewModel.cs" />
     <Compile Include="Models\QueryEventViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedOperationModeViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
@@ -2895,6 +2896,8 @@
     <Content Include="Views\OthersElectronicDocuments\AddOrUpdate.cshtml" />
     <Content Include="Views\OthersElectronicDocuments\_form.cshtml" />
     <Content Include="Views\OthersElectronicDocuments\_default.cshtml" />
+    <Content Include="Views\Document\ShowDocumentToPublic.cshtml" />
+    <Content Include="Views\Radian\_detailsTestSet.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

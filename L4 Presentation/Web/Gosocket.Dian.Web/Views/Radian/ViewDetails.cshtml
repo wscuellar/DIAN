@@ -1,4 +1,5 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianContributorsViewModel
+@using Newtonsoft.Json
 
 @{
 
@@ -22,7 +23,7 @@
                             @Html.Partial("_default")
                         </div>
                         <div class="panel-footer text-right">
-                            <button type="button"  onclick="location.href='@Url.Action("AdminRadianView", "Radian")'" class="btn btn-default btn-radian-default">Cancelar</button>
+                            <button type="button" onclick="location.href='@Url.Action("AdminRadianView", "Radian")'" class="btn btn-default btn-radian-default">Cancelar</button>
                             <button type="button" class="btn btn-success btn-radian-success button-change-state">Guardar cambios</button>
                         </div>
                     </div>
@@ -56,6 +57,8 @@
 
     <script>
         $(document).ready(function () {
+            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_detailsTestSet").ToString().Trim('"'))));
+            ShowDetailsTestSet(htmlPartial);
             for (var i = 0; i < $("tr.select-radian-contributor").length; i++){
                 var fileId = "status-file-" + i;
                 SetIconsList(fileId);
@@ -104,18 +107,18 @@
                         }
                     };
                     var successAction = (data) => {
-                        var messageSuccess = Object.values(data)[0];
-                        var id = Object.values(data)[2];
+                        var messageSuccess = data.message;
+                        var id = data.id;
                         var operation = () => {
                             showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                             window.location.href = "/Radian/ViewDetails/" + id;
                         }
-                        if (radianApproveState == "1" && '@Model.RadianState' != "En pruebas") {
+                        if (data.html && radianApproveState == "1") {
                             showConfirmation(bootboxMessage.CANCEL_RESPONSE_CORRECT, AlertExec(operation), "cancel-confirmation", operation);
                         } else {
                             showConfirmation(messageSuccess, AlertExec(operation));
                         }
-                        
+
                     };
                     var label = "";
                 if (radianApproveState == "1") {

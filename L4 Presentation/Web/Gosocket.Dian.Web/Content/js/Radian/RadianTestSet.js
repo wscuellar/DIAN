@@ -1,5 +1,5 @@
 ﻿$('#OperationModeId').change(function () {
-    $('.captureFields').val('0');
+    $('.captureFields').val('');
 });
 
 $('#TotalDocumentRequired').attr('readonly', true);

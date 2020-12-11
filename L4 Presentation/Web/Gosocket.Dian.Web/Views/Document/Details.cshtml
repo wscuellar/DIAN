@@ -19,7 +19,7 @@
             margin-left: 20px;
             margin-right: 20px;
             padding-bottom: 20px;
-        }
+        } 
 
         .tab-base .tab-content {
             margin-top: 50px;
@@ -100,9 +100,14 @@
 
 
     <script>
+
+        function showModal(cude) {
+            debugger;
+            showPdfModal("#show-graphic-document",cude,'@Url.Action("PrintGraphicRepresentation", "Document")');
+        }
+
         $(document).ready(function () {
             showPdfModal("#show-document", "@Model.Document.DocumentKey", '@Url.Action("PrintDocument", "Document")');
-            showPdfModal("#show-graphic-document","@Model.Document.DocumentKey",'@Url.Action("PrintDocument", "Document")');
             $('#container1-title').hide();
             $('.document-row').click('onClick', function () {
                 if (!$(this).hasClass('not-redirect')) {
