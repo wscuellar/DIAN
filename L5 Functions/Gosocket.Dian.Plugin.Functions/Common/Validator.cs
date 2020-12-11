@@ -273,7 +273,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var ValDesc = objCune.ValDesc?.Trim();
             var ValTol = objCune.ValTol?.Trim();
             var errorCode = "FAD06";
-            var prop = "CUFE";
+            var prop = "CUNE";
 
             string key = string.Empty;
 
@@ -305,10 +305,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var HorNIE = objCune.HorNIE;
             var NitNIE = objCune.NitNIE;
             var DocEmp = objCune.DocEmp;
-            var SoftwarePin = objCune.SoftwarePin;
+            var SoftwarePin = objCune.SoftwareId;
             var TipAmb = objCune.TipAmb;
 
-            var numberSha384 = $"{NumNIE}{FechNIE}{HorNIE}{ValDev}{ValDesc}{ValTol}{NitNIE}{DocEmp}{SoftwarePin}{TipAmb}{key}";
+            var numberSha384 = $"{NumNIE}{FechNIE}{HorNIE}{ValDev}{ValDesc}{ValTol}{NitNIE}{DocEmp}{SoftwarePin}{TipAmb}";
 
             var hash = numberSha384.EncryptSHA384();
 

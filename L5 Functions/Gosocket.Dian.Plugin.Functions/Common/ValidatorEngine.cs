@@ -329,7 +329,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
 
             cmObject.FecNIE = xmlParser.globalDocPayrolls.FechaGen.ToString("yyyy-MM-dd");
-            cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen.ToString("HH:MM:ss");
+            cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen;
             cmObject.SoftwareId = xmlParser.globalDocPayrolls.SoftwareID;
             cmObject.ValDesc = Convert.ToString(xmlParser.globalDocPayrolls.deduccionesTotal);
             cmObject.ValTol = Convert.ToString(xmlParser.globalDocPayrolls.comprobanteTotal);
