@@ -292,11 +292,14 @@ namespace Gosocket.Dian.Web.Controllers
                 RadianContributorId = data.RadianContributorId
             };
 
-            
+
             RadianTestSet testSet = _radianAprovedService.GetTestResult(data.SoftwareType.ToString());
             ResponseMessage response = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, testSet, !string.IsNullOrEmpty(data.SoftwareName));
-            RadianContributor participant =  _radianAprovedService.GetRadianContributor(data.RadianContributorId);
-            _radianContributorService.ChangeParticipantStatus(participant.ContributorId, RadianState.Test.GetDescription(), participant.RadianContributorTypeId, RadianState.Registrado.GetDescription(), string.Empty);
+            if (response.Code != 500)
+            {
+                RadianContributor participant = _radianAprovedService.GetRadianContributor(data.RadianContributorId);
+                _radianContributorService.ChangeParticipantStatus(participant.ContributorId, RadianState.Test.GetDescription(), participant.RadianContributorTypeId, RadianState.Registrado.GetDescription(), string.Empty);
+            }
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 

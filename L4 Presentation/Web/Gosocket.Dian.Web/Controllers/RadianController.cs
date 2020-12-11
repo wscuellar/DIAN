@@ -13,6 +13,7 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using System.Text;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Common.Resources;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -266,56 +267,29 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
+                RadianState stateProcess = approveState == "1" ? RadianState.Cancelado : RadianState.Test;
+                if (radianAdmin.Contributor.RadianState == RadianState.Test.GetDescription() && stateProcess == RadianState.Cancelado)
+                    return Json(new { messasge = TextResources.TestNotRemove, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
 
-                if (approveState == "1")
+                if (stateProcess == RadianState.Test && radianAdmin.Files.Any(n => n.Status != 2 && n.RadianContributorFileType.Mandatory))
+                    return Json(new { messasge = TextResources.AllSoftware, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+
+                if (radianAdmin.Contributor.RadianState == RadianState.Habilitado.GetDescription())
                 {
-                    if ((radianAdmin.Contributor.RadianState == "Habilitado" || radianAdmin.Contributor.RadianState == "Registrado"))
-                    {
-                        _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, RadianState.Cancelado.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
-                        _ = SendMail(radianAdmin);
-                    }
-                    else
-                    {
-                        return Json(new
-                        {
-                            messasge = "Los participantes 'En pruebas' no se pueden cancelar.",
-                            success = true,
-                            id = radianAdmin.Contributor.RadianContributorId
-                        }, JsonRequestBehavior.AllowGet);
-                    }
+                    string clientsData = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
+                    if (!string.IsNullOrEmpty(clientsData))
+                        return Json(new { messasge = clientsData, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
                 }
 
-                if (approveState == "0")
-                {
-                    foreach (var n in radianAdmin.Files)
-                    {
-                        if (n.Status != 2 && n.RadianContributorFileType.Mandatory)
-                            return Json(new
-                            {
-                                messasge = "Todos los archivos deben estar en estado 'Aceptado' para poder cambiar el estado del participante.",
-                                success = true,
-                                id = radianAdmin.Contributor.RadianContributorId
-                            }, JsonRequestBehavior.AllowGet);
-                    }
-                    _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, RadianState.Test.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
-                    _ = SendMail(radianAdmin);
-                }
+                _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, stateProcess.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                _ = SendMail(radianAdmin);
 
-                return Json(new
-                {
-                    messasge = "Datos actualizados correctamente.",
-                    success = true,
-                    id = radianAdmin.Contributor.RadianContributorId
-                }, JsonRequestBehavior.AllowGet);
+                return Json(new { messasge = TextResources.SuccessSoftware, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    messasge = "Tenemos problemas al actualizar los datos.",
-                    success = false,
-                    error = ex
-                }, JsonRequestBehavior.AllowGet);
+                return Json(new { messasge = "Tenemos problemas al actualizar los datos.", success = false, error = ex }, JsonRequestBehavior.AllowGet);
             }
         }
 
