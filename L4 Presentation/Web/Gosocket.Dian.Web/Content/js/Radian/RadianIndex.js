@@ -175,21 +175,21 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
 
 }
 
-function ShowDetailsTestSet(htmlPartial, id, softwareId, operation) {
-        customDialog(htmlPartial, id, softwareId, operation);
+function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {
+    customDialog(htmlPartial, id, softwareId, operation, url);
 }
 
-function customDialog(htmlPartial, code, softwareId, operation) {
+function customDialog(htmlPartial, code, softwareId, operation, url) {
     var data = {
         code: code,
         softwareId: softwareId,
-        operation: operation
+        softwareType: operation
     }
     var actionError = (error) => {
-
+        console.log(success);
     }
     var actionSuccess = (success) => {
-
+        console.log(success);
     }
     bootbox.dialog({
         message: htmlPartial,

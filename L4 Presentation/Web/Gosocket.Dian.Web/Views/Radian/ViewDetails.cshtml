@@ -157,11 +157,12 @@
                 //showConfirmation(confirmationMessage, ConfirmExec(operation, null, operationCancel));
             })
 
-            $(".show-details-set").click(() => {
-                var softwareId = $(this).parents("tr").children(".set-id").html();
+            $(".show-details-set").click(function() {
+                var url = '@Url.Action("GetSetTestByContributor", "Radian")';
+                var softwareId = $(this).parents("tr").children(".set-id").children("a").html();
                 var code = @Model.Code;
-                var softwareType = $(this).parents("tr").children(".operation-name").html();
-                ShowDetailsTestSet(htmlPartial, code, softwareId, softwareType);
+                var softwareType = $(this).parents("tr").children(".operation-name").children("a").html();
+                ShowDetailsTestSet(htmlPartial, code, softwareId, softwareType, url);
             })
 
         });
