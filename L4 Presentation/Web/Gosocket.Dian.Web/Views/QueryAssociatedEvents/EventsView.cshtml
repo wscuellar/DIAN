@@ -128,10 +128,6 @@
         border-bottom-width: 20px;
     }
 
-    .fa-download {
-        padding-right: 5px;
-    }
-
     i.fa-info-circle {
         color: #348441 !important;
         padding-right: 3px;
@@ -148,6 +144,13 @@
     .second-section-align {
         margin-left: 12px;
         margin-top: 37px;
+    }
+
+    .btn-link-download {
+        padding-left: 0px;
+        border-left-width: 0px;
+        text-decoration: underline;
+        color: #348441;
     }
 </style>
 
@@ -176,7 +179,8 @@
                         <span>CUDE:</span>
                         <span class="cude-text">@Model.CUDE</span>
                         <div class="left-section ContainerDownload">
-                            <p><i class="fa fa-download"></i>
+                            <p>
+                                <i class="fa fa-download"></i>
                                 <um>
                                     <button id="show-graphic-document" class="btn btn-link" onclick="showModal('@Model.CUDE')">Descarga</button>
                                 </um>

@@ -58,7 +58,6 @@
     <script>
         $(document).ready(function () {
             var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_detailsTestSet").ToString().Trim('"'))));
-            ShowDetailsTestSet(htmlPartial);
             for (var i = 0; i < $("tr.select-radian-contributor").length; i++){
                 var fileId = "status-file-" + i;
                 SetIconsList(fileId);
@@ -113,7 +112,7 @@
                             showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                             window.location.href = "/Radian/ViewDetails/" + id;
                         }
-                        if (data.html && radianApproveState == "1") {
+                        if (!data.html && radianApproveState == "1") {
                             showConfirmation(bootboxMessage.CANCEL_RESPONSE_CORRECT, AlertExec(operation), "cancel-confirmation", operation);
                         } else {
                             showConfirmation(messageSuccess, AlertExec(operation));
@@ -156,6 +155,14 @@
                 }
                 ShowPromptCancel(confirmationMessage, operation, null, operationCancel);
                 //showConfirmation(confirmationMessage, ConfirmExec(operation, null, operationCancel));
+            })
+
+            $(".show-details-set").click(function() {
+                var url = '@Url.Action("GetSetTestByContributor", "Radian")';
+                var softwareId = $(this).parents("tr").children(".set-id").children("a").html();
+                var code = @Model.Code;
+                var softwareType = $(this).parents("tr").children(".operation-name").children("a").html();
+                ShowDetailsTestSet(htmlPartial, code, softwareId, softwareType, url);
             })
 
         });
