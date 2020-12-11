@@ -1417,3 +1417,6 @@ button.selectpicker .fa-caret-down {
     color: #348441;
     font-size: 13px;
 }
+.documents-table {
+    text-align: center;
+}
