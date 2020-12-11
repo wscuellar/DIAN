@@ -69,12 +69,26 @@ namespace Gosocket.Dian.Domain.Entity
         public int ApplicationAvailableAccepted { get; set; }
         public int ApplicationAvailableRejected { get; set; }
 
-        // Endoso electrónico
-        public int EndorsementTotalRequired { get; set; }
-        public int EndorsementTotalAcceptedRequired { get; set; }
-        public int TotalEndorsementSent { get; set; }
-        public int EndorsementAccepted { get; set; }
-        public int EndorsementRejected { get; set; }
+        // Endoso en Propiedad
+        public int EndorsementPropertyTotalRequired { get; set; }
+        public int EndorsementPropertyTotalAcceptedRequired { get; set; }
+        public int TotalEndorsementPropertySent { get; set; }
+        public int EndorsementPropertyAccepted { get; set; }
+        public int EndorsementPropertyRejected { get; set; }
+
+        // Endoso en Procuracion
+        public int EndorsementProcurementTotalRequired { get; set; }
+        public int EndorsementProcurementTotalAcceptedRequired { get; set; }
+        public int TotalEndorsementProcurementSent { get; set; }
+        public int EndorsementProcurementAccepted { get; set; }
+        public int EndorsementProcurementRejected { get; set; }
+
+        // Endoso en Garantia
+        public int EndorsementGuaranteeTotalRequired { get; set; }
+        public int EndorsementGuaranteeTotalAcceptedRequired { get; set; }
+        public int TotalEndorsementGuaranteeSent { get; set; }
+        public int EndorsementGuaranteeAccepted { get; set; }
+        public int EndorsementGuaranteeRejected { get; set; }
 
         // Cancelación de endoso
         public int EndorsementCancellationTotalRequired { get; set; }
