@@ -72,8 +72,6 @@ namespace Gosocket.Dian.Application
         public ResponseMessage RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode)
         {
             Contributor contributor = _contributorService.GetByCode(userCode);
-            if (contributor == null || contributor.AcceptanceStatusId != 4)
-                return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
 
             bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
             Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributor.Id);

@@ -110,7 +110,7 @@ namespace Gosocket.Dian.Application
                 if (software != null && software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted)
                     return new ResponseMessage() { Message = "El software encuentra en estado aceptado." };
 
-                _radianCallSoftwareService.DeleteSoftware(operationToDelete.SoftwareId);               
+                _radianCallSoftwareService.DeleteSoftware(operationToDelete.SoftwareId);
             }
 
             RadianContributor participant = _radianContributorRepository.Get(t => t.Id == operationToDelete.RadianContributorId);
@@ -210,7 +210,7 @@ namespace Gosocket.Dian.Application
                 RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                 {
                     Id = Guid.NewGuid().ToString(),
-                    ContributorId= radianContributor.Id,
+                    ContributorId = radianContributor.Id,
                     ContributorTypeId = radianContributor.RadianContributorTypeId.ToString(),
                     TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
                     ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
@@ -220,12 +220,11 @@ namespace Gosocket.Dian.Application
                     RejectInvoiceTotalRequired = testSet.RejectInvoiceTotalAcceptedRequired,
                     ApplicationAvailableTotalRequired = testSet.ApplicationAvailableTotalRequired,
                     ApplicationAvailableTotalAcceptedRequired = testSet.ApplicationAvailableTotalAcceptedRequired,
-                    // Endosos
-                    EndorsementPropertyTotalRequired =          testSet.EndorsementPropertyTotalRequired,
-                    EndorsementPropertyTotalAcceptedRequired =  testSet.EndorsementPropertyTotalAcceptedRequired,
-                    EndorsementProcurementTotalRequired =           testSet.EndorsementProcurementTotalRequired,
-                    EndorsementProcurementTotalAcceptedRequired =   testSet.EndorsementProcurementTotalAcceptedRequired,
-                    EndorsementGuaranteeTotalRequired =         testSet.EndorsementGuaranteeTotalRequired,
+                    EndorsementPropertyTotalRequired = testSet.EndorsementPropertyTotalRequired,
+                    EndorsementPropertyTotalAcceptedRequired = testSet.EndorsementPropertyTotalAcceptedRequired,
+                    EndorsementProcurementTotalRequired = testSet.EndorsementProcurementTotalRequired,
+                    EndorsementProcurementTotalAcceptedRequired = testSet.EndorsementProcurementTotalAcceptedRequired,
+                    EndorsementGuaranteeTotalRequired = testSet.EndorsementGuaranteeTotalRequired,
                     EndorsementGuaranteeTotalAcceptedRequired = testSet.EndorsementGuaranteeTotalAcceptedRequired,
                     EndorsementCancellationTotalRequired = testSet.EndorsementCancellationTotalRequired,
                     EndorsementCancellationTotalAcceptedRequired = testSet.EndorsementCancellationTotalAcceptedRequired,
