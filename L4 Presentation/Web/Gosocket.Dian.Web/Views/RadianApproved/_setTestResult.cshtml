@@ -163,7 +163,19 @@
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired, defaultHtmlAttr)
                                 </div>
                             </div>
-                            <div class="col-sm-10 padding-xs-0">
+                            <div class="col-sm-2 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.Label("Endoso en garantía", new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired, defaultHtmlAttr)
+                                </div>
+                            </div>
+                            <div class="col-sm-2 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.Label("Endoso en procuración", new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, defaultHtmlAttr)
+                                </div>
+                            </div>
+                            <div class="col-sm-4 padding-xs-0">
                                 <div class="form-group">
                                     @Html.Label("Terminación de la limitación de circulación", new { @class = "control-label" })
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
@@ -260,7 +272,19 @@
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
                                 </div>
                             </div>
-                            <div class="col-sm-10 padding-xs-0">
+                            <div class="col-sm-2 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.Label("Endoso en garantía", new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired, defaultHtmlAttr)
+                                </div>
+                            </div>
+                            <div class="col-sm-2 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.Label("Endoso en procuración", new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, defaultHtmlAttr)
+                                </div>
+                            </div>
+                            <div class="col-sm-4 padding-xs-0">
                                 <div class="form-group">
                                     @Html.Label("Terminación de la limitación de circulación", new { @class = "control-label" })
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
