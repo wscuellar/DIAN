@@ -23,7 +23,7 @@
             if ("@operationMode" != "2") {
                 $("#OperationModeSelectedId").val(1);
             } else {
-                  $("#OperationModeSelectedId").change(function (value) {
+                  $("#OperationModeSelectedId").change(function (value) {debugger
                     var software = $("#OperationModeSelectedId").val();
                     RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
                 })

@@ -33,7 +33,7 @@ function AddOperationMode(url, SetOperationViewModel) {
 
 function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType) {
 
-    if (softwareType == "1") {
+    if (true) {
         var metod = "POST";
         var data = {
             term: "",
