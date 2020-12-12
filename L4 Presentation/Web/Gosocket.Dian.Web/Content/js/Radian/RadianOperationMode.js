@@ -100,7 +100,7 @@ function ChangeSelected() {
     })
 }
 
-function LoadSoftwareList(radianId) {debugger
+function LoadSoftwareList(radianId) {
     var url = "/RadianApproved/SoftwareList";
     var metod = "POST";
     var data = {
@@ -108,7 +108,7 @@ function LoadSoftwareList(radianId) {debugger
     }
     var actionError = () => { };
     var actionSuccess = (response) => {
-        debugger
+        hideLoading('#panel-form');
         for (var i = 0; i < response.length; i++) {
             $("#SoftwareNameList").append($("<option>", { value: response[i].value, text: response[i].text }));
         }

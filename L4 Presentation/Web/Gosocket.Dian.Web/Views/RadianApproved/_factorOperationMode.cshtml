@@ -2,7 +2,7 @@
 
 @{ 
     ViewBag.title = "Configurar modo de operación";
-    string operationMode = Request.Params["RadianOperationMode"];
+    string operationMode = Model.Contributor.RadianOperationModeId.ToString();
     string contributorId = Request.Params["ContributorId"];
     string radianContributorType = Request.Params["RadianContributorTypeId"];
 
@@ -26,7 +26,7 @@
 
     </div>
     <div>
-        <div class="panel">
+        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" >
             <div class="panel-body padding-top-20">
                 <div class="pad-btm padding-bottom-0">
                     <div class="row margin-horizontal-0">
@@ -63,7 +63,7 @@
                                                 @if (operationMode == "2")
                                                 {
                                                     <div class="col-sm-6 col-md-3 padding-xs-0">
-                                                        <div class="form-group input-arrow">
+                                                        <div class="form-group">
                                                             @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
                                                             <select id="bussiness-name" class="form-control input-general"></select>
                                                         </div>

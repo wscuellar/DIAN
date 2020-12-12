@@ -212,3 +212,7 @@ function cancelRegister(cancelData) {
     var label = bootboxMessage.CANCEL_DESCRIPTION;
     CancelRegister(url, dataAjax, confirmationMessage, successAction, label);
 }
+
+function RadianApprovalState() {
+
+}
