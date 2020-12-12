@@ -39,6 +39,22 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
+        private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
+        private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
+
+        #region Constructor
+
+        public DocumentController(
+           IRadianPdfCreationService radianPdfCreationService
+           , IRadianGraphicRepresentationService radianGraphicRepresentationService, IQueryAssociatedEventsService queryAssociatedEventsService
+           )
+        {
+            _radianPdfCreationService = radianPdfCreationService;
+            _radianGraphicRepresentationService = radianGraphicRepresentationService;
+            _queryAssociatedEventsService = queryAssociatedEventsService;
+        }
+
+        #endregion
 
         private List<DocValidatorTrackingModel> GetValidatedRules(string trackId)
         {
@@ -55,11 +71,6 @@ namespace Gosocket.Dian.Web.Controllers
                 Priority = d.Priority,
                 Status = d.Status
             }).Where(d => d.IsNotification).OrderBy(d => d.Status).ToList();
-        }
-
-        public DocumentController(IRadianPdfCreationService radianPdfCreationService)
-        {
-            _radianPdfCreationService = radianPdfCreationService;
         }
 
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
@@ -460,13 +471,29 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult SearchInvalidQR()
         {
             return View();
-        }
+        } 
 
         public async Task<JsonResult> PrintDocument(string cufe)
         {
             byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe);
             String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet );
+        }
+
+        public JsonResult PrintGraphicRepresentation(string cufe)
+        {
+            byte[] pdfDocument = _radianGraphicRepresentationService.GetPdfReport(cufe);
+            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
+            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult ShowDocumentToPublic(string Id)
+        {
+            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(Id);
+            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(invoiceAndNotes.Item1, invoiceAndNotes.Item2);
+
+            return View(invoiceNotes);
         }
 
         #region Private methods

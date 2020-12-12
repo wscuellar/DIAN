@@ -1040,7 +1040,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                         dianResponse.IsValid = false;
                         var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-                        TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);                      
+                        TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
+                        var documentValidatorDocument = TableManagerGlobalDocValidatorDocument.FindhByGlobalDocumentId(trackIdCude, trackIdCude);
+                        TableManagerGlobalDocValidatorDocument.Delete(documentValidatorDocument);
                         return dianResponse;
                     }
                 }

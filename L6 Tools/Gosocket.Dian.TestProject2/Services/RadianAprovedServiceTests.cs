@@ -34,23 +34,23 @@ namespace Gosocket.Dian.Application.Tests
 
        
 
-        [TestMethod()]
-        public void GetRadianContributorTest()
-        {
-            // Arrange
-            int radianContributorId = 0;
+        //[TestMethod()]
+        //public void GetRadianContributorTest()
+        //{
+        //    // Arrange
+        //    int radianContributorId = 0;
 
-            _current.Setup(t => t.GetRadianContributor(radianContributorId))
-                .Returns(It.IsAny<RadianContributor>());
+        //    _current.Setup(t => t.GetRadianContributor(radianContributorId))
+        //        .Returns(It.IsAny<RadianContributor>());
 
-            RadianContributor expected = null;
+        //    RadianContributor expected = null;
 
-            //ACT
-            var actual = _current.Object.GetRadianContributor(radianContributorId);
+        //    //ACT
+        //    var actual = _current.Object.GetRadianContributor(radianContributorId);
 
-            // Assert
-            Assert.AreEqual(expected, actual);
-        }
+        //    // Assert
+        //    Assert.AreEqual(expected, actual);
+        //}
 
         [TestMethod()]
         public void ListContributorFilesTest()

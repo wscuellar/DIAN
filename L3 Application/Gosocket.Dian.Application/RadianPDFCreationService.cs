@@ -147,7 +147,7 @@ namespace Gosocket.Dian.Application
 
         #region GetPdfBytes
 
-        private static byte[] GetPdfBytes(string htmlContent)
+        public static byte[] GetPdfBytes(string htmlContent)
         {
             byte[] pdf = null;
 
@@ -166,7 +166,7 @@ namespace Gosocket.Dian.Application
 
         #region GenerateQR
 
-        private Bitmap GenerateQR(string invoiceUrl)
+        public static Bitmap GenerateQR(string invoiceUrl)
         {
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
             QRCodeData qrCodeData = qrGenerator.CreateQrCode(invoiceUrl, QRCodeGenerator.ECCLevel.Q);

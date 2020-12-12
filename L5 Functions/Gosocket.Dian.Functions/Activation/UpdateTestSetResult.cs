@@ -179,7 +179,7 @@ namespace Gosocket.Dian.Functions.Activation
                     // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
                     bool isActive = globalRadianOperationService.IsActive(globalTestSetTracking.SenderCode, new Guid(globalTestSetTracking.SoftwareId));
                     if (isActive)
-                        return ;
+                        return;
 
                     // busco el registro del set de pruebas a actualizar
                     var radianTestSet = radianTestSetResultTableManager.Find<RadianTestSetResult>(radianTesSetResult.TestSetReference, radianTesSetResult.TestSetReference);
@@ -227,11 +227,23 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.ApplicationAvailableAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
                     radianTesSetResult.ApplicationAvailableRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
 
-                    // Endoso electrónico 
-                    string[] tipos = { EventStatus.EndosoGarantia.ToString(), EventStatus.EndosoProcuracion.ToString(), EventStatus.EndosoPropiedad.ToString() };
-                    radianTesSetResult.TotalEndorsementSent = allGlobalTestSetTracking.Count(a => tipos.Contains(a.DocumentTypeId));
-                    radianTesSetResult.EndorsementAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && tipos.Contains(a.DocumentTypeId));
-                    radianTesSetResult.EndorsementRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && tipos.Contains(a.DocumentTypeId));
+                    // Endoso de propiedad 
+                    tipo = EventStatus.EndosoPropiedad.ToString();
+                    radianTesSetResult.TotalEndorsementPropertySent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementPropertyAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementPropertyRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+
+                    // Endoso de Garantia 
+                    tipo = EventStatus.EndosoGarantia.ToString();
+                    radianTesSetResult.TotalEndorsementGuaranteeSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementGuaranteeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementGuaranteeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+
+                    // Endoso de Procuracion 
+                    tipo = EventStatus.EndosoProcuracion.ToString();
+                    radianTesSetResult.TotalEndorsementProcurementSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementProcurementAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementProcurementRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
 
                     // Cancelación de endoso 
                     tipo = EventStatus.InvoiceOfferedForNegotiation.ToString();
@@ -283,7 +295,9 @@ namespace Gosocket.Dian.Functions.Activation
                             && radianTesSetResult.AutomaticAcceptanceTotalRequired >= radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired
                             && radianTesSetResult.RejectInvoiceTotalRequired >= radianTesSetResult.RejectInvoiceTotalAcceptedRequired
                             && radianTesSetResult.ApplicationAvailableTotalRequired >= radianTesSetResult.ApplicationAvailableTotalAcceptedRequired
-                            && radianTesSetResult.EndorsementTotalRequired >= radianTesSetResult.EndorsementTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementPropertyTotalRequired >= radianTesSetResult.EndorsementPropertyTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementProcurementTotalRequired >= radianTesSetResult.EndorsementProcurementTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementGuaranteeTotalRequired >= radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired
                             && radianTesSetResult.EndorsementCancellationTotalRequired >= radianTesSetResult.EndorsementCancellationTotalAcceptedRequired
                             && radianTesSetResult.GuaranteeTotalRequired >= radianTesSetResult.GuaranteeTotalAcceptedRequired
                             && radianTesSetResult.ElectronicMandateTotalRequired >= radianTesSetResult.ElectronicMandateTotalAcceptedRequired
@@ -304,7 +318,7 @@ namespace Gosocket.Dian.Functions.Activation
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (radianTesSetResult.Status == (int)TestSetStatus.Accepted)
                     {
-                       
+
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
                         {
@@ -327,7 +341,7 @@ namespace Gosocket.Dian.Functions.Activation
                             }
                             catch (Exception ex)
                             {
-                               // log.Error($"Error al enviar a activar RADIAN contribuyente con id {contributor.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                                // log.Error($"Error al enviar a activar RADIAN contribuyente con id {contributor.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                                 throw;
                             }
                         }

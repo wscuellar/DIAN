@@ -36,10 +36,16 @@ namespace Gosocket.Dian.Domain.Entity
 
         public int ApplicationAvailableTotalRequired { get; set; }
         public int ApplicationAvailableTotalAcceptedRequired { get; set; }
-
-        public int EndorsementTotalRequired { get; set; }
-        public int EndorsementTotalAcceptedRequired { get; set; }
-
+        // Endoso en Propiedad
+        public int EndorsementPropertyTotalRequired { get; set; }
+        public int EndorsementPropertyTotalAcceptedRequired { get; set; }
+        // ENdoso en procuracion
+        public int EndorsementProcurementTotalRequired { get; set; }
+        public int EndorsementProcurementTotalAcceptedRequired { get; set; }
+        // Endoso en Garantia
+        public int EndorsementGuaranteeTotalRequired { get; set; }
+        public int EndorsementGuaranteeTotalAcceptedRequired { get; set; }
+        // Cancelacion de endoso
         public int EndorsementCancellationTotalRequired { get; set; }
         public int EndorsementCancellationTotalAcceptedRequired { get; set; }
 

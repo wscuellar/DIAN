@@ -19,7 +19,7 @@
             margin-left: 20px;
             margin-right: 20px;
             padding-bottom: 20px;
-        }
+        } 
 
         .tab-base .tab-content {
             margin-top: 50px;
@@ -28,6 +28,10 @@
         .title-container {
             margin-left: 20px;
             margin-top: 19px;
+        }
+
+        .modal-lg {
+            width: auto !important;
         }
     </style>
 }
@@ -96,8 +100,14 @@
 
 
     <script>
+
+        function showModal(cude) {
+            debugger;
+            showPdfModal("#show-graphic-document",cude,'@Url.Action("PrintGraphicRepresentation", "Document")');
+        }
+
         $(document).ready(function () {
-            showPdfModal("#show-document","@Model.Document.DocumentKey",'@Url.Action("PrintDocument", "Document")');
+            showPdfModal("#show-document", "@Model.Document.DocumentKey", '@Url.Action("PrintDocument", "Document")');
             $('#container1-title').hide();
             $('.document-row').click('onClick', function () {
                 if (!$(this).hasClass('not-redirect')) {
@@ -115,7 +125,7 @@
                 GetEventsPartialView(documentKey);
 
                 setTimeout(function () {
-                    $('#divViewerPartial').css("height", "540px");
+                    $('#divViewerPartial').css("height", "635px");
                     $('#divPageContent').css('max-height', '623px');
                 }, 200)
             })
@@ -137,6 +147,7 @@
                         $('#modifyWrapper').html(data);
                         $('#modifyWrapper').fadeIn(300);
                         $('#container1-title').fadeIn(300);
+                        $('#divChildrenModifyWrapper').css("padding-top", "100px");
                     }
                     else {
                         window.location.href = '/User/Login';
@@ -155,6 +166,7 @@
             $('#container1-title').fadeOut(300);
             $('#divViewerPartial').css('height', '');
             $('#divPageContent').css('max-height', '');
+            $('#divChildrenModifyWrapper').css('padding-top', '');
             setTimeout(function () {
                 $('#container1').fadeIn(300);
             }, 500);
@@ -165,6 +177,7 @@
             $('#container1-title').fadeOut(300);
             $('#divViewerPartial').css('height', '');
             $('#divPageContent').css('max-height', '');
+            $('#divChildrenModifyWrapper').css('padding-top', '');
             setTimeout(function () {
                 $('#container1').fadeIn(300);
             }, 500);

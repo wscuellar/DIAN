@@ -1359,3 +1359,75 @@ button.selectpicker .fa-caret-down {
 .dis-flex img{
     margin: 0 9px;
 }
+
+.table-set-files {
+    width: 70%;
+    margin: auto;
+}
+
+.table-set-files table{
+    table-layout: fixed;
+    text-align: center;
+}
+
+.table-set-files table td:first-child {
+    white-space: inherit;
+    text-align: left;
+}
+
+.underline-subrow {
+    border-bottom: 2px solid #E9E8E8;
+}
+
+.custom-styles-files {
+    font-size: 14px;
+}
+.custom-styles-files i{
+    font-size: 18px !important;
+}
+.full-width{
+    width: 100%;
+}
+
+.select-radian-contributor td:first-child{
+    display: inline-flex;
+    width: 100%;
+}
+
+.htmlalert p {
+    font-size: 22px;
+}
+
+.htmlalert ul{
+    text-align: left;
+    font-size: 14px;
+}
+
+.list-unstyled {
+    list-style: none;
+}
+.set-details {
+    display: inline-flex;
+    width: 100%;
+    padding: 6px 0;
+    border-bottom: 1px solid #E9E8E8;
+    color: #707782;
+    font-size: 14px;
+}
+.set-details span{
+    width: 70%;
+}
+.set-details > div {
+    margin: 10px 0px;
+}
+
+.set-details-conventions span{
+    margin-right: 6px;
+}
+.show-details-set {
+    color: #348441;
+    font-size: 13px;
+}
+.documents-table {
+    text-align: center;
+}

@@ -173,8 +173,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.TerminacionMandato ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
@@ -330,7 +329,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
 
             cmObject.FecNIE = xmlParser.globalDocPayrolls.FechaGen.ToString("yyyy-MM-dd");
-            cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen.ToString("HH:MM:ss");
+            cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen;
             cmObject.SoftwareId = xmlParser.globalDocPayrolls.SoftwareID;
             cmObject.ValDesc = Convert.ToString(xmlParser.globalDocPayrolls.deduccionesTotal);
             cmObject.ValTol = Convert.ToString(xmlParser.globalDocPayrolls.comprobanteTotal);
