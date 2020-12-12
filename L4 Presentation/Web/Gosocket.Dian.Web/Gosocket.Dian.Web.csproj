@@ -328,6 +328,7 @@
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ExternalUsersController.cs" />
+    <Compile Include="Controllers\OthersElectronicDocAssociatedController.cs" />
     <Compile Include="Controllers\OthersElectronicDocumentsController.cs" />
     <Compile Include="Controllers\QueryAssociatedEventsController.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
@@ -2920,6 +2921,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
+    <Folder Include="Views\OthersElectronicDocAssociated\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
