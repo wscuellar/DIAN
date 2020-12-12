@@ -341,7 +341,7 @@ namespace Gosocket.Dian.Functions.Activation
                             }
                             catch (Exception ex)
                             {
-                                // log.Error($"Error al enviar a activar RADIAN contribuyente con id {contributor.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                                log.Error($"Error al enviar a activar RADIAN contribuyente con id {globalTestSetTracking.SenderCode} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                                 throw;
                             }
                         }
@@ -389,60 +389,5 @@ namespace Gosocket.Dian.Functions.Activation
             public string Trace { get; set; }
         }
 
-        //private static async Task SendToActivateContributorToProduction(ActivateContributorRequestObject activateContributorRequestObject)
-        //{
-        //    List<EventGridEvent> eventsList = new List<EventGridEvent>
-        //    {
-        //        new EventGridEvent()
-        //        {
-        //            Id = Guid.NewGuid().ToString(),
-        //            EventType = "Activate.Contributor.Event",
-        //            Data = JsonConvert.SerializeObject(activateContributorRequestObject),
-        //            EventTime = DateTime.UtcNow,
-        //            Subject = $"|PRIORITY:1|",
-        //            DataVersion = "2.0"
-        //        }
-        //    };
-        //    await EventGridManager.Instance("EventGridKeyProd", "EventGridTopicEndpointProd").SendMessagesToEventGridAsync(eventsList);
-        //}
-
-        //class ActivateContributorRequestObject
-        //{
-        //    [JsonProperty(PropertyName = "contributorId")]
-        //    public int ContributorId { get; set; }
-        //    [JsonProperty(PropertyName = "contributorTypeId")]
-        //    public int ContributorTypeId { get; set; }
-        //    [JsonProperty(PropertyName = "operationModeId")]
-        //    public int OperationModeId { get; set; }
-        //    [JsonProperty(PropertyName = "providerId")]
-        //    public int ProviderId { get; set; }
-        //    [JsonProperty(PropertyName = "software")]
-        //    public ActivateSoftwareContributorRequestObject Software { get; set; }
-        //}
-
-        //class ActivateSoftwareContributorRequestObject
-        //{
-        //    public Guid Id { get; set; }
-
-        //    public int ContributorId { get; set; }
-
-        //    public string ContributorCode { get; set; }
-
-        //    public string Pin { get; set; }
-
-        //    public string Name { get; set; }
-
-        //    public DateTime? SoftwareDate { get; set; }
-
-        //    public string SoftwareUser { get; set; }
-
-        //    public string SoftwarePassword { get; set; }
-
-        //    public string Url { get; set; }
-
-        //    public bool Status { get; set; }
-
-        //    public int AcceptanceStatusSoftwareId { get; set; }
-        //}
     }
 }
