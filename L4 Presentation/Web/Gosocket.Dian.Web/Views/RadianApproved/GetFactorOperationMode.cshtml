@@ -2,8 +2,8 @@
 
 @Html.Partial("_factorOperationMode")
 @{
-    string contributorType = Request.Params["RadianContributorType"];
-    string operationMode = Request.Params["RadianOperationMode"];
+    string contributorType = Model.Contributor.RadianContributorTypeId.ToString();
+    string operationMode = Model.Contributor.RadianOperationModeId.ToString();
 
 }
 @section Scripts{

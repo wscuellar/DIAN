@@ -31,7 +31,7 @@ function AddOperationMode(url, SetOperationViewModel) {
         ajaxFunction(url, metod, data, actionError, actionSuccess);
 }
 
-function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType) {debugger
+function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType) {
 
     //if (true) {
         var metod = "POST";
@@ -45,14 +45,15 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
             console.log(error);
         };
     var actionSuccess = (response) => {
-            LoadSoftwareList(response[0].value);
+        response.length == 0 && hideLoading('#panel-form');
+        LoadSoftwareList(response[0].value);
             for (var i = 0; i < response.length; i++) {
                 $("#bussiness-name").append($("<option>", { value: response[i].value, text: response[i].text }));
             }
         }
         ajaxFunction(url, metod, data, actionError, actionSuccess);
 
-        $("#bussiness-name").change(function (element) {debugger
+        $("#bussiness-name").change(function (element) {
             LoadSoftwareList(element);
         })
     //} else {

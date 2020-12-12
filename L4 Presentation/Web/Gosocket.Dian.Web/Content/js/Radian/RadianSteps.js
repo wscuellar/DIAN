@@ -213,6 +213,8 @@ function cancelRegister(cancelData) {
     CancelRegister(url, dataAjax, confirmationMessage, successAction, label);
 }
 
-function RadianApprovalState() {
-
+function DeleteOptions(operationMode, radianState) {
+    if (operationMode == 1 || radianState == 'Habilitado') {
+        $("#RadianApprovalState option[value='0']").remove();
+    }
 }
