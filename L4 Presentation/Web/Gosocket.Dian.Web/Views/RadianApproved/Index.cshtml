@@ -104,7 +104,6 @@
 
     <script>
         $(document).ready(function () {
-        DeleteOptions(@Model.Contributor.RadianOperationModeId, @Model.RadianState);
         var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
         RenderSteps(index);
 
