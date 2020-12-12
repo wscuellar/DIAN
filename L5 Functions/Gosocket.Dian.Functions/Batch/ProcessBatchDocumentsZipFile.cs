@@ -60,6 +60,7 @@ namespace Gosocket.Dian.Functions.Batch
                 zipKey = obj.ZipKey;
                 log.Info($"Init batch process for zipKey {zipKey}.");
                 tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "START", ""));
+
                 // Get zip from storgae
                 var zipBytes = await fileManager.GetBytesAsync(blobContainer, $"{blobContainerFolder}/{obj.BlobPath}/{zipKey}.zip");
                 // Unzip files
@@ -79,12 +80,19 @@ namespace Gosocket.Dian.Functions.Batch
                 // Create get xpath data values request object
                 var requestObjects = contentFileList.Where(c => !c.HasError).Select(x => CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(x.XmlBytes), x.XmlFileName));
 
+                //Obtener xpath tipo documento
+                var xpathRequest = requestObjects.FirstOrDefault();
+                var xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+
+                Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);
+
                 // Check big contributor
                 if (string.IsNullOrEmpty(testSetId))
                 {
-                    var xpathRequest = requestObjects.FirstOrDefault();
-                    var xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
-                    var nitBigContributor = xpathResponse.XpathsValues["SenderCodeXpath"];
+                    xpathRequest = requestObjects.FirstOrDefault();
+                    xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+                    var nitBigContributor = xpathResponse.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"];
+
                     var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(nitBigContributor, nitBigContributor);
                     if (bigContributorRequestAuthorization?.StatusCode != (int)BigContributorAuthorizationStatus.Authorized)
                     {
@@ -111,7 +119,7 @@ namespace Gosocket.Dian.Functions.Batch
                 multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(c => c.Success).ToList();
 
                 // check if unique nits
-                var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues["SenderCodeXpath"]).Distinct();
+                var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
                 if (nits.Count() > 1)
                 {
                     batchFileStatus.StatusCode = "2";
@@ -126,10 +134,10 @@ namespace Gosocket.Dian.Functions.Batch
 
                 foreach (var responseXpathValues in multipleResponsesXpathDataValue)
                 {
-                    if (!string.IsNullOrEmpty(responseXpathValues.XpathsValues["SeriesXpath"]) && responseXpathValues.XpathsValues["NumberXpath"].Length > responseXpathValues.XpathsValues["SeriesXpath"].Length)
-                        responseXpathValues.XpathsValues["NumberXpath"] = responseXpathValues.XpathsValues["NumberXpath"].Substring(responseXpathValues.XpathsValues["SeriesXpath"].Length, responseXpathValues.XpathsValues["NumberXpath"].Length - responseXpathValues.XpathsValues["SeriesXpath"].Length);
+                    if (!string.IsNullOrEmpty(responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"]) && responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"].Length > responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"].Length)
+                        responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"] = responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"].Substring(responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"].Length, responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"].Length - responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"].Length);
 
-                    responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues["SeriesXpath"]}-{responseXpathValues.XpathsValues["NumberXpath"]}";
+                    responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"]}-{responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"]}";
                 }
 
                 // Check permissions
@@ -148,6 +156,8 @@ namespace Gosocket.Dian.Functions.Batch
                 //var arrayTasks = multipleResponsesXpathDataValue.Select(response => UploadXmlsAsync(testSetId, zipKey, response, uploadResponses));
                 //await Task.WhenAll(arrayTasks);
 
+
+
                 // Upload all xml's
                 log.Info($"Init upload xml´s.");
                 BlockingCollection<ResponseUploadXml> uploadResponses = new BlockingCollection<ResponseUploadXml>();
@@ -155,8 +165,8 @@ namespace Gosocket.Dian.Functions.Batch
                 {
                     var xmlBase64 = response.XpathsValues["XmlBase64"];
                     var fileName = response.XpathsValues["FileName"];
-                    var documentTypeId = response.XpathsValues["DocumentTypeXpath"];
-                    var trackId = response.XpathsValues["DocumentKeyXpath"];
+                    var documentTypeId = response.XpathsValues[flagApplicationResponse ? "AppResDocumentTypeXpath" : "DocumentTypeXpath"];
+                    var trackId = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"];
                     trackId = trackId?.ToLower();
                     var softwareId = response.XpathsValues["SoftwareIdXpath"];
                     var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId };
@@ -164,12 +174,12 @@ namespace Gosocket.Dian.Functions.Batch
                     uploadResponses.Add(uploadXmlResponse);
                 });
 
-                var uploadFailed = uploadResponses.Where(m => !m.Success && multipleResponsesXpathDataValue.Select(d => d.XpathsValues["DocumentKeyXpath"]).Contains(m.DocumentKey));
+                var uploadFailed = uploadResponses.Where(m => !m.Success && multipleResponsesXpathDataValue.Select(d => d.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"]).Contains(m.DocumentKey));
                 var failed = uploadFailed.Count();
                 await ProcessUploadFailed(zipKey, uploadFailed);
 
                 // Get success upload
-                multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(x => !uploadFailed.Select(e => e.DocumentKey).Contains(x.XpathsValues["DocumentKeyXpath"])).ToList();
+                multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(x => !uploadFailed.Select(e => e.DocumentKey).Contains(x.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])).ToList();
 
                 log.Info($"Init validation xml´s.");
                 BlockingCollection<GlobalBatchFileResult> batchFileResults = new BlockingCollection<GlobalBatchFileResult>();
@@ -177,7 +187,7 @@ namespace Gosocket.Dian.Functions.Batch
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
                 {
                     var draft = false;
-                    var trackId = response.XpathsValues["DocumentKeyXpath"].ToLower();
+                    var trackId = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"].ToLower();
                     try
                     {
                         var request = new { trackId, draft, testSetId };
@@ -219,7 +229,7 @@ namespace Gosocket.Dian.Functions.Batch
                     var uploadResult = new FileManager().Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{zipKey}.zip", multipleZipBytes);
                     log.Info($"Upload applition responses zip OK.");
                 }
-                tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "END", ""));
+                //tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "END", ""));
                 log.Info($"End.");
             }
             catch (Exception ex)
@@ -250,7 +260,17 @@ namespace Gosocket.Dian.Functions.Batch
                 { "PartyIdentificationSchemeIdXpath","//*[local-name()='AccountingCustomerParty']/*[local-name()='Party']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']/@schemeID|/*[local-name()='Invoice']/*[local-name()='AccountingSupplierParty']/*[local-name()='Party']/*[local-name()='PartyIdentification']/*[local-name()='ID']/@schemeID"},
                 { "DocumentReferenceKeyXpath","//*[local-name()='BillingReference']/*[local-name()='InvoiceDocumentReference']/*[local-name()='UUID']"},
                 { "DocumentTypeId", "" },
-                { "SoftwareIdXpath", "//sts:SoftwareID" }
+                { "SoftwareIdXpath", "//sts:SoftwareID" },
+
+                //ApplicationResponse
+                { "AppResReceiverCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']" },
+                { "AppResSenderCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']" },
+                { "AppResDocumentTypeXpath", "96" },
+                { "AppResNumberXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='ID']" },
+                { "AppResSeriesXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='ID']"},
+                { "AppResDocumentKeyXpath","//*[local-name()='ApplicationResponse']/*[local-name()='UUID']"},
+                { "AppResDocumentReferenceKeyXpath","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']"},
+
             };
 
             return requestObj;

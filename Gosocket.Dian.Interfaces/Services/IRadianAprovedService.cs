@@ -20,6 +20,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         List<RadianContributorFileType> ContributorFileTypeList(int typeId);
 
+        ResponseMessage OperationDelete(RadianContributorOperation operationToDelete);
         ResponseMessage OperationDelete(int radianContributorOperationId);
 
         ResponseMessage UploadFile(Stream fileStream, string code, RadianContributorFile radianContributorFile);
@@ -40,7 +41,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId);
 
-        List<RadianSoftware> SoftwareList(int radianContributorId);
+        List<RadianSoftware> SoftwareList(int radianContributorId, RadianSoftwareStatus softwareStatus);
 
         List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term);
 
@@ -51,5 +52,7 @@ namespace Gosocket.Dian.Interfaces.Services
         RadianSoftware GetSoftware(Guid id);
 
         RadianSoftware GetSoftware(int radianContributorId, int softwareType);
+        void DeleteSoftware(Guid softwareId);
+        List<RadianContributorOperation> OperationsBySoftwareId(Guid id);
     }
 }

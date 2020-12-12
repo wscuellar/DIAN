@@ -1175,7 +1175,7 @@ button.selectpicker .fa-caret-down {
     padding: 5px 10px;
 }
 
-.form-group.input-arrow::before {
+/*.form-group.input-arrow::before {
     content: "";
     border-bottom: 2px solid;
     border-left: 2px solid;
@@ -1185,7 +1185,7 @@ button.selectpicker .fa-caret-down {
     position: absolute;
     margin: 33px 0px 0px 0px;
     right: 15px;
-}
+}*/
 
 .fa-caret-down::before {
     content: "";

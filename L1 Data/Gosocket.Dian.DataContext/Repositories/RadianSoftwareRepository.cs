@@ -29,9 +29,7 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public PagedResult<RadianSoftware> List(Expression<Func<RadianSoftware, bool>> expression, int page, int pagesize)
         {
-            IQueryable<RadianSoftware> query = sqlDBContext.RadianSoftwares.Where(expression)
-               .Include("RadianContributor")
-               .Include("RadianContributorOperations");
+            IQueryable<RadianSoftware> query = sqlDBContext.RadianSoftwares.Where(expression);
             return query.Paginate(page, pagesize, t => t.Id.ToString());
         }
 

@@ -197,6 +197,10 @@ namespace Gosocket.Dian.Web.Controllers
                 // Endosos
                 EndorsementTotalRequired =          testSet.EndorsementPropertyTotalRequired,
                 EndorsementTotalAcceptedRequired =  testSet.EndorsementPropertyTotalAcceptedRequired,
+                EndorsementWarrantyTotalRequired = testSet.EndorsementGuaranteeTotalAcceptedRequired,
+                EndorsementWarrantyTotalAcceptedRequired = testSet.EndorsementGuaranteeTotalAcceptedRequired,
+                EndorsementProcurationTotalRequired = testSet.EndorsementGuaranteeTotalRequired,
+                EndorsementProcurationTotalAcceptedRequired = testSet.EndorsementProcurementTotalAcceptedRequired,
                 EndorsementCancellationTotalRequired = testSet.EndorsementCancellationTotalRequired,
                 EndorsementCancellationTotalAcceptedRequired = testSet.EndorsementCancellationTotalAcceptedRequired,
                 GuaranteeTotalRequired = testSet.GuaranteeTotalRequired,
