@@ -34,7 +34,7 @@ namespace Gosocket.Dian.DataContext.Repositories
             return query.FirstOrDefault();
         }
 
-        public ResponseMessage Update(int radianContributorOperationId)
+        public ResponseMessage Delete(int radianContributorOperationId)
         {
             using (var context = new SqlDBContext())
             {
@@ -57,6 +57,25 @@ namespace Gosocket.Dian.DataContext.Repositories
                 return responseMessage;
             }
         }
+
+        public bool Update(RadianContributorOperation contributorOperation)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var radianContributorOperationInstance = context.RadianContributorOperations.FirstOrDefault(c => c.Id == contributorOperation.Id);
+
+                radianContributorOperationInstance.OperationStatusId = contributorOperation.OperationStatusId;
+                radianContributorOperationInstance.RadianContributorId = contributorOperation.RadianContributorId;
+                radianContributorOperationInstance.SoftwareId = contributorOperation.SoftwareId;
+                radianContributorOperationInstance.SoftwareType = contributorOperation.SoftwareType;
+                radianContributorOperationInstance.Deleted = contributorOperation.Deleted;
+                radianContributorOperationInstance.Timestamp = System.DateTime.Now;
+                context.Entry(radianContributorOperationInstance).State = System.Data.Entity.EntityState.Modified;
+                context.SaveChanges();
+                return true;
+            }
+        }
+
 
         public int Add(RadianContributorOperation contributorOperation)
         {

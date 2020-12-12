@@ -153,6 +153,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 RadianContributorId = radianContributor.Id,
                 SoftwareId = software.Id,
+                OperationStatusId = (int)RadianState.Registrado,
                 SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
                 Timestamp = DateTime.Now
             };
@@ -272,6 +273,7 @@ namespace Gosocket.Dian.Web.Controllers
             RadianContributorOperation contributorOperation = new RadianContributorOperation()
             {
                 RadianContributorId = data.RadianContributorId,
+                OperationStatusId = (int)RadianState.Test,
                 Deleted = false,
                 Timestamp = DateTime.Now,
                 SoftwareType = data.SoftwareType,
@@ -298,7 +300,8 @@ namespace Gosocket.Dian.Web.Controllers
             if (response.Code != 500)
             {
                 RadianContributor participant = _radianAprovedService.GetRadianContributor(data.RadianContributorId);
-                _radianContributorService.ChangeParticipantStatus(participant.ContributorId, RadianState.Test.GetDescription(), participant.RadianContributorTypeId, RadianState.Registrado.GetDescription(), string.Empty);
+                if (participant.RadianState != RadianState.Habilitado.GetDescription())
+                    _radianContributorService.ChangeParticipantStatus(participant.ContributorId, RadianState.Test.GetDescription(), participant.RadianContributorTypeId, participant.RadianState, string.Empty);
             }
             return Json(response, JsonRequestBehavior.AllowGet);
         }
@@ -374,7 +377,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult SoftwareList(int radianContributorId)
         {
-            List<RadianSoftware> softwares = _radianAprovedService.SoftwareList(radianContributorId);
+            List<RadianSoftware> softwares = _radianAprovedService.SoftwareList(radianContributorId, RadianSoftwareStatus.Accepted);
             List<AutoListModel> filteredItems = softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
             return Json(filteredItems, JsonRequestBehavior.AllowGet);
         }
