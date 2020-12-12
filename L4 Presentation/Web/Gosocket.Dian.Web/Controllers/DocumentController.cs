@@ -330,7 +330,7 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> FindDocument(string documentKey, string partitionKey, string emissionDate)
         {
             var date = DateNumberToDateTime(emissionDate);
-            var globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(documentKey, partitionKey, date);
+            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(documentKey, partitionKey, date);
 
             if (globalDataDocument == null)
             {
@@ -339,6 +339,123 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("Search", searchViewModel);
             }
 
+            DocValidatorModel model = ReturnDocValidationModel(documentKey, globalDataDocument);
+
+            return View(model);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult Search()
+        {
+            return RedirectToAction(nameof(UserController.SearchDocument), "User");
+        }
+
+        [HttpPost]
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult Search(SearchViewModel model)
+        {
+            return RedirectToAction(nameof(UserController.SearchDocument), "User");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
+            if (globalDocValidatorDocumentMeta == null)
+            {
+                ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
+                return View(model);
+            }
+
+            var identifier = $"{globalDocValidatorDocumentMeta.SenderCode}{globalDocValidatorDocumentMeta.DocumentTypeId}{globalDocValidatorDocumentMeta.SerieAndNumber}".EncryptSHA256();
+            var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
+            if (globalDocValidatorDocument == null)
+            {
+                ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
+                return View(model);
+            }
+
+            var partitionKey = $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocument.DocumentKey.Substring(0, 2)}";
+
+            return RedirectToAction(nameof(FindDocument), new { documentKey = globalDocValidatorDocument.DocumentKey, partitionKey, emissionDate = globalDocValidatorDocument.EmissionDateNumber });
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult SearchQR(string documentKey)
+        {
+            documentKey = documentKey.ToLower();
+            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
+            if (globalDocValidatorDocumentMeta == null) return RedirectToAction(nameof(SearchInvalidQR));
+
+            var identifier = globalDocValidatorDocumentMeta.Identifier;
+            var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
+            if (globalDocValidatorDocument == null) return RedirectToAction(nameof(SearchInvalidQR));
+
+            if (globalDocValidatorDocument.DocumentKey != documentKey) return RedirectToAction(nameof(SearchInvalidQR));
+
+            var partitionKey = $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocument.DocumentKey.Substring(0, 2)}";
+
+            return RedirectToAction(nameof(FindDocument), new { documentKey = globalDocValidatorDocument.DocumentKey, partitionKey, emissionDate = globalDocValidatorDocument.EmissionDateNumber });
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult SearchInvalidQR()
+        {
+            return View();
+        }
+
+        public async Task<JsonResult> PrintDocument(string cufe)
+        {
+            byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe);
+            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
+            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult PrintGraphicRepresentation(string cufe)
+        {
+            byte[] pdfDocument = _radianGraphicRepresentationService.GetPdfReport(cufe);
+            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
+            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public async Task<ActionResult> ShowDocumentToPublic(string Id)
+        {
+            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(Id);
+            List<DocValidatorModel> listDocValidatorModels = new List<DocValidatorModel>();
+            List<GlobalDocValidatorDocumentMeta> listGlobalValidatorDocumentMeta = invoiceAndNotes.Item2;
+
+            DateTime date = DateNumberToDateTime(invoiceAndNotes.Item1.EmissionDateNumber);
+            string partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, invoiceAndNotes.Item1.DocumentKey);
+            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(invoiceAndNotes.Item1.DocumentKey, partitionKey, date);
+
+            DocValidatorModel docModel = ReturnDocValidationModel(invoiceAndNotes.Item1.DocumentKey, globalDataDocument);
+            listDocValidatorModels.Add(docModel);
+
+            foreach (var item in listGlobalValidatorDocumentMeta)
+            {
+                partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, item.DocumentKey);
+                globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(item.DocumentKey, partitionKey, date);
+
+                docModel = ReturnDocValidationModel(item.DocumentKey, globalDataDocument);
+
+                listDocValidatorModels.Add(docModel);
+            }
+
+
+            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(invoiceAndNotes.Item1, invoiceAndNotes.Item2, listDocValidatorModels);
+
+            return View(invoiceNotes);
+        }
+
+        #region Private methods               
+
+        private string ReturnPartitionKey(string emissionDateNumber, string documentKey)
+        {
+            return $"co|{emissionDateNumber.Substring(6, 2)}|{documentKey.Substring(0, 2)}";
+        }
+
+        private DocValidatorModel ReturnDocValidationModel(string documentKey, GlobalDataDocument globalDataDocument)
+        {
             var model = new DocValidatorModel();
             model.Validations.AddRange(GetValidatedRules(documentKey));
 
@@ -411,92 +528,8 @@ namespace Gosocket.Dian.Web.Controllers
                 }).ToList());
             }
 
-            return View(model);
+            return model;
         }
-
-        [ExcludeFilter(typeof(Authorization))]
-        public ActionResult Search()
-        {
-            return RedirectToAction(nameof(UserController.SearchDocument), "User");
-        }
-
-        [HttpPost]
-        [ExcludeFilter(typeof(Authorization))]
-        public ActionResult Search(SearchViewModel model)
-        {
-            return RedirectToAction(nameof(UserController.SearchDocument), "User");
-
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
-            if (globalDocValidatorDocumentMeta == null)
-            {
-                ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
-                return View(model);
-            }
-
-            var identifier = $"{globalDocValidatorDocumentMeta.SenderCode}{globalDocValidatorDocumentMeta.DocumentTypeId}{globalDocValidatorDocumentMeta.SerieAndNumber}".EncryptSHA256();
-            var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
-            if (globalDocValidatorDocument == null)
-            {
-                ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
-                return View(model);
-            }
-
-            var partitionKey = $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocument.DocumentKey.Substring(0, 2)}";
-
-            return RedirectToAction(nameof(FindDocument), new { documentKey = globalDocValidatorDocument.DocumentKey, partitionKey, emissionDate = globalDocValidatorDocument.EmissionDateNumber });
-        }
-
-        [ExcludeFilter(typeof(Authorization))]
-        public ActionResult SearchQR(string documentKey)
-        {
-            documentKey = documentKey.ToLower();
-            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
-            if (globalDocValidatorDocumentMeta == null) return RedirectToAction(nameof(SearchInvalidQR));
-
-            var identifier = globalDocValidatorDocumentMeta.Identifier;
-            var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
-            if (globalDocValidatorDocument == null) return RedirectToAction(nameof(SearchInvalidQR));
-
-            if (globalDocValidatorDocument.DocumentKey != documentKey) return RedirectToAction(nameof(SearchInvalidQR));
-
-            var partitionKey = $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocument.DocumentKey.Substring(0, 2)}";
-
-            return RedirectToAction(nameof(FindDocument), new { documentKey = globalDocValidatorDocument.DocumentKey, partitionKey, emissionDate = globalDocValidatorDocument.EmissionDateNumber });
-        }
-
-        [ExcludeFilter(typeof(Authorization))]
-        public ActionResult SearchInvalidQR()
-        {
-            return View();
-        } 
-
-        public async Task<JsonResult> PrintDocument(string cufe)
-        {
-            byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe);
-            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
-            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet );
-        }
-
-        public JsonResult PrintGraphicRepresentation(string cufe)
-        {
-            byte[] pdfDocument = _radianGraphicRepresentationService.GetPdfReport(cufe);
-            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
-            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
-        }
-
-        [ExcludeFilter(typeof(Authorization))]
-        public ActionResult ShowDocumentToPublic(string Id)
-        {
-            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(Id);
-            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(invoiceAndNotes.Item1, invoiceAndNotes.Item2);
-
-            return View(invoiceNotes);
-        }
-
-        #region Private methods
 
         private bool IsValidCaptcha(string token)
         {
