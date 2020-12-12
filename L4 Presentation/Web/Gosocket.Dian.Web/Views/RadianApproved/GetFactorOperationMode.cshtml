@@ -23,7 +23,7 @@
             if ("@operationMode" != "2") {
                 $("#OperationModeSelectedId").val(1);
             } else {
-                  $("#OperationModeSelectedId").change(function (value) {debugger
+                  $("#OperationModeSelectedId").change(function (value) {
                     var software = $("#OperationModeSelectedId").val();
                     RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
                 })
@@ -35,6 +35,7 @@
                     RadianContributorId: @Model.Contributor.RadianContributorId,
                     SoftwareType: $("#OperationModeSelectedId").val(),
                     SoftwareId: $("#SoftwareNameList option:selected").val(),
+                    CustomerId: $("#bussiness-name option:selected").val(),
                     SoftwareName: $("#SoftwareName").val(),
                     Pin: $("#SoftwarePin").val(),
                     Url: '@Model.SoftwareUrl',
