@@ -31,15 +31,28 @@
             <div class="panel-body padding-top-20">
                 @if (operationMode == "2")
                 {
-                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                    @using (Html.BeginForm("GetFactorOperationMode", "RadianApproved", FormMethod.Post))
+                    {
+                        @Html.HiddenFor(m => m.Nit);
+                        @Html.HiddenFor(m => m.Name);
+                        @Html.HiddenFor(m => m.BusinessName);
+                        @Html.HiddenFor(m => m.Email);
+                        @Html.HiddenFor(m => m.Step);
+                        @Html.HiddenFor(m => m.Nit);
+                        @Html.HiddenFor(m => m.FilesRequires);
+                        @Html.HiddenFor(m => m.Customers);
+                        @Html.HiddenFor(m => m.RadianContributorTypeId);
+                        @Html.HiddenFor(m => m.ContributorId);
                         <div class="panel-body padding-20 padding-bottom-10">
                             <div class="radian-personal-info">
                                 @Html.Partial("_personalInfo")
                             </div>
                         </div>
                         <div class="panel-footer text-right">
-                            <button type="button" class="btn btn-success btn-radian-success button-change-state">Configurar modo de operación</button>
+                            <button type="submit" class="btn btn-success btn-radian-success button-change-state">Configurar modo de operación</button>
                         </div>
+                    }
                     </div>
                 }
                 else
@@ -91,8 +104,6 @@
 
     <script>
         $(document).ready(function () {
-            //howLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
-
         var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
         RenderSteps(index);
 

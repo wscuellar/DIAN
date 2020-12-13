@@ -319,7 +319,7 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> FindDocument(string documentKey, string partitionKey, string emissionDate)
         {
             var date = DateNumberToDateTime(emissionDate);
-            var globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(documentKey, partitionKey, date);
+            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(documentKey, partitionKey, date);
 
             if (globalDataDocument == null)
             {
@@ -328,77 +328,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("Search", searchViewModel);
             }
 
-            var model = new DocValidatorModel();
-            model.Validations.AddRange(GetValidatedRules(documentKey));
-
-            model.Document = new DocumentViewModel
-            {
-                DocumentKey = globalDataDocument.DocumentKey,
-                Amount = globalDataDocument.FreeAmount,
-                DocumentTypeId = globalDataDocument.DocumentTypeId,
-                DocumentTypeName = globalDataDocument.DocumentTypeName,
-                GenerationDate = globalDataDocument.GenerationTimeStamp,
-                Id = globalDataDocument.DocumentKey,
-                EmissionDate = globalDataDocument.EmissionDate,
-                Number = Services.Utils.StringUtil.TextAfter(globalDataDocument.SerieAndNumber, globalDataDocument.Serie),
-                //TechProviderName = globalDataDocument?.TechProviderInfo?.TechProviderName,
-                TechProviderCode = globalDataDocument?.TechProviderInfo?.TechProviderCode,
-                ReceiverName = globalDataDocument.ReceiverName,
-                ReceiverCode = globalDataDocument.ReceiverCode,
-                ReceptionDate = globalDataDocument.ReceptionTimeStamp,
-                Serie = globalDataDocument.Serie,
-                SenderName = globalDataDocument.SenderName,
-                SenderCode = globalDataDocument.SenderCode,
-                Status = globalDataDocument.ValidationResultInfo.Status,
-                StatusName = globalDataDocument.ValidationResultInfo.StatusName,
-                TaxAmountIva = globalDataDocument.TaxAmountIva,
-                TotalAmount = globalDataDocument.TotalAmount
-            };
-
-            model.Document.Events = globalDataDocument.Events.Select(e => new EventViewModel
-            {
-                Code = e.Code,
-                Date = e.Date,
-                DateNumber = e.DateNumber,
-                Description = e.Description,
-                ReceiverCode = e.ReceiverCode,
-                ReceiverName = e.ReceiverName,
-                SenderCode = e.SenderCode,
-                SenderName = e.SenderName,
-                TimeStamp = e.TimeStamp
-            }).ToList();
-
-            model.Document.References = globalDataDocument.References.Select(r => new ReferenceViewModel
-            {
-                DocumentKey = r.DocumentKey,
-                DocumentTypeId = r.DocumentTypeId,
-                DocumenTypeName = r.DocumenTypeName,
-                Date = r.Date,
-                DateNumber = r.DateNumber,
-                Description = r.Description,
-                ReceiverCode = r.ReceiverCode,
-                ReceiverName = r.ReceiverName,
-                SenderCode = r.SenderCode,
-                SenderName = r.SenderName,
-                TimeStamp = r.TimeStamp,
-                ShowAsReference = true
-            }).ToList();
-
-            //Se debe evaluar sustituir la lista de referencia a la factura por campos de nota de credito y debito
-            TableManager tableManagerGlobalDocReference = new TableManager("GlobalDocReference");
-            if (model.Document.DocumentTypeId == "1" || model.Document.DocumentTypeId == "01")
-            {
-                List<GlobalDocReference> globalDocReferences = tableManagerGlobalDocReference.FindByPartition<GlobalDocReference>(model.Document.Id).Where(x => x.RowKey != "INVOICE").ToList();
-
-                model.Document.References.AddRange(globalDocReferences.Select(r => new ReferenceViewModel
-                {
-                    DocumentKey = r.DocumentKey,
-                    DocumenTypeName = r.DocumentTypeName,
-                    DateNumber = r.DateNumber,
-                    TimeStamp = r.Timestamp.Date,
-                    ShowAsReference = false
-                }).ToList());
-            }
+            DocValidatorModel model = ReturnDocValidationModel(documentKey, globalDataDocument);
 
             return View(model);
         }
@@ -477,15 +407,118 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [ExcludeFilter(typeof(Authorization))]
-        public ActionResult ShowDocumentToPublic(string Id)
+        public async Task<ActionResult> ShowDocumentToPublic(string Id)
         {
             Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(Id);
-            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(invoiceAndNotes.Item1, invoiceAndNotes.Item2);
+            List<DocValidatorModel> listDocValidatorModels = new List<DocValidatorModel>();
+            List<GlobalDocValidatorDocumentMeta> listGlobalValidatorDocumentMeta = invoiceAndNotes.Item2;
+
+            DateTime date = DateNumberToDateTime(invoiceAndNotes.Item1.EmissionDateNumber);
+            string partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, invoiceAndNotes.Item1.DocumentKey);
+            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(invoiceAndNotes.Item1.DocumentKey, partitionKey, date);
+
+            DocValidatorModel docModel = ReturnDocValidationModel(invoiceAndNotes.Item1.DocumentKey, globalDataDocument);
+            listDocValidatorModels.Add(docModel);
+
+            foreach (var item in listGlobalValidatorDocumentMeta)
+            {
+                partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, item.DocumentKey);
+                globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(item.DocumentKey, partitionKey, date);
+
+                docModel = ReturnDocValidationModel(item.DocumentKey, globalDataDocument);
+
+                listDocValidatorModels.Add(docModel);
+            }
+
+
+            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(invoiceAndNotes.Item1, invoiceAndNotes.Item2, listDocValidatorModels);
 
             return View(invoiceNotes);
         }
 
-        #region Private methods
+        #region Private methods               
+
+        private string ReturnPartitionKey(string emissionDateNumber, string documentKey)
+        {
+            return $"co|{emissionDateNumber.Substring(6, 2)}|{documentKey.Substring(0, 2)}";
+        }
+
+        private DocValidatorModel ReturnDocValidationModel(string documentKey, GlobalDataDocument globalDataDocument)
+        {
+            var model = new DocValidatorModel();
+            model.Validations.AddRange(GetValidatedRules(documentKey));
+
+            model.Document = new DocumentViewModel
+            {
+                DocumentKey = globalDataDocument.DocumentKey,
+                Amount = globalDataDocument.FreeAmount,
+                DocumentTypeId = globalDataDocument.DocumentTypeId,
+                DocumentTypeName = globalDataDocument.DocumentTypeName,
+                GenerationDate = globalDataDocument.GenerationTimeStamp,
+                Id = globalDataDocument.DocumentKey,
+                EmissionDate = globalDataDocument.EmissionDate,
+                Number = Services.Utils.StringUtil.TextAfter(globalDataDocument.SerieAndNumber, globalDataDocument.Serie),
+                //TechProviderName = globalDataDocument?.TechProviderInfo?.TechProviderName,
+                TechProviderCode = globalDataDocument?.TechProviderInfo?.TechProviderCode,
+                ReceiverName = globalDataDocument.ReceiverName,
+                ReceiverCode = globalDataDocument.ReceiverCode,
+                ReceptionDate = globalDataDocument.ReceptionTimeStamp,
+                Serie = globalDataDocument.Serie,
+                SenderName = globalDataDocument.SenderName,
+                SenderCode = globalDataDocument.SenderCode,
+                Status = globalDataDocument.ValidationResultInfo.Status,
+                StatusName = globalDataDocument.ValidationResultInfo.StatusName,
+                TaxAmountIva = globalDataDocument.TaxAmountIva,
+                TotalAmount = globalDataDocument.TotalAmount
+            };
+
+            model.Document.Events = globalDataDocument.Events.Select(e => new EventViewModel
+            {
+                Code = e.Code,
+                Date = e.Date,
+                DateNumber = e.DateNumber,
+                Description = e.Description,
+                ReceiverCode = e.ReceiverCode,
+                ReceiverName = e.ReceiverName,
+                SenderCode = e.SenderCode,
+                SenderName = e.SenderName,
+                TimeStamp = e.TimeStamp
+            }).ToList();
+
+            model.Document.References = globalDataDocument.References.Select(r => new ReferenceViewModel
+            {
+                DocumentKey = r.DocumentKey,
+                DocumentTypeId = r.DocumentTypeId,
+                DocumenTypeName = r.DocumenTypeName,
+                Date = r.Date,
+                DateNumber = r.DateNumber,
+                Description = r.Description,
+                ReceiverCode = r.ReceiverCode,
+                ReceiverName = r.ReceiverName,
+                SenderCode = r.SenderCode,
+                SenderName = r.SenderName,
+                TimeStamp = r.TimeStamp,
+                ShowAsReference = true
+            }).ToList();
+
+            //Se debe evaluar sustituir la lista de referencia a la factura por campos de nota de credito y debito
+            TableManager tableManagerGlobalDocReference = new TableManager("GlobalDocReference");
+            if (model.Document.DocumentTypeId == "1" || model.Document.DocumentTypeId == "01")
+            {
+                List<GlobalDocReference> globalDocReferences = tableManagerGlobalDocReference.FindByPartition<GlobalDocReference>(model.Document.Id).Where(x => x.RowKey != "INVOICE").ToList();
+
+                model.Document.References.AddRange(globalDocReferences.Select(r => new ReferenceViewModel
+                {
+                    DocumentKey = r.DocumentKey,
+                    DocumenTypeName = r.DocumentTypeName,
+                    DateNumber = r.DateNumber,
+                    TimeStamp = r.Timestamp.Date,
+                    ShowAsReference = false
+                }).ToList());
+            }
+
+            return model;
+        }
 
         private bool IsValidCaptcha(string token)
         {

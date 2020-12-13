@@ -101,6 +101,14 @@ namespace Gosocket.Dian.Application
             return contributorTypeList;
         }
 
+
+        public ResponseMessage OperationDelete(RadianContributorOperation operationToDelete)
+        {
+            RadianContributor participant = _radianContributorRepository.Get(t => t.Id == operationToDelete.RadianContributorId);
+            _globalRadianOperationService.Delete(participant.Contributor.Code, operationToDelete.SoftwareId.ToString());
+            return _radianContributorOperationRepository.Delete(operationToDelete.Id);
+        }
+
         public ResponseMessage OperationDelete(int radianContributorOperationId)
         {
             RadianContributorOperation operationToDelete = _radianContributorOperationRepository.Get(t => t.Id == radianContributorOperationId);
@@ -110,12 +118,12 @@ namespace Gosocket.Dian.Application
                 if (software != null && software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted)
                     return new ResponseMessage() { Message = "El software encuentra en estado aceptado." };
 
-                _radianCallSoftwareService.DeleteSoftware(operationToDelete.SoftwareId);               
+                _radianCallSoftwareService.DeleteSoftware(operationToDelete.SoftwareId);
             }
 
             RadianContributor participant = _radianContributorRepository.Get(t => t.Id == operationToDelete.RadianContributorId);
             _globalRadianOperationService.Delete(participant.Contributor.Code, operationToDelete.SoftwareId.ToString());
-            return _radianContributorOperationRepository.Update(operationToDelete.Id);
+            return _radianContributorOperationRepository.Delete(operationToDelete.Id);
         }
 
         public ResponseMessage UploadFile(Stream fileStream, string code, RadianContributorFile radianContributorFile)
@@ -198,7 +206,7 @@ namespace Gosocket.Dian.Application
             Contributor contributor = radianContributor.Contributor;
             GlobalRadianOperations operation = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString())
             {
-                RadianStatus = RadianState.Test.GetDescription(),
+                RadianStatus = RadianState.Registrado.GetDescription(),
                 SoftwareType = existingOperation.SoftwareType,
                 RadianContributorTypeId = radianContributor.RadianContributorTypeId,
                 Deleted = false
@@ -210,7 +218,7 @@ namespace Gosocket.Dian.Application
                 RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                 {
                     Id = Guid.NewGuid().ToString(),
-                    ContributorId= radianContributor.Id,
+                    ContributorId = radianContributor.Id,
                     ContributorTypeId = radianContributor.RadianContributorTypeId.ToString(),
                     TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
                     ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
@@ -220,12 +228,11 @@ namespace Gosocket.Dian.Application
                     RejectInvoiceTotalRequired = testSet.RejectInvoiceTotalAcceptedRequired,
                     ApplicationAvailableTotalRequired = testSet.ApplicationAvailableTotalRequired,
                     ApplicationAvailableTotalAcceptedRequired = testSet.ApplicationAvailableTotalAcceptedRequired,
-                    // Endosos
-                    EndorsementPropertyTotalRequired =          testSet.EndorsementPropertyTotalRequired,
-                    EndorsementPropertyTotalAcceptedRequired =  testSet.EndorsementPropertyTotalAcceptedRequired,
-                    EndorsementProcurementTotalRequired =           testSet.EndorsementProcurementTotalRequired,
-                    EndorsementProcurementTotalAcceptedRequired =   testSet.EndorsementProcurementTotalAcceptedRequired,
-                    EndorsementGuaranteeTotalRequired =         testSet.EndorsementGuaranteeTotalRequired,
+                    EndorsementPropertyTotalRequired = testSet.EndorsementPropertyTotalRequired,
+                    EndorsementPropertyTotalAcceptedRequired = testSet.EndorsementPropertyTotalAcceptedRequired,
+                    EndorsementProcurementTotalRequired = testSet.EndorsementProcurementTotalRequired,
+                    EndorsementProcurementTotalAcceptedRequired = testSet.EndorsementProcurementTotalAcceptedRequired,
+                    EndorsementGuaranteeTotalRequired = testSet.EndorsementGuaranteeTotalRequired,
                     EndorsementGuaranteeTotalAcceptedRequired = testSet.EndorsementGuaranteeTotalAcceptedRequired,
                     EndorsementCancellationTotalRequired = testSet.EndorsementCancellationTotalRequired,
                     EndorsementCancellationTotalAcceptedRequired = testSet.EndorsementCancellationTotalAcceptedRequired,
@@ -252,7 +259,7 @@ namespace Gosocket.Dian.Application
         public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
         {
             RadianContributorOperationWithSoftware radianContributorOperationWithSoftware = new RadianContributorOperationWithSoftware();
-            radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId && t.Deleted == false);
+            radianContributorOperationWithSoftware.RadianContributorOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorId && !t.Deleted);
             radianContributorOperationWithSoftware.Softwares = radianContributorOperationWithSoftware.RadianContributorOperations.Select(t => t.Software).ToList();
             return radianContributorOperationWithSoftware;
         }
@@ -270,14 +277,22 @@ namespace Gosocket.Dian.Application
         /// <param name="operationMode"></param>
         /// <param name="term"></param>
         /// <returns></returns>
-        public List<RadianSoftware> SoftwareList(int radianContributorId)
+        public List<RadianSoftware> SoftwareList(int radianContributorId, RadianSoftwareStatus softwareStatus)
         {
+
             List<RadianContributor> participants;
-            int softwareStatus = (int)RadianSoftwareStatus.Accepted;
-            participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.RadianSoftwares.Any(x => x.Status && x.RadianSoftwareStatusId == softwareStatus)).Results;
+            int softStatus = (int)softwareStatus;
+            if (softwareStatus == 0)
+                participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.RadianSoftwares.Any(x => x.Status)).Results;
+            else
+                participants = _radianContributorRepository.List(t => t.Id == radianContributorId && t.RadianSoftwares.Any(x => x.Status && x.RadianSoftwareStatusId == softStatus)).Results;
             return participants.Select(t => t.RadianSoftwares).Aggregate(new List<RadianSoftware>(), (list, source) =>
             {
-                list.AddRange(source.Where(t => t.RadianSoftwareStatusId == softwareStatus));
+                if (softwareStatus == 0)
+                    list.AddRange(source);
+                else
+                    list.AddRange(source.Where(t => t.RadianSoftwareStatusId == softStatus));
+
                 return list;
             }).Distinct().ToList();
         }
@@ -329,5 +344,14 @@ namespace Gosocket.Dian.Application
             return _radianContributorFileHistoryRepository.List(t => true, page, pagesize);
         }
 
+        public void DeleteSoftware(Guid softwareId)
+        {
+            _radianCallSoftwareService.DeleteSoftware(softwareId);
+        }
+
+        public List<RadianContributorOperation> OperationsBySoftwareId(Guid id)
+        {
+            return _radianContributorOperationRepository.List(t => t.SoftwareId == id);
+        }
     }
 }

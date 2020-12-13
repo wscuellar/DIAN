@@ -213,3 +213,11 @@ function customDialog(htmlPartial, code, softwareId, operation, url) {
         ajaxFunction(url, "POST", data, actionError, actionSuccess);
     });
 }
+
+
+function DeleteOptions(operationMode, radianState) {
+    if (operationMode == 1 || radianState == 'Habilitado') {
+        $("#RadianApprovalState option[value='0']").remove();
+
+    }
+}
