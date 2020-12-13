@@ -184,8 +184,6 @@ namespace Gosocket.Dian.Application
 
         public ResponseMessage AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation)
         {
-            int result = 0;
-
             if (testSet == null)
                 return new ResponseMessage(TextResources.ModeWithoutTestSet, TextResources.alertType, 500);
 
@@ -208,9 +206,16 @@ namespace Gosocket.Dian.Application
             }
 
             radianContributorOperation.OperationStatusId = (int)(radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test : RadianState.Registrado);
-            result = _radianContributorOperationRepository.Add(radianContributorOperation);
-            existingOperation = _radianContributorOperationRepository.Get(t => t.Id == result);
+            int operationId = _radianContributorOperationRepository.Add(radianContributorOperation);
+            existingOperation = _radianContributorOperationRepository.Get(t => t.Id == operationId);
 
+            ApplyTestSet(radianContributorOperation, testSet, radianContributor, existingOperation);
+
+            return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
+        }
+
+        private void ApplyTestSet(RadianContributorOperation radianContributorOperation, RadianTestSet testSet, RadianContributor radianContributor, RadianContributorOperation existingOperation)
+        {
             Contributor contributor = radianContributor.Contributor;
             GlobalRadianOperations operation = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString())
             {
@@ -260,8 +265,6 @@ namespace Gosocket.Dian.Application
                 _ = _radianTestSetResultService.InsertTestSetResult(setResult);
 
             }
-
-            return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
         }
 
         public RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId)
