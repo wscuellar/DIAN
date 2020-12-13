@@ -450,6 +450,25 @@ namespace Gosocket.Dian.Domain.Common
         SoftwareFactor = 4
     }
 
+    public enum RadianDocumentStatus
+    {
+        [Description("NO APLICA")]
+        DontApply = 0,
+        [Description("LIMITADA")]
+        Limited = 1,
+        [Description("PAGADA")]
+        Paid = 2,
+        [Description("ENDOSADA")]
+        Endorsed = 3,
+        [Description("DISPONIBILIZADA")]
+        Readiness = 4,
+        [Description("TÍTULO VALOR")]
+        SecurityTitle = 5,
+        [Description("FACTURA ELECTRONICA")]
+        ElectronicInvoice = 6
+    }
+
+
     /// <summary>
     /// Documentos Electronicos. Utilizados en la configuración de Set de Pruebas - Otros Documentos
     /// </summary>
