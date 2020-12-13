@@ -31,7 +31,7 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerGlobalBigContributorRequestAuthorization = new TableManager("GlobalBigContributorRequestAuthorization");
         private static readonly TableManager tableManagerGlobalTestSetResult = new TableManager("GlobalTestSetResult");
         private static readonly TableManager tableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
-            private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
         // Set queue name
         private const string queueName = "global-process-batch-zip-input%Slot%";
