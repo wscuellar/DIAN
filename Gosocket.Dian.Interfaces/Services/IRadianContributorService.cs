@@ -31,6 +31,8 @@ namespace Gosocket.Dian.Interfaces.Services
 
         bool ChangeParticipantStatus(int contributorId, string newState, int radianContributorTypeId, string actualState, string description);
 
+        void UpdateRadianOperation(int radiancontributorId, int softwareType);
+
         RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size);
 
         Guid UpdateRadianContributorFile(RadianContributorFile radianContributorFile);

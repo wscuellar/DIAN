@@ -3,6 +3,7 @@ using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
@@ -32,6 +33,18 @@ namespace Gosocket.Dian.DataContext.Repositories
                 .Include("RadianContributorOperations");
 
             return query.FirstOrDefault();
+        }
+
+        public bool GetParticipantWithActiveProcess(int contributorId, int contributorTypeId)
+        {
+            List<RadianContributor> participants = (from p in sqlDBContext.RadianContributors.Where(t => t.ContributorId == contributorId)
+                                                   join o in sqlDBContext.RadianContributorOperations on p.Id equals o.RadianContributorId
+                                                   where p.RadianContributorTypeId != contributorTypeId
+                                                   && p.RadianOperationModeId == 1
+                                                   &&  o.OperationStatusId< 4
+                                                   select p).ToList();
+            return participants.Any();
+
         }
 
 

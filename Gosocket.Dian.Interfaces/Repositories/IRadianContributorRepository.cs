@@ -9,6 +9,7 @@ namespace Gosocket.Dian.Interfaces.Repositories
     public interface IRadianContributorRepository
     {
 
+        bool GetParticipantWithActiveProcess(int contributorId, int contributorTypeId);
         RadianContributor Get(Expression<Func<RadianContributor, bool>> expression);
         PagedResult<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0);
 

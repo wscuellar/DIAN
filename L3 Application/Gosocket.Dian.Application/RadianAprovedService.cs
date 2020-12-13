@@ -182,12 +182,24 @@ namespace Gosocket.Dian.Application
             return _radianTestSetService.GetTestSet(softwareType, softwareType);
         }
 
-        public ResponseMessage AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert)
+        public ResponseMessage AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation)
         {
             int result = 0;
 
             if (testSet == null)
                 return new ResponseMessage(TextResources.ModeWithoutTestSet, TextResources.alertType, 500);
+
+            if (validateOperation)
+            {
+                List<RadianContributorOperation> currentOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareType == radianContributorOperation.SoftwareType && t.OperationStatusId != (int)RadianState.Habilitado && !t.Deleted);
+                if (currentOperations.Any())
+                    return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
+            }
+
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorOperation.RadianContributorId);
+            RadianContributorOperation existingOperation = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == radianContributorOperation.SoftwareId && !t.Deleted);
+            if (existingOperation != null)
+                return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
 
             if (isInsert)
             {
@@ -195,18 +207,14 @@ namespace Gosocket.Dian.Application
                 radianContributorOperation.SoftwareId = soft.Id;
             }
 
-            RadianContributorOperation existingOperation = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == radianContributorOperation.SoftwareId && !t.Deleted);
-            if (existingOperation == null)
-            {
-                result = _radianContributorOperationRepository.Add(radianContributorOperation);
-                existingOperation = _radianContributorOperationRepository.Get(t => t.Id == result);
-            }
+            radianContributorOperation.OperationStatusId = (int)(radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test : RadianState.Registrado);
+            result = _radianContributorOperationRepository.Add(radianContributorOperation);
+            existingOperation = _radianContributorOperationRepository.Get(t => t.Id == result);
 
-            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorOperation.RadianContributorId);
             Contributor contributor = radianContributor.Contributor;
             GlobalRadianOperations operation = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString())
             {
-                RadianStatus = RadianState.Registrado.GetDescription(),
+                RadianStatus = radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test.GetDescription() : RadianState.Registrado.GetDescription(),
                 SoftwareType = existingOperation.SoftwareType,
                 RadianContributorTypeId = radianContributor.RadianContributorTypeId,
                 Deleted = false

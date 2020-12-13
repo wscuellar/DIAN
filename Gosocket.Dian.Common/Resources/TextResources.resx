@@ -231,4 +231,7 @@
   <data name="WithCustomerList" xml:space="preserve">
     <value>El software de la operación tiene clientes asociados.</value>
   </data>
+  <data name="OperationFailOtherInProcess" xml:space="preserve">
+    <value>No puede registrar esta operación, tiene software en proceso!!.</value>
+  </data>
 </root>

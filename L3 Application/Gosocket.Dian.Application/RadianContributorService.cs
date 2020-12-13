@@ -82,14 +82,13 @@ namespace Gosocket.Dian.Application
             bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
             Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributor.Id);
             if (!indirectElectronicBiller && ownSoftware == null)
+
                 return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
 
             if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
-                List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(userCode);
-                string enabledStatus = RadianState.Habilitado.GetDescription();
-                string cancelStatus = RadianState.Cancelado.GetDescription();
-                if (radianOperations.Any(t => t.RowKey.Equals(ownSoftware.Id.ToString(), StringComparison.OrdinalIgnoreCase) && t.RadianStatus != enabledStatus && t.RadianStatus != cancelStatus && t.RadianContributorTypeId != (int)radianContributorType))
+                bool otherActiveProcess = _radianContributorRepository.GetParticipantWithActiveProcess(contributor.Id, (int)radianContributorType);
+                if (otherActiveProcess)
                     return new ResponseMessage(TextResources.OnlyActiveProcess, TextResources.alertType);
             }
 
@@ -265,9 +264,6 @@ namespace Gosocket.Dian.Application
             if (newState == RadianState.Habilitado.GetDescription()) competitor.Step = 4;
             if (newState == RadianState.Cancelado.GetDescription()) competitor.Step = 1;
 
-            if(competitor.RadianState ==  RadianState.Test.GetDescription())
-                UpdateRadianOperation(competitor);
-
             if (competitor.RadianState == RadianState.Cancelado.GetDescription())
                 CancelParticipant(competitor);
 
@@ -279,7 +275,7 @@ namespace Gosocket.Dian.Application
 
         }
 
-       
+
         #region Private methods Cancel Participant
 
         private void UpdateGlobalRadianOperation(int radianContributorTypeId, RadianContributor competitor)
@@ -316,7 +312,20 @@ namespace Gosocket.Dian.Application
                 foreach (RadianContributorFile file in files)
                 {
                     file.Deleted = true;
+                    file.Status = 3;
                     _radianContributorFileRepository.AddOrUpdate(file);
+
+                    RadianContributorFileHistory radianFileHistory = new RadianContributorFileHistory();
+                    radianFileHistory.Id = Guid.NewGuid();
+                    radianFileHistory.Timestamp = System.DateTime.Now;
+                    radianFileHistory.CreatedBy = file.CreatedBy;
+                    radianFileHistory.FileName = file.FileName;
+                    radianFileHistory.Comments = file.Comments;
+                    radianFileHistory.CreatedBy = file.CreatedBy;
+                    radianFileHistory.Status = file.Status;
+                    radianFileHistory.RadianContributorFileId = file.Id;
+                    _ = _radianContributorFileHistoryRepository.AddRegisterHistory(radianFileHistory);
+
                 }
 
             List<RadianSoftware> softwares = _radianCallSoftwareService.List(competitor.Id);
@@ -326,20 +335,19 @@ namespace Gosocket.Dian.Application
                 _radianCallSoftwareService.DeleteSoftware(software.Id);
 
                 //Quitar la operacion.
-                List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.SoftwareId == software.Id &&  !t.Deleted);
+                List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.SoftwareId == software.Id && !t.Deleted);
                 foreach (RadianContributorOperation operation in operations)
                 {
-                    _radianContributorOperationRepository.Delete(operation.Id);
+                    operation.OperationStatusId = (int)RadianState.Cancelado;
+                    operation.Deleted = true;
+                    _radianContributorOperationRepository.Update(operation);
                 }
-
             }
         }
 
-        private void UpdateRadianOperation(RadianContributor competitor)
+        public void UpdateRadianOperation(int radiancontributorId, int softwareType)
         {
-            RadianOperationModeTestSet parnert = (RadianOperationModeTestSet)Enum.Parse(typeof(RadianOperationModeTestSet), competitor.RadianContributorTypeId.ToString());
-            int softwaretType = (int)(competitor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Direct ? RadianOperationModeTestSet.OwnSoftware : parnert);
-            List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.RadianContributorId == competitor.Id && !t.Deleted && t.SoftwareType == softwaretType);
+            List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radiancontributorId && !t.Deleted && t.SoftwareType == softwareType && t.OperationStatusId == 1);
             foreach (RadianContributorOperation operation in operations)
             {
                 operation.OperationStatusId = (int)RadianState.Test;

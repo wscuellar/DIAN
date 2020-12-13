@@ -241,6 +241,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a No puede registrar esta operación, tiene software en proceso!!..
+        /// </summary>
+        public static string OperationFailOtherInProcess {
+            get {
+                return ResourceManager.GetString("OperationFailOtherInProcess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a ¿Desea iniciar el proceso de habilitación para @docume?.
         /// </summary>
         public static string OthersElectronicDocumentsSelect_Confirm {
