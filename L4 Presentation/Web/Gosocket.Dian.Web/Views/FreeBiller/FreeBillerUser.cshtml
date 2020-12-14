@@ -1,0 +1,84 @@
+﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFreeBillerModel
+@{
+    ViewBag.Title = "FreeBillerUser";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 12px;
+        line-height: 14px;
+    }
+
+    label {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 12px;
+        line-height: 14px;
+        color: #2C323C;
+        margin: 7px;
+    }
+
+    input {
+        margin: 7px;
+    }
+
+    input[type=text] {
+        background: #FFFFFF;
+        border: 1px solid #CCCCCC;
+        box-sizing: border-box;
+        border-radius: 4px;
+        height: 41px;
+        width: 100%;
+    }
+
+    select {
+        background: #FFFFFF;
+        border: 1px solid #CCCCCC;
+        box-sizing: border-box;
+        border-radius: 4px;
+        height: 41px;
+        width: 100%;
+        margin: 7px;
+    }
+
+    .boderCreate {
+        border: 1px solid #348441;
+        box-sizing: border-box;
+        border-radius: 0px 5px 0px 0px;
+    }
+
+    .btnCancel {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 16px;
+        color: #707782;
+        background: #FFFFFF;
+        border: 2px solid #B4B4B4;
+        box-sizing: border-box;
+        border-radius: 10px;
+    }
+
+    .btnSuccess {
+        background: #348441;
+        border-radius: 10px;
+        font-family: Arial;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 12px;
+        line-height: 14px;
+        color: #FFFFFF;
+    }
+</style>
+
+<h2>FreeBillerUser</h2>
+
+<div class="container">
+    @Html.Partial("CreateUser", Model)
+</div>
