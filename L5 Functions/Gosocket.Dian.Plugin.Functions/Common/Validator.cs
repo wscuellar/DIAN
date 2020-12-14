@@ -33,6 +33,8 @@ using Gosocket.Dian.Plugin.Functions.Common;
 using System.Text.RegularExpressions;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
 using System.Threading.Tasks;
+using Gosocket.Dian.Services.Utils.Helpers;
+using Gosocket.Dian.Services.Utils;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -1474,6 +1476,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         StartDate = startDateAttorney
                     };
                     TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
+                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), new { TrackId = attorneyDocument.cufe, ResponseCode = data.EventCode, TrackIdCude = trackId });
+                    if (processEventResponse.Code != "100")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla:"+ processEventResponse.Code + "-(R): ",
+                            ErrorMessage = processEventResponse.Message,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        return responses;
+                    }
                 }
                 responses.Add(new ValidateListResponse
                 {
