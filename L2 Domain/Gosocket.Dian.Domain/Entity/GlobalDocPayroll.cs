@@ -76,7 +76,7 @@ namespace Gosocket.Dian.Domain.Entity
 
         public System.DateTime Info_FechaGen { get; set; }
 
-        public System.DateTime HoraGen { get; set; }
+        public string HoraGen { get; set; }
 
         public byte TipoNomina { get; set; }
 

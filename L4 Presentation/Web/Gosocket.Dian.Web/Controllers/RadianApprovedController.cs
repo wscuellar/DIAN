@@ -96,10 +96,7 @@ namespace Gosocket.Dian.Web.Controllers
             if ((int)registrationData.RadianOperationMode == 2)
             {
                 if (model.RadianState == "Habilitado")
-                {
-
                     return View(model);
-                }
                 else
                 {
                     Software software = _radianAprovedService.SoftwareByContributor(registrationData.ContributorId);
@@ -120,9 +117,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
             else
-            {
                 return View(model);
-            }
         }
 
         [HttpPost]
@@ -157,7 +152,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
                 Timestamp = DateTime.Now
             };
-            ResponseMessage result = _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, testSet, true);
+            ResponseMessage result = _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, testSet, true, false);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
@@ -296,7 +291,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 
             RadianTestSet testSet = _radianAprovedService.GetTestResult(data.SoftwareType.ToString());
-            ResponseMessage response = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, testSet, !string.IsNullOrEmpty(data.SoftwareName));
+            ResponseMessage response = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, testSet, !string.IsNullOrEmpty(data.SoftwareName), true);
             if (response.Code != 500)
             {
                 RadianContributor participant = _radianAprovedService.GetRadianContributor(data.RadianContributorId);
@@ -412,7 +407,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 Page = filter.Page,
                 RowCount = data.RowCount,
-                Customers = data.Results.Select(t => new FileHistoryItemViewModel()
+                Customers = data.Results.OrderByDescending(t=> t.Timestamp).Select(t => new FileHistoryItemViewModel()
                 {
                     FileName = t.FileName,
                     Comments = t.Comments,

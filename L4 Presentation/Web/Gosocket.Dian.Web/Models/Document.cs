@@ -204,12 +204,12 @@ namespace Gosocket.Dian.Web.Models
             {
                 new DocumentRadianStatusViewModel() { Code = "0", Name = "Todos..." },
                 new DocumentRadianStatusViewModel() { Code = "1", Name = "Titulo valor" },
-                new DocumentRadianStatusViewModel() { Code = "3", Name = "Disponibilizada" },
-                new DocumentRadianStatusViewModel() { Code = "4", Name = "Endosada" },
-                new DocumentRadianStatusViewModel() { Code = "5", Name = "Pagada" },
-                new DocumentRadianStatusViewModel() { Code = "6", Name = "Limitada" },
-                new DocumentRadianStatusViewModel() { Code = "7", Name = "No Aplica" },
-                new DocumentRadianStatusViewModel() { Code = "8", Name = "Factura Electronica" }
+                new DocumentRadianStatusViewModel() { Code = "2", Name = "Disponibilizada" },
+                new DocumentRadianStatusViewModel() { Code = "3", Name = "Endosada" },
+                new DocumentRadianStatusViewModel() { Code = "4", Name = "Pagada" },
+                new DocumentRadianStatusViewModel() { Code = "5", Name = "Limitada" },
+                new DocumentRadianStatusViewModel() { Code = "6", Name = "Factura Electronica" },
+                new DocumentRadianStatusViewModel() { Code = "7", Name = "No Aplica" }
             };
         }
     }

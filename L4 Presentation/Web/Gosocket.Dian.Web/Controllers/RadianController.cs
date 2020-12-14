@@ -274,14 +274,21 @@ namespace Gosocket.Dian.Web.Controllers
                 if (stateProcess == RadianState.Test && radianAdmin.Files.Any(n => n.Status != 2 && n.RadianContributorFileType.Mandatory))
                     return Json(new { message = TextResources.AllSoftware, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
 
-                if (radianAdmin.Contributor.RadianState == RadianState.Habilitado.GetDescription())
+                if (radianAdmin.Contributor.RadianState == RadianState.Habilitado.GetDescription() && stateProcess == RadianState.Cancelado)
                 {
-                    string clientsData = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
-                    if (!string.IsNullOrEmpty(clientsData))
-                        return Json(new { message = clientsData, success = true, id = radianAdmin.Contributor.RadianContributorId, html = "html" }, JsonRequestBehavior.AllowGet);
+                    int counter = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
+                    if (counter > 0)
+                    {
+                        string message = string.Format(TextResources.WithCustomerList, counter);
+                        return Json(new { message, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                    }
                 }
 
                 _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, stateProcess.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+
+                if (stateProcess == RadianState.Test && radianAdmin.Contributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
+                    _radianContributorService.UpdateRadianOperation(radianAdmin.Contributor.RadianContributorId, (int)Domain.Common.RadianOperationModeTestSet.OwnSoftware);
+
                 _ = SendMail(radianAdmin);
 
                 return Json(new { message = TextResources.SuccessSoftware, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);

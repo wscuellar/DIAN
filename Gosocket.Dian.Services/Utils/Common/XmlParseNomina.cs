@@ -132,7 +132,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.CUNE = xInformacionGeneral[j].Attributes["CUNE"]?.InnerText;
                         globalDocPayrolls.EncripCUNE = xInformacionGeneral[j].Attributes["EncripCUNE"]?.InnerText;
                         globalDocPayrolls.Info_FechaGen = Convert.ToDateTime(xInformacionGeneral[j].Attributes["FechaGen"]?.InnerText);
-                        globalDocPayrolls.HoraGen = Convert.ToDateTime(xInformacionGeneral[j].Attributes["HoraGen"]?.InnerText);
+                        globalDocPayrolls.HoraGen = Convert.ToString(xInformacionGeneral[j].Attributes["HoraGen"]?.InnerText);
                         globalDocPayrolls.TipoNomina = Convert.ToByte(xInformacionGeneral[j].Attributes["TipoNomina"]?.InnerText);
                         globalDocPayrolls.PeriodoNomina = Convert.ToByte(xInformacionGeneral[j].Attributes["PeriodoNomina"]?.InnerText);
                         globalDocPayrolls.TipoMoneda = xInformacionGeneral[j].Attributes["TipoMoneda"]?.InnerText;
