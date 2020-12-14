@@ -222,8 +222,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }           
             else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice)                   
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), 
-                    data.DocumentTypeId, "0" + (int)code, data.CustomizationID).FirstOrDefault();
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(),
+                    data.DocumentTypeId, "0" + (int)code, "361", "362").FirstOrDefault();
                 if (documentMeta != null)
                 {
                     data.TrackId = documentMeta.PartitionKey;
