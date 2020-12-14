@@ -16,8 +16,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-            return View();
-        }
+          
         public ActionResult EditFreeBillerUser(UserFreeBillerModel model)
         {
             return View();
