@@ -371,6 +371,7 @@
     <Compile Include="Models\AutoListModel.cs" />
     <Compile Include="Models\EventsCounterViewModel.cs" />
     <Compile Include="Models\FileHistoryFilterViewModel.cs" />
+    <Compile Include="Models\OthersElectronicDocAssociatedViewModel.cs" />
     <Compile Include="Models\OthersElectronicDocumentsViewModel.cs" />
     <Compile Include="Models\ParametersDataViewModel.cs" />
     <Compile Include="Models\ContingencyViewModel.cs" />
@@ -2904,6 +2905,10 @@
     <Content Include="Views\Document\ShowDocumentToPublic.cshtml" />
     <Content Include="Views\Radian\_detailsTestSet.cshtml" />
     <Content Include="Views\OthersElectronicDocuments\AddParticipants.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\Index.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\_personalInfo.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\_finish.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\_pending.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2927,7 +2932,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
-    <Folder Include="Views\OthersElectronicDocAssociated\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

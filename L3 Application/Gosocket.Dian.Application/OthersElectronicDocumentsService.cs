@@ -27,7 +27,7 @@ namespace Gosocket.Dian.Application
                 sqlDBContext = new SqlDBContext();
         }
 
-        public ResponseMessage Validation(string userCode, string Accion, int IdElectronicDocument, string complementeTexto, int ParticipanteId)
+        public ResponseMessage Validation(string userCode, string Accion, int IdElectronicDocument, string complementeTexto, int ContributorIdType)
         {
             Contributor contributor = _contributorService.GetByCode(userCode);
             if (contributor == null || contributor.AcceptanceStatusId != 4)
@@ -42,6 +42,10 @@ namespace Gosocket.Dian.Application
 
             if (Accion == "SeleccionOperationMode")
                 return new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", complementeTexto), TextResources.confirmType);
+
+            if (Accion == "CancelRegister")
+                return new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", complementeTexto), TextResources.confirmType);
+
 
             return new ResponseMessage(TextResources.FailedValidation, TextResources.alertType);
         }
