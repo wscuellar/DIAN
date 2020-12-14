@@ -9,7 +9,7 @@
         public int ElectronicDocument { get; set; }
         public string ComplementoTexto { get; set; }
 
-        public int ParticipanteId { get; set; }
+        public int ContributorIdType { get; set; }
 
         
     }

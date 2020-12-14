@@ -2090,6 +2090,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            string errorRegla = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? "Regla: LGC01-(R): " : "Regla: LGC20-(R): ";
 
             var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
             //Valida eventos previos terminacion de mandato
@@ -2169,7 +2170,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = "Regla: LGC01-(R): ",
+                                ErrorCode = errorRegla,
                                 ErrorMessage = "Evento registrado previamente",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -2668,7 +2669,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         Mandatory = true,
                                         ErrorCode = "Regla: 89-(R): ",
                                         ErrorMessage = "No es posible realizar la Anulación de Endoso, ya existe un evento 037 Endoso en Propiedad" +
-                                        "y/o un evento 041 Limitación de circulación",
+                                        " y/o un evento 041 Limitación de circulación",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -3127,9 +3128,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        {
                            IsValid = false,
                            Mandatory = true,
-                           ErrorCode = "Regla: 89-(R): ",
+                           ErrorCode = "Regla: AAD09-(R): ",
                            ErrorMessage =
-                               "La fecha de la firma del aval debe ser mayor a la Primera Disponibilización",
+                               "IssueDate del evento no puede ser anterior al SigningTime del documento referenciado.",
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
                     }
@@ -3374,65 +3375,65 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorMessageReceiverFETV = string.Empty
             };
 
-            response.errorCodeNote = "AAD11";
+            response.errorCodeNote = "AAD11-(R): ";
             response.errorMessageNote = "No fue informada la nota cuando el evento fue generado por un mandato. ";
             response.errorMessageFETV = "Nombre o Razón social no esta autorizado para generar esté evento";
             response.errorMessageReceiverFETV = "El adquiriente no esta autorizado para recibir esté evento";
 
             //SenderPArty
-            if (eventCode == "030") response.errorCodeFETV = "AAF01a";
-            if (eventCode == "031") response.errorCodeFETV = "AAF01b";
-            if (eventCode == "032") response.errorCodeFETV = "AAF01c";
-            if (eventCode == "033") response.errorCodeFETV = "AAF01d";
-            if (eventCode == "034") response.errorCodeFETV = "AAF01e";
+            if (eventCode == "030") response.errorCodeFETV = "AAF01a-(R): ";
+            if (eventCode == "031") response.errorCodeFETV = "AAF01b-(R): ";
+            if (eventCode == "032") response.errorCodeFETV = "AAF01c-(R): ";
+            if (eventCode == "033") response.errorCodeFETV = "AAF01d-(R): ";
+            if (eventCode == "034") response.errorCodeFETV = "AAF01e-(R): ";
             //ReceiverParty
-            if (eventCode == "030") response.errorCodeReceiverFETV = "AAG01a";
-            if (eventCode == "031") response.errorCodeReceiverFETV = "AAG01b";
-            if (eventCode == "032") response.errorCodeReceiverFETV = "AAG01c";
-            if (eventCode == "033") response.errorCodeReceiverFETV = "AAG01d";
+            if (eventCode == "030") response.errorCodeReceiverFETV = "AAG01a-(R): ";
+            if (eventCode == "031") response.errorCodeReceiverFETV = "AAG01b-(R): ";
+            if (eventCode == "032") response.errorCodeReceiverFETV = "AAG01c-(R): ";
+            if (eventCode == "033") response.errorCodeReceiverFETV = "AAG01d-(R): ";
 
             else if (eventCode == "036")
             {
-                response.errorCodeB = "AAF01b";
+                response.errorCodeB = "AAF01b-(R): ";
                 response.errorMessageB = "No corresponde a la información del Tenedor Legítimo";
-                response.errorCode = "AAF01a";
+                response.errorCode = "AAF01a-(R): ";
                 response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico";
             }
             else if (eventCode == "035")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No fue informado el avalista";
                 response.errorCodeNoteA = "AAD11a";
                 response.errorMessageNoteA = "No fue informada la nota cuando el evento fue generado por un mandato. ";
             }
             else if (eventCode == "037")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo";
             }
             else if (eventCode == "040" || eventCode == "039" || eventCode == "038")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo en su disponibización";
             }
             else if (eventCode == "041")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No fue referenciado la información del Juez o Juzgado";
             }
             else if (eventCode == "043")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No es informado el grupo del Mandante";
             }
             else if (eventCode == "044")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No coincide con la Mandante o Mandatario del mandato";
             }
             else if (eventCode == "045")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No fue informado el Adquirente/Deudor/Aceptante o Tenedor Legítimo";
             }
             return response;
