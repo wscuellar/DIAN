@@ -911,7 +911,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             var partitionKey = $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocument.DocumentKey.Substring(0, 2)}";
 
-            return RedirectToAction(nameof(DocumentController.FindDocument), "Document", new { documentKey = globalDocValidatorDocument.DocumentKey, partitionKey, emissionDate = globalDocValidatorDocument.EmissionDateNumber });
+            return RedirectToAction(nameof(DocumentController.ShowDocumentToPublic), "Document", new { Id = globalDocValidatorDocument.DocumentKey });
         }
 
         [HttpPost]
