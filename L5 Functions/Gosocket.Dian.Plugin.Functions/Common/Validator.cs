@@ -2965,6 +2965,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             var businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
+            ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(data.EventCode);
+            string errorCodeRef = data.EventCode == "030" ? errorCodeMessage.errorCodeSigningTimeAcuse : errorCodeMessage.errorCodeSigningTimeRecibo;
+            string errorMesaageRef = data.EventCode == "030" ? errorCodeMessage.errorMessageigningTimeAcuse : errorCodeMessage.errorMessageigningTimeRecibo;
 
             switch (int.Parse(data.EventCode))
             {
@@ -2985,9 +2988,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: 89-(R): ",
-                            ErrorMessage =
-                                "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
+                            ErrorCode = (data.EventCode == "030" || data.EventCode == "032") ? errorCodeRef : "Regla: 89-(R): ",
+                            ErrorMessage = (data.EventCode == "030" || data.EventCode == "032") ? errorMesaageRef : "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
@@ -3338,7 +3340,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             public string errorMessageFETV { get; set; }
             public string errorCodeReceiverFETV { get; set; }
             public string errorMessageReceiverFETV { get; set; }
-
+            public string errorCodeSigningTimeAcuse { get; set; }
+            public string errorMessageigningTimeAcuse { get; set; }
+            public string errorCodeSigningTimeRecibo { get; set; }
+            public string errorMessageigningTimeRecibo { get; set; }
 
         }
 
@@ -3357,7 +3362,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCodeFETV = string.Empty,
                 errorMessageFETV = string.Empty,
                 errorCodeReceiverFETV = string.Empty,
-                errorMessageReceiverFETV = string.Empty
+                errorMessageReceiverFETV = string.Empty,
+                errorCodeSigningTimeAcuse = string.Empty,
+                errorMessageigningTimeAcuse = string.Empty,
+                errorCodeSigningTimeRecibo = string.Empty,
+                errorMessageigningTimeRecibo = string.Empty
             };
 
             response.errorCodeNote = "AAD11-(R): ";
@@ -3376,6 +3385,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (eventCode == "031") response.errorCodeReceiverFETV = "AAG01b-(R): ";
             if (eventCode == "032") response.errorCodeReceiverFETV = "AAG01c-(R): ";
             if (eventCode == "033") response.errorCodeReceiverFETV = "AAG01d-(R): ";
+            //SigningTime
+            if (eventCode == "030") response.errorCodeSigningTimeAcuse = "DC24a-(R): ";
+            if (eventCode == "030") response.errorMessageigningTimeAcuse = "No se puede generar el evento acuse de recibo de la factura electrónica de venta " +
+                    "antes de la fecha de generación del documento referenciado. ";
+            if (eventCode == "032") response.errorCodeSigningTimeAcuse = "DC24b-(R): ";
+            if (eventCode == "032") response.errorMessageigningTimeAcuse = "No se puede generar el evento recibo de bien prestación de servicio antes de la fecha de generación " +
+                    "del evento acuse de recibo de la factura electrónica de venta.. ";
+
 
             else if (eventCode == "036")
             {
