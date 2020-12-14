@@ -10,8 +10,8 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult FreeBillerUser()
         {
             UserFreeBillerModel model = new UserFreeBillerModel();
-            model.TiposDoc = this.DataTiposDoc();
-            model.Perfiles = this.DataPerfiles();
+            model.TypesDoc = this.DataTiposDoc();
+            model.Profiles = this.DataPerfiles();
             return View(model);
         }
 

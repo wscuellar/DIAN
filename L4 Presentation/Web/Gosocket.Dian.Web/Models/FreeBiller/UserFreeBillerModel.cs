@@ -11,22 +11,22 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
     {
         public int Id { get; set; }
 
-        [DisplayName("Nombres")]
-        public string Nombre { get; set; }
+        [DisplayName("Nombre")]
+        public string Name { get; set; }
 
         [DisplayName("Apellidos")]
-        public string Apellido { get; set; }
+        public string LastName { get; set; }
 
         [DisplayName("Nombres y apellidos")]
-        public string NombreCopleto { get; set; }
+        public string FullName { get; set; }
 
         [DisplayName("Tipo documento")]
-        public string TipoDocId { get; set; }
+        public string TypeDocId { get; set; }
 
-        public List<SelectListItem> TiposDoc { get; set; }
+        public List<SelectListItem> TypesDoc { get; set; }
 
         [DisplayName("Número documento")]
-        public string Numerodoc { get; set; }
+        public string NumberDoc { get; set; }
 
         [DisplayName("Correo electrónico")]
         public string Email { get; set; }
@@ -35,8 +35,8 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public string Password { get; set; }
 
         [DisplayName("Perfil")]
-        public int PerfilId { get; set; }
+        public int ProfileId { get; set; }
 
-        public List<SelectListItem> Perfiles { get; set; }
+        public List<SelectListItem> Profiles { get; set; }
     }
 }

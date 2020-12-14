@@ -328,6 +328,7 @@
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ExternalUsersController.cs" />
+    <Compile Include="Controllers\FreeBillerController.cs" />
     <Compile Include="Controllers\OthersElectronicDocumentsController.cs" />
     <Compile Include="Controllers\QueryAssociatedEventsController.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
@@ -370,6 +371,8 @@
     <Compile Include="Models\AutoListModel.cs" />
     <Compile Include="Models\EventsCounterViewModel.cs" />
     <Compile Include="Models\FileHistoryFilterViewModel.cs" />
+    <Compile Include="Models\FreeBiller\UserFiltersFreeBillerModel.cs" />
+    <Compile Include="Models\FreeBiller\UserFreeBillerModel.cs" />
     <Compile Include="Models\OthersElectronicDocumentsViewModel.cs" />
     <Compile Include="Models\ParametersDataViewModel.cs" />
     <Compile Include="Models\ContingencyViewModel.cs" />
@@ -2905,6 +2908,7 @@
     <Content Include="Views\OthersElectronicDocuments\AddParticipants.cshtml" />
     <Content Include="Views\FreeBiller\EditFreeBillerUser.cshtml" />
     <Content Include="Views\FreeBiller\FreeBillerUser.cshtml" />
+    <Content Include="Views\FreeBiller\CreateUser.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
