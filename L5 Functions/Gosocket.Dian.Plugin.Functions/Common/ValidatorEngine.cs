@@ -143,19 +143,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 case (int)EventStatus.Receipt:
                     code = EventStatus.Received; 
-                    break;
-                case (int)EventStatus.TerminacionMandato:
-                    code = EventStatus.Mandato;
-                    break;
-                case (int)EventStatus.EndosoProcuracion:
-                    code = EventStatus.SolicitudDisponibilizacion;
-                    break;
+                    break;              
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     code = EventStatus.Accepted;
-                    break;
-                case (int)EventStatus.AnulacionLimitacionCirculacion:
-                    code = EventStatus.NegotiatedInvoice;
-                    break;
+                    break;              
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                 case (int)EventStatus.NegotiatedInvoice:
                     code = EventStatus.SolicitudDisponibilizacion;
@@ -171,10 +162,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(data.EventCode) == (int)EventStatus.Rejected ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Receipt ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.TerminacionMandato ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||                
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                 )

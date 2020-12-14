@@ -32,6 +32,7 @@
         public string DocumentTypeIdRef { get; set; }
         public string DocumentTypeId { get; set; }
         public string SerieAndNumber { get; set; }
+        public string ValidityPeriodEndDate { get; set; }
 
     }
 }
