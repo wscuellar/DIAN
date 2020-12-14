@@ -438,7 +438,22 @@ namespace Gosocket.Dian.Application
 
         public RadianTestSetResult GetSetTestResult(string code, string softwareId, string softwareType)
         {
-            RadianOperationModeTestSet softwareTypeEnum = EnumHelper.GetValueFromDescription<RadianOperationModeTestSet>(softwareType);
+            RadianOperationModeTestSet softwareTypeEnum = RadianOperationModeTestSet.OwnSoftware;
+            switch (softwareType)
+            {
+                case "Software Propio":
+                    softwareTypeEnum = RadianOperationModeTestSet.OwnSoftware;
+                    break;
+                case "Software de un proveedor tecnológico":
+                    softwareTypeEnum = RadianOperationModeTestSet.SoftwareTechnologyProvider;
+                    break;
+                case "Software de un sistema de negociación":
+                    softwareTypeEnum = RadianOperationModeTestSet.SoftwareTradingSystem;
+                    break;
+                case "Software de un factor":
+                    softwareTypeEnum = RadianOperationModeTestSet.SoftwareFactor;
+                    break;
+            }
             string key = ((int)softwareTypeEnum).ToString() + "|" + softwareId;
             return _radianTestSetResultManager.GetTestSetResult(code, key);
         }
