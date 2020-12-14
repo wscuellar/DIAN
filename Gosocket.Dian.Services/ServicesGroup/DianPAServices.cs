@@ -1052,17 +1052,20 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.StatusCode = Properties.Settings.Default.Code_00;
                     dianResponse.StatusMessage = message;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Procees_Sucessfull;
-                    validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { DocumentKey = trackIdCude, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };                   
+                    validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { DocumentKey = trackIdCude, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };
 
-                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude });
-                    if (processEventResponse.Code != Properties.Settings.Default.Code_100)
+                    if(Convert.ToInt32(eventCode) != (int)EventStatus.Mandato)
                     {
-                        dianResponse.IsValid = false;
-                        dianResponse.XmlFileName = contentFileList.First().XmlFileName;
-                        dianResponse.StatusCode = processEventResponse.Code;
-                        dianResponse.StatusDescription = processEventResponse.Message;                      
-                        UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
-                        return dianResponse;
+                        var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude });
+                        if (processEventResponse.Code != Properties.Settings.Default.Code_100)
+                        {
+                            dianResponse.IsValid = false;
+                            dianResponse.XmlFileName = contentFileList.First().XmlFileName;
+                            dianResponse.StatusCode = processEventResponse.Code;
+                            dianResponse.StatusDescription = processEventResponse.Message;                      
+                            UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+                            return dianResponse;
+                        }
                     }
                     UpdateFinishAttorney(trackIdCude, documentParsed.DocumentKey.ToLower(), eventCode);
                 }
@@ -1102,6 +1105,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                 Task.WhenAll(arrayTasks);
 
+                if (!errors.Any() && Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && !flag)
+                {
+                    var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
+                }
                 var lastZone = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_LastZone) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 TableManagerGlobalLogger.InsertOrUpdate(lastZone);
                 // LAST ZONE
@@ -1627,9 +1635,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
         
         private DianResponse ValidationReferenceAttorney(string trackId)
         {
-
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });            
-            
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateReferenceAttorney", new { trackId });
+                                                                                         
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
