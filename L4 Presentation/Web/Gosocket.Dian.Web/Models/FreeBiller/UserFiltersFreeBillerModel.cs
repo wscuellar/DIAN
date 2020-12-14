@@ -22,5 +22,8 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public List<SelectListItem> DocTypes { get; set; }
 
         public List<SelectListItem> Profiles { get; set; }
+
+        public List<UserFreeBillerModel> Users { get; set; }
+
     }
 }

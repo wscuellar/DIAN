@@ -15,19 +15,13 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-
-            return View();
-        }
+        
         public ActionResult EditFreeBillerUser(UserFreeBillerModel model)
         {
             return View();
         }
-        public ActionResult CreateUser()
+        public ActionResult CreateUser(UserFreeBillerModel model)
         {
-            UserFreeBillerModel model = new UserFreeBillerModel();
-            model.TiposDoc = this.DataTiposDoc();
-            model.Perfiles = this.DataPerfiles();
-
             return View(model);
 
         }

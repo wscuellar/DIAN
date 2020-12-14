@@ -1,4 +1,4 @@
-﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFreeBillerModel
+﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFiltersFreeBillerModel
 @{
     ViewBag.Title = "FreeBillerUser";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -27,14 +27,14 @@
         margin: 7px;
     }
 
-    input[type=text] {
-        background: #FFFFFF;
-        border: 1px solid #CCCCCC;
-        box-sizing: border-box;
-        border-radius: 4px;
-        height: 41px;
-        width: 100%;
-    }
+        input[type=text] {
+            background: #FFFFFF;
+            border: 1px solid #CCCCCC;
+            box-sizing: border-box;
+            border-radius: 4px;
+            height: 41px;
+            width: 100%;
+        }
 
     select {
         background: #FFFFFF;
@@ -80,5 +80,45 @@
 <h2>FreeBillerUser</h2>
 
 <div class="container">
+
+    <div id="divFilters" class="container">
+
+        <div class="row">
+            <div class="col-md-3" style="background: #FFFFFF">
+                @Html.LabelFor(m => m.DocTypeId)
+                @Html.DropDownListFor(m => m.DocTypeId, Model.DocTypes, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+            <div class="col-md-3">
+                @Html.LabelFor(m => m.DocNumber)
+                @Html.EditorFor(model => model.DocNumber, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+            <div class="col-md-3">
+                @Html.LabelFor(m => m.FullName)
+                @Html.EditorFor(m => m.FullName, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+            <div class="col-md-3">
+                @Html.LabelFor(m => m.ProfileId)
+                @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+
+            </div>
+            <div class="col-md-3">
+
+            </div>
+            <div class="col-md-3">
+
+            </div>
+            <div class="col-md-3">
+                <input type="button" class="btnSuccess" value="Buscar" />
+            </div>
+        </div>
+
+    </div>
+
+
     @Html.Partial("CreateUser", Model)
 </div>
