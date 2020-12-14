@@ -403,7 +403,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a El software de la operación tiene clientes asociados..
+        ///   Busca una cadena traducida similar a El software de la operación tiene {0} clientes asociados..
         /// </summary>
         public static string WithCustomerList {
             get {

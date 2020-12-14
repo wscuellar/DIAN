@@ -430,23 +430,11 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
         }
 
-        public string GetAssociatedClients(int radianContributorId)
+        public int GetAssociatedClients(int radianContributorId)
         {
             List<RadianCustomerList> customerLists = _radianContributorRepository.CustomerList(radianContributorId, string.Empty, string.Empty).Results;
-            if (!customerLists.Any())
-                return string.Empty;
-            StringBuilder message = new StringBuilder();
-            message.AppendFormat("<div class='htmlalert'><p>{0}</p>", TextResources.WithCustomerList);
-            message.Append("<ul>");
-            foreach (RadianCustomerList customer in customerLists)
-            {
-                message.AppendFormat("<li>{0}</li>", customer.Nit + "-" + customer.BussinessName);
-            }
-            message.Append("</ul></div>");
-            return message.ToString();
+            return customerLists.Count;
         }
-
-
 
         public RadianTestSetResult GetSetTestResult(string code, string softwareId, string softwareType)
         {

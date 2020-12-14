@@ -58,8 +58,10 @@ namespace Gosocket.Dian.DataContext.Repositories
                                                     join c in sqlDBContext.Contributors on rc2.ContributorId equals c.Id
                                                     where rc.Id == id
                                                     && rco.SoftwareType != 1
+                                                    && rc2.RadianState != "Cancelado"
                                                     && (string.IsNullOrEmpty(code) || c.Code == code)
                                                     && (string.IsNullOrEmpty(radianState) || rc2.RadianState == radianState)
+                                                    
                                                     select new RadianCustomerList()
                                                     {
                                                         Id = rc2.Id,
