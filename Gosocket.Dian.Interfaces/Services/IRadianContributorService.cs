@@ -13,8 +13,15 @@ namespace Gosocket.Dian.Interfaces.Services
         /// </summary>
         /// <param name="userCode"></param>
         /// <returns></returns>
-        NameValueCollection Summary(string userCode);
-        ResponseMessage RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode);
+        NameValueCollection Summary(int contributorId);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="contributorId"></param>
+        /// <param name="radianContributorType"></param>
+        /// <param name="radianOperationMode"></param>
+        /// <returns></returns>
+        ResponseMessage RegistrationValidation(int contributorId, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode);
 
         /// <summary>
         /// Consulta de participantes de radian en estado Registrado

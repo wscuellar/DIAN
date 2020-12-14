@@ -51,6 +51,6 @@ namespace Gosocket.Dian.Interfaces
         /// <returns></returns>
         List<OperationMode> GetOperationModes();
 
-        Software GetBaseSoftwareForRadian(int contributorid);
+        List<Software> GetBaseSoftwareForRadian(int contributorid);
     }
 }
