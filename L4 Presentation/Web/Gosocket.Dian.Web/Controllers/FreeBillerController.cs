@@ -1,6 +1,4 @@
-﻿using Gosocket.Dian.Web.Models.FreeBiller;
-using System.Collections.Generic;
-using System.Web.Mvc;
+﻿using System.Collections.Generic;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -9,14 +7,10 @@ namespace Gosocket.Dian.Web.Controllers
         // GET: FreeBiller
         public ActionResult FreeBillerUser()
         {
-            UserFreeBillerModel model = new UserFreeBillerModel();
-            model.TiposDoc = this.DataTiposDoc();
-            model.Perfiles = this.DataPerfiles();
-            return View(model);
+
+
+            return View();
         }
-
-
-          
         public ActionResult EditFreeBillerUser(UserFreeBillerModel model)
         {
             return View();
