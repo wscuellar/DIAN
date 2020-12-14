@@ -1431,3 +1431,31 @@ button.selectpicker .fa-caret-down {
 .documents-table {
     text-align: center;
 }
+
+.custom-badget-blue{
+    background-color: #028AB7;
+    color: white;
+}
+.custom-badget-green{
+    background-color: #348441;
+    color: white;
+}
+.custom-badget-red {
+    background-color: #B81818;
+    color: white;
+}
+.col-pr-50 {
+    padding-right: 50px !important;
+}
+
+.set-test-counts .panel-body {
+    padding-left: 40px;
+}
+
+.show-details {
+    color: #348441;
+}
+
+.show-details a{
+    padding: 0px;
+}
