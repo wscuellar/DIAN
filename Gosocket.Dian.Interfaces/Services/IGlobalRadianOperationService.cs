@@ -13,6 +13,7 @@ namespace Gosocket.Dian.Interfaces.Services
         bool IsActive(string code, Guid softwareId);
         List<GlobalRadianOperations> OperationList(string code);
         bool SoftwareAdd(GlobalSoftware item);
-        
+        GlobalRadianOperations EnableParticipantRadian(string code, string softwareId);
+        bool Delete(string code, string v);
     }
 }

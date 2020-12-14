@@ -79,6 +79,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Todos los archivos deben estar en estado &apos;Aceptado&apos; para poder cambiar el estado del participante..
+        /// </summary>
+        public static string AllSoftware {
+            get {
+                return ResourceManager.GetString("AllSoftware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a confirm.
         /// </summary>
         public static string confirmType {
@@ -205,6 +214,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Este modo de operación carece de Set de Pruebas!!!.
+        /// </summary>
+        public static string ModeWithoutTestSet {
+            get {
+                return ResourceManager.GetString("ModeWithoutTestSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El usuario no habilitado para el sistema!!!.
         /// </summary>
         public static string NonExistentParticipant {
@@ -219,6 +237,33 @@ namespace Gosocket.Dian.Common.Resources {
         public static string OnlyActiveProcess {
             get {
                 return ResourceManager.GetString("OnlyActiveProcess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a ¿Desea iniciar el proceso de habilitación para @docume?.
+        /// </summary>
+        public static string OthersElectronicDocumentsSelect_Confirm {
+            get {
+                return ResourceManager.GetString("OthersElectronicDocumentsSelect_Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a ¿Desea habilitar la trasmisión de &quot;Otros Documentos Electrónicos&quot; en el sistema como @Participante de otros documentos electrónicos?.
+        /// </summary>
+        public static string OthersElectronicDocumentsSelectOperationMode_Confirm {
+            get {
+                return ResourceManager.GetString("OthersElectronicDocumentsSelectOperationMode_Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a ¿Desea iniciar el proceso como para @Participante de otros documentos electrónicos?.
+        /// </summary>
+        public static string OthersElectronicDocumentsSelectParticipante_Confirm {
+            get {
+                return ResourceManager.GetString("OthersElectronicDocumentsSelectParticipante_Confirm", resourceCulture);
             }
         }
         
@@ -331,11 +376,29 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Los participantes &apos;En pruebas&apos; no se pueden cancelar..
+        /// </summary>
+        public static string TestNotRemove {
+            get {
+                return ResourceManager.GetString("TestNotRemove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a ¿Está seguro que desea operar como Sistema de Negociación?.
         /// </summary>
         public static string TradingSystem_Confirm {
             get {
                 return ResourceManager.GetString("TradingSystem_Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El software de la operación tiene clientes asociados..
+        /// </summary>
+        public static string WithCustomerList {
+            get {
+                return ResourceManager.GetString("WithCustomerList", resourceCulture);
             }
         }
     }

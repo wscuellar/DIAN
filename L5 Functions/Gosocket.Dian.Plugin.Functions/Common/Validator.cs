@@ -32,6 +32,7 @@ using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Common;
 using System.Text.RegularExpressions;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -238,7 +239,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 fakeData = $"{cufeModel.SerieAndNumber}---{cufeModel.EmissionDate}---{cufeModel.HourEmission}---{cufeModel.SenderCode}---{cufeModel.ReceiverCode}---{cufeModel.ResponseCode}---{cufeModel.ReferenceId}---{cufeModel.ReferenceTypeCode}---{key}";
 
-                if (cufeModel.ResponseCode == "038" && cufeModel.ResponseCodeListID == "2")
+                if ( (cufeModel.ResponseCode == "037" || cufeModel.ResponseCode == "038" || cufeModel.ResponseCode == "039") && cufeModel.ResponseCodeListID == "2")
                 {
                     //Endoso en garantia en blanco
                     data = $"{cufeModel.SerieAndNumber}{cufeModel.EmissionDate}{cufeModel.HourEmission}{cufeModel.ReceiverCode}{cufeModel.ResponseCode}{cufeModel.ResponseCodeListID}{cufeModel.ReferenceId}{cufeModel.ReferenceTypeCode}{key}";
@@ -273,7 +274,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var ValDesc = objCune.ValDesc?.Trim();
             var ValTol = objCune.ValTol?.Trim();
             var errorCode = "FAD06";
-            var prop = "CUFE";
+            var prop = "CUNE";
 
             string key = string.Empty;
 
@@ -305,10 +306,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var HorNIE = objCune.HorNIE;
             var NitNIE = objCune.NitNIE;
             var DocEmp = objCune.DocEmp;
-            var SoftwarePin = objCune.SoftwarePin;
+            var SoftwarePin = objCune.SoftwareId;
             var TipAmb = objCune.TipAmb;
 
-            var numberSha384 = $"{NumNIE}{FechNIE}{HorNIE}{ValDev}{ValDesc}{ValTol}{NitNIE}{DocEmp}{SoftwarePin}{TipAmb}{key}";
+            var numberSha384 = $"{NumNIE}{FechNIE}{HorNIE}{ValDev}{ValDesc}{ValTol}{NitNIE}{DocEmp}{SoftwarePin}{TipAmb}";
 
             var hash = numberSha384.EncryptSHA384();
 
@@ -1306,6 +1307,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
         {
             NitModel nitModel = new NitModel();
+            string issuerPartyName = string.Empty;
             int attorneyLimit = Properties.Settings.Default.MAX_Attorney;
             bool validate = true;
             string validateCufeErrorCode = "Regla: 89-(R): ";
@@ -1417,9 +1419,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                 attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 attorneyModel.idTypeDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
-                //Valida CUFE referenciado existe en sistema DIAN
-                nitModel.DocumentKey = attorneyModel.cufe;
-                var resultValidateCufe = ValidateDocumentReferencePrev(nitModel, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference);
+                //Valida CUFE referenciado existe en sistema DIAN                
+                var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference, issuerPartyCode, issuerPartyName);
                 if (resultValidateCufe[0].IsValid)
                     attorney.Add(attorneyModel);
                 else
@@ -1970,8 +1971,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validación de la Sección DocumentReference - CUFE Informado
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
-        public List<ValidateListResponse> ValidateDocumentReferencePrev(NitModel nitModel, string idDocumentReference, string eventCode, 
-            string documentTypeIdRef, string IssuerPartyCode = null, string IssuerPartyName = null)
+        public List<ValidateListResponse> ValidateDocumentReferencePrev(string trackId, string idDocumentReference, string eventCode, 
+            string documentTypeIdRef, string issuerPartyCode = null, string issuerPartyName = null)
         {
             string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato) 
                 ? "No corresponde a un tipo de documento valido"
@@ -1980,7 +1981,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
             //Valida exista CUFE/CUDE en sistema DIAN
-            var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(nitModel.DocumentKey.ToLower()).FirstOrDefault();
+            var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(trackId.ToLower()).FirstOrDefault();
             if (documentMeta == null)
             {
                 responses.Add(new ValidateListResponse
@@ -1991,6 +1992,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
+
+                return responses;
             }
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
@@ -2026,7 +2029,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
             {
                 //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
-                if (documentMeta.ReceiverCode != IssuerPartyCode)
+                if (documentMeta.ReceiverCode != issuerPartyCode)
                 {
                     responses.Add(new ValidateListResponse
                     {
@@ -2038,7 +2041,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
                 //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
-                if (documentMeta.ReceiverName != IssuerPartyName)
+                if (documentMeta.ReceiverName != issuerPartyName)
                 {
                     responses.Add(new ValidateListResponse
                     {
@@ -2074,6 +2077,61 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
+            //Valida eventos previos terminacion de mandato
+            if (eventPrev.EventCode == "044")
+            {
+                //Valida exista mandato
+                var arrayTasks = new List<Task>();
+                List<GlobalDocReferenceAttorney> documentsAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(eventPrev.TrackId).ToList();
+                if (documentsAttorney == null)
+                {
+                    validFor = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: 89-(R): ",
+                        ErrorMessage = "No es posible realizar la Terminación de Mandato, no existe un Mandato registrado con este CUDE referenciado",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                else
+                {
+                    foreach (var documentAttorney in documentsAttorney)
+                    {
+                        //Valida exista un mandato vigente activo
+                        if (!documentAttorney.Active)
+                        {
+                            validFor = true;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "Regla: 89-(R): ",
+                                ErrorMessage = "No es posible realizar la Terminación de Mandato, no existe una Mandato vigente a la fecha",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        if (validFor)
+                        {
+                            return responses;
+                        }
+                    }
+                }
+
+                if (!validFor)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = "Evento referenciado correctamente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                return responses;
+            }
 
             foreach (var documentIdentifier in documentMeta)
             {
@@ -2082,8 +2140,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //if (document != null)
                 if (documentMeta.Count >= 2)
                 {
-                    //No valida Evento registrado previamente para solictud de disponibilizacion posterior
-                    if ((eventPrev.CustomizationID != "363" && eventPrev.CustomizationID != "364"))
+                    //No valida Evento registrado previamente para solictud de disponibilizacion posterior, Aval y Terminacion de Mandato
+                    if ((eventPrev.CustomizationID != "363" && eventPrev.CustomizationID != "364" 
+                        && eventPrev.EventCode != "035"))
                     {
                         if (documentMeta.Where(t => t.EventCode == eventPrev.EventCode
                         && document != null
@@ -2634,7 +2693,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ErrorMessage = "Evento referenciado correctamente",
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
-                                break;
+                                break;                          
                             case (int)EventStatus.NotificacionPagoTotalParcial:
                                 //Si el titulo valor tiene una limitación previa (041)
                                 if (documentMeta
@@ -2728,6 +2787,59 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return responses;
         }
 
+        //private ValidateListResponse ValidateAval(XmlParser xmlParserCufe, XmlParser xmlParserCude)
+        //{
+        //    DateTime startDate = DateTime.UtcNow;
+        //    string valueTotalInvoice = xmlParserCufe.TotalInvoice;
+
+        //    XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+        //    int totalValueSender = 0;
+        //    for (int i = 0; i < valueListSender.Count; i++)
+        //    {
+        //        string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+        //        // Si no se reporta, el Avalista asume el valor del monto de quien respalda...
+        //        if (string.IsNullOrWhiteSpace(valueStockAmount)) return null;
+
+        //        totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+        //    }
+
+        //    if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+        //    {
+        //        return new ValidateListResponse
+        //        {
+        //            IsValid = false,
+        //            Mandatory = true,
+        //            ErrorCode = "Regla: 89-(R): ",
+        //            ErrorMessage = $"{(string)null} El valor reportado del elemento SenderParty supera el valor total del Título Valor.",
+        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+        //        };
+        //    }
+
+        //    XmlNodeList valueListIssuerParty = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']");
+        //    // En caso de no indicarlo quedan garantizadas las obligaciones de todas las partes del título.
+        //    if (valueListIssuerParty.Count <= 0) return null;
+
+        //    int totalValueIssuerParty = 0;
+        //    for (int i = 0; i < valueListIssuerParty.Count; i++)
+        //    {
+        //        string valueStockAmount = valueListIssuerParty.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+        //        if (!string.IsNullOrWhiteSpace(valueStockAmount)) totalValueIssuerParty += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+        //    }
+
+        //    if (totalValueIssuerParty != totalValueSender)
+        //    {
+        //        return new ValidateListResponse
+        //        {
+        //            IsValid = false,
+        //            Mandatory = true,
+        //            ErrorCode = "Regla: AAH32c-(R): ",
+        //            ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
+        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+        //        };
+        //    }           
+
+        //    return null;
+        //}
         private ValidateListResponse ValidateAval(XmlParser xmlParserCufe, XmlParser xmlParserCude)
         {
             DateTime startDate = DateTime.UtcNow;
@@ -2742,6 +2854,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (string.IsNullOrWhiteSpace(valueStockAmount)) return null;
 
                 totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+
+                // Si se reporta, pero en ceros (0), el Avalista asume el valor del monto de quien respalda...
+                if (totalValueSender == 0) return null;
             }
 
             if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
@@ -2767,6 +2882,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (!string.IsNullOrWhiteSpace(valueStockAmount)) totalValueIssuerParty += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
 
+            if (totalValueIssuerParty == 0) return null;
+
             if (totalValueIssuerParty != totalValueSender)
             {
                 return new ValidateListResponse
@@ -2777,8 +2894,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 };
-            }           
-          
+            }
+
             return null;
         }
         #endregion
@@ -2995,9 +3112,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        {
                            IsValid = false,
                            Mandatory = true,
-                           ErrorCode = "Regla: 89-(R): ",
+                           ErrorCode = "Regla: AAD09-(R): ",
                            ErrorMessage =
-                               "La fecha de la firma del aval debe ser mayor a la Primera Disponibilización",
+                               "IssueDate del evento no puede ser anterior al SigningTime del documento referenciado.",
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
                     }
@@ -3057,7 +3174,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.TerminacionMandato:
                     DateTime signingTime = Convert.ToDateTime(data.SigningTime);
                     //General por tiempo ilimitado_432 - limitado por tiempo ilimitado_434
-                    if (dataModel.CustomizationID == "432" || dataModel.CustomizationID == "434") //que se mayor
+                    if (nitModel.CustomizationId == "432" || nitModel.CustomizationId == "434") //que se mayor
                     {
                         DateTime dateMandato = Convert.ToDateTime(dataModel.SigningTime);
                         if (signingTime >= dateMandato)
@@ -3084,9 +3201,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
                     // General por tiempo limitado_431 - limitado por tiempo limitado_433
-                    else if (dataModel.CustomizationID == "431" || dataModel.CustomizationID == "433")  //que sea menor
+                    else if (nitModel.CustomizationId == "431" || nitModel.CustomizationId == "433")  //que sea menor
                     {
-                        DateTime endDateMandato = Convert.ToDateTime(dataModel.FieldValue("EndDate"));
+                        DateTime endDateMandato = Convert.ToDateTime(nitModel.ValidityPeriodEndDate);
                         if (signingTime <= endDateMandato)
                         {
                             responses.Add(new ValidateListResponse
@@ -3242,65 +3359,65 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorMessageReceiverFETV = string.Empty
             };
 
-            response.errorCodeNote = "AAD11";
+            response.errorCodeNote = "AAD11-(R): ";
             response.errorMessageNote = "No fue informada la nota cuando el evento fue generado por un mandato. ";
             response.errorMessageFETV = "Nombre o Razón social no esta autorizado para generar esté evento";
             response.errorMessageReceiverFETV = "El adquiriente no esta autorizado para recibir esté evento";
 
             //SenderPArty
-            if (eventCode == "030") response.errorCodeFETV = "AAF01a";
-            if (eventCode == "031") response.errorCodeFETV = "AAF01b";
-            if (eventCode == "032") response.errorCodeFETV = "AAF01c";
-            if (eventCode == "033") response.errorCodeFETV = "AAF01d";
-            if (eventCode == "034") response.errorCodeFETV = "AAF01e";
+            if (eventCode == "030") response.errorCodeFETV = "AAF01a-(R): ";
+            if (eventCode == "031") response.errorCodeFETV = "AAF01b-(R): ";
+            if (eventCode == "032") response.errorCodeFETV = "AAF01c-(R): ";
+            if (eventCode == "033") response.errorCodeFETV = "AAF01d-(R): ";
+            if (eventCode == "034") response.errorCodeFETV = "AAF01e-(R): ";
             //ReceiverParty
-            if (eventCode == "030") response.errorCodeReceiverFETV = "AAG01a";
-            if (eventCode == "031") response.errorCodeReceiverFETV = "AAG01b";
-            if (eventCode == "032") response.errorCodeReceiverFETV = "AAG01c";
-            if (eventCode == "033") response.errorCodeReceiverFETV = "AAG01d";
+            if (eventCode == "030") response.errorCodeReceiverFETV = "AAG01a-(R): ";
+            if (eventCode == "031") response.errorCodeReceiverFETV = "AAG01b-(R): ";
+            if (eventCode == "032") response.errorCodeReceiverFETV = "AAG01c-(R): ";
+            if (eventCode == "033") response.errorCodeReceiverFETV = "AAG01d-(R): ";
 
             else if (eventCode == "036")
             {
-                response.errorCodeB = "AAF01b";
+                response.errorCodeB = "AAF01b-(R): ";
                 response.errorMessageB = "No corresponde a la información del Tenedor Legítimo";
-                response.errorCode = "AAF01a";
+                response.errorCode = "AAF01a-(R): ";
                 response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico";
             }
             else if (eventCode == "035")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No fue informado el avalista";
                 response.errorCodeNoteA = "AAD11a";
                 response.errorMessageNoteA = "No fue informada la nota cuando el evento fue generado por un mandato. ";
             }
             else if (eventCode == "037")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo";
             }
             else if (eventCode == "040" || eventCode == "039" || eventCode == "038")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo en su disponibización";
             }
             else if (eventCode == "041")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No fue referenciado la información del Juez o Juzgado";
             }
             else if (eventCode == "043")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No es informado el grupo del Mandante";
             }
             else if (eventCode == "044")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No coincide con la Mandante o Mandatario del mandato";
             }
             else if (eventCode == "045")
             {
-                response.errorCode = "AAF01";
+                response.errorCode = "AAF01-(R): ";
                 response.errorMessage = "No fue informado el Adquirente/Deudor/Aceptante o Tenedor Legítimo";
             }
             return response;

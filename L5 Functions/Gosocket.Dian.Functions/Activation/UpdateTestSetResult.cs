@@ -1,5 +1,6 @@
 using Gosocket.Dian.Application;
 using Gosocket.Dian.DataContext.Repositories;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
@@ -33,6 +34,10 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
         private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
+        private static readonly TableManager radianTestSetTableManager = new TableManager("RadianTestSet");
+        private static readonly TableManager globalRadianOperations = new TableManager("GlobalRadianOperations");
+        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+
 
         // Set queue name 
         private const string queueName = "global-test-set-tracking-input%Slot%";
@@ -46,121 +51,25 @@ namespace Gosocket.Dian.Functions.Activation
             {
                 var eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
                 var globalTestSetTracking = JsonConvert.DeserializeObject<GlobalTestSetTracking>(eventGridEvent.Data.ToString());
+
                 await globalTestSetTrackingTableManager.InsertOrUpdateAsync(globalTestSetTracking);
 
                 var allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
+                var operation = globalRadianOperations.Find<GlobalRadianOperations>(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
+                var radianTestSet = radianTestSetTableManager.FindByPartition<RadianTestSet>(operation.SoftwareType.ToString());
+               
 
-                var testSetResults = globalTestSetResultTableManager.FindByPartition<GlobalTestSetResult>(globalTestSetTracking.SenderCode);
-
-                if (testSetResults != null)  // Roberto Alvarado --> Esto es para mantener lo de Factura Electronica tal cual esta actualmente 2020/11/25
-                {
-                    #region Factura Electronica 
-
-                    var globalTesSetResult = testSetResults.SingleOrDefault(t => !t.Deleted && t.Id == globalTestSetTracking.TestSetId && t.Status == (int)TestSetStatus.InProcess);
-
-                    if (globalTesSetResult == null)
-                        return;
-
-                    var globalTestSet = globalTestSetTableManager.Find<GlobalTestSet>(globalTesSetResult.TestSetReference, globalTesSetResult.TestSetReference);
-
-                    string[] invoiceCodes = { "1", "01", "02", "03" };
-                    string[] creditNoteCodes = { "7", "91" };
-                    string[] debitNoteCodes = { "8", "92" };
-
-                    globalTesSetResult.Id = globalTestSetTracking.TestSetId;
-
-                    globalTesSetResult.TotalDocumentSent = allGlobalTestSetTracking.Count;
-                    globalTesSetResult.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
-                    globalTesSetResult.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
+                string resultJson = JsonConvert.SerializeObject(radianTestSet);
+                var lastZone = new GlobalLogger("13579", "13579") { Message = resultJson };
+                TableManagerGlobalLogger.InsertOrUpdate(lastZone);
 
 
-                    globalTesSetResult.InvoicesTotalSent = allGlobalTestSetTracking.Count(a => invoiceCodes.Contains(a.DocumentTypeId));
-                    globalTesSetResult.TotalInvoicesAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && invoiceCodes.Contains(a.DocumentTypeId));
-                    globalTesSetResult.TotalInvoicesRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && invoiceCodes.Contains(a.DocumentTypeId));
 
-                    globalTesSetResult.TotalCreditNotesSent = allGlobalTestSetTracking.Count(a => creditNoteCodes.Contains(a.DocumentTypeId));
-                    globalTesSetResult.TotalCreditNotesAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && creditNoteCodes.Contains(a.DocumentTypeId));
-                    globalTesSetResult.TotalCreditNotesRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && creditNoteCodes.Contains(a.DocumentTypeId));
-
-                    globalTesSetResult.TotalDebitNotesSent = allGlobalTestSetTracking.Count(a => debitNoteCodes.Contains(a.DocumentTypeId));
-                    globalTesSetResult.TotalDebitNotesAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && debitNoteCodes.Contains(a.DocumentTypeId));
-                    globalTesSetResult.TotalDebitNotesRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && debitNoteCodes.Contains(a.DocumentTypeId));
-
-                    if (globalTesSetResult.TotalInvoicesAccepted >= globalTesSetResult.TotalInvoicesAcceptedRequired && globalTesSetResult.TotalCreditNotesAccepted >= globalTesSetResult.TotalCreditNotesAcceptedRequired && globalTesSetResult.TotalDebitNotesAccepted >= globalTesSetResult.TotalDebitNotesAcceptedRequired && globalTesSetResult.Status == (int)TestSetStatus.InProcess)
-                        globalTesSetResult.Status = (int)TestSetStatus.Accepted;
-
-                    if (globalTesSetResult.TotalDocumentsRejected > (globalTesSetResult.TotalDocumentRequired - globalTesSetResult.TotalDocumentAcceptedRequired) && globalTesSetResult.Status == (int)TestSetStatus.InProcess)
-                        globalTesSetResult.Status = (int)TestSetStatus.Rejected;
-
-                    await globalTestSetResultTableManager.InsertOrUpdateAsync(globalTesSetResult);
-
-                    if (globalTesSetResult.Status == (int)TestSetStatus.Accepted)
-                    {
-                        // partition key are sender code.
-                        var contributor = contributorService.GetByCode(globalTesSetResult.PartitionKey);
-                        if (contributor.AcceptanceStatusId == (int)ContributorStatus.Registered)
-                        {
-                            contributorService.SetToEnabled(contributor);
-                            var globalContributor = new GlobalContributor(contributor.Code, contributor.Code) { Code = contributor.Code, StatusId = contributor.AcceptanceStatusId, TypeId = contributor.ContributorTypeId };
-                            await contributorTableManager.InsertOrUpdateAsync(globalContributor);
-                        }
-
-                        var software = softwareService.Get(Guid.Parse(globalTesSetResult.SoftwareId));
-                        if (software.AcceptanceStatusSoftwareId == (int)Domain.Common.OperationMode.Own
-                            && globalTesSetResult.OperationModeId != (int)Domain.Common.OperationMode.Free)
-                        {
-                            softwareService.SetToProduction(software);
-                            var softwareId = software.Id.ToString();
-                            var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
-                            await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
-                        }
-
-
-                        // Send to activate contributor in production
-                        if (ConfigurationManager.GetValue("Environment") == "Hab")
-                        {
-                            try
-                            {
-                                var requestObject = new { contributorId = contributor.Id };
-                                var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), requestObject);
-
-                                var guid = Guid.NewGuid().ToString();
-                                var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
-                                {
-                                    Success = activation.Success,
-                                    ContributorCode = contributor.Code,
-                                    ContributorTypeId = contributor.ContributorTypeId,
-                                    OperationModeId = globalTesSetResult.OperationModeId,
-                                    OperationModeName = globalTesSetResult.OperationModeName,
-                                    SentToActivateBy = "Function",
-                                    SoftwareId = globalTesSetResult.SoftwareId,
-                                    SendDate = DateTime.UtcNow,
-                                    TestSetId = globalTesSetResult.Id,
-                                    Trace = activation.Trace,
-                                    Message = activation.Message,
-                                    Detail = activation.Detail,
-                                    Request = JsonConvert.SerializeObject(requestObject)
-                                };
-                                await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
-
-                                if (globalTesSetResult.OperationModeId == (int)SoftwareStatus.Production)
-                                    await MigrateCertificate(contributor.Code);
-
-                            }
-                            catch (Exception ex)
-                            {
-                                log.Error($"Error al enviar a activar contribuyente con id {contributor.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
-                                throw;
-                            }
-                        }
-                    }
-                    #endregion 
-                }
-                else
+                //Valida RADIAN
+                if (radianTestSet != null)
                 {
                     // Roberto Alvarado 20202/11/25
                     // Proceso de RADIAN TestSetResults
-                    #region Proceso Documentos RADIAN
 
                     var result = new List<XmlParamsResponseTrackId>();
 
@@ -170,18 +79,18 @@ namespace Gosocket.Dian.Functions.Activation
                     // Valido que este en Process el registro de Set de pruebas
                     var radianTesSetResult = radianTestSetResults.SingleOrDefault(t => !t.Deleted &&
                                                                                 t.Id == globalTestSetTracking.TestSetId &&
-                                                                                t.Status == (int)TestSetStatus.InProcess);
-
-                    if (radianTesSetResult == null)
-                        return;
+                                                                                t.Status == (int)TestSetStatus.InProcess);                   
 
                     // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
                     bool isActive = globalRadianOperationService.IsActive(globalTestSetTracking.SenderCode, new Guid(globalTestSetTracking.SoftwareId));
                     if (isActive)
-                        return ;
+                        return;
+
+                   
+                    string key = operation.SoftwareType.ToString() + "|" + globalTestSetTracking.SoftwareId;
 
                     // busco el registro del set de pruebas a actualizar
-                    var radianTestSet = radianTestSetResultTableManager.Find<RadianTestSetResult>(radianTesSetResult.TestSetReference, radianTesSetResult.TestSetReference);
+                    var radianTestSetResult = radianTestSetResultTableManager.Find<RadianTestSetResult>(globalTestSetTracking.SenderCode, key);
 
                     // Le asigno el Id 
                     radianTesSetResult.Id = globalTestSetTracking.TestSetId;
@@ -226,11 +135,23 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.ApplicationAvailableAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
                     radianTesSetResult.ApplicationAvailableRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
 
-                    // Endoso electrónico 
-                    string[] tipos = { EventStatus.EndosoGarantia.ToString(), EventStatus.EndosoProcuracion.ToString(), EventStatus.EndosoPropiedad.ToString() };
-                    radianTesSetResult.TotalEndorsementSent = allGlobalTestSetTracking.Count(a => tipos.Contains(a.DocumentTypeId));
-                    radianTesSetResult.EndorsementAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && tipos.Contains(a.DocumentTypeId));
-                    radianTesSetResult.EndorsementRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && tipos.Contains(a.DocumentTypeId));
+                    // Endoso de propiedad 
+                    tipo = EventStatus.EndosoPropiedad.ToString();
+                    radianTesSetResult.TotalEndorsementPropertySent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementPropertyAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementPropertyRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+
+                    // Endoso de Garantia 
+                    tipo = EventStatus.EndosoGarantia.ToString();
+                    radianTesSetResult.TotalEndorsementGuaranteeSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementGuaranteeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementGuaranteeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+
+                    // Endoso de Procuracion 
+                    tipo = EventStatus.EndosoProcuracion.ToString();
+                    radianTesSetResult.TotalEndorsementProcurementSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementProcurementAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
+                    radianTesSetResult.EndorsementProcurementRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
 
                     // Cancelación de endoso 
                     tipo = EventStatus.InvoiceOfferedForNegotiation.ToString();
@@ -282,7 +203,9 @@ namespace Gosocket.Dian.Functions.Activation
                             && radianTesSetResult.AutomaticAcceptanceTotalRequired >= radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired
                             && radianTesSetResult.RejectInvoiceTotalRequired >= radianTesSetResult.RejectInvoiceTotalAcceptedRequired
                             && radianTesSetResult.ApplicationAvailableTotalRequired >= radianTesSetResult.ApplicationAvailableTotalAcceptedRequired
-                            && radianTesSetResult.EndorsementTotalRequired >= radianTesSetResult.EndorsementTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementPropertyTotalRequired >= radianTesSetResult.EndorsementPropertyTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementProcurementTotalRequired >= radianTesSetResult.EndorsementProcurementTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementGuaranteeTotalRequired >= radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired
                             && radianTesSetResult.EndorsementCancellationTotalRequired >= radianTesSetResult.EndorsementCancellationTotalAcceptedRequired
                             && radianTesSetResult.GuaranteeTotalRequired >= radianTesSetResult.GuaranteeTotalAcceptedRequired
                             && radianTesSetResult.ElectronicMandateTotalRequired >= radianTesSetResult.ElectronicMandateTotalAcceptedRequired
@@ -303,66 +226,142 @@ namespace Gosocket.Dian.Functions.Activation
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (radianTesSetResult.Status == (int)TestSetStatus.Accepted)
                     {
-                        // partition key are sender code.
-                        var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
-                        if (contributor.AcceptanceStatusId == (int)ContributorStatus.Registered)
-                        {
-                            contributorService.SetToEnabled(contributor);
-                            var globalContributor = new GlobalContributor(contributor.Code, contributor.Code) { Code = contributor.Code, StatusId = contributor.AcceptanceStatusId, TypeId = contributor.ContributorTypeId };
-                            await contributorTableManager.InsertOrUpdateAsync(globalContributor);
-                        }
-
-                        // Ubico el software
-                        var software = radianSoftwareService.Get(Guid.Parse(radianTesSetResult.SoftwareId));
-                        if (software.RadianSoftwareStatusId == (int)RadianSoftwareStatus.Accepted &&
-                                    radianTesSetResult.OperationModeId != (int)RadianSoftwareStatus.InProcess)
-                        {
-                            radianSoftwareService.SetToProduction(software);
-                            var softwareId = software.Id.ToString();
-                            var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.RadianSoftwareStatusId };
-                            await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
-                        }
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
                         {
                             try
                             {
-                                var requestObject = new { contributorId = contributor.Id };
-                                var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), requestObject);
+                                #region Proceso Radian
 
-                                var guid = Guid.NewGuid().ToString();
-                                var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
+                                Contributor contributor = contributorService.GetByCode(globalTestSetTracking.SenderCode);
+                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
+                                if (!string.IsNullOrEmpty(isPartipantActive.RadianStatus))
                                 {
-                                    Success = activation.Success,
-                                    ContributorCode = contributor.Code,
-                                    ContributorTypeId = contributor.ContributorTypeId,
-                                    OperationModeId = radianTesSetResult.OperationModeId,
-                                    OperationModeName = radianTesSetResult.OperationModeName,
-                                    SentToActivateBy = "Function",
-                                    SoftwareId = radianTesSetResult.SoftwareId,
-                                    SendDate = DateTime.UtcNow,
-                                    TestSetId = radianTesSetResult.Id,
-                                    Trace = activation.Trace,
-                                    Message = activation.Message,
-                                    Detail = activation.Detail,
-                                    Request = JsonConvert.SerializeObject(requestObject)
-                                };
-                                await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
+                                    contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey);
+                                }
+                                #endregion
 
-                                if (radianTesSetResult.Status == (int)RadianSoftwareStatus.Accepted)
-                                    await MigrateCertificate(contributor.Code);
+                                #region Pendiente migracion
+
+                                #endregion
 
                             }
                             catch (Exception ex)
                             {
-                                log.Error($"Error al enviar a activar RADIAN contribuyente con id {contributor.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                                // log.Error($"Error al enviar a activar RADIAN contribuyente con id {contributor.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                                 throw;
                             }
                         }
                     }
+                }
+                else // Factura Electronica
+                {                 
 
-                    #endregion
+                    var testSetResults = globalTestSetResultTableManager.FindByPartition<GlobalTestSetResult>(globalTestSetTracking.SenderCode);
+
+                    if (testSetResults != null)  // Roberto Alvarado --> Esto es para mantener lo de Factura Electronica tal cual esta actualmente 2020/11/25
+                    {
+                     
+                        var globalTesSetResult = testSetResults.SingleOrDefault(t => !t.Deleted && t.Id == globalTestSetTracking.TestSetId && t.Status == (int)TestSetStatus.InProcess);
+
+                        if (globalTesSetResult == null)
+                            return;
+
+                        var globalTestSet = globalTestSetTableManager.Find<GlobalTestSet>(globalTesSetResult.TestSetReference, globalTesSetResult.TestSetReference);
+
+                        string[] invoiceCodes = { "1", "01", "02", "03" };
+                        string[] creditNoteCodes = { "7", "91" };
+                        string[] debitNoteCodes = { "8", "92" };
+
+                        globalTesSetResult.Id = globalTestSetTracking.TestSetId;
+
+                        globalTesSetResult.TotalDocumentSent = allGlobalTestSetTracking.Count;
+                        globalTesSetResult.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
+                        globalTesSetResult.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
+
+
+                        globalTesSetResult.InvoicesTotalSent = allGlobalTestSetTracking.Count(a => invoiceCodes.Contains(a.DocumentTypeId));
+                        globalTesSetResult.TotalInvoicesAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && invoiceCodes.Contains(a.DocumentTypeId));
+                        globalTesSetResult.TotalInvoicesRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && invoiceCodes.Contains(a.DocumentTypeId));
+
+                        globalTesSetResult.TotalCreditNotesSent = allGlobalTestSetTracking.Count(a => creditNoteCodes.Contains(a.DocumentTypeId));
+                        globalTesSetResult.TotalCreditNotesAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && creditNoteCodes.Contains(a.DocumentTypeId));
+                        globalTesSetResult.TotalCreditNotesRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && creditNoteCodes.Contains(a.DocumentTypeId));
+
+                        globalTesSetResult.TotalDebitNotesSent = allGlobalTestSetTracking.Count(a => debitNoteCodes.Contains(a.DocumentTypeId));
+                        globalTesSetResult.TotalDebitNotesAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && debitNoteCodes.Contains(a.DocumentTypeId));
+                        globalTesSetResult.TotalDebitNotesRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && debitNoteCodes.Contains(a.DocumentTypeId));
+
+                        if (globalTesSetResult.TotalInvoicesAccepted >= globalTesSetResult.TotalInvoicesAcceptedRequired && globalTesSetResult.TotalCreditNotesAccepted >= globalTesSetResult.TotalCreditNotesAcceptedRequired && globalTesSetResult.TotalDebitNotesAccepted >= globalTesSetResult.TotalDebitNotesAcceptedRequired && globalTesSetResult.Status == (int)TestSetStatus.InProcess)
+                            globalTesSetResult.Status = (int)TestSetStatus.Accepted;
+
+                        if (globalTesSetResult.TotalDocumentsRejected > (globalTesSetResult.TotalDocumentRequired - globalTesSetResult.TotalDocumentAcceptedRequired) && globalTesSetResult.Status == (int)TestSetStatus.InProcess)
+                            globalTesSetResult.Status = (int)TestSetStatus.Rejected;
+
+                        await globalTestSetResultTableManager.InsertOrUpdateAsync(globalTesSetResult);
+
+                        if (globalTesSetResult.Status == (int)TestSetStatus.Accepted)
+                        {
+                            // partition key are sender code.
+                            var contributor = contributorService.GetByCode(globalTesSetResult.PartitionKey);
+                            if (contributor.AcceptanceStatusId == (int)ContributorStatus.Registered)
+                            {
+                                contributorService.SetToEnabled(contributor);
+                                var globalContributor = new GlobalContributor(contributor.Code, contributor.Code) { Code = contributor.Code, StatusId = contributor.AcceptanceStatusId, TypeId = contributor.ContributorTypeId };
+                                await contributorTableManager.InsertOrUpdateAsync(globalContributor);
+                            }
+
+                            var software = softwareService.Get(Guid.Parse(globalTesSetResult.SoftwareId));
+                            if (software.AcceptanceStatusSoftwareId == (int)Domain.Common.OperationMode.Own
+                                && globalTesSetResult.OperationModeId != (int)Domain.Common.OperationMode.Free)
+                            {
+                                softwareService.SetToProduction(software);
+                                var softwareId = software.Id.ToString();
+                                var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
+                                await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
+                            }
+
+
+                            // Send to activate contributor in production
+                            if (ConfigurationManager.GetValue("Environment") == "Hab")
+                            {
+                                try
+                                {
+                                    var requestObject = new { contributorId = contributor.Id };
+                                    var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), requestObject);
+
+                                    var guid = Guid.NewGuid().ToString();
+                                    var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
+                                    {
+                                        Success = activation.Success,
+                                        ContributorCode = contributor.Code,
+                                        ContributorTypeId = contributor.ContributorTypeId,
+                                        OperationModeId = globalTesSetResult.OperationModeId,
+                                        OperationModeName = globalTesSetResult.OperationModeName,
+                                        SentToActivateBy = "Function",
+                                        SoftwareId = globalTesSetResult.SoftwareId,
+                                        SendDate = DateTime.UtcNow,
+                                        TestSetId = globalTesSetResult.Id,
+                                        Trace = activation.Trace,
+                                        Message = activation.Message,
+                                        Detail = activation.Detail,
+                                        Request = JsonConvert.SerializeObject(requestObject)
+                                    };
+                                    await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
+
+                                    if (globalTesSetResult.OperationModeId == (int)SoftwareStatus.Production)
+                                        await MigrateCertificate(contributor.Code);
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    log.Error($"Error al enviar a activar contribuyente con id {contributor.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                                    throw;
+                                }
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)

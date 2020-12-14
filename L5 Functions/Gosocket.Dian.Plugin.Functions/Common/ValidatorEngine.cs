@@ -15,6 +15,7 @@ using Gosocket.Dian.Plugin.Functions.Event;
 using static Gosocket.Dian.Domain.Common.EnumHelper;
 using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
+using Gosocket.Dian.Plugin.Functions.Cufe;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -118,32 +119,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public async Task<List<ValidateListResponse>> StartValidateDocumentReferenceAsync(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef)
+        public List<ValidateListResponse> StartValidateDocumentReference(ValidateDocumentReference.RequestObject validateReference)
         {
             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
             DateTime startDate = DateTime.UtcNow;
-            //Obtiene XML CUFE - CUDE
-            var xmlBytes = await GetXmlFromStorageAsync(trackId);
-           
-            if(xmlBytes == null)
-            {
-                ValidateListResponse response = new ValidateListResponse();
-                response.ErrorMessage = $"esta UUID no existe en la base de datos de la DIAN.";
-                response.IsValid = false;
-                response.ErrorCode = "Regla: AAH07-(R): ";
-                response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                validateResponses.Add(response);
-                return validateResponses;
-            }
-            var xmlParser = new XmlParser(xmlBytes);
 
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
 
-            var nitModel = xmlParser.Fields.ToObject<NitModel>();
-
-            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(nitModel, idDocumentReference, eventCode, documentTypeIdRef));
+            validateResponses.AddRange(validator.ValidateDocumentReferencePrev(validateReference.TrackId,
+                validateReference.IdDocumentReference, validateReference.EventCode, validateReference.DocumentTypeIdRef,
+                validateReference.IssuerPartyCode, validateReference.IssuerPartyName));
 
             return validateResponses;
         }
@@ -158,19 +143,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 case (int)EventStatus.Receipt:
                     code = EventStatus.Received; 
-                    break;
-                case (int)EventStatus.TerminacionMandato:
-                    code = EventStatus.Mandato;
-                    break;
-                case (int)EventStatus.EndosoProcuracion:
-                    code = EventStatus.SolicitudDisponibilizacion;
-                    break;
+                    break;              
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     code = EventStatus.Accepted;
-                    break;
-                case (int)EventStatus.AnulacionLimitacionCirculacion:
-                    code = EventStatus.NegotiatedInvoice;
-                    break;
+                    break;              
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                 case (int)EventStatus.NegotiatedInvoice:
                     code = EventStatus.SolicitudDisponibilizacion;
@@ -186,11 +162,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(data.EventCode) == (int)EventStatus.Rejected ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Receipt ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.TerminacionMandato ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||                
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                 )
@@ -345,7 +318,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
 
             cmObject.FecNIE = xmlParser.globalDocPayrolls.FechaGen.ToString("yyyy-MM-dd");
-            cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen.ToString("HH:MM:ss");
+            cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen;
             cmObject.SoftwareId = xmlParser.globalDocPayrolls.SoftwareID;
             cmObject.ValDesc = Convert.ToString(xmlParser.globalDocPayrolls.deduccionesTotal);
             cmObject.ValTol = Convert.ToString(xmlParser.globalDocPayrolls.comprobanteTotal);

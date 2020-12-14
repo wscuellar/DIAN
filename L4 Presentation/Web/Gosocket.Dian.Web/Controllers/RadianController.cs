@@ -13,6 +13,7 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using System.Text;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Common.Resources;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -28,9 +29,12 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-        #region Registro de participantes
+        #region MODOS DE OPERACION RADIAN
 
-        // GET: Radian
+        /// <summary>
+        /// Action GET encargada de inicializar la vista de ingreso a RADIAN, Consulta la informacion del contribuyente postulante.
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Index()
         {
             NameValueCollection result = _radianContributorService.Summary(User.UserCode());
@@ -46,11 +50,20 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Action GET encargada de inicializar la vista de ingreso a RADIAN, Consulta la informacion del contribuyente postulante, para los modos de Facturador Electronico.
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ElectronicInvoiceView()
         {
             return Index();
         }
 
+        /// <summary>
+        /// Metodo POST, encargado de realizar las validaciones de registro en la seleccion de modos de operacion de RADIAN.
+        /// </summary>
+        /// <param name="registrationData">Estructura con la informacion a validar</param>
+        /// <returns>Json con la respuesta de la validacion</returns>
         [HttpPost]
         public JsonResult RegistrationValidation(RegistrationDataViewModel registrationData)
         {
@@ -62,7 +75,10 @@ namespace Gosocket.Dian.Web.Controllers
 
         #endregion
 
-
+        /// <summary>
+        /// Metodo GET para la consulta de participantes en la habilitacion RADIAN
+        /// </summary>
+        /// <returns>Modelo con la informacion para graficar la vista de Habilitacion</returns>
         public ActionResult AdminRadianView()
         {
             int page = 1, size = 10;
@@ -95,6 +111,11 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult AdminRadianView(AdminRadianViewModel model)
         {
@@ -104,7 +125,7 @@ namespace Gosocket.Dian.Web.Controllers
                 Code = model.Code,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
-                Type= model.Type,
+                Type = model.Type,
                 RadianState = model.RadianState != null ? model.RadianState.Value.GetDescription() : null
             };
             RadianAdmin radianAdmin = _radianContributorService.ListParticipantsFilter(filter, model.Page, model.Length);
@@ -120,8 +141,8 @@ namespace Gosocket.Dian.Web.Controllers
                     Code = c.Code,
                     TradeName = c.TradeName,
                     BusinessName = c.BusinessName,
-                    AcceptanceStatusName = c.AcceptanceStatusName
-
+                    AcceptanceStatusName = c.AcceptanceStatusName,
+                    RadianState = c.RadianState
                 }).ToList(),
                 RadianType = radianAdmin.Types.Select(c => new SelectListItem
                 {
@@ -246,61 +267,29 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
+                RadianState stateProcess = approveState == "1" ? RadianState.Cancelado : RadianState.Test;
+                if (radianAdmin.Contributor.RadianState == RadianState.Test.GetDescription() && stateProcess == RadianState.Cancelado)
+                    return Json(new { message = TextResources.TestNotRemove, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
 
-                if (approveState == "1")
+                if (stateProcess == RadianState.Test && radianAdmin.Files.Any(n => n.Status != 2 && n.RadianContributorFileType.Mandatory))
+                    return Json(new { message = TextResources.AllSoftware, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+
+                if (radianAdmin.Contributor.RadianState == RadianState.Habilitado.GetDescription())
                 {
-                    if ((radianAdmin.Contributor.RadianState == "Habilitado" || radianAdmin.Contributor.RadianState == "Registrado"))
-                    {
-                        _ = _radianContributorService.ChangeParticipantStatus(id, RadianState.Cancelado.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
-                        _ = SendMail(radianAdmin);
-                    }
-                    else
-                    {
-                        return Json(new
-                        {
-                            messasge = "Los participantes 'En pruebas' no se pueden cancelar.",
-                            success = true,
-                            id = radianAdmin.Contributor.RadianContributorId
-                        }, JsonRequestBehavior.AllowGet);
-                    }
+                    string clientsData = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
+                    if (!string.IsNullOrEmpty(clientsData))
+                        return Json(new { message = clientsData, success = true, id = radianAdmin.Contributor.RadianContributorId, html = "html" }, JsonRequestBehavior.AllowGet);
                 }
 
-                if (approveState == "0")
-                {
-                    foreach (var n in radianAdmin.Files)
-                    {
-                        if (n.Status != 2)
-                        {
-                            return Json(new
-                            {
-                                messasge = "Todos los archivos deben estar en estado 'Aceptado' para poder cambiar el estado del participante.",
-                                success = true,
-                                id = radianAdmin.Contributor.RadianContributorId
-                            }, JsonRequestBehavior.AllowGet);
-                        }
-                        else
-                        {
-                            _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, RadianState.Test.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
-                            _ = SendMail(radianAdmin);
-                        }
-                    }
-                }
+                _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, stateProcess.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                _ = SendMail(radianAdmin);
 
-                return Json(new
-                {
-                    messasge = "Datos actualizados correctamente.",
-                    success = true,
-                    id = radianAdmin.Contributor.RadianContributorId
-                }, JsonRequestBehavior.AllowGet);
+                return Json(new { message = TextResources.SuccessSoftware, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    messasge = "Tenemos problemas al actualizar los datos.",
-                    success = false,
-                    error = ex
-                }, JsonRequestBehavior.AllowGet);
+                return Json(new { messasge = "Tenemos problemas al actualizar los datos.", success = false, error = ex }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -327,5 +316,37 @@ namespace Gosocket.Dian.Web.Controllers
 
             return true;
         }
+
+        [HttpPost]
+        public JsonResult GetSetTestByContributor(string code, string softwareId, string softwareType)
+        {
+            RadianTestSetResult result = _radianContributorService.GetSetTestResult(code, softwareId, softwareType);
+
+            List<EventCountersViewModel> events = new List<EventCountersViewModel>();
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Received.GetDescription(), Counter1 = result.ReceiptNoticeTotalAcceptedRequired, Counter2 = result.ReceiptNoticeAccepted, Counter3 = result.ReceiptNoticeRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Rejected.GetDescription(), Counter1 = result.ReceiptServiceTotalAcceptedRequired, Counter2 = result.ReceiptServiceAccepted, Counter3 = result.ReceiptServiceRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Receipt.GetDescription(), Counter1 = result.ReceiptServiceTotalAcceptedRequired, Counter2 = result.ReceiptServiceAccepted, Counter3 = result.ReceiptServiceRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Accepted.GetDescription(), Counter1 = result.ExpressAcceptanceTotalAcceptedRequired, Counter2 = result.ExpressAcceptanceAccepted, Counter3 = result.ExpressAcceptanceRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.AceptacionTacita.GetDescription(), Counter1 = result.AutomaticAcceptanceTotalAcceptedRequired, Counter2 = result.AutomaticAcceptanceAccepted, Counter3 = result.AutomaticAcceptanceRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Avales.GetDescription(), Counter1 = result.GuaranteeTotalAcceptedRequired, Counter2 = result.GuaranteeAccepted, Counter3 = result.GuaranteeRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.SolicitudDisponibilizacion.GetDescription(), Counter1 = result.ApplicationAvailableTotalAcceptedRequired, Counter2 = result.ApplicationAvailableAccepted, Counter3 = result.ApplicationAvailableRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.NegotiatedInvoice.GetDescription(), Counter1 = result.CirculationLimitationTotalAcceptedRequired, Counter2 = result.CirculationLimitationAccepted, Counter3 = result.CirculationLimitationRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.AnulacionLimitacionCirculacion.GetDescription(), Counter1 = result.EndCirculationLimitationTotalAcceptedRequired, Counter2 = result.EndCirculationLimitationAccepted, Counter3 = result.EndCirculationLimitationRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Mandato.GetDescription(), Counter1 = result.ElectronicMandateTotalAcceptedRequired, Counter2 = result.ElectronicMandateAccepted, Counter3 = result.ElectronicMandateRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.TerminacionMandato.GetDescription(), Counter1 = result.EndMandateTotalAcceptedRequired, Counter2 = result.EndMandateAccepted, Counter3 = result.EndMandateRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.NotificacionPagoTotalParcial.GetDescription(), Counter1 = result.PaymentNotificationTotalAcceptedRequired, Counter2 = result.PaymentNotificationAccepted, Counter3 = result.PaymentNotificationRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.InvoiceOfferedForNegotiation.GetDescription(), Counter1 = result.EndorsementCancellationTotalAcceptedRequired, Counter2 = result.EndorsementCancellationAccepted, Counter3 = result.EndorsementCancellationRejected });
+
+            //to do: hablar con roberto sobre el servicio y estos endosos que no estan mapeados.
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoPropiedad.GetDescription(), Counter1 =      result.EndorsementPropertyTotalAcceptedRequired, Counter2 = result.EndorsementPropertyAccepted, Counter3 = result.EndorsementPropertyRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoGarantia.GetDescription(), Counter1 =       result.EndorsementGuaranteeTotalAcceptedRequired, Counter2 = result.EndorsementGuaranteeAccepted, Counter3 = result.EndorsementGuaranteeRejected });
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoProcuracion.GetDescription(), Counter1 =    result.EndorsementProcurementTotalAcceptedRequired, Counter2 = result.EndorsementProcurementAccepted, Counter3 = result.EndorsementProcurementRejected });
+            
+            return Json(events, JsonRequestBehavior.AllowGet);
+        }
+
+
     }
+
+    
 }

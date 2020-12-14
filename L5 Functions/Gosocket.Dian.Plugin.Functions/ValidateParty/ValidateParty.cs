@@ -37,7 +37,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ResponseCode in the request body");
 
             //Valida eventos diferentes a Endosos en blanco, dado que evento no informa el emisor documento AR
-            if (!((data.ResponseCode == "038" || data.ResponseCode == "037" || data.ResponseCode == "036") && data.ListId =="2"))
+            if (!((data.ResponseCode == "038" || data.ResponseCode == "037" || data.ResponseCode == "039") && data.ListId =="2"))
             {               
                 if (string.IsNullOrEmpty(data.SenderParty))
                     return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a SenderParty in the request body");

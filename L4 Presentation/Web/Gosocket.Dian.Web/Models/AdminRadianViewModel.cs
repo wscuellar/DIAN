@@ -77,13 +77,14 @@ namespace Gosocket.Dian.Web.Models
 
         public int RadianContributorTypeId { get; set; }
         public int RadianOperationModeId { get; set; }
+        [Display(Name = "Estado de aprobación")]
         public string RadianState { get; set; }
         public int CreatedBy { get; set; }
 
         [Display(Name = "Estado de aprobación")]
         public int AcceptanceStatusId { get; set; }
 
-        [Display(Name = "Estado de aprobación")]
+        
         public string AcceptanceStatusName { get; set; }
         public List<RadianContributorAcceptanceStatusViewModel> AcceptanceStatuses { get; set; }
 

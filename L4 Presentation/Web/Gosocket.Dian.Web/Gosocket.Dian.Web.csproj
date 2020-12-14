@@ -328,6 +328,7 @@
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ExternalUsersController.cs" />
+    <Compile Include="Controllers\OthersElectronicDocumentsController.cs" />
     <Compile Include="Controllers\QueryAssociatedEventsController.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
     <Compile Include="Controllers\ContributorFileTypeController.cs" />
@@ -367,7 +368,9 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdminRadianViewModel.cs" />
     <Compile Include="Models\AutoListModel.cs" />
+    <Compile Include="Models\EventsCounterViewModel.cs" />
     <Compile Include="Models\FileHistoryFilterViewModel.cs" />
+    <Compile Include="Models\OthersElectronicDocumentsViewModel.cs" />
     <Compile Include="Models\ParametersDataViewModel.cs" />
     <Compile Include="Models\ContingencyViewModel.cs" />
     <Compile Include="Models\Contributor.cs" />
@@ -376,6 +379,7 @@
     <Compile Include="Models\ExternalUserViewModel.cs" />
     <Compile Include="Models\GeneralResponseModel.cs" />
     <Compile Include="Models\PermissionViewModel.cs" />
+    <Compile Include="Models\InvoiceNotesViewModel.cs" />
     <Compile Include="Models\QueryEventViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedOperationModeViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
@@ -397,6 +401,7 @@
     <Compile Include="Models\RadianTestSetTableViewModel.cs" />
     <Compile Include="Models\RadianTestSetTrackingViewModel.cs" />
     <Compile Include="Models\RadianTestSetViewModel.cs" />
+    <Compile Include="Models\ValidacionOtherElectronicDocumentsViewModel.cs" />
     <Compile Include="Models\RegistrationDataViewModel.cs" />
     <Compile Include="Models\RequestAuthorizationBigContributorViewModel.cs" />
     <Compile Include="Models\Role\RoleModel.cs" />
@@ -581,10 +586,14 @@
     <Content Include="Content\images\puerbas-2.png" />
     <Content Include="Content\images\reject.png" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\EstadoFacturaRadian1.svg" />
+    <Content Include="Content\images\Svg\EstadoFacturaRadian2.svg" />
+    <Content Include="Content\images\Svg\Emisor.svg" />
     <Content Include="Content\images\Svg\Loaded.svg" />
     <Content Include="Content\images\Svg\Factor.svg" />
     <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
     <Content Include="Content\images\Svg\OperacionDirecta.svg" />
+    <Content Include="Content\images\Svg\ProveedorTecnologicoII.svg" />
     <Content Include="Content\images\Svg\SistemaNegociacion.svg" />
     <Content Include="Content\images\Svg\ProveedorTecnologico.svg" />
     <Content Include="Content\images\Svg\FacturadorElectronico.svg" />
@@ -2887,6 +2896,13 @@
     <Content Include="Views\RadianApproved\_certificatesThirdStep.cshtml" />
     <Content Include="Views\RadianApproved\_formSearchHistory.cshtml" />
     <Content Include="Views\Document\PrintDocument.cshtml" />
+    <Content Include="Views\OthersElectronicDocuments\Index.cshtml" />
+    <Content Include="Views\OthersElectronicDocuments\AddOrUpdate.cshtml" />
+    <Content Include="Views\OthersElectronicDocuments\_form.cshtml" />
+    <Content Include="Views\OthersElectronicDocuments\_default.cshtml" />
+    <Content Include="Views\Document\ShowDocumentToPublic.cshtml" />
+    <Content Include="Views\Radian\_detailsTestSet.cshtml" />
+    <Content Include="Views\OthersElectronicDocuments\AddParticipants.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

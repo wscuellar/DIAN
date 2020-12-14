@@ -203,7 +203,7 @@
     <Compile Include="Entity\GlobalTypeList.cs" />
     <Compile Include="Entity\KeyValue.cs" />
     <Compile Include="Entity\PagedResultBase.cs" />
-    <Compile Include="Entity\PdfCreatorModel.cs" />
+    <Compile Include="Entity\EventDataModel.cs" />
     <Compile Include="Entity\RadianContributorOperationWithSoftware.cs" />
     <Compile Include="Entity\RadianCustomerList.cs" />
     <Compile Include="Entity\RadianLogger.cs" />
@@ -256,6 +256,12 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Gosocket.Dian.Common\Gosocket.Dian.Common.csproj">
+      <Project>{61f42a77-9c41-446b-9c1f-d3d84241bb6c}</Project>
+      <Name>Gosocket.Dian.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Azure.DocumentDB.2.2.1\build\Microsoft.Azure.DocumentDB.targets" Condition="Exists('..\..\packages\Microsoft.Azure.DocumentDB.2.2.1\build\Microsoft.Azure.DocumentDB.targets')" />

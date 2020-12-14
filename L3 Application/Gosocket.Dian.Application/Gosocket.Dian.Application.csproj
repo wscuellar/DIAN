@@ -205,6 +205,7 @@
     <Compile Include="Managers\RadianLoggerManager.cs" />
     <Compile Include="Managers\RadianTestSetResultManager.cs" />
     <Compile Include="EmailService.cs" />
+    <Compile Include="OthersElectronicDocumentsService.cs" />
     <Compile Include="PdfCreatorEvents.cs" />
     <Compile Include="PdfCreatorModel.cs" />
     <Compile Include="RadianAprovedService.cs" />
@@ -228,6 +229,7 @@
     <Compile Include="RadianLoggerService.cs" />
     <Compile Include="QueryAssociatedEventsService.cs" />
     <Compile Include="RadianPDFCreationService.cs" />
+    <Compile Include="RadianGraphicRepresentationService .cs" />
     <Compile Include="RadianTestSetAppliedService.cs" />
     <Compile Include="RadianTestSetResultService.cs" />
     <Compile Include="RadianTestSetService.cs" />

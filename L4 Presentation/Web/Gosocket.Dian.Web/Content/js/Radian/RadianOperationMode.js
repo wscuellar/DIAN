@@ -17,9 +17,13 @@ function DeleteOperationMode(url) {
 function AddOperationMode(url, SetOperationViewModel) {
         var metod = 'POST';
         var data = SetOperationViewModel;
-        var actionError = () => { }
+        var actionError = (error) => {
+            var message = error.Message;
+            var button = AlertExec();
+            showConfirmation(message, button);
+        }
         var actionSuccess = (response) => {
-            var message = response.message;
+            var message = response.Message;
             var operation = () => { location.reload() };
             var button = AlertExec(operation);
             showConfirmation(message, button);

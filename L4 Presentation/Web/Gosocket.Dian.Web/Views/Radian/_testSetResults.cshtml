@@ -12,10 +12,8 @@
                 <th>Identificador del set</th>
                 <th>Identificador del software</th>
                 <th>Modo operación</th>
-                <th>Facturas</th>
-                <th>Notas de crédito</th>
-                <th>Notas de débito</th>
                 <th>Estado</th>
+                <th>Eventos</th>
             </tr>
         </thead>
         <tbody>
@@ -37,21 +35,23 @@
                         label = "custom-label-primary";
                         break;
                 };
-                <tr class=''>
-                    <td class="text-nowrap"><a>@t.Id</a></td>
-                    <td class="text-nowrap"><a>@t.SoftwareId</a></td>
-                    <td class="text-nowrap"><a>@t.OperationModeName</a></td>
-                    <td>
-                        <a class="badge custom-badget-primary add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Mínimo de aceptadas requeridas">@t.TotalInvoicesAcceptedRequired</a> <a class="badge custom-badget-success add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Aceptadas">@t.TotalInvoicesAccepted</a> <a class="badge custom-badget-danger add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Rechazadas">@t.TotalInvoicesRejected</a>
-                    </td>
-                    <td>
-                        <a class="badge custom-badget-primary add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Mínimo de aceptadas requeridas">@t.TotalCreditNotesAcceptedRequired</a> <a class="badge custom-badget-success add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Aceptadas">@t.TotalCreditNotesAccepted</a> <a class="badge custom-badget-danger add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Rechazadas">@t.TotalCreditNotesRejected</a>
-                    </td>
-                    <td>
-                        <a class="badge custom-badget-primary add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Mínimo de aceptadas requeridas">@t.TotalDebitNotesAcceptedRequired</a> <a class="badge custom-badget-success add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Aceptadas">@t.TotalDebitNotesAccepted</a> <a class="badge custom-badget-danger add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Rechazadas">@t.TotalDebitNotesRejected</a>
-                    </td>
-                    <td class="text-nowrap"><a class="label label-table @label">@t.StatusDescription</a></td>
-                </tr>
+            <tr class=''>
+                <td class="text-nowrap"><a>@t.Id</a></td>
+                <td class="text-nowrap set-id"><a>@t.SoftwareId</a></td>
+                <td class="text-nowrap operation-name"><a>@t.OperationModeName</a></td>
+                <td class="text-nowrap"><a class="label label-table">@t.StatusDescription</a></td>
+                <td class="text-nowrap"><button class="btn btn-link show-details-set">Ver detalle</button></td>
+                @*<td>
+        <a class="badge custom-badget-primary add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Mínimo de aceptadas requeridas">@t.TotalInvoicesAcceptedRequired</a> <a class="badge custom-badget-success add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Aceptadas">@t.TotalInvoicesAccepted</a> <a class="badge custom-badget-danger add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Rechazadas">@t.TotalInvoicesRejected</a>
+        </td>
+        <td>
+            <a class="badge custom-badget-primary add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Mínimo de aceptadas requeridas">@t.TotalCreditNotesAcceptedRequired</a> <a class="badge custom-badget-success add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Aceptadas">@t.TotalCreditNotesAccepted</a> <a class="badge custom-badget-danger add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Rechazadas">@t.TotalCreditNotesRejected</a>
+        </td>
+        <td>
+            <a class="badge custom-badget-primary add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Mínimo de aceptadas requeridas">@t.TotalDebitNotesAcceptedRequired</a> <a class="badge custom-badget-success add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Aceptadas">@t.TotalDebitNotesAccepted</a> <a class="badge custom-badget-danger add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="Rechazadas">@t.TotalDebitNotesRejected</a>
+        </td>
+                *@
+            </tr>
             }
         </tbody>
     </table>

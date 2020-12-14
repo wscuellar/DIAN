@@ -96,11 +96,14 @@ function RenderSteps(index) {
     $(".close").click(function () {
         $(this).parent().toggle();
         $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
+        $(this).parents(".inputs-dinamics").children(".file-input-enabled").children(".custom-file").children("input").val("");
+        $(this).parents(".inputs-dinamics").children(".file-input-enabled").children(".custom-file").children("label").html("");
+
     })
 }
 
 function RenderTable(paramsObject) {
-    var totalPages = Math.round(paramsObject.customersTotalCount / 10) + 1 ;
+    var totalPages = Math.trunc(paramsObject.customersTotalCount / 10) + 1 ;
     paramsObject.tableRendered && paramsObject.tableRendered.destroy();
     paramsObject.tableRendered = $(paramsObject.element).DataTable({
         paging: false,
@@ -121,7 +124,7 @@ function RenderTable(paramsObject) {
         }
     });
     $(paramsObject.element + "_filter > label").hide();
-    $(paramsObject.element + "_wrapper").append("<div><span>Mostrando 1 de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.Page, paramsObject.customersTotalCount));
+    $(paramsObject.element + "_wrapper").append("<div><span>Mostrando " + paramsObject.ajaxData.Page + " de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.Page, paramsObject.customersTotalCount, paramsObject.data.length));
     $(paramsObject.element + "_filter").append(paramsObject.form);
     LoadEventsToSearch(paramsObject);
     LoadEventsToPagiantion(paramsObject);
@@ -155,21 +158,23 @@ function SearchData(paramsObject) {
 function LoadEventsToPagiantion(paramsObject) {
     $(".next-page").click(function () {
         paramsObject.page = paramsObject.page + 1;
-        paramsObject.ajaxData.page = paramsObject.page
+        paramsObject.ajaxData.Page = paramsObject.page
         SearchData(paramsObject);
     });
     $(".prev-page").click(function () {
         paramsObject.page = paramsObject.page - 1;
-        paramsObject.ajaxData.page = paramsObject.page
+        paramsObject.ajaxData.Page = paramsObject.page
         SearchData(paramsObject);
     });
 }
 
-function TablePagination(page, totalCount) {
+function TablePagination(page, totalCount, countPage) {
     var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : ""; 
     var disabledPrev = page == 1 ? 'disabled="disabled"' : "";
+    var min = (page - 1) * 10 + 1;
+    var max = 10 > countPage ? (page - 1) * 10 + countPage : (page) * 10;
     var html = '<div class="pagination-controls pull-right"><span class="text-muted">\
-                <strong>1-1</strong >\
+                <strong>'+ min + '-' + max+'</strong >\
                 </span >\
                 <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">\
                 <a class="btn btn-default paginate-btn prev-page" '+ disabledPrev +'>\
