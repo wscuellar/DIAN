@@ -120,7 +120,7 @@
                     className: "table-data modal-radian",
                     size: 'large'
                 });
-                dialog.init(function (e) {
+                dialog.init(function (e) {debugger
                     var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.FileHistories.Customers))');
                     var customersTotalCount = @Model.FileHistoriesRowCount;
                     var columns = [

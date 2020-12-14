@@ -32,6 +32,7 @@
 
             $("#save-operation-mode").click(function (e) {
                 e.preventDefault();
+                showLoading('#panel-form', 'Cargando', 'Guardando datos, por favor espere.')
                 var SetOperationViewModel = {
                     RadianContributorId: @Model.Contributor.RadianContributorId,
                     SoftwareType: $("#OperationModeSelectedId").val(),

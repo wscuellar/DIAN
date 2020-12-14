@@ -1451,3 +1451,11 @@ button.selectpicker .fa-caret-down {
 .set-test-counts .panel-body {
     padding-left: 40px;
 }
+
+.show-details {
+    color: #348441;
+}
+
+.show-details a{
+    padding: 0px;
+}
