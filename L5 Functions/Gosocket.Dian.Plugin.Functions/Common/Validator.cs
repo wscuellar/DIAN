@@ -32,6 +32,7 @@ using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Common;
 using System.Text.RegularExpressions;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -1991,6 +1992,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
+
+                return responses;
             }
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
@@ -2074,6 +2077,61 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
+            //Valida eventos previos terminacion de mandato
+            if (eventPrev.EventCode == "044")
+            {
+                //Valida exista mandato
+                var arrayTasks = new List<Task>();
+                List<GlobalDocReferenceAttorney> documentsAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(eventPrev.TrackId).ToList();
+                if (documentsAttorney == null)
+                {
+                    validFor = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: 89-(R): ",
+                        ErrorMessage = "No es posible realizar la Terminación de Mandato, no existe un Mandato registrado con este CUDE referenciado",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                else
+                {
+                    foreach (var documentAttorney in documentsAttorney)
+                    {
+                        //Valida exista un mandato vigente activo
+                        if (!documentAttorney.Active)
+                        {
+                            validFor = true;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "Regla: 89-(R): ",
+                                ErrorMessage = "No es posible realizar la Terminación de Mandato, no existe una Mandato vigente a la fecha",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        if (validFor)
+                        {
+                            return responses;
+                        }
+                    }
+                }
+
+                if (!validFor)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = "Evento referenciado correctamente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                return responses;
+            }
 
             foreach (var documentIdentifier in documentMeta)
             {
@@ -2082,7 +2140,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //if (document != null)
                 if (documentMeta.Count >= 2)
                 {
-                    //No valida Evento registrado previamente para solictud de disponibilizacion posterior y Aval
+                    //No valida Evento registrado previamente para solictud de disponibilizacion posterior, Aval y Terminacion de Mandato
                     if ((eventPrev.CustomizationID != "363" && eventPrev.CustomizationID != "364" 
                         && eventPrev.EventCode != "035"))
                     {
@@ -2635,7 +2693,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ErrorMessage = "Evento referenciado correctamente",
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
-                                break;
+                                break;                          
                             case (int)EventStatus.NotificacionPagoTotalParcial:
                                 //Si el titulo valor tiene una limitación previa (041)
                                 if (documentMeta
@@ -3116,7 +3174,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.TerminacionMandato:
                     DateTime signingTime = Convert.ToDateTime(data.SigningTime);
                     //General por tiempo ilimitado_432 - limitado por tiempo ilimitado_434
-                    if (dataModel.CustomizationID == "432" || dataModel.CustomizationID == "434") //que se mayor
+                    if (nitModel.CustomizationId == "432" || nitModel.CustomizationId == "434") //que se mayor
                     {
                         DateTime dateMandato = Convert.ToDateTime(dataModel.SigningTime);
                         if (signingTime >= dateMandato)
@@ -3143,9 +3201,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
                     // General por tiempo limitado_431 - limitado por tiempo limitado_433
-                    else if (dataModel.CustomizationID == "431" || dataModel.CustomizationID == "433")  //que sea menor
+                    else if (nitModel.CustomizationId == "431" || nitModel.CustomizationId == "433")  //que sea menor
                     {
-                        DateTime endDateMandato = Convert.ToDateTime(dataModel.FieldValue("EndDate"));
+                        DateTime endDateMandato = Convert.ToDateTime(nitModel.ValidityPeriodEndDate);
                         if (signingTime <= endDateMandato)
                         {
                             responses.Add(new ValidateListResponse
