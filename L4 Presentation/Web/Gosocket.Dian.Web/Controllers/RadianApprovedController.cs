@@ -413,7 +413,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Comments = t.Comments,
                     CreatedBy = t.CreatedBy,
                     Status = t.RadianContributorFileStatus?.Name,
-                    Updated = t.Timestamp.ToString("yyyy-MM-dd")
+                    Updated = t.Timestamp.ToString("yyyy-MM-dd HH:mm")
                 }).ToList()
             };
             return Json(result, JsonRequestBehavior.AllowGet);
