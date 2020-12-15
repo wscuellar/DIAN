@@ -471,54 +471,22 @@ namespace Gosocket.Dian.Application.Cosmos
             return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, result.ResponseContinuation, result.ToList());
         }
 
-        public async Task<Tuple<bool, string, List<GlobalDataDocument>>> ReadDocumentsAsyncOrderByReception(string continuationToken,
-                                                                                                            DateTime? from,
-                                                                                                            DateTime? to,
-                                                                                                            int status,
-                                                                                                            string documentTypeId,
-                                                                                                            string senderCode,
-                                                                                                            string serieAndNumber,
-                                                                                                            string receiverCode,
-                                                                                                            string providerCode,
-                                                                                                            int maxItemCount,
-                                                                                                            string documentKey,
-                                                                                                            string referenceType,
-                                                                                                            List<string> pks = null,
-                                                                                                            int radianStatus = 0)
+        public async Task<(bool HasMoreResults, string Continuation, List<GlobalDataDocument> GlobalDocuments)>
+            ReadDocumentsAsyncOrderByReception(string continuationToken,
+                                               DateTime? from,
+                                               DateTime? to,
+                                               int status,
+                                               string documentTypeId,
+                                               string senderCode,
+                                               string serieAndNumber,
+                                               string receiverCode,
+                                               string providerCode,
+                                               int maxItemCount,
+                                               string documentKey,
+                                               string referenceType,
+                                               List<string> pks = null,
+                                               int radianStatus = 0)
         {
-
-            if (!from.HasValue || !to.HasValue)
-            {
-                from = to.Value.AddMonths(-1);
-                to = DateTime.Now.Date;
-            }
-
-            int fromNumber = int.Parse(from.Value.ToString("yyyyMMdd"));
-            int toNumber = int.Parse(to.Value.ToString("yyyyMMdd"));
-            string documentTypeOption1 = "";
-            string documentTypeOption2 = "";
-
-            switch (documentTypeId)
-            {
-                case "01": documentTypeOption1 = "1"; documentTypeOption2 = "1"; break;
-                case "02": documentTypeOption1 = "2"; documentTypeOption2 = "2"; break;
-                case "03": documentTypeOption1 = "3"; documentTypeOption2 = "3"; break;
-                case "07": documentTypeOption1 = "7"; documentTypeOption2 = "91"; break;
-                case "08": documentTypeOption1 = "8"; documentTypeOption2 = "92"; break;
-            }
-
-            string referenceTypeOption1 = "";
-            string referenceTypeOption2 = "";
-
-            switch (referenceType)
-            {
-                case "07": referenceTypeOption1 = "7"; referenceTypeOption2 = "91"; break;
-                case "08": referenceTypeOption1 = "8"; referenceTypeOption2 = "92"; break;
-            }
-
-            string collectionName = GetCollectionName(to.Value);
-            string collectionLink = collections[collectionName].SelfLink;
-
             FeedOptions options = new FeedOptions()
             {
                 MaxItemCount = maxItemCount,
@@ -526,83 +494,183 @@ namespace Gosocket.Dian.Application.Cosmos
                 RequestContinuation = continuationToken
             };
 
+            string collectionName = GetCollectionName(to.Value);
+            string collectionLink = collections[collectionName].SelfLink;
+
             IOrderedQueryable<GlobalDataDocument> query = null;
+            FeedResponse<GlobalDataDocument> result = null;
+            List<string> radianStatusFilter = null;
 
             if (pks != null && !string.IsNullOrEmpty(documentKey))
             {
-                query = (IOrderedQueryable<GlobalDataDocument>)
-                    client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
+                query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
                     .Where(e => pks.Contains(e.PartitionKey) && e.DocumentKey == documentKey).AsDocumentQuery();
+
+                result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+                return (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults,
+                        result.ResponseContinuation,
+                        GlobalDocuments: result.ToList());
             }
-            else
+
+            if (!from.HasValue || !to.HasValue)
             {
-                List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
+                from = to.Value.AddMonths(-1);
+                to = DateTime.Now.Date;
+            }
 
-                var predicate = PredicateBuilder.New<GlobalDataDocument>();
-                predicate = predicate.And(g => partitionKeys.Contains(g.PartitionKey));
-                predicate = predicate.And(g => g.EmissionDateNumber >= fromNumber && g.EmissionDateNumber <= toNumber);
-                predicate = predicate.And(g => status == 0 || g.ValidationResultInfo.Status == status);
-                predicate = predicate.And(g => documentTypeId == "00"
-                                          || g.DocumentTypeId == documentTypeId
-                                          || g.DocumentTypeId == documentTypeOption1
-                                          || g.DocumentTypeId == documentTypeOption2);
-                predicate = predicate.And(g => referenceType == "00"
-                                          || g.References.Any(r => r.DocumentTypeId == referenceType)
-                                          || g.References.Any(r => r.DocumentTypeId == referenceTypeOption1)
-                                          || g.References.Any(r => r.DocumentTypeId == referenceTypeOption2));
-                predicate = predicate.And(g => senderCode == null || g.SenderCode == senderCode);
-                predicate = predicate.And(g => serieAndNumber == null || g.SerieAndNumber == serieAndNumber);
-                predicate = predicate.And(g => receiverCode == null || g.ReceiverCode == receiverCode);
-                predicate = predicate.And(g => providerCode == null || g.TechProviderInfo.TechProviderCode == providerCode);
+            ExpressionStarter<GlobalDataDocument> predicate = PredicateBuilder.New<GlobalDataDocument>();
 
-                if (radianStatus > 0)
+            int fromNumber = int.Parse($"{from.Value:yyyyMMdd}");
+            int toNumber = int.Parse($"{to.Value:yyyyMMdd}");
+
+            List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
+            predicate = predicate.And(g => partitionKeys.Contains(g.PartitionKey));
+            predicate = predicate.And(g => g.EmissionDateNumber >= fromNumber && g.EmissionDateNumber <= toNumber);
+
+            if (status != 0)
+                predicate = predicate.And(g => g.ValidationResultInfo.Status == status);
+
+            if (!documentTypeId.Equals("00"))
+            {
+                switch (documentTypeId)
                 {
-                    switch (radianStatus)
-                    {
-                        case 1:
-                            predicate = predicate.And(g => g.Events.Any(e => e.Code.Equals(((int)EventStatus.Received).ToString())
-                                                      || e.Code.Equals(((int)EventStatus.Receipt).ToString())
-                                                      || e.Code.Equals(((int)EventStatus.Accepted).ToString())));
-                            break;
-                        case 2:
-                            predicate = predicate.And(g => g.Events.Any(e => e.Code.Equals(((int)EventStatus.SolicitudDisponibilizacion).ToString())));
-                            break;
-                        case 3:
-                            predicate = predicate.And(g => g.Events.Any(e => e.Code.Equals(((int)EventStatus.EndosoPropiedad).ToString()))
-                                                      || g.Events.Any(e => e.Code.Equals(((int)EventStatus.EndosoGarantia).ToString()))
-                                                      || g.Events.Any(e => e.Code.Equals(((int)EventStatus.EndosoProcuracion).ToString()))
-                                                      || g.Events.Any(e => e.Code.Equals(((int)EventStatus.InvoiceOfferedForNegotiation).ToString())));
-                            break;
-                        case 4:
-                            predicate = predicate.And(g => g.Events.Any(e => e.Code.Equals(((int)EventStatus.NotificacionPagoTotalParcial).ToString())));
-                            break;
-                        case 5:
-                            predicate = predicate.And(g => g.Events.Any(e => e.Code.Equals(((int)EventStatus.NegotiatedInvoice).ToString()))
-                                                      || g.Events.Any(e => e.Code.Equals(((int)EventStatus.AnulacionLimitacionCirculacion).ToString())));
-                            break;
-                        case 6:
-                            if (documentTypeId == "01")
-                            {
-                                predicate = predicate.And(g => g.Events.Any(e => !e.Code.Equals(((int)EventStatus.Received).ToString()))
-                                                          || g.Events.Any(e => !e.Code.Equals(((int)EventStatus.Receipt).ToString())) 
-                                                          || g.Events.Any(e => !e.Code.Equals(((int)EventStatus.Accepted).ToString())));
-                            }
-                            break;
-                        case 7:
-                            if (documentTypeId == "00")
-                                predicate = predicate.And(g => g.DocumentTypeId == ((int)DocumentType.CreditNote).ToString()
-                                                         || g.DocumentTypeId == ((int)DocumentType.DebitNote).ToString()
-                                                         || g.DocumentTypeId == ((int)DocumentType.ApplicationResponse).ToString());
-                            break;
-                    }
+                    case "01":
+                    case "02":
+                    case "03":
+                        predicate = predicate.And(g => g.DocumentTypeId == documentTypeId
+                                                  || g.DocumentTypeId == documentTypeId.Remove(0, 1));
+                        break;
+                    case "07":
+                    case "08":
+                        predicate = predicate.And(g => g.DocumentTypeId == documentTypeId
+                                                 || g.DocumentTypeId == documentTypeId.Remove(0, 1)
+                                                 || g.DocumentTypeId == (documentTypeId == "08" ? "92" : "91"));
+                        break;
+                    default:
+                        predicate = predicate.And(g => g.DocumentTypeId == documentTypeId);
+                        break;
+                }
+            }
+
+            if (!referenceType.Equals("00"))
+            {
+                switch (referenceType)
+                {
+                    case "07":
+                    case "08":
+                        predicate = predicate.And(g => g.References.Any(r => r.DocumentTypeId == referenceType)
+                                                  || g.References.Any(r => r.DocumentTypeId == referenceType.Remove(0, 1))
+                                                  || g.References.Any(r => r.DocumentTypeId == (referenceType == "07" ? "91" : "92")));
+                        break;
+                    default:
+                        predicate = predicate.And(g => g.References.Any(r => r.DocumentTypeId == referenceType));
+                        break;
+                }
+            }
+
+            if (senderCode != null)
+                predicate = predicate.And(g => g.SenderCode == senderCode);
+
+            if (serieAndNumber != null)
+                predicate = predicate.And(g => g.SerieAndNumber == serieAndNumber);
+
+            if (receiverCode != null)
+                predicate = predicate.And(g => g.ReceiverCode == receiverCode);
+
+            if (providerCode != null)
+                predicate = predicate.And(g => g.TechProviderInfo.TechProviderCode == providerCode);
+
+            if (radianStatus > 0)
+            {
+                switch (radianStatus)
+                {
+                    case 1:
+                        options.MaxItemCount = 40;
+                        radianStatusFilter = new List<string>() {
+                            $"0{(int)EventStatus.Received}", $"0{(int)EventStatus.Receipt}", $"0{(int)EventStatus.Accepted}"
+                        };
+                        break;
+                    case 2:
+                        radianStatusFilter = new List<string>() { $"0{(int)EventStatus.SolicitudDisponibilizacion}" };
+                        break;
+                    case 3:
+                        radianStatusFilter = new List<string>() {
+                            $"0{(int)EventStatus.EndosoPropiedad}", $"0{(int)EventStatus.EndosoGarantia}",
+                            $"0{(int)EventStatus.EndosoProcuracion}", $"0{(int)EventStatus.InvoiceOfferedForNegotiation}"
+                        };
+                        break;
+                    case 4:
+                        radianStatusFilter = new List<string>() { $"0{(int)EventStatus.NotificacionPagoTotalParcial}" };
+                        break;
+                    case 5:
+                        radianStatusFilter = new List<string>() {
+                            $"0{(int)EventStatus.NegotiatedInvoice}", $"0{(int)EventStatus.AnulacionLimitacionCirculacion}"
+                        };
+                        break;
+                    case 6:
+                        if (documentTypeId == "01")
+                        {
+                            radianStatusFilter = new List<string>() {
+                                $"0{(int)EventStatus.Received}", $"0{(int)EventStatus.Receipt}",
+                                $"0{(int)EventStatus.Accepted}"
+                            };
+                        }
+                        break;
+                    case 7:
+                        if (documentTypeId == "00")
+                        {
+                            predicate = predicate.And(g => g.DocumentTypeId == ((int)DocumentType.CreditNote).ToString()
+                                                     || g.DocumentTypeId == ((int)DocumentType.DebitNote).ToString()
+                                                     || g.DocumentTypeId == ((int)DocumentType.ApplicationResponse).ToString());
+                        }
+                        break;
                 }
 
-                query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
-                    .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();
+                if (radianStatusFilter != null)
+                    predicate = predicate.And(g => g.Events.Any(e => radianStatusFilter.Contains(e.Code)));
             }
 
-            FeedResponse<GlobalDataDocument> result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
-            return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, result.ResponseContinuation, result.ToList());
+            query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
+                    .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();
+            result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+            List<GlobalDataDocument> globalDocuments = result.ToList();
+
+            switch (radianStatus)
+            {
+                case 7:
+                case 0:
+                    break;
+                case 6:
+                    if (documentTypeId == "01")
+                        goto default;
+                    break;
+                default:
+                    List<GlobalDataDocument> globalDocRadianStateFiltered = new List<GlobalDataDocument>();
+                    globalDocuments = globalDocuments.Where(g => g.Events.Count >= radianStatusFilter.Count).ToList();
+
+                    foreach (GlobalDataDocument globalDocu in globalDocuments)
+                    {
+                        bool correctStatus = true;
+                        for (int i = 0; i < radianStatusFilter.Count; i++)
+                        {
+                            if (!radianStatusFilter.Contains(globalDocu.Events.OrderByDescending(e => e.Date).ElementAt(i).Code))
+                            {
+                                correctStatus = false;
+                                break;
+                            }
+                        }
+
+                        if (correctStatus)
+                            globalDocRadianStateFiltered.Add(globalDocu);
+                    }
+
+                    globalDocuments = globalDocRadianStateFiltered.Take(10).ToList();
+                    break;
+            }
+
+            return (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults,
+                    result.ResponseContinuation,
+                    GlobalDocuments: globalDocuments);
         }
 
         public GlobalDataDocument UpdateDocument(GlobalDataDocument document)
