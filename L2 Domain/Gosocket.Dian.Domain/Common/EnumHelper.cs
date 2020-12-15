@@ -62,9 +62,9 @@ namespace Gosocket.Dian.Domain.Common
                         return (T)field.GetValue(null);
                 }
             }
-
-            throw new ArgumentException("Not found.", nameof(description));
+            return default(T);
         }
+
     }
 
     public enum AuthType

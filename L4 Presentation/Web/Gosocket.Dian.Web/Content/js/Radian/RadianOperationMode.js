@@ -44,54 +44,20 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
         var actionError = (error) => {
             console.log(error);
         };
-    var actionSuccess = (response) => {
-        response.length == 0 && hideLoading('#panel-form');
-        LoadSoftwareList(response[0].value);
-            for (var i = 0; i < response.length; i++) {
-                $("#bussiness-name").append($("<option>", { value: response[i].value, text: response[i].text }));
+        var actionSuccess = (response) => {
+                response.length == 0 && hideLoading('#panel-form');
+                if (response.length) {
+                    LoadSoftwareList(response[0].value);
+                }
+                for (var i = 0; i < response.length; i++) {
+                    $("#bussiness-name").append($("<option>", { value: response[i].value, text: response[i].text }));
+                }
             }
-        }
         ajaxFunction(url, metod, data, actionError, actionSuccess);
 
         $("#bussiness-name").change(function (element) {
             LoadSoftwareList(element);
         })
-    //} else {
-    //    $("#CustomerName").val("");
-    //    $("#SoftwareNameList option").remove();
-    //    $("#CustomerName").autocomplete({
-    //        source: function (request, response) {
-    //            $.ajax({
-    //                url: url,
-    //                datatype: "json",
-    //                data: {
-    //                    term: request.term,
-    //                    contributorId,
-    //                    contributorTypeId,
-    //                    softwareType
-    //                },
-    //                success: function (data) {
-    //                        response($.map(data, function (val, item) {
-    //                            return {
-    //                                label: val.text,
-    //                                value: val.text,
-    //                                customerId: val.value
-    //                            }
-    //                        }))
-    //                }
-    //            })
-    //        },
-    //        select: function (event, ui) {
-    //            if (softwareType == "1") {
-    //                $("#CustomerName").val(ui.item.customerId);
-    //                $("#CustomerID").val(ui.item.customerId);
-    //            } else {
-    //                $("#CustomerID").val(ui.item.customerId);
-    //            }
-    //            LoadSoftwareList(ui.item.customerId);
-    //        }
-    //    });
-    //}
 
 }
 

@@ -10,7 +10,9 @@
 
 /*Large devices (desktops, 992px and up)*/
 @media (min-width: 992px) {
-
+    .set-test-counts .modal-dialog {
+        width: 992px;
+    }
 }
 
 /*Extra large devices (large desktops, 1200px and up)*/
@@ -20,6 +22,12 @@
     }
     .modal .panel-body {
         padding-left: 0;
+    }
+    .set-test-counts .modal-dialog {
+        width: 1016px;
+    }
+    .set-test-counts .modal .panel-body {
+        padding-left: 50px;
     }
 }
 

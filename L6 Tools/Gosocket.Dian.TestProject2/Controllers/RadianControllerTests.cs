@@ -37,7 +37,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     nameValue.Add("ContributorId", expected);
                     break;
             }
-            _radianContributorService.Setup(t => t.Summary(It.IsAny<string>())).Returns(nameValue);
+            _radianContributorService.Setup(t => t.Summary(It.IsAny<int>())).Returns(nameValue);
 
 
             //ejecucion
@@ -63,7 +63,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     nameValue.Add("ContributorId", expected);
                     break;
             }
-            _radianContributorService.Setup(t => t.Summary(It.IsAny<string>())).Returns(nameValue);
+            _radianContributorService.Setup(t => t.Summary(It.IsAny<int>())).Returns(nameValue);
 
 
             //ejecucion
@@ -89,7 +89,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 _current.Url = mockUrlHelper.Object;
                 validation.MessageType = "redirect" ;
             }
-            _radianContributorService.Setup(t => t.RegistrationValidation(It.IsAny<string>(), registrationData.RadianContributorType, registrationData.RadianOperationMode)).Returns(validation);
+            _radianContributorService.Setup(t => t.RegistrationValidation(It.IsAny<int>(), registrationData.RadianContributorType, registrationData.RadianOperationMode)).Returns(validation);
 
             //add
             JsonResult result = _current.RegistrationValidation(registrationData);

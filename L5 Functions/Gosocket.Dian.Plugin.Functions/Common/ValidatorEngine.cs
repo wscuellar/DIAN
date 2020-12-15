@@ -84,7 +84,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
             if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
             {
-                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackIdCude, eventPrev.TrackIdCude);
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
                 if (documentMeta != null)
                 {
                     //Obtiene el CUFE
@@ -143,19 +143,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 case (int)EventStatus.Receipt:
                     code = EventStatus.Received; 
-                    break;
-                case (int)EventStatus.TerminacionMandato:
-                    code = EventStatus.Mandato;
-                    break;
-                case (int)EventStatus.EndosoProcuracion:
-                    code = EventStatus.SolicitudDisponibilizacion;
-                    break;
+                    break;              
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     code = EventStatus.Accepted;
-                    break;
-                case (int)EventStatus.AnulacionLimitacionCirculacion:
-                    code = EventStatus.NegotiatedInvoice;
-                    break;
+                    break;              
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                 case (int)EventStatus.NegotiatedInvoice:
                     code = EventStatus.SolicitudDisponibilizacion;
@@ -171,10 +162,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(data.EventCode) == (int)EventStatus.Rejected ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Receipt ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.TerminacionMandato ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||                
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                 )
@@ -233,8 +222,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }           
             else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice)                   
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), 
-                    data.DocumentTypeId, "0" + (int)code, data.CustomizationID).FirstOrDefault();
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(),
+                    data.DocumentTypeId, "0" + (int)code, "361", "362").FirstOrDefault();
                 if (documentMeta != null)
                 {
                     data.TrackId = documentMeta.PartitionKey;

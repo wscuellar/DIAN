@@ -232,6 +232,9 @@ namespace Gosocket.Dian.Application
                 {
                     Id = Guid.NewGuid().ToString(),
                     ContributorId = radianContributor.Id,
+                    State = TestSetStatus.InProcess.GetDescription(),
+                    Status = (int)TestSetStatus.InProcess,
+                    StatusDescription = TestSetStatus.InProcess.GetDescription(),
                     ContributorTypeId = radianContributor.RadianContributorTypeId.ToString(),
                     TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
                     ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalAcceptedRequired,

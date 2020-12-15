@@ -427,11 +427,11 @@ button.edit-state {
 }
 
 .btn-radian-success {
-    background: #348441;
+    background: #348441 !important;
     border-radius: 10px;
     color: white;
     padding: 8px 20px;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 16px;
     border-color: #348441;
 }
@@ -1416,9 +1416,10 @@ button.selectpicker .fa-caret-down {
 }
 .set-details span{
     width: 70%;
+    margin: auto;
 }
 .set-details > div {
-    margin: 10px 0px;
+    margin: auto 0px;
 }
 
 .set-details-conventions span{
@@ -1430,4 +1431,36 @@ button.selectpicker .fa-caret-down {
 }
 .documents-table {
     text-align: center;
+}
+
+.custom-badget-blue{
+    background-color: #028AB7;
+    color: white;
+}
+.custom-badget-green{
+    background-color: #348441;
+    color: white;
+}
+.custom-badget-red {
+    background-color: #B81818;
+    color: white;
+}
+.col-pr-50 {
+    padding-right: 50px !important;
+}
+
+.set-test-counts .panel-body {
+    padding-left: 40px;
+}
+
+.set-test-counts .panel{
+    box-shadow: none;
+}
+
+.show-details {
+    color: #348441;
+}
+
+.show-details a{
+    padding: 0px;
 }
