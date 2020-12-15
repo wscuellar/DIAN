@@ -16,7 +16,7 @@
 
     #endregion
 
-    public class RadianGraphicRepresentationService : IRadianGraphicRepresentationService 
+    public class RadianGraphicRepresentationService : IRadianGraphicRepresentationService
     {
         #region Properties
 
@@ -51,13 +51,16 @@
             DateTime expeditionDate = DateTime.Now;
             Bitmap qrCode = RadianPdfCreationService.GenerateQR(TextResources.RadianReportQRCode.Replace("{CUFE}", model.CUDE));
 
-            //string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
-            //string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
+            string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
+            string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
 
 
             // Mapping Labels common data
 
             template = DataTemplateMapping(template, expeditionDate, model);
+
+            // Replace QrLabel
+            template = template.Replace("{QrCode}", ImgHtml);
 
             // Mapping Events
 
@@ -72,9 +75,9 @@
 
         private Domain.Entity.EventDataModel GetEventDataModel(string cude)
         {
-            var eventItem = _queryAssociatedEventsService.DocumentValidation(cude);
+            GlobalDocValidatorDocumentMeta eventItem = _queryAssociatedEventsService.DocumentValidation(cude);
 
-            Domain.Entity.EventDataModel model = 
+            Domain.Entity.EventDataModel model =
                 new Domain.Entity.EventDataModel()
                 {
                     Prefix = eventItem.Serie,
@@ -98,7 +101,7 @@
 
             GlobalDocValidatorDocumentMeta invoice = _queryAssociatedEventsService.DocumentValidation(eventItem.PartitionKey);
 
-            // SetMandate();
+            // Set Mandate
 
             if (model.EventStatus == EventStatus.Mandato)
             {
@@ -111,6 +114,8 @@
                     MandateType = TextResources.Event_MandateType
                 };
 
+                model.ReceiverName = model.Mandate.ReceiverName;
+                model.ReceiverCode = model.Mandate.ReceiverCode;
                 List<GlobalDocReferenceAttorney> referenceAttorneys = _queryAssociatedEventsService.ReferenceAttorneys(eventItem.DocumentKey, eventItem.DocumentReferencedKey, eventItem.ReceiverCode, eventItem.SenderCode);
 
                 if (referenceAttorneys.Any())
@@ -118,9 +123,10 @@
             }
 
 
-            // SetEndoso();
+            // Set Endoso
 
             if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia || model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
+            {
                 model.Endoso = new Domain.Entity.EndosoModel()
                 {
                     ReceiverCode = eventItem.ReceiverCode,
@@ -129,12 +135,15 @@
                     SenderName = invoice.SenderName,
                     EndosoType = EnumHelper.GetEnumDescription((Enum.Parse(typeof(EventStatus), eventItem.EventCode)))
                 };
+                model.ReceiverName = model.Endoso.ReceiverName;
+                model.ReceiverCode = model.Endoso.ReceiverCode;
+            }
 
             model.RequestType = TextResources.Event_RequestType;
 
             Domain.Entity.GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem.Identifier);
 
-            // SetValidations();
+            // Set Validations
 
             if (eventVerification.ValidationStatus == 1)
             {
@@ -147,7 +156,7 @@
                 model.Validations = res.Select(t => new Domain.Entity.AssociatedValidationsModel(t)).ToList();
             }
 
-            // SetReferences()
+            // SetReferences
             GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
             if (referenceMeta != null)
             {
@@ -168,7 +177,7 @@
                 });
             }
 
-            //SetEventAssociated(model, eventItem);
+            // SetEventAssociated 
             EventStatus allowEvent = _queryAssociatedEventsService.IdentifyEvent(eventItem);
 
             if (allowEvent != EventStatus.None)
@@ -193,6 +202,64 @@
                     }
                 }
             }
+
+            // Set Particular Data
+            switch (model.EventStatus)
+            {
+                case EventStatus.AceptacionTacita:
+                    model.ReceiverType = "Emisor FEV";
+                    model.ShowTitleValueSection = false;
+                    break;
+                case EventStatus.Received:
+                    model.ReceiverType = "Adquiriente FEV";
+                    model.ShowTitleValueSection = false;
+                    break;
+                case EventStatus.Receipt:
+                    model.ReceiverType = "Adquiriente FEV";
+                    model.ShowTitleValueSection = false;
+                    break;
+                case EventStatus.Accepted:
+                    model.ReceiverType = "Adquiriente FEV";
+                    model.ShowTitleValueSection = false;
+                    break;
+                case EventStatus.Rejected:
+                    model.ReceiverType = "Adquiriente FEV";
+                    break;
+                case EventStatus.NegotiatedInvoice:
+                    model.ReceiverType = "Autoridad Competente";
+                    break;
+                case EventStatus.AnulacionLimitacionCirculacion:
+                    model.ReceiverType = "Autoridad Competente";
+                    break;
+                case EventStatus.EndosoGarantia:
+                    model.ReceiverType = "Endosante";
+                    break;
+                case EventStatus.EndosoProcuracion:
+                    model.ReceiverType = "Endosante";
+                    break;
+                case EventStatus.EndosoPropiedad:
+                    model.ReceiverType = "Endosante";
+                    break;
+                case EventStatus.InvoiceOfferedForNegotiation:
+                    model.ReceiverType = "Endosante";
+                    break;
+                case EventStatus.Avales:
+                    model.ReceiverType = "Avalado";
+                    break;
+                case EventStatus.Mandato:
+                    model.ReceiverType = "Mandante";
+                    break;
+                case EventStatus.TerminacionMandato:
+                    model.ReceiverType = "Mandatario";
+                    break;
+                case EventStatus.NotificacionPagoTotalParcial:
+                    model.ReceiverType = "Tenedor Legítimo";
+                    break;
+                default:
+                    model.ReceiverType = "Emisor FEV";
+                    break;
+            }
+
             return model;
         }
 
@@ -202,10 +269,7 @@
 
         private StringBuilder DataTemplateMapping(StringBuilder template, DateTime expeditionDate, Domain.Entity.EventDataModel model)
         {
-            //byte[] bytesLogo = _fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg");
-            //byte[] bytesFooter = _fileManager.GetBytes("radian-dian-logos", "GroupFooter.png");
-            //string imgLogo = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesLogo)}'>";
-            //string imgFooter = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesFooter)}' class='img-footer'>";
+            string sectionHtml = "<div class='text - section padding - top20'> Sección {SectionNumber}</ div > ";
 
             // Mapping Event Data Section
             template = template.Replace("{EventName}", model.Title);
@@ -233,6 +297,46 @@
             template = template.Replace("{IssueDate}", model.References[0].DateOfIssue.ToShortDateString());
             template = template.Replace("{ExpirationDate}", string.Empty);
             template = template.Replace("{OperationType}", string.Empty);
+
+            // Mapping reference event data section
+
+            template = template.Replace("{ReferenceEventData}", string.Empty);
+
+            // Mapping Sections data 
+
+            if (!string.IsNullOrEmpty(model.ReceiverName) && !string.IsNullOrEmpty(model.ReceiverCode))
+            {
+                StringBuilder templateSujeto = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGraficaSujeto.html"));
+
+                StringBuilder subjects = new StringBuilder();
+
+                for (int i = 1; i <= 3; i++)
+                {
+                    subjects.Append(sectionHtml);
+                    subjects.Append(templateSujeto);
+                    subjects = subjects.Replace("{SectionNumber}", i.ToString());
+                    subjects = subjects.Replace("{SubjectNumber}", i.ToString());
+                    subjects = subjects.Replace("{SubjectBusinessName}", model.ReceiverName);
+                    subjects = subjects.Replace("{SubjectType}", model.ReceiverType);
+                    subjects = subjects.Replace("{SubjectDocumentType}", model.ReceiverCode);
+                    subjects = subjects.Replace("{SubjectNit}", model.ReceiverCode);
+                    subjects = subjects.Replace("{SubjectAddress}", string.Empty);
+                    subjects = subjects.Replace("{SubjectCity}", string.Empty);
+                    subjects = subjects.Replace("{SubjectEmail1}", string.Empty);
+                    subjects = subjects.Replace("{SubjectPhoneNumber}", string.Empty);
+                }
+
+                template = template.Replace("{SectionsData}", subjects.ToString());
+            }
+
+
+            // Mapping Title Value section
+
+            template = template.Replace("{TitleValue}", string.Empty);
+
+            // Mapping Final Data Section
+
+            template = template.Replace("{FinalData}", "Numero de Autrozación :20585563 Rango Autorizado: Desde 984567356346 Rango Autorizado: Hasta 2356745740585563 Vigencia 2030-01-04 ");
 
             return template;
         }

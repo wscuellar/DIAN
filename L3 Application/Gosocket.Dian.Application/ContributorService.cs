@@ -435,7 +435,7 @@ namespace Gosocket.Dian.Application
         /// </summary>
         /// <param name="contributorid"></param>
         /// <returns></returns>
-        public Software GetBaseSoftwareForRadian(int contributorid)
+        public List<Software> GetBaseSoftwareForRadian(int contributorid)
         {
             using (var context = new SqlDBContext())
             {
@@ -448,10 +448,9 @@ namespace Gosocket.Dian.Application
                         &&  !c.Deleted
                         && s.Status
                         && !s.Deleted
-                        && s.AcceptanceStatusSoftwareId == 2
                         && cp.OperationModeId == 2
                         && !cp.Deleted
-                        select s).OrderByDescending(t=> t.Updated).FirstOrDefault();
+                        select s).ToList();
             }
         }
 
