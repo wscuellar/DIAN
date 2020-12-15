@@ -911,6 +911,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     return responses;
                 case (int)EventStatus.NegotiatedInvoice:
+                case (int)EventStatus.AnulacionLimitacionCirculacion:
                     // Valida receptor documento AR coincida con DIAN
                     if (party.ReceiverParty != "800197268")
                     {
@@ -2117,7 +2118,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string errorRegla = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? "Regla: LGC01-(R): " : "Regla: LGC20-(R): ";
 
-            // evento 041 no tiene validación de eventos previos.
+            //Evento 041 no tiene validación de eventos previos.
             if (eventPrev.EventCode == "041")
             {
                 responses.Add(new ValidateListResponse
@@ -2739,6 +2740,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
                                 break;
+                            //Validación de la existencia de limitación de circulación (041)
+                            case (int)EventStatus.AnulacionLimitacionCirculacion:
+                                if (documentMeta.Where(t => t.EventCode == "041").ToList().Count == decimal.Zero)
+                                {
+                                    validFor = true;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "Regla: LGC35-(R): ",
+                                        ErrorMessage = "No se puede generar este evento si previamente no existe el evento limitación de circulación",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                break;
                             case (int)EventStatus.Mandato:
                                 responses.Add(new ValidateListResponse
                                 {
@@ -3018,7 +3045,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
+            int businessDays = 0;
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(data.EventCode);
             string errorCodeRef = data.EventCode == "030" ? errorCodeMessage.errorCodeSigningTimeAcuse : errorCodeMessage.errorCodeSigningTimeRecibo;
             string errorMesaageRef = data.EventCode == "030" ? errorCodeMessage.errorMessageigningTimeAcuse : errorCodeMessage.errorMessageigningTimeRecibo;
@@ -3048,6 +3075,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.Rejected:
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
                     responses.Add(businessDays > 3
                          ? new ValidateListResponse
                          {
@@ -3068,6 +3096,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.Accepted:
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
                     responses.Add(businessDays >= 3
                         ? new ValidateListResponse
                         {
@@ -3088,6 +3117,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     break;
                 case (int)EventStatus.AceptacionTacita:
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
                     responses.Add(businessDays > 3
                         ? new ValidateListResponse
                         {

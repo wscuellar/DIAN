@@ -82,7 +82,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             XmlParser xmlParserCude = null;
 
             //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
-            if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
+            if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation || 
+                Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
                 var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
                 if (documentMeta != null)
