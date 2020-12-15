@@ -11,14 +11,14 @@ namespace Gosocket.Dian.Domain.Sql
         public int Id { get; set; }
         public int ContributorId { get; set; }
         public Contributor Contributor { get; set; }
-        public int? OtherDocElecContributorTypeId { get; set; }
-        public OtherDocElecContributorType OtherDocElecContributorTypes { get; set; }
-        public int? OtherDocElecOperationModeId { get; set; }
-        public OtherDocElecOperationMode OtherDocElecOperationModes { get; set; }
+        public int OtherDocElecContributorTypeId { get; set; }
+        public OtherDocElecContributorType OtherDocElecContributorType { get; set; }
+        public int OtherDocElecOperationModeId { get; set; }
+        public OtherDocElecOperationMode OtherDocElecOperationMode { get; set; }
         public string State { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
         public int Step { get; set; }
-        public DateTime? Update { get; set; }
+        public DateTime Update { get; set; }
         public string CreatedBy { get; set; }
         public string Description { get; set; }
         public virtual ICollection<OtherDocElecSoftware> OtherDocElecSoftwares { get; set; }
