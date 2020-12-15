@@ -45,6 +45,21 @@
             </div>
         }
     </div>
+    <div class="panel-body padding-top-20">
+        <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
+            <a href="@Url.Action("SearchDocument", "User")" class="btn btn-gosocket btn-lg btn-block margin-top-40">Regresar</a>
+        </div>
+        <div class="col-md-3" style="padding-left: 0;padding-top:7px;"></div>
+        <div class="col-md-3" style="padding-left: 0;padding-top:7px;"></div>
+        @if (Model.GlobalDocValidatorDocument.ValidationStatus != 2)
+        {
+            <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
+                <a href="@Url.Action("DownloadPDF", "Document", new { trackId = Model.GlobalDocValidatorDocument.GlobalDocumentId})" class="btn btn-gosocket btn-lg btn-block margin-top-40 downloadPDFUrl">
+                    <i class="fa fa-download"></i> Descargar PDF
+                </a>
+            </div>
+        }
+    </div>
 </div>
 
 @section scripts{
