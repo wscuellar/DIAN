@@ -1,0 +1,255 @@
+﻿@model Gosocket.Dian.Web.Models.DocValidatorModel
+@using Newtonsoft.Json
+
+@*@{
+    ViewBag.Title = "Ver Documento";
+    var status = "success";
+    if (Model.Document.Status == 10)
+    {
+        status = "primary";
+    }
+    if (Model.Document.Status == 2)
+    {
+        status = "danger";
+    }
+}*@
+
+@section css
+{
+    <style>
+    </style>
+    <link href="~/Content/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
+    <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
+}
+
+<style>
+    .cufe-text {
+        overflow-wrap: break-word;
+        width: auto;
+    }
+
+    .ContainerDownload {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        font-style: normal;
+        font-size: 14px;
+        line-height: 14px;
+        color: #348441;
+        cursor: pointer;
+    }
+
+    .render-row {
+        border: hidden !important;
+    }
+
+    .subtitle-radian-status {
+        font-weight: normal !important;
+    }
+
+    .line-bottom {
+        border-bottom: 2px solid #E9E8E8;
+    }
+
+    .row-fe-details {
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+    }
+
+    .row-fe-states {
+        display: grid;
+        font-size: 16px;
+    }
+
+    .radian-state-ef-line {
+        width: 33px;
+        height: 0px;
+        border: 1px dashed #2C323C;
+        margin-top: 20px;
+    }
+</style>
+
+<!--Message-->
+<!--===================================================-->
+<div class="mar-top pad-no bg-white" id="html-gdoc">
+
+    <div style="display: none;" id="viewer-company-options"></div>
+    <div class="fab-shadow"></div>
+
+    <div>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <div>
+            <div class="row line-bottom row-fe-details" style="padding-bottom:14px">
+                <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
+                    <img class="img-responsive" style="max-height: 130px;" src="~/Content/img/LogoDian.png">
+                </div>
+                <div class="col-md-5" style="padding-top: 7px; padding-left: 0">
+                    <span class="cufe-text">
+                        CUFE: @Model.Document.DocumentKey<br>
+                    </span>
+                </div>
+                <div class="col-md-4" style="padding-top: 7px; padding-left: 0;">
+                    <p style="text-align: right;">
+                        <span class="tipo-doc">@Model.Document.DocumentTypeName</span>
+                        <br>
+                        @if (!string.IsNullOrEmpty(Model.Document.Serie))
+                        {
+                            @Html.Raw($"Serie: {Model.Document.Serie}<br>");
+                        }
+                        Folio: @Model.Document.Number<br>
+                        Fecha de emisión de la factura Electrónica: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row line-bottom row-fe-details" style="padding-bottom:24px; padding-top:14px;">
+                <div class="col-md-4" style="padding: 0">
+                    <p>
+                        <span class="datos-receptor">DATOS DEL EMISOR</span>
+                        <br>
+                        NIT: @Model.Document.SenderCode<br>
+                        Nombre: @Model.Document.SenderName<br>
+                    </p>
+                </div>
+                <div class="col-md-4" style="padding: 0">
+                    <p>
+                        <span class="datos-receptor">DATOS DEL RECEPTOR</span>
+                        <br>
+                        NIT: @Model.Document.ReceiverCode<br>
+                        Nombre: @Model.Document.ReceiverName<br>
+                    </p>
+                </div>
+                @if (Model.Document.Status != 2)
+                {
+                    <div class="col-md-4" style="padding-right: 0">
+                        <p style="text-align: right;font-weight: bold;">
+                            TOTALES E IMPUESTOS<br>
+                        </p>
+                        <p style="text-align: right;font-weight: bold;">
+                            IVA: @Model.Document.TaxAmountIva.ToString("C0")<br>
+                            Total: @Model.Document.TotalAmount.ToString("C0")<br>
+                        </p>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row" style="padding-top:24px">
+        <h4 class="subtitle-radian-status">ESTADO EN EL REGISTRO DE FACTURAS ELECTRÓNICAS</h4>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <div style="display:inline-flex">
+                <div style="display:grid">
+                    <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
+                    <span>Título Valor</span>
+                </div>
+                <div class="radian-state-ef-line"></div>
+                <div style="display: grid; padding-left: 21px; padding-top: 4px;">
+                    <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
+                    <span>Registrada</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 row-fe-states">
+            <span class="cufe-text">
+                Legítimo Tenedor actual: <s>COMPAÑÍA EJEMPLO S.A.S</s>
+            </span>
+            <span class="cufe-text">
+                Fecha de autorización para circulación: <s>08/08/2020</s>
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="ContainerDownload">
+            <p>
+                <i class="fa fa-download"></i>
+                <um id="show-document">
+                    <ins>Certificado de existencia</ins>
+                </um>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row mar-no line-bottom">
+    <div class="col-sm-6 pad-no">
+        <h4 class="margin-top-10">Validaciones del documento</h4>
+    </div>
+</div>
+@if (Model.Validations != null && Model.Validations.Count() == 0)
+{
+    <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i>  Documento validado por la DIAN.</h5>
+}
+else
+{
+    <div class="table-responsive">
+
+        <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Validations)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>
+                            <label class="label label-primary">@item.Status</label>
+                            <span class="fa fa fa-info-circle add-tooltip" data-original-title="@item.ErrorMessage"></span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<br />
+@Html.Partial("QueryEventsList", Model)
+<br />
+<br />
+@if (Model.Document.References.Where(x => x.ShowAsReference).Count() > 0)
+{
+    <div class="row mar-no line-bottom">
+        <div class="col-sm-6 pad-no">
+            <h4 class="margin-top-10">Referencias del documento</h4>
+        </div>
+    </div>
+    <div class="table-responsive">
+
+        <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+            <thead>
+                <tr>
+                    <th>Tipo de documento</th>
+                    <th>Fecha</th>
+                    <th>Descripción</th>
+                    <th>Nit Emisor</th>
+                    <th>Emisor</th>
+                    <th>Nit Receptor</th>
+                    <th>Receptor</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Document.References)
+                {
+                    <tr data-id="@item.DocumentKey" data-partitionKey="@item.DateNumber" class="document-row">
+                        <td>@item.DocumenTypeName</td>
+                        <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                        <td>@item.Description</td>
+                        <td>@item.SenderCode</td>
+                        <td>@item.SenderName</td>
+                        <td>@item.ReceiverCode</td>
+                        <td>@item.ReceiverName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

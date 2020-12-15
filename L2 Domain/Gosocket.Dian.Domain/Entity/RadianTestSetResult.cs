@@ -69,6 +69,11 @@ namespace Gosocket.Dian.Domain.Entity
         public int ApplicationAvailableAccepted { get; set; }
         public int ApplicationAvailableRejected { get; set; }
 
+
+        public int EndorsementTotalRequired { get; set; }
+        public int EndorsementTotalAcceptedRequired { get; set; }
+        
+
         // Endoso en Propiedad
         public int EndorsementPropertyTotalRequired { get; set; }
         public int EndorsementPropertyTotalAcceptedRequired { get; set; }

@@ -33,7 +33,7 @@ function AddOperationMode(url, SetOperationViewModel) {
 
 function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType) {
 
-    if (softwareType == "1") {
+    //if (true) {
         var metod = "POST";
         var data = {
             term: "",
@@ -41,55 +41,23 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
             contributorTypeId,
             softwareType
         };
-        var actionError = () => { };
+        var actionError = (error) => {
+            console.log(error);
+        };
         var actionSuccess = (response) => {
-            var newUrl = "/RadianApproved/SoftwareList";
-            var newData = {
-                radianContributorId: response[0].value
-            };
-            var newAction = (response) => {
-                $("#SoftwareNameList").append($("<option>", { value: response[0].value, text: response[0].text }));
-            }
-            $("#CustomerName").val(response[0].text);
-            ajaxFunction(newUrl, metod, newData, actionError, newAction);
-        }
-        ajaxFunction(url, metod, data, actionError, actionSuccess);
-    } else {
-        $("#CustomerName").val("");
-        $("#SoftwareNameList option").remove();
-        $("#CustomerName").autocomplete({
-            source: function (request, response) {
-                $.ajax({
-                    url: url,
-                    datatype: "json",
-                    data: {
-                        term: request.term,
-                        contributorId,
-                        contributorTypeId,
-                        softwareType
-                    },
-                    success: function (data) {
-                            response($.map(data, function (val, item) {
-                                return {
-                                    label: val.text,
-                                    value: val.text,
-                                    customerId: val.value
-                                }
-                            }))
-                    }
-                })
-            },
-            select: function (event, ui) {
-                if (softwareType == "1") {
-                    $("#CustomerName").val(ui.item.customerId);
-                    $("#CustomerID").val(ui.item.customerId);
-                } else {
-                    $("#CustomerID").val(ui.item.customerId);
+                response.length == 0 && hideLoading('#panel-form');
+                if (response.length) {
+                    LoadSoftwareList(response[0].value);
                 }
-                LoadSoftwareList(ui.item.customerId);
+                for (var i = 0; i < response.length; i++) {
+                    $("#bussiness-name").append($("<option>", { value: response[i].value, text: response[i].text }));
+                }
             }
-        });
-    }
+        ajaxFunction(url, metod, data, actionError, actionSuccess);
+
+        $("#bussiness-name").change(function (element) {
+            LoadSoftwareList(element);
+        })
 
 }
 
@@ -107,6 +75,7 @@ function LoadSoftwareList(radianId) {
     }
     var actionError = () => { };
     var actionSuccess = (response) => {
+        hideLoading('#panel-form');
         for (var i = 0; i < response.length; i++) {
             $("#SoftwareNameList").append($("<option>", { value: response[i].value, text: response[i].text }));
         }

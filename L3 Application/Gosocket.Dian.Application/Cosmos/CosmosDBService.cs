@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain.Cosmos;
+﻿using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Infrastructure;
 using LinqKit;
 using Microsoft.Azure.Documents;
@@ -8,6 +9,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -463,6 +465,140 @@ namespace Gosocket.Dian.Application.Cosmos
                     && (receiverCode == null || e.ReceiverCode == receiverCode)
                     && (providerCode == null || e.TechProviderInfo.TechProviderCode == providerCode)
                 ).OrderByDescending(e => e.Timestamp).AsDocumentQuery();
+            }
+
+            FeedResponse<GlobalDataDocument> result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+            return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, result.ResponseContinuation, result.ToList());
+        }
+
+        public async Task<Tuple<bool, string, List<GlobalDataDocument>>> ReadDocumentsAsyncOrderByReception(string continuationToken,
+                                                                                                            DateTime? from,
+                                                                                                            DateTime? to,
+                                                                                                            int status,
+                                                                                                            string documentTypeId,
+                                                                                                            string senderCode,
+                                                                                                            string serieAndNumber,
+                                                                                                            string receiverCode,
+                                                                                                            string providerCode,
+                                                                                                            int maxItemCount,
+                                                                                                            string documentKey,
+                                                                                                            string referenceType,
+                                                                                                            List<string> pks = null,
+                                                                                                            int radianStatus = 0)
+        {
+
+            if (!from.HasValue || !to.HasValue)
+            {
+                from = to.Value.AddMonths(-1);
+                to = DateTime.Now.Date;
+            }
+
+            int fromNumber = int.Parse(from.Value.ToString("yyyyMMdd"));
+            int toNumber = int.Parse(to.Value.ToString("yyyyMMdd"));
+            string documentTypeOption1 = "";
+            string documentTypeOption2 = "";
+
+            switch (documentTypeId)
+            {
+                case "01": documentTypeOption1 = "1"; documentTypeOption2 = "1"; break;
+                case "02": documentTypeOption1 = "2"; documentTypeOption2 = "2"; break;
+                case "03": documentTypeOption1 = "3"; documentTypeOption2 = "3"; break;
+                case "07": documentTypeOption1 = "7"; documentTypeOption2 = "91"; break;
+                case "08": documentTypeOption1 = "8"; documentTypeOption2 = "92"; break;
+            }
+
+            string referenceTypeOption1 = "";
+            string referenceTypeOption2 = "";
+
+            switch (referenceType)
+            {
+                case "07": referenceTypeOption1 = "7"; referenceTypeOption2 = "91"; break;
+                case "08": referenceTypeOption1 = "8"; referenceTypeOption2 = "92"; break;
+            }
+
+            string collectionName = GetCollectionName(to.Value);
+            string collectionLink = collections[collectionName].SelfLink;
+
+            FeedOptions options = new FeedOptions()
+            {
+                MaxItemCount = maxItemCount,
+                EnableCrossPartitionQuery = true,
+                RequestContinuation = continuationToken
+            };
+
+            IOrderedQueryable<GlobalDataDocument> query = null;
+
+            if (pks != null && !string.IsNullOrEmpty(documentKey))
+            {
+                query = (IOrderedQueryable<GlobalDataDocument>)
+                    client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
+                    .Where(e => pks.Contains(e.PartitionKey) && e.DocumentKey == documentKey).AsDocumentQuery();
+            }
+            else
+            {
+                List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
+
+                var predicate = PredicateBuilder.New<GlobalDataDocument>();
+                predicate = predicate.And(g => partitionKeys.Contains(g.PartitionKey));
+                predicate = predicate.And(g => g.EmissionDateNumber >= fromNumber && g.EmissionDateNumber <= toNumber);
+                predicate = predicate.And(g => status == 0 || g.ValidationResultInfo.Status == status);
+                predicate = predicate.And(g => documentTypeId == "00"
+                                          || g.DocumentTypeId == documentTypeId
+                                          || g.DocumentTypeId == documentTypeOption1
+                                          || g.DocumentTypeId == documentTypeOption2);
+                predicate = predicate.And(g => referenceType == "00"
+                                          || g.References.Any(r => r.DocumentTypeId == referenceType)
+                                          || g.References.Any(r => r.DocumentTypeId == referenceTypeOption1)
+                                          || g.References.Any(r => r.DocumentTypeId == referenceTypeOption2));
+                predicate = predicate.And(g => senderCode == null || g.SenderCode == senderCode);
+                predicate = predicate.And(g => serieAndNumber == null || g.SerieAndNumber == serieAndNumber);
+                predicate = predicate.And(g => receiverCode == null || g.ReceiverCode == receiverCode);
+                predicate = predicate.And(g => providerCode == null || g.TechProviderInfo.TechProviderCode == providerCode);
+
+                if (radianStatus > 0)
+                {
+                    switch (radianStatus)
+                    {
+                        case 1:
+                            predicate = predicate.And(g => g.Events.Any(e => e.Code.Equals(((int)EventStatus.Received).ToString())
+                                                      || e.Code.Equals(((int)EventStatus.Receipt).ToString())
+                                                      || e.Code.Equals(((int)EventStatus.Accepted).ToString())));
+                            break;
+                        case 2:
+                            predicate = predicate.And(g => g.Events.Any(e => e.Code.Equals(((int)EventStatus.SolicitudDisponibilizacion).ToString())));
+                            break;
+                        case 3:
+                            predicate = predicate.And(g => g.Events.Any(e => e.Code.Equals(((int)EventStatus.EndosoPropiedad).ToString()))
+                                                      || g.Events.Any(e => e.Code.Equals(((int)EventStatus.EndosoGarantia).ToString()))
+                                                      || g.Events.Any(e => e.Code.Equals(((int)EventStatus.EndosoProcuracion).ToString()))
+                                                      || g.Events.Any(e => e.Code.Equals(((int)EventStatus.InvoiceOfferedForNegotiation).ToString())));
+                            break;
+                        case 4:
+                            predicate = predicate.And(g => g.Events.Any(e => e.Code.Equals(((int)EventStatus.NotificacionPagoTotalParcial).ToString())));
+                            break;
+                        case 5:
+                            predicate = predicate.And(g => g.Events.Any(e => e.Code.Equals(((int)EventStatus.NegotiatedInvoice).ToString()))
+                                                      || g.Events.Any(e => e.Code.Equals(((int)EventStatus.AnulacionLimitacionCirculacion).ToString())));
+                            break;
+                        case 6:
+                            if (documentTypeId == "01")
+                            {
+                                predicate = predicate.And(g => g.Events.Any(e => !e.Code.Equals(((int)EventStatus.Received).ToString()))
+                                                          || g.Events.Any(e => !e.Code.Equals(((int)EventStatus.Receipt).ToString())) 
+                                                          || g.Events.Any(e => !e.Code.Equals(((int)EventStatus.Accepted).ToString())));
+                            }
+                            break;
+                        case 7:
+                            if (documentTypeId == "00")
+                                predicate = predicate.And(g => g.DocumentTypeId == ((int)DocumentType.CreditNote).ToString()
+                                                         || g.DocumentTypeId == ((int)DocumentType.DebitNote).ToString()
+                                                         || g.DocumentTypeId == ((int)DocumentType.ApplicationResponse).ToString());
+                            break;
+                    }
+                }
+
+                query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
+                    .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();
             }
 
             FeedResponse<GlobalDataDocument> result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();

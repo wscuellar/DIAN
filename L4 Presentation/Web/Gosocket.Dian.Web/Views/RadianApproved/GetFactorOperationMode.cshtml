@@ -2,8 +2,8 @@
 
 @Html.Partial("_factorOperationMode")
 @{
-    string contributorType = Request.Params["RadianContributorType"];
-    string operationMode = Request.Params["RadianOperationMode"];
+    string contributorType = Model.Contributor.RadianContributorTypeId.ToString();
+    string operationMode = Model.Contributor.RadianOperationModeId.ToString();
 
 }
 @section Scripts{
@@ -23,7 +23,8 @@
             if ("@operationMode" != "2") {
                 $("#OperationModeSelectedId").val(1);
             } else {
-                  $("#OperationModeSelectedId").change(function (value) {
+                $("#OperationModeSelectedId").change(function (value) {
+                    showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
                     var software = $("#OperationModeSelectedId").val();
                     RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
                 })
@@ -31,10 +32,12 @@
 
             $("#save-operation-mode").click(function (e) {
                 e.preventDefault();
+                showLoading('#panel-form', 'Cargando', 'Guardando datos, por favor espere.')
                 var SetOperationViewModel = {
                     RadianContributorId: @Model.Contributor.RadianContributorId,
                     SoftwareType: $("#OperationModeSelectedId").val(),
                     SoftwareId: $("#SoftwareNameList option:selected").val(),
+                    CustomerId: $("#bussiness-name option:selected").val(),
                     SoftwareName: $("#SoftwareName").val(),
                     Pin: $("#SoftwarePin").val(),
                     Url: '@Model.SoftwareUrl',
