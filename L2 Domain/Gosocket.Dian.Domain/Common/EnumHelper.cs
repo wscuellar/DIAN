@@ -242,7 +242,9 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Terminación del mandato")]
         TerminacionMandato = 044,
         [Description("Notificación del pago total o parcial")]
-        NotificacionPagoTotalParcial = 045
+        NotificacionPagoTotalParcial = 045,
+        [Description("Valor Informe 3 dias Pago")]
+        ValInfoPago = 046
     }
 
 
