@@ -571,10 +571,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             party.TrackId = party.TrackId.ToLower();
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(party.ResponseCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-
+            string eventCode = party.ResponseCode;
             var senderCode = nitModel.SenderCode;
-            var receiverCode = nitModel.ReceiverCode;
-            string receiver2DvErrorCode = "Regla: 89-(R): ";
+            var receiverCode = nitModel.ReceiverCode;            
             string sender2DvErrorCode = "Regla: 89-(R): ";
             switch (Convert.ToInt16(party.ResponseCode))
             {
@@ -585,24 +584,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida emeisor documento 
                     if (party.SenderParty != receiverCode)
                     {
-                        //valida si existe los permisos del mandatario 
-                        var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
-                            party.ResponseCode, xmlParserCude.NoteMandato);
-                        if (response != null)
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(response);
-                        }
-                        else
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = "Evento senderParty referenciado correctamente",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCodeFETV,
+                            ErrorMessage = errorCodeMessage.errorMessageFETV,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
                     }
                     else
                     {
@@ -638,6 +627,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+
+                    //valida si existe los permisos del mandatario 
+                    //var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
+                    //    party.ResponseCode, xmlParserCude.NoteMandato);
+                    //if (response != null)
+                    //{
+                    //    responses.Add(response);
+                    //}
+                    //else
+                    //{
+                    //    responses.Add(new ValidateListResponse
+                    //    {
+                    //        IsValid = true,
+                    //        Mandatory = true,
+                    //        ErrorCode = "100",
+                    //        ErrorMessage = "Evento senderParty referenciado correctamente",
+                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //    });
+                    //}
+
                     return responses;
                 case (int)EventStatus.EndosoPropiedad:
                 case (int)EventStatus.EndosoGarantia:
@@ -646,24 +655,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if (party.SenderParty != senderCode)
                         {
-                            //valida si existe los permisos del mandatario 
-                            var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
-                                party.ResponseCode, xmlParserCude.NoteMandato);
-                            if (response != null)
+                            responses.Add(new ValidateListResponse
                             {
-                                responses.Add(response);
-                            }
-                            else
-                            {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = true,
-                                    Mandatory = true,
-                                    ErrorCode = "100",
-                                    ErrorMessage = "Evento senderParty referenciado correctamente",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = errorCodeMessage.errorCode,
+                                ErrorMessage = errorCodeMessage.errorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
                         }
                         else
                         {
@@ -688,29 +687,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+
+                    //valida si existe los permisos del mandatario 
+                    //var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
+                    //    party.ResponseCode, xmlParserCude.NoteMandato);
+                    //if (response != null)
+                    //{
+                    //    responses.Add(response);
+                    //}
+                    //else
+                    //{
+                    //    responses.Add(new ValidateListResponse
+                    //    {
+                    //        IsValid = true,
+                    //        Mandatory = true,
+                    //        ErrorCode = "100",
+                    //        ErrorMessage = "Evento senderParty referenciado correctamente",
+                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //    });
+                    //}
+
                     return responses;
                 case (int)EventStatus.AceptacionTacita:
                 case (int)EventStatus.Mandato:
                     if (party.SenderParty != senderCode)
                     {
-                        //valida si existe los permisos del mandatario 
-                        var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
-                            party.ResponseCode, xmlParserCude.NoteMandato);
-                        if (response != null)
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(response);
-                        }
-                        else
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = "Evento senderParty referenciado correctamente",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = (Convert.ToInt32(eventCode) == 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCode,
+                            ErrorMessage = (Convert.ToInt32(eventCode) == 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
                     }
                     else
                     {
@@ -747,8 +756,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+
+                    //valida si existe los permisos del mandatario 
+                    //var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
+                    //    party.ResponseCode, xmlParserCude.NoteMandato);
+                    //if (response != null)
+                    //{
+                    //    responses.Add(response);
+                    //}
+                    //else
+                    //{
+                    //    responses.Add(new ValidateListResponse
+                    //    {
+                    //        IsValid = true,
+                    //        Mandatory = true,
+                    //        ErrorCode = "100",
+                    //        ErrorMessage = "Evento senderParty referenciado correctamente",
+                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //    });
+                    //}
+
                     return responses;
                 case (int)EventStatus.Avales:
+
                     //valida si existe los permisos del mandatario 
                     var responseAval = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
                         party.ResponseCode, xmlParserCude.NoteMandato);
@@ -797,24 +827,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     if (party.SenderParty != senderCode)
                     {
-                        //valida si existe los permisos del mandatario 
-                        var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
-                            party.ResponseCode, xmlParserCude.NoteMandato);
-                        if (response != null)
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(response);
-                        }
-                        else
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = "Evento senderParty referenciado correctamente",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCode,
+                            ErrorMessage = errorCodeMessage.errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
                     }
                     else
                     {
@@ -851,29 +871,38 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
+                    ////valida si existe los permisos del mandatario 
+                    //var responseMandato = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
+                    //    party.ResponseCode, xmlParserCude.NoteMandato);
+                    //if (responseMandato != null)
+                    //{
+                    //    responses.Add(responseMandato);
+                    //}
+                    //else
+                    //{
+                    //    responses.Add(new ValidateListResponse
+                    //    {
+                    //        IsValid = true,
+                    //        Mandatory = true,
+                    //        ErrorCode = "100",
+                    //        ErrorMessage = "Evento senderParty referenciado correctamente",
+                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //    });
+                    //}
+
                     return responses;
                 // Validación de la Sección SenderParty / ReceiverParty TASK 791
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
                     if (party.SenderParty != senderCode)
                     {
-                        //valida si existe los permisos del mandatario 
-                        var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
-                            party.ResponseCode, xmlParserCude.NoteMandato);
-                        if (response != null)
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(response);
-                        }
-                        else
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = "Evento senderParty referenciado correctamente",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCode,
+                            ErrorMessage = errorCodeMessage.errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
                     }
                     else
                     {
@@ -909,6 +938,27 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+
+                    ////valida si existe los permisos del mandatario 
+                    //var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
+                    //    party.ResponseCode, xmlParserCude.NoteMandato);
+                    //if (response != null)
+                    //{
+                    //    responses.Add(response);
+                    //}
+                    //else
+                    //{
+                    //    responses.Add(new ValidateListResponse
+                    //    {
+                    //        IsValid = true,
+                    //        Mandatory = true,
+                    //        ErrorCode = "100",
+                    //        ErrorMessage = "Evento senderParty referenciado correctamente",
+                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //    });
+                    //}
+
+
                     return responses;
                 case (int)EventStatus.NegotiatedInvoice:
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
@@ -947,8 +997,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = receiver2DvErrorCode,
-                                ErrorMessage = "Emisor/Facturador Electrónico no coincide con la información de la factura referenciada",
+                                ErrorCode = errorCodeMessage.errorCode,
+                                ErrorMessage = errorCodeMessage.errorMessage,
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -997,8 +1047,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = receiver2DvErrorCode,
-                                ErrorMessage = "Información del Mandatario/Representante no coincide con la información del evento referenciado",
+                                ErrorCode = errorCodeMessage.errorCode,
+                                ErrorMessage = errorCodeMessage.errorMessage,
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -1030,24 +1080,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                     if (party.SenderParty != receiverCode)
                     {
-                        //valida si existe los permisos del mandatario 
-                        var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, receiverCode,
-                            party.ResponseCode, xmlParserCude.NoteMandato);
-                        if (response != null)
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(response);
-                        }
-                        else
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = "Evento senderParty referenciado correctamente",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCode,
+                            ErrorMessage = errorCodeMessage.errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
                     }
                     else
                     {
@@ -1083,6 +1123,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+
+                    ////valida si existe los permisos del mandatario 
+                    //var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, receiverCode,
+                    //    party.ResponseCode, xmlParserCude.NoteMandato);
+                    //if (response != null)
+                    //{
+                    //    responses.Add(response);
+                    //}
+                    //else
+                    //{
+                    //    responses.Add(new ValidateListResponse
+                    //    {
+                    //        IsValid = true,
+                    //        Mandatory = true,
+                    //        ErrorCode = "100",
+                    //        ErrorMessage = "Evento senderParty referenciado correctamente",
+                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //    });
+                    //}
+
                     return responses;
             }
 

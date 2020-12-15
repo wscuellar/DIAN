@@ -138,6 +138,7 @@
     <Compile Include="Repositories\RadianContributorFileStatusRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileTypeRepository.cs" />
     <Compile Include="Repositories\RadianContributorOperationRepository.cs" />
+    <Compile Include="Repositories\OthersDocsElecContributorRepository.cs" />
     <Compile Include="Repositories\RadianContributorRepository.cs" />
     <Compile Include="Repositories\RadianContributorTypeRepository.cs" />
     <Compile Include="Repositories\RadianOperationModeRepository.cs" />
