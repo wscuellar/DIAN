@@ -54,51 +54,40 @@ namespace Gosocket.Dian.Functions.Activation
                 var globalTestSetTracking = JsonConvert.DeserializeObject<GlobalTestSetTracking>(eventGridEvent.Data.ToString());
 
                 await globalTestSetTrackingTableManager.InsertOrUpdateAsync(globalTestSetTracking);
-
                 var allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
-                var operation = globalRadianOperations.Find<GlobalRadianOperations>(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
-                var radianTestSet = radianTestSetTableManager.FindByPartition<RadianTestSet>(operation.SoftwareType.ToString());
 
+                List<RadianTestSet> radianTestSet = new List<RadianTestSet>();
+                GlobalRadianOperations operation = globalRadianOperations.Find<GlobalRadianOperations>(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
+                if (operation != null && operation.RadianStatus == Domain.Common.RadianState.Test.GetDescription())
+                    radianTestSet = radianTestSetTableManager.FindByPartition<RadianTestSet>(operation.SoftwareType.ToString());
 
                 //Valida RADIAN
-                if (radianTestSet != null)
+                if (radianTestSet.Any())
                 {
                     // Roberto Alvarado 20202/11/25
                     // Proceso de RADIAN TestSetResults
 
-                    var result = new List<XmlParamsResponseTrackId>();
-                   
                     // traigo los datos de RadianTestSetResult
                     var radianTestSetResults = radianTestSetResultTableManager.FindByPartition<RadianTestSetResult>(globalTestSetTracking.SenderCode);
 
                     // Valido que este en Process el registro de Set de pruebas
-                    var radianTesSetResult = radianTestSetResults.SingleOrDefault(t => !t.Deleted &&
+                    RadianTestSetResult radianTesSetResult = radianTestSetResults.SingleOrDefault(t => !t.Deleted &&
                                                                                 t.Id == globalTestSetTracking.TestSetId &&
                                                                                 t.Status == (int)TestSetStatus.InProcess);
+
+                    if (radianTesSetResult == null)
+                        return;
 
                     // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
                     bool isActive = globalRadianOperationService.IsActive(globalTestSetTracking.SenderCode, new Guid(globalTestSetTracking.SoftwareId));
                     if (isActive)
                         return;
 
-
-                    // string key = operation.SoftwareType.ToString() + "|" + globalTestSetTracking.SoftwareId;
-
-                    // Busco todos los Set de Pruebas por el NIT del Contributor
-                    var listradianTestSetResult = radianTestSetResultTableManager.FindByPartition<RadianTestSetResult>(globalTestSetTracking.SenderCode);
-
-                    // busco el registro del set de pruebas a actualizar
-                    var radianTestSetResult = listradianTestSetResult.Where(r => r.Id == globalTestSetTracking.TestSetId);
-                    // Si no lo encuentro, no continuo
-                    if (radianTestSetResult == null)
-                        return;
-
-
+                    //Ajustamos los documentType para sean los eventos de la factura
                     foreach (var item in allGlobalTestSetTracking)
                     {
-                        //Consigue inbformacion del CUDE
+                        //Consigue informacion del CUDE
                         GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(item.TrackId, item.TrackId);
-
                         item.DocumentTypeId = validatorDocumentMeta.EventCode;
                     }
 
@@ -115,7 +104,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.TotalReceiptNoticeSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
                     radianTesSetResult.ReceiptNoticeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
                     radianTesSetResult.ReceiptNoticeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
-                  
+
                     // Recibo del Bien
                     tipo = EventStatus.Received.ToString();
                     radianTesSetResult.TotalReceiptServiceSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
@@ -245,25 +234,25 @@ namespace Gosocket.Dian.Functions.Activation
 
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (radianTesSetResult.Status == (int)TestSetStatus.Accepted)
-                    {       
+                    {
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
                         {
-                            
+
                             try
                             {
-                                #region Proceso Radian
+                                #region Proceso Radian Habilitacion
 
                                 Contributor contributor = contributorService.GetByCode(globalTestSetTracking.SenderCode);
                                 GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
-                                if (!string.IsNullOrEmpty(isPartipantActive.RadianStatus))
-                                {
-                                    contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
-                                }
+                                if (operation.RadianStatus != Domain.Common.RadianState.Habilitado.GetDescription()) return;
+                                contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
+
                                 #endregion
 
                                 #region Pendiente migracion SQL
+
 
                                 #endregion
 
