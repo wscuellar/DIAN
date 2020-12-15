@@ -196,6 +196,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var serie = documentParsed.Serie;
             var serieAndNumber = documentParsed.SerieAndNumber;
             var trackId = documentParsed.DocumentKey.ToLower();
+            var eventCode = documentParsed.ResponseCode;
             var zone3 = new GlobalLogger("", "Zone 3") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
             // ZONE 3
 
@@ -220,7 +221,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // Duplicity
             start = DateTime.UtcNow;
-            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serie, serieAndNumber, trackId);
+            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serie, serieAndNumber, trackId, eventCode);
             if (response != null) return response;
             var duplicity = new GlobalLogger(trackId, "Duplicity") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
             // Duplicity
@@ -833,7 +834,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // Duplicity
             start = DateTime.UtcNow;
-            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serie, serieAndNumber, trackIdCude);
+            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serie, serieAndNumber, trackIdCude, eventCode);
             if (response != null)
             {
                 UpdateInTransactions(trackId, eventCode);
@@ -1293,7 +1294,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="serie"></param>
         /// <param name="number"></param>
         /// <returns></returns>
-        private DianResponse CheckDocumentDuplicity(string senderCode, string documentType, string serie, string serieAndNumber, string trackId)
+        private DianResponse CheckDocumentDuplicity(string senderCode, string documentType, string serie, string serieAndNumber, string trackId, string eventCode)
         {
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             // identifier
@@ -1302,7 +1303,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
 
             // first check
-            CheckDocument(ref response, document, documentType);
+            CheckDocument(ref response, document, documentType, eventCode);
 
             // Check if response has errors
             if (response.ErrorMessage.Any())
@@ -1331,7 +1332,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(identifier, identifier);
 
             // second check
-            CheckDocument(ref response, document, documentType);
+            CheckDocument(ref response, document, documentType, eventCode);
 
             // Check if response has errors
             if (response.ErrorMessage.Any())
@@ -1350,7 +1351,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             {
                 document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
 
-                CheckDocument(ref response, document, documentType, meta);
+                CheckDocument(ref response, document, documentType, eventCode,meta);
 
                 // Check if response has errors
                 if (response.ErrorMessage.Any())
@@ -1374,42 +1375,58 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="document"></param>
         /// <param name="meta"></param>
         /// <returns></returns>
-        private DianResponse CheckDocument(ref DianResponse response, GlobalDocValidatorDocument document, string documentType, GlobalDocValidatorDocumentMeta meta = null)
+        private DianResponse CheckDocument(ref DianResponse response, GlobalDocValidatorDocument document, string documentType, string eventCode, GlobalDocValidatorDocumentMeta meta = null)
         {
             List<string> failedList = new List<string>();
             if (document != null)
             {
-                if (meta == null)
-                    meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(document.DocumentKey, document.DocumentKey);
-
-                if (documentType == "96")
+                if(eventCode == "043")
                 {
                     var cudeList = new List<string>
-                     {
-                         $"Regla: 90, Rechazo: Documento con CUDE '{document.DocumentKey}' procesado anteriormente."
-                     };
+                         {
+                             $"Regla: 90, Rechazo: Documento con CUDE '{document.DocumentKey}' procesado anteriormente."
+                         };
                     failedList.AddRange(cudeList);
+                    response.IsValid = false;
+                    response.StatusCode = "99";
+                    response.StatusMessage = "Documento con errores en campos mandatorios.";
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                    response.ErrorMessage.AddRange(failedList);
+                    response.XmlDocumentKey = document.DocumentKey;
                 }
                 else
                 {
-                    var cudeList = new List<string>
-                     {
-                         $"Regla: 90, Rechazo: Documento con CUFE '{document.DocumentKey}' procesado anteriormente."
-                     };
-                    failedList.AddRange(cudeList);
+                    if (meta == null)
+                        meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(document.DocumentKey, document.DocumentKey);
+
+                    if (documentType == "96")
+                    {
+                        var cudeList = new List<string>
+                         {
+                             $"Regla: 90, Rechazo: Documento con CUDE '{document.DocumentKey}' procesado anteriormente."
+                         };
+                        failedList.AddRange(cudeList);
+                    }
+                    else
+                    {
+                        var cudeList = new List<string>
+                         {
+                             $"Regla: 90, Rechazo: Documento con CUFE '{document.DocumentKey}' procesado anteriormente."
+                         };
+                        failedList.AddRange(cudeList);
+                    }
+                
+
+                    response.IsValid = false;
+                    response.StatusCode = "99";
+                    response.StatusMessage = "Documento con errores en campos mandatorios.";
+                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                    response.ErrorMessage.AddRange(failedList);
+                    var xmlBytes = XmlUtil.GetApplicationResponseIfExist(meta);
+                    response.XmlBase64Bytes = xmlBytes;
+                    response.XmlDocumentKey = document.DocumentKey;
+                    response.XmlFileName = meta.FileName;
                 }
-
-
-                response.IsValid = false;
-                response.StatusCode = "99";
-                response.StatusMessage = "Documento con errores en campos mandatorios.";
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                response.ErrorMessage.AddRange(failedList);
-                var xmlBytes = XmlUtil.GetApplicationResponseIfExist(meta);
-                response.XmlBase64Bytes = xmlBytes;
-                response.XmlDocumentKey = document.DocumentKey;
-                response.XmlFileName = meta.FileName;
-
             }
 
             return response;
