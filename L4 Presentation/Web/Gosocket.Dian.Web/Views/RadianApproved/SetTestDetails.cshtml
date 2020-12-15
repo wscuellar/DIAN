@@ -6,14 +6,14 @@
 }
 
 <div class="page-content radian-view margin-15">
-    <div class="row title-container">
+    <div class="title-container">
         <p class="title-view">
             @ViewBag.title
         </p>
         <div class="underline-title"></div>
         <div class="back-button"><a href="javascript:history.back()"><i class="fa fa-chevron-left"></i> Volver</a></div>
     </div>
-    <div class="row margin-horizontal-0">
+    <div class="margin-horizontal-0">
         <div class="panel">
             <div class="panel-body padding-top-20">
                 <div class="row warning-wrapper">
@@ -24,7 +24,7 @@
                         <span class="warning-title">¡Importante!</span>
                         <p>
                             Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta en proceso.<br>
-                            Usted debe proporcinar el identificador del st de pruebas (TestSetld) <b>42f705e7-4906-4144-8ef2-9ed76f7d84</b> en el web service  para el envío de su set de pruebas.
+                            Usted debe proporcinar el identificador del st de pruebas (TestSetld) <b>@Model.RadianTestSetResult.Id</b> en el web service  para el envío de su set de pruebas.
                         </p>
                     </div>
                 </div>
@@ -61,7 +61,7 @@
                             }
                         });
 
-                        function showChart(data) {
+                        function showChart(data) {debugger
                             var dataChart = data.data;
                             Highcharts.chart('setTestDetails', {
                                 chart: {
@@ -86,7 +86,9 @@
                                         'Endoso',
                                         'Anulación endoso',
                                         'Notificación pago parcial o total',
-                                        'Terminación de la limitación de circulación'
+                                        'Terminación de la limitación de circulación',
+                                        'Endoso en garantia',
+                                        'Endoso en procuración'
                                     ]
                                 },
                                 yAxis: {
@@ -125,7 +127,9 @@
                                             dataChart.EndorsementTotalRequired,
                                             dataChart.EndorsementCancellationTotalRequired,
                                             dataChart.PaymentNotificationTotalRequired,
-                                            dataChart.EndCirculationLimitationTotalRequired
+                                            dataChart.EndCirculationLimitationTotalRequired,
+                                            dataChart.EndorsementGuaranteeTotalRequired,
+                                            dataChart.EndorsementProcurementTotalRequired
                                         ]
                                     },
                                     {
@@ -145,7 +149,9 @@
                                             dataChart.EndorsementTotalAcceptedRequired,
                                             dataChart.EndorsementCancellationTotalAcceptedRequired,
                                             dataChart.PaymentNotificationTotalAcceptedRequired,
-                                            dataChart.EndCirculationLimitationTotalAcceptedRequired
+                                            dataChart.EndCirculationLimitationTotalAcceptedRequired,
+                                            dataChart.EndorsementGuaranteeTotalAcceptedRequired,
+                                            dataChart.EndorsementProcurementTotalAcceptedRequired
                                         ]
                                     },
                                     {
@@ -165,7 +171,9 @@
                                             dataChart.TotalEndorsementSent,
                                             dataChart.TotalEndorsementCancellationSent,
                                             dataChart.TotalPaymentNotificationSent,
-                                            dataChart.TotalEndCirculationLimitationSent
+                                            dataChart.TotalEndCirculationLimitationSent,
+                                            dataChart.TotalEndorsementGuaranteeSent,
+                                            dataChart.TotalEndorsementProcurementSent
                                         ]
                                     },
                                     {
@@ -185,7 +193,9 @@
                                             dataChart.EndorsementAccepted,
                                             dataChart.EndorsementCancellationAccepted,
                                             dataChart.PaymentNotificationAccepted,
-                                            dataChart.EndCirculationLimitationAccepted
+                                            dataChart.EndCirculationLimitationAccepted,
+                                            dataChart.EndorsementGuaranteeAccepted,
+                                            dataChart.EndorsementProcurementAccepted
                                         ]
                                     },
                                     {
@@ -205,7 +215,9 @@
                                             dataChart.EndorsementRejected,
                                             dataChart.EndorsementCancellationRejected,
                                             dataChart.PaymentNotificationRejected,
-                                            dataChart.EndCirculationLimitationRejected
+                                            dataChart.EndCirculationLimitationRejected,
+                                            dataChart.EndorsementGuaranteeRejected,
+                                            dataChart.EndorsementProcurementRejected
                                         ]
                                     }
                                 ]

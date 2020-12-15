@@ -32,19 +32,16 @@
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
             <div>
-                <div>CUFE:</div>
-                <div>@Model.GlobalDocValidatorDocument.GlobalDocumentId</div>
+                @Html.Partial("_ViewerPartial", Model.ListDocValidatorModels[0]);
+                @*<div>CUFE:</div>
+                    <div>@Model.GlobalDocValidatorDocument.GlobalDocumentId</div>*@
             </div>
         </div>
 
-        @foreach (var item in Model.ListGlobalDocValidatorDocumentMetas)
+        @foreach (var item in Model.ListDocValidatorModels.Where(d => d.Document.DocumentKey != "01"))
         {
-            <div id="@item.DocumentKey" class="tab-pane fade">
-                <div>
-                    <div class="title h3">@item.DocumentTypeName</div>
-                    <div>CUDE:</div>
-                    <div>@item.DocumentKey</div>
-                </div>
+            <div id="@item.Document.DocumentKey" class="tab-pane fade">
+                @Html.Partial("_ViewerPartial", item);
             </div>
         }
     </div>

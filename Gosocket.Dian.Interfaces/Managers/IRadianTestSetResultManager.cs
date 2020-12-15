@@ -10,5 +10,6 @@ namespace Gosocket.Dian.Interfaces.Managers
         RadianTestSetResult GetTestSetResult(string partitionKey, string rowKey);
         bool InsertOrUpdateTestSetResult(RadianTestSetResult testSetResult);
         List<RadianTestSetResult> GetTestSetResultByNit(string nit);
+        List<GlobalTestSetResult> GetTestSetResulByCatalog(string code);
     }
 }

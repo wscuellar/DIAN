@@ -18,6 +18,7 @@
                         <th>Nombre Comercial</th>
                         <th>Razón Social</th>
                         <th>Estado</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,14 +27,13 @@
                         var textClass = DataUtils.GetProviderStatusStyle(RadianContributor.AcceptanceStatusId);
                         var isClickableRow = User.IsInAnyRole("Administrador", "Super") ? "clickable-row" : "";
                         var urlView = User.IsInAnyRole("Administrador", "Super") ? Url.Action("ViewDetails", "Radian", new { id = RadianContributor.Id }) : "";
-                        <tr class='@isClickableRow' data-href="@urlView">
-                            <td class="smallText iffyTip"><a>@RadianContributor.Code</a></td>
-                            <td class="largeText iffyTip"><a>@RadianContributor.BusinessName</a></td>
-                            <td class="largeText iffyTip"><a>@RadianContributor.TradeName</a></td>
-                            <td class="largeText iffyTip">
-                                <a><i class="fa fa-circle @textClass"></i>&nbsp;@RadianContributor.RadianState</a>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td class="smallText iffyTip"><a>@RadianContributor.Code</a></td>
+                        <td class="largeText iffyTip"><a>@RadianContributor.BusinessName</a></td>
+                        <td class="largeText iffyTip"><a>@RadianContributor.TradeName</a></td>
+                        <td class="largeText iffyTip"><a>@RadianContributor.RadianState</a></td>
+                        <td class="largeText iffyTip show-details @isClickableRow" data-href="@urlView"><a class="btn btn-link">Ver detalle</a></td>
+                    </tr>
                     }
                 </tbody>
             </table>
