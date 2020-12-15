@@ -582,10 +582,10 @@ namespace Gosocket.Dian.Application.Cosmos
 
             if (radianStatus > 0)
             {
+                options.MaxItemCount = 40;
                 switch (radianStatus)
                 {
                     case 1:
-                        options.MaxItemCount = 40;
                         radianStatusFilter = new List<string>() {
                             $"0{(int)EventStatus.Received}", $"0{(int)EventStatus.Receipt}", $"0{(int)EventStatus.Accepted}"
                         };

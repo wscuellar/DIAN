@@ -328,6 +328,7 @@
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ExternalUsersController.cs" />
+    <Compile Include="Controllers\OthersElectronicDocAssociatedController.cs" />
     <Compile Include="Controllers\OthersElectronicDocumentsController.cs" />
     <Compile Include="Controllers\QueryAssociatedEventsController.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeController.cs" />
@@ -370,6 +371,7 @@
     <Compile Include="Models\AutoListModel.cs" />
     <Compile Include="Models\EventsCounterViewModel.cs" />
     <Compile Include="Models\FileHistoryFilterViewModel.cs" />
+    <Compile Include="Models\OthersElectronicDocAssociatedViewModel.cs" />
     <Compile Include="Models\OthersElectronicDocumentsViewModel.cs" />
     <Compile Include="Models\ParametersDataViewModel.cs" />
     <Compile Include="Models\ContingencyViewModel.cs" />
@@ -2903,6 +2905,10 @@
     <Content Include="Views\Document\ShowDocumentToPublic.cshtml" />
     <Content Include="Views\Radian\_detailsTestSet.cshtml" />
     <Content Include="Views\OthersElectronicDocuments\AddParticipants.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\Index.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\_personalInfo.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\_finish.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\_pending.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
