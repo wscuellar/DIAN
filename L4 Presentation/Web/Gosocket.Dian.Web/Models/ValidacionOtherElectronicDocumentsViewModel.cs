@@ -9,8 +9,9 @@
         public int ElectronicDocument { get; set; }
         public string ComplementoTexto { get; set; }
 
-        public int ContributorIdType { get; set; }
+        public Domain.Common.OtherDocElecContributorType ContributorIdType { get; set; }
 
-        
+        public Domain.Common.OtherDocElecOperationMode OperationModeId { get; set; }
+
     }
 }

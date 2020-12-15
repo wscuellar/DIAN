@@ -1,10 +1,13 @@
 ﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -34,26 +37,22 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns></returns>
         public ActionResult Index()
         {
-            ViewBag.UserCode = User.UserCode();
-            ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-            ViewBag.ListElectronicDocuments = new ElectronicDocumentService().GetElectronicDocuments()
-                .Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
-            ViewBag.ContributorId = User.ContributorId();
-
             NameValueCollection result = _othersDocsElecContributorService.Summary(User.UserCode());
             ViewBag.ContributorId = result["ContributorId"];
-            ViewBag.ElectronicInvoice_OtherDocElecContributorTypeId = result["ElectronicInvoice_OtherDocElecContributorTypeId"];
-            ViewBag.ElectronicInvoice_OtherDocElecOperationModeId = result["ElectronicInvoice_OtherDocElecOperationModeId"];
+            ViewBag.Transmitter_OtherDocElecContributorTypeId = result["Transmitter_OtherDocElecContributorTypeId"];
+            ViewBag.Transmitter_OtherDocElecOperationModeId = result["Transmitter_OtherDocElecOperationModeId"];
             ViewBag.TechnologyProvider_OtherDocElecContributorTypeId = result["TechnologyProvider_OtherDocElecContributorTypeId"];
             ViewBag.TechnologyProvider_OtherDocElecOperationModeId = result["TechnologyProvider_OtherDocElecOperationModeId"];
-            ViewBag.TradingSystem_OtherDocElecContributorTypeId = result["TradingSystem_OtherDocElecContributorTypeId"];
-            ViewBag.TradingSystem_OtherDocElecOperationModeId = result["TradingSystem_OtherDocElecOperationModeId"];
-            ViewBag.Factor_OtherDocElecContributorTypeId = result["Factor_OtherDocElecContributorTypeId"];
-            ViewBag.Factor_OtherDocElecOperationModeId = result["Factor_OtherDocElecOperationModeId"];
-            return View(); 
+
+            ViewBag.UserCode = User.UserCode();
+            ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
+            ViewBag.ListElectronicDocuments = new ElectronicDocumentService().GetElectronicDocuments().Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            ViewBag.ContributorId = User.ContributorId();
+
+            return View();
         }
 
-        public ActionResult AddOrUpdate(int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0 )
+        public ActionResult AddOrUpdate(int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0)
         {
             List<ElectronicDocument> listED = new ElectronicDocumentService().GetElectronicDocuments();
             List<OperationModeViewModel> listOM = new TestSetViewModel().GetOperationModes();
@@ -81,8 +80,37 @@ namespace Gosocket.Dian.Web.Controllers
                  Text = c.Name
              });
             ViewBag.ListOperationMode = OperationsModes;
-            
+
             return View();
+        }
+
+
+        [HttpPost]
+        public JsonResult Add(ValidacionOtherElectronicDocumentsViewModel registrationData)
+        {
+
+
+            OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(registrationData.ContributorId,
+                                                Domain.Common.OtherDocElecState.Registrado,
+                                                registrationData.ContributorIdType,
+                                                registrationData.OperationModeId,
+                                                User.UserName());
+
+
+            //if (otherDocElecContributor.RadianSoftwares == null || radianContributor.RadianSoftwares.Count == 0)
+            //   return Json(new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+
+            OtherDocElecSoftware software = otherDocElecContributor.OtherDocElecSoftwares.FirstOrDefault();
+            OtherDocElecContributorOperations ContributorOperation = new OtherDocElecContributorOperations()
+            {
+                OtherDocElecContributorId = otherDocElecContributor.Id,
+                SoftwareId = software.Id,
+                OperationStatusId = (int)OtherDocElecState.Registrado,
+                SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
+                Timestamp = DateTime.Now
+            };
+            ResponseMessage result = _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, testSet, true, false);
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
 
@@ -90,6 +118,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult Validation(ValidacionOtherElectronicDocumentsViewModel ValidacionOtherElectronicDocuments)
         {
+            int contributorId = User.ContributorId();
             ResponseMessage validation =
                 _othersElectronicDocumentsService.Validation(ValidacionOtherElectronicDocuments.UserCode.ToString(),
                 ValidacionOtherElectronicDocuments.Accion,

@@ -1,4 +1,6 @@
 ﻿using Gosocket.Dian.DataContext;
+using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Repositories;
@@ -41,17 +43,70 @@ namespace Gosocket.Dian.Application
             Domain.Contributor contributor = _contributorService.GetByCode(userCode);
             List<OtherDocElecContributor> LContributors = _othersDocsElecContributorRepository.List(t => t.ContributorId == contributor.Id && t.State != "Cancelado").Results;
             if (LContributors.Any())
-                foreach (var radianContributor in LContributors)
+                foreach (var itemContributor in LContributors)
                 {
-                    string key = Enum.GetName(typeof(Domain.Common.RadianContributorType), radianContributor. OtherDocElecContributorTypeId);
-                    collection.Add(key + "_OtherDocElecContributorTypeId", radianContributor.OtherDocElecContributorTypeId.ToString());
-                    collection.Add(key + "_OtherDocElecOperationModeId", radianContributor.OtherDocElecOperationModeId.ToString());
+                    string key = Enum.GetName(typeof(Domain.Common.OtherDocElecContributorType), itemContributor.OtherDocElecContributorTypeId);
+                    collection.Add(key + "_OtherDocElecContributorTypeId", itemContributor.OtherDocElecContributorTypeId.ToString());
+                    collection.Add(key + "_OtherDocElecOperationModeId", itemContributor.OtherDocElecOperationModeId.ToString());
                 }
             if (contributor == null) return collection;
             collection.Add("ContributorId", contributor.Id.ToString());
             collection.Add("ContributorTypeId", contributor.ContributorTypeId.ToString());
             collection.Add("Active", contributor.Status.ToString());
             return collection;
+        }
+
+        public OtherDocElecContributor CreateContributor(int contributorId, OtherDocElecState State, Domain.Common.OtherDocElecContributorType ContributorType, Domain.Common.OtherDocElecOperationMode OperationMode, string createdBy)
+        {
+            OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId && t.OtherDocElecContributorTypeId == (int)ContributorType);
+
+            OtherDocElecContributor newContributor = new OtherDocElecContributor()
+            {
+                Id = existing != null ? existing.Id : 0,
+                ContributorId = contributorId,
+                CreatedBy = createdBy,
+                OtherDocElecContributorTypeId = (int)ContributorType,
+                OtherDocElecOperationModeId = (int)OperationMode,
+                State = State.GetDescription(),
+                CreatedDate = existing != null ? existing.CreatedDate : DateTime.Now
+            };
+            newContributor.Id = _othersDocsElecContributorRepository.AddOrUpdate(newContributor);
+
+            Software ownSoftware = GetSoftwareOwn(contributorId);
+            //OtherDocElecSoftware odeSoftware = new OtherDocElecSoftware(ownSoftware, newContributor.Id, createdBy);
+            //newContributor.OtherDocElecSoftwares = new List<OtherDocElecSoftware>() { odeSoftware };
+             
+            return newContributor;
+        }
+
+        private Software GetSoftwareOwn(int contributorId)
+        {
+            List<Software> ownSoftwares = _contributorService.GetBaseSoftwareForRadian(contributorId);
+            if (!ownSoftwares.Any())
+                return null;
+            List<string> softwares = ContributorSoftwareAcceptedList(contributorId);
+
+            return (from os in ownSoftwares
+                    join s in softwares on os.Id.ToString() equals s
+                    select os).OrderByDescending(t => t.Timestamp).FirstOrDefault();
+        }
+
+
+        private List<string> ContributorSoftwareAcceptedList(int contributorId)
+        {
+            Contributor contributor = _contributorService.Get(contributorId);
+            var contributorOperations = contributor.ContributorOperations.Where(o => !o.Deleted);
+            //var testSetResults = _radianTestSetResultManager.GetTestSetResulByCatalog(contributor.Code);
+
+            List<string> softwareAccepted = new List<string>();
+            foreach (var item in contributorOperations)
+            {
+                //GlobalTestSetResult testset = GetTestSetResult(testSetResults, item, contributor.ContributorTypeId.Value);
+                // if (((TestSetStatus)testset.Status) == TestSetStatus.Accepted)
+                // softwareAccepted.Add(testset.SoftwareId);
+            }
+
+            return softwareAccepted;
         }
     }
 }

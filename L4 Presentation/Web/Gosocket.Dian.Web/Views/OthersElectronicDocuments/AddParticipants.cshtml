@@ -184,11 +184,17 @@
                 CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
                     function (param) {
 
-                        var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
-                            + "?electronicDocumentId=" + electronicDocumentId
-                            + "&operationModeId=" + OperationMode
-                            + "&ContributorIdType=" + ContributorIdType;
-                        window.location.href = url;
+                         CallExecution("POST", '@Url.Action("Add", "OthersElectronicDocuments")', RegistrationDataViewModel,
+                                function (param) {
+                                    var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
+                                            + "?electronicDocumentId=" + electronicDocumentId
+                                            + "&operationModeId=" + OperationMode
+                                            + "&ContributorIdType=" + ContributorIdType;
+                                        window.location.href = url;
+                                }, false, () => hideLoading('#panel-form')
+                        );
+
+
 
 
                     }, true, () => hideLoading('#panel-form')
