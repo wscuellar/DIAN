@@ -194,9 +194,9 @@ namespace Gosocket.Dian.Application
                      item.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription(Enum.Parse(typeof(RadianOperationModeTestSet), parts[0]));
                  }
                  List<string> userIds = _contributorService.GetUserContributors(c.Contributor.Id).Select(u => u.UserId).ToList();
-                 List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(t => t.RadianContributorTypeId == c.RadianContributorTypeId && !t.Deleted);
+                 List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(t =>t.RadianContributorTypeId == c.RadianContributorTypeId && !t.Deleted);
                  List<RadianContributorFile> newFiles = (from t in fileTypes
-                                                         join f in c.RadianContributorFile.Where(t => !t.Deleted) on t.Id equals f.FileType into files
+                                                         join f in c.RadianContributorFile.Where(t => t.RadianContributorId == c.Id && !t.Deleted) on t.Id equals f.FileType into files
                                                          from fl in files.DefaultIfEmpty(new RadianContributorFile()
                                                          {
                                                              FileName = t.Name,

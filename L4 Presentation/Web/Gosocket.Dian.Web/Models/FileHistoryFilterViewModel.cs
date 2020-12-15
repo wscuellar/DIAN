@@ -5,6 +5,8 @@ namespace Gosocket.Dian.Web.Models
 {
     public class FileHistoryFilterViewModel
     {
+
+        public int RadianContributorId { get; set; }
         public string FileName { get; set; }
         public string Initial { get; set; }
         public string End { get; set; }

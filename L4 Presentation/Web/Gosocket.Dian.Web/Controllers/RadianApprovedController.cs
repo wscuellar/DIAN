@@ -76,7 +76,7 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
             model.CustomerTotalCount = customers.RowCount;
 
-            var data = _radianAprovedService.FileHistoryFilter(string.Empty, string.Empty, string.Empty, 1, 10);
+            var data = _radianAprovedService.FileHistoryFilter(radianAdmin.Contributor.RadianContributorId, string.Empty, string.Empty, string.Empty, 1, 10);
             FileHistoryListViewModel resultH = new FileHistoryListViewModel()
             {
                 Page = 1,
@@ -402,7 +402,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult FileHistoyList(FileHistoryFilterViewModel filter)
         {
-            PagedResult<RadianContributorFileHistory> data = _radianAprovedService.FileHistoryFilter(filter.FileName, filter.Initial, filter.End, filter.Page, filter.PageSize);
+            PagedResult<RadianContributorFileHistory> data = _radianAprovedService.FileHistoryFilter(filter.RadianContributorId, filter.FileName, filter.Initial, filter.End, filter.Page, filter.PageSize);
             FileHistoryListViewModel result = new FileHistoryListViewModel()
             {
                 Page = filter.Page,

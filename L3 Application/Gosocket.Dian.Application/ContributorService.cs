@@ -442,10 +442,10 @@ namespace Gosocket.Dian.Application
                 return (from c in context.Contributors
                         from s in c.Softwares
                         join cp in context.ContributorOperations on s.Id equals cp.SoftwareId
-                        where 
+                        where
                             c.Id == contributorid
-                        &&  c.Status
-                        &&  !c.Deleted
+                        && c.Status
+                        && !c.Deleted
                         && s.Status
                         && !s.Deleted
                         && cp.OperationModeId == 2
@@ -454,18 +454,30 @@ namespace Gosocket.Dian.Application
             }
         }
 
-        public void SetToEnabledRadian(int contributorId, int contributorTypeId, string softwareId)
+        public void SetToEnabledRadian(int contributorId, int contributorTypeId, string softwareId, int softwareType)
         {
             using (var context = new SqlDBContext())
             {
-                var radianc = context.RadianContributors.FirstOrDefault(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId);
-                radianc.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
-                Guid softId = new Guid(softwareId);
+                var radianc = context.RadianContributors.FirstOrDefault(t => t.ContributorId == contributorId
+                                        && t.RadianContributorTypeId == contributorTypeId);
+                if (radianc != null)
+                {
+                    radianc.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
 
-                RadianSoftware soft =  context.RadianSoftwares.FirstOrDefault(t => t.Id == softId);
-                soft.RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted;
+                    Guid softId = new Guid(softwareId);
+                    if (radianc.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
+                    {
+                        RadianSoftware soft = context.RadianSoftwares.FirstOrDefault(t => t.Id == softId);
+                        soft.RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted;
+                    }
 
-                context.SaveChanges();
+                    RadianContributorOperation radianOperation = context.RadianContributorOperations.FirstOrDefault(
+                                                 t => t.RadianContributorId == radianc.Id
+                                                 && t.SoftwareType == softwareType && t.SoftwareId == softId);
+                    radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado;
+
+                    context.SaveChanges();
+                }
             }
         }
     }
