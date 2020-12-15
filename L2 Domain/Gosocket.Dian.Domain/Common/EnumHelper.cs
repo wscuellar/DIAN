@@ -490,6 +490,17 @@ namespace Gosocket.Dian.Domain.Common
         ElectronicPOS = 5
     }
 
+    public enum OtherDocElecSoftwaresStatus
+    {
+        None = 0,
+        [Description("En proceso")]
+        InProcess = 1,
+        [Description("Aceptado")]
+        Accepted = 2,
+        [Description("Rechazado")]
+        Rejected = 3,
+    }
+
     public enum OtherDocElecContributorType
     {
         [Description("Emisor")]
