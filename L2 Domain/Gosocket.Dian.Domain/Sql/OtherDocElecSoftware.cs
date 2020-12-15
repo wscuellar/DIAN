@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gosocket.Dian.Domain.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,10 +8,36 @@ namespace Gosocket.Dian.Domain.Sql
     [System.ComponentModel.DataAnnotations.Schema.Table("OtherDocElecSoftware")]
     public class OtherDocElecSoftware
     {
+        public OtherDocElecSoftware()
+        {
+
+        }
+
+
+        public OtherDocElecSoftware(Software software, int otherDocElecContributorId, string createdBy)
+        {
+            Id = software.Id;
+            Name = software.Name;
+            Pin = software.Pin;
+            OtherDocElecContributorId = otherDocElecContributorId;
+            SoftwareDate = software.SoftwareDate;
+            SoftwarePassword = software.SoftwarePassword;
+            SoftwareUser = software.SoftwareUser;
+            CreatedBy = createdBy;
+            Deleted = false;
+            Status = true;
+            OtherDocElecSoftwareStatusId = (int)OtherDocElecSoftwaresStatus.InProcess;
+            Url = software.Url;
+            Timestamp = software.Timestamp;
+            Updated = software.Updated;
+        }
+
         [Key]
         public Guid Id { get; set; }
+        
         public int OtherDocElecContributorId { get; set; }
         public virtual OtherDocElecContributor OtherDocElecContributor { get; set; }
+
         public string Name { get; set; }
         public string Pin { get; set; }
         public DateTime? SoftwareDate { get; set; }

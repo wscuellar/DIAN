@@ -89,25 +89,27 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public PagedResult<OtherDocElecContributor> List(Expression<Func<OtherDocElecContributor, bool>> expression, int page = 0, int length = 0)
         {
-            IQueryable<OtherDocElecContributor> query = sqlDBContext.OtherDocElecContributors.Where(expression)
-                    .Include("Contributor")
-                    .Include("OtherDocElecContributorTypes")
-                    .Include("OtherDocElecOperationModes");
- 
             try
             {
-                IQueryable<OtherDocElecContributor> query4 = sqlDBContext.OtherDocElecContributors.Where(expression)
+                //IQueryable<OtherDocElecContributor> query = sqlDBContext.OtherDocElecContributors.Where(expression)
+                //    .Include("Contributor")
+                //    .Include("OtherDocElecContributorTypes")
+                //    .Include("OtherDocElecOperationModes");
+
+                IQueryable<OtherDocElecContributor> query = sqlDBContext.OtherDocElecContributors.Where(expression)
                  .Include("Contributor")
-                 .Include("OtherDocElecContributorTypes")
-                 .Include("OtherDocElecOperationModes")
+                 .Include("OtherDocElecContributorType")
+                 .Include("OtherDocElecOperationMode")
                  .Include("OtherDocElecContributorOperations");
-                var d = query4.Paginate(page, length, t => t.Id.ToString());
+
+                return query.Paginate(page, length, t => t.Id.ToString());
             }
             catch (Exception ex)
             {
                 var exs = ex.Message;
             }
-            return query.Paginate(page, length, t => t.Id.ToString());
+
+            return new PagedResult<OtherDocElecContributor>();
         }
 
 

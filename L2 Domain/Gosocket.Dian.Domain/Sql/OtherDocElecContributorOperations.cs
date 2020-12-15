@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gosocket.Dian.Domain.Sql
 {
-    [System.ComponentModel.DataAnnotations.Schema.Table("OtherDocElecContributorOperations")]
+    [Table("OtherDocElecContributorOperations")]
     public class OtherDocElecContributorOperations
     {
         public int Id { get; set; }
@@ -13,7 +13,7 @@ namespace Gosocket.Dian.Domain.Sql
         //public int OperationStatusId { get; set; }
         public int SoftwareType { get; set; }
         public Guid SoftwareId { get; set; }
-        public OtherDocElecSoftware OtherDocElecSoftwares { get; set; }
+        public OtherDocElecSoftware Software { get; set; }
         public bool Deleted { get; set; }
         public DateTime Timestamp { get; set; }
          
