@@ -38,5 +38,13 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public int ProfileId { get; set; }
 
         public List<SelectListItem> Profiles { get; set; }
+
+        public string DescriptionTypeDoc { get; set; }
+
+        public string DescriptionProfile { get; set; }
+
+        public DateTime? LastUpdate { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }

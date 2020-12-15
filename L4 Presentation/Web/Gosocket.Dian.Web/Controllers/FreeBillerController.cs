@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Web.Models.FreeBiller;
+using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
 
@@ -9,26 +10,41 @@ namespace Gosocket.Dian.Web.Controllers
         // GET: FreeBiller
         public ActionResult FreeBillerUser()
         {
-            UserFreeBillerModel model = new UserFreeBillerModel();
-            model.TypesDoc = this.DataTiposDoc();
+            UserFiltersFreeBillerModel model = new UserFiltersFreeBillerModel();
+            model.DocTypes = this.DataTiposDoc();
             model.Profiles = this.DataPerfiles();
+            model.Users = this.Datausuarios(); //new List<UserFreeBillerModel>();
             return View(model);
         }
 
-        
+        [HttpPost]
+        public ActionResult FreeBillerUser(UserFiltersFreeBillerModel model)
+        {
+
+            var algo = model;
+            return RedirectToAction("FreeBillerUser");
+        }
+
+
+
+
         public ActionResult EditFreeBillerUser(UserFreeBillerModel model)
         {
             return View();
         }
-        public ActionResult CreateUser(UserFreeBillerModel model)
-        {
-            return View(model);
 
+        public ActionResult CreateUser()
+        {
+            UserFreeBillerModel model = new UserFreeBillerModel();
+            model.TypesDoc = this.DataTiposDoc();
+            model.Profiles = this.DataPerfiles();
+            
+            return View(model);
         }
 
 
 
-        private List<SelectListItem> DataTiposDoc()
+        private List<SelectListItem> DataPerfiles()
         {
             return new List<SelectListItem> {
                 new SelectListItem{ Value="1", Text= "Administrador (TODOS)" },
@@ -38,7 +54,7 @@ namespace Gosocket.Dian.Web.Controllers
             };
         }
 
-        private List<SelectListItem> DataPerfiles()
+        private List<SelectListItem> DataTiposDoc()
         {
             return new List<SelectListItem> {
                 new SelectListItem{ Value="11", Text="Registro civil" },
@@ -52,6 +68,30 @@ namespace Gosocket.Dian.Web.Controllers
                 new SelectListItem{ Value="47", Text="PEP" },
                 new SelectListItem{ Value="50", Text="Nit de otro país " },
                 new SelectListItem{ Value="91", Text="NIUP" }
+            };
+        }
+
+        private List<UserFreeBillerModel> Datausuarios()
+        {
+            return new List<UserFreeBillerModel>{
+                new UserFreeBillerModel{
+                    Id=1,
+                    FullName= "Pepito perez",
+                    DescriptionTypeDoc = "Cedula de ciudadanía",
+                    DescriptionProfile = "Facturador",
+                    NumberDoc = "1000223674",
+                    //LastUpdate = DateTime.Now,
+                    IsActive = true
+                },
+                new UserFreeBillerModel{
+                    Id=2,
+                    FullName= "lala lolo",
+                    DescriptionTypeDoc = "Cedula de ciudadanía",
+                    DescriptionProfile = "Fiscal",
+                    NumberDoc = "45722258",
+                    LastUpdate = DateTime.Now,
+                    IsActive = false
+                }
             };
         }
     }

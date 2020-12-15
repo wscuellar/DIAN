@@ -1,74 +1,172 @@
 ﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFreeBillerModel
+@{
+    ViewBag.Title = "Creación de Usuarios";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
 
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-
-    <div class="boderCreate">
-
-        @*
-            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-            <div class="form-group">
-                @Html.LabelFor(model => model.Nombre, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.Nombre, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.Nombre, "", new { @class = "text-danger" })
-                </div>
-            </div>*@
-
-        <div class="row" style="background: #ffffff">
-            <div class="col-md-3">
-
-                @Html.LabelFor(model => model.TypeDocId, new { htmlAttributes = new { @class = "form-label" } })
-                @Html.DropDownListFor(model => model.TypeDocId, Model.TypesDoc, new { htmlAttributes = new { @class = "form-control" } })
-                @*@Html.ValidationMessageFor(model => model.TipoDocId, "", new { @class = "text-danger" })*@
-            </div>
-            <div class="col-md-3">
-                @Html.LabelFor(model => model.NumberDoc, new { htmlAttributes = new { @class = "form-label" } })
-                @Html.EditorFor(model => model.NumberDoc, new { htmlAttributes = new { @class = "form-control" } })
-                @*@Html.ValidationMessageFor(model => model.Numerodoc, "", new { @class = "text-danger" })*@
-            </div>
-            <div class="col-md-4">
-                @Html.LabelFor(model => model.FullName, new { htmlAttributes = new { @class = "form-label" } })
-                @Html.EditorFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control" } })
-                @*@Html.ValidationMessageFor(model => model.NombreCopleto, "", new { @class = "text-danger" })*@
-            </div>
-        </div>
-
-        <div class="row" style="background: #ffffff">
-            <div class="col-md-3">
-                @Html.LabelFor(model => model.Email, new { htmlAttributes = new { @class = "form-label" } })
-                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
-                @*@Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })*@
-            </div>
-
-            <div class="col-md-3">
-                @Html.LabelFor(model => model.ProfileId, new { htmlAttributes = new { @class = "form-label" } })
-                @Html.DropDownListFor(model => model.ProfileId, Model.Profiles, new { htmlAttributes = new { @class = "form-control" } })
-                @*@Html.ValidationMessageFor(model => model.PerfilId, "", new { @class = "text-danger" })*@
-            </div>
-
-            <div class="col-md-4">
-                <br />
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3">
-                <br />
-            </div>
-            <div class="col-md-4">
-                <br />
-            </div>
-            <div class="col-md-4">
-                <input type="button" value="Cancelar" class="btnCancel" />
-                <input type="submit" value="Crear Usuario" class="btnSuccess" />
-            </div>
-        </div>
-
-
-    </div>
+    var columnSize = 3;
+    //if (view == "Index" || view == "Provider")
+    //{
+    //    columnSize = 3;
+    //}
 }
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+}
+
+<style>
+    .form-control {
+        border-radius: 4px;
+        height: 43px !important;
+        border: 1px solid #CCCCCC;
+    }
+
+    .btn-default {
+        border-radius: 4px;
+        height: 43px !important;
+        padding-top: 12px;
+        padding-left: 0px !important;
+    }
+
+    .title-container {
+        margin-bottom: 50px !important;
+        margin-top: 30px !important;
+    }
+
+    .select-container {
+        padding-left: 10px !important;
+    }
+
+    .submit-container {
+        margin-top: 8px;
+        padding-top: 24px;
+        padding-bottom: 20px;
+    }
+
+    .bootstrap-select button {
+        padding-left: 10px !important;
+    }
+</style>
+
+<div class="page-content margin-15">
+
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+
+
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div id="divMain" class="panel">
+                        <div class="panel-body padding-top-20">
+                            <div class="pad-btm padding-bottom-0">
+                                <div class="row margin-horizontal-0">
+                                    @using (Html.BeginForm("CreateUser", "FreeBiller", FormMethod.Post))
+                                    {
+                                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                            <div class="col-md-12 padding-horizontal-0">
+                                                <div id="document-list" class="panel panel-bordered-dian">
+
+                                                    <div class="panel-body padding-20 padding-bottom-0">
+                                                        <div class="row">
+                                                            <div class="col-sm-@columnSize padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.TypeDocId, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, new { @class = "form-control selectpicker" })
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.NumberDoc, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.NumberDoc, new { @class = "form-control" })
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.FullName, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <br />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="panel-footer-grey text-right submit-container">
+                                                        <button id="btnCancel" type="button" class="btn btn-success btn-radian-default">Cancelar</button>
+                                                        <button type="submit" class="btn btn-success btn-radian-success">Crear Usuario</button>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+
+                            @*permisos*@
+                            @*@Html.Partial("_usersFreeBiller")*@
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var urlNewUser = "@Url.Action("FreeBillerUser")";
+
+            $("#btnCancel").click(function () {
+                window.location.href = urlNewUser;
+            });
+            
+        });
+    </script>
+
+}
+
+
+

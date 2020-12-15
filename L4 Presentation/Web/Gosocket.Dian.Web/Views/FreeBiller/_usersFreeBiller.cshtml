@@ -1,0 +1,96 @@
+﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFiltersFreeBillerModel
+@using System
+<style>
+    .fa-download {
+        color: #348441;
+        font-size: 125%;
+    }
+
+    .radian-subtitle-line {
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="row radian-subtitle-container">
+    <p class="subtitle-view">
+        Resultados de búsqueda
+    </p>
+    <div class="radian-subtitle-line"></div>
+</div>
+
+<div class="table-responsive padding-bottom-15">
+    <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Tipo de doocumento</th>
+                <th>N&uacute;mero de documento</th>
+                <th>Nombre y apellido</th>
+                <th>Perfil</th>
+                <th>&Uacute;ltima Modificaci&oacute;n</th>
+                <th colspan="3">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Users.Count == 0)
+            {
+                <tr style="background-color: transparent !important;">
+                    <td class="text-nowrap text-center" colspan="13" style="padding-left: 0 !important; padding-right: 0 !important;">
+                        <div class="alert panel-footer-grey">
+                            Ningún usuario disponible para mostrar.
+                        </div>
+                    </td>
+                </tr>
+            }
+            @foreach (var user in Model.Users)
+            {
+                <tr class="document-row">
+                    <td class="text-nowrap">
+                        <a>@user.DescriptionTypeDoc</a>
+                    </td>
+                    <td class="text-nowrap text-center">
+                        <a>@user.NumberDoc</a>
+                    </td>
+                    <td class="text-center text-nowrap">
+                        @user.FullName
+                    </td>
+                    <td class="text-nowrap text-center">
+                        @user.DescriptionProfile
+                    </td>
+                    <td class="text-center">
+                        @user.LastUpdate
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.ActionLink("Ver detalles","Details")
+                    </td>
+                    <td>
+                        @Html.ActionLink("E", "EditFreeBillerUser")
+                    </td>
+                    <td class="text-nowrap">
+                        <input type="checkbox" checked="@user.IsActive" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="row margin-horizontal-0 padding-top-0">
+    <div class="col-md-9 table-toolbar-left padding-left-0">
+    </div>
+    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+        @if (Model.Users.Any())
+        {
+            <span class="text-muted">
+                <strong>@(Model.Page * Model.MaxItemCount + 1)-@(Model.MaxItemCount > Model.Users.Count ? (Model.Page) * Model.MaxItemCount + Model.Users.Count : (Model.Page + 1) * Model.MaxItemCount)</strong>
+            </span>
+            <div class="btn-group btn-group margin-left-5">
+                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                    <span class="fa fa-chevron-left"></span>
+                </a>
+                <a class="btn btn-default paginate-btn next-page" @(Model.Users.Count < Model.MaxItemCount ? "disabled=\"disabled\"" : "")>
+                    <span class="fa fa-chevron-right"></span>
+                </a>
+            </div>
+        }
+    </div>
+</div>

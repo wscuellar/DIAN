@@ -2909,6 +2909,7 @@
     <Content Include="Views\FreeBiller\EditFreeBillerUser.cshtml" />
     <Content Include="Views\FreeBiller\FreeBillerUser.cshtml" />
     <Content Include="Views\FreeBiller\CreateUser.cshtml" />
+    <Content Include="Views\FreeBiller\_usersFreeBiller.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

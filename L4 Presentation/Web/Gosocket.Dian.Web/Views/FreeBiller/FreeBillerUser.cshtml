@@ -1,124 +1,163 @@
 ﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFiltersFreeBillerModel
 @{
-    ViewBag.Title = "FreeBillerUser";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Usuarios Facturadoir Gratuito";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var columnSize = 3;
+    //if (view == "Index" || view == "Provider")
+    //{
+    //    columnSize = 3;
+    //}
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
 }
 
 <style>
-    body {
-        font-family: Arial;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 12px;
-        line-height: 14px;
-    }
-
-    label {
-        font-family: Arial;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 12px;
-        line-height: 14px;
-        color: #2C323C;
-        margin: 7px;
-    }
-
-    input {
-        margin: 7px;
-    }
-
-        input[type=text] {
-            background: #FFFFFF;
-            border: 1px solid #CCCCCC;
-            box-sizing: border-box;
-            border-radius: 4px;
-            height: 41px;
-            width: 100%;
-        }
-
-    select {
-        background: #FFFFFF;
-        border: 1px solid #CCCCCC;
-        box-sizing: border-box;
+    .form-control {
         border-radius: 4px;
-        height: 41px;
-        width: 100%;
-        margin: 7px;
+        height: 43px !important;
+        border: 1px solid #CCCCCC;
     }
 
-    .boderCreate {
-        border: 1px solid #348441;
-        box-sizing: border-box;
-        border-radius: 0px 5px 0px 0px;
+    .btn-default {
+        border-radius: 4px;
+        height: 43px !important;
+        padding-top: 12px;
+        padding-left: 0px !important;
     }
 
-    .btnCancel {
-        font-family: Arial;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 16px;
-        color: #707782;
-        background: #FFFFFF;
-        border: 2px solid #B4B4B4;
-        box-sizing: border-box;
-        border-radius: 10px;
+    .title-container {
+        margin-bottom: 50px !important;
+        margin-top: 30px !important;
     }
 
-    .btnSuccess {
-        background: #348441;
-        border-radius: 10px;
-        font-family: Arial;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 12px;
-        line-height: 14px;
-        color: #FFFFFF;
+    .select-container {
+        padding-left: 10px !important;
+    }
+
+    .submit-container {
+        margin-top: 8px;
+        padding-top: 24px;
+        padding-bottom: 20px;
+    }
+
+    .bootstrap-select button {
+        padding-left: 10px !important;
     }
 </style>
 
-<h2>FreeBillerUser</h2>
+<div class="page-content margin-15">
 
-<div class="container">
-
-    <div id="divFilters" class="container">
-
-        <div class="row">
-            <div class="col-md-3" style="background: #FFFFFF">
-                @Html.LabelFor(m => m.DocTypeId)
-                @Html.DropDownListFor(m => m.DocTypeId, Model.DocTypes, new { htmlAttributes = new { @class = "form-control" } })
-            </div>
-            <div class="col-md-3">
-                @Html.LabelFor(m => m.DocNumber)
-                @Html.EditorFor(model => model.DocNumber, new { htmlAttributes = new { @class = "form-control" } })
-            </div>
-            <div class="col-md-3">
-                @Html.LabelFor(m => m.FullName)
-                @Html.EditorFor(m => m.FullName, new { htmlAttributes = new { @class = "form-control" } })
-            </div>
-            <div class="col-md-3">
-                @Html.LabelFor(m => m.ProfileId)
-                @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { htmlAttributes = new { @class = "form-control" } })
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-3">
-
-            </div>
-            <div class="col-md-3">
-
-            </div>
-            <div class="col-md-3">
-
-            </div>
-            <div class="col-md-3">
-                <input type="button" class="btnSuccess" value="Buscar" />
-            </div>
-        </div>
-
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
     </div>
 
 
-    @Html.Partial("CreateUser", Model)
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div id="divMain" class="panel">
+                        <div class="panel-body padding-top-20">
+                            <div class="pad-btm padding-bottom-0">
+                                <div class="row margin-horizontal-0">
+                                    @using (Html.BeginForm("FreeBillerUser", "FreeBiller", FormMethod.Post))
+                                    {
+                                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                            <div class="col-md-12 padding-horizontal-0">
+                                                <div id="document-list" class="panel panel-bordered-dian">
+
+                                                    <div class="panel-body padding-20 padding-bottom-0">
+                                                        <div class="row">
+                                                            <div class="col-sm-@columnSize padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.DocTypeId, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.DocTypeId, Model.DocTypes, new { @class = "form-control selectpicker" })
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.DocNumber, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.DocNumber, new { @class = "form-control" })
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.FullName, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker" })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="panel-footer-grey text-right submit-container">
+                                                        <button type="submit" class="btn btn-success btn-radian-success">Buscar</button>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+
+                            @Html.Partial("_usersFreeBiller")
+
+                        </div>
+
+                        <div class="row margin-horizontal-0 text-right">
+                            <input id="btnProfile" type="button" value="Crear Perfil" class="btn btn-success btn-radian-success" />
+                            <input id="btnUser" type="button" value="Crear Usuario" class="btn btn-success btn-radian-success" />
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var urlNewUser = "@Url.Action("CreateUser")";
+
+            $("#btnUser").click(function () {
+                window.location.href = urlNewUser;
+            });
+
+            $("#btnProfile").click(function () {
+                alert('no está listo');
+            });
+        });
+    </script>
+
+}
