@@ -17,7 +17,7 @@ namespace Gosocket.Dian.Application
 {
     public class OthersElectronicDocumentsService : IOthersElectronicDocumentsService
     {
-        SqlDBContext sqlDBContext;
+        private SqlDBContext sqlDBContext;
         private readonly IContributorService _contributorService;
 
         public OthersElectronicDocumentsService(IContributorService contributorService )
@@ -50,13 +50,7 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage(TextResources.FailedValidation, TextResources.alertType);
         }
 
-        public List<Gosocket.Dian.Domain.OperationMode> GetOperationModes()
-        {
-            using (var context = new SqlDBContext())
-            {
-                return context.OperationModes.ToList();
-            }
-        }
-
+   
+         
     }
 }
