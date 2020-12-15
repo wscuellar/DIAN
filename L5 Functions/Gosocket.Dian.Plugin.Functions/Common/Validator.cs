@@ -33,6 +33,8 @@ using Gosocket.Dian.Plugin.Functions.Common;
 using System.Text.RegularExpressions;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
 using System.Threading.Tasks;
+using Gosocket.Dian.Services.Utils.Helpers;
+using Gosocket.Dian.Services.Utils;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -908,6 +910,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     return responses;
+                case (int)EventStatus.NegotiatedInvoice:
+                    // Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = sender2DvErrorCode,
+                            ErrorMessage = "El receptor del documento transmitido no coincide con el NIT DIAN",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento receiverParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    return responses;
                 // Validación de la Sección SenderParty / ReceiverParty TASK 791
                 case (int)EventStatus.TerminacionMandato:
                     //Revocación es información del mandante
@@ -1474,6 +1501,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         StartDate = startDateAttorney
                     };
                     TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
+                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), new { TrackId = attorneyDocument.cufe, ResponseCode = data.EventCode, TrackIdCude = trackId });
+                    if (processEventResponse.Code != "100")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla:"+ processEventResponse.Code + "-(R): ",
+                            ErrorMessage = processEventResponse.Message,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        return responses;
+                    }
                 }
                 responses.Add(new ValidateListResponse
                 {
@@ -2075,6 +2115,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            string errorRegla = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? "Regla: LGC01-(R): " : "Regla: LGC20-(R): ";
+
+            // evento 041 no tiene validación de eventos previos.
+            if (eventPrev.EventCode == "041")
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = true,
+                    Mandatory = true,
+                    ErrorCode = "100",
+                    ErrorMessage = "Evento referenciado correctamente",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+                return responses;
+            }
 
             var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
             //Valida eventos previos terminacion de mandato
@@ -2154,7 +2209,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = "Regla: LGC01-(R): ",
+                                ErrorCode = errorRegla,
                                 ErrorMessage = "Evento registrado previamente",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -2653,7 +2708,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         Mandatory = true,
                                         ErrorCode = "Regla: 89-(R): ",
                                         ErrorMessage = "No es posible realizar la Anulación de Endoso, ya existe un evento 037 Endoso en Propiedad" +
-                                        "y/o un evento 041 Limitación de circulación",
+                                        " y/o un evento 041 Limitación de circulación",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -2964,6 +3019,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             var businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
+            ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(data.EventCode);
+            string errorCodeRef = data.EventCode == "030" ? errorCodeMessage.errorCodeSigningTimeAcuse : errorCodeMessage.errorCodeSigningTimeRecibo;
+            string errorMesaageRef = data.EventCode == "030" ? errorCodeMessage.errorMessageigningTimeAcuse : errorCodeMessage.errorMessageigningTimeRecibo;
 
             switch (int.Parse(data.EventCode))
             {
@@ -2984,9 +3042,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: 89-(R): ",
-                            ErrorMessage =
-                                "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
+                            ErrorCode = (data.EventCode == "030" || data.EventCode == "032") ? errorCodeRef : "Regla: 89-(R): ",
+                            ErrorMessage = (data.EventCode == "030" || data.EventCode == "032") ? errorMesaageRef : "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
@@ -3337,7 +3394,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             public string errorMessageFETV { get; set; }
             public string errorCodeReceiverFETV { get; set; }
             public string errorMessageReceiverFETV { get; set; }
-
+            public string errorCodeSigningTimeAcuse { get; set; }
+            public string errorMessageigningTimeAcuse { get; set; }
+            public string errorCodeSigningTimeRecibo { get; set; }
+            public string errorMessageigningTimeRecibo { get; set; }
 
         }
 
@@ -3356,7 +3416,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCodeFETV = string.Empty,
                 errorMessageFETV = string.Empty,
                 errorCodeReceiverFETV = string.Empty,
-                errorMessageReceiverFETV = string.Empty
+                errorMessageReceiverFETV = string.Empty,
+                errorCodeSigningTimeAcuse = string.Empty,
+                errorMessageigningTimeAcuse = string.Empty,
+                errorCodeSigningTimeRecibo = string.Empty,
+                errorMessageigningTimeRecibo = string.Empty
             };
 
             response.errorCodeNote = "AAD11-(R): ";
@@ -3375,6 +3439,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (eventCode == "031") response.errorCodeReceiverFETV = "AAG01b-(R): ";
             if (eventCode == "032") response.errorCodeReceiverFETV = "AAG01c-(R): ";
             if (eventCode == "033") response.errorCodeReceiverFETV = "AAG01d-(R): ";
+            //SigningTime
+            if (eventCode == "030") response.errorCodeSigningTimeAcuse = "DC24a-(R): ";
+            if (eventCode == "030") response.errorMessageigningTimeAcuse = "No se puede generar el evento acuse de recibo de la factura electrónica de venta " +
+                    "antes de la fecha de generación del documento referenciado. ";
+            if (eventCode == "032") response.errorCodeSigningTimeAcuse = "DC24b-(R): ";
+            if (eventCode == "032") response.errorMessageigningTimeAcuse = "No se puede generar el evento recibo de bien prestación de servicio antes de la fecha de generación " +
+                    "del evento acuse de recibo de la factura electrónica de venta.. ";
+
 
             else if (eventCode == "036")
             {

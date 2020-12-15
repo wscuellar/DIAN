@@ -32,6 +32,12 @@ namespace Gosocket.Dian.Application
             return _softwareService.GetSoftwares(contributorId);
         }
 
+        public List<RadianSoftware> List(int radianContributorId)
+        {
+            return _RadianSoftwareRepository.List(t => t.RadianContributorId == radianContributorId, 0, 0).Results;
+        }
+
+
         public RadianSoftware CreateSoftware(RadianSoftware software)
         {
             software.Id = _RadianSoftwareRepository.AddOrUpdate(software);

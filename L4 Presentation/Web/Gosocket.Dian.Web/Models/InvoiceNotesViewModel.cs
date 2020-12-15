@@ -7,11 +7,13 @@ namespace Gosocket.Dian.Web.Models
     {
         public GlobalDocValidatorDocument GlobalDocValidatorDocument { get; }
         public List<GlobalDocValidatorDocumentMeta> ListGlobalDocValidatorDocumentMetas { get; }
+        public List<DocValidatorModel> ListDocValidatorModels { get; }
 
-        public InvoiceNotesViewModel(GlobalDocValidatorDocument globalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta> listGlobalDocValidatorDocumentMetas)
+        public InvoiceNotesViewModel(GlobalDocValidatorDocument globalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta> listGlobalDocValidatorDocumentMetas, List<DocValidatorModel> docValidatorModels)
         {
             GlobalDocValidatorDocument = globalDocValidatorDocument;
             ListGlobalDocValidatorDocumentMetas = listGlobalDocValidatorDocumentMetas;
+            ListDocValidatorModels = docValidatorModels;
         }
     }
 }

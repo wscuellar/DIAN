@@ -12,6 +12,7 @@ namespace Gosocket.Dian.Interfaces.Repositories
         RadianContributorOperation Get(Expression<Func<RadianContributorOperation, bool>> expression);
         List<RadianContributorOperation> List(Expression<Func<RadianContributorOperation, bool>> expression);
 
-        ResponseMessage Update(int radianContributorOperationId);
+        ResponseMessage Delete(int radianContributorOperationId);
+        bool Update(RadianContributorOperation contributorOperation);
     }
 }

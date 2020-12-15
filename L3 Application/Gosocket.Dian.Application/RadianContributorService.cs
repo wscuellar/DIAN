@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
 
 namespace Gosocket.Dian.Application
 {
@@ -22,6 +21,8 @@ namespace Gosocket.Dian.Application
         private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
         private readonly IRadianContributorFileRepository _radianContributorFileRepository;
         private readonly IRadianContributorFileTypeRepository _radianContributorFileTypeRepository;
+        private readonly IRadianContributorOperationRepository _radianContributorOperationRepository;
+        private readonly IRadianCallSoftwareService _radianCallSoftwareService;
         private readonly IRadianTestSetResultManager _radianTestSetResultManager;
         private readonly IRadianOperationModeRepository _radianOperationModeRepository;
         private readonly IRadianContributorFileHistoryRepository _radianContributorFileHistoryRepository;
@@ -31,11 +32,13 @@ namespace Gosocket.Dian.Application
             IRadianContributorRepository radianContributorRepository,
             IRadianContributorTypeRepository radianContributorTypeRepository,
             IRadianContributorFileRepository radianContributorFileRepository,
+            IRadianContributorOperationRepository radianContributorOperationRepository,
             IRadianTestSetResultManager radianTestSetResultManager,
             IRadianOperationModeRepository radianOperationModeRepository,
             IRadianContributorFileHistoryRepository radianContributorFileHistoryRepository,
             IGlobalRadianOperationService globalRadianOperationService,
-            IRadianContributorFileTypeRepository radianContributorFileTypeRepository)
+            IRadianContributorFileTypeRepository radianContributorFileTypeRepository,
+            IRadianCallSoftwareService radianCallSoftwareService)
         {
             _contributorService = contributorService;
             _radianContributorRepository = radianContributorRepository;
@@ -46,14 +49,16 @@ namespace Gosocket.Dian.Application
             _radianContributorFileHistoryRepository = radianContributorFileHistoryRepository;
             _globalRadianOperationService = globalRadianOperationService;
             _radianContributorFileTypeRepository = radianContributorFileTypeRepository;
+            _radianCallSoftwareService = radianCallSoftwareService;
+            _radianContributorOperationRepository = radianContributorOperationRepository;
         }
 
         #region Registro de participantes
 
-        public NameValueCollection Summary(string userCode)
+        public NameValueCollection Summary(int contributorId)
         {
             NameValueCollection collection = new NameValueCollection();
-            Domain.Contributor contributor = _contributorService.GetByCode(userCode);
+            Domain.Contributor contributor = _contributorService.Get(contributorId);
             List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado").Results;
             if (radianContributors.Any())
                 foreach (var radianContributor in radianContributors)
@@ -69,23 +74,18 @@ namespace Gosocket.Dian.Application
             return collection;
         }
 
-        public ResponseMessage RegistrationValidation(string userCode, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode)
+        public ResponseMessage RegistrationValidation(int contributorId, Domain.Common.RadianContributorType radianContributorType, Domain.Common.RadianOperationMode radianOperationMode)
         {
-            Contributor contributor = _contributorService.GetByCode(userCode);
-            if (contributor == null || contributor.AcceptanceStatusId != 4)
-                return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
-
+            Contributor contributor = _contributorService.Get(contributorId);
             bool indirectElectronicBiller = radianContributorType == Domain.Common.RadianContributorType.ElectronicInvoice && radianOperationMode == Domain.Common.RadianOperationMode.Indirect;
-            Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributor.Id);
-            if (!indirectElectronicBiller && ownSoftware == null)
+
+            if (!indirectElectronicBiller && GetSoftwareOwn(contributor.Id) == null)
                 return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
 
             if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
-                List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(userCode);
-                string enabledStatus = RadianState.Habilitado.GetDescription();
-                string cancelStatus = RadianState.Cancelado.GetDescription();
-                if (radianOperations.Any(t => t.RowKey.Equals(ownSoftware.Id.ToString(), StringComparison.OrdinalIgnoreCase) && t.RadianStatus != enabledStatus && t.RadianStatus != cancelStatus && t.RadianContributorTypeId != (int)radianContributorType))
+                bool otherActiveProcess = _radianContributorRepository.GetParticipantWithActiveProcess(contributor.Id, (int)radianContributorType);
+                if (otherActiveProcess)
                     return new ResponseMessage(TextResources.OnlyActiveProcess, TextResources.alertType);
             }
 
@@ -257,39 +257,102 @@ namespace Gosocket.Dian.Application
             RadianContributor competitor = contributors.FirstOrDefault();
             competitor.RadianState = newState;
             competitor.Description = description;
-
             if (newState == RadianState.Test.GetDescription()) competitor.Step = 3;
             if (newState == RadianState.Habilitado.GetDescription()) competitor.Step = 4;
             if (newState == RadianState.Cancelado.GetDescription()) competitor.Step = 1;
 
-            _radianContributorRepository.AddOrUpdate(competitor);
-
-            if (competitor.RadianState != RadianState.Test.GetDescription() && competitor.RadianState != RadianState.Cancelado.GetDescription())
-                return true;
-
             if (competitor.RadianState == RadianState.Cancelado.GetDescription())
-            {
-                List<RadianContributorFile> files = _radianContributorFileRepository.List(t => t.RadianContributorId == competitor.Id);
-                if (files.Any())
-                    foreach (RadianContributorFile file in files)
-                    {
-                        file.Deleted = true;
-                        _radianContributorFileRepository.AddOrUpdate(file);
-                    }
-            }
-            List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(competitor.Contributor.Code);
-            if(radianOperations.Any())
-            {
-                GlobalRadianOperations operations = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
-                operations.Deleted = competitor.RadianState == RadianState.Cancelado.GetDescription();
-                operations.RadianStatus = competitor.RadianState;
-                _globalRadianOperationService.Update(operations);
-            }
-            
+                CancelParticipant(competitor);
+
+            UpdateGlobalRadianOperation(radianContributorTypeId, competitor);
+
+            _radianContributorRepository.AddOrUpdate(competitor);
 
             return true;
 
         }
+
+
+        #region Private methods Cancel Participant
+
+        private void UpdateGlobalRadianOperation(int radianContributorTypeId, RadianContributor competitor)
+        {
+            List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(competitor.Contributor.Code);
+            if (radianOperations.Any())
+            {
+                List<GlobalRadianOperations> operations = radianOperations.Where(t => t.RadianContributorTypeId == radianContributorTypeId).ToList();
+                if (competitor.RadianState == RadianState.Test.GetDescription())
+                {
+                    GlobalRadianOperations operation = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
+                    operation.Deleted = false;
+                    operation.RadianStatus = competitor.RadianState;
+                    _globalRadianOperationService.Update(operation);
+                }
+                else
+                {
+                    foreach (GlobalRadianOperations operation in operations)
+                    {
+                        operation.Deleted = true;
+                        operation.RadianStatus = competitor.RadianState;
+                        _globalRadianOperationService.Update(operation);
+                    }
+                }
+
+            }
+        }
+
+        private void CancelParticipant(RadianContributor competitor)
+        {
+            //Quita los archivos
+            List<RadianContributorFile> files = _radianContributorFileRepository.List(t => t.RadianContributorId == competitor.Id);
+            if (files.Any())
+                foreach (RadianContributorFile file in files)
+                {
+                    file.Deleted = true;
+                    file.Status = 3;
+                    _radianContributorFileRepository.AddOrUpdate(file);
+
+                    RadianContributorFileHistory radianFileHistory = new RadianContributorFileHistory();
+                    radianFileHistory.Id = Guid.NewGuid();
+                    radianFileHistory.Timestamp = System.DateTime.Now;
+                    radianFileHistory.CreatedBy = file.CreatedBy;
+                    radianFileHistory.FileName = file.FileName;
+                    radianFileHistory.Comments = file.Comments;
+                    radianFileHistory.CreatedBy = file.CreatedBy;
+                    radianFileHistory.Status = file.Status;
+                    radianFileHistory.RadianContributorFileId = file.Id;
+                    _ = _radianContributorFileHistoryRepository.AddRegisterHistory(radianFileHistory);
+
+                }
+
+            List<RadianSoftware> softwares = _radianCallSoftwareService.List(competitor.Id);
+            foreach (RadianSoftware software in softwares)
+            {
+                //Quita los software
+                _radianCallSoftwareService.DeleteSoftware(software.Id);
+
+                //Quitar la operacion.
+                List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.SoftwareId == software.Id && !t.Deleted);
+                foreach (RadianContributorOperation operation in operations)
+                {
+                    operation.OperationStatusId = (int)RadianState.Cancelado;
+                    operation.Deleted = true;
+                    _radianContributorOperationRepository.Update(operation);
+                }
+            }
+        }
+
+        public void UpdateRadianOperation(int radiancontributorId, int softwareType)
+        {
+            List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radiancontributorId && !t.Deleted && t.SoftwareType == softwareType && t.OperationStatusId == 1);
+            foreach (RadianContributorOperation operation in operations)
+            {
+                operation.OperationStatusId = (int)RadianState.Test;
+                _radianContributorOperationRepository.Update(operation);
+            }
+        }
+        #endregion
+
 
         public bool ChangeContributorStep(int radianContributorId, int step)
         {
@@ -325,7 +388,7 @@ namespace Gosocket.Dian.Application
             newRadianContributor.Id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
             if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
-                Software ownSoftware = _contributorService.GetBaseSoftwareForRadian(contributorId);
+                Software ownSoftware = GetSoftwareOwn(contributorId); 
                 RadianSoftware radianSoftware = new RadianSoftware(ownSoftware, newRadianContributor.Id, createdBy);
                 newRadianContributor.RadianSoftwares = new List<RadianSoftware>() { radianSoftware };
             }
@@ -364,29 +427,88 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
         }
 
-        public string GetAssociatedClients(int radianContributorId)
+        public int GetAssociatedClients(int radianContributorId)
         {
             List<RadianCustomerList> customerLists = _radianContributorRepository.CustomerList(radianContributorId, string.Empty, string.Empty).Results;
-            if (!customerLists.Any())
-                return string.Empty;
-            StringBuilder message = new StringBuilder();
-            message.AppendFormat("<div class='htmlalert'><p>{0}</p>", TextResources.WithCustomerList);
-            message.Append("<ul>");
-            foreach(RadianCustomerList customer in customerLists)
-            {
-                message.AppendFormat("<li>{0}</li>", customer.Nit + "-" + customer.BussinessName);
-            }
-            message.Append("</ul></div>");
-            return message.ToString();
+            return customerLists.Count;
         }
 
-
-    
         public RadianTestSetResult GetSetTestResult(string code, string softwareId, string softwareType)
         {
-            RadianOperationModeTestSet softwareTypeEnum =EnumHelper.GetValueFromDescription<RadianOperationModeTestSet>(softwareType);
-            string key =  ((int)softwareTypeEnum).ToString() + "|" + softwareId;
+            RadianOperationModeTestSet softwareTypeEnum = EnumHelper.GetValueFromDescription<RadianOperationModeTestSet>(softwareType);
+            string key = ((int)softwareTypeEnum).ToString() + "|" + softwareId;
             return _radianTestSetResultManager.GetTestSetResult(code, key);
         }
+
+        #region Private Methods
+
+        /// <summary>
+        /// Calcula el software propio heredado de catalogo
+        /// </summary>
+        /// <param name="contributorId">Identificador del contribuyente</param>
+        /// <returns></returns>
+        private Software GetSoftwareOwn(int contributorId)
+        {
+            List<Software> ownSoftwares = _contributorService.GetBaseSoftwareForRadian(contributorId);
+            if (!ownSoftwares.Any())
+                return null;
+            List<string> softwares = ContributorSoftwareAcceptedList(contributorId);
+
+            return (from os in ownSoftwares
+                    join s in softwares on os.Id.ToString() equals s
+                    select os).OrderByDescending(t => t.Timestamp).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Listado de software que pasaron el set de pruebas en estado aceptado de catalogo
+        /// </summary>
+        /// <param name="contributorId">Identificador del contribuyente</param>
+        /// <returns></returns>
+        private List<string> ContributorSoftwareAcceptedList(int contributorId)
+        {
+            Contributor contributor = _contributorService.Get(contributorId);
+            var contributorOperations = contributor.ContributorOperations.Where(o => !o.Deleted);
+            var testSetResults = _radianTestSetResultManager.GetTestSetResulByCatalog(contributor.Code);
+
+            List<string> softwareAccepted = new List<string>();
+            foreach (var item in contributorOperations)
+            {
+                GlobalTestSetResult testset = GetTestSetResult(testSetResults, item, contributor.ContributorTypeId.Value);
+                if (((TestSetStatus)testset.Status) == TestSetStatus.Accepted)
+                    softwareAccepted.Add(testset.SoftwareId);
+            }
+
+            return softwareAccepted;
+        }
+
+        /// <summary>
+        /// Rutina heredada de catalogo para determinar su set de pruebas
+        /// </summary>
+        /// <param name="testSetResults">Listado de set de pruebas</param>
+        /// <param name="operation">Operacion</param>
+        /// <param name="ContributorTypeId">tipo de contribuyente</param>
+        /// <returns>Set de prubas que uso el contribuyente para la operacion en cuestion.</returns>
+        private GlobalTestSetResult GetTestSetResult(List<GlobalTestSetResult> testSetResults, ContributorOperations operation, int ContributorTypeId)
+        {
+            string softwareId = operation.SoftwareId.Value.ToString();
+            GlobalTestSetResult testSetResult = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{operation.ContributorTypeId}|{softwareId}" && t.OperationModeId == operation.OperationModeId);
+            if (testSetResult != null)
+                return testSetResult;
+
+            testSetResult = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{ContributorTypeId}|{softwareId}" && t.OperationModeId == operation.OperationModeId);
+
+            if (testSetResult == null)
+                testSetResult = testSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)Domain.Common.ContributorType.Zero}|{operation.SoftwareId}" && t.OperationModeId == operation.OperationModeId);
+
+            if (testSetResult == null && ContributorTypeId == (int)Domain.Common.ContributorType.Provider)
+                testSetResult = testSetResults.FirstOrDefault(t => !t.Deleted && int.Parse(t.ContributorTypeId) == (int)Domain.Common.ContributorType.Provider && t.SoftwareId == softwareId && t.OperationModeId == operation.OperationModeId);
+
+            if (testSetResult == null && ContributorTypeId == (int)Domain.Common.ContributorType.Provider)
+                testSetResult = testSetResults.FirstOrDefault(t => !t.Deleted && int.Parse(t.ContributorTypeId) == (int)Domain.Common.ContributorType.Biller && t.SoftwareId == softwareId && t.OperationModeId == operation.OperationModeId);
+
+            return testSetResult;
+        }
+        #endregion
+
     }
 }

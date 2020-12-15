@@ -205,6 +205,7 @@
     <Compile Include="Managers\RadianLoggerManager.cs" />
     <Compile Include="Managers\RadianTestSetResultManager.cs" />
     <Compile Include="EmailService.cs" />
+    <Compile Include="OthersDocsElecContributorService.cs" />
     <Compile Include="OthersElectronicDocumentsService.cs" />
     <Compile Include="PdfCreatorEvents.cs" />
     <Compile Include="PdfCreatorModel.cs" />

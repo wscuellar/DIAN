@@ -58,7 +58,7 @@
             <div class="row-fluid">
 
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="card RadianCardContainer pull-left" style="width: 92% !important; height: 240px !important;" id="1" ParticipanteId="1" Participantetexto="Emisor">
+                    <div class="card RadianCardContainer pull-left" style="width: 92% !important; height: 240px !important;" id="1" ContributorIdType="1" Participantetexto="Emisor">
                         <div class="RadianImgContainer">
                             <img class="RadianimgSvg" src="~/Content/images/Svg/Emisor.svg" />
                         </div>
@@ -70,7 +70,7 @@
                 </div>
 
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="card RadianCardContainer pull-right" style="width: 92% !important; height: 240px !important;" ParticipanteId="2" Participantetexto="Proveedor Tecnológico">
+                    <div class="card RadianCardContainer pull-right" style="width: 92% !important; height: 240px !important;" ContributorIdType="2" Participantetexto="Proveedor Tecnológico">
                         <div class="RadianImgContainer">
                             <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologicoII.svg" />
                         </div>
@@ -128,7 +128,7 @@
         var operationClick = false;
         var electronicDocumentId = 0;
         var complementoTexto = '';
-        var ParticipanteId =0;
+        var ContributorIdType =0;
         var requeridoOperationMode = "Seleccionar un modo de operación";
 
 
@@ -140,7 +140,7 @@
 
 
                     electronicDocumentId = @ViewBag.electronicDocumentId;
-                    ParticipanteId = $(this).attr('ParticipanteId');
+                    ContributorIdType = $(this).attr('ContributorIdType');
                     complementoTexto= $(this).attr('Participantetexto');
 
                     var ValidacionOtherElectronicDocumentsViewModel = {
@@ -148,7 +148,7 @@
                         Accion: 'SeleccionParticipante',
                         ElectronicDocument: electronicDocumentId,
                         complementoTexto: complementoTexto,
-                        ParticipanteId: ParticipanteId
+                        ContributorIdType: ContributorIdType
                     };
 
                     CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
@@ -178,7 +178,7 @@
                     Accion: 'SeleccionOperationMode',
                     ElectronicDocument: electronicDocumentId,
                     complementoTexto: complementoTexto,
-                    ParticipanteId: ParticipanteId
+                    ContributorIdType: ContributorIdType
                 };
 
                 CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
@@ -187,7 +187,7 @@
                         var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
                             + "?electronicDocumentId=" + electronicDocumentId
                             + "&operationModeId=" + OperationMode
-                            + "&ParticipanteId=" + ParticipanteId;
+                            + "&ContributorIdType=" + ContributorIdType;
                         window.location.href = url;
 
 

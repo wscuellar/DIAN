@@ -41,5 +41,6 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         public int CustomerID { get; set; }
 
         public int SoftwareSelectedId { get; set; }
+        public List<AutoListModel> SupplierCompany { get; set; }
     }
 }

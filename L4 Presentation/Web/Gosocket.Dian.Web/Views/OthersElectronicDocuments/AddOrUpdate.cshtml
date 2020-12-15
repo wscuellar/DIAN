@@ -113,9 +113,10 @@
                                     {
                                         @Html.Partial("_form")
 
-                                        <div class="panel-footer text-right">
-                                            <button id="btnSave" type="button" class="btn btn-success btn-radian-success">Asociar</button>
-                                        </div>
+                                    <div class="panel-footer text-right">
+                                        <a href="@Url.Action("Index", "OthersElectronicDocAssociated", new { electronicDocumentId = 0,  operationModeId = 0,  ContributorIdType = 0 })" class="btnBackTop">Siguiente Pruebas</a>
+                                        <button id="btnSave" type="button" class="btn btn-success btn-radian-success">Asociar</button>
+                                    </div>
                                     }
                                 </div>
                             </div>

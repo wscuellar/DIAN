@@ -129,7 +129,48 @@ namespace Gosocket.Dian.DataContext
             //  .ToTable("Permission")
             //  .HasKey(c => c.Id);
 
+
             #endregion
+
+
+            #region OthersDocsElec Contributor relations
+            ////Contributor-AcceptanceStatus one-to-one 
+            //modelBuilder.Entity<OtherDocElecContributor>()
+            //.HasRequired<AcceptanceStatus>(s => s.AcceptanceStatus)
+            //.WithMany()
+            //.HasForeignKey<int>(s => s.AcceptanceStatusId);
+
+            ////Contributor-OperationMode one-to-one 
+            //modelBuilder.Entity<OtherDocElecContributor>()
+            //.HasOptional<OtherDocElecOperationMode>(s => s.OtherDocElecOperationModes)
+            //.WithMany()
+            //.HasForeignKey<int?>(s => s.OtherDocElecOperationModeId);
+
+            ////Contributor-ContributorType one-to-one 
+            //modelBuilder.Entity<OtherDocElecContributor>()
+            //.HasOptional<ContributorType>(s => s.ContributorType)
+            //.WithMany()
+            //.HasForeignKey<int?>(s => s.ContributorTypeId);
+
+            ////Contributor - Contributor one-to-many Provider as many Clients
+            //modelBuilder.Entity<Contributor>()
+            //.HasOptional<Contributor>(s => s.Provider)
+            //.WithMany(g => g.Clients)
+            //.HasForeignKey<int?>(s => s.ProviderId);
+
+            //// Contributor has many Software 
+            //modelBuilder.Entity<Contributor>()
+            //    .HasMany<Software>(c => c.Softwares)
+            //    .WithMany();
+
+
+            //modelBuilder.Entity<OtherDocElecContributorOperations>()
+            //.HasOptional(co => co.OtherDocElecSoftwares)
+            //.WithMany()
+            //.HasForeignKey(co => co.SoftwareId);
+
+            #endregion
+
         }
 
         public DbSet<Software> Softwares { set; get; }
@@ -173,6 +214,16 @@ namespace Gosocket.Dian.DataContext
         /// </summary>
         public DbSet<Domain.Sql.ElectronicDocument> ElectronicDocuments { set; get; }
 
+        #region --- Other Docs Elect ---
+
+        public DbSet<OtherDocElecContributor> OtherDocElecContributors { set; get; }
+        public DbSet<OtherDocElecContributorOperations> OtherDocElecContributorOperations { set; get; }
+        public DbSet<OtherDocElecContributorType> OtherDocElecContributorTypes { set; get; }
+        public DbSet<OtherDocElecOperationMode> OtherDocElecOperationModes { set; get; }
+        public DbSet<OtherDocElecSoftware> OtherDocElecSoftwares { set; get; }
+        public DbSet<OtherDocElecSoftwareStatus> OtherDocElecSoftwareStatus { set; get; }
+
+        #endregion --- Other Docs Elect ---
     }
 
     public class MigrateDBConfiguration : System.Data.Entity.Migrations.DbMigrationsConfiguration<SqlDBContext>

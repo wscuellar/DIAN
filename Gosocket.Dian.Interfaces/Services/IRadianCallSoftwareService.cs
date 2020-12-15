@@ -11,5 +11,6 @@ namespace Gosocket.Dian.Interfaces.Services
         RadianSoftware CreateSoftware(RadianSoftware software);
         Guid DeleteSoftware(Guid id);
         void SetToProduction(RadianSoftware software);
+        List<RadianSoftware> List(int id);
     }
 }
