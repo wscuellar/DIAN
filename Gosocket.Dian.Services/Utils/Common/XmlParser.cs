@@ -40,6 +40,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string TasaDescuento { get; set; }
         public string MedioPago { get; set; }
         public string DocumentTypeIdRef { get; set; }
+        public string ValidityPeriodEndDate { get; set; }
 
         public XmlParser()
         {
