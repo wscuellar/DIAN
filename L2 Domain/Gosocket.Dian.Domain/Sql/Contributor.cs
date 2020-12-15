@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gosocket.Dian.Domain.Sql;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -68,6 +69,6 @@ namespace Gosocket.Dian.Domain
         public virtual List<ContributorOperations> ContributorOperations { get; set; }
 
         public virtual ICollection<RadianContributor> RadiantContributors { get; set; }
-
+        public virtual ICollection<OtherDocElecContributor> OtherDocElecContributors { get; set; }
     }
 }

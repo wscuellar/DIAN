@@ -3,6 +3,7 @@ using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
@@ -34,6 +35,18 @@ namespace Gosocket.Dian.DataContext.Repositories
             return query.FirstOrDefault();
         }
 
+        public bool GetParticipantWithActiveProcess(int contributorId, int contributorTypeId)
+        {
+            List<RadianContributor> participants = (from p in sqlDBContext.RadianContributors.Where(t => t.ContributorId == contributorId)
+                                                   join o in sqlDBContext.RadianContributorOperations on p.Id equals o.RadianContributorId
+                                                   where p.RadianContributorTypeId != contributorTypeId
+                                                   && p.RadianOperationModeId == 1
+                                                   &&  o.OperationStatusId< 4
+                                                   select p).ToList();
+            return participants.Any();
+
+        }
+
 
 
         public PagedResult<RadianCustomerList> CustomerList(int id, string code, string radianState, int page = 0, int length = 0)
@@ -45,8 +58,10 @@ namespace Gosocket.Dian.DataContext.Repositories
                                                     join c in sqlDBContext.Contributors on rc2.ContributorId equals c.Id
                                                     where rc.Id == id
                                                     && rco.SoftwareType != 1
+                                                    && rc2.RadianState != "Cancelado"
                                                     && (string.IsNullOrEmpty(code) || c.Code == code)
                                                     && (string.IsNullOrEmpty(radianState) || rc2.RadianState == radianState)
+                                                    
                                                     select new RadianCustomerList()
                                                     {
                                                         Id = rc2.Id,

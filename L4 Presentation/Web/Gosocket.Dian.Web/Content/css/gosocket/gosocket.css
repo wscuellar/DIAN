@@ -2128,3 +2128,11 @@ text-white {
     font-size: 14px;
     line-height: 16px;
 }
+
+.iconcheckcircle {
+    font-size: 80px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#41D78C ), to(#64A36F ));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align:center;
+}

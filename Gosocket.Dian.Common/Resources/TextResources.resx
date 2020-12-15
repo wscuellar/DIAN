@@ -229,6 +229,9 @@
     <value>¿Desea habilitar la trasmisión de "Otros Documentos Electrónicos" en el sistema como @Participante de otros documentos electrónicos?</value>
   </data>
   <data name="WithCustomerList" xml:space="preserve">
-    <value>El software de la operación tiene clientes asociados.</value>
+    <value>El software de la operación tiene {0} clientes asociados.</value>
+  </data>
+  <data name="OperationFailOtherInProcess" xml:space="preserve">
+    <value>No puede registrar esta operación, tiene software en proceso!!.</value>
   </data>
 </root>

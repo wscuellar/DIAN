@@ -1,0 +1,337 @@
+﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
+@{
+    ViewBag.Title = "TODO:";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+    <style type="text/css">
+         
+
+        #steps-otherdocELectAssociate .steps li {
+            width: 20%;
+            height: 108.15px;
+            border-radius: 50%;
+            margin: 0px 20px;
+        }
+
+        #steps-otherdocELectAssociate .steps a {
+            background: none;
+            position: relative;
+        }
+
+        #steps-otherdocELectAssociate .steps span.number {
+            display: none;
+        }
+
+        #steps-otherdocELectAssociate .steps img {
+            width: 100%;
+        }
+
+        #steps-otherdocELectAssociate .steps li a {
+            height: inherit;
+            top: -3px;
+            position: relative;
+        }
+
+        #steps-otherdocELectAssociate .steps li.done {
+            opacity: 1;
+            position: relative;
+        }
+
+            #steps-otherdocELectAssociate .steps li.done::after {
+                content: "";
+                width: 108px;
+                height: 130px;
+                background: transparent;
+                position: absolute;
+                top: 0px;
+            }
+
+            #steps-otherdocELectAssociate .steps li.done::before {
+                width: 20px;
+                height: 20px;
+            }
+
+        #steps-otherdocELectAssociate .steps li:nth-child(3).disabled a {
+            background: url(../Content/images/png/pruebas3.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #steps-otherdocELectAssociate .steps li:nth-child(2).current a {
+            background: url(../Content/images/png/pendiente2.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0px;
+            padding: 0px;
+        }
+
+
+        #steps-otherdocELectAssociate .steps li:nth-child(3).current a {
+            background: url(../Content/images/png/pruebas2.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #steps-otherdocELectAssociate .steps li:nth-child(1).done a {
+            background: url(../Content/images/png/ingreso1.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #steps-otherdocELectAssociate .steps li:nth-child(2).done a {
+            background: url(../Content/images/png/pendiente1.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0px;
+            padding: 0px;
+        }
+
+
+        #steps-otherdocELectAssociate .steps li:nth-child(3).done a {
+            background: url(../Content/images/png/pruebas1.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #steps-otherdocELectAssociate .steps li.last a {
+            background: url(../Content/images/png/flagFinish.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #steps-otherdocELectAssociate .steps li.done::before {
+            content: "";
+            position: absolute;
+            right: 33px;
+            top: 2px;
+            width: 35px;
+            height: 35px;
+            background-repeat: no-repeat;
+            background-image: url(../Content/images/png/done.png);
+            z-index: 1;
+        }
+
+        #steps-otherdocELectAssociate .content {
+            background: none;
+        }
+
+        #steps-otherdocELectAssociate section {
+            border: 1px solid #348441;
+            padding: 0;
+            width: 100%;
+            height: auto;
+            position: relative;
+        }
+
+
+        #steps-otherdocELectAssociate .radian-conventions {
+            margin: 20px 0;
+        }
+
+        #steps-otherdocELectAssociate .steps {
+            width: 65%;
+            margin: auto;
+            padding: 50px 0px;
+            margin-bottom: 30px;
+        }
+
+        #steps-otherdocELectAssociate li.done .name-state {
+            position: absolute;
+            bottom: -29px;
+            color: black;
+            text-align: center;
+            width: 100%;
+            padding: 0px 12px;
+        }
+
+        #steps-otherdocELectAssociate li.current .name-state {
+            position: absolute;
+            bottom: -29px;
+            text-align: center;
+            color: #348441;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        #steps-otherdocELectAssociate li.done:nth-child(2) .name-state {
+            bottom: -20px;
+        }
+
+        #steps-otherdocELectAssociate li.disabled .name-state {
+            position: absolute;
+            bottom: -29px;
+            text-align: center;
+            color: #B0B0B0;
+            width: 100%;
+            padding: 0 12px;
+        }
+
+        #steps-otherdocELectAssociate .content {
+            background: none;
+        }
+
+        .wizard > .content {
+            margin-top: 20px;
+            min-height: auto !important;
+            margin: 0px !important;
+        }
+
+
+    </style>
+}
+<div class="page-content radian-view margin-20">
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+    <div class="row margin-horizontal-0 margin-top-50">
+        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
+            <div class="padding-top-20">
+
+                <div id="steps-otherdocELectAssociate" style="margin:0px !important;">
+                    <div class="radian-personal-info panel-body ">
+                        @Html.Partial("_personalInfo")
+                    </div>
+                    <h3><span class="name-state">Ingreso de solicitud</span></h3>
+                    <section>
+                    </section>
+                    <h3><span class="name-state">Pendiente</span></h3>
+                    <section style="border: 0px !important;">
+                       
+                                <div class="panel-footer text-right">
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
+                                        <button name="Submit" class="btn btn-radian-success submit-button">Enviar</button>
+                                    </div>
+                                </div>
+                       
+                    </section>
+                    <h3><span class="name-state">Pruebas de aceptación</span></h3>
+                    <section style="border: 0px !important;">
+                    </section>
+                    <h3></h3>
+                    <section style="border: 0px !important;">
+                        @Html.Partial("_finish")
+                    </section>
+                </div>
+
+            </div>
+           
+            @{ if (@Model.State != "En pruebas" && Model.Step == 2)
+                {
+                    <div class="panel-footer text-right">
+                        <div class="form-group">
+                            <button name="Submit" class="btn btn-radian-success submit-button Set-Prueba">Set de Pruebas</button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+
+        <div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
+                        <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 23px;">&nbsp; Cancelación #####TODO:####</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="bootbox-body">
+                            <Label  id="lbldangercancelregister" class="control-label">Describa el motivo de la cancelación del registro</Label> 
+                            <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
+                                      name="txtCancelRegistro" rows="3" style="height: auto !important;background: white !important;"></textarea> 
+                            
+                        </div>
+                    </div><div class="modal-footer">
+                        <button id="savecancel-register" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+@section scripts{
+
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/Radian/constants.js"></script>
+    <script src="~/Content/js/Radian/RadianSteps.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            //howLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
+
+            var index = '@Model.State' == "En pruebas" ? 3 : @Model.Step;
+            RenderStepsOtherDoc(index);
+             
+            $(".cancel-register").click(function () {
+                $("#txtCancelRegistro").val("");
+                $('#lbldangercancelregister').removeClass("text-danger text-bold");
+                $("#dialogcancelarregistro").modal('show');
+            });
+             
+            $(".savecancel-register").click(function () {
+
+                if ($("#txtCancelRegistro").val() == null || $("#txtCancelRegistro").val() == '') {
+                    $('#lbldangercancelregister').addClass("text-danger  text-bold");
+                    return;
+                }
+
+                $("#dialogcancelarregistro").modal('hide');
+                    showConfirmation("¿Desea cancelación el registro del participante TODO: de TODO: ? ", ConfirmExec(
+                    function () { 
+                            bootbox.dialog({ 
+                                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se cancelo el registro exitosamente</h4></div></div>",
+                                onEscape: () => {
+                                    var url = "@Url.Action("Index", "OthersElectronicDocuments")";
+                                    window.location.href = url;s
+                                }
+                            });
+                     }
+                    , "", () => hideLoading('#panel-form')));
+              });
+
+             
+
+             function RenderStepsOtherDoc(index) {
+                 var validator;
+                 $("#steps-otherdocELectAssociate").steps({
+                     headerTag: "h3",
+                     bodyTag: "section",
+                     transitionEffect: "slideLeft",
+                     autoFocus: true,
+                     startIndex: index,
+                     enablePagination: false,
+                     enableKeyNavigation: false,
+                     onInit: () => {
+                         var tooltip = $('.add-tooltip');
+                         if (tooltip.length) tooltip.tooltip();
+                     }
+                 });
+             }
+     });
+
+
+    </script>
+}
+
+

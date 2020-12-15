@@ -62,9 +62,9 @@ namespace Gosocket.Dian.Domain.Common
                         return (T)field.GetValue(null);
                 }
             }
-
-            throw new ArgumentException("Not found.", nameof(description));
+            return default(T);
         }
+
     }
 
     public enum AuthType
@@ -452,6 +452,25 @@ namespace Gosocket.Dian.Domain.Common
         SoftwareFactor = 4
     }
 
+    public enum RadianDocumentStatus
+    {
+        [Description("NO APLICA")]
+        DontApply = 0,
+        [Description("LIMITADA")]
+        Limited = 1,
+        [Description("PAGADA")]
+        Paid = 2,
+        [Description("ENDOSADA")]
+        Endorsed = 3,
+        [Description("DISPONIBILIZADA")]
+        Readiness = 4,
+        [Description("TÍTULO VALOR")]
+        SecurityTitle = 5,
+        [Description("FACTURA ELECTRONICA")]
+        ElectronicInvoice = 6
+    }
+
+
     /// <summary>
     /// Documentos Electronicos. Utilizados en la configuración de Set de Pruebas - Otros Documentos
     /// </summary>
@@ -471,6 +490,17 @@ namespace Gosocket.Dian.Domain.Common
         
         [Description("POS electrónico")]
         ElectronicPOS = 5
+    }
+
+    public enum OtherDocElecSoftwaresStatus
+    {
+        None = 0,
+        [Description("En proceso")]
+        InProcess = 1,
+        [Description("Aceptado")]
+        Accepted = 2,
+        [Description("Rechazado")]
+        Rejected = 3,
     }
 
 }
