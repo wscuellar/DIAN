@@ -47,10 +47,9 @@
         padding-bottom: 20px;
     }
 
-    .bootstrap-select button{
+    .bootstrap-select button {
         padding-left: 10px !important;
     }
-
 </style>
 
 <div class="page-content margin-15">
@@ -367,6 +366,22 @@
             }
         });
         $('.hideText').css('width', $('.hideText').parent().width());
+
+
+        $("#RadianStatus").change(function () {
+            var radianStatusValue = parseInt($("#RadianStatus option:selected").val(), 10);
+
+            if (radianStatusValue > 0 && radianStatusValue < 6)
+            {
+                var documentTypeId = $("#DocumentTypeId").val();
+
+                if (documentTypeId == "00") {
+                    $("#DocumentTypeId").val("01");
+                    $("#DocumentTypeId").parent().find("button").find("span").first()
+                        .text($("#DocumentTypeId option:selected").text());
+                }
+            }
+        });
 
     </script>
 
