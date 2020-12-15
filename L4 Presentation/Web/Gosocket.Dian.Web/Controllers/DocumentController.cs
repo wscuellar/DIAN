@@ -298,18 +298,18 @@ namespace Gosocket.Dian.Web.Controllers
             List<GlobalDocValidatorDocumentMeta> listGlobalValidatorDocumentMeta = invoiceAndNotes.Item2;
 
             DateTime date = DateNumberToDateTime(invoiceAndNotes.Item1.EmissionDateNumber);
-            //string partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, invoiceAndNotes.Item1.DocumentKey);
-            //GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(invoiceAndNotes.Item1.DocumentKey, partitionKey, date);
+            string partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, invoiceAndNotes.Item1.DocumentKey);
+            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(invoiceAndNotes.Item1.DocumentKey, partitionKey, date);
 
-            DocValidatorModel docModel = await ReturnDocValidatorModelByCufe(invoiceAndNotes.Item1.DocumentKey);
+            DocValidatorModel docModel = await ReturnDocValidatorModelByCufe(invoiceAndNotes.Item1.DocumentKey, globalDataDocument);
             listDocValidatorModels.Add(docModel);
 
             foreach (var item in listGlobalValidatorDocumentMeta)
             {
-                //partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, item.DocumentKey);
-                //globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(item.DocumentKey, partitionKey, date);
+                partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, item.DocumentKey);
+                globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(item.DocumentKey, partitionKey, date);
 
-                docModel = await ReturnDocValidatorModelByCufe(item.DocumentKey);
+                docModel = await ReturnDocValidatorModelByCufe(item.DocumentKey, globalDataDocument);
 
                 listDocValidatorModels.Add(docModel);
             }
@@ -327,19 +327,20 @@ namespace Gosocket.Dian.Web.Controllers
             return $"co|{emissionDateNumber.Substring(6, 2)}|{documentKey.Substring(0, 2)}";
         }
 
-        private async Task<DocValidatorModel> ReturnDocValidatorModelByCufe(string trackId)
+        private async Task<DocValidatorModel> ReturnDocValidatorModelByCufe(string trackId, GlobalDataDocument globalDataDocument = null)
         {
-            var validations = GetValidatedRules(trackId);
+            List<DocValidatorTrackingModel> validations = GetValidatedRules(trackId);
 
-            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            var emissionDateNumber = globalDocValidatorDocumentMeta.EmissionDate.ToString("yyyyMMdd");
-            var partitionKey = $"co|{emissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocumentMeta.DocumentKey.Substring(0, 2)}";
+            GlobalDocValidatorDocumentMeta globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            string emissionDateNumber = globalDocValidatorDocumentMeta.EmissionDate.ToString("yyyyMMdd");
+            string partitionKey = $"co|{emissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocumentMeta.DocumentKey.Substring(0, 2)}";
 
-            var date = DateNumberToDateTime(emissionDateNumber);
+            DateTime date = DateNumberToDateTime(emissionDateNumber);
 
-            var globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(globalDocValidatorDocumentMeta.DocumentKey, partitionKey, date);
+            if (globalDataDocument == null)
+                globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(globalDocValidatorDocumentMeta.DocumentKey, partitionKey, date);
 
-            var document = new DocumentViewModel
+            DocumentViewModel document = new DocumentViewModel
             {
                 DocumentKey = globalDataDocument.DocumentKey,
                 Amount = globalDataDocument.FreeAmount,
