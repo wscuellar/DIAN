@@ -259,7 +259,7 @@ namespace Gosocket.Dian.Functions.Activation
                                 GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
                                 if (!string.IsNullOrEmpty(isPartipantActive.RadianStatus))
                                 {
-                                    contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey);
+                                    contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
                                 }
                                 #endregion
 
