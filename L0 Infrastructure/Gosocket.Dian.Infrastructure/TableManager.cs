@@ -490,7 +490,7 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
-        public List<T> FindDocumentReferenced_EventCode_TypeId_CustomizationID<T>(string documentReferencedKey, string documentTypeId, string eventCode, string customizationId) where T : ITableEntity, new()
+        public List<T> FindDocumentReferenced_EventCode_TypeId_CustomizationID<T>(string documentReferencedKey, string documentTypeId, string eventCode, string customizationId, string customizationId2) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
 
@@ -506,9 +506,19 @@ namespace Gosocket.Dian.Infrastructure
             prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
                 QueryComparisons.Equal,
                 eventCode));
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("CustomizationID",
+            
+            var customization1 = TableQuery.GenerateFilterCondition("CustomizationID",
                 QueryComparisons.Equal,
-                customizationId));
+                customizationId);
+
+            var customization2 = TableQuery.GenerateFilterCondition("CustomizationID",
+                QueryComparisons.Equal,
+                customizationId2);
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.CombineFilters(customization1, 
+                TableOperators.Or, 
+                customization2));
+
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
             return entities.ToList();

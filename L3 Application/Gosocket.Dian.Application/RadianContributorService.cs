@@ -178,72 +178,65 @@ namespace Gosocket.Dian.Application
 
         public RadianAdmin ContributorSummary(int contributorId, int radianContributorType = 0)
         {
-            List<RadianContributor> radianContributors;
-
-            if (radianContributorType != 0)
-                radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorType).Results;
-            else
-                radianContributors = _radianContributorRepository.List(t => t.Id == contributorId).Results;
-
+            List<RadianContributor> radianContributors = (radianContributorType != 0) ?
+                                _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorType).Results :
+                                _radianContributorRepository.List(t => t.Id == contributorId).Results;
 
             RadianAdmin radianAdmin = null;
-
             radianContributors.ForEach(c =>
-            {
+             {
 
-                List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(c.Id).ToList();
-                foreach (var item in testSet)
-                {
-                    string[] parts = item.RowKey.Split('|');
-                    item.SoftwareId = parts[1];
-                    item.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription(Enum.Parse(typeof(RadianOperationModeTestSet), parts[0]));
-                }
+                 List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(c.Id).ToList();
+                 foreach (var item in testSet)
+                 {
+                     string[] parts = item.RowKey.Split('|');
+                     item.SoftwareId = parts[1];
+                     item.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription(Enum.Parse(typeof(RadianOperationModeTestSet), parts[0]));
+                 }
+                 List<string> userIds = _contributorService.GetUserContributors(c.Contributor.Id).Select(u => u.UserId).ToList();
+                 List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(t => t.RadianContributorTypeId == c.RadianContributorTypeId && !t.Deleted);
+                 List<RadianContributorFile> newFiles = (from t in fileTypes
+                                                         join f in c.RadianContributorFile.Where(t => !t.Deleted) on t.Id equals f.FileType into files
+                                                         from fl in files.DefaultIfEmpty(new RadianContributorFile()
+                                                         {
+                                                             FileName = t.Name,
+                                                             FileType = t.Id,
+                                                             Status = 0,
+                                                             RadianContributorFileType = t,
+                                                             RadianContributorFileStatus = new RadianContributorFileStatus()
+                                                             {
+                                                                 Id = 0,
+                                                                 Name = "Pendiente"
+                                                             }
+                                                         })
+                                                         select fl).ToList();
 
-                List<string> userIds = _contributorService.GetUserContributors(c.Contributor.Id).Select(u => u.UserId).ToList();
-
-                List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(t => t.RadianContributorTypeId == c.RadianContributorTypeId && !t.Deleted);
-                List<RadianContributorFile> newFiles = (from t in fileTypes
-                                                        join f in c.RadianContributorFile.Where(t => !t.Deleted) on t.Id equals f.FileType into files
-                                                        from fl in files.DefaultIfEmpty(new RadianContributorFile()
-                                                        {
-                                                            FileName = t.Name,
-                                                            FileType = t.Id,
-                                                            Status = 0,
-                                                            RadianContributorFileType = t,
-                                                            RadianContributorFileStatus = new RadianContributorFileStatus()
-                                                            {
-                                                                Id = 0,
-                                                                Name = "Pendiente"
-                                                            }
-                                                        })
-                                                        select fl).ToList();
-
-                radianAdmin = new RadianAdmin()
-                {
-                    Contributor = new RedianContributorWithTypes()
-                    {
-                        RadianContributorId = c.Id,
-                        Id = c.Contributor.Id,
-                        Code = c.Contributor.Code,
-                        TradeName = c.Contributor.Name,
-                        BusinessName = c.Contributor.BusinessName,
-                        AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name,
-                        Email = c.Contributor.Email,
-                        Update = c.Update,
-                        RadianState = c.RadianState,
-                        AcceptanceStatusId = c.Contributor.AcceptanceStatus.Id,
-                        CreatedDate = c.CreatedDate,
-                        Step = c.Step,
-                        RadianContributorTypeId = c.RadianContributorTypeId,
-                        RadianOperationModeId = c.RadianOperationModeId
-                    },
-                    Files = newFiles,
-                    FileTypes = fileTypes,
-                    Tests = testSet,
-                    LegalRepresentativeIds = userIds,
-                    Type = c.RadianContributorType
-                };
-            });
+                 radianAdmin = new RadianAdmin()
+                 {
+                     Contributor = new RedianContributorWithTypes()
+                     {
+                         RadianContributorId = c.Id,
+                         Id = c.Contributor.Id,
+                         Code = c.Contributor.Code,
+                         TradeName = c.Contributor.Name,
+                         BusinessName = c.Contributor.BusinessName,
+                         AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name,
+                         Email = c.Contributor.Email,
+                         Update = c.Update,
+                         RadianState = c.RadianState,
+                         AcceptanceStatusId = c.Contributor.AcceptanceStatus.Id,
+                         CreatedDate = c.CreatedDate,
+                         Step = c.Step,
+                         RadianContributorTypeId = c.RadianContributorTypeId,
+                         RadianOperationModeId = c.RadianOperationModeId
+                     },
+                     Files = newFiles,
+                     FileTypes = fileTypes,
+                     Tests = testSet,
+                     LegalRepresentativeIds = userIds,
+                     Type = c.RadianContributorType
+                 };
+             });
 
             return radianAdmin;
         }
@@ -388,7 +381,7 @@ namespace Gosocket.Dian.Application
             newRadianContributor.Id = _radianContributorRepository.AddOrUpdate(newRadianContributor);
             if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
-                Software ownSoftware = GetSoftwareOwn(contributorId); 
+                Software ownSoftware = GetSoftwareOwn(contributorId);
                 RadianSoftware radianSoftware = new RadianSoftware(ownSoftware, newRadianContributor.Id, createdBy);
                 newRadianContributor.RadianSoftwares = new List<RadianSoftware>() { radianSoftware };
             }

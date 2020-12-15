@@ -41,7 +41,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
-        public ActionResult AddOrUpdate(int electronicDocumentId = 0, int operationModeId = 0, int ParticipanteId = 0 )
+        public ActionResult AddOrUpdate(int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0 )
         {
             List<ElectronicDocument> listED = new ElectronicDocumentService().GetElectronicDocuments();
             List<OperationModeViewModel> listOM = new TestSetViewModel().GetOperationModes();
@@ -83,7 +83,7 @@ namespace Gosocket.Dian.Web.Controllers
                 ValidacionOtherElectronicDocuments.Accion,
                 ValidacionOtherElectronicDocuments.ElectronicDocument,
                    ValidacionOtherElectronicDocuments.ComplementoTexto,
-                   ValidacionOtherElectronicDocuments.ParticipanteId
+                   ValidacionOtherElectronicDocuments.ContributorIdType
                 );
 
             return Json(validation, JsonRequestBehavior.AllowGet);
