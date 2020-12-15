@@ -4,6 +4,7 @@
 
     using Gosocket.Dian.Common.Resources;
     using Gosocket.Dian.Domain.Common;
+    using Gosocket.Dian.Domain.Cosmos;
     using System;
     using System.Collections.Generic;
 
@@ -50,6 +51,7 @@
         public ElectronicMandateModel Mandate { get; set; }
 
         public List<AssociatedEventsModel> AssociatedEvents { get; set; }
+        public List<GlobalDataDocument> ValueTitleDocuments { get; set; }
         public EndosoModel Endoso { get; set; }
         public string EventTitle { get; set; }
         public string RequestType { get; set; }
