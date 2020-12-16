@@ -655,6 +655,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var globalStart = DateTime.UtcNow;
             var contentFileList = contentFile.ExtractMultipleZip();
             List<Task> arrayTasks = new List<Task>();
+            bool flagMeta = false;
             var unzip = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_GlobalLogger)
             {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture)
@@ -897,6 +898,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var sender_receiver_response = ValidateParty(documentParsed.DocumentKey.ToLower(), trackIdCude, senderCode, receiverCode, eventCode, customizationID, listId, dianResponse);
             if (!sender_receiver_response.IsValid)
             {
+                flagMeta = true;
                 dianResponse = sender_receiver_response;
                 dianResponse.XmlDocumentKey = trackIdCude;
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
@@ -912,6 +914,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var eventCodeResponse = ValidateEventCode(documentParsed.DocumentKey.ToLower(), eventCode, docTypeCode, trackIdCude, customizationID, listId, dianResponse);
             if (!eventCodeResponse.IsValid)
             {
+                flagMeta = true;
                 dianResponse = eventCodeResponse;
                 dianResponse.XmlDocumentKey = trackIdCude;
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
@@ -929,6 +932,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var validationAcceptanceTacitaExpresa = ValidationSigningTime(documentParsed.DocumentKey.ToLower(), eventCode, signingTime, docTypeCode, customizationID, dianResponse);
             if (!validationAcceptanceTacitaExpresa.IsValid)
             {
+                flagMeta = true;
                 dianResponse = validationAcceptanceTacitaExpresa;
                 dianResponse.XmlDocumentKey = trackIdCude;
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
@@ -1112,6 +1116,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
                     TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
                 }
+                if (flagMeta)
+                {
+                    var documentMetaFlag = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaFlag);
+                }
+
                 var lastZone = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_LastZone) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 TableManagerGlobalLogger.InsertOrUpdate(lastZone);
                 // LAST ZONE
