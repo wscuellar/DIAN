@@ -56,9 +56,15 @@ namespace Gosocket.Dian.Application
             return collection;
         }
 
-        public OtherDocElecContributor CreateContributor(int contributorId, OtherDocElecState State, Domain.Common.OtherDocElecContributorType ContributorType, Domain.Common.OtherDocElecOperationMode OperationMode, string createdBy)
+        public OtherDocElecContributor CreateContributor(string userCode, OtherDocElecState State,
+            Domain.Common.OtherDocElecContributorType ContributorType,
+            Domain.Common.OtherDocElecOperationMode OperationMode, int ElectronicDocumentId, string createdBy)
         {
-            OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId && t.OtherDocElecContributorTypeId == (int)ContributorType);
+
+            int contributorId = _contributorService.GetByCode(userCode).Id;
+            OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId
+                                                                                     && t.OtherDocElecContributorTypeId == (int)ContributorType
+                                                                                     && t.ElectronicDocumentId == ElectronicDocumentId);
 
             OtherDocElecContributor newContributor = new OtherDocElecContributor()
             {
@@ -67,15 +73,16 @@ namespace Gosocket.Dian.Application
                 CreatedBy = createdBy,
                 OtherDocElecContributorTypeId = (int)ContributorType,
                 OtherDocElecOperationModeId = (int)OperationMode,
+                ElectronicDocumentId = ElectronicDocumentId,
                 State = State.GetDescription(),
                 CreatedDate = existing != null ? existing.CreatedDate : DateTime.Now
             };
             newContributor.Id = _othersDocsElecContributorRepository.AddOrUpdate(newContributor);
 
-            Software ownSoftware = GetSoftwareOwn(contributorId);
+            //Software ownSoftware = GetSoftwareOwn(contributorId);
             //OtherDocElecSoftware odeSoftware = new OtherDocElecSoftware(ownSoftware, newContributor.Id, createdBy);
             //newContributor.OtherDocElecSoftwares = new List<OtherDocElecSoftware>() { odeSoftware };
-             
+
             return newContributor;
         }
 
@@ -108,5 +115,20 @@ namespace Gosocket.Dian.Application
 
             return softwareAccepted;
         }
+
+        public List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int ContributorTypeId, string state)
+        {
+            return _othersDocsElecContributorRepository.List(t => t.ContributorId == ContributorId
+                                                                                      && t.OtherDocElecContributorTypeId == ContributorTypeId
+                                                                                      && t.State != state).Results;
+ 
+        }
+
+        public bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware) 
+        {
+            return _othersDocsElecContributorRepository.GetParticipantWithActiveProcess(ContributorId,ContributorTypeId, OperationModeId, stateSofware);
+
+        }
+ 
     }
 }

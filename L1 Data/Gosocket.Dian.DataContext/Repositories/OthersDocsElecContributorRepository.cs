@@ -1,5 +1,4 @@
 ﻿using Gosocket.Dian.DataContext.Middle;
-using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces.Repositories;
@@ -24,9 +23,9 @@ namespace Gosocket.Dian.DataContext.Repositories
         public OtherDocElecContributor Get(Expression<Func<OtherDocElecContributor, bool>> expression)
         {
             IQueryable<OtherDocElecContributor> query = sqlDBContext.OtherDocElecContributors.Where(expression)
-                .Include("OtherDocElecContributor")
-                .Include("OtherDocElecSoftware")
-                .Include("OtherDocElecSoftware.OtherDocElecContributorOperations")
+                .Include("Contributor")
+                .Include("OtherDocElecSoftwares")
+                .Include("OtherDocElecSoftwares.OtherDocElecContributorOperations")
                 .Include("OtherDocElecContributorType")
                 .Include("OtherDocElecOperationMode")
                 .Include("OtherDocElecContributorOperations");
@@ -44,25 +43,27 @@ namespace Gosocket.Dian.DataContext.Repositories
         {
             using (var context = new SqlDBContext())
             {
-                OtherDocElecContributor ContributorInstance = context.OtherDocElecContributors.FirstOrDefault(c => c.Id == othersDocsElecContributor.Id);
+                OtherDocElecContributor ContributorInstance =
+                    context.OtherDocElecContributors.FirstOrDefault(c => c.Id == othersDocsElecContributor.Id);
 
                 if (ContributorInstance != null)
                 {
                     ContributorInstance.OtherDocElecContributorTypeId = othersDocsElecContributor.OtherDocElecContributorTypeId;
                     ContributorInstance.Update = DateTime.Now;
                     ContributorInstance.State = othersDocsElecContributor.State;
+                    ContributorInstance.ElectronicDocumentId = othersDocsElecContributor.ElectronicDocumentId;
                     ContributorInstance.OtherDocElecOperationModeId = othersDocsElecContributor.OtherDocElecOperationModeId;
                     ContributorInstance.CreatedBy = othersDocsElecContributor.CreatedBy;
                     ContributorInstance.Description = othersDocsElecContributor.Description;
                     ContributorInstance.Step = othersDocsElecContributor.Step == 0 ? 1 : othersDocsElecContributor.Step;
 
-                    context.Entry(ContributorInstance).State = System.Data.Entity.EntityState.Modified;
+                    context.Entry(ContributorInstance).State = EntityState.Modified;
                 }
                 else
                 {
                     othersDocsElecContributor.Step = 1;
                     othersDocsElecContributor.Update = DateTime.Now;
-                    context.Entry(othersDocsElecContributor).State = System.Data.Entity.EntityState.Added;
+                    context.Entry(othersDocsElecContributor).State = EntityState.Added;
                 }
 
                 context.SaveChanges();
@@ -112,6 +113,14 @@ namespace Gosocket.Dian.DataContext.Repositories
             return new PagedResult<OtherDocElecContributor>();
         }
 
-
+        public bool GetParticipantWithActiveProcess(int contributorId, int contributorTypeId, int OperationModeId, int statusSowftware)
+        {
+            return (from p in sqlDBContext.OtherDocElecContributors.Where(t => t.ContributorId == contributorId)
+                                                          join o in sqlDBContext.OtherDocElecSoftwares on p.Id equals o.OtherDocElecContributorId
+                                                          where p.OtherDocElecContributorTypeId != contributorTypeId
+                                                          && p.OtherDocElecOperationModeId == OperationModeId
+                                                          && o.OtherDocElecSoftwareStatusId == statusSowftware
+                                                          select p).ToList().Any();
+        }
     }
 }

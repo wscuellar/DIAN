@@ -1,8 +1,10 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
@@ -21,14 +23,17 @@ namespace Gosocket.Dian.Web.Controllers
     [Authorize]
     public class OthersElectronicDocumentsController : Controller
     {
+        private readonly IContributorService _contributorService;
         private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
         private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
-            IOthersDocsElecContributorService othersDocsElecContributorService)
+            IOthersDocsElecContributorService othersDocsElecContributorService,
+            IContributorService contributorService)
         {
             _othersElectronicDocumentsService = othersElectronicDocumentsService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
+            _contributorService = contributorService;
         }
 
         /// <summary>
@@ -36,14 +41,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// </summary>
         /// <returns></returns>
         public ActionResult Index()
-        {
-            NameValueCollection result = _othersDocsElecContributorService.Summary(User.UserCode());
-            ViewBag.ContributorId = result["ContributorId"];
-            ViewBag.Transmitter_OtherDocElecContributorTypeId = result["Transmitter_OtherDocElecContributorTypeId"];
-            ViewBag.Transmitter_OtherDocElecOperationModeId = result["Transmitter_OtherDocElecOperationModeId"];
-            ViewBag.TechnologyProvider_OtherDocElecContributorTypeId = result["TechnologyProvider_OtherDocElecContributorTypeId"];
-            ViewBag.TechnologyProvider_OtherDocElecOperationModeId = result["TechnologyProvider_OtherDocElecOperationModeId"];
-
+        { 
             ViewBag.UserCode = User.UserCode();
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
             ViewBag.ListElectronicDocuments = new ElectronicDocumentService().GetElectronicDocuments().Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
@@ -54,16 +52,18 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult AddOrUpdate(int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0)
         {
+ 
             List<ElectronicDocument> listED = new ElectronicDocumentService().GetElectronicDocuments();
             List<OperationModeViewModel> listOM = new TestSetViewModel().GetOperationModes();
             OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
 
+
+            ViewBag.softwareActive = _othersDocsElecContributorService.ValidateSoftwareActive(User.ContributorId(), ContributorIdType, operationModeId,(int)OtherDocElecSoftwaresStatus.InProcess);
             var opeMode = listOM.FirstOrDefault(o => o.Id == operationModeId);
             if (opeMode != null)
                 model.OperationMode = opeMode.Name;
 
             ViewBag.Title = $"Asociar modo de operación {model.OperationMode}";
-
 
             return View(model);
         }
@@ -73,12 +73,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.UserCode = User.UserCode();
             ViewBag.electronicDocumentId = electronicDocumentId;
 
-            IEnumerable<SelectListItem> OperationsModes = _othersDocsElecContributorService.GetOperationModes()
-             .Select(c => new SelectListItem
-             {
-                 Value = c.Id.ToString(),
-                 Text = c.Name
-             });
+            IEnumerable<SelectListItem> OperationsModes = _othersDocsElecContributorService.GetOperationModes().Select(c => new SelectListItem   {  Value = c.Id.ToString(),  Text = c.Name  });
             ViewBag.ListOperationMode = OperationsModes;
 
             return View();
@@ -89,27 +84,14 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult Add(ValidacionOtherElectronicDocumentsViewModel registrationData)
         {
 
-
-            OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(registrationData.ContributorId,
-                                                Domain.Common.OtherDocElecState.Registrado,
+            OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(registrationData.UserCode.ToString(),
+                                                OtherDocElecState.Registrado,
                                                 registrationData.ContributorIdType,
                                                 registrationData.OperationModeId,
+                                                registrationData.ElectronicDocument,
                                                 User.UserName());
 
-
-            //if (otherDocElecContributor.RadianSoftwares == null || radianContributor.RadianSoftwares.Count == 0)
-            //   return Json(new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
-
-            OtherDocElecSoftware software = otherDocElecContributor.OtherDocElecSoftwares.FirstOrDefault();
-            OtherDocElecContributorOperations ContributorOperation = new OtherDocElecContributorOperations()
-            {
-                OtherDocElecContributorId = otherDocElecContributor.Id,
-                SoftwareId = software.Id,
-                OperationStatusId = (int)OtherDocElecState.Registrado,
-                SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
-                Timestamp = DateTime.Now
-            };
-            ResponseMessage result = _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, testSet, true, false);
+            ResponseMessage result = new ResponseMessage(TextResources.OtherSuccessSoftware, TextResources.alertType); ;
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
@@ -118,16 +100,54 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult Validation(ValidacionOtherElectronicDocumentsViewModel ValidacionOtherElectronicDocuments)
         {
-            int contributorId = User.ContributorId();
-            ResponseMessage validation =
-                _othersElectronicDocumentsService.Validation(ValidacionOtherElectronicDocuments.UserCode.ToString(),
-                ValidacionOtherElectronicDocuments.Accion,
-                ValidacionOtherElectronicDocuments.ElectronicDocument,
-                   ValidacionOtherElectronicDocuments.ComplementoTexto,
-                   ValidacionOtherElectronicDocuments.ContributorIdType
-                );
+            Contributor contributor = _contributorService.GetByCode(ValidacionOtherElectronicDocuments.UserCode.ToString());
+            if (contributor == null || contributor.AcceptanceStatusId != 4)
+                return Json(new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType), JsonRequestBehavior.AllowGet);
 
-            return Json(validation, JsonRequestBehavior.AllowGet);
+
+            if (ValidacionOtherElectronicDocuments.Accion == "SeleccionElectronicDocument")
+                return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelect_Confirm.Replace("@docume", ValidacionOtherElectronicDocuments.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+
+            if (ValidacionOtherElectronicDocuments.Accion == "SeleccionParticipante")
+                return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectParticipante_Confirm.Replace("@Participante", ValidacionOtherElectronicDocuments.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+
+            if (ValidacionOtherElectronicDocuments.Accion == "SeleccionOperationMode")
+            {
+                List<OtherDocElecContributor> Lista = _othersDocsElecContributorService.ValidateExistenciaContribuitor(contributor.Id, (int)ValidacionOtherElectronicDocuments.ContributorIdType, OtherDocElecState.Cancelado.GetDescription());
+                if (Lista.Any())
+                {
+                    if (!Lista.Where(x => x.ElectronicDocumentId == ValidacionOtherElectronicDocuments.ElectronicDocument).Any())
+                    {
+                        OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(
+                                                            ValidacionOtherElectronicDocuments.UserCode.ToString(),
+                                                            OtherDocElecState.Registrado,
+                                                            ValidacionOtherElectronicDocuments.ContributorIdType,
+                                                            ValidacionOtherElectronicDocuments.OperationModeId,
+                                                            ValidacionOtherElectronicDocuments.ElectronicDocument,
+                                                            User.UserName());
+                    }
+                    var ResponseMessageRedirectTo = new ResponseMessage("", TextResources.redirectType)
+                    {
+                        RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
+                                                new
+                                                {
+                                                    electronicDocumentId = ValidacionOtherElectronicDocuments.ElectronicDocument,
+                                                    operationModeId = ValidacionOtherElectronicDocuments.OperationModeId,
+                                                    ContributorIdType = ValidacionOtherElectronicDocuments.ContributorIdType
+                                                })
+                    };
+                    return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
+
+                }
+                return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", ValidacionOtherElectronicDocuments.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+            }
+
+            if (ValidacionOtherElectronicDocuments.Accion == "CancelRegister")
+                return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", ValidacionOtherElectronicDocuments.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+
+
+            return Json(new ResponseMessage(TextResources.FailedValidation, TextResources.alertType), JsonRequestBehavior.AllowGet);
+
         }
 
     }

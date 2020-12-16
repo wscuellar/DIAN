@@ -2,6 +2,7 @@
 {
     public class ValidacionOtherElectronicDocumentsViewModel
     {
+        public  int ContributorId { get; set; }
         public int UserCode { get; set; }
 
         public string Accion { get; set; }

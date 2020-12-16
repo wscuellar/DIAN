@@ -178,13 +178,14 @@
                     Accion: 'SeleccionOperationMode',
                     ElectronicDocument: electronicDocumentId,
                     complementoTexto: complementoTexto,
-                    ContributorIdType: ContributorIdType
+                    ContributorIdType: ContributorIdType,
+                    operationModeId: OperationMode
                 };
 
                 CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
                     function (param) {
 
-                         CallExecution("POST", '@Url.Action("Add", "OthersElectronicDocuments")', RegistrationDataViewModel,
+                        CallExecution("POST", '@Url.Action("Add", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
                                 function (param) {
                                     var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
                                             + "?electronicDocumentId=" + electronicDocumentId

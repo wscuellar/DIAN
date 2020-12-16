@@ -15,8 +15,13 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <returns></returns>
         NameValueCollection Summary(string userCode);
 
-        List<Gosocket.Dian.Domain.Sql.OtherDocElecOperationMode> GetOperationModes();
+        List<OtherDocElecOperationMode> GetOperationModes();
 
-        OtherDocElecContributor CreateContributor(int contributorId, Domain.Common.OtherDocElecState State, Domain.Common.OtherDocElecContributorType ContributorType, Domain.Common.OtherDocElecOperationMode OperationMode, string createdBy);
+        OtherDocElecContributor CreateContributor(string userCode, Domain.Common.OtherDocElecState State, Domain.Common.OtherDocElecContributorType ContributorType, Domain.Common.OtherDocElecOperationMode OperationMode, int ElectronicDocumentId, string createdBy);
+
+        List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int ContributorTypeId, string state);
+
+        bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware);
+
     }
 }
