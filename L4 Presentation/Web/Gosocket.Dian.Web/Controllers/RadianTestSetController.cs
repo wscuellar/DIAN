@@ -309,15 +309,11 @@ namespace Gosocket.Dian.Web.Controllers
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.TerminacionMandato.GetDescription(), Counter1 = testSet.EndMandateTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.NotificacionPagoTotalParcial.GetDescription(), Counter1 = testSet.PaymentNotificationTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.InvoiceOfferedForNegotiation.GetDescription(), Counter1 = testSet.EndorsementCancellationTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoPropiedad.GetDescription(), Counter1 = testSet.EndorsementPropertyTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoGarantia.GetDescription(), Counter1 = testSet.EndorsementGuaranteeTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoProcuracion.GetDescription(), Counter1 = testSet.EndorsementProcurementTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-
             }
-
             return Json(events, JsonRequestBehavior.AllowGet);
-
         }
 
 
