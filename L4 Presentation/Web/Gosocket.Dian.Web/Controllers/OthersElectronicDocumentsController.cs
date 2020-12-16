@@ -23,9 +23,9 @@ namespace Gosocket.Dian.Web.Controllers
     [Authorize]
     public class OthersElectronicDocumentsController : Controller
     {
-        private readonly IContributorService _contributorService;
         private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
         private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
+        private readonly IContributorService _contributorService;
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
@@ -56,14 +56,38 @@ namespace Gosocket.Dian.Web.Controllers
             List<ElectronicDocument> listED = new ElectronicDocumentService().GetElectronicDocuments();
             List<OperationModeViewModel> listOM = new TestSetViewModel().GetOperationModes();
             OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
+            List<ContributorViewModel> listContri = new List<ContributorViewModel>()
+            {
+                new ContributorViewModel() { Id=0, Name= "Seleccione..."}
+            };
+
+            ViewBag.ListSoftwares = new List<SoftwareViewModel>()
+            {
+                new SoftwareViewModel() { Id = System.Guid.Empty, Name = "Seleccione..."}
+            };
+
+            var listCont = _contributorService.GetContributors(ContributorType.Provider.GetHashCode(), 
+                ContributorStatus.Enabled.GetHashCode()).ToList();
+
+            if(listCont != null)
+            {
+                listContri.AddRange(listCont.Select(c => new ContributorViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name
+                }).ToList());
+            }
 
 
             ViewBag.softwareActive = _othersDocsElecContributorService.ValidateSoftwareActive(User.ContributorId(), ContributorIdType, operationModeId,(int)OtherDocElecSoftwaresStatus.InProcess);
+            ViewBag.ListTechnoProviders = listContri;
+
             var opeMode = listOM.FirstOrDefault(o => o.Id == operationModeId);
             if (opeMode != null)
                 model.OperationMode = opeMode.Name;
 
             ViewBag.Title = $"Asociar modo de operación {model.OperationMode}";
+
 
             return View(model);
         }
@@ -148,6 +172,24 @@ namespace Gosocket.Dian.Web.Controllers
 
             return Json(new ResponseMessage(TextResources.FailedValidation, TextResources.alertType), JsonRequestBehavior.AllowGet);
 
+        }
+
+        [HttpPost]
+        public JsonResult GetSoftwaresByContributorId(int id)
+        {
+            List<SoftwareViewModel> softwareList=new List<SoftwareViewModel>();
+            var softs = new SoftwareService().GetSoftwaresByContributorAndState(id, true);
+
+            if(softs != null)
+            {
+                softwareList = softs.Select(s => new SoftwareViewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name
+                }).ToList();
+            }
+
+            return Json(new { res = softwareList }, JsonRequestBehavior.AllowGet);
         }
 
     }

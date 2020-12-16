@@ -13,10 +13,11 @@
     using System.Drawing;
     using System.Linq;
     using System.Text;
+    using System.Threading.Tasks;
 
     #endregion
 
-    public class RadianGraphicRepresentationService : IRadianGraphicRepresentationService 
+    public class RadianGraphicRepresentationService : IRadianGraphicRepresentationService
     {
         #region Properties
 
@@ -37,27 +38,30 @@
 
         #endregion
 
-        #region GetGraphicRepresentationPdfReport
+        #region GetPdfReport
 
-        public byte[] GetPdfReport(string cude)
+        public async Task<byte[]> GetPdfReport(string cude)
         {
             // Load Templates            
             StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGráfica.html"));
 
             // Load Document Data
-            Domain.Entity.EventDataModel model = GetEventDataModel(cude);
+            Domain.Entity.EventDataModel model = await GetEventDataModel(cude);
 
             // Set Variables
             DateTime expeditionDate = DateTime.Now;
             Bitmap qrCode = RadianPdfCreationService.GenerateQR(TextResources.RadianReportQRCode.Replace("{CUFE}", model.CUDE));
 
-            //string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
-            //string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
+            string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
+            string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
 
 
             // Mapping Labels common data
 
             template = DataTemplateMapping(template, expeditionDate, model);
+
+            // Replace QrLabel
+            template = template.Replace("{QrCode}", ImgHtml);
 
             // Mapping Events
 
@@ -70,11 +74,11 @@
 
         #region GetEventDataModel
 
-        private Domain.Entity.EventDataModel GetEventDataModel(string cude)
+        private  async Task<Domain.Entity.EventDataModel> GetEventDataModel(string cude)
         {
-            var eventItem = _queryAssociatedEventsService.DocumentValidation(cude);
+            GlobalDocValidatorDocumentMeta eventItem = _queryAssociatedEventsService.DocumentValidation(cude);
 
-            Domain.Entity.EventDataModel model = 
+            Domain.Entity.EventDataModel model =
                 new Domain.Entity.EventDataModel()
                 {
                     Prefix = eventItem.Serie,
@@ -87,18 +91,15 @@
                 };
 
             model.EventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), eventItem.EventCode);
-
             model.CUDE = cude;
-
 
             // Set Titles
             model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
-            model.ValidationTitle = TextResources.Event_ValidationTitle;
-            model.ReferenceTitle = TextResources.Event_ReferenceTitle;
+            model.ReceiverType = string.Empty;
 
             GlobalDocValidatorDocumentMeta invoice = _queryAssociatedEventsService.DocumentValidation(eventItem.PartitionKey);
 
-            // SetMandate();
+            // Set Mandate
 
             if (model.EventStatus == EventStatus.Mandato)
             {
@@ -111,6 +112,8 @@
                     MandateType = TextResources.Event_MandateType
                 };
 
+                model.ReceiverName = model.Mandate.ReceiverName;
+                model.ReceiverCode = model.Mandate.ReceiverCode;
                 List<GlobalDocReferenceAttorney> referenceAttorneys = _queryAssociatedEventsService.ReferenceAttorneys(eventItem.DocumentKey, eventItem.DocumentReferencedKey, eventItem.ReceiverCode, eventItem.SenderCode);
 
                 if (referenceAttorneys.Any())
@@ -118,9 +121,10 @@
             }
 
 
-            // SetEndoso();
+            // Set Endoso
 
             if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia || model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
+            {
                 model.Endoso = new Domain.Entity.EndosoModel()
                 {
                     ReceiverCode = eventItem.ReceiverCode,
@@ -129,12 +133,15 @@
                     SenderName = invoice.SenderName,
                     EndosoType = EnumHelper.GetEnumDescription((Enum.Parse(typeof(EventStatus), eventItem.EventCode)))
                 };
+                model.ReceiverName = model.Endoso.ReceiverName;
+                model.ReceiverCode = model.Endoso.ReceiverCode;
+            }
 
             model.RequestType = TextResources.Event_RequestType;
 
             Domain.Entity.GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem.Identifier);
 
-            // SetValidations();
+            // Set Validations
 
             if (eventVerification.ValidationStatus == 1)
             {
@@ -147,7 +154,7 @@
                 model.Validations = res.Select(t => new Domain.Entity.AssociatedValidationsModel(t)).ToList();
             }
 
-            // SetReferences()
+            // SetReferences
             GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
             if (referenceMeta != null)
             {
@@ -168,8 +175,8 @@
                 });
             }
 
-            //SetEventAssociated(model, eventItem);
-            EventStatus allowEvent = _queryAssociatedEventsService.IdentifyEvent(eventItem);
+            // SetEventAssociated 
+            EventStatus allowEvent = _queryAssociatedEventsService.IdentifyEvent(referenceMeta);
 
             if (allowEvent != EventStatus.None)
             {
@@ -193,6 +200,80 @@
                     }
                 }
             }
+
+
+            // Set title value data Particular Data
+            // valida la regla de negocio para mostrar la sección de titulos valor
+
+            if (model.EventStatus == EventStatus.AceptacionTacita
+                || model.EventStatus == EventStatus.Received
+                || model.EventStatus == EventStatus.Receipt
+                || model.EventStatus == EventStatus.Accepted)
+            {
+                model.ShowTitleValueSection = false;
+            }
+            else
+            {
+                // GetDocuments
+
+                List<GlobalDataDocument> globalDocsValueTitle = new List<GlobalDataDocument>();
+
+                if (!string.IsNullOrEmpty(eventItem.DocumentKey))
+                {
+                    List<string> pks = null;
+                    List<string> radianStatusFilter = new List<string>() {
+                            $"0{(int)EventStatus.Received}", $"0{(int)EventStatus.Receipt}", $"0{(int)EventStatus.Accepted}"
+                        };
+                    pks = new List<string> { $"co|{eventVerification.EmissionDateNumber.Substring(6, 2)}|{eventItem.DocumentKey.Substring(0, 2)}" };
+
+
+                    (bool hasMoreResults, string continuation, List<GlobalDataDocument> globalDataDocuments) cosmosResponse =
+                    (false, null, new List<GlobalDataDocument>());
+
+                    cosmosResponse = await _cosmosDBService.ReadDocumentsAsyncOrderByReception(null,
+                                                                                                DateTime.Now,
+                                                                                                DateTime.Now,
+                                                                                                0,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                40,
+                                                                                                eventItem.DocumentKey,
+                                                                                                null,
+                                                                                                pks
+                                                                                                );
+
+                   
+
+                    foreach (GlobalDataDocument globalDocu in cosmosResponse.globalDataDocuments)
+                    {
+                        if (!globalDocu.Events.Any())
+                        {
+                            break;
+                        }
+                        bool correctStatus = true;
+                        for (int i = 0; i < radianStatusFilter.Count; i++)
+                        {
+                            if (!radianStatusFilter.Contains(globalDocu.Events.OrderByDescending(e => e.Date).ElementAt(i).Code))
+                            {
+                                correctStatus = false;
+                                break;
+                            }
+                        }
+
+                        if (correctStatus)
+                            globalDocsValueTitle.Add(globalDocu);
+                    }
+
+                    if (globalDocsValueTitle.Any())
+                    {
+                        model.ShowTitleValueSection = true;
+                        model.ValueTitleDocuments = globalDocsValueTitle;
+                    }
+                }
+            }
             return model;
         }
 
@@ -202,11 +283,9 @@
 
         private StringBuilder DataTemplateMapping(StringBuilder template, DateTime expeditionDate, Domain.Entity.EventDataModel model)
         {
-            //byte[] bytesLogo = _fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg");
-            //byte[] bytesFooter = _fileManager.GetBytes("radian-dian-logos", "GroupFooter.png");
-            //string imgLogo = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesLogo)}'>";
-            //string imgFooter = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesFooter)}' class='img-footer'>";
+            string sectionHtml = "<div class='text-section padding-top20'> Sección {SectionNumber}</ div > ";
 
+            #region Mapping Event Data Section
             // Mapping Event Data Section
             template = template.Replace("{EventName}", model.Title);
             template = template.Replace("{EventNumber}", $"{model.Prefix} - {model.Number}");
@@ -220,6 +299,9 @@
             template = template.Replace("{RegistrationDate}", string.Empty);
             template = template.Replace("{StartDate}", string.Empty);
             template = template.Replace("{FinishDate}", string.Empty);
+            #endregion
+
+            #region Mapping reference invoice data section
 
             // Mapping reference invoice data section
 
@@ -234,6 +316,85 @@
             template = template.Replace("{ExpirationDate}", string.Empty);
             template = template.Replace("{OperationType}", string.Empty);
 
+            // Mapping reference event data section
+
+            template = template.Replace("{ReferenceEventData}", string.Empty);
+            #endregion
+
+            #region Mapping Sections data 
+
+            // Mapping Sections data 
+            // por el momento solo es posible mapear la sección 1(datos del adquiriente) y
+            // la sección 2 datos del emisor.
+
+            if (!string.IsNullOrEmpty(model.ReceiverName) && !string.IsNullOrEmpty(model.ReceiverCode))
+            {
+                StringBuilder templateSujeto = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGraficaSujeto.html"));
+
+                StringBuilder subjects = new StringBuilder();
+
+
+                // Section 1
+
+                subjects.Append(sectionHtml);
+                subjects.Append(templateSujeto);
+
+                subjects = SubjectTemplateMapping(subjects, "1", "1",
+                    model.ReceiverName
+                    , model.ReceiverType
+                    , model.ReceiverCode
+                    , model.ReceiverCode
+                    , string.Empty
+                    , string.Empty
+                    , string.Empty
+                    , string.Empty);
+
+                // Section 2
+
+                subjects.Append(sectionHtml);
+                subjects.Append(templateSujeto);
+
+                subjects = SubjectTemplateMapping(subjects, "2", "1",
+                    model.SenderName
+                    , model.ReceiverType
+                    , model.SenderCode
+                    , model.SenderCode
+                    , string.Empty
+                    , string.Empty
+                    , string.Empty
+                    , string.Empty);
+
+                template = template.Replace("{SectionsData}", subjects.ToString());
+            }
+            #endregion
+
+            #region Mapping Title Value section
+            
+            // Mapping Title Value section
+
+            if (model.ShowTitleValueSection)
+            {
+                StringBuilder templateTitleValue = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGraficaFacturaTituloValor.html"));
+
+                for (int i = 0; i < model.ValueTitleDocuments.Count; i++)
+                {
+                    GlobalDataDocument document = model.ValueTitleDocuments[i];
+                    templateTitleValue = DocumentTemplateMapping(templateTitleValue, document, (i + 1).ToString());
+                }
+                template = template.Replace("{TitleValue}", templateTitleValue.ToString());
+            }
+            else
+            {
+                template = template.Replace("{TitleValue}", string.Empty);
+            }
+
+            #endregion
+
+
+            // Mapping Final Data Section
+
+            template = template.Replace("{FinalData}", "");
+
             return template;
         }
 
@@ -241,14 +402,45 @@
 
         #region SubjectTemplateMapping
 
-        private StringBuilder SubjectTemplateMapping(StringBuilder template, Event eventObj, string subEvent)
+        private StringBuilder SubjectTemplateMapping(StringBuilder template,
+            string sectionNumber,
+            string subjectNumber,
+            string subjectBusinessName,
+            string subjectType,
+            string subjectDocumentType,
+            string subjectNit,
+            string subjectAddress,
+            string subjectCity,
+            string subjectEmail,
+            string subjectPhoneNumber
+            )
         {
-            template = template.Replace("{EventNumber" + subEvent + "}", eventObj.Code);
-            template = template.Replace("{DocumentTypeName" + subEvent + "}", eventObj.Description);
-            template = template.Replace("{CUDE" + subEvent + "}", eventObj.DocumentKey);
-            template = template.Replace("{ValidationDate}", $"{eventObj.Date:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
-            template = template.Replace("{SenderBusinessName" + subEvent + "}", eventObj.SenderName);
-            template = template.Replace("{ReceiverBusinessName" + subEvent + "}", eventObj.ReceiverName);
+
+            template = template.Replace("{SectionNumber}", sectionNumber);
+            template = template.Replace("{SubjectNumber}", subjectNumber);
+            template = template.Replace("{SubjectBusinessName}", subjectBusinessName);
+            template = template.Replace("{SubjectType}", subjectType);
+            template = template.Replace("{SubjectDocumentType}", subjectDocumentType);
+            template = template.Replace("{SubjectNit}", subjectNit);
+            template = template.Replace("{SubjectAddress}", subjectAddress);
+            template = template.Replace("{SubjectCity}", subjectCity);
+            template = template.Replace("{SubjectEmail}", subjectEmail);
+            template = template.Replace("{SubjectPhoneNumber}", subjectPhoneNumber);
+
+            return template;
+        }
+
+        #endregion
+
+        #region DocumentTemplateMapping
+
+        private StringBuilder DocumentTemplateMapping(StringBuilder template, GlobalDataDocument document, string number)
+        {
+            template = template.Replace("{Number" + number + "}", number);
+            template = template.Replace("{EventNumber" + number + "}", document.Number);
+            template = template.Replace("{Description" + number + "}", document.DocumentTypeName);
+            template = template.Replace("{GenerationDate" + number + "}", document.EmissionDate.ToShortDateString());
+            template = template.Replace("{Registrationdate" + number + "}", document.EmissionDate.ToShortDateString());
 
             return template;
         }
