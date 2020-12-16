@@ -1213,6 +1213,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida informacion Endoso                           
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
             {
+                if(String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAI07b-(R): ",
+                        ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+
                 //Valida precio a pagar endoso
                 int resultValuePriceToPay = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
                 resultValuePriceToPay = resultValuePriceToPay / 100;
@@ -2283,7 +2295,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalDocValidatorDocument document = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string errorRegla = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? "Regla: LGC01-(R): " : "Regla: LGC20-(R): ";
-
+            ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
             //Evento 041 no tiene validación de eventos previos.
             if (eventPrev.EventCode == "041")
             {
@@ -2362,9 +2374,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //if (document != null)
                 if (documentMeta.Count >= 2)
                 {
-                    //No valida Evento registrado previamente para solictud de disponibilizacion posterior, Aval y Terminacion de Mandato
+                    //No valida Evento registrado previamente para solictud de disponibilizacion posterior, Aval, Endoso en Propiedad
+                    // y Terminacion de Mandato
                     if ((eventPrev.CustomizationID != "363" && eventPrev.CustomizationID != "364"
-                        && eventPrev.EventCode != "035"))
+                        && eventPrev.EventCode != "035" && eventPrev.EventCode != "037"))
                     {
                         if (documentMeta.Where(t => t.EventCode == eventPrev.EventCode
                         && document != null
@@ -2729,8 +2742,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "Regla: 89-(R): ",
-                                        ErrorMessage = "No se pueda transmitir el evento porque ya existe un pago total.",
+                                        ErrorCode = errorCodeMessage.errorCodeEndoso,
+                                        ErrorMessage = errorCodeMessage.errorMessageEndoso,
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -3035,59 +3048,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return responses;
         }
 
-        //private ValidateListResponse ValidateAval(XmlParser xmlParserCufe, XmlParser xmlParserCude)
-        //{
-        //    DateTime startDate = DateTime.UtcNow;
-        //    string valueTotalInvoice = xmlParserCufe.TotalInvoice;
-
-        //    XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-        //    int totalValueSender = 0;
-        //    for (int i = 0; i < valueListSender.Count; i++)
-        //    {
-        //        string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-        //        // Si no se reporta, el Avalista asume el valor del monto de quien respalda...
-        //        if (string.IsNullOrWhiteSpace(valueStockAmount)) return null;
-
-        //        totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-        //    }
-
-        //    if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
-        //    {
-        //        return new ValidateListResponse
-        //        {
-        //            IsValid = false,
-        //            Mandatory = true,
-        //            ErrorCode = "Regla: 89-(R): ",
-        //            ErrorMessage = $"{(string)null} El valor reportado del elemento SenderParty supera el valor total del Título Valor.",
-        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-        //        };
-        //    }
-
-        //    XmlNodeList valueListIssuerParty = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']");
-        //    // En caso de no indicarlo quedan garantizadas las obligaciones de todas las partes del título.
-        //    if (valueListIssuerParty.Count <= 0) return null;
-
-        //    int totalValueIssuerParty = 0;
-        //    for (int i = 0; i < valueListIssuerParty.Count; i++)
-        //    {
-        //        string valueStockAmount = valueListIssuerParty.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-        //        if (!string.IsNullOrWhiteSpace(valueStockAmount)) totalValueIssuerParty += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-        //    }
-
-        //    if (totalValueIssuerParty != totalValueSender)
-        //    {
-        //        return new ValidateListResponse
-        //        {
-        //            IsValid = false,
-        //            Mandatory = true,
-        //            ErrorCode = "Regla: AAH32c-(R): ",
-        //            ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
-        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-        //        };
-        //    }           
-
-        //    return null;
-        //}
+      
         private ValidateListResponse ValidateAval(XmlParser xmlParserCufe, XmlParser xmlParserCude)
         {
             DateTime startDate = DateTime.UtcNow;
@@ -3627,6 +3588,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             public string errorMessageigningTimeAcuse { get; set; }
             public string errorCodeSigningTimeRecibo { get; set; }
             public string errorMessageigningTimeRecibo { get; set; }
+            public string errorCodeEndoso { get; set; }
+            public string errorMessageEndoso { get; set; }
+
 
         }
 
@@ -3649,76 +3613,84 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCodeSigningTimeAcuse = string.Empty,
                 errorMessageigningTimeAcuse = string.Empty,
                 errorCodeSigningTimeRecibo = string.Empty,
-                errorMessageigningTimeRecibo = string.Empty
+                errorMessageigningTimeRecibo = string.Empty,
+                errorCodeEndoso = string.Empty,
+                errorMessageEndoso = string.Empty
+
+                
             };
 
-            response.errorCodeNote = "AAD11-(R): ";
+            response.errorCodeNote = "Regla: AAD11-(R): ";
             response.errorMessageNote = "No fue informada la nota cuando el evento fue generado por un mandato. ";
             response.errorMessageFETV = "Nombre o Razón social no esta autorizado para generar esté evento";
             response.errorMessageReceiverFETV = "El adquiriente no esta autorizado para recibir esté evento";
+            response.errorMessageEndoso = "No se puede registrar este evento si previamente se ha registrado el evento Pago de la factura electrónica de venta como título valor";
 
             //SenderPArty
-            if (eventCode == "030") response.errorCodeFETV = "AAF01a-(R): ";
-            if (eventCode == "031") response.errorCodeFETV = "AAF01b-(R): ";
-            if (eventCode == "032") response.errorCodeFETV = "AAF01c-(R): ";
-            if (eventCode == "033") response.errorCodeFETV = "AAF01d-(R): ";
-            if (eventCode == "034") response.errorCodeFETV = "AAF01e-(R): ";
+            if (eventCode == "030") response.errorCodeFETV = "Regla: AAF01a-(R): ";
+            if (eventCode == "031") response.errorCodeFETV = "Regla: AAF01b-(R): ";
+            if (eventCode == "032") response.errorCodeFETV = "Regla: AAF01c-(R): ";
+            if (eventCode == "033") response.errorCodeFETV = "Regla: AAF01d-(R): ";
+            if (eventCode == "034") response.errorCodeFETV = "Regla: AAF01e-(R): ";
             //ReceiverParty
-            if (eventCode == "030") response.errorCodeReceiverFETV = "AAG01a-(R): ";
-            if (eventCode == "031") response.errorCodeReceiverFETV = "AAG01b-(R): ";
-            if (eventCode == "032") response.errorCodeReceiverFETV = "AAG01c-(R): ";
-            if (eventCode == "033") response.errorCodeReceiverFETV = "AAG01d-(R): ";
+            if (eventCode == "030") response.errorCodeReceiverFETV = "Regla: AAG01a-(R): ";
+            if (eventCode == "031") response.errorCodeReceiverFETV = "Regla: AAG01b-(R): ";
+            if (eventCode == "032") response.errorCodeReceiverFETV = "Regla: AAG01c-(R): ";
+            if (eventCode == "033") response.errorCodeReceiverFETV = "Regla: AAG01d-(R): ";
             //SigningTime
-            if (eventCode == "030") response.errorCodeSigningTimeAcuse = "DC24a-(R): ";
+            if (eventCode == "030") response.errorCodeSigningTimeAcuse = "Regla: DC24a-(R): ";
             if (eventCode == "030") response.errorMessageigningTimeAcuse = "No se puede generar el evento acuse de recibo de la factura electrónica de venta " +
                     "antes de la fecha de generación del documento referenciado. ";
-            if (eventCode == "032") response.errorCodeSigningTimeAcuse = "DC24b-(R): ";
+            if (eventCode == "032") response.errorCodeSigningTimeAcuse = "Regla: DC24b-(R): ";
             if (eventCode == "032") response.errorMessageigningTimeAcuse = "No se puede generar el evento recibo de bien prestación de servicio antes de la fecha de generación " +
                     "del evento acuse de recibo de la factura electrónica de venta.. ";
-
+            //Endoso
+            if (eventCode == "037") response.errorCodeEndoso = "Regla: LGC27-(R): ";
+            if (eventCode == "038") response.errorCodeEndoso = "Regla: LGC30-(R): ";
+            if (eventCode == "039") response.errorCodeEndoso = "Regla: LGC33-(R): ";
 
             else if (eventCode == "036")
             {
-                response.errorCodeB = "AAF01b-(R): ";
+                response.errorCodeB = "Regla: AAF01b-(R): ";
                 response.errorMessageB = "No corresponde a la información del Tenedor Legítimo";
-                response.errorCode = "AAF01a-(R): ";
+                response.errorCode = "Regla: AAF01a-(R): ";
                 response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico";
             }
             else if (eventCode == "035")
             {
-                response.errorCode = "AAF01-(R): ";
+                response.errorCode = "Regla: AAF01-(R): ";
                 response.errorMessage = "No fue informado el avalista";
-                response.errorCodeNoteA = "AAD11a";
+                response.errorCodeNoteA = "Regla: AAD11a";
                 response.errorMessageNoteA = "No fue informada la nota cuando el evento fue generado por un mandato. ";
             }
             else if (eventCode == "037")
             {
-                response.errorCode = "AAF01-(R): ";
-                response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo";
+                response.errorCode = "Regla: AAF01-(R): ";
+                response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo";               
             }
             else if (eventCode == "040" || eventCode == "039" || eventCode == "038")
             {
-                response.errorCode = "AAF01-(R): ";
+                response.errorCode = "Regla: AAF01-(R): ";
                 response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo en su disponibización";
             }
             else if (eventCode == "041")
             {
-                response.errorCode = "AAF01-(R): ";
+                response.errorCode = "Regla: AAF01-(R): ";
                 response.errorMessage = "No fue referenciado la información del Juez o Juzgado";
             }
             else if (eventCode == "043")
             {
-                response.errorCode = "AAF01-(R): ";
+                response.errorCode = "Regla: AAF01-(R): ";
                 response.errorMessage = "No es informado el grupo del Mandante";
             }
             else if (eventCode == "044")
             {
-                response.errorCode = "AAF01-(R): ";
+                response.errorCode = "Regla: AAF01-(R): ";
                 response.errorMessage = "No coincide con la Mandante o Mandatario del mandato";
             }
             else if (eventCode == "045")
             {
-                response.errorCode = "AAF01-(R): ";
+                response.errorCode = "Regla: AAF01-(R): ";
                 response.errorMessage = "No fue informado el Adquirente/Deudor/Aceptante o Tenedor Legítimo";
             }
             return response;

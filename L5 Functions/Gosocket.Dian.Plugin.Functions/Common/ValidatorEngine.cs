@@ -222,6 +222,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     validateResponses.Add(response);
                     return validateResponses;
                 }
+                else if (documentMeta == null)
+                {                    
+                    ValidateListResponse response = new ValidateListResponse();
+                    response.ErrorMessage = "No se encontró evento referenciado para evaluar fecha";
+                    response.IsValid = false;
+                    response.ErrorCode = "89";
+                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                    validateResponses.Add(response);
+                    return validateResponses;
+                }
             }           
             else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice)                   
             {
