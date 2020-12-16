@@ -757,24 +757,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
-                    //valida si existe los permisos del mandatario 
-                    //var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
-                    //    party.ResponseCode, xmlParserCude.NoteMandato);
-                    //if (response != null)
-                    //{
-                    //    responses.Add(response);
-                    //}
-                    //else
-                    //{
-                    //    responses.Add(new ValidateListResponse
-                    //    {
-                    //        IsValid = true,
-                    //        Mandatory = true,
-                    //        ErrorCode = "100",
-                    //        ErrorMessage = "Evento senderParty referenciado correctamente",
-                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    //    });
-                    //}
+                    //valida si existe los permisos del mandatario
+                    var response = ValidateFacultityAttorney(party.TrackId, nitModel.ProviderCode, senderCode,
+                        party.ResponseCode, xmlParserCude.NoteMandato);
+                    if (response != null)
+                    {
+                        responses.Add(response);
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Evento senderParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
 
                     return responses;
                 case (int)EventStatus.Avales:
@@ -1362,17 +1362,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool valid = false;
             if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
             {
-                //Aplica si el emisor es el avalista evento Aval
-                if (Convert.ToInt32(eventCode) == (int)EventStatus.Avales) return null;
+                //No existe Mandato para el CUFE referenciado.
+                return null;
 
-                return new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCode,
-                    ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessage,
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
+                ////Aplica si el emisor es el avalista evento Aval
+                //if (Convert.ToInt32(eventCode) == (int)EventStatus.Avales) return null;
+
+                //return new ValidateListResponse
+                //{
+                //    IsValid = false,
+                //    Mandatory = true,
+                //    ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCode,
+                //    ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessage,
+                //    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                //};
             }
             bool validError = false;
             //Valida existan permisos para firmar evento mandatario
