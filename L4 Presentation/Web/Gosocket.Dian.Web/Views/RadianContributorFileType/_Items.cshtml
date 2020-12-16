@@ -44,7 +44,7 @@
         @if (Model.RadianContributorFileTypes.Count > 0)
         {
             <div class="pull-left">
-                <span>Mostrando @(Model.Page + 1) de @(Model.RadianContributorFileTypes.Count) páginas</span>
+                <span>Mostrando @(Model.Page + 1) de @(Decimal.Truncate((Model.RadianContributorFileTypes.Count / 10) + 1)) páginas</span>
             </div>
             <div class="pull-right">
                 <span class="text-muted">
