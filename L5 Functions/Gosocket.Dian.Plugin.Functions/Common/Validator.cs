@@ -51,6 +51,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager typeListTableManager = new TableManager("GlobalTypeList");
         private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
         private TableManager TableManagerGlobalAttorneyFacultity = new TableManager("GlobalAttorneyFacultity");
+        private TableManager TableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -1428,6 +1429,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
             }
             string actor = factor;
+            //Valida que exista en Radian
+            var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByRadianStatus(issuerPartyCode, false, "Habilitado");
+            if(globalRadianOperation == null)
+            {
+                validate = false;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAH11-(R): ",
+                    ErrorMessage = "No corresponde a un Mandatario habilitado en el DIAN.",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
             //Valida existe Contrato del mandatos entre las partes
             if (AttachmentBase64 != null)
             {
