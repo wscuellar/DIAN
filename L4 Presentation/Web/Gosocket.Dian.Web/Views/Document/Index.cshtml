@@ -67,7 +67,7 @@
             <!--Tabs Content-->
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
-                    <div class="panel">
+                    <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
@@ -203,6 +203,7 @@
             });
 
             $('.document-row').click('onClick', function () {
+                showLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
                 if (!$(this).hasClass('not-redirect')) {
                     var id = $(this).context.getAttribute('data-id');
                     var partitionKey = $(this).context.getAttribute('data-partitionKey');

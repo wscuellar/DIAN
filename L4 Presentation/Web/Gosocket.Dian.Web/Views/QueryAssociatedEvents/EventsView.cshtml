@@ -277,10 +277,10 @@
                                     @foreach (var item in Model.Validations)
                                     {
                                         <tr>
-                                            <td>@item.RuleName</td>
+                                            <td class="text-left">@item.RuleName</td>
                                             <td class="text-right right-section">
                                                 <p class="underline-reject-text">
-                                                    <span class="green-text-color" data-placement="left" data-toggle="popover" data-trigger="click" title="@item.Status" data-content="@item.Message" data-template='<div class="popover" role="tooltip"><div class="arrow"></div><div class="icon-alert"><i class="fa fa-exclamation-circle"></i></div><div class="popover-body">@item.Message</div></div>'>
+                                                    <span class="green-text-color" data-placement="left" data-toggle="popover" data-trigger="hover" title="@item.Status" data-content="@item.Message" data-template='<div class="popover" role="tooltip"><div class="arrow"></div><div class="icon-alert"><i class="fa fa-exclamation-circle"></i></div><div class="popover-body">@item.Message</div></div>'>
                                                         <i class="fa fa-info-circle"></i>@item.Status
                                                     </span>
 
