@@ -1,6 +1,8 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianTestSetTableViewModel
-
-
+@using Newtonsoft.Json
+@{ 
+    var htmlPartial = JsonConvert.SerializeObject(Html.Partial("_detailsTestSet").ToString());
+}
 <div class="table-responsive">
     <table class="documents-table text-center table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         @if (Model.RadianTestSets.Count == 0)
@@ -29,12 +31,11 @@
             <tbody>
                 @foreach (var set in Model.RadianTestSets)
                 {
-
-                <tr class='clickable-row' data-href="@Url.Action("Edit","RadianTestSet",new { operationModeId = set.OperationModeId})">
+                <tr>
                     <td class="text-nowrap"><a>@set.OperationModeName</a></td>
                     <td class="text-nowrap"><a>@set.Description</a></td>
                     <td class="text-nowrap"><a>@set.TotalDocumentRequired</a></td>
-                    <td class="text-nowrap"><a>@set.TotalDocumentAcceptedRequired</a></td>
+                    <td class="text-nowrap"><a href="javascript:showDetails(@htmlPartial, '@set.OperationModeName', '@Url.Action("GetTestSetSummary","RadianTestSet")');">Eventos</a></td>
                     <td class="text-nowrap">
                         @{
                             var text_color = set.Active ? "text-gosocket" : "text-red";
@@ -43,7 +44,7 @@
                         }
                     </td>
                     <td class="text-nowrap"><a>@set.CreatedBy</a></td>
-                    <td class="text-nowrap"><i class="fa fa-pencil"></i></td>
+                    <td class="text-nowrap clickable-row" data-href="@Url.Action("Edit","RadianTestSet",new { operationModeId = set.OperationModeId})"><i class="fa fa-pencil"></i></td>
                 </tr>
                 }
             </tbody>

@@ -106,6 +106,7 @@
         }
 
         $(document).ready(function () {
+            $('[data-toggle="popover"]').popover();
             showPdfModal("#show-document", "@Model.Document.DocumentKey", '@Url.Action("PrintDocument", "Document")');
             $('#container1-title').hide();
             $('.document-row').click('onClick', function () {

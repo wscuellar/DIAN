@@ -177,15 +177,19 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
 }
 
 function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {
-    customDialog(htmlPartial, id, softwareId, operation, url);
+    var data = {
+        id: id,
+        softwareId: softwareId,
+        operation: operation
+    }
+    customDialog(htmlPartial, data, url);
 }
 
-function customDialog(htmlPartial, code, softwareId, operation, url) {
-    var data = {
-        code: code,
-        softwareId: softwareId,
-        softwareType: operation
-    }
+function ShowDetailsTestSetConfig(htmlPartial, data, url) {
+    customDialog(htmlPartial, data, url);
+}
+
+function customDialog(htmlPartial, data, url) {
     var actionError = (error) => {
         console.log(success);
     }
@@ -194,9 +198,9 @@ function customDialog(htmlPartial, code, softwareId, operation, url) {
         var columns = 0;
         success.forEach((element, index) => {
             html += '<li>\
-            <div class="set-details"><span>' + element.EventName + '</span><div><a class="badge custom-badget-blue">' + element.Counter1 + '</a> <a class="badge custom-badget-green">' + element.Counter2 + '</a> <a class="badge custom-badget-red">' + element.Counter3 + '</a></div></div>\
+            <div class="set-details"><span>' + element.EventName + '</span><div><span><a class="badge custom-badget-blue">' + element.Counter1 + '</a></span><span> <a class="badge custom-badget-green">' + element.Counter2 + '</a></span><span> <a class="badge custom-badget-red">' + element.Counter3 + '</a></span></div></div>\
             </li >';
-            if ((index + 1) % 5 == 0) {
+            if ((index + 1) % 6 == 0) {
                 $(".list-unstyled-" + columns).append(html);
                 columns++;
                 html = "";
