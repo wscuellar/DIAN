@@ -1470,3 +1470,31 @@ a.badge {
 .show-details a{
     padding: 0px;
 }
+
+.popover-body {
+    width: 80%;
+    overflow: hidden;
+    margin: 20px;
+    display: inline-block;
+    float: right;
+    border-left: solid 1px #EA965A;
+    padding-left: 20px;
+    color: #2c323c;
+}
+.arrow {
+    background-color: #F2ECE7;
+}
+.popover {
+    background-color: #F2ECE7;
+    border-radius: 0px;
+    width: 340px;
+    max-width: none;
+}
+.icon-alert {
+    display: inline-flex;
+    font-size: 14px;
+}
+    .icon-alert fa-exclamation-circle {
+        margin: 20px;
+        position: absolute;
+    }

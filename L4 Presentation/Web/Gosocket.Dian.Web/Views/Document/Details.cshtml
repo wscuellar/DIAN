@@ -88,12 +88,12 @@
     </div>
 </div>
 
-@section Scripts {
+@section scripts {
     @Scripts.Render("~/bundles/jqueryval")
 
     <!--Bootstrap Select [ OPTIONAL ]-->
-    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
-    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    @*<script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>*@
     <script src="~/Content/js/file-validator.js"></script>
     <script src="~/Content/js/Radian/RadianPrintDocumentPdf.js"></script>
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
@@ -106,7 +106,6 @@
         }
 
         $(document).ready(function () {
-            $('[data-toggle="popover"]').popover();
             showPdfModal("#show-document", "@Model.Document.DocumentKey", '@Url.Action("PrintDocument", "Document")');
             $('#container1-title').hide();
             $('.document-row').click('onClick', function () {
@@ -119,11 +118,10 @@
                     $(this).removeClass('not-redirect')
             });
 
-            $(".eventView").click(function () {
+            $(".eventView").click(function () {debugger
                 var documentKey = $(this).parent().find("#DocumentKey").val()
                 $('#container1').fadeOut(200);
                 GetEventsPartialView(documentKey);
-
                 setTimeout(function () {
                     $('#divViewerPartial').css("height", "635px");
                     $('#divPageContent').css('max-height', '623px');
@@ -148,6 +146,7 @@
                         $('#modifyWrapper').fadeIn(300);
                         $('#container1-title').fadeIn(300);
                         $('#divChildrenModifyWrapper').css("padding-top", "100px");
+                        $('[data-toggle="popover"]').popover();
                     }
                     else {
                         window.location.href = '/User/Login';
