@@ -5,7 +5,13 @@ namespace Gosocket.Dian.Web.Models
     public class OthersElectronicDocumentsViewModel
     {
         public string Id { get; set; }
+
+        //[Required(ErrorMessage = "{0} es requerido")]
+        [Display(Name = "Proveedor tecnológico")]
+        public int ContributorId { get; set; }
+
         [Display(Name = "Nombre de software")]
+        public int SoftwareId { get; set; }
         public string SoftwareName { get; set; }
 
         [Display(Name = "PIN del SW")]
