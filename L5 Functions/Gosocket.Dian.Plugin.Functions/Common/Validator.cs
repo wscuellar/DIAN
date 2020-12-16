@@ -1561,11 +1561,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = "Regla: AAH11-(R): ",
-                    ErrorMessage = "No corresponde a un Mandatario habilitado en el DIAN.",
+                    ErrorMessage = "No corresponde a un Mandatario habilitado en RADIAN.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
-            //Valida existe Contrato del mandatos entre las partes
+            //Valida existe Contrato de mandatos entre las partes
             if (AttachmentBase64 != null)
             {
                 if (!IsBase64(AttachmentBase64))
