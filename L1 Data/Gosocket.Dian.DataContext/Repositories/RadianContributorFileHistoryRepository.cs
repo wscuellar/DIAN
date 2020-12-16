@@ -30,5 +30,15 @@ namespace Gosocket.Dian.DataContext.Repositories
            var query = _sqlDBContext.RadianContributorFileHistories.Where(expression);
             return query.Paginate(page, pagesize, t => t.Id.ToString());
         }
+
+
+        public PagedResult<RadianContributorFileHistory> HistoryByParticipantList(int radiancontributorId, Expression<Func<RadianContributorFileHistory, bool>> expression, int page, int pagesize)
+        {
+            var query = from fc in _sqlDBContext.RadianContributorFiles.Where(t => t.RadianContributorId == radiancontributorId)
+                      join ft in _sqlDBContext.RadianContributorFileHistories.Where(expression) on fc.Id equals ft.RadianContributorFileId
+                      select ft;
+
+            return query.Paginate(page, pagesize, t => t.Id.ToString());
+        }
     }
 }

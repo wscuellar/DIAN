@@ -427,11 +427,11 @@ button.edit-state {
 }
 
 .btn-radian-success {
-    background: #348441;
+    background: #348441 !important;
     border-radius: 10px;
     color: white;
     padding: 8px 20px;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 16px;
     border-color: #348441;
 }

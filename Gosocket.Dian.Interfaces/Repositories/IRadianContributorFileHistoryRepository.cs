@@ -10,6 +10,9 @@ namespace Gosocket.Dian.Interfaces.Repositories
         Guid AddRegisterHistory(RadianContributorFileHistory radianContributorFileHistory);
 
         PagedResult<RadianContributorFileHistory> List(Expression<Func<RadianContributorFileHistory, bool>> expression, int page, int pagesize);
-        
+
+        PagedResult<RadianContributorFileHistory> HistoryByParticipantList(int radiancontributorId, Expression<Func<RadianContributorFileHistory, bool>> expression, int page, int pagesize);
+
+
     }
 }

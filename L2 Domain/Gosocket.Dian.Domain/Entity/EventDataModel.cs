@@ -4,6 +4,7 @@
 
     using Gosocket.Dian.Common.Resources;
     using Gosocket.Dian.Domain.Common;
+    using Gosocket.Dian.Domain.Cosmos;
     using System;
     using System.Collections.Generic;
 
@@ -24,7 +25,7 @@
             References = new List<AssociatedReferenceModel>();
             AssociatedEvents = new List<AssociatedEventsModel>();
 
-            
+
         }
 
         public string Title { get; set; }
@@ -35,7 +36,9 @@
         public string SenderCode { get; set; }
         public string ReceiverCode { get; set; }
         public string ReceiverName { get; set; }
+        public string ReceiverType { get; set; }
         public string SenderName { get; set; }
+        public bool ShowTitleValueSection { get; set; }
         public string ValidationMessage { get; set; }
         public EventStatus EventStatus { get; set; }
         public List<AssociatedValidationsModel> Validations { get; set; }
@@ -48,6 +51,7 @@
         public ElectronicMandateModel Mandate { get; set; }
 
         public List<AssociatedEventsModel> AssociatedEvents { get; set; }
+        public List<GlobalDataDocument> ValueTitleDocuments { get; set; }
         public EndosoModel Endoso { get; set; }
         public string EventTitle { get; set; }
         public string RequestType { get; set; }
@@ -64,9 +68,9 @@
             Message = globalDocValidatorTracking.ErrorMessage;
         }
 
-        public string RuleName { get;  set; }
-        public string Status { get;  set; }
-        public string Message { get;  set; }
+        public string RuleName { get; set; }
+        public string Status { get; set; }
+        public string Message { get; set; }
     }
 
     public class AssociatedReferenceModel
@@ -74,16 +78,16 @@
 
         public AssociatedReferenceModel()
         {
-            
+
         }
 
-        public DateTime DateOfIssue { get;  set; }
-        public string Description { get;  set; }
-        public string SenderCode { get;  set; }
-        public string SenderName { get;  set; }
-        public string ReceiverCode { get;  set; }
-        public string ReceiverName { get;  set; }
-        public string Document { get;  set; }
+        public DateTime DateOfIssue { get; set; }
+        public string Description { get; set; }
+        public string SenderCode { get; set; }
+        public string SenderName { get; set; }
+        public string ReceiverCode { get; set; }
+        public string ReceiverName { get; set; }
+        public string Document { get; set; }
         public string CUFE { get; set; }
         public string Number { get; set; }
         public double TotalAmount { get; set; }
@@ -93,45 +97,45 @@
     {
         public ElectronicMandateModel()
         {
-            
+
         }
 
-        public string ContractDate { get;  set; }
-        public string ReceiverCode { get;  set; }
-        public string ReceiverName { get;  set; }
-        public string SenderCode { get;  set; }
-        public string SenderName { get;  set; }
-        public string MandateType { get;  set; }
+        public string ContractDate { get; set; }
+        public string ReceiverCode { get; set; }
+        public string ReceiverName { get; set; }
+        public string SenderCode { get; set; }
+        public string SenderName { get; set; }
+        public string MandateType { get; set; }
     }
 
     public class AssociatedEventsModel
     {
         public AssociatedEventsModel()
         {
-            
+
         }
 
 
-        public string EventCode { get;  set; }
-        public string Document { get;  set; }
-        public DateTime EventDate { get;  set; }
-        public string SenderCode { get;  set; }
-        public string Sender { get;  set; }
-        public string ReceiverCode { get;  set; }
-        public string Receiver { get;  set; }
+        public string EventCode { get; set; }
+        public string Document { get; set; }
+        public DateTime EventDate { get; set; }
+        public string SenderCode { get; set; }
+        public string Sender { get; set; }
+        public string ReceiverCode { get; set; }
+        public string Receiver { get; set; }
     }
 
     public class EndosoModel
     {
         public EndosoModel()
         {
-           
+
         }
 
-        public string ReceiverCode { get;  set; }
-        public string ReceiverName { get;  set; }
-        public string SenderCode { get;  set; }
-        public string SenderName { get;  set; }
-        public string EndosoType { get;  set; }
+        public string ReceiverCode { get; set; }
+        public string ReceiverName { get; set; }
+        public string SenderCode { get; set; }
+        public string SenderName { get; set; }
+        public string EndosoType { get; set; }
     }
 }
