@@ -38,7 +38,7 @@
 
         #endregion
 
-        #region GetGraphicRepresentationPdfReport
+        #region GetPdfReport
 
         public async Task<byte[]> GetPdfReport(string cude)
         {
@@ -176,7 +176,7 @@
             }
 
             // SetEventAssociated 
-            EventStatus allowEvent = _queryAssociatedEventsService.IdentifyEvent(eventItem);
+            EventStatus allowEvent = _queryAssociatedEventsService.IdentifyEvent(referenceMeta);
 
             if (allowEvent != EventStatus.None)
             {
@@ -285,6 +285,7 @@
         {
             string sectionHtml = "<div class='text-section padding-top20'> Sección {SectionNumber}</ div > ";
 
+            #region Mapping Event Data Section
             // Mapping Event Data Section
             template = template.Replace("{EventName}", model.Title);
             template = template.Replace("{EventNumber}", $"{model.Prefix} - {model.Number}");
@@ -298,6 +299,9 @@
             template = template.Replace("{RegistrationDate}", string.Empty);
             template = template.Replace("{StartDate}", string.Empty);
             template = template.Replace("{FinishDate}", string.Empty);
+            #endregion
+
+            #region Mapping reference invoice data section
 
             // Mapping reference invoice data section
 
@@ -315,6 +319,9 @@
             // Mapping reference event data section
 
             template = template.Replace("{ReferenceEventData}", string.Empty);
+            #endregion
+
+            #region Mapping Sections data 
 
             // Mapping Sections data 
             // por el momento solo es posible mapear la sección 1(datos del adquiriente) y
@@ -359,11 +366,30 @@
 
                 template = template.Replace("{SectionsData}", subjects.ToString());
             }
+            #endregion
 
-
+            #region Mapping Title Value section
+            
             // Mapping Title Value section
 
-            template = template.Replace("{TitleValue}", string.Empty);
+            if (model.ShowTitleValueSection)
+            {
+                StringBuilder templateTitleValue = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGraficaFacturaTituloValor.html"));
+
+                for (int i = 0; i < model.ValueTitleDocuments.Count; i++)
+                {
+                    GlobalDataDocument document = model.ValueTitleDocuments[i];
+                    templateTitleValue = DocumentTemplateMapping(templateTitleValue, document, (i + 1).ToString());
+                }
+                template = template.Replace("{TitleValue}", templateTitleValue.ToString());
+            }
+            else
+            {
+                template = template.Replace("{TitleValue}", string.Empty);
+            }
+
+            #endregion
+
 
             // Mapping Final Data Section
 
@@ -400,6 +426,21 @@
             template = template.Replace("{SubjectCity}", subjectCity);
             template = template.Replace("{SubjectEmail}", subjectEmail);
             template = template.Replace("{SubjectPhoneNumber}", subjectPhoneNumber);
+
+            return template;
+        }
+
+        #endregion
+
+        #region DocumentTemplateMapping
+
+        private StringBuilder DocumentTemplateMapping(StringBuilder template, GlobalDataDocument document, string number)
+        {
+            template = template.Replace("{Number" + number + "}", number);
+            template = template.Replace("{EventNumber" + number + "}", document.Number);
+            template = template.Replace("{Description" + number + "}", document.DocumentTypeName);
+            template = template.Replace("{GenerationDate" + number + "}", document.EmissionDate.ToShortDateString());
+            template = template.Replace("{Registrationdate" + number + "}", document.EmissionDate.ToShortDateString());
 
             return template;
         }
