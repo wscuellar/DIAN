@@ -198,7 +198,7 @@ function customDialog(htmlPartial, data, url) {
         var columns = 0;
         success.forEach((element, index) => {
             html += '<li>\
-            <div class="set-details"><span>' + element.EventName + '</span><div><a class="badge custom-badget-blue">' + element.Counter1 + '</a> <a class="badge custom-badget-green">' + element.Counter2 + '</a> <a class="badge custom-badget-red">' + element.Counter3 + '</a></div></div>\
+            <div class="set-details"><span>' + element.EventName + '</span><div><span><a class="badge custom-badget-blue">' + element.Counter1 + '</a></span><span> <a class="badge custom-badget-green">' + element.Counter2 + '</a></span><span> <a class="badge custom-badget-red">' + element.Counter3 + '</a></span></div></div>\
             </li >';
             if ((index + 1) % 6 == 0) {
                 $(".list-unstyled-" + columns).append(html);
