@@ -231,10 +231,10 @@ namespace Gosocket.Dian.Functions.Activation
 
                     // Escribo el registro de RadianTestResult
                     await globalTestSetResultTableManager.InsertOrUpdateAsync(radianTesSetResult);
-
+                
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (radianTesSetResult.Status == (int)TestSetStatus.Accepted)
-                    {
+                    {                      
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
@@ -243,10 +243,10 @@ namespace Gosocket.Dian.Functions.Activation
                             try
                             {
                                 #region Proceso Radian Habilitacion
+                                var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
+                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);                                
 
-                                Contributor contributor = contributorService.GetByCode(globalTestSetTracking.SenderCode);
-                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
-                                if (operation.RadianStatus != Domain.Common.RadianState.Habilitado.GetDescription()) return;
+                                if (isPartipantActive.RadianStatus != Domain.Common.RadianState.Habilitado.GetDescription()) return;
                                 contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
 
                                 #endregion
@@ -255,10 +255,9 @@ namespace Gosocket.Dian.Functions.Activation
 
 
                                 #endregion
-
                             }
                             catch (Exception ex)
-                            {
+                            {                                                              
                                 log.Error($"Error al enviar a activar RADIAN contribuyente con id {globalTestSetTracking.SenderCode} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                                 throw;
                             }
@@ -375,7 +374,7 @@ namespace Gosocket.Dian.Functions.Activation
                 }
             }
             catch (Exception ex)
-            {
+            {              
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 throw;
             }

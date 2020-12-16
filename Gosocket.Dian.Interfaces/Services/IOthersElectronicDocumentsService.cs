@@ -11,10 +11,6 @@ namespace Gosocket.Dian.Interfaces.Services
 
         ResponseMessage Validation(string userCode, string Accion, int IdElectronicDocument, string complementeTexto, int ParticipanteId);
 
-        /// <summary>
-        /// Retornar la lista de Modos de Operación
-        /// </summary>
-        /// <returns></returns>
-        List<OperationMode> GetOperationModes();
+ 
     }
 }
