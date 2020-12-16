@@ -196,7 +196,7 @@ function customDialog(htmlPartial, code, softwareId, operation, url) {
             html += '<li>\
             <div class="set-details"><span>' + element.EventName + '</span><div><a class="badge custom-badget-blue">' + element.Counter1 + '</a> <a class="badge custom-badget-green">' + element.Counter2 + '</a> <a class="badge custom-badget-red">' + element.Counter3 + '</a></div></div>\
             </li >';
-            if ((index + 1) % 5 == 0) {
+            if ((index + 1) % 6 == 0) {
                 $(".list-unstyled-" + columns).append(html);
                 columns++;
                 html = "";
