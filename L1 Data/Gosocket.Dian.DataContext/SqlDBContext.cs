@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Domain.Sql.FreeBiller;
 using Gosocket.Dian.Infrastructure;
 using System;
 using System.Data.Entity;
@@ -172,6 +173,22 @@ namespace Gosocket.Dian.DataContext
         /// Otros documentos. Utilizado por el momento para la Opción/Vista de Set de Pruebas - Otros Documentos
         /// </summary>
         public DbSet<Domain.Sql.ElectronicDocument> ElectronicDocuments { set; get; }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DbSet<MenuOptions> MenuOptions { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DbSet<MenuOptionsByProfiles> MenuOptionsByProfiles { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DbSet<Profile> Profile { get; set; }
 
     }
 

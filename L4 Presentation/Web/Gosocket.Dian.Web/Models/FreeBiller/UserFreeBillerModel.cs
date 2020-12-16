@@ -9,7 +9,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
 {
     public class UserFreeBillerModel
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [DisplayName("Nombre")]
         public string Name { get; set; }
