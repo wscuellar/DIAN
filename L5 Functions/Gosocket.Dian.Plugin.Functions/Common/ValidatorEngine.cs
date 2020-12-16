@@ -82,7 +82,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             XmlParser xmlParserCude = null;
 
             //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
-            if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
+            if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation || 
+                Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
                 var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
                 if (documentMeta != null)
@@ -152,6 +153,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     code = EventStatus.SolicitudDisponibilizacion;
                     break;
                 case (int)EventStatus.Avales:
+                case (int)EventStatus.ValInfoPago:
                     code = EventStatus.SolicitudDisponibilizacion;
                     break;
                 default:
@@ -165,7 +167,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.ValInfoPago
                 )
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
@@ -213,6 +216,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     ValidateListResponse response = new ValidateListResponse();
                     response.ErrorMessage = $"No se encontró evento referenciado CUDE y/o CUFE para evaluar fecha.";
+                    response.IsValid = false;
+                    response.ErrorCode = "89";
+                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                    validateResponses.Add(response);
+                    return validateResponses;
+                }
+                else if (documentMeta == null)
+                {                    
+                    ValidateListResponse response = new ValidateListResponse();
+                    response.ErrorMessage = "No se encontró evento referenciado para evaluar fecha";
                     response.IsValid = false;
                     response.ErrorCode = "89";
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;

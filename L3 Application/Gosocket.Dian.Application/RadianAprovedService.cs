@@ -343,19 +343,19 @@ namespace Gosocket.Dian.Application
             return customers;
         }
 
-        public PagedResult<RadianContributorFileHistory> FileHistoryFilter(string fileName, string initial, string end, int page, int pagesize)
+        public PagedResult<RadianContributorFileHistory> FileHistoryFilter(int radiancontributorId, string fileName, string initial, string end, int page, int pagesize)
         {
             DateTime initialDate, endDate;
             if (!string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(initial) && DateTime.TryParse(initial, out initialDate) && !string.IsNullOrEmpty(end) && DateTime.TryParse(end, out endDate))
-                return _radianContributorFileHistoryRepository.List(t => t.FileName.Contains(fileName) && t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
+                return _radianContributorFileHistoryRepository.HistoryByParticipantList(radiancontributorId, t => t.FileName.Contains(fileName) && t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
 
             if (string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(initial) && DateTime.TryParse(initial, out initialDate) && !string.IsNullOrEmpty(end) && DateTime.TryParse(end, out endDate))
-                return _radianContributorFileHistoryRepository.List(t => t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
+                return _radianContributorFileHistoryRepository.HistoryByParticipantList(radiancontributorId, t => t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
 
             if (!string.IsNullOrEmpty(fileName))
-                return _radianContributorFileHistoryRepository.List(t => t.FileName.Contains(fileName), page, pagesize);
+                return _radianContributorFileHistoryRepository.HistoryByParticipantList(radiancontributorId, t => t.FileName.Contains(fileName), page, pagesize);
 
-            return _radianContributorFileHistoryRepository.List(t => true, page, pagesize);
+            return _radianContributorFileHistoryRepository.HistoryByParticipantList(radiancontributorId, t => true, page, pagesize);
         }
 
         public void DeleteSoftware(Guid softwareId)
