@@ -35,7 +35,7 @@
                     <td class="text-nowrap"><a>@set.OperationModeName</a></td>
                     <td class="text-nowrap"><a>@set.Description</a></td>
                     <td class="text-nowrap"><a>@set.TotalDocumentRequired</a></td>
-                    <td class="text-nowrap"><a href="javascript:showDetails(@htmlPartial, '@set.OperationModeName', @Url.Action("",""));">Eventos</a></td>
+                    <td class="text-nowrap"><a href="javascript:showDetails(@htmlPartial, '@set.OperationModeName', '@Url.Action("GetTestSetSummary","RadianTestSet")');">Eventos</a></td>
                     <td class="text-nowrap">
                         @{
                             var text_color = set.Active ? "text-gosocket" : "text-red";

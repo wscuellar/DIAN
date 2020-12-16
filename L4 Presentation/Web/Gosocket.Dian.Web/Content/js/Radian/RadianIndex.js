@@ -177,15 +177,19 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
 }
 
 function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {
-    customDialog(htmlPartial, id, softwareId, operation, url);
+    var data = {
+        id: id,
+        softwareId: softwareId,
+        operation: operation
+    }
+    customDialog(htmlPartial, data, url);
 }
 
-function customDialog(htmlPartial, code, softwareId, operation, url) {
-    var data = {
-        code: code,
-        softwareId: softwareId,
-        softwareType: operation
-    }
+function ShowDetailsTestSetConfig(htmlPartial, data, url) {
+    customDialog(htmlPartial, data, url);
+}
+
+function customDialog(htmlPartial, data, url) {
     var actionError = (error) => {
         console.log(success);
     }

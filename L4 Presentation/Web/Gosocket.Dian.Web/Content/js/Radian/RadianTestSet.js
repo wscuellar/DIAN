@@ -356,8 +356,9 @@ function showErrorMessage(total) {
 //    ShowDetailsTestSet(htmlPartial, "", "", softwareType, url);
 //}
 
-function showDetails(html, softwareName) {
-    debugger
-    var html = html;
-    ShowDetailsTestSet(htmlPartial, softwareName, url);
+function showDetails(html, softwareName, url) {
+    var data = {
+        softwareType: softwareName
+    }
+    ShowDetailsTestSetConfig(html, data, url);
 }
