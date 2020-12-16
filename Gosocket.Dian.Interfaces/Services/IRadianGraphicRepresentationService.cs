@@ -1,7 +1,9 @@
-﻿namespace Gosocket.Dian.Interfaces.Services
+﻿using System.Threading.Tasks;
+
+namespace Gosocket.Dian.Interfaces.Services
 {
     public interface IRadianGraphicRepresentationService
     {
-        byte[] GetPdfReport(string cude);
+        Task<byte[]> GetPdfReport(string cude);
     }
 }
