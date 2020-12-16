@@ -87,11 +87,11 @@ namespace Gosocket.Dian.Functions.Radian
                     var software = softwareService.GetRadianSoftware(requestObject.Software.Id);
                     if (software == null)
                     {
-                        var ownSoftware = contributorService.GetByCode(requestObject.Software.ContributorCode);
+                        var ownContributor= contributorService.GetByCode(requestObject.Software.ContributorCode);
                         software = new RadianSoftware
                         {
                             Id = requestObject.Software.Id,
-                            RadianContributorId = ownSoftware.Id, // OJOOOOOOOOOOOO
+                            RadianContributorId = ownContributor.Id, 
                             Name = requestObject.Software.Name,
                             Pin = requestObject.Software.Pin,
                             SoftwareDate = utcNow,
@@ -141,12 +141,9 @@ namespace Gosocket.Dian.Functions.Radian
                         Timestamp = utcNow
                     };
 
-                    /*********************************************************************************************/
-                    // Porque esto ConfigurationManager.GetValue("BillerSoftwareId") ??????????????
-                    /*********************************************************************************************/
-                    if (contributorOperation.OperationModeId == (int)Domain.Common.OperationMode.Free &&
-                                            contributorOperation.SoftwareId == null)
-                        contributorOperation.SoftwareId = Guid.Parse(ConfigurationManager.GetValue("BillerSoftwareId"));
+                    //if (contributorOperation.OperationModeId == (int)Domain.Common.OperationMode.Free &&
+                    //                        contributorOperation.SoftwareId == null)
+                    //    contributorOperation.SoftwareId = Guid.Parse(ConfigurationManager.GetValue("BillerSoftwareId"));
 
                     var contributorOperationSearch = contributorOperationService.Get(
                                             contributor.Id,
@@ -196,6 +193,23 @@ namespace Gosocket.Dian.Functions.Radian
                 }
                 catch (Exception ex)
                 {
+                    if (contributorActivation == null)
+                        contributorActivation = new GlobalContributorActivation(requestObject.ContributorId.ToString(), Guid.NewGuid().ToString());
+
+                    contributorActivation.Success = false;
+                    contributorActivation.Message = "Error al activar contribuyente en producción.";
+                    contributorActivation.Detail = ex.Message;
+                    contributorActivation.Trace = ex.StackTrace;
+                    contributorActivationTableManager.InsertOrUpdate(contributorActivation);
+
+                    var resultJson = JsonConvert.SerializeObject(contributorActivation);
+                    var lastZone = new GlobalLogger("RadianActivateContributor", "Exception")
+                    {
+                        Message = ex.Message + " --> " + resultJson
+                                             + " -----------------------------------" + ex
+                    };
+                    TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+
                     log.Error($"Exception in RadianActivateContributor. {ex.Message}", ex);
                     throw;
                 }
