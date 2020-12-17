@@ -18,6 +18,8 @@
         public string DocumentTypeIdRef { get; set; }
         public string IssuerPartyCode { get; set; }
         public string IssuerPartyName { get; set; }
+        public string ProviderCode { get; set; }
+
 
         public static void SetValues(ref DocumentParsed documentParsed)
         {
@@ -29,6 +31,7 @@
             documentParsed.DocumentTypeIdRef = documentParsed?.DocumentTypeIdRef;
             documentParsed.IssuerPartyName = documentParsed?.IssuerPartyName;
             documentParsed.IssuerPartyCode = documentParsed?.IssuerPartyCode;
+            documentParsed.ProviderCode = documentParsed.ProviderCode;
         }
     }
 }

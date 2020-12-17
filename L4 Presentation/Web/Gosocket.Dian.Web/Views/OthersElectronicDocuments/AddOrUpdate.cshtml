@@ -70,7 +70,7 @@
             background-color: #348441 !important;
         }
 
-        .divBackTop{
+        .divBackTop {
             padding-top: 15px;
         }
 
@@ -82,11 +82,8 @@
         .btnBackTop {
             color: #348441;
             font-size: 14pt;
-            text-decoration:underline;
+            text-decoration: underline;
         }
-
-
-        
     </style>
 }
 <div class="page-content margin-15">
@@ -113,10 +110,10 @@
                                     {
                                         @Html.Partial("_form")
 
-                                    <div class="panel-footer text-right">
-                                        <a href="@Url.Action("Index", "OthersElectronicDocAssociated", new { electronicDocumentId = 0,  operationModeId = 0,  ContributorIdType = 0 })" class="btnBackTop">Siguiente Pruebas</a>
-                                        <button id="btnSave" type="button" class="btn btn-success btn-radian-success">Asociar</button>
-                                    </div>
+                                        <div class="panel-footer text-right">
+                                            <a href="@Url.Action("Index", "OthersElectronicDocAssociated", new { electronicDocumentId = 0,  operationModeId = 0,  ContributorIdType = 0 })" class="btnBackTop">Siguiente Pruebas</a>
+                                            <button id="btnSave" type="button" class="btn btn-success btn-radian-success">Asociar</button>
+                                        </div>
                                     }
                                 </div>
                             </div>
@@ -154,8 +151,78 @@
                 }
             });
 
+            $('#ContributorId').change(function () {
+
+                console.log("botones", $(":button"));
+                getSoftwares($('#ContributorId').val());
+
+            });
+
+            if ($('#ContributorId').val() != '' && $('#ContributorId').val() != "0") {
+                getSoftwares($('#ContributorId').val());
+            }
 
         });//ready
+
+        function getSoftwares(contributorId){
+
+            $("#SoftwareId").html('<option value="" selected="selected">Seleccione...</option>');
+            $('#ulSoftwareId').html('<li data-original-index="0" class="selected"><a tabindex="0" class=""' +
+                'data-normalized-text="Seleccione..."><span class="text">Seleccione...</span><span class="fa fa-check check-mark"></span></a></li>');
+
+            cambiarTextoSelect();
+
+            $.ajax({
+                url: "@Url.Action("GetSoftwaresByContributorId", "OthersElectronicDocuments")",
+                type: "POST",
+                data: { id: contributorId },
+                datatype: "json",
+                success: function (result) {
+
+                    if (result != null && result.res != null) {
+
+                        $.each(result.res, function (index, value) {
+//                            console.log('<option value="' + value.Id + '">' + value.Name + '</option>');
+                            $('#SoftwareId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                            $('#ulSoftwareId').append('<li data-original-index="' + (index + 1) + '"><a tabindex="0" class=""' +
+                                ' data-normalized-text="' + value.Name + '"><span class="text">' + value.Name + '</span>' +
+                                '<span class="fa fa-check check-mark"></span></a></li>');
+                        });
+                    }
+                    else
+                        bootbox.alert("No se pudo realizar la eliminación");
+                },
+                complete: function () {
+
+                },
+                error: function (result) {
+                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
+
+        }
+
+        function cambiarTextoSelect() {
+            var botones = $(":button");
+            var boton;
+
+            $.each(botones, function (index1, val1) {
+                if (val1.attributes != undefined && $(val1).hasClass("selectpicker")) {
+                    
+                    boton = val1;
+                    $.each(val1.attributes, function (index, value) {
+                        
+                        if (value.localName == "data-id" && value.nodeValue == "SoftwareId") {
+                            
+                            boton.firstElementChild.textContent = "Seleccione...";
+                            
+                        }
+                    });
+                }
+            });
+        }
 
     </script>
 
