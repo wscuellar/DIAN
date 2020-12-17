@@ -384,8 +384,8 @@
                                     </li>
 
                                     <!--Rol Administrador-->
-                                    @if (User.IsInAnyRole("Administrador", "Super"))
-                                    {
+                                    @*@if (User.IsInAnyRole("Administrador", "Super"))
+                                    {*@
                                         <li id="@Navigation.NavigationEnum.ExternalUsersCreate">
                                             <a href="@Url.Action("AddUser", "ExternalUsers")">
                                                 <i class="fa fa-user-circle-o"></i>
@@ -394,7 +394,7 @@
                                                 </span>
                                             </a>
                                         </li>
-                                    }
+                                    @*}*@
 
                                     <!--Rol Administrador-->
                                     @if (User.IsInAnyRole("Administrador", "Super"))

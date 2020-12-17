@@ -1,6 +1,8 @@
 ﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
@@ -20,12 +22,15 @@ namespace Gosocket.Dian.Web.Controllers
     {
         private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
         private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
+        private readonly IContributorService _contributorService;
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
-            IOthersDocsElecContributorService othersDocsElecContributorService)
+            IOthersDocsElecContributorService othersDocsElecContributorService,
+            IContributorService contributorService)
         {
             _othersElectronicDocumentsService = othersElectronicDocumentsService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
+            _contributorService = contributorService;
         }
 
         /// <summary>
@@ -58,6 +63,29 @@ namespace Gosocket.Dian.Web.Controllers
             List<ElectronicDocument> listED = new ElectronicDocumentService().GetElectronicDocuments();
             List<OperationModeViewModel> listOM = new TestSetViewModel().GetOperationModes();
             OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
+            List<ContributorViewModel> listContri = new List<ContributorViewModel>()
+            {
+                new ContributorViewModel() { Id=0, Name= "Seleccione..."}
+            };
+
+            ViewBag.ListSoftwares = new List<SoftwareViewModel>()
+            {
+                new SoftwareViewModel() { Id = System.Guid.Empty, Name = "Seleccione..."}
+            };
+
+            var listCont = _contributorService.GetContributors(ContributorType.Provider.GetHashCode(), 
+                ContributorStatus.Enabled.GetHashCode()).ToList();
+
+            if(listCont != null)
+            {
+                listContri.AddRange(listCont.Select(c => new ContributorViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name
+                }).ToList());
+            }
+
+            ViewBag.ListTechnoProviders = listContri;
 
             var opeMode = listOM.FirstOrDefault(o => o.Id == operationModeId);
             if (opeMode != null)
@@ -85,8 +113,6 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
-
-
         [HttpPost]
         public JsonResult Validation(ValidacionOtherElectronicDocumentsViewModel ValidacionOtherElectronicDocuments)
         {
@@ -99,6 +125,24 @@ namespace Gosocket.Dian.Web.Controllers
                 );
 
             return Json(validation, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult GetSoftwaresByContributorId(int id)
+        {
+            List<SoftwareViewModel> softwareList=new List<SoftwareViewModel>();
+            var softs = new SoftwareService().GetSoftwaresByContributorAndState(id, true);
+
+            if(softs != null)
+            {
+                softwareList = softs.Select(s => new SoftwareViewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name
+                }).ToList();
+            }
+
+            return Json(new { res = softwareList }, JsonRequestBehavior.AllowGet);
         }
 
     }

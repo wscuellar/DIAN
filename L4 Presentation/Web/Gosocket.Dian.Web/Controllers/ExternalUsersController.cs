@@ -28,7 +28,7 @@ namespace Gosocket.Dian.Web.Controllers
     /// Para que puedan ingresar al catalogo de validación sin necesidad(Facturando electrónicamente) de usar token
     /// </summary>
     //[AllowAnonymous]
-    [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
+    //[CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
     public class ExternalUsersController : Controller
     {
         ApplicationDbContext _context;

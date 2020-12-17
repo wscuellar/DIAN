@@ -86,6 +86,7 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> Details(string trackId)
         {
             DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
+            //model.IconsData = _queryAssociatedEventsService.IconType(model.eve);
 
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
             return View(model);

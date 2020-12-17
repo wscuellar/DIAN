@@ -130,42 +130,36 @@ namespace Gosocket.Dian.Application
         {
             Dictionary<int, string> statusValue = new Dictionary<int, string>();
             int securityTitleCounter = 0;
-            statusValue.Add(1, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");
+            statusValue.Add(1, $"{RadianDocumentStatus.ElectronicInvoice.GetDescription()}");
 
             foreach (GlobalDocValidatorDocumentMeta documentMeta in allReferencedDocuments)
             {
                 if (documentMeta.EventCode != null)
                 {
-                    //if (TITULOVALORCODES.Contains(documentMeta.EventCode.Trim()))
-                    //statusValue.Add(1, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");
-                    //statusValue.Append($"{RadianDocumentStatus.ElectronicInvoice.GetDescription()}"); //6
-
                     if (TITULOVALORCODES.Contains(documentMeta.EventCode.Trim()))
                     {
                         securityTitleCounter++;
                     }
 
                     if (securityTitleCounter >= 3)
-                        statusValue.Add(2, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");
-                    //statusValue.Append($"{RadianDocumentStatus.SecurityTitle.GetDescription()}"); //5
+                        statusValue.Add(2, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");//5
 
                     if (DISPONIBILIZACIONCODES.Contains(documentMeta.EventCode.Trim()))
-                        statusValue.Add(3, $"{RadianDocumentStatus.Readiness.GetDescription()}");
-                    //statusValue.Append($"{RadianDocumentStatus.Readiness.GetDescription()}"); //4 //INSCRITA
+                        statusValue.Add(3, $"{RadianDocumentStatus.Readiness.GetDescription()}");//4 //INSCRITA
 
                     if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim()))
-                        statusValue.Add(4, $"{RadianDocumentStatus.Endorsed.GetDescription()}");
-                    //statusValue.Append($"{RadianDocumentStatus.Endorsed.GetDescription()}"); //3            
+                        statusValue.Add(4, $"{RadianDocumentStatus.Endorsed.GetDescription()}");//3       
 
                     if (PAGADACODES.Contains(documentMeta.EventCode.Trim()))
-                        statusValue.Add(5, $"{RadianDocumentStatus.Paid.GetDescription()}");
-                        //statusValue.Append($"{RadianDocumentStatus.Paid.GetDescription()}"); //2
+                        statusValue.Add(5, $"{RadianDocumentStatus.Paid.GetDescription()}");//2
 
                     if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()))
-                        statusValue.Add(6, $"{RadianDocumentStatus.Limited.GetDescription()}");
-                        //statusValue.Append($"{RadianDocumentStatus.Limited.GetDescription()}"); //1
+                        statusValue.Add(6, $"{RadianDocumentStatus.Limited.GetDescription()}");//1 
                 }
             }
+
+            if (statusValue.ContainsKey(3) || statusValue.ContainsKey(6))
+                statusValue.Remove(1);
 
             return statusValue;
         }
