@@ -176,7 +176,7 @@
             }
 
             // SetEventAssociated 
-            EventStatus allowEvent = _queryAssociatedEventsService.IdentifyEvent(referenceMeta);
+            EventStatus allowEvent = _queryAssociatedEventsService.IdentifyEvent(eventItem);
 
             if (allowEvent != EventStatus.None)
             {
@@ -201,6 +201,8 @@
                 }
             }
 
+            model.EntityName = referenceMeta.Serie;
+            model.CertificateNumber = referenceMeta.SerieAndNumber;
 
             // Set title value data Particular Data
             // valida la regla de negocio para mostrar la sección de titulos valor
@@ -224,7 +226,7 @@
                     List<string> radianStatusFilter = new List<string>() {
                             $"0{(int)EventStatus.Received}", $"0{(int)EventStatus.Receipt}", $"0{(int)EventStatus.Accepted}"
                         };
-                    pks = new List<string> { $"co|{eventVerification.EmissionDateNumber.Substring(6, 2)}|{eventItem.DocumentKey.Substring(0, 2)}" };
+                    pks = new List<string> { $"co|{eventVerification.EmissionDateNumber.Substring(6, 2)}|{eventItem.DocumentReferencedKey.Substring(0, 2)}" };
 
 
                     (bool hasMoreResults, string continuation, List<GlobalDataDocument> globalDataDocuments) cosmosResponse =
@@ -240,7 +242,7 @@
                                                                                                 null,
                                                                                                 null,
                                                                                                 40,
-                                                                                                eventItem.DocumentKey,
+                                                                                                eventItem.DocumentReferencedKey,
                                                                                                 null,
                                                                                                 pks
                                                                                                 );
@@ -369,17 +371,17 @@
             #endregion
 
             #region Mapping Title Value section
-            
+
             // Mapping Title Value section
 
             if (model.ShowTitleValueSection)
             {
                 StringBuilder templateTitleValue = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGraficaFacturaTituloValor.html"));
 
-                for (int i = 0; i < model.ValueTitleDocuments.Count; i++)
+                for (int i = 0; i < model.ValueTitleDocuments[0].Events.Count; i++)
                 {
-                    GlobalDataDocument document = model.ValueTitleDocuments[i];
-                    templateTitleValue = DocumentTemplateMapping(templateTitleValue, document, (i + 1).ToString());
+                    Event eventDoc = model.ValueTitleDocuments[0].Events[i];
+                    templateTitleValue = DocumentTemplateMapping(templateTitleValue, eventDoc, (i + 1).ToString());
                 }
                 template = template.Replace("{TitleValue}", templateTitleValue.ToString());
             }
@@ -393,7 +395,7 @@
 
             // Mapping Final Data Section
 
-            template = template.Replace("{FinalData}", "");
+            template = template.Replace("{FinalData}", $"Nombre de la Entidad de Certificación Digital: {model.EntityName}  Número del certificado digital: {model.CertificateNumber} ");
 
             return template;
         }
@@ -434,13 +436,13 @@
 
         #region DocumentTemplateMapping
 
-        private StringBuilder DocumentTemplateMapping(StringBuilder template, GlobalDataDocument document, string number)
+        private StringBuilder DocumentTemplateMapping(StringBuilder template, Event eventDoc, string number)
         {
             template = template.Replace("{Number" + number + "}", number);
-            template = template.Replace("{EventNumber" + number + "}", document.Number);
-            template = template.Replace("{Description" + number + "}", document.DocumentTypeName);
-            template = template.Replace("{GenerationDate" + number + "}", document.EmissionDate.ToShortDateString());
-            template = template.Replace("{Registrationdate" + number + "}", document.EmissionDate.ToShortDateString());
+            template = template.Replace("{EventNumber" + number + "}", eventDoc.Code);
+            template = template.Replace("{Description" + number + "}", eventDoc.Description);
+            template = template.Replace("{GenerationDate" + number + "}", eventDoc.Date.ToShortDateString());
+            template = template.Replace("{Registrationdate" + number + "}", eventDoc.Date.ToShortDateString());
 
             return template;
         }

@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
 using System;
@@ -185,6 +186,7 @@ namespace Gosocket.Dian.Application
                 }
             }
         }
+
 
         public void SetHabilitationAndProductionDates(Contributor contributor)
         {
@@ -489,9 +491,9 @@ namespace Gosocket.Dian.Application
         /// </summary>
         /// <param name="radianContributorId">Id a ubicar</param>
         /// <returns>Un objeto RadianCotributor buscado</returns>
-        public RadianContributor GetRadian(int radianContributorId)
+        public RadianContributor GetRadian(int contributorId, int contributorTypeId)
         {
-            return sqlDBContext.RadianContributors.FirstOrDefault(rc => rc.Id == radianContributorId);
+            return sqlDBContext.RadianContributors.FirstOrDefault(rc => rc.ContributorId == contributorId && rc.RadianContributorTypeId == contributorTypeId);
         }
 
         /// <summary>
@@ -505,13 +507,60 @@ namespace Gosocket.Dian.Application
                 var contributorInstance = context.RadianContributors.FirstOrDefault(c => c.Id == contributor.Id);
                 if (contributorInstance != null)
                 {
-                    contributorInstance.RadianState = Domain.Common.ContributorStatus.Enabled.ToString();
+                    contributorInstance.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
                     contributorInstance.RadianContributorTypeId = contributor.RadianContributorTypeId;
                     contributorInstance.Update = DateTime.UtcNow;
                     context.SaveChanges();
                 }
             }
         }
+
+
+
+        public int  AddOrUpdateRadianContributor(RadianContributor radianContributor)
+        {
+            using (var context = new SqlDBContext())
+            {
+                RadianContributor radianContributorInstance =
+                    context.RadianContributors.FirstOrDefault(c => c.Id == radianContributor.Id);
+
+                if (radianContributorInstance != null)
+                {
+                    radianContributorInstance.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
+                    radianContributorInstance.Update = DateTime.Now;
+                    radianContributorInstance.RadianState = radianContributor.RadianState;
+                    radianContributorInstance.RadianOperationModeId = radianContributor.RadianOperationModeId;
+                    radianContributorInstance.CreatedBy = radianContributor.CreatedBy;
+                    radianContributorInstance.Description = radianContributor.Description;
+                    radianContributorInstance.Step = radianContributor.Step == 0 ? 1 : radianContributor.Step;
+
+                    context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
+                }
+                else
+                {
+                    radianContributor.Step = 4;
+                    radianContributor.Update = DateTime.Now;
+                    context.Entry(radianContributor).State = System.Data.Entity.EntityState.Added;
+                }
+
+                context.SaveChanges();
+
+                return radianContributorInstance != null ? radianContributorInstance.Id : radianContributor.Id;
+            }
+        }
+
+
+        public int AddRadianOperation(RadianContributorOperation operation)
+        {
+            int affectedRecords = 0;
+            using (var context = new SqlDBContext())
+            {
+                context.RadianContributorOperations.Add(operation);
+                affectedRecords = context.SaveChanges();
+            }
+            return affectedRecords > 0 ? operation.Id : 0;
+        }
+
 
         #endregion
     }
