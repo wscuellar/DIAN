@@ -58,10 +58,17 @@ namespace Gosocket.Dian.Web.Controllers
             return RedirectToAction("FreeBillerUser");
         }
 
-
-        public ActionResult EditFreeBillerUser(UserFreeBillerModel model)
+        [HttpGet]
+        public ActionResult EditFreeBillerUser(string guid ="7713a5d0-fe76-4e9a-b704-d05a7d7b7f07")
         {
-            return View();
+            UserService user = new UserService();
+            var data = user.Get(guid);
+            UserFreeBillerModel model = new UserFreeBillerModel();
+            model.Name = data.Name;
+            model.Email = data.Email;
+            model.LastUpdate = data.LastUpdated;
+            model.Profiles = this.DataPerfiles();
+            return View(model);
         }
 
         public ActionResult CreateUser()
