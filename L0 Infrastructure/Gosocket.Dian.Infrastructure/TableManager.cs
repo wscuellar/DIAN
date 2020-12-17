@@ -824,6 +824,32 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+        public DynamicTableEntity FindhByRadianStatus(string partitionKey, bool deleted, string radianStatus)
+        {
+            var query = new TableQuery();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterConditionForBool("Deleted",
+                    QueryComparisons.Equal,
+                    deleted));
+            prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RadianStatus",
+                    QueryComparisons.Equal,
+                    radianStatus));
+
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
+
         public T FindByGlobalDocumentId<T>(string globalDocumentId) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("GlobalDocumentId", QueryComparisons.Equal, globalDocumentId));

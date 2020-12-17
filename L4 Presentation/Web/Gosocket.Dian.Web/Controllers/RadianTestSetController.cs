@@ -290,14 +290,14 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult GetTestSetSummary(string softwareType)
         {
 
-            Domain.Common.RadianOperationModeTestSet softwareTypeEnum = Domain.Common.EnumHelper.GetValueFromDescription<Domain.Common.RadianOperationModeTestSet>(softwareType);
+            RadianOperationModeTestSet softwareTypeEnum = Domain.Common.EnumHelper.GetValueFromDescription<RadianOperationModeTestSet>(softwareType);
             string key = ((int)softwareTypeEnum).ToString();
             RadianTestSet testSet = _radianAprovedService.GetTestResult(key);
             List<EventCountersViewModel> events = new List<EventCountersViewModel>();
             if (testSet !=  null)
             {
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.Received.GetDescription(), Counter1 = testSet.ReceiptServiceTotalRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.Rejected.GetDescription(), Counter1 = testSet.ReceiptServiceTotalRequired, Counter2 = 0, Counter3 = 0 });
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Received.GetDescription(), Counter1 = testSet.ReceiptNoticeTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Rejected.GetDescription(), Counter1 = testSet.RejectInvoiceTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.Receipt.GetDescription(), Counter1 = testSet.ReceiptServiceTotalRequired, Counter2 = 0, Counter3 = 0 });
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.Accepted.GetDescription(), Counter1 = testSet.ExpressAcceptanceTotalRequired, Counter2 = 0, Counter3 = 0 });
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.AceptacionTacita.GetDescription(), Counter1 = testSet.AutomaticAcceptanceTotalRequired, Counter2 = 0, Counter3 = 0 });
