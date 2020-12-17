@@ -82,6 +82,13 @@ namespace Gosocket.Dian.Application
             return sqlDBContext.Softwares.FirstOrDefault(x => x.Id == id);
         }
 
+
+        public RadianSoftware GetByRadian(Guid id)
+        {
+            return sqlDBContext.RadianSoftwares.FirstOrDefault(x => x.Id == id);
+        }
+
+
         public IEnumerable<Software> GetAll()
         {
             return sqlDBContext.Softwares;

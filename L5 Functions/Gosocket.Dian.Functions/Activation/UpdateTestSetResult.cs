@@ -243,15 +243,58 @@ namespace Gosocket.Dian.Functions.Activation
                             try
                             {
                                 #region Proceso Radian Habilitacion
+                                //Traemos el contribuyente
                                 var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
+
+                                //Habilitamos el participante en GlobalRadianOperations
                                 GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);                                
 
+                                //Verificamos si quedo habilitado sino termina
                                 if (isPartipantActive.RadianStatus != Domain.Common.RadianState.Habilitado.GetDescription()) return;
+
+                                //Habilitamos en RADIAN en HAB
+                                //--Habilitamos SQL
                                 contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
+
+                                //--GlobalSoftware 
+                                var softwareId = isPartipantActive.RowKey;
+                                var software = softwareService.GetByRadian(Guid.Parse(softwareId));
+                                var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id =software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
+                                await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
 
                                 #endregion
 
                                 #region Pendiente migracion SQL
+
+                                var requestObject = new { 
+                                    code = isPartipantActive.PartitionKey,
+                                    contributorId = contributor.Id, 
+                                    contributorTypeId = isPartipantActive.RadianContributorTypeId,
+                                    softwareId = isPartipantActive.RowKey,
+                                    softwareType =isPartipantActive.SoftwareType,
+                                    softwareUser = software.SoftwareUser,
+                                    softwarePassword =software.SoftwarePassword,
+                                    pin = software.Pin,
+                                    url =software.Url,
+                                    softwareName = software.Name
+                                };
+                                //var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), requestObject);
+
+                                var guid = Guid.NewGuid().ToString();
+                                var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
+                                {
+                                    Success = true,
+                                    ContributorCode = isPartipantActive.PartitionKey,
+                                    ContributorTypeId = isPartipantActive.RadianContributorTypeId,
+                                    OperationModeId = isPartipantActive.SoftwareType,
+                                    OperationModeName = "RADIAN",
+                                    SentToActivateBy = "Function",
+                                    SoftwareId = isPartipantActive.RowKey,
+                                    SendDate = DateTime.UtcNow,
+                                    TestSetId = radianTesSetResult.Id,
+                                    Request = JsonConvert.SerializeObject(requestObject)
+                                };
+                                await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
 
 
                                 #endregion

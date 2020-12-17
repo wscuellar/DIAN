@@ -33,74 +33,92 @@ namespace Gosocket.Dian.Functions.Radian
 
             if (ConfigurationManager.GetValue("Environment") == "Hab")
             {
-                RadianContributor contributor = null;
-                var activateContributorRequestObject = new ActivateContributorRequestObject();
+                RadianContributor radianContributor = null;
+                Contributor contributor = null;
+                //var activateContributorRequestObject = new ActivateContributorRequestObject();
                 var sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnectionProd");
 
                 try
                 {
-                    var data = await req.Content.ReadAsAsync<ActivationRequest>();
+                    var data = await req.Content.ReadAsAsync<RadianActivationRequest>();
                     if (data == null)
                         throw new Exception("Request body is empty.");
 
                     if (data.ContributorId == 0)
                         throw new Exception("Please pass a contributor ud in the request body.");
 
-                    // Step 1 Get RadianContributor
-                    contributor = contributorService.GetRadian(data.ContributorId);
+
+                    contributor = contributorService.Get(data.ContributorId);
                     if (contributor == null)
                         throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
 
-                    string resultJson = JsonConvert.SerializeObject(contributor);
+                    // Step 1 Contributor Production
+                    var contributorProd = contributorService.GetByCode(data.Code, sqlConnectionStringProd);
+                    if (contributorProd == null)
+                        throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {data.Code}.");
+
+                    string resultJson = JsonConvert.SerializeObject(contributorProd);
                     var lastZone = new GlobalLogger("RadianSendToActivateContributor", "Step 1") { Message = resultJson };
                     TableManagerGlobalLogger.InsertOrUpdate(lastZone);
 
-                    // Step 2 Contributor Production
-                    var contributorProd = contributorService.GetByCode(contributor.ContributorId.ToString(), sqlConnectionStringProd);
-                    if (contributorProd == null)
-                        throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {contributor.ContributorId}.");
+                    // Step 2 Get RadianContributor
+                    radianContributor = contributorService.GetRadian(data.ContributorId, data.ContributorTypeId);
+                    if (radianContributor == null)
+                        throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
 
-                    resultJson = JsonConvert.SerializeObject(contributorProd);
+                    resultJson = JsonConvert.SerializeObject(radianContributor);
                     lastZone = new GlobalLogger("RadianSendToActivateContributor", "Step 2") { Message = resultJson };
                     TableManagerGlobalLogger.InsertOrUpdate(lastZone);
 
-                    // Step 3 GlobalTestSetResult
-                    var results = globalTestSetResultTableManager.FindByPartition<GlobalTestSetResult>(contributor.ContributorId.ToString());
-                    results = results.Where(r => !r.Deleted && r.Status == (int)Domain.Common.TestSetStatus.Accepted).ToList();
-                    if (!results.Any()) throw new Exception("Contribuyente no a pasado set de pruebas.");
 
+                    // Step 3 RadianTestSetResult
+                    string key = data.SoftwareType + '|' + data.SoftwareId;
+                    var results = globalTestSetResultTableManager.Find<RadianTestSetResult>(data.Code, key);
+                    if(results.Status != (int)Domain.Common.TestSetStatus.Accepted || !results.Deleted)
+                        throw new Exception("Contribuyente no a pasado set de pruebas.");
+                    
                     resultJson = JsonConvert.SerializeObject(results);
                     lastZone = new GlobalLogger("RadianSendToActivateContributor", "Step 3") { Message = resultJson };
                     TableManagerGlobalLogger.InsertOrUpdate(lastZone);
 
                     // Step 4  Enable Contributor
-                    RadianSoftware radianSoftware = new RadianSoftware();
-                    if (contributor.RadianSoftwares != null)
-                    {
-                        radianSoftware = contributor.RadianSoftwares.FirstOrDefault();
-                    }
-
                     contributorService.SetToEnabledRadian(
-                        contributor.ContributorId,
-                        contributor.RadianContributorTypeId,
-                        radianSoftware.Id.ToString(),
-                        contributor.RadianContributorTypeId);
+                        radianContributor.ContributorId,
+                        radianContributor.RadianContributorTypeId,
+                        data.SoftwareId,
+                        Convert.ToInt32( data.SoftwareType));
 
                     // resultJson = JsonConvert.SerializeObject(results);
                     lastZone = new GlobalLogger("RadianSendToActivateContributor", "Step 4") { Message =  
-                        contributor.ContributorId + " " 
-                        + contributor.RadianContributorTypeId + " " 
-                        + radianSoftware.Id.ToString() + " " 
-                        +contributor.RadianContributorTypeId
+                        radianContributor.ContributorId + " " 
+                        + radianContributor.RadianContributorTypeId + " " 
+                        + data.SoftwareId + " "
+                        + data.SoftwareType
                     };
                     TableManagerGlobalLogger.InsertOrUpdate(lastZone);
 
                     // Step 5 Contributor Operations
+                    RadianaActivateContributorRequestObject activateRadianContributorRequestObject = new RadianaActivateContributorRequestObject()
+                    {
+                        ContributorId = radianContributor.ContributorId,
+                        RadianContributorTypeId = radianContributor.RadianContributorTypeId,
+                        CreatedBy = radianContributor.CreatedBy,
+                        RadianOperationModeId = (int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),
+                        SoftwarePassword = data.SoftwarePassword,
+                        SoftwareUser = data.SoftwareUser,
+                        Pin = data.Pin,
+                        SoftwareName = data.SoftwareName,
+                        SoftwareId = data.SoftwareId,
+                        SoftwareType=data.SoftwareType,
+                        Url = data.Url
+                    };
+
+                    await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
 
                 }
                 catch (Exception ex)
                 {
-                    log.Error($"Error al enviar a activar contribuyente con id {contributor?.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                    log.Error($"Error al enviar a activar contribuyente con id {radianContributor?.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                     var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producción.", detail = ex.Message, trace = ex.StackTrace };
 
                     string resultJson = JsonConvert.SerializeObject(failResponse);
@@ -119,14 +137,14 @@ namespace Gosocket.Dian.Functions.Radian
             return req.CreateResponse(HttpStatusCode.BadRequest, fail);
         }
 
-        private static async Task SendToActivateContributorToProduction(ActivateContributorRequestObject activateContributorRequestObject)
+        private static async Task SendToActivateRadianContributorToProduction(RadianaActivateContributorRequestObject activateContributorRequestObject)
         {
             List<EventGridEvent> eventsList = new List<EventGridEvent>
             {
                 new EventGridEvent()
                 {
                     Id = Guid.NewGuid().ToString(),
-                    EventType = "Activate.Contributor.Event",
+                    EventType = "Activate.RadianContributor.Event", //andres proporciona este dato.
                     Data = JsonConvert.SerializeObject(activateContributorRequestObject),
                     EventTime = DateTime.UtcNow,
                     Subject = $"|PRIORITY:1|",
@@ -136,52 +154,79 @@ namespace Gosocket.Dian.Functions.Radian
             await EventGridManager.Instance("EventGridKeyProd", "EventGridTopicEndpointProd").SendMessagesToEventGridAsync(eventsList);
         }
 
-        class ActivationRequest
-        {
-            [JsonProperty(PropertyName = "contributorId")]
-            public int ContributorId { get; set; }
-        }
 
-        class ActivateContributorRequestObject
+        class RadianActivationRequest
         {
+
+            [JsonProperty(PropertyName = "code")]
+            public string Code { get; set; }
+
             [JsonProperty(PropertyName = "contributorId")]
             public int ContributorId { get; set; }
-            [JsonProperty(PropertyName = "exchangeEmail")]
-            public string ExchangeEmail { get; set; }
+
             [JsonProperty(PropertyName = "contributorTypeId")]
             public int ContributorTypeId { get; set; }
-            [JsonProperty(PropertyName = "operationModeId")]
-            public int OperationModeId { get; set; }
-            [JsonProperty(PropertyName = "providerId")]
-            public int? ProviderId { get; set; }
-            [JsonProperty(PropertyName = "software")]
-            public ActivateSoftwareContributorRequestObject Software { get; set; }
-        }
 
-        class ActivateSoftwareContributorRequestObject
-        {
-            public Guid Id { get; set; }
+            [JsonProperty(PropertyName = "softwareId")]
+            public string SoftwareId { get; set; }
 
-            public int ContributorId { get; set; }
+            [JsonProperty(PropertyName = "softwareType")]
+            public string SoftwareType { get; set; }
 
-            public string ContributorCode { get; set; }
-
-            public string Pin { get; set; }
-
-            public string Name { get; set; }
-
-            public DateTime? SoftwareDate { get; set; }
-
+            [JsonProperty(PropertyName = "softwareUser")]
             public string SoftwareUser { get; set; }
 
+            [JsonProperty(PropertyName = "softwarePassword")]
             public string SoftwarePassword { get; set; }
 
+            [JsonProperty(PropertyName = "pin")]
+            public string Pin { get; set; }
+
+            [JsonProperty(PropertyName = "softwareName")]
+            public string SoftwareName { get; set; }
+
+            [JsonProperty(PropertyName = "url")]
             public string Url { get; set; }
 
-            public bool Status { get; set; }
-
-            public int AcceptanceStatusSoftwareId { get; set; }
         }
+
+        class RadianaActivateContributorRequestObject
+        {
+            [JsonProperty(PropertyName = "contributorId")]
+            public int ContributorId { get; set; }
+
+            [JsonProperty(PropertyName = "radianContributorTypeId")]
+            public int RadianContributorTypeId { get; set; }
+
+            [JsonProperty(PropertyName = "radianOperationModeId")]
+            public int RadianOperationModeId { get; set; }
+
+            [JsonProperty(PropertyName = "createdBy")]
+            public string CreatedBy { get; set; }
+
+            [JsonProperty(PropertyName = "softwareType")]
+            public string SoftwareType { get; set; }
+
+            [JsonProperty(PropertyName = "softwareId")]
+            public string  SoftwareId { get; set; }
+
+            [JsonProperty(PropertyName = "softwareName")]
+            public string SoftwareName { get; set; }
+
+            [JsonProperty(PropertyName = "pin")]
+            public string Pin { get; set; }
+
+            [JsonProperty(PropertyName = "url")]
+            public string Url { get; set; }
+
+            [JsonProperty(PropertyName = "softwareUser")]
+            public string SoftwareUser { get; set; }
+
+            [JsonProperty(PropertyName = "softwarePassword")]
+            public string SoftwarePassword { get; set; }
+        }
+
+        
 
     }
 }
