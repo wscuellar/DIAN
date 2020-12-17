@@ -220,7 +220,7 @@ else
 
         <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
             <thead>
-                <tr>
+                <tr class="text-left">
                     <th>Nombre</th>
                     <th>Estado</th>
                 </tr>
@@ -228,10 +228,10 @@ else
             <tbody>
                 @foreach (var item in Model.Validations)
                 {
-                    <tr>
+                    <tr class="text-left">
                         <td>@item.Name</td>
-                        <td>
-                            <label class="label label-primary">@item.Status</label>
+                        <td style="display:flex">
+                            <label class="label label-primary">@item.Status</label> 
                             <span class="fa fa fa-info-circle add-tooltip" data-original-title="@item.ErrorMessage"></span>
                         </td>
                     </tr>
