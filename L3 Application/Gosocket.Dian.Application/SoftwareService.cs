@@ -142,5 +142,39 @@ namespace Gosocket.Dian.Application
             var tableManager = new TableManager("GlobalLogger");
             tableManager.InsertOrUpdate(logger);
         }
+
+        #region RADIAN 
+
+
+        public RadianSoftware GetRadianSoftware(Guid id)
+        {
+            return sqlDBContext.RadianSoftwares.FirstOrDefault(x => x.Id == id);
+        }
+
+        public void AddOrUpdateRadianSoftware(RadianSoftware software)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var softwareInstance = context.RadianSoftwares.FirstOrDefault(c => c.Id == software.Id);
+                if (softwareInstance != null)
+                {
+                    softwareInstance.Deleted = software.Deleted;
+                    softwareInstance.Name = software.Name;
+                    softwareInstance.RadianContributorId = software.RadianContributorId;
+                    softwareInstance.SoftwareUser = software.SoftwareUser;
+                    softwareInstance.SoftwarePassword = software.SoftwarePassword;
+                    softwareInstance.Url = software.Url;
+                    softwareInstance.Updated = DateTime.UtcNow;
+                    softwareInstance.RadianSoftwareStatusId  = software.RadianSoftwareStatusId;
+                    context.Entry(softwareInstance).State = System.Data.Entity.EntityState.Modified;
+                }
+                else
+                {
+                    context.Entry(software).State = System.Data.Entity.EntityState.Added;
+                }
+                context.SaveChanges();
+            }
+        }
+        #endregion
     }
 }

@@ -480,5 +480,39 @@ namespace Gosocket.Dian.Application
                 }
             }
         }
+
+        #region Funciones Radian para Migracion
+
+
+        /// <summary>
+        /// Metodo que devuelve un objeto RadianContributor desde SQL
+        /// </summary>
+        /// <param name="radianContributorId">Id a ubicar</param>
+        /// <returns>Un objeto RadianCotributor buscado</returns>
+        public RadianContributor GetRadian(int radianContributorId)
+        {
+            return sqlDBContext.RadianContributors.FirstOrDefault(rc => rc.Id == radianContributorId);
+        }
+
+        /// <summary>
+        /// Metodo que activa el RadianContributor en Produccion, lo ubica y cambia los Estados necesarios
+        /// </summary>
+        /// <param name="contributor">Los datos del radian Contributor a actualizar</param>
+        public void ActivateRadian(RadianContributor contributor)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var contributorInstance = context.RadianContributors.FirstOrDefault(c => c.Id == contributor.Id);
+                if (contributorInstance != null)
+                {
+                    contributorInstance.RadianState = Domain.Common.ContributorStatus.Enabled.ToString();
+                    contributorInstance.RadianContributorTypeId = contributor.RadianContributorTypeId;
+                    contributorInstance.Update = DateTime.UtcNow;
+                    context.SaveChanges();
+                }
+            }
+        }
+
+        #endregion
     }
 }

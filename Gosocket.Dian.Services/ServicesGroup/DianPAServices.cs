@@ -1701,9 +1701,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private void DeleteTransactions(string trackIdCude)
         {
             var documentMetaFlag = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-            var documentValidatorDocument = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(documentMetaFlag.Identifier, documentMetaFlag.Identifier);
-            TableManagerGlobalDocValidatorDocument.Delete(documentValidatorDocument);
-            TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaFlag);
+            if(documentMetaFlag != null)
+            {
+                var documentValidatorDocument = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(documentMetaFlag.Identifier, documentMetaFlag.Identifier);
+                TableManagerGlobalDocValidatorDocument.Delete(documentValidatorDocument);
+                TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaFlag);
+            }               
         }
 
         private void UpdateFinishAttorney(string trackId, string trackIdAttorney, string eventCode)
