@@ -120,6 +120,22 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        /// <summary>
+        /// Buscar/Listar los Software por id del contribuyente que no esten eliminados y que esten activos o inactivos
+        /// </summary>
+        /// <param name="contributorId"></param>
+        /// <param name="state">True. Activos, False: inactivos</param>
+        /// <returns></returns>
+        public List<Software> GetSoftwaresByContributorAndState(int contributorId, bool state)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.Softwares.Where(p => !p.Deleted
+                                                   && p.ContributorId == contributorId
+                                                   && p.Status == state).ToList();
+            }
+        }
+
 
         private void RegisterException(GlobalLogger logger)
         {

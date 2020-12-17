@@ -6,9 +6,16 @@
 
     <div class="col-sm-3 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.SoftwareName, new { @class = "form-control input-general fields captureFields" })
-            @Html.ValidationMessageFor(m => m.SoftwareName, "", new { @class = "text-danger" })
+            @Html.LabelFor(m => m.ContributorId, new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.ContributorId, new SelectList(ViewBag.ListTechnoProviders, "Id", "Name"), new { @class = "form-control selectpicker" })
+            @Html.ValidationMessageFor(m => m.ContributorId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.SoftwareId, new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.SoftwareId, new SelectList(ViewBag.ListSoftwares, "Id", "Name"), new { @class = "form-control selectpicker" })
+            @Html.ValidationMessageFor(m => m.SoftwareId, "", new { @class = "text-danger" })
         </div>
     </div>
     <div class="col-sm-3 padding-xs-0">

@@ -759,22 +759,25 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                     //valida si existe los permisos del mandatario
-                    var response = ValidateFacultityAttorney(party.TrackId, nitModel.ProviderCode, senderCode,
-                        party.ResponseCode, xmlParserCude.NoteMandato);
-                    if (response != null)
+                    if(party.SenderParty != nitModel.ProviderCode)
                     {
-                        responses.Add(response);
-                    }
-                    else
-                    {
-                        responses.Add(new ValidateListResponse
+                        var response = ValidateFacultityAttorney(party.TrackId, nitModel.ProviderCode, senderCode,
+                       party.ResponseCode, xmlParserCude.NoteMandato);
+                        if (response != null)
                         {
-                            IsValid = true,
-                            Mandatory = true,
-                            ErrorCode = "100",
-                            ErrorMessage = "Evento senderParty referenciado correctamente",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                            responses.Add(response);
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Evento senderParty referenciado correctamente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
                     }
 
                     return responses;
@@ -1358,89 +1361,80 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
             }
-            //Valida exista informacion mandato - Mandatario - CUFE
-            var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cufe, senderCode);
-            bool valid = false;
-            if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
+            //Valida exista informacion mandato - Mandatario - CUFE para eventos disitintos a Mandato 043
+            if(eventCode != "043")
             {
-                //No existe Mandato para el CUFE referenciado.
-                return null;
-
-                ////Aplica si el emisor es el avalista evento Aval
-                //if (Convert.ToInt32(eventCode) == (int)EventStatus.Avales) return null;
-
-                //return new ValidateListResponse
-                //{
-                //    IsValid = false,
-                //    Mandatory = true,
-                //    ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCode,
-                //    ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessage,
-                //    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                //};
-            }
-            bool validError = false;
-            //Valida existan permisos para firmar evento mandatario
-            foreach (var docReferenceAttorney in docsReferenceAttorney)
-            {
-                if (docReferenceAttorney.IssuerAttorney == issueAtorney)
+                var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cufe, senderCode);
+                bool valid = false;
+                if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
                 {
-                    var filter = $"{docReferenceAttorney.FacultityCode}-{docReferenceAttorney.Actor}";
-                    //Valida permisos firma para el evento emitido
-                    var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
-                    if (attorneyFacultity != null)
+                    //No existe Mandato para el CUFE referenciado.
+                    return null;
+                }
+                bool validError = false;
+                //Valida existan permisos para firmar evento mandatario
+                foreach (var docReferenceAttorney in docsReferenceAttorney)
+                {
+                    if (docReferenceAttorney.IssuerAttorney == issueAtorney)
                     {
-                        if (attorneyFacultity.RowKey == eventCode)
+                        var filter = $"{docReferenceAttorney.FacultityCode}-{docReferenceAttorney.Actor}";
+                        //Valida permisos firma para el evento emitido
+                        var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
+                        if (attorneyFacultity != null)
                         {
-                            //Valida exista note mandatario
-                            if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                            if (attorneyFacultity.RowKey == eventCode)
                             {
-                                return new ValidateListResponse
+                                //Valida exista note mandatario
+                                if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                                 {
-                                    IsValid = false,
-                                    Mandatory = true,
-                                    ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                    ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                };
+                                    return new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                        ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    };
+                                }
+                                else
+                                    valid = true;
+
                             }
-                            else
-                                valid = true;
-
                         }
+                        validError = false;
+                        continue;
                     }
-                    validError = false;
-                    continue;
+                    else
+                    {
+                        validError = true;
+                    }
+
                 }
-                else
+                if (validError)
                 {
-                    validError = true;
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeB,
+                        ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageB,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
+                }
+                if (!valid)
+                {
+                    return new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                        ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    };
                 }
 
             }
-            if (validError)
-            {
-                return new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeB,
-                    ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageB,
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
-            }
-            if (!valid)
-            {
-                return new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                    ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                };
-            }
-
-
+         
             return null;
         }
 
