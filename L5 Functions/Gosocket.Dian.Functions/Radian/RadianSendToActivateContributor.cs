@@ -26,7 +26,7 @@ namespace Gosocket.Dian.Functions.Radian
 
 
 
-        [FunctionName("RadianSendToActivateContributor")]
+        [FunctionName("SendToActivateRadianOperation")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");
@@ -123,7 +123,7 @@ namespace Gosocket.Dian.Functions.Radian
                     var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producción.", detail = ex.Message, trace = ex.StackTrace };
 
                     string resultJson = JsonConvert.SerializeObject(failResponse);
-                    var lastZone = new GlobalLogger("RadianSendToActivateContributor", "Exception")
+                    var lastZone = new GlobalLogger("SendToActivateRadianOperation", "Exception")
                     {
                         Message = resultJson + " ---------------------------------------- "
                                 + ex.Message + " ---> " + ex
@@ -145,7 +145,7 @@ namespace Gosocket.Dian.Functions.Radian
                 new EventGridEvent()
                 {
                     Id = Guid.NewGuid().ToString(),
-                    EventType = "Activate.RadianContributor.Event", //andres proporciona este dato.
+                    EventType = "Activate.RadianOperation.Event", //andres proporciona este dato.
                     Data = JsonConvert.SerializeObject(activateContributorRequestObject),
                     EventTime = DateTime.UtcNow,
                     Subject = $"|PRIORITY:1|",

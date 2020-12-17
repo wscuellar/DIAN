@@ -254,13 +254,13 @@ namespace Gosocket.Dian.Functions.Activation
 
                                 //Habilitamos en RADIAN en HAB
                                 //--Habilitamos SQL
-                                contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
+                                //contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
 
                                 //--GlobalSoftware 
                                 var softwareId = isPartipantActive.RowKey;
                                 var software = softwareService.GetByRadian(Guid.Parse(softwareId));
-                                var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id =software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
-                                await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
+                                //var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.RadianSoftwareStatusId };
+                                //await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
 
                                 #endregion
 
@@ -278,7 +278,9 @@ namespace Gosocket.Dian.Functions.Activation
                                     url =software.Url,
                                     softwareName = software.Name
                                 };
-                                //var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), requestObject);
+                                
+                                string functionPath = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
+                                var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
 
                                 var guid = Guid.NewGuid().ToString();
                                 var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
@@ -422,6 +424,8 @@ namespace Gosocket.Dian.Functions.Activation
                 throw;
             }
         }
+
+
 
         private static async Task MigrateCertificate(string contributorCode)
         {

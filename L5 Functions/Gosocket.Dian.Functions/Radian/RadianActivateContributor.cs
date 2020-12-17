@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Functions.Radian
 
 
 
-        [FunctionName("RadianActivateContributor")]
+        [FunctionName("ActivateRadianOperation")]
         public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
