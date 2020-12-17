@@ -3410,7 +3410,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.EndosoGarantia:
                 case (int)EventStatus.EndosoProcuracion:
                 case (int)EventStatus.EndosoPropiedad:
-                    responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModel.PaymentDueDate)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) <= Convert.ToDateTime(dataModel.PaymentDueDate)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
