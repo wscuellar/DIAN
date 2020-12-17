@@ -100,6 +100,7 @@ namespace Gosocket.Dian.Functions.Radian
                     // Step 5 Contributor Operations
                     RadianaActivateContributorRequestObject activateRadianContributorRequestObject = new RadianaActivateContributorRequestObject()
                     {
+                        Code = data.Code,
                         ContributorId = radianContributor.ContributorId,
                         RadianContributorTypeId = radianContributor.RadianContributorTypeId,
                         CreatedBy = radianContributor.CreatedBy,
@@ -192,6 +193,8 @@ namespace Gosocket.Dian.Functions.Radian
 
         class RadianaActivateContributorRequestObject
         {
+            [JsonProperty(PropertyName = "code")]
+            public string Code { get; set; }
             [JsonProperty(PropertyName = "contributorId")]
             public int ContributorId { get; set; }
 
