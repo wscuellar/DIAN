@@ -1,6 +1,7 @@
 ﻿
 using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -79,6 +80,27 @@ namespace Gosocket.Dian.Application
             using (var context = new SqlDBContext())
             {
                 var contributorOperationsInstance = context.ContributorOperations.FirstOrDefault(c => c.Id == contributorOperations.Id);
+                if (contributorOperationsInstance != null)
+                {
+                    contributorOperationsInstance.Deleted = contributorOperations.Deleted;
+                    context.Entry(contributorOperationsInstance).State = System.Data.Entity.EntityState.Modified;
+                }
+                else
+                {
+                    context.Entry(contributorOperations).State = System.Data.Entity.EntityState.Added;
+                }
+
+                context.SaveChanges();
+                return contributorOperationsInstance != null ? contributorOperationsInstance.Id : contributorOperations.Id;
+            }
+        }
+
+        public int AddOrUpdateRadianContributorOperation(RadianContributorOperations contributorOperations)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var contributorOperationsInstance = context.RadianContributorOperations.FirstOrDefault(
+                                                                                c => c.Id == contributorOperations.Id);
                 if (contributorOperationsInstance != null)
                 {
                     contributorOperationsInstance.Deleted = contributorOperations.Deleted;

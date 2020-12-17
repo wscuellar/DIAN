@@ -41,6 +41,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string MedioPago { get; set; }
         public string DocumentTypeIdRef { get; set; }
         public string ValidityPeriodEndDate { get; set; }
+        public string ProviderCode { get; set; }
 
         public XmlParser()
         {

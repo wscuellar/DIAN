@@ -39,6 +39,8 @@
         public string ReceiverType { get; set; }
         public string SenderName { get; set; }
         public bool ShowTitleValueSection { get; set; }
+        public string EntityName { get; set; }
+        public string CertificateNumber { get; set; }
         public string ValidationMessage { get; set; }
         public EventStatus EventStatus { get; set; }
         public List<AssociatedValidationsModel> Validations { get; set; }

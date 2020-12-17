@@ -973,8 +973,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 start = DateTime.UtcNow;
                 string message = string.Empty;
                 bool existDocument = false;
-                GlobalDocValidatorDocumentMeta documentMeta = null;
-
+                GlobalDocValidatorDocumentMeta documentMeta = null; 
+     
 
                 Task secondLocalRun = Task.Run(() =>
                 {
@@ -985,10 +985,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 });
 
                 var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
-                var notifications = validations.Where(r => r.IsNotification).ToList();
-               
+                var notifications = validations.Where(r => r.IsNotification).ToList();              
 
-                if (!errors.Any() && !notifications.Any())
+                if (!errors.Any() && !notifications.Any() && !flagMeta)
                 {
                     dianResponse.IsValid = true;
                     dianResponse.StatusMessage = message;
@@ -999,7 +998,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var failedList = new List<string>();
                     foreach (var f in errors)
                         failedList.Add($"Regla: {f.ErrorCode}, Rechazo: {f.ErrorMessage}");
-
+                    flagMeta = true;
                     dianResponse.IsValid = false;
                     dianResponse.StatusMessage = Properties.Settings.Default.Msg_Error_FieldMandatori;
                     dianResponse.ErrorMessage.AddRange(failedList);
@@ -1080,6 +1079,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.IsValid = false;
                     dianResponse.StatusCode = Properties.Settings.Default.Code_99;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Error_FieldMandatori;
+                    dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios.";
                 }
                 var application = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_7AplicattionSendEvent) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 // ZONE APPLICATION
@@ -1116,11 +1116,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
                     TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
                 }
+
                 if (flagMeta)
-                {
-                    var documentMetaFlag = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-                    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaFlag);
-                }
+                    DeleteTransactions(trackIdCude);
+                Task.WhenAll(arrayTasks);
 
                 var lastZone = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_LastZone) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 TableManagerGlobalLogger.InsertOrUpdate(lastZone);
@@ -1497,7 +1496,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             {
                 response = new DianResponse()
                 {
-                    StatusMessage = validations[0].ErrorMessage,
+                    StatusMessage = "Documento con errores en campos mandatorios.",
                     StatusCode = Properties.Settings.Default.Code_89,
                     IsValid = validations[0].IsValid
                 };              
@@ -1507,9 +1506,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     if (!item.IsValid)
                     {
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
-                        response.IsValid = item.IsValid;
-                        response.StatusMessage = item.ErrorMessage;
-                        response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                        response.IsValid = item.IsValid;                       
+                        response.StatusDescription = "Validación contiene errores en campos mandatorios."; 
                     }
                 }
             }
@@ -1525,7 +1523,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             {
                 response = new DianResponse()
                 {
-                    StatusMessage = validations[0].ErrorMessage,
+                    StatusMessage = "Documento con errores en campos mandatorios.",
                     StatusCode = Properties.Settings.Default.Code_89,
                     IsValid = validations[0].IsValid
                 };
@@ -1535,8 +1533,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     if (!item.IsValid)
                     {
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
-                        response.IsValid = item.IsValid;
-                        response.StatusMessage = item.ErrorMessage;
+                        response.IsValid = item.IsValid;                   
                         response.StatusDescription = "Validación contiene errores en campos mandatorios.";
                     }
                 }
@@ -1558,7 +1555,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     response = new DianResponse()
                     {
-                        StatusMessage = validations[0].ErrorMessage,
+                        StatusMessage = "Documento con errores en campos mandatorios.",
                         StatusCode = Properties.Settings.Default.Code_89,
                         IsValid = validations[0].IsValid,
                         ErrorMessage = new List<string>()
@@ -1585,7 +1582,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     response = new DianResponse()
                     {
-                        StatusMessage = validations[0].ErrorMessage,
+                        StatusMessage = "Documento con errores en campos mandatorios.",
                         StatusCode = Properties.Settings.Default.Code_89,
                         IsValid = validations[0].IsValid,
                         ErrorMessage = new List<string>()
@@ -1612,7 +1609,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     response = new DianResponse()
                     {
-                        StatusMessage = validations[0].ErrorMessage,
+                        StatusMessage = "Documento con errores en campos mandatorios.",
                         StatusCode = Properties.Settings.Default.Code_89,
                         IsValid = validations[0].IsValid,
                         ErrorMessage = new List<string>()
@@ -1638,7 +1635,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             {
                 response = new DianResponse
                 {
-                    StatusMessage = validations[0].ErrorMessage,
+                    StatusMessage = "Documento con errores en campos mandatorios.",
                     StatusCode = Properties.Settings.Default.Code_89,
                     IsValid = validations[0].IsValid,                   
                 };
@@ -1649,7 +1646,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     {
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
                         response.IsValid = item.IsValid;
-                        response.StatusMessage = item.ErrorMessage;
+          
                         response.StatusDescription = "Validación contiene errores en campos mandatorios.";
                     }
                 }
@@ -1666,7 +1663,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             {
                 response = new DianResponse
                 {
-                    StatusMessage = validations[0].ErrorMessage,
+                    StatusMessage = "Documento con errores en campos mandatorios.",
                     StatusCode = Properties.Settings.Default.Code_89,
                     IsValid = validations[0].IsValid,
                 };
@@ -1677,7 +1674,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     {
                         response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
                         response.IsValid = item.IsValid;
-                        response.StatusMessage = item.ErrorMessage;
                         response.StatusDescription = "Validación contiene errores en campos mandatorios.";
                     }
                 }
@@ -1700,6 +1696,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 validatorDocumentMeta.InTransaction = false;
                 arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
             }
+        }
+
+        private void DeleteTransactions(string trackIdCude)
+        {
+            var documentMetaFlag = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+            if(documentMetaFlag != null)
+            {
+                var documentValidatorDocument = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(documentMetaFlag.Identifier, documentMetaFlag.Identifier);
+                TableManagerGlobalDocValidatorDocument.Delete(documentValidatorDocument);
+                TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaFlag);
+            }               
         }
 
         private void UpdateFinishAttorney(string trackId, string trackIdAttorney, string eventCode)

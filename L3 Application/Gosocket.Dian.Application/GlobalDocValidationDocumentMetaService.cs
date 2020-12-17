@@ -32,5 +32,12 @@ namespace Gosocket.Dian.Application
             return documentMetaTableManager
                 .FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(documentReferencedKey, documentType);
         }
+
+        //Find All referenced documents
+        public List<GlobalDocValidatorDocumentMeta> FindDocumentByReference(string documentReferencedKey)
+        {
+            return documentMetaTableManager
+                .FindDocumentByReference<GlobalDocValidatorDocumentMeta>(documentReferencedKey);
+        }
     }
 }
