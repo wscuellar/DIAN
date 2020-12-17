@@ -445,7 +445,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 string sender2DvErrorCode = "FAJ47";
                 if (documentMeta.DocumentTypeId == "91") sender2DvErrorCode = "CAJ47";
                 else if (documentMeta.DocumentTypeId == "92") sender2DvErrorCode = "DAJ47";
-                else if (documentMeta.DocumentTypeId == "96") sender2DvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ47;
+                
                 sender2 = GetContributorInstanceCache(senderCodeProvider);
                 if (string.IsNullOrEmpty(senderCodeProviderDigit) || senderCodeProviderDigit == "undefined") senderCodeProviderDigit = "11";
                 if (ValidateDigitCode(senderCodeProvider, int.Parse(senderCodeProviderDigit)))
@@ -475,12 +475,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string sender2ErrorCode = "FAJ44";
             if (documentMeta.DocumentTypeId == "91") sender2ErrorCode = "CAJ44";
             else if (documentMeta.DocumentTypeId == "92") sender2ErrorCode = "DAJ44";
-            else if (documentMeta.DocumentTypeId == "96") sender2ErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ44;
+            
 
             string softwareProviderErrorCode = "FAB19b";
             if (documentMeta.DocumentTypeId == "05") softwareProviderErrorCode = "DSAB19b";
             else if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
             else if (documentMeta.DocumentTypeId == "92") softwareProviderErrorCode = "DAB19b";
+            //Validar habilitacion RADIAN
             else if (documentMeta.DocumentTypeId == "96") softwareProviderErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB19b;
 
             if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
