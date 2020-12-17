@@ -126,11 +126,16 @@ namespace Gosocket.Dian.Application
             return EventStatus.None;
         }
 
-        public Dictionary<int, string> IconType(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments)
+        public Dictionary<int, string> IconType(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments, string documentKey = "")
         {
             Dictionary<int, string> statusValue = new Dictionary<int, string>();
             int securityTitleCounter = 0;
             statusValue.Add(1, $"{RadianDocumentStatus.ElectronicInvoice.GetDescription()}");
+
+            if (documentKey != "")
+            {
+                allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
+            }
 
             foreach (GlobalDocValidatorDocumentMeta documentMeta in allReferencedDocuments)
             {
