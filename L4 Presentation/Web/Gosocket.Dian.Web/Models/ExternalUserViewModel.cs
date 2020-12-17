@@ -27,6 +27,7 @@ namespace Gosocket.Dian.Web.Models
         [DataType(DataType.Text)]
         [Display(Name = "Nombre")]
         [Required(ErrorMessage = "{0} es requerido.")]
+        [MaxLength(100, ErrorMessage = "Solo se permiten 100 caracteres")]
         [RegularExpression(@"^[0-9a-zA-Z\sñÑáéíóú]+$", ErrorMessage = "Solo se permiten caracteres 0-9 y a-z")]
         public string Names { get; set; }
 
@@ -37,11 +38,13 @@ namespace Gosocket.Dian.Web.Models
         [DataType(DataType.Text)]
         [Display(Name = "Número de identificaión")]
         [Required(ErrorMessage = "{0} es requerido.")]
+        [MaxLength(30, ErrorMessage = "Solo se permiten 30 caracteres")]
         [RegularExpression(@"^[0-9]+$", ErrorMessage = "Solo se permiten números 0-9")]
         public string IdentificationId { get; set; }
 
         [Display(Name = "Correo electrónico")]
         [Required(ErrorMessage = "{0} es requerido")]
+        [MaxLength(100, ErrorMessage = "Solo se permiten 100 caracteres")]
         [EmailAddress(ErrorMessage = "Formato de correo electrónico inválido")]
         public string Email { get; set; }
 

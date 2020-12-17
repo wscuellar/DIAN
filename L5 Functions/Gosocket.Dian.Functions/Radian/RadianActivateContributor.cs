@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Functions.Radian
 
 
 
-        [FunctionName("RadianActivateContributor")]
+        [FunctionName("ActivateRadianOperation")]
         public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
@@ -51,28 +51,6 @@ namespace Gosocket.Dian.Functions.Radian
                     var lastZone = new GlobalLogger("RadianActivateContributor", "Step 1") { Message = resultJson };
                     TableManagerGlobalLogger.InsertOrUpdate(lastZone);
 
-                   // if (radianContributor == null)
-                     //   throw new ObjectNotFoundException($"Not found RADIAN contributor with given id {requestObject.ContributorId}");
-
-                    // Step 2 Incluyo los datos en GlobalContributorActivation 
-                    //var guid = Guid.NewGuid().ToString();
-                    //contributorActivation = new GlobalContributorActivation(radianContributor.ContributorId.ToString(), guid)
-                    //{
-                    //    Success = true,
-                    //    ContributorCode = radianContributor.ContributorId.ToString(),
-                    //    ContributorTypeId = requestObject.ContributorTypeId,
-                    //    OperationModeId = requestObject.OperationModeId,
-                    //    SentToActivateBy = "Function",
-                    //    SoftwareId = requestObject.Software?.Id.ToString(),
-                    //    SendDate = DateTime.UtcNow,
-                    //    Message = "Contribuyente Radian se activó en producción con éxito.",
-                    //    Request = myQueueItem
-                    //};
-
-                    //resultJson = JsonConvert.SerializeObject(contributorActivation);
-                    //lastZone = new GlobalLogger("RadianActivateContributor", "Step 2") { Message = resultJson };
-                    //TableManagerGlobalLogger.InsertOrUpdate(lastZone);
-
                     // Step 3 Activo RadianContributor
 
                     radianContributor.RadianContributorTypeId = requestObject.RadianContributorTypeId;
@@ -84,112 +62,72 @@ namespace Gosocket.Dian.Functions.Radian
 
                     // Step 4 Actualizo RadianSoftware en SQL 
 
-                    //var utcNow = DateTime.UtcNow;
-                    //var software = softwareService.GetRadianSoftware(requestObject.Software.Id);
-                    //if (software == null)
-                    //{
-                    //    var ownContributor= contributorService.GetByCode(requestObject.Software.ContributorCode);
-                    //    software = new RadianSoftware
-                    //    {
-                    //        Id = requestObject.Software.Id,
-                    //        RadianContributorId = ownContributor.Id, 
-                    //        Name = requestObject.Software.Name,
-                    //        Pin = requestObject.Software.Pin,
-                    //        SoftwareDate = utcNow,
-                    //        SoftwareUser = requestObject.Software.SoftwareUser,
-                    //        SoftwarePassword = requestObject.Software.SoftwarePassword,
-                    //        Url = requestObject.Software.Url,
-                    //        Status = true,
-                    //        Deleted = false,
-                    //        Timestamp = utcNow,
-                    //        Updated = utcNow,
-                    //        CreatedBy = "ActivateContributorFunction",
-                    //        RadianSoftwareStatusId = (int)SoftwareStatus.Production
-                    //    };
-                    //    softwareService.AddOrUpdateRadianSoftware(software);
+                    RadianContributor newRadianContributor = new RadianContributor()
+                    {
+                        CreatedBy = requestObject.CreatedBy,
+                        ContributorId = requestObject.ContributorId,
+                        RadianContributorTypeId = requestObject.RadianContributorTypeId,
+                        RadianOperationModeId = requestObject.RadianOperationModeId,
+                        RadianState = Domain.Common.RadianState.Habilitado.GetDescription(),
+                        Step = 4
+                    };
 
-                    //    resultJson = JsonConvert.SerializeObject(software);
-                    //    lastZone = new GlobalLogger("RadianActivateContributor", "Step 4") { Message = "AddOrUpdateRadianSoftware --> " + resultJson };
-                    //    TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+                    int radianContributorId = contributorService.AddOrUpdateRadianContributor(newRadianContributor);
 
-                    //    // Step 5  Actualizacion Software Table Storage
+                    // si el software No Existe
+                    if (Convert.ToInt32(requestObject.SoftwareType) == (int)Domain.Common.RadianOperationModeTestSet.OwnSoftware)
+                    {
+                        RadianSoftware newSoftware = new RadianSoftware()
+                        {
+                            Id = new Guid(requestObject.SoftwareId),
+                            Deleted = false,
+                            Name = requestObject.SoftwareName,
+                            Pin = requestObject.Pin,
+                            SoftwareDate = DateTime.Now,
+                            SoftwareUser = requestObject.SoftwareUser,
+                            SoftwarePassword = requestObject.SoftwarePassword,
+                            Status = true,
+                            RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted,
+                            Url = requestObject.Url,
+                            CreatedBy = requestObject.CreatedBy,
+                            RadianContributorId = radianContributorId
+                        };
 
-                    //    var softwareId = software.Id.ToString();
-                    //    var globalSoftware = new GlobalSoftware(softwareId, softwareId)
-                    //    {
-                    //        Id = software.Id,
-                    //        Deleted = software.Deleted,
-                    //        Pin = software.Pin,
-                    //        StatusId = software.RadianSoftwareStatusId
-                    //    };
-                    //    softwareTableManager.InsertOrUpdate(globalSoftware);
+                        softwareService.AddOrUpdateRadianSoftware(newSoftware);
 
-                    //    resultJson = JsonConvert.SerializeObject(software);
-                    //    lastZone = new GlobalLogger("RadianActivateContributor", "Step 5") { Message = "AddOrUpdateRadianSoftware --> " + resultJson };
-                    //    TableManagerGlobalLogger.InsertOrUpdate(lastZone);
-                    //}
+                        // Crear Software en TableSTorage
+                        GlobalSoftware globalSoftware = new GlobalSoftware(requestObject.SoftwareId, requestObject.SoftwareId)
+                        {
+                            Id = new Guid(requestObject.SoftwareId),
+                            Deleted = false,
+                            Pin = requestObject.Pin,
+                            StatusId = (int)Domain.Common.SoftwareStatus.Production
+                        };
+                        softwareTableManager.InsertOrUpdateAsync(globalSoftware);
+                    }
 
-                    //// Step 6 
+                    //  Insertamos la operacion
+                    RadianContributorOperation operation = new RadianContributorOperation()
+                    {
+                        Deleted = false,
+                        OperationStatusId = (int)Domain.Common.RadianState.Habilitado,
+                        SoftwareId = new Guid(requestObject.SoftwareId),
+                        RadianContributorId = radianContributorId,
+                        SoftwareType = Convert.ToInt32(requestObject.SoftwareType)
+                    };
 
-                    //var contributorOperation = new RadianContributorOperations
-                    //{
-                    //    ContributorId = radianContributor.Id,
-                    //    ContributorTypeId = requestObject.ContributorTypeId,
-                    //    OperationModeId = requestObject.OperationModeId,
-                    //    ProviderId = requestObject.ProviderId != 0 ? requestObject.ProviderId : null,
-                    //    SoftwareId = requestObject.Software.Id,
-                    //    Deleted = false,
-                    //    Timestamp = utcNow
-                    //};
+                    int oper = contributorService.AddRadianOperation(operation);
 
-                    //if (contributorOperation.OperationModeId == (int)Domain.Common.OperationMode.Free &&
-                    //                        contributorOperation.SoftwareId == null)
-                    //    contributorOperation.SoftwareId = Guid.Parse(ConfigurationManager.GetValue("BillerSoftwareId"));
+                    GlobalRadianOperations globalRadianOperations =
+                                new GlobalRadianOperations(requestObject.Code, requestObject.SoftwareId)
+                                {
+                                    Deleted = false,
+                                    RadianContributorTypeId = radianContributor.RadianContributorTypeId,
+                                    RadianStatus = Domain.Common.RadianState.Habilitado.GetDescription(),
+                                    SoftwareType = Convert.ToInt32(requestObject.SoftwareType)
+                                };
 
-                    //var contributorOperationSearch = contributorOperationService.Get(
-                    //                        radianContributor.Id,
-                    //                        contributorOperation.OperationModeId,
-                    //                        contributorOperation.ProviderId,
-                    //                        contributorOperation.SoftwareId);
-
-                    //if (contributorOperationSearch == null)
-                    //    contributorOperationService.AddOrUpdateRadianContributorOperation(contributorOperation);
-
-                    //resultJson = JsonConvert.SerializeObject(contributorOperation);
-                    //lastZone = new GlobalLogger("RadianActivateContributor", "Step 6") { Message = "AddOrUpdateRadianContributorOperation --> " + resultJson };
-                    //TableManagerGlobalLogger.InsertOrUpdate(lastZone);
-
-                    // Step 7  Global Authorization 
-
-                    //var auth = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(
-                    //                                                        radianContributor.Id.ToString(),
-                    //                                                        radianContributor.Id.ToString());
-                    //if (auth == null)
-                    //    tableManagerGlobalAuthorization.InsertOrUpdate(new GlobalAuthorization(
-                    //                                            radianContributor.Id.ToString(), radianContributor.Id.ToString()));
-
-                    //if (contributorOperation.ProviderId != null)
-                    //{
-                    //    var provider = contributorService.Get(contributorOperation.ProviderId.Value);
-                    //    if (provider != null)
-                    //    {
-                    //        var authorization = new GlobalAuthorization(provider.Code, radianContributor.ContributorId.ToString());
-                    //        tableManagerGlobalAuthorization.InsertOrUpdate(authorization);
-
-                    //        resultJson = JsonConvert.SerializeObject(contributorOperation);
-                    //        lastZone = new GlobalLogger("RadianActivateContributor", "Step 7") { Message = "GlobalAuthorization --> " + resultJson };
-                    //        TableManagerGlobalLogger.InsertOrUpdate(lastZone);
-
-                    //    }
-                    //}
-                    //// Step 8 Update GlobalContributor Activation 
-                    //contributorActivationTableManager.InsertOrUpdate(contributorActivation);
-
-                    //resultJson = JsonConvert.SerializeObject(contributorActivation);
-                    //lastZone = new GlobalLogger("RadianActivateContributor", "Step 8") { Message = " --> " + resultJson };
-                    //TableManagerGlobalLogger.InsertOrUpdate(lastZone);
-
-                    //log.Info($"Activation Radian successfully completed. Contributor with given id: {radianContributor.Id}");
+                    log.Info($"Activation Radian successfully completed. Contributor with given id: {radianContributor.Id}");
 
                 }
                 catch (Exception ex)
@@ -221,6 +159,9 @@ namespace Gosocket.Dian.Functions.Radian
 
         class RadianaActivateContributorRequestObject
         {
+            [JsonProperty(PropertyName = "code")]
+            public string Code { get; set; }
+
             [JsonProperty(PropertyName = "contributorId")]
             public int ContributorId { get; set; }
 
@@ -255,6 +196,6 @@ namespace Gosocket.Dian.Functions.Radian
             public string SoftwarePassword { get; set; }
         }
 
-       
+
     }
 }
