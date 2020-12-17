@@ -18,12 +18,14 @@ namespace Gosocket.Dian.Web.Controllers
     [Authorize]
     public class OthersElectronicDocumentsController : Controller
     {
-        private readonly IOthersElectronicDocumentsService _OthersElectronicDocumentsService;
+        private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
+        private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
 
-
-        public OthersElectronicDocumentsController(IOthersElectronicDocumentsService OthersElectronicDocumentsService)
+        public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
+            IOthersDocsElecContributorService othersDocsElecContributorService)
         {
-            _OthersElectronicDocumentsService = OthersElectronicDocumentsService;
+            _othersElectronicDocumentsService = othersElectronicDocumentsService;
+            _othersDocsElecContributorService = othersDocsElecContributorService;
         }
 
         /// <summary>
@@ -38,7 +40,17 @@ namespace Gosocket.Dian.Web.Controllers
                 .Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
             ViewBag.ContributorId = User.ContributorId();
 
-            return View();
+            NameValueCollection result = _othersDocsElecContributorService.Summary(User.UserCode());
+            ViewBag.ContributorId = result["ContributorId"];
+            ViewBag.ElectronicInvoice_OtherDocElecContributorTypeId = result["ElectronicInvoice_OtherDocElecContributorTypeId"];
+            ViewBag.ElectronicInvoice_OtherDocElecOperationModeId = result["ElectronicInvoice_OtherDocElecOperationModeId"];
+            ViewBag.TechnologyProvider_OtherDocElecContributorTypeId = result["TechnologyProvider_OtherDocElecContributorTypeId"];
+            ViewBag.TechnologyProvider_OtherDocElecOperationModeId = result["TechnologyProvider_OtherDocElecOperationModeId"];
+            ViewBag.TradingSystem_OtherDocElecContributorTypeId = result["TradingSystem_OtherDocElecContributorTypeId"];
+            ViewBag.TradingSystem_OtherDocElecOperationModeId = result["TradingSystem_OtherDocElecOperationModeId"];
+            ViewBag.Factor_OtherDocElecContributorTypeId = result["Factor_OtherDocElecContributorTypeId"];
+            ViewBag.Factor_OtherDocElecOperationModeId = result["Factor_OtherDocElecOperationModeId"];
+            return View(); 
         }
 
         public ActionResult AddOrUpdate(int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0 )
@@ -62,7 +74,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.UserCode = User.UserCode();
             ViewBag.electronicDocumentId = electronicDocumentId;
 
-            IEnumerable<SelectListItem> OperationsModes = _OthersElectronicDocumentsService.GetOperationModes()
+            IEnumerable<SelectListItem> OperationsModes = _othersDocsElecContributorService.GetOperationModes()
              .Select(c => new SelectListItem
              {
                  Value = c.Id.ToString(),
@@ -79,7 +91,7 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult Validation(ValidacionOtherElectronicDocumentsViewModel ValidacionOtherElectronicDocuments)
         {
             ResponseMessage validation =
-                _OthersElectronicDocumentsService.Validation(ValidacionOtherElectronicDocuments.UserCode.ToString(),
+                _othersElectronicDocumentsService.Validation(ValidacionOtherElectronicDocuments.UserCode.ToString(),
                 ValidacionOtherElectronicDocuments.Accion,
                 ValidacionOtherElectronicDocuments.ElectronicDocument,
                    ValidacionOtherElectronicDocuments.ComplementoTexto,

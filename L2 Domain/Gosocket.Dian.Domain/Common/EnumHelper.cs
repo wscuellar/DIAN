@@ -242,7 +242,9 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Terminación del mandato")]
         TerminacionMandato = 044,
         [Description("Notificación del pago total o parcial")]
-        NotificacionPagoTotalParcial = 045
+        NotificacionPagoTotalParcial = 045,
+        [Description("Valor Informe 3 dias Pago")]
+        ValInfoPago = 046
     }
 
 
@@ -488,6 +490,17 @@ namespace Gosocket.Dian.Domain.Common
         
         [Description("POS electrónico")]
         ElectronicPOS = 5
+    }
+
+    public enum OtherDocElecSoftwaresStatus
+    {
+        None = 0,
+        [Description("En proceso")]
+        InProcess = 1,
+        [Description("Aceptado")]
+        Accepted = 2,
+        [Description("Rechazado")]
+        Rejected = 3,
     }
 
 }

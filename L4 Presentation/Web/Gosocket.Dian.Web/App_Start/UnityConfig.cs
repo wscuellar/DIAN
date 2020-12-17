@@ -29,6 +29,7 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IRadianContributorOperationRepository, RadianContributorOperationRepository>();
             container.RegisterType<IRadianSoftwareRepository, RadianSoftwareRepository>();
             container.RegisterType<IPermissionRepository, PermissionRepository>();
+            container.RegisterType<IOthersDocsElecContributorRepository, OthersDocsElecContributorRepository>();
 
             #endregion
 
@@ -53,7 +54,8 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IRadianGraphicRepresentationService, RadianGraphicRepresentationService>();
             container.RegisterType<IGlobalRadianOperationService, GlobalRadianOperationService>();
             container.RegisterType<IOthersElectronicDocumentsService, OthersElectronicDocumentsService>();
-
+            container.RegisterType<IOthersDocsElecContributorService, OthersDocsElecContributorService>();
+             
             #endregion
 
             #region Managers

@@ -3,6 +3,8 @@
 @{
     ViewBag.Title = "Detalles del documento";
     Layout = "~/Views/Shared/_LayoutPublicInfo.cshtml";
+    var invoiceDocValidatorModel = Model.ListDocValidatorModels[0];
+    invoiceDocValidatorModel.IconsData = Model.IconsData;
 }
 
 @section css
@@ -31,8 +33,8 @@
 
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
-            <div>
-                @Html.Partial("_ViewerPartial", Model.ListDocValidatorModels[0]);
+            <div>                
+                @Html.Partial("_ViewerPartial", invoiceDocValidatorModel);
                 @*<div>CUFE:</div>
                     <div>@Model.GlobalDocValidatorDocument.GlobalDocumentId</div>*@
             </div>

@@ -450,6 +450,21 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
+        public List<T> FindDocumentByReference<T>(string documentReferencedKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = (
+                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                    QueryComparisons.Equal,
+                    documentReferencedKey));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+
+
         public List<T> FindDocumentReferenced_TypeId<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -808,6 +823,32 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.FirstOrDefault();
         }
+
+        public DynamicTableEntity FindhByRadianStatus(string partitionKey, bool deleted, string radianStatus)
+        {
+            var query = new TableQuery();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterConditionForBool("Deleted",
+                    QueryComparisons.Equal,
+                    deleted));
+            prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RadianStatus",
+                    QueryComparisons.Equal,
+                    radianStatus));
+
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
 
         public T FindByGlobalDocumentId<T>(string globalDocumentId) where T : ITableEntity, new()
         {
