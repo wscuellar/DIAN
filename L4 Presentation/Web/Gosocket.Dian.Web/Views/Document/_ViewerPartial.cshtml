@@ -159,17 +159,21 @@
                             if (statusIcons.Key != Model.IconsData.First().Key)
                             {
                                 <div style="display:grid">
-                                    <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
-                                    <span>@statusIcons.Value</span>
+                                    <div class="text-center">
+                                        <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
+                                    </div>
+                                    <p>@statusIcons.Value</p>
                                 </div>
                                 <div class="radian-state-ef-line"></div>
                             }
                             else
                             {
-                                <div style="display:grid">
+                            <div style="display:grid">
+                                <div class="text-center">
                                     <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
-                                    <span>@statusIcons.Value</span>
                                 </div>
+                                <p>@statusIcons.Value</p>
+                            </div>
 
                             }
                         }
