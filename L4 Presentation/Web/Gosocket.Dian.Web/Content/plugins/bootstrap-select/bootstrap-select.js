@@ -193,7 +193,10 @@
           this.options.deselectAllText +
           '</button>' +
           '</div>' +
-          '</div>' : '';
+            '</div>' : '';
+
+        console.log('id del select: ' + this.$element.attr("id"));
+
       var drop =
           '<div class="btn-group bootstrap-select' + multiple + inputGroup + '">' +
               '<button type="button" class="btn dropdown-toggle selectpicker' + btnSize + '" data-toggle="dropdown"' + autofocus + '>' +
@@ -204,7 +207,7 @@
               header +
               searchbox +
               actionsbox +
-              '<ul class="dropdown-menu inner selectpicker" role="menu">' +
+          '<ul id="ul' + this.$element.attr("id") + '" class="dropdown-menu inner selectpicker" role="menu">' +
               '</ul>' +
               '</div>' +
               '</div>';
