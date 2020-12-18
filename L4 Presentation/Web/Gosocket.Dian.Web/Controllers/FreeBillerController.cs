@@ -98,6 +98,8 @@ namespace Gosocket.Dian.Web.Controllers
             return RedirectToAction("FreeBillerUser");
         }
 
+
+
         /// <summary>
         /// Cargue de información para editar.
         /// </summary>
@@ -106,6 +108,9 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpGet]
         public ActionResult EditFreeBillerUser(string guid ="7713a5d0-fe76-4e9a-b704-d05a7d7b7f07")
         {
+            var tdocs = GetTypesDoc();
+            //dropdown
+            ViewBag.tdocs = tdocs.Select(p => new SelectListItem() { Value = p.Value.ToString(), Text = p.Text }).ToList<SelectListItem>();
             UserService user = new UserService();
             var data = user.Get(guid);
             UserFreeBillerModel model = new UserFreeBillerModel();
@@ -120,8 +125,6 @@ namespace Gosocket.Dian.Web.Controllers
             model.ProfileId = 1;
             model.TypeDocId = Convert.ToString(data.IdentificationTypeId);
             model.IsActive = false;
-
-
             return View(model);
         }
         /// <summary>
@@ -147,7 +150,7 @@ namespace Gosocket.Dian.Web.Controllers
                 if (result.Succeeded)
                 {
                     //Envio de notificacion por correo
-                    var envio = SendMailCreate(model);
+                    SendMailCreate(model);
                     return RedirectToAction("FreeBillerUser");
                 }
                 foreach (var error in result.Errors)
@@ -161,8 +164,12 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult CreateUser()
         {
             UserFreeBillerModel model = new UserFreeBillerModel();
+
             model.TypesDoc = this.staticTypeDoc;
             model.Profiles = this.staticProfiles;
+
+            model.TypesDoc = this.GetTypesDoc();
+            model.Profiles = this.GetProfiles();
 
             return View(model);
         }
@@ -171,8 +178,6 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult CreateUser(UserFreeBillerModel model)
         {
             var uCompany = userService.Get(User.Identity.GetUserId());
-
-
             if (!ModelState.IsValid)
             {
                 IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
@@ -362,6 +367,7 @@ namespace Gosocket.Dian.Web.Controllers
             return selectTypesId;
         }
 
+    
         /// <summary>
         /// Método encargado de obtener los tipos de documentos y asignarlos a una lista para 
         /// usarlos en las vistas.
@@ -420,4 +426,5 @@ namespace Gosocket.Dian.Web.Controllers
             return listUsers;
         }
     }
+    
 }

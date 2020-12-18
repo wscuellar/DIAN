@@ -119,8 +119,11 @@
 
                                                                 @Html.LabelFor(model => model.TypeDocId, htmlAttributes: new { @class = "control-label col-md-2" })
 
-                                                                @Html.EditorFor(model => model.TypeDocId, new { htmlAttributes = new { @class = "form-control" } })
-                                                                @Html.ValidationMessageFor(model => model.TypeDocId, "", new { @class = "text-danger" })
+                                                                @*@Html.EditorFor(model => model.TypeDocId, new { htmlAttributes = new { @class = "form-control" } })*@
+                                                             
+                                                                    @Html.DropDownListFor(model => model.TypeDocId, (List<SelectListItem>
+                                                                    )ViewBag.tdocs, new { @class = "form-control selectpicker" })
+                                                                    @Html.ValidationMessageFor(model => model.TypeDocId, "", new { @class = "text-danger" })
 
                                                             </div>
                                                         </div>
@@ -159,7 +162,8 @@
 
                                                                 @Html.LabelFor(model => model.ProfileId, htmlAttributes: new { @class = "control-label col-md-2" })
 
-                                                                @Html.EditorFor(model => model.ProfileId, new { htmlAttributes = new { @class = "form-control selectpicker" } })
+                                                                @*@Html.EditorFor(model => model.ProfileId, new { htmlAttributes = new { @class = "form-control selectpicker" } })*@
+                                                                @Html.DropDownListFor(model => model.ProfileId, Model.Profiles, new { @class = "form-control selectpicker" })
                                                                 @Html.ValidationMessageFor(model => model.ProfileId, "", new { @class = "text-danger" })
 
                                                             </div>
