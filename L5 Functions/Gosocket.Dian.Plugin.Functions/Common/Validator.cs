@@ -2419,9 +2419,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "Regla: 202-(R): ",
-                                                ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
-                                                "ya existe un evento (033) Aceptación Expresaa",
+                                                ErrorCode = "Regla: LGC02-(R): ",
+                                                ErrorMessage = "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente.",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -2432,9 +2431,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "Regla: 202-(R): ",
-                                                ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
-                                                "ya existe un evento (034) Aceptación Tacita de la factura",
+                                                ErrorCode = "Regla: LGC02-(R): ",
+                                                ErrorMessage = "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente.",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
