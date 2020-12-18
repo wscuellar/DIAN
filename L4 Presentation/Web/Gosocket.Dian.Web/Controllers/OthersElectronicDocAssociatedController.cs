@@ -53,10 +53,10 @@ namespace Gosocket.Dian.Web.Controllers
         /// <param name="operationModeId"></param>
         /// <param name="ContributorIdType"></param>
         /// <returns></returns>
-        public ActionResult Index(int id=0, int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0)
+        public ActionResult Index(int id=0, int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0)//TODO:
         {
             ViewBag.OtherDocElecContributorId = id;
-            ViewBag.Participant = "Emisor";
+            ViewBag.Participant = "Emisor";//TODO:
 
             var electronicDoc = new ElectronicDocumentService().GetElectronicDocuments()
                 .Where(d => d.Id == electronicDocumentId).FirstOrDefault();/*.Select(e => new ElectronicDocumentViewModel
@@ -86,8 +86,8 @@ namespace Gosocket.Dian.Web.Controllers
                 Nit = contributor.Code,
                 BusinessName = contributor.BusinessName,
                 Email = contributor.Email,
-                Step = 1,
-                State = "Dev",
+                Step = 1,//TODO:
+                State = "Dev",//TODO:
             };
 
             return View(model);

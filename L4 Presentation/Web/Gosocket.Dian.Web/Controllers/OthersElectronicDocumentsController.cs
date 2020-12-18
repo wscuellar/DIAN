@@ -86,13 +86,13 @@ namespace Gosocket.Dian.Web.Controllers
                 ContributorId = t.ContributorId,
                 OperationMode = t.OperationMode,
                 ContibutorType = t.ContibutorType,
-                ElectronicDoc=t.ElectronicDoc,
+                ElectronicDoc = t.ElectronicDoc,
                 Software = t.Software,
                 PinSW = t.PinSW,
-                StateSoftware = t.StateSoftware,    
+                StateSoftware = t.StateSoftware,
                 StateContributor = t.StateContributor,
                 Url = t.Url,
-                CreatedDate = t.CreatedDate, 
+                CreatedDate = t.CreatedDate,
             }).ToList();
 
 
@@ -111,7 +111,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
                 foreach (var item in allErrors) ModelState.AddModelError("", item.ErrorMessage);
-                return View(model);
+                return View("AddOrUpdate", new ValidacionOtherDocsElecViewModel { ContributorId = 1 });
             }
 
             var IdS = new Guid();
@@ -148,7 +148,7 @@ namespace Gosocket.Dian.Web.Controllers
                 _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
             }
 
-            return View(model);
+            return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = model.Id });
         }
 
 

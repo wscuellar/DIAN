@@ -25,7 +25,6 @@ namespace Gosocket.Dian.Interfaces.Services
 
         PagedResult<OtherDocsElectList> List(string userCode, int OperationModeId);
 
-        List<Gosocket.Dian.Domain.Sql.OtherDocElecOperationMode> GetOperationModes();
         /// <summary>
         /// Cancelar un registro en la tabla OtherDocElecContributor
         /// </summary>
