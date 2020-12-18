@@ -1602,7 +1602,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidationSigningTime(string trackId, string eventCode, string signingTime, string documentTypeId, string customizationID, string endDate,  DianResponse response)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateSigningTime", new { trackId, eventCode, signingTime, documentTypeId, customizationID, endDate });            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId, customizationID, endDate });            
             
             if (validations.Count > 0)
             {
