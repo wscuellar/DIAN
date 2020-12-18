@@ -1188,7 +1188,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
             }
-
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
@@ -1200,7 +1199,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
-
             string valueTotalEndoso = nitModel.ValorTotalEndoso;
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
@@ -1280,7 +1278,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
             }
-
             return null;
         }
         #endregion
