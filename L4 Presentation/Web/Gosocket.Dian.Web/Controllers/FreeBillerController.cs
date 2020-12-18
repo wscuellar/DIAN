@@ -15,6 +15,7 @@ using System.Text;
 using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.FreeBiller;
 using Gosocket.Dian.Domain.Utils;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -96,11 +97,64 @@ namespace Gosocket.Dian.Web.Controllers
             var algo = model;
             return RedirectToAction("FreeBillerUser");
         }
-
-
-        public ActionResult EditFreeBillerUser(UserFreeBillerModel model)
+        /// <summary>
+        /// Cargue de información para editar.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult EditFreeBillerUser(string guid ="7713a5d0-fe76-4e9a-b704-d05a7d7b7f07")
         {
-            return View();
+            UserService user = new UserService();
+            var data = user.Get(guid);
+            UserFreeBillerModel model = new UserFreeBillerModel();
+            model.Id = data.Id;
+            model.Name = data.UserName;
+            model.Email = data.Email;
+            model.LastUpdate = data.LastUpdated;
+            model.Profiles = this.DataPerfiles();
+            model.LastName = "Perez";
+            model.FullName = data.Name;
+            model.NumberDoc = data.IdentificationId;
+            model.ProfileId = 1;
+            model.TypeDocId = Convert.ToString(data.IdentificationTypeId);
+            model.IsActive = false;
+
+
+            return View(model);
+        }
+        /// <summary>
+        /// Metodo asincrono para editar la información..
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> EditFreeBillerUser(UserFreeBillerModel model)
+        {
+
+            var user = await userManager.FindByIdAsync(model.Id);
+
+            if (user == null)
+            {
+                ViewBag.message = "No se encontro el ID";
+                return View("Not found");
+            }else
+            {
+                user.Name = model.Name;
+                user.Name = model.NumberDoc;
+                var result = await userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    //Envio de notificacion por correo
+                    var envio = SendMailCreate(model);
+                    return RedirectToAction("FreeBillerUser");
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.ToString());
+                }
+                return View(model);
+            }
         }
 
         public ActionResult CreateUser()
