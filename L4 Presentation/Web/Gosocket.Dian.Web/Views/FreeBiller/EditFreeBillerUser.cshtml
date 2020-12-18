@@ -159,7 +159,7 @@
 
                                                                 @Html.LabelFor(model => model.ProfileId, htmlAttributes: new { @class = "control-label col-md-2" })
 
-                                                                @Html.EditorFor(model => model.ProfileId, new { htmlAttributes = new { @class = "btn dropdown-toggle selectpicker btn-default" } })
+                                                                @Html.EditorFor(model => model.ProfileId, new { htmlAttributes = new { @class = "form-control selectpicker" } })
                                                                 @Html.ValidationMessageFor(model => model.ProfileId, "", new { @class = "text-danger" })
 
                                                             </div>
@@ -172,21 +172,39 @@
                                                         <input type="submit" value="Guardar" class="btn btn-success btn-radian-success" />
                                                     </div>
                                                 </div>
-                                                </div>
-                                            </div>
-                                                       
-                                                    </div>
-                                                </div>
-
                                             </div>
                                         </div>
+
                                     </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <div class="page-content margin-15">
+        <div class="row margin-horizontal-0">
+            <div class="tab-base">
+                <!--Tabs Content-->
+                <div class="tab-content padding-0">
+                    <div id="tab-current-country" class="tab-pane fade active in">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Permisos</h3>
+                            </div>
 
-    <div class="row margin-horizontal-0">
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row margin-vertical-0">
         <div class="tab-base">
             <!--Tabs Content-->
             <div class="tab-content padding-0">
@@ -194,18 +212,184 @@
                     <div class="panel">
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
-                                <div class="row margin-horizontal-0">
-                                    <div class="form-group">
-                                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
-                                            <div class="col-md-12 padding-horizontal-0">
-                                                <div id="document-list" class="panel panel-bordered-dian">
+                                <div class="margin-vertical-0">
+                                  
+                                    <div class="margin-vertical-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                        <div class="col-md-2">
+                                            <h3 class="panel-title">Facturación</h3>
+                                            <!-- Default checkbox -->
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       value=""
+                                                       id="flexCheckDefault" />
+                                                <label class="form-check-label" for="flexCheckDefault">
+                                                    Default checkbox
+                                                </label>
+                                            </div>
 
-                                                 
+                                            <!-- Checked checkbox -->
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       value=""
+                                                       id="flexCheckChecked"
+                                                       checked />
+                                                <label class="form-check-label" for="flexCheckChecked">
+                                                    Checked checkbox
+                                                </label>
+                                            </div>
+
+                                            <!-- Default checkbox -->
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       value=""
+                                                       id="flexCheckDefault" />
+                                                <label class="form-check-label" for="flexCheckDefault">
+                                                    Default checkbox
+                                                </label>
+                                            </div>
+
+                                            <!-- Checked checkbox -->
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       value=""
+                                                       id="flexCheckChecked"
+                                                       checked />
+                                                <label class="form-check-label" for="flexCheckChecked">
+                                                    Checked checkbox
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <h3 class="panel-title">Configuración</h3>
+                                            <div class="d-flex align-items-center bg-light mb-3" style="height: 100px;">
+                                                <!-- Default checkbox -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           value=""
+                                                           id="flexCheckDefault" />
+                                                    <label class="form-check-label" for="flexCheckDefault">
+                                                        Default checkbox
+                                                    </label>
+                                                </div>
+
+                                                <!-- Checked checkbox -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           value=""
+                                                           id="flexCheckChecked"
+                                                           checked />
+                                                    <label class="form-check-label" for="flexCheckChecked">
+                                                        Checked checkbox
+                                                    </label>
+                                                </div>
+                                                <!-- Default checkbox -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           value=""
+                                                           id="flexCheckDefault" />
+                                                    <label class="form-check-label" for="flexCheckDefault">
+                                                        Default checkbox
+                                                    </label>
+                                                </div>
+
+                                               
+                                            </div>
+
+
+                                        </div>
+                                       
+                                        <div class="col-md-2">
+                                            <h3 class="panel-title">Plantillas</h3>
+                                            <div class="d-flex align-items-end bg-light mb-3" style="height: 100px;">
+                                                <!-- Default checkbox -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           value=""
+                                                           id="flexCheckDefault" />
+                                                    <label class="form-check-label" for="flexCheckDefault">
+                                                        Default checkbox
+                                                    </label>
+                                                </div>
+
+                                                <!-- Checked checkbox -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           value=""
+                                                           id="flexCheckChecked"
+                                                           checked />
+                                                    <label class="form-check-label" for="flexCheckChecked">
+                                                        Checked checkbox
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-md-2">
+                                            <div class="d-flex align-items-end bg-light mb-3" style="height: 100px;">
+                                                <h3 class="panel-title">Documentos</h3>
+                                                <!-- Default checkbox -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           value=""
+                                                           id="flexCheckDefault" />
+                                                    <label class="form-check-label" for="flexCheckDefault">
+                                                        Default checkbox
+                                                    </label>
+                                                </div>
 
+                                                <!-- Checked checkbox -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           value=""
+                                                           id="flexCheckChecked"
+                                                           checked />
+                                                    <label class="form-check-label" for="flexCheckChecked">
+                                                        Checked checkbox
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="d-flex align-items-end bg-light mb-3" style="height: 100px;">
+                                                <h3 class="panel-title">Operaciones</h3>
+                                                <!-- Default checkbox -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           value=""
+                                                           id="flexCheckDefault" />
+                                                    <label class="form-check-label" for="flexCheckDefault">
+                                                        Default checkbox
+                                                    </label>
+                                                </div>
+
+                                                <!-- Checked checkbox -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           value=""
+                                                           id="flexCheckChecked"
+                                                           checked />
+                                                    <label class="form-check-label" for="flexCheckChecked">
+                                                        Checked checkbox
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+                                       
+
+                                    
                                 </div>
 
                             </div>
