@@ -219,9 +219,14 @@ namespace Gosocket.Dian.Application
             Contributor contributor = radianContributor.Contributor;
             GlobalRadianOperations operation = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString())
             {
-                RadianStatus = radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test.GetDescription() : RadianState.Registrado.GetDescription(),
+                RadianState = radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test.GetDescription() : RadianState.Registrado.GetDescription(),
                 SoftwareType = existingOperation.SoftwareType,
                 RadianContributorTypeId = radianContributor.RadianContributorTypeId,
+                ElectronicInvoicer = radianContributor.RadianContributorTypeId ==  (int)Domain.Common.RadianContributorType.ElectronicInvoice,
+                TecnologicalSupplier = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider,
+                Factor = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor,
+                NegotiationSystem = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem,
+                IndirectElectronicInvoicer = radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect,
                 Deleted = false
             };
 

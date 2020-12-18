@@ -37,7 +37,8 @@
     "EventGridKey": "8LsJnXyVytKAFjjyJfykHTIhxBKtf9y9s1pCrzs27tU=",
     "EventGridTopicEndpoint": "https://gtpa-event-grid-topic-documents-test.eastus2-1.eventgrid.azure.net/api/events",
     "ValidateDocumentUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/ValidateDocument?code=6geUagElMczp1nJt1mirlM5q5hs4p5YC7pZ8BXXeJB87I7aCqWOsAg==",
-    "GetAppResponseUrl": "https://gtpa-function-commons-test.azurewebsites.net/api/GetApplicationResponse?code=XZluU0hdWUVC98bqkWerZ6l2JcXd9nlMSLKIEN7P/SHr3ZRsvUaTGQ=="
+    "GetAppResponseUrl": "https://gtpa-function-commons-test.azurewebsites.net/api/GetApplicationResponse?code=XZluU0hdWUVC98bqkWerZ6l2JcXd9nlMSLKIEN7P/SHr3ZRsvUaTGQ==",
+    "SendToActivateRadianOperationUrl": "https://gtpa-function-commons-test.azurewebsites.net/api/SendToActivateRadianOperation?code=Uq0BEoDaN0a3rC3do08KWZxSaVTIRQlZT5RdXeZIE0xipU56LkfsFA=="
 
     //"Environment": "Hab",
     //"CertificateThumbprint": "BF6B7AE700D03E317C8792D93C4C3DD488C1A002",
