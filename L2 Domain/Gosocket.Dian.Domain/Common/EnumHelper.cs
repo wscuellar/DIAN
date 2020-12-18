@@ -454,19 +454,19 @@ namespace Gosocket.Dian.Domain.Common
 
     public enum RadianDocumentStatus
     {
-        [Description("NO APLICA")]
+        [Description("No Aplica")]
         DontApply = 0,
-        [Description("LIMITADA")]
+        [Description("Limitada")]
         Limited = 1,
-        [Description("PAGADA")]
+        [Description("Pagada")]
         Paid = 2,
-        [Description("ENDOSADA")]
+        [Description("Endosada")]
         Endorsed = 3,
-        [Description("DISPONIBILIZADA")]
+        [Description("Disponibilizada")]
         Readiness = 4,
-        [Description("TÍTULO VALOR")]
+        [Description("Título Valor")]
         SecurityTitle = 5,
-        [Description("FACTURA ELECTRONICA")]
+        [Description("Factura Electrónica")]
         ElectronicInvoice = 6
     }
 

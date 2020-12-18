@@ -696,6 +696,7 @@ namespace Gosocket.Dian.Services.Utils
             var listID = documentParsed.listID;
             var UBLVersionID = documentParsed.UBLVersionID;
             var receiverCode = documentParsed.ReceiverCode;
+            var providerCode = documentParsed.ProviderCode;
 
             switch (docTypeCode)
             {
@@ -738,6 +739,14 @@ namespace Gosocket.Dian.Services.Utils
             Boolean flagEvento = true;
             if(docTypeCode == "96")
             {
+                if (providerCode.Equals("800197268"))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}89-(R): NIT de DIAN no autorizado para emitir ApplicationResponse");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
                 if (!UBLVersionID.Equals("UBL 2.1"))
                 {
                     stringBuilder.AppendLine($"{codeMessage}D01-(R): El elemento no contiene el literal 'UBL 2.1'");

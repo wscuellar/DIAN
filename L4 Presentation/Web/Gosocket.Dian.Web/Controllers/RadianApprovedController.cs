@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
@@ -105,14 +106,17 @@ namespace Gosocket.Dian.Web.Controllers
                     RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
                     {
                         Contributor = radianAdmin.Contributor,
-                        Software = software,
                         OperationModeList = operationModeList,
+                        OperationModes = new SelectList(operationModeList, "Id", "Name"),
                         RadianContributorOperations = radianContributorOperations,
-                        CreatedBy = software.CreatedBy,
-                        SoftwareId = software.Id,
-                        SoftwareUrl = software.Url,
-                        OperationModes = new SelectList(operationModeList, "Id", "Name")
+                        SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrl")
                     };
+                    if(software != null)
+                    {
+                        radianApprovedOperationModeViewModel.Software = software;
+                        radianApprovedOperationModeViewModel.CreatedBy = software.CreatedBy;
+                        radianApprovedOperationModeViewModel.SoftwareId = software.Id;
+                    }
                     return View("GetFactorOperationMode", radianApprovedOperationModeViewModel);
                 }
             }
@@ -255,7 +259,7 @@ namespace Gosocket.Dian.Web.Controllers
                 RadianContributorOperations = radianContributorOperations,
                 CreatedBy = software.CreatedBy,
                 SoftwareId = software.Id,
-                SoftwareUrl = software.Url,
+                SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrl"),
                 OperationModes = new SelectList(operationModeList, "Id", "Name")
             };
 

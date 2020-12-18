@@ -1,8 +1,9 @@
 ﻿using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Web.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Gosocket.Dian.Web.Utils;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using System.Web;
 using System.Web.Mvc;
 
@@ -14,19 +15,47 @@ namespace Gosocket.Dian.Web.Controllers
     [Authorize]
     public class OthersElectronicDocAssociatedController : Controller
     {
-        // GET: OthersElectronicDocAssociated
+        private UserService userService = new UserService();
+
+        private ApplicationUserManager _userManager;
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
+
+        public readonly IContributorService _contributorService;
+
+        public OthersElectronicDocAssociatedController(IContributorService contributorService)
+        {
+            _contributorService = contributorService;
+        }
+
         public ActionResult Index(int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0)
         {
+            var contributor = _contributorService.GetContributorByUserId(User.Identity.GetUserId(), ContributorIdType);
+
+            if (contributor == null)
+            {
+                ModelState.AddModelError("", "No existe contribuyente!");
+                return View();
+            }
 
             OthersElectronicDocAssociatedViewModel model = new OthersElectronicDocAssociatedViewModel()
             {
-                ContributorId = 1,
-                Name = "Datos Quemados",
-                Nit = "Nit000",
-                BusinessName = "BusinessName",
-                Email = "Email",
+                ContributorId = contributor.Id,
+                Name = contributor.Name,
+                Nit = contributor.Code,
+                BusinessName = contributor.BusinessName,
+                Email = contributor.Email,
                 Step = 1,
-                State = "",
+                State = "Dev",
             };
 
             return View(model);
