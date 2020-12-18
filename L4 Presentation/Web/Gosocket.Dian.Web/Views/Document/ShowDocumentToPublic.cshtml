@@ -3,6 +3,8 @@
 @{
     ViewBag.Title = "Detalles del documento";
     Layout = "~/Views/Shared/_LayoutPublicInfo.cshtml";
+    var invoiceDocValidatorModel = Model.ListDocValidatorModels[0];
+    invoiceDocValidatorModel.IconsData = Model.IconsData;
 }
 
 @section css
@@ -31,8 +33,8 @@
 
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
-            <div>
-                @Html.Partial("_ViewerPartial", Model.ListDocValidatorModels[0]);
+            <div>                
+                @Html.Partial("_ViewerPartial", invoiceDocValidatorModel);
                 @*<div>CUFE:</div>
                     <div>@Model.GlobalDocValidatorDocument.GlobalDocumentId</div>*@
             </div>
@@ -61,7 +63,58 @@
         }
     </div>
 </div>
+<div class="tab-content">
+    <div id="modifyWrapper">
+
+    </div>
+</div>
 
 @section scripts{
     <script src="~/Content/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".eventView").click(function () {
+                var documentKey = $(this).parent().find("#DocumentKey").val()
+                $('#container1').fadeOut(200);
+                GetEventsPartialView(documentKey);
+                setTimeout(function () {
+                    $('#divViewerPartial').css("height", "635px");
+                    $('#divPageContent').css('max-height', '623px');
+                }, 200)
+            })
+
+            function GetEventsPartialView(id) {debugger
+                var url = '/QueryAssociatedEvents/EventsView?id=' + id + "&cufe=" + '@Model.GlobalDocValidatorDocument.DocumentKey'
+            $.ajax({
+                url: url,
+                success: function (data, status, xhr) {
+                    var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
+                    if (injectingPartialView == "true") {
+                        $('#modifyWrapper').html(data);
+                        $('#modifyWrapper').fadeIn(300);
+                        $('#container1-title').fadeIn(300);
+                        $('#divChildrenModifyWrapper').css("padding-top", "100px");
+                        $('[data-toggle="popover"]').popover();
+                    }
+                    else {
+                        window.location.href = '/User/Login';
+                    }
+                }
+            });
+
+        };
+        })
+
+
+        function showMore() {
+            $('#modifyWrapper').fadeOut(300);
+            $('#container1-title').fadeOut(300);
+            $('#divViewerPartial').css('height', '');
+            $('#divPageContent').css('max-height', '');
+            $('#divChildrenModifyWrapper').css('padding-top', '');
+            setTimeout(function () {
+                $('#container1').fadeIn(300);
+            }, 500);
+        }
+    </script>
 }

@@ -160,7 +160,7 @@
 <div class="event-section page-content radian-view margin-15">
 
     <div id="divChildrenModifyWrapper" class="row margin-horizontal-0">
-        <div class="panel panel-event">
+        <div class="panel panel-event" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" >
             <div class="panel-heading padding-15">
                 <div class="row">
                     <div class="col-sm-8 left-section">
@@ -277,16 +277,13 @@
                                     @foreach (var item in Model.Validations)
                                     {
                                         <tr>
-                                            <td>@item.RuleName</td>
+                                            <td class="text-left">@item.RuleName</td>
                                             <td class="text-right right-section">
-                                                <p class="underline-reject-text tooltip-custom">
-                                                    <span class="green-text-color">
+                                                <p class="underline-reject-text">
+                                                    <span class="green-text-color" data-placement="left" data-toggle="popover" data-trigger="hover" title="@item.Status" data-content="@item.Message" data-template='<div class="popover" role="tooltip"><div class="arrow"></div><div class="icon-alert"><i class="fa fa-exclamation-circle"></i></div><div class="popover-body">@item.Message</div></div>'>
                                                         <i class="fa fa-info-circle"></i>@item.Status
                                                     </span>
-                                                    <span class="tooltiptext">
-                                                        <i class="fa fa-exclamation-circle"></i>
-                                                        @item.Message
-                                                    </span>
+
                                                 </p>
                                             </td>
                                         </tr>
@@ -378,12 +375,3 @@
     </div>
 </div>
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-
-    <!--Bootstrap Select [ OPTIONAL ]-->
-    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
-    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
-    <script src="~/Content/js/file-validator.js"></script>
-
-}

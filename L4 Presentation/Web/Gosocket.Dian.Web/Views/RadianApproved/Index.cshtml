@@ -120,7 +120,7 @@
                     className: "table-data modal-radian",
                     size: 'large'
                 });
-                dialog.init(function (e) {debugger
+                dialog.init(function (e) {
                     var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.FileHistories.Customers))');
                     var customersTotalCount = @Model.FileHistoriesRowCount;
                     var columns = [
@@ -131,6 +131,7 @@
                         { data: 'Comments' }
                     ]
                     var ajaxData = {
+                        RadianContributorId: @Model.Contributor.RadianContributorId,
                         FileName: "#NameSearch",
                         Initial: "#dateFrom",
                         End: "#dateTo",

@@ -5,6 +5,7 @@ using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Gosocket.Dian.Application
 {
@@ -19,6 +20,9 @@ namespace Gosocket.Dian.Application
         const string CONS363 = "363";
         const string CONS364 = "364";
 
+        const string TITULOVALORCODES = "030, 032, 033, 034";
+        const string DISPONIBILIZACIONCODES = "036";
+        const string PAGADACODES = "045";
         const string ENDOSOCODES = "037,038,039";
         const string LIMITACIONCODES = "041";
         const string MANDATOCODES = "043";
@@ -122,25 +126,82 @@ namespace Gosocket.Dian.Application
             return EventStatus.None;
         }
 
-        public Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>> InvoiceAndNotes(string documentKey)
+        public Dictionary<int, string> IconType(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments, string documentKey = "")
         {
-            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>> tuple = Tuple.Create(GlobalDocValidatorDocumentByGlobalId(documentKey), CreditAndDebitNotes(documentKey));
+            Dictionary<int, string> statusValue = new Dictionary<int, string>();
+            int securityTitleCounter = 0;
+            statusValue.Add(1, $"{RadianDocumentStatus.ElectronicInvoice.GetDescription()}");
+
+            if (documentKey != "")
+            {
+                allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
+            }
+
+            foreach (GlobalDocValidatorDocumentMeta documentMeta in allReferencedDocuments)
+            {
+                if (documentMeta.EventCode != null)
+                {
+                    if (TITULOVALORCODES.Contains(documentMeta.EventCode.Trim()))
+                    {
+                        securityTitleCounter++;
+                    }
+
+                    if (securityTitleCounter >= 3)
+                    {
+                        statusValue.Add(2, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");//5
+                        securityTitleCounter = 0;
+                    }
+
+                    if (DISPONIBILIZACIONCODES.Contains(documentMeta.EventCode.Trim()))
+                        statusValue.Add(3, $"{RadianDocumentStatus.Readiness.GetDescription()}");//4 //INSCRITA
+
+                    if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim()))
+                        statusValue.Add(4, $"{RadianDocumentStatus.Endorsed.GetDescription()}");//3       
+
+                    if (PAGADACODES.Contains(documentMeta.EventCode.Trim()))
+                        statusValue.Add(5, $"{RadianDocumentStatus.Paid.GetDescription()}");//2
+
+                    if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()))
+                        statusValue.Add(6, $"{RadianDocumentStatus.Limited.GetDescription()}");//1 
+                }
+            }
+
+            if (statusValue.ContainsKey(3) || statusValue.ContainsKey(6))
+                statusValue.Remove(1);
+
+            return statusValue;
+        }
+
+        //Pass Information to DocumentController for Debit And Credit Notes
+        public Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> InvoiceAndNotes(string documentKey)
+        {
+            List<GlobalDocValidatorDocumentMeta> allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
+
+            Dictionary<int, string> icons = IconType(allReferencedDocuments);
+
+            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> tuple = Tuple.Create(GlobalDocValidatorDocumentByGlobalId(documentKey), CreditAndDebitNotes(allReferencedDocuments), icons);
 
             return tuple;
         }
 
-        public List<GlobalDocValidatorDocumentMeta> CreditAndDebitNotes(string documentReferencedKey)
+        //Join Credit and Debit Notes in one list
+        public List<GlobalDocValidatorDocumentMeta> CreditAndDebitNotes(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments)
         {
-            List<GlobalDocValidatorDocumentMeta> creditNotes = FindCreditNotes(documentReferencedKey);
-            List<GlobalDocValidatorDocumentMeta> debitNotes = FindDebitNotes(documentReferencedKey);
+            Tuple<List<GlobalDocValidatorDocumentMeta>, List<GlobalDocValidatorDocumentMeta>> creditDebitNotes = FindAllNotes(allReferencedDocuments);
+            List<GlobalDocValidatorDocumentMeta> creditNotes = creditDebitNotes.Item1;
+            List<GlobalDocValidatorDocumentMeta> debitNotes = creditDebitNotes.Item2;
             List<GlobalDocValidatorDocumentMeta> joinNotes = creditNotes.Concat(debitNotes).ToList();
 
             return joinNotes.OrderBy(n => n.EmissionDate).ToList();
         }
 
-        public List<GlobalDocValidatorDocumentMeta> FindCreditNotes(string documentReferencedKey)
+        //
+        public Tuple<List<GlobalDocValidatorDocumentMeta>, List<GlobalDocValidatorDocumentMeta>> FindAllNotes(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments)
         {
-            return _radianGlobalDocValidationDocumentMeta.FindReferencedDocuments(documentReferencedKey, CREDITNOTE);
+            List<GlobalDocValidatorDocumentMeta> creditNotes = allReferencedDocuments.Where(c => c.DocumentTypeId == CREDITNOTE).ToList();
+            List<GlobalDocValidatorDocumentMeta> debitNotes = allReferencedDocuments.Where(c => c.DocumentTypeId == DEBITNOTE).ToList();
+
+            return Tuple.Create(creditNotes, debitNotes);
         }
 
         public List<GlobalDocValidatorDocumentMeta> FindDebitNotes(string documentReferencedKey)

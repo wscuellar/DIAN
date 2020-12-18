@@ -82,6 +82,13 @@ namespace Gosocket.Dian.Application
             return sqlDBContext.Softwares.FirstOrDefault(x => x.Id == id);
         }
 
+
+        public RadianSoftware GetByRadian(Guid id)
+        {
+            return sqlDBContext.RadianSoftwares.FirstOrDefault(x => x.Id == id);
+        }
+
+
         public IEnumerable<Software> GetAll()
         {
             return sqlDBContext.Softwares;
@@ -120,11 +127,61 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        /// <summary>
+        /// Buscar/Listar los Software por id del contribuyente que no esten eliminados y que esten activos o inactivos
+        /// </summary>
+        /// <param name="contributorId"></param>
+        /// <param name="state">True. Activos, False: inactivos</param>
+        /// <returns></returns>
+        public List<Software> GetSoftwaresByContributorAndState(int contributorId, bool state)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.Softwares.Where(p => !p.Deleted
+                                                   && p.ContributorId == contributorId
+                                                   && p.Status == state).ToList();
+            }
+        }
+
 
         private void RegisterException(GlobalLogger logger)
         {
             var tableManager = new TableManager("GlobalLogger");
             tableManager.InsertOrUpdate(logger);
         }
+
+        #region RADIAN 
+
+
+        public RadianSoftware GetRadianSoftware(Guid id)
+        {
+            return sqlDBContext.RadianSoftwares.FirstOrDefault(x => x.Id == id);
+        }
+
+        public void AddOrUpdateRadianSoftware(RadianSoftware software)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var softwareInstance = context.RadianSoftwares.FirstOrDefault(c => c.Id == software.Id);
+                if (softwareInstance != null)
+                {
+                    softwareInstance.Deleted = software.Deleted;
+                    softwareInstance.Name = software.Name;
+                    softwareInstance.RadianContributorId = software.RadianContributorId;
+                    softwareInstance.SoftwareUser = software.SoftwareUser;
+                    softwareInstance.SoftwarePassword = software.SoftwarePassword;
+                    softwareInstance.Url = software.Url;
+                    softwareInstance.Updated = DateTime.UtcNow;
+                    softwareInstance.RadianSoftwareStatusId  = software.RadianSoftwareStatusId;
+                    context.Entry(softwareInstance).State = System.Data.Entity.EntityState.Modified;
+                }
+                else
+                {
+                    context.Entry(software).State = System.Data.Entity.EntityState.Added;
+                }
+                context.SaveChanges();
+            }
+        }
+        #endregion
     }
 }

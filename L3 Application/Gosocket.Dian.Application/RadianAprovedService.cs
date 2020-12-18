@@ -217,13 +217,25 @@ namespace Gosocket.Dian.Application
         private void ApplyTestSet(RadianContributorOperation radianContributorOperation, RadianTestSet testSet, RadianContributor radianContributor, RadianContributorOperation existingOperation)
         {
             Contributor contributor = radianContributor.Contributor;
-            GlobalRadianOperations operation = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString())
-            {
-                RadianStatus = radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test.GetDescription() : RadianState.Registrado.GetDescription(),
-                SoftwareType = existingOperation.SoftwareType,
-                RadianContributorTypeId = radianContributor.RadianContributorTypeId,
-                Deleted = false
-            };
+            GlobalRadianOperations operation = _globalRadianOperationService.GetOperation(contributor.Code, existingOperation.SoftwareId);
+            if (operation == null)
+                operation = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString());
+
+            if (radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect)
+                operation.IndirectElectronicInvoicer = radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice)
+                operation.ElectronicInvoicer = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider)
+                operation.TecnologicalSupplier = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem)
+                operation.NegotiationSystem = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor)
+                operation.Factor = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor;
+
+            operation.RadianState = radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test.GetDescription() : RadianState.Registrado.GetDescription();
+            operation.SoftwareType = existingOperation.SoftwareType;
+            operation.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
+            operation.Deleted = false;
 
             if (_globalRadianOperationService.Insert(operation, existingOperation.Software))
             {
@@ -236,32 +248,55 @@ namespace Gosocket.Dian.Application
                     Status = (int)TestSetStatus.InProcess,
                     StatusDescription = TestSetStatus.InProcess.GetDescription(),
                     ContributorTypeId = radianContributor.RadianContributorTypeId.ToString(),
+                    // Totales Generales
                     TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
-                    ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
-                    ReceiptServiceTotalRequired = testSet.ReceiptServiceTotalAcceptedRequired,
-                    ExpressAcceptanceTotalRequired = testSet.ExpressAcceptanceTotalAcceptedRequired,
-                    AutomaticAcceptanceTotalRequired = testSet.AutomaticAcceptanceTotalAcceptedRequired,
-                    RejectInvoiceTotalRequired = testSet.RejectInvoiceTotalAcceptedRequired,
+                    TotalDocumentAcceptedRequired = testSet.TotalDocumentAcceptedRequired,
+                    // Acuse de recibo
+                    ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalRequired,
+                    ReceiptNoticeTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
+                    //Recibo del bien
+                    ReceiptServiceTotalRequired = testSet.ReceiptServiceTotalRequired,
+                    ReceiptServiceTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
+                    // Aceptación expresa
+                    ExpressAcceptanceTotalRequired = testSet.ExpressAcceptanceTotalRequired,
+                    ExpressAcceptanceTotalAcceptedRequired = testSet.ExpressAcceptanceTotalAcceptedRequired,
+                    //Manifestación de aceptación
+                    AutomaticAcceptanceTotalRequired = testSet.AutomaticAcceptanceTotalRequired,
+                    AutomaticAcceptanceTotalAcceptedRequired = testSet.AutomaticAcceptanceTotalAcceptedRequired,
+                    //Rechazo factura electrónica
+                    RejectInvoiceTotalRequired = testSet.RejectInvoiceTotalRequired,
+                    RejectInvoiceTotalAcceptedRequired = testSet.RejectInvoiceTotalAcceptedRequired,
+                    // Solicitud disponibilización
                     ApplicationAvailableTotalRequired = testSet.ApplicationAvailableTotalRequired,
                     ApplicationAvailableTotalAcceptedRequired = testSet.ApplicationAvailableTotalAcceptedRequired,
+                    // Endoso en Propiedad
                     EndorsementPropertyTotalRequired = testSet.EndorsementPropertyTotalRequired,
                     EndorsementPropertyTotalAcceptedRequired = testSet.EndorsementPropertyTotalAcceptedRequired,
+                    // Endoso en Procuracion
                     EndorsementProcurementTotalRequired = testSet.EndorsementProcurementTotalRequired,
                     EndorsementProcurementTotalAcceptedRequired = testSet.EndorsementProcurementTotalAcceptedRequired,
+                    // Endoso en Garantia
                     EndorsementGuaranteeTotalRequired = testSet.EndorsementGuaranteeTotalRequired,
                     EndorsementGuaranteeTotalAcceptedRequired = testSet.EndorsementGuaranteeTotalAcceptedRequired,
+                    // Cancelación de endoso
                     EndorsementCancellationTotalRequired = testSet.EndorsementCancellationTotalRequired,
                     EndorsementCancellationTotalAcceptedRequired = testSet.EndorsementCancellationTotalAcceptedRequired,
+                    // Avales
                     GuaranteeTotalRequired = testSet.GuaranteeTotalRequired,
                     GuaranteeTotalAcceptedRequired = testSet.GuaranteeTotalAcceptedRequired,
+                    // Mandato electrónico
                     ElectronicMandateTotalRequired = testSet.ElectronicMandateTotalRequired,
                     ElectronicMandateTotalAcceptedRequired = testSet.ElectronicMandateTotalAcceptedRequired,
+                    // Terminación mandato
                     EndMandateTotalRequired = testSet.EndMandateTotalRequired,
                     EndMandateTotalAcceptedRequired = testSet.EndMandateTotalAcceptedRequired,
+                    // Notificación de pago
                     PaymentNotificationTotalRequired = testSet.PaymentNotificationTotalRequired,
                     PaymentNotificationTotalAcceptedRequired = testSet.PaymentNotificationTotalAcceptedRequired,
+                    // Limitación de circulación
                     CirculationLimitationTotalRequired = testSet.CirculationLimitationTotalRequired,
                     CirculationLimitationTotalAcceptedRequired = testSet.CirculationLimitationTotalAcceptedRequired,
+                    // Terminación limitación 
                     EndCirculationLimitationTotalRequired = testSet.EndCirculationLimitationTotalRequired,
                     EndCirculationLimitationTotalAcceptedRequired = testSet.EndCirculationLimitationTotalAcceptedRequired
                 };
@@ -343,19 +378,19 @@ namespace Gosocket.Dian.Application
             return customers;
         }
 
-        public PagedResult<RadianContributorFileHistory> FileHistoryFilter(string fileName, string initial, string end, int page, int pagesize)
+        public PagedResult<RadianContributorFileHistory> FileHistoryFilter(int radiancontributorId, string fileName, string initial, string end, int page, int pagesize)
         {
             DateTime initialDate, endDate;
             if (!string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(initial) && DateTime.TryParse(initial, out initialDate) && !string.IsNullOrEmpty(end) && DateTime.TryParse(end, out endDate))
-                return _radianContributorFileHistoryRepository.List(t => t.FileName.Contains(fileName) && t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
+                return _radianContributorFileHistoryRepository.HistoryByParticipantList(radiancontributorId, t => t.FileName.Contains(fileName) && t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
 
             if (string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(initial) && DateTime.TryParse(initial, out initialDate) && !string.IsNullOrEmpty(end) && DateTime.TryParse(end, out endDate))
-                return _radianContributorFileHistoryRepository.List(t => t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
+                return _radianContributorFileHistoryRepository.HistoryByParticipantList(radiancontributorId, t => t.Timestamp >= initialDate.Date && t.Timestamp <= endDate.Date, page, pagesize);
 
             if (!string.IsNullOrEmpty(fileName))
-                return _radianContributorFileHistoryRepository.List(t => t.FileName.Contains(fileName), page, pagesize);
+                return _radianContributorFileHistoryRepository.HistoryByParticipantList(radiancontributorId, t => t.FileName.Contains(fileName), page, pagesize);
 
-            return _radianContributorFileHistoryRepository.List(t => true, page, pagesize);
+            return _radianContributorFileHistoryRepository.HistoryByParticipantList(radiancontributorId, t => true, page, pagesize);
         }
 
         public void DeleteSoftware(Guid softwareId)

@@ -1,4 +1,4 @@
-﻿using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Filters;
@@ -15,10 +15,12 @@ namespace Gosocket.Dian.Web.Controllers
     {
 
         private readonly IRadianTestSetService _radianTestSetService;
+        private readonly IRadianApprovedService _radianAprovedService;
 
-        public RadianTestSetController(IRadianTestSetService radianTestSetService)
+        public RadianTestSetController(IRadianTestSetService radianTestSetService, IRadianApprovedService radianAprovedService)
         {
             _radianTestSetService = radianTestSetService;
+            _radianAprovedService = radianAprovedService;
         }
 
         // GET: RadianSetTest
@@ -80,9 +82,9 @@ namespace Gosocket.Dian.Web.Controllers
                 AutomaticAcceptanceTotalRequired = 0,
                 RejectInvoiceTotalRequired = 0,
                 ApplicationAvailableTotalRequired = 0,
-                EndorsementTotalRequired =0,
+                EndorsementTotalRequired = 0,
                 EndorsementCancellationTotalRequired = 0,
-                GuaranteeTotalRequired =0,
+                GuaranteeTotalRequired = 0,
                 ElectronicMandateTotalRequired = 0,
                 EndMandateTotalRequired = 0,
                 PaymentNotificationTotalRequired = 0,
@@ -165,7 +167,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         private List<OperationModeViewModel> LoadSoftwareOperationMode()
         {
-            List<RadianOperationMode> list = _radianTestSetService.OperationModeList( Domain.Common.RadianOperationMode.None);
+            List<Domain.RadianOperationMode> list = _radianTestSetService.OperationModeList(Domain.Common.RadianOperationMode.None);
             List<OperationModeViewModel> OperationModes = list.Select(t => new OperationModeViewModel() { Id = t.Id, Name = t.Name }).ToList();
             return OperationModes;
         }
@@ -195,8 +197,8 @@ namespace Gosocket.Dian.Web.Controllers
                 ApplicationAvailableTotalRequired = testSet.ApplicationAvailableTotalRequired,
                 ApplicationAvailableTotalAcceptedRequired = testSet.ApplicationAvailableTotalAcceptedRequired,
                 // Endosos
-                EndorsementTotalRequired =          testSet.EndorsementPropertyTotalRequired,
-                EndorsementTotalAcceptedRequired =  testSet.EndorsementPropertyTotalAcceptedRequired,
+                EndorsementTotalRequired = testSet.EndorsementPropertyTotalRequired,
+                EndorsementTotalAcceptedRequired = testSet.EndorsementPropertyTotalAcceptedRequired,
                 EndorsementWarrantyTotalRequired = testSet.EndorsementGuaranteeTotalAcceptedRequired,
                 EndorsementWarrantyTotalAcceptedRequired = testSet.EndorsementGuaranteeTotalAcceptedRequired,
                 EndorsementProcurationTotalRequired = testSet.EndorsementGuaranteeTotalRequired,
@@ -282,6 +284,70 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.ErrorMessage = "Ocurrio un problema editando el Set de Pruebas de Radian";
             return View("Edit", model);
         }
+
+        [HttpPost]
+        public JsonResult GetTestSetSummary(string softwareType)
+        {
+
+            RadianOperationModeTestSet softwareTypeEnum = Domain.Common.EnumHelper.GetValueFromDescription<RadianOperationModeTestSet>(softwareType);
+            string key = ((int)softwareTypeEnum).ToString();
+            RadianTestSet testSet = _radianAprovedService.GetTestResult(key);
+            List<EventCountersViewModel> events = new List<EventCountersViewModel>();
+            if (testSet != null)
+            {
+                // Acuse de recibo
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Received.GetDescription(), Counter1 = testSet.ReceiptNoticeTotalAcceptedRequired, Counter2 = testSet.ReceiptNoticeTotalRequired, Counter3 = 0 });
+
+                //Recibo del bien
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Receipt.GetDescription(), Counter1 = testSet.ReceiptNoticeTotalAcceptedRequired, Counter2 = testSet.ReceiptServiceTotalRequired, Counter3 = 0 });
+
+                // Aceptación expresa
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Accepted.GetDescription(), Counter1 = testSet.ExpressAcceptanceTotalAcceptedRequired, Counter2 = testSet.ExpressAcceptanceTotalRequired, Counter3 = 0 });
+
+                //Manifestación de aceptación
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.AceptacionTacita.GetDescription(), Counter1 = testSet.AutomaticAcceptanceTotalAcceptedRequired, Counter2 = testSet.AutomaticAcceptanceTotalRequired, Counter3 = 0 });
+
+                //Rechazo factura electrónica
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Rejected.GetDescription(), Counter1 = testSet.RejectInvoiceTotalAcceptedRequired, Counter2 = testSet.RejectInvoiceTotalAcceptedRequired, Counter3 = 0 });
+
+                // Solicitud disponibilización
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.SolicitudDisponibilizacion.GetDescription(), Counter1 = testSet.ApplicationAvailableTotalAcceptedRequired, Counter2 = testSet.ApplicationAvailableTotalRequired, Counter3 = 0 });
+
+                // Endoso en Propiedad
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoPropiedad.GetDescription(), Counter1 = testSet.EndorsementPropertyTotalAcceptedRequired, Counter2 = testSet.EndorsementPropertyTotalRequired, Counter3 = 0 });
+
+                // Endoso en Procuracion
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoProcuracion.GetDescription(), Counter1 = testSet.EndorsementProcurementTotalAcceptedRequired, Counter2 = testSet.EndorsementProcurementTotalRequired, Counter3 = 0 });
+
+                // Endoso en Garantia
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoGarantia.GetDescription(), Counter1 = testSet.EndorsementGuaranteeTotalAcceptedRequired, Counter2 = testSet.EndorsementGuaranteeTotalRequired, Counter3 = 0 });
+
+                // Cancelación de endoso
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.InvoiceOfferedForNegotiation.GetDescription(), Counter1 = testSet.EndorsementCancellationTotalAcceptedRequired, Counter2 = testSet.EndorsementCancellationTotalRequired, Counter3 = 0 });
+
+                // Avales
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Avales.GetDescription(), Counter1 = testSet.GuaranteeTotalAcceptedRequired, Counter2 = testSet.GuaranteeTotalRequired, Counter3 = 0 });
+
+                // Mandato electrónico
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Mandato.GetDescription(), Counter1 = testSet.ElectronicMandateTotalAcceptedRequired, Counter2 = testSet.ElectronicMandateTotalRequired, Counter3 = 0 });
+
+                // Terminación mandato
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.TerminacionMandato.GetDescription(), Counter1 = testSet.EndMandateTotalAcceptedRequired, Counter2 = testSet.EndMandateTotalRequired, Counter3 = 0 });
+
+                // Notificación de pago
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.NotificacionPagoTotalParcial.GetDescription(), Counter1 = testSet.PaymentNotificationTotalAcceptedRequired, Counter2 = testSet.PaymentNotificationTotalRequired, Counter3 = 0 });
+
+                // Limitación de circulación
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.NegotiatedInvoice.GetDescription(), Counter1 = testSet.CirculationLimitationTotalAcceptedRequired, Counter2 = testSet.CirculationLimitationTotalRequired, Counter3 = 0 });
+
+                // Terminación limitación 
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.AnulacionLimitacionCirculacion.GetDescription(), Counter1 = testSet.EndCirculationLimitationTotalAcceptedRequired, Counter2 = testSet.EndCirculationLimitationTotalRequired, Counter3 = 0 });
+            }
+            return Json(events, JsonRequestBehavior.AllowGet);
+
+
+        }
+
 
     }
 }

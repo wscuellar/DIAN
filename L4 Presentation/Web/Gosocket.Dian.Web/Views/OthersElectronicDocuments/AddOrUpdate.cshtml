@@ -70,7 +70,7 @@
             background-color: #348441 !important;
         }
 
-        .divBackTop{
+        .divBackTop {
             padding-top: 15px;
         }
 
@@ -82,11 +82,8 @@
         .btnBackTop {
             color: #348441;
             font-size: 14pt;
-            text-decoration:underline;
+            text-decoration: underline;
         }
-
-
-        
     </style>
 }
 <div class="page-content margin-15">
@@ -109,15 +106,75 @@
                         <div class="panel-body padding-top-20">
                             <div class="row margin-horizontal-0">
                                 <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
-                                    @using (Html.BeginForm("AddOrUpdate", "OthersElectronicDocuments", FormMethod.Post, new { id = "frmOthersElectronicDocuments" }))
+
+                                    @using (Html.BeginForm("AddOrUpdateContributor", "OthersElectronicDocuments", FormMethod.Post, new { id = "frmOthersElectronicDocuments" }))
                                     {
                                         @Html.Partial("_form")
+                                        if (!ViewBag.softwareActive)
+                                        {
+                                            <div class="panel-footer text-right">
+                                                <a href="@Url.Action("Index", "OthersElectronicDocAssociated", new { electronicDocumentId = 0,  operationModeId = 0,  ContributorIdType = 0 })" class="btnBackTop">Siguiente Pruebas</a>
 
-                                    <div class="panel-footer text-right">
-                                        <a href="@Url.Action("Index", "OthersElectronicDocAssociated", new { electronicDocumentId = 0,  operationModeId = 0,  ContributorIdType = 0 })" class="btnBackTop">Siguiente Pruebas</a>
-                                        <button id="btnSave" type="button" class="btn btn-success btn-radian-success">Asociar</button>
-                                    </div>
+                                                <button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave">Asociar</button>
+                                            </div>
+                                        }
                                     }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body padding-top-20">
+                            <div class="row">
+                                <div class="col-lg-12  col-md-12  col-xs-12">
+                                    <h4> Listado de modos de operación asociados</h4>
+                                </div>
+                                <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
+                                </div>
+                                <div class="col-lg-12 col-md-12  col-xs-12">
+                                    <div class="table-responsive">
+
+                                        <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-left">Modo de operación</th>
+                                                    <th class="text-left">Tipo Participante</th>
+                                                    <th class="text-left">Documento Electrónicos</th>
+                                                    <th class="text-center">Registro</th>
+                                                    <th class="text-center">Estado (Participante - Software)</th>
+                                                    <th class="text-center">Nombre del Software</th>
+                                                    <th class="text-center">PIN del SW </th>
+                                                    <th class="text-center">URL</th>
+                                                    <th class="text-center"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.ListTable != null)
+                                                {
+                                                    //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                                                    foreach (var item in (List<Gosocket.Dian.Web.Models.OtherDocsElectListViewModel>)Model.ListTable)
+                                                    {
+                                                        <tr>
+                                                            <td class="text-left">@item.OperationMode</td>
+                                                            <td class="text-center">@item.ContibutorType</td>
+                                                            <td class="text-center">@item.ElectronicDoc</td>
+                                                            <td class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                                                            <td class="text-center">@item.StateContributor - @item.StateSoftware</td>
+                                                            <td class="text-center">@item.Software</td>
+                                                            <td class="text-center">@item.PinSW</td>
+                                                            <td class="text-center">  @item.Url  </td>
+                                                            <td class="text-center">
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!--Paginacón de la tabla-->
+                                    <div class="pull-right table-pagination padding-top-10">
+
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -133,29 +190,139 @@
 @section scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
     <script>
 
-        var enumElectronicsDocuments =
-        {
-            ElectronicPayroll: 1, //Nomina electronica y Nomina de ajuste
-            ImportDocument: 2,
-            SupportDocument: 3,
-        };
 
         $(document).ready(function ($) {
 
 
-            $('#btn-save').click(function () {
-                var form = $('#add-testset-form');
-                if (form.valid()) {
-                    showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
+            if ('@ViewBag.softwareActive'=='True'){
+                console.log('d');
+                var sms ='No puede ' + '@ViewBag.title' + ', tiene uno en estado "En Proceso"';
+                 bootbox.dialog({
+                     message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'></div><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
+                                onEscape: () => {  }
+                 });
+
+            }
+            $('#btnSave').click(function () {
+                var form = $('#frmOthersElectronicDocuments');
+                console.log(form);
+                console.log(form.valid());
+                if (form.valid()) { 
                     form.submit();
                 }
             });
 
+            $('#ProviderId').change(function () {
+                if ('@ViewBag.softwareActive' == 'False') {
+                    console.log("botones", $(":button"));
+                    $('#UrlEventReception').val('');
+                    $('#SoftwareType').val('');
+                    getSoftwares($('#ProviderId').val());
+                }
+            });
+
+            if ($('#ProviderId').val() != '' && $('#ProviderId').val() != "0") {
+                getSoftwares($('#ProviderId').val());
+            }
+
+            $('#SoftwareId').change(function () {
+                getDataSoftwareSeleccionado($('#SoftwareId').val());
+            });
 
         });//ready
+
+       function getSoftwares(ProviderId){
+
+            $("#SoftwareId").html('<option value="" selected="selected">Seleccione...</option>');
+            $('#ulSoftwareId').html('<li data-original-index="0" class="selected"><a tabindex="0" class=""' +
+                'data-normalized-text="Seleccione..."><span class="text">Seleccione...</span><span class="fa fa-check check-mark"></span></a></li>');
+
+            cambiarTextoSelect();
+
+            $.ajax({
+                url: "@Url.Action("GetSoftwaresByContributorId", "OthersElectronicDocuments")",
+                type: "POST",
+                data: { id: ProviderId },
+                datatype: "json",
+                success: function (result) {
+
+                    if (result != null && result.res != null) {
+
+                        $.each(result.res, function (index, value) {
+//                            console.log('<option value="' + value.Id + '">' + value.Name + '</option>');
+                            $('#SoftwareId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                            $('#ulSoftwareId').append('<li data-original-index="' + (index + 1) + '"><a tabindex="0" class=""' +
+                                ' data-normalized-text="' + value.Name + '"><span class="text">' + value.Name + '</span>' +
+                                '<span class="fa fa-check check-mark"></span></a></li>');
+                        });
+                    }
+                    else
+                        bootbox.alert("No se pudo realizar la eliminación");
+                },
+                complete: function () {
+
+                },
+                error: function (result) {
+                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
+
+        }
+
+        function getDataSoftwareSeleccionado(SoftwareId){
+
+            $.ajax({
+                url: "@Url.Action("GetDataBySoftwareId", "OthersElectronicDocuments")",
+                type: "POST",
+                data: { SoftwareId: SoftwareId },
+                datatype: "json",
+                success: function (result) {
+
+                    if (result != null) { 
+                        console.log(result);
+                        $('#UrlEventReception').val(result.url);
+                        $('#SoftwareType').val(result.SoftwareType)
+                    }
+                    else
+                        bootbox.alert("No se pudo realizar la eliminación");
+                },
+                complete: function () {
+
+                },
+                error: function (result) {
+                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
+
+        }
+
+        function cambiarTextoSelect() {
+            var botones = $(":button");
+            var boton;
+
+            $.each(botones, function (index1, val1) {
+                if (val1.attributes != undefined && $(val1).hasClass("selectpicker")) {
+
+                    boton = val1;
+                    $.each(val1.attributes, function (index, value) {
+
+                        if (value.localName == "data-id" && value.nodeValue == "SoftwareId") {
+
+                            boton.firstElementChild.textContent = "Seleccione...";
+
+                        }
+                    });
+                }
+            });
+        }
 
     </script>
 

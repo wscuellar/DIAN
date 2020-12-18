@@ -118,7 +118,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 // filer by success
                 multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(c => c.Success).ToList();
-             
+
                 // check if unique nits
                 var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
                 if (nits.Count() > 1)
@@ -127,10 +127,10 @@ namespace Gosocket.Dian.Functions.Batch
                     batchFileStatus.StatusDescription = "Lote de documentos contenidos en el archivo zip deben pertenecer todos a un mismo emisor.";
                     await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
                     return;
-                }          
+                }
 
                 // Check xpaths
-                var xpathValuesValidationResult = ValidateXpathValues(multipleResponsesXpathDataValue, flagApplicationResponse);             
+                var xpathValuesValidationResult = ValidateXpathValues(multipleResponsesXpathDataValue, flagApplicationResponse);
 
                 multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(c => xpathValuesValidationResult.Where(v => v.Success).Select(v => v.DocumentKey).Contains(c.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])).ToList();
                 foreach (var responseXpathValues in multipleResponsesXpathDataValue)
@@ -156,7 +156,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 //var arrayTasks = multipleResponsesXpathDataValue.Select(response => UploadXmlsAsync(testSetId, zipKey, response, uploadResponses));
                 //await Task.WhenAll(arrayTasks);
-         
+
                 // Upload all xml's
                 log.Info($"Init upload xml´s.");
                 BlockingCollection<ResponseUploadXml> uploadResponses = new BlockingCollection<ResponseUploadXml>();
@@ -168,7 +168,7 @@ namespace Gosocket.Dian.Functions.Batch
                     var documentTypeId = flagApplicationResponse ? "96" : response.XpathsValues["DocumentTypeXpath"];
                     var trackId = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"];
                     trackId = trackId?.ToLower();
-                    var softwareId = response.XpathsValues["SoftwareIdXpath"];                   
+                    var softwareId = response.XpathsValues["SoftwareIdXpath"];
 
                     if (isEvent)
                     {
@@ -184,7 +184,7 @@ namespace Gosocket.Dian.Functions.Batch
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
-    
+
                 });
 
                 var uploadFailed = uploadResponses.Where(m => !m.Success && multipleResponsesXpathDataValue.Select(d => d.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"]).Contains(m.DocumentKey));
@@ -278,7 +278,8 @@ namespace Gosocket.Dian.Functions.Batch
 
                 //ApplicationResponse
                 { "AppResReceiverCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']" },
-                { "AppResSenderCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']" },               
+                { "AppResSenderCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']" },
+                { "AppResProviderIdXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='DianExtensions']/*[local-name()='SoftwareProvider']/*[local-name()='ProviderID']" },
                 { "AppResEventCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
                 { "AppResDocumentTypeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
                 { "AppResNumberXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='ID']" },
@@ -295,7 +296,7 @@ namespace Gosocket.Dian.Functions.Batch
         private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, Boolean flagApplicationResponse = false)
         {
             var result = new List<XmlParamsResponseTrackId>();
-            var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
+            var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResProviderIdXpath" : "SenderCodeXpath"]).Distinct();
 
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
             foreach (var code in codes.ToList())
@@ -312,7 +313,7 @@ namespace Gosocket.Dian.Functions.Batch
                     {
                         List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
 
-                        RadianTestSetResult objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(),StringComparison.OrdinalIgnoreCase));
+                        RadianTestSetResult objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
                         var softwareId = softwareIds.Last();
 
                         if (objRadianTestSetResult == null)
@@ -358,6 +359,7 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else
                         {
+                            // Validations to RADIAN  
                             bool isActive = globalRadianOperationService.IsActive(code, new Guid(softwareId));
                             if (isActive)
                             {
@@ -365,45 +367,12 @@ namespace Gosocket.Dian.Functions.Batch
                                 return result;
                             }
 
-                            // Validations to RADIAN  
-                            var radianTestSetResults = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
                             RadianTestSetResult radianTestSetResultEntity = null;
-
-                            if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
-
-                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
-
-                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
-
-                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
-
-                            if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
-
-                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
-
-                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
-
-                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
-
-                            if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.ElectronicInvoice}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
-
-                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.Factor}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
-
-                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TechnologyProvider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
-
-                            else if (radianTestSetResults.Any(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
-                                radianTestSetResultEntity = radianTestSetResults.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)RadianContributorType.TradingSystem}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
+                            if (objRadianTestSetResult != null &&
+                                (objRadianTestSetResult.Status == (int)TestSetStatus.InProcess ||
+                                 objRadianTestSetResult.Status == (int)TestSetStatus.Accepted ||
+                                 objRadianTestSetResult.Status == (int)TestSetStatus.Rejected))
+                                radianTestSetResultEntity = objRadianTestSetResult;
 
                             if (radianTestSetResultEntity == null)
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} no tiene habilitado set de prueba RADIAN para software con id {softwareId}" });
@@ -522,20 +491,20 @@ namespace Gosocket.Dian.Functions.Batch
         }
 
         private static List<XmlParamsResponseTrackId> ValidateXpathValues(List<ResponseXpathDataValue> responses, Boolean flagApplicationResponse = false)
-        {            
+        {
 
             string[] noteCodes = { "7", "07", "8", "08", "91", "92", "96" };
-            var result = new List<XmlParamsResponseTrackId>();         
+            var result = new List<XmlParamsResponseTrackId>();
 
             foreach (var response in responses)
             {
                 bool isValid = true;
                 var documentTypeCode = flagApplicationResponse ? "96" : response.XpathsValues["DocumentTypeXpath"];
-               
+
                 if (string.IsNullOrEmpty(documentTypeCode))
                     documentTypeCode = response.XpathsValues["DocumentTypeId"];
 
-                if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"]) 
+                if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])
                     && !noteCodes.Contains(documentTypeCode))
                     isValid = false;
 
@@ -557,11 +526,12 @@ namespace Gosocket.Dian.Functions.Batch
                     isValid = false;
 
                 if (isValid)
-                    result.Add(new XmlParamsResponseTrackId {
-                        Success = isValid, 
-                        XmlFileName = response.XpathsValues["FileName"], 
-                        DocumentKey = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"], 
-                        SenderCode = response.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"] 
+                    result.Add(new XmlParamsResponseTrackId
+                    {
+                        Success = isValid,
+                        XmlFileName = response.XpathsValues["FileName"],
+                        DocumentKey = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"],
+                        SenderCode = response.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]
                     });
             }
 

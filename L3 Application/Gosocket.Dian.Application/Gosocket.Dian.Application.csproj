@@ -205,10 +205,12 @@
     <Compile Include="Managers\RadianLoggerManager.cs" />
     <Compile Include="Managers\RadianTestSetResultManager.cs" />
     <Compile Include="EmailService.cs" />
+    <Compile Include="OthersDocsElecContributorService.cs" />
     <Compile Include="OthersElectronicDocumentsService.cs" />
     <Compile Include="PdfCreatorEvents.cs" />
     <Compile Include="PdfCreatorModel.cs" />
     <Compile Include="RadianAprovedService.cs" />
+    <Compile Include="OthersDocsElecSoftwareService.cs" />
     <Compile Include="RadianCallSoftwareService.cs" />
     <Compile Include="RadianContributorFileTypeService.cs" />
     <Compile Include="ContributorOperationsService.cs" />

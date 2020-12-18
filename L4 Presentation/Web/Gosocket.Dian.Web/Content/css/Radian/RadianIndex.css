@@ -1409,17 +1409,20 @@ button.selectpicker .fa-caret-down {
 .set-details {
     display: inline-flex;
     width: 100%;
-    padding: 6px 0;
+    padding: 6px 0 0;
     border-bottom: 1px solid #E9E8E8;
     color: #707782;
     font-size: 14px;
 }
-.set-details span{
-    width: 70%;
+.set-test-counts .modal-dialog {
+    margin-bottom: 0px;
+}
+.set-details span {
+    width: 90%;
     margin: auto;
 }
 .set-details > div {
-    margin: auto 0px;
+    width: 10%;
 }
 
 .set-details-conventions span{
@@ -1433,11 +1436,11 @@ button.selectpicker .fa-caret-down {
     text-align: center;
 }
 
-.custom-badget-blue{
+.custom-badget-blue {
     background-color: #028AB7;
     color: white;
 }
-.custom-badget-green{
+.custom-badget-green {
     background-color: #348441;
     color: white;
 }
@@ -1449,6 +1452,9 @@ button.selectpicker .fa-caret-down {
     padding-right: 50px !important;
 }
 
+a.badge {
+    display: table-caption;
+}
 .set-test-counts .panel-body {
     padding-left: 40px;
 }
@@ -1464,3 +1470,31 @@ button.selectpicker .fa-caret-down {
 .show-details a{
     padding: 0px;
 }
+
+.popover-body {
+    width: 80%;
+    overflow: hidden;
+    margin: 20px;
+    display: inline-block;
+    float: right;
+    border-left: solid 1px #EA965A;
+    padding-left: 20px;
+    color: #2c323c;
+}
+.arrow {
+    background-color: #F2ECE7;
+}
+.popover {
+    background-color: #F2ECE7;
+    border-radius: 0px;
+    width: 340px;
+    max-width: none;
+}
+.icon-alert {
+    display: inline-flex;
+    font-size: 14px;
+}
+    .icon-alert fa-exclamation-circle {
+        margin: 20px;
+        position: absolute;
+    }

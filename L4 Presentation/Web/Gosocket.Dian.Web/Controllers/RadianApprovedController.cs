@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
@@ -76,7 +77,7 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
             model.CustomerTotalCount = customers.RowCount;
 
-            var data = _radianAprovedService.FileHistoryFilter(string.Empty, string.Empty, string.Empty, 1, 10);
+            var data = _radianAprovedService.FileHistoryFilter(radianAdmin.Contributor.RadianContributorId, string.Empty, string.Empty, string.Empty, 1, 10);
             FileHistoryListViewModel resultH = new FileHistoryListViewModel()
             {
                 Page = 1,
@@ -87,7 +88,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Comments = t.Comments,
                     CreatedBy = t.CreatedBy,
                     Status = t.RadianContributorFileStatus?.Name,
-                    Updated = t.Timestamp.ToString("yyyy-MM-dd")
+                    Updated = t.Timestamp.ToString("yyyy-MM-dd HH:mm")
                 }).ToList()
             };
             model.FileHistories = resultH;
@@ -105,14 +106,17 @@ namespace Gosocket.Dian.Web.Controllers
                     RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
                     {
                         Contributor = radianAdmin.Contributor,
-                        Software = software,
                         OperationModeList = operationModeList,
+                        OperationModes = new SelectList(operationModeList, "Id", "Name"),
                         RadianContributorOperations = radianContributorOperations,
-                        CreatedBy = software.CreatedBy,
-                        SoftwareId = software.Id,
-                        SoftwareUrl = software.Url,
-                        OperationModes = new SelectList(operationModeList, "Id", "Name")
+                        SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrl")
                     };
+                    if(software != null)
+                    {
+                        radianApprovedOperationModeViewModel.Software = software;
+                        radianApprovedOperationModeViewModel.CreatedBy = software.CreatedBy;
+                        radianApprovedOperationModeViewModel.SoftwareId = software.Id;
+                    }
                     return View("GetFactorOperationMode", radianApprovedOperationModeViewModel);
                 }
             }
@@ -255,7 +259,7 @@ namespace Gosocket.Dian.Web.Controllers
                 RadianContributorOperations = radianContributorOperations,
                 CreatedBy = software.CreatedBy,
                 SoftwareId = software.Id,
-                SoftwareUrl = software.Url,
+                SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrl"),
                 OperationModes = new SelectList(operationModeList, "Id", "Name")
             };
 
@@ -402,7 +406,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult FileHistoyList(FileHistoryFilterViewModel filter)
         {
-            PagedResult<RadianContributorFileHistory> data = _radianAprovedService.FileHistoryFilter(filter.FileName, filter.Initial, filter.End, filter.Page, filter.PageSize);
+            PagedResult<RadianContributorFileHistory> data = _radianAprovedService.FileHistoryFilter(filter.RadianContributorId, filter.FileName, filter.Initial, filter.End, filter.Page, filter.PageSize);
             FileHistoryListViewModel result = new FileHistoryListViewModel()
             {
                 Page = filter.Page,
@@ -413,7 +417,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Comments = t.Comments,
                     CreatedBy = t.CreatedBy,
                     Status = t.RadianContributorFileStatus?.Name,
-                    Updated = t.Timestamp.ToString("yyyy-MM-dd")
+                    Updated = t.Timestamp.ToString("yyyy-MM-dd HH:mm")
                 }).ToList()
             };
             return Json(result, JsonRequestBehavior.AllowGet);

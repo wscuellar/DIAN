@@ -4,6 +4,7 @@
 
     using Gosocket.Dian.Common.Resources;
     using Gosocket.Dian.Domain.Common;
+    using Gosocket.Dian.Domain.Cosmos;
     using System;
     using System.Collections.Generic;
 
@@ -38,6 +39,8 @@
         public string ReceiverType { get; set; }
         public string SenderName { get; set; }
         public bool ShowTitleValueSection { get; set; }
+        public string EntityName { get; set; }
+        public string CertificateNumber { get; set; }
         public string ValidationMessage { get; set; }
         public EventStatus EventStatus { get; set; }
         public List<AssociatedValidationsModel> Validations { get; set; }
@@ -50,6 +53,7 @@
         public ElectronicMandateModel Mandate { get; set; }
 
         public List<AssociatedEventsModel> AssociatedEvents { get; set; }
+        public List<GlobalDataDocument> ValueTitleDocuments { get; set; }
         public EndosoModel Endoso { get; set; }
         public string EventTitle { get; set; }
         public string RequestType { get; set; }

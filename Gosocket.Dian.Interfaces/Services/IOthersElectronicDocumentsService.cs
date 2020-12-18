@@ -1,4 +1,4 @@
-﻿using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -11,10 +11,8 @@ namespace Gosocket.Dian.Interfaces.Services
 
         ResponseMessage Validation(string userCode, string Accion, int IdElectronicDocument, string complementeTexto, int ParticipanteId);
 
-        /// <summary>
-        /// Retornar la lista de Modos de Operación
-        /// </summary>
-        /// <returns></returns>
-        List<OperationMode> GetOperationModes();
+        ResponseMessage AddOtherDocElecContributorOperation(OtherDocElecContributorOperations ContributorOperation, OtherDocElecSoftware software,  bool isInsert, bool validateOperation);
+
+        bool ChangeParticipantStatus(int contributorId, string newState, int ContributorTypeId, string actualState, string description);
     }
 }

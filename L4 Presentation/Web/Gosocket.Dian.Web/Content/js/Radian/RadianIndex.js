@@ -59,6 +59,38 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFu
     });
 }
 
+function CallExecutionWithData(callMethod, url, jsonvalue, method, showMessage, cancelFunction) {
+    $.ajax({
+        url: url,
+        type: callMethod,
+        data: jsonvalue,
+        success: function (data) {
+            if (showMessage) {
+                if (data.MessageType === "alert") {
+                    showConfirmation(data.Message, AlertExec(cancelFunction));
+                }
+                if (data.MessageType === "confirm") {
+                    showConfirmation(data.Message, ConfirmExec(method, jsonvalue, cancelFunction));
+                }
+                if (data.MessageType === "redirect") {
+                    operationClick = false;
+                    window.location.href = data.RedirectTo;
+                }
+            }
+            else {
+                if (data.Code == "500" && data.MessageType === "alert") {
+                    showConfirmation(data.Message, AlertExec(cancelFunction));
+                }
+                else {
+                    method(jsonvalue, data);
+                }
+
+            }
+
+        }
+    });
+}
+
 function showConfirmation(confirmMessage, buttons, className, operationCancel) {
     bootbox.dialog({
         className: className && className,
@@ -176,16 +208,20 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
 
 }
 
-function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {
-    customDialog(htmlPartial, id, softwareId, operation, url);
-}
-
-function customDialog(htmlPartial, code, softwareId, operation, url) {
+function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {debugger
     var data = {
-        code: code,
+        code: id,
         softwareId: softwareId,
         softwareType: operation
     }
+    customDialog(htmlPartial, data, url);
+}
+
+function ShowDetailsTestSetConfig(htmlPartial, data, url) {
+    customDialog(htmlPartial, data, url);
+}
+
+function customDialog(htmlPartial, data, url) {debugger
     var actionError = (error) => {
         console.log(success);
     }
@@ -194,9 +230,9 @@ function customDialog(htmlPartial, code, softwareId, operation, url) {
         var columns = 0;
         success.forEach((element, index) => {
             html += '<li>\
-            <div class="set-details"><span>' + element.EventName + '</span><div><a class="badge custom-badget-blue">' + element.Counter1 + '</a> <a class="badge custom-badget-green">' + element.Counter2 + '</a> <a class="badge custom-badget-red">' + element.Counter3 + '</a></div></div>\
+            <div class="set-details"><span>' + element.EventName + '</span><div><span><a class="badge custom-badget-blue">' + element.Counter1 + '</a></span><span> <a class="badge custom-badget-green">' + element.Counter2 + '</a></span><span> <a class="badge custom-badget-red">' + element.Counter3 + '</a></span></div></div>\
             </li >';
-            if ((index + 1) % 5 == 0) {
+            if ((index + 1) % 6 == 0) {
                 $(".list-unstyled-" + columns).append(html);
                 columns++;
                 html = "";

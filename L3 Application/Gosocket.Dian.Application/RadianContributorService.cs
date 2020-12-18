@@ -196,7 +196,7 @@ namespace Gosocket.Dian.Application
                  List<string> userIds = _contributorService.GetUserContributors(c.Contributor.Id).Select(u => u.UserId).ToList();
                  List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(t => t.RadianContributorTypeId == c.RadianContributorTypeId && !t.Deleted);
                  List<RadianContributorFile> newFiles = (from t in fileTypes
-                                                         join f in c.RadianContributorFile.Where(t => !t.Deleted) on t.Id equals f.FileType into files
+                                                         join f in c.RadianContributorFile.Where(t => t.RadianContributorId == c.Id && !t.Deleted) on t.Id equals f.FileType into files
                                                          from fl in files.DefaultIfEmpty(new RadianContributorFile()
                                                          {
                                                              FileName = t.Name,
@@ -243,7 +243,9 @@ namespace Gosocket.Dian.Application
 
         public bool ChangeParticipantStatus(int contributorId, string newState, int radianContributorTypeId, string actualState, string description)
         {
-            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == radianContributorTypeId && t.RadianState == actualState).Results;
+            List<RadianContributor> contributors = _radianContributorRepository.List(t => t.ContributorId == contributorId
+                                                                                    && t.RadianContributorTypeId == radianContributorTypeId
+                                                                                    && t.RadianState == actualState).Results;
             if (!contributors.Any())
                 return false;
 
@@ -257,7 +259,7 @@ namespace Gosocket.Dian.Application
             if (competitor.RadianState == RadianState.Cancelado.GetDescription())
                 CancelParticipant(competitor);
 
-            UpdateGlobalRadianOperation(radianContributorTypeId, competitor);
+            UpdateGlobalRadianOperation(competitor);
 
             _radianContributorRepository.AddOrUpdate(competitor);
 
@@ -268,29 +270,27 @@ namespace Gosocket.Dian.Application
 
         #region Private methods Cancel Participant
 
-        private void UpdateGlobalRadianOperation(int radianContributorTypeId, RadianContributor competitor)
+        private void UpdateGlobalRadianOperation(RadianContributor competitor)
         {
-            List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(competitor.Contributor.Code);
-            if (radianOperations.Any())
+            RadianContributorOperation radianOperation = competitor.RadianContributorOperations.FirstOrDefault(t => t.OperationStatusId == (int)Domain.Common.RadianState.Registrado);
+            if (radianOperation == null)
+                return;
+
+            GlobalRadianOperations operation = _globalRadianOperationService.GetOperation(competitor.Contributor.Code, radianOperation.SoftwareId);
+            if (operation != null)
             {
-                List<GlobalRadianOperations> operations = radianOperations.Where(t => t.RadianContributorTypeId == radianContributorTypeId).ToList();
                 if (competitor.RadianState == RadianState.Test.GetDescription())
                 {
-                    GlobalRadianOperations operation = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
                     operation.Deleted = false;
-                    operation.RadianStatus = competitor.RadianState;
+                    operation.RadianState = competitor.RadianState;
                     _globalRadianOperationService.Update(operation);
                 }
                 else
                 {
-                    foreach (GlobalRadianOperations operation in operations)
-                    {
-                        operation.Deleted = true;
-                        operation.RadianStatus = competitor.RadianState;
-                        _globalRadianOperationService.Update(operation);
-                    }
+                    operation.Deleted = true;
+                    operation.RadianState = competitor.RadianState;
+                    _globalRadianOperationService.Update(operation);
                 }
-
             }
         }
 
@@ -467,7 +467,7 @@ namespace Gosocket.Dian.Application
             foreach (var item in contributorOperations)
             {
                 GlobalTestSetResult testset = GetTestSetResult(testSetResults, item, contributor.ContributorTypeId.Value);
-                if (((TestSetStatus)testset.Status) == TestSetStatus.Accepted)
+                if (testset != null && ((TestSetStatus)testset.Status) == TestSetStatus.Accepted)
                     softwareAccepted.Add(testset.SoftwareId);
             }
 
