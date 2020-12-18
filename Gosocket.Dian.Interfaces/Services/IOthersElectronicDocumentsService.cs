@@ -13,5 +13,6 @@ namespace Gosocket.Dian.Interfaces.Services
 
         ResponseMessage AddOtherDocElecContributorOperation(OtherDocElecContributorOperations ContributorOperation, OtherDocElecSoftware software,  bool isInsert, bool validateOperation);
 
+        bool ChangeParticipantStatus(int contributorId, string newState, int ContributorTypeId, string actualState, string description);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Repositories;
@@ -11,6 +12,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Gosocket.Dian.DataContext.Middle;
 
 namespace Gosocket.Dian.Application
 {
@@ -40,7 +42,7 @@ namespace Gosocket.Dian.Application
         public NameValueCollection Summary(string userCode)
         {
             NameValueCollection collection = new NameValueCollection();
-            Domain.Contributor contributor = _contributorService.GetByCode(userCode);
+            Contributor contributor = _contributorService.GetByCode(userCode);
             List<OtherDocElecContributor> LContributors = _othersDocsElecContributorRepository.List(t => t.ContributorId == contributor.Id && t.State != "Cancelado").Results;
             if (LContributors.Any())
                 foreach (var itemContributor in LContributors)
@@ -64,6 +66,7 @@ namespace Gosocket.Dian.Application
             int contributorId = _contributorService.GetByCode(userCode).Id;
             OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId
                                                                                      && t.OtherDocElecContributorTypeId == (int)ContributorType
+                                                                                     && t.OtherDocElecOperationModeId == (int)OperationMode
                                                                                      && t.ElectronicDocumentId == ElectronicDocumentId);
 
             OtherDocElecContributor newContributor = new OtherDocElecContributor()
@@ -116,19 +119,54 @@ namespace Gosocket.Dian.Application
             return softwareAccepted;
         }
 
-        public List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int ContributorTypeId, string state)
+        public List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int OperationModeId, string state)
         {
             return _othersDocsElecContributorRepository.List(t => t.ContributorId == ContributorId
-                                                                                      && t.OtherDocElecContributorTypeId == ContributorTypeId
+                                                                                      && t.OtherDocElecOperationModeId == OperationModeId
                                                                                       && t.State != state).Results;
- 
+
         }
 
-        public bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware) 
+        public bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware)
         {
-            return _othersDocsElecContributorRepository.GetParticipantWithActiveProcess(ContributorId,ContributorTypeId, OperationModeId, stateSofware);
+            return _othersDocsElecContributorRepository.GetParticipantWithActiveProcess(ContributorId, ContributorTypeId, OperationModeId, stateSofware);
 
         }
+
+
+        public PagedResult<OtherDocsElectList> List(string userCode, int OperationModeId)
+        {
+            Contributor contributor = _contributorService.GetByCode(userCode);
+
+
+
+            IQueryable<OtherDocsElectList> query = (from oc in sqlDBContext.OtherDocElecContributors
+                                                    join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
+                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on s.Id equals oco.SoftwareId
+                                                    join ocs in sqlDBContext.OtherDocElecSoftwareStatus on s.OtherDocElecSoftwareStatusId equals ocs.Id
+                                                    join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
+                                                    join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
+                                                    join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
+                                                    where oc.ContributorId == contributor.Id
+                                                     && oc.State != "Cancelado"
+
+                                                    select new OtherDocsElectList()
+                                                    {
+                                                        Id = oc.Id,
+                                                        ContributorId = oc.ContributorId,
+                                                        OperationMode = ope.Name,
+                                                        ContibutorType = oty.Name,
+                                                        Software =s.Name,
+                                                        PinSW =s.Pin,
+                                                        StateSoftware =ocs.Name, 
+                                                        StateContributor =oc.State,
+                                                        CreatedDate = oc.CreatedDate,
+                                                        ElectronicDoc= eld.Name,
+                                                        Url =s.Url, 
+                                                    }).Distinct();
+            return query.Paginate(0, 100, t => t.Id.ToString());
  
+        }
+
     }
 }

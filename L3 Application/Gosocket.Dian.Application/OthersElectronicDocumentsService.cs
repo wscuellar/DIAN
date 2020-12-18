@@ -83,5 +83,93 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
         }
 
+        public bool ChangeParticipantStatus(int contributorId, string newState, int ContributorTypeId, string actualState, string description)
+        {
+            List<OtherDocElecContributor> contributors = _othersDocsElecContributorRepository.List(t => t.Id == contributorId 
+                                                         && t.State == actualState).Results;
+            if (!contributors.Any())
+                return false;
+
+            OtherDocElecContributor entity = contributors.FirstOrDefault();
+            entity.State = newState;
+            entity.Description = description;
+
+            if (newState == OtherDocElecState.Test.GetDescription()) entity.Step = 2;
+            if (newState == OtherDocElecState.Habilitado.GetDescription()) entity.Step = 3;
+            if (newState == OtherDocElecState.Cancelado.GetDescription()) entity.Step = 1;
+
+            if (entity.State == OtherDocElecState.Cancelado.GetDescription())
+                CancelParticipant(entity);
+
+            //UpdateGlobalRadianOperation(radianContributorTypeId, competitor);
+
+            _othersDocsElecContributorRepository.AddOrUpdate(entity);
+
+            return true;
+
+        }
+
+
+        #region Private methods Cancel Participant
+
+        private void UpdateGlobalRadianOperation(int ContributorTypeId, OtherDocElecContributor competitor)
+        {
+           /* List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(competitor.Contributor.Code);
+            if (radianOperations.Any())
+            {
+                List<GlobalRadianOperations> operations = radianOperations.Where(t => t.RadianContributorTypeId == radianContributorTypeId).ToList();
+                if (competitor.RadianState == RadianState.Test.GetDescription())
+                {
+                    GlobalRadianOperations operation = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
+                    operation.Deleted = false;
+                    operation.RadianStatus = competitor.RadianState;
+                    _globalRadianOperationService.Update(operation);
+                }
+                else
+                {
+                    foreach (GlobalRadianOperations operation in operations)
+                    {
+                        operation.Deleted = true;
+                        operation.RadianStatus = competitor.RadianState;
+                        _globalRadianOperationService.Update(operation);
+                    }
+                }
+
+            }*/
+        }
+
+        private void CancelParticipant(OtherDocElecContributor entity)
+        {
+   
+            List<OtherDocElecSoftware> softwares = _othersDocsElecSoftwareService.List(entity.Id);
+            foreach (OtherDocElecSoftware software in softwares)
+            {
+                //Quita los software
+                _othersDocsElecSoftwareService.DeleteSoftware(software.Id);
+
+                //Quitar la operacion.
+                List<OtherDocElecContributorOperations> operations = _othersDocsElecContributorOperationRepository.List(t => t.SoftwareId == software.Id && !t.Deleted);
+                foreach (OtherDocElecContributorOperations operation in operations)
+                {
+                    operation.OperationStatusId = (int)OtherDocElecState.Cancelado;
+                    operation.Deleted = true;
+                    _othersDocsElecContributorOperationRepository.Update(operation);
+                }
+            }
+        }
+
+        public void UpdateRadianOperation(int radiancontributorId, int softwareType)
+        {
+            /*List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radiancontributorId && !t.Deleted && t.SoftwareType == softwareType && t.OperationStatusId == 1);
+            foreach (RadianContributorOperation operation in operations)
+            {
+                operation.OperationStatusId = (int)RadianState.Test;
+                _radianContributorOperationRepository.Update(operation);
+            }*/
+        }
+
+       
+      
+        #endregion
     }
 }

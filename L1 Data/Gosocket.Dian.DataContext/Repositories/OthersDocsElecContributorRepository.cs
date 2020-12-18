@@ -99,6 +99,8 @@ namespace Gosocket.Dian.DataContext.Repositories
 
                 IQueryable<OtherDocElecContributor> query = sqlDBContext.OtherDocElecContributors.Where(expression)
                  .Include("Contributor")
+                 .Include("OtherDocElecSoftwares")
+                 .Include("OtherDocElecSoftwares.OtherDocElecContributorOperations")
                  .Include("OtherDocElecContributorType")
                  .Include("OtherDocElecOperationMode")
                  .Include("OtherDocElecContributorOperations");
@@ -117,8 +119,7 @@ namespace Gosocket.Dian.DataContext.Repositories
         {
             return (from p in sqlDBContext.OtherDocElecContributors.Where(t => t.ContributorId == contributorId)
                                                           join o in sqlDBContext.OtherDocElecSoftwares on p.Id equals o.OtherDocElecContributorId
-                                                          where p.OtherDocElecContributorTypeId != contributorTypeId
-                                                          && p.OtherDocElecOperationModeId == OperationModeId
+                                                          where p.OtherDocElecOperationModeId == OperationModeId
                                                           && o.OtherDocElecSoftwareStatusId == statusSowftware
                                                           select p).ToList().Any();
         }

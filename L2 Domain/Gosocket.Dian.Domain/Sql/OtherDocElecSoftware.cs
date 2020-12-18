@@ -46,6 +46,12 @@ namespace Gosocket.Dian.Domain.Sql
         public string Url { get; set; }
         public bool Status { get; set; }
         public int OtherDocElecSoftwareStatusId { get; set; }
+        public int ProviderId { get; set; }
+
+        public Guid SoftwareId { get; set; }
+        
+        public Contributor Provider { get; set; }
+
         public bool Deleted { get; set; }
         public DateTime Timestamp { get; set; }
         public DateTime Updated { get; set; }
