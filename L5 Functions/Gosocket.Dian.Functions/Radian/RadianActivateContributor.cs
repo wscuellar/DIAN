@@ -2,14 +2,12 @@ using Gosocket.Dian.Application;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System;
-using System.Data.Entity.Core;
 
 namespace Gosocket.Dian.Functions.Radian
 {
@@ -59,7 +57,7 @@ namespace Gosocket.Dian.Functions.Radian
                     radianContributor.RadianContributorTypeId = requestObject.RadianContributorTypeId;
                     contributorService.ActivateRadian(radianContributor);
 
-                    SetLogger(radianContributor, "Step 2", "ActivateRadian -->  ");
+                    SetLogger(radianContributor, "Step 3", "ActivateRadian -->  ");
 
                     // Step 4 Actualizo RadianSoftware en SQL 
 
@@ -97,6 +95,8 @@ namespace Gosocket.Dian.Functions.Radian
 
                         softwareService.AddOrUpdateRadianSoftware(newSoftware);
 
+                        SetLogger(newSoftware, "Step 5", " -- softwareService.AddOrUpdateRadianSoftware -- ");
+
                         // Crear Software en TableSTorage
                         GlobalSoftware globalSoftware = new GlobalSoftware(requestObject.SoftwareId, requestObject.SoftwareId)
                         {
@@ -106,6 +106,8 @@ namespace Gosocket.Dian.Functions.Radian
                             StatusId = (int)Domain.Common.SoftwareStatus.Production
                         };
                         softwareTableManager.InsertOrUpdateAsync(globalSoftware);
+
+                        SetLogger(globalSoftware, "Step 6", " -- softwareTableManager.InsertOrUpdateAsync -- ");
                     }
 
                     //  Insertamos la operacion
@@ -120,6 +122,8 @@ namespace Gosocket.Dian.Functions.Radian
 
                     int oper = contributorService.AddRadianOperation(operation);
 
+                    SetLogger(operation, "Step 7", " -- contributorService.AddRadianOperation -- ");
+
                     GlobalRadianOperations globalRadianOperations =
                                 new GlobalRadianOperations(requestObject.Code, requestObject.SoftwareId)
                                 {
@@ -128,6 +132,9 @@ namespace Gosocket.Dian.Functions.Radian
                                     RadianState = Domain.Common.RadianState.Habilitado.GetDescription(),
                                     SoftwareType = Convert.ToInt32(requestObject.SoftwareType)
                                 };
+
+                    SetLogger(globalRadianOperations, "Step 8", " -- globalRadianOperations -- ");
+
 
                     log.Info($"Activation Radian successfully completed. Contributor with given id: {radianContributor.Id}");
 
@@ -143,13 +150,7 @@ namespace Gosocket.Dian.Functions.Radian
                     contributorActivation.Trace = ex.StackTrace;
                     contributorActivationTableManager.InsertOrUpdate(contributorActivation);
 
-                    var resultJson = JsonConvert.SerializeObject(contributorActivation);
-                    var lastZone = new GlobalLogger("RadianActivateContributor", "Exception")
-                    {
-                        Message = ex.Message + " --> " + resultJson
-                                             + " -----------------------------------" + ex
-                    };
-                    TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+                    SetLogger(contributorActivation, "Exception", ex.Message + " -- -- " + ex);
 
                     log.Error($"Exception in RadianActivateContributor. {ex.Message}", ex);
                     throw;
