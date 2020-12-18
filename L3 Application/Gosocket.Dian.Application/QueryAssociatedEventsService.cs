@@ -147,7 +147,10 @@ namespace Gosocket.Dian.Application
                     }
 
                     if (securityTitleCounter >= 3)
+                    {
                         statusValue.Add(2, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");//5
+                        securityTitleCounter = 0;
+                    }
 
                     if (DISPONIBILIZACIONCODES.Contains(documentMeta.EventCode.Trim()))
                         statusValue.Add(3, $"{RadianDocumentStatus.Readiness.GetDescription()}");//4 //INSCRITA
