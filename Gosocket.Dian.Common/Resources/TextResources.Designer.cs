@@ -277,6 +277,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Datos asociados correctamente..
+        /// </summary>
+        public static string OtherSuccessSoftware {
+            get {
+                return ResourceManager.GetString("OtherSuccessSoftware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El participante no cuenta con un software propio activo en el sistema.
         /// </summary>
         public static string ParticipantWithoutSoftware {

@@ -3,6 +3,7 @@ using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Managers;
 using Gosocket.Dian.Interfaces.Repositories;
@@ -19,38 +20,156 @@ namespace Gosocket.Dian.Application
     {
         private SqlDBContext sqlDBContext;
         private readonly IContributorService _contributorService;
+        private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
+        
+        private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
+        private readonly IOthersDocsElecContributorRepository _othersDocsElecContributorRepository;
+        private readonly IOthersDocsElecContributorOperationRepository _othersDocsElecContributorOperationRepository;
 
-        public OthersElectronicDocumentsService(IContributorService contributorService )
+        public OthersElectronicDocumentsService(IContributorService contributorService,
+            IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
+            IOthersDocsElecContributorService othersDocsElecContributorService,
+            IOthersDocsElecContributorOperationRepository othersDocsElecContributorOperationRepository,
+            IOthersDocsElecContributorRepository othersDocsElecContributorRepositor)
         {
             _contributorService = contributorService;
+            _othersDocsElecContributorService = othersDocsElecContributorService;
+            _othersDocsElecSoftwareService = othersDocsElecSoftwareService;
+            _othersDocsElecContributorRepository = othersDocsElecContributorRepositor;
+            _othersDocsElecContributorOperationRepository = othersDocsElecContributorOperationRepository;
             if (sqlDBContext == null)
                 sqlDBContext = new SqlDBContext();
         }
 
-        public ResponseMessage Validation(string userCode, string Accion, int IdElectronicDocument, string complementeTexto, int ContributorIdType)
+        public ResponseMessage Validation(string userCode, string Accion, int ElectronicDocumentId, string complementeTexto, int ContributorIdType)
         {
-            Contributor contributor = _contributorService.GetByCode(userCode);
-            if (contributor == null || contributor.AcceptanceStatusId != 4)
-                return new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType);
-             
-
-            if (Accion == "SeleccionElectronicDocument")
-                return new ResponseMessage(  TextResources.OthersElectronicDocumentsSelect_Confirm .Replace("@docume", complementeTexto), TextResources.confirmType);
-
-            if (Accion == "SeleccionParticipante")
-                return new ResponseMessage(TextResources.OthersElectronicDocumentsSelectParticipante_Confirm.Replace("@Participante", complementeTexto), TextResources.confirmType);
-
-            if (Accion == "SeleccionOperationMode")
-                return new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", complementeTexto), TextResources.confirmType);
-
-            if (Accion == "CancelRegister")
-                return new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", complementeTexto), TextResources.confirmType);
-
-
             return new ResponseMessage(TextResources.FailedValidation, TextResources.alertType);
         }
 
+
+        public ResponseMessage AddOtherDocElecContributorOperation(OtherDocElecContributorOperations ContributorOperation, OtherDocElecSoftware software, bool isInsert, bool validateOperation)
+        {
+            //if (testSet == null)
+            //    return new ResponseMessage(TextResources.ModeWithoutTestSet, TextResources.alertType, 500);
+
+            if (validateOperation)
+            {
+                List<OtherDocElecContributorOperations> currentOperations = 
+                    _othersDocsElecContributorOperationRepository.List(t => t. OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId
+                                                                    && t.SoftwareType == ContributorOperation.SoftwareType
+                                                                    && t.OperationStatusId != (int)OtherDocElecState.Habilitado
+                                                                    && !t.Deleted);
+                if (currentOperations.Any())
+                    return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
+            }
+
+            OtherDocElecContributor Contributor = _othersDocsElecContributorRepository.Get(t => t.Id ==  ContributorOperation.OtherDocElecContributorId);
+            OtherDocElecContributorOperations existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t. OtherDocElecContributorId ==  ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted);
+            if (existingOperation != null)
+                return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
+
+            if (isInsert)
+            {
+                OtherDocElecSoftware soft = _othersDocsElecSoftwareService.CreateSoftware(software);
+                ContributorOperation.SoftwareId = soft.Id;
+            }
+
+            ContributorOperation.OperationStatusId = (int)(Contributor.State == OtherDocElecState.Habilitado.GetDescription() ? (int)OtherDocElecState.Test : (int)RadianState.Registrado);
+            int operationId = _othersDocsElecContributorOperationRepository.Add(ContributorOperation);
+            existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.Id == operationId);
+
+            //ApplyTestSet(radianContributorOperation, testSet, radianContributor, existingOperation);
+
+            return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
+        }
+
+        public bool ChangeParticipantStatus(int contributorId, string newState, int ContributorTypeId, string actualState, string description)
+        {
+            List<OtherDocElecContributor> contributors = _othersDocsElecContributorRepository.List(t => t.Id == contributorId 
+                                                         && t.State == actualState).Results;
+            if (!contributors.Any())
+                return false;
+
+            OtherDocElecContributor entity = contributors.FirstOrDefault();
+            entity.State = newState;
+            entity.Description = description;
+
+            if (newState == OtherDocElecState.Test.GetDescription()) entity.Step = 2;
+            if (newState == OtherDocElecState.Habilitado.GetDescription()) entity.Step = 3;
+            if (newState == OtherDocElecState.Cancelado.GetDescription()) entity.Step = 1;
+
+            if (entity.State == OtherDocElecState.Cancelado.GetDescription())
+                CancelParticipant(entity);
+
+            //UpdateGlobalRadianOperation(radianContributorTypeId, competitor);
+
+            _othersDocsElecContributorRepository.AddOrUpdate(entity);
+
+            return true;
+
+        }
+
+
+        #region Private methods Cancel Participant
+
+        private void UpdateGlobalRadianOperation(int ContributorTypeId, OtherDocElecContributor competitor)
+        {
+           /* List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(competitor.Contributor.Code);
+            if (radianOperations.Any())
+            {
+                List<GlobalRadianOperations> operations = radianOperations.Where(t => t.RadianContributorTypeId == radianContributorTypeId).ToList();
+                if (competitor.RadianState == RadianState.Test.GetDescription())
+                {
+                    GlobalRadianOperations operation = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
+                    operation.Deleted = false;
+                    operation.RadianStatus = competitor.RadianState;
+                    _globalRadianOperationService.Update(operation);
+                }
+                else
+                {
+                    foreach (GlobalRadianOperations operation in operations)
+                    {
+                        operation.Deleted = true;
+                        operation.RadianStatus = competitor.RadianState;
+                        _globalRadianOperationService.Update(operation);
+                    }
+                }
+
+            }*/
+        }
+
+        private void CancelParticipant(OtherDocElecContributor entity)
+        {
    
-         
+            List<OtherDocElecSoftware> softwares = _othersDocsElecSoftwareService.List(entity.Id);
+            foreach (OtherDocElecSoftware software in softwares)
+            {
+                //Quita los software
+                _othersDocsElecSoftwareService.DeleteSoftware(software.Id);
+
+                //Quitar la operacion.
+                List<OtherDocElecContributorOperations> operations = _othersDocsElecContributorOperationRepository.List(t => t.SoftwareId == software.Id && !t.Deleted);
+                foreach (OtherDocElecContributorOperations operation in operations)
+                {
+                    operation.OperationStatusId = (int)OtherDocElecState.Cancelado;
+                    operation.Deleted = true;
+                    _othersDocsElecContributorOperationRepository.Update(operation);
+                }
+            }
+        }
+
+        public void UpdateRadianOperation(int radiancontributorId, int softwareType)
+        {
+            /*List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radiancontributorId && !t.Deleted && t.SoftwareType == softwareType && t.OperationStatusId == 1);
+            foreach (RadianContributorOperation operation in operations)
+            {
+                operation.OperationStatusId = (int)RadianState.Test;
+                _radianContributorOperationRepository.Update(operation);
+            }*/
+        }
+
+       
+      
+        #endregion
     }
 }

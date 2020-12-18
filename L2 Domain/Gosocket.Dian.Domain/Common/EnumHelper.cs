@@ -454,19 +454,19 @@ namespace Gosocket.Dian.Domain.Common
 
     public enum RadianDocumentStatus
     {
-        [Description("NO APLICA")]
+        [Description("No Aplica")]
         DontApply = 0,
-        [Description("LIMITADA")]
+        [Description("Limitada")]
         Limited = 1,
-        [Description("PAGADA")]
+        [Description("Pagada")]
         Paid = 2,
-        [Description("ENDOSADA")]
+        [Description("Endosada")]
         Endorsed = 3,
-        [Description("DISPONIBILIZADA")]
+        [Description("Disponibilizada")]
         Readiness = 4,
-        [Description("TÍTULO VALOR")]
+        [Description("Título Valor")]
         SecurityTitle = 5,
-        [Description("FACTURA ELECTRONICA")]
+        [Description("Factura Electrónica")]
         ElectronicInvoice = 6
     }
 
@@ -503,4 +503,38 @@ namespace Gosocket.Dian.Domain.Common
         Rejected = 3,
     }
 
+    public enum OtherDocElecContributorType
+    {
+        [Description("Emisor")]
+        Transmitter = 1, 
+        [Description("Proveedor Tecnologico")]
+        TechnologyProvider = 2,
+    }
+
+    public enum OtherDocElecState
+    {
+        none = 0,
+        [Display(Name = "Registrado")]
+        [Description("Registrado")]
+        Registrado = 1,
+        [Display(Name = "En pruebas")]
+        [Description("En pruebas")]
+        Test = 3,
+        [Display(Name = "Habilitado")]
+        [Description("Habilitado")]
+        Habilitado = 4,
+        [Display(Name = "Cancelado")]
+        [Description("Cancelado")]
+        Cancelado = 5
+    }
+
+    public enum OtherDocElecOperationMode
+    {
+        [Display(Name = "Software Propio")]
+        [Description("Software Propio")]
+        OwnSoftware = 1,
+        [Display(Name = "Software de un proveedor tecnológico")]
+        [Description("Software de un proveedor tecnológico")]
+        SoftwareTechnologyProvider = 2
+    }
 }

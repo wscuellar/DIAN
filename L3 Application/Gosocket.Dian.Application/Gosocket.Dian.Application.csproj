@@ -210,6 +210,7 @@
     <Compile Include="PdfCreatorEvents.cs" />
     <Compile Include="PdfCreatorModel.cs" />
     <Compile Include="RadianAprovedService.cs" />
+    <Compile Include="OthersDocsElecSoftwareService.cs" />
     <Compile Include="RadianCallSoftwareService.cs" />
     <Compile Include="RadianContributorFileTypeService.cs" />
     <Compile Include="ContributorOperationsService.cs" />

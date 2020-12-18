@@ -169,7 +169,7 @@ namespace Gosocket.Dian.Web.Models
         public int ElectronicMandateTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Manadato electrónico        ")]
+        [Display(Name = "Mandato electrónico        ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ElectronicMandateTotalAcceptedRequired { get; set; }
@@ -181,7 +181,7 @@ namespace Gosocket.Dian.Web.Models
         public int EndMandateTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación manadato        ")]
+        [Display(Name = "Terminación mandato        ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndMandateTotalAcceptedRequired { get; set; }
