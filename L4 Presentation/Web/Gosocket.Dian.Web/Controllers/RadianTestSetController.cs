@@ -1,5 +1,4 @@
-﻿using Gosocket.Dian.Domain;
-using Gosocket.Dian.Domain.Common;
+﻿using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Filters;
@@ -294,26 +293,59 @@ namespace Gosocket.Dian.Web.Controllers
             string key = ((int)softwareTypeEnum).ToString();
             RadianTestSet testSet = _radianAprovedService.GetTestResult(key);
             List<EventCountersViewModel> events = new List<EventCountersViewModel>();
-            if (testSet !=  null)
+            if (testSet != null)
             {
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.Received.GetDescription(), Counter1 = testSet.ReceiptNoticeTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.Rejected.GetDescription(), Counter1 = testSet.RejectInvoiceTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.Receipt.GetDescription(), Counter1 = testSet.ReceiptServiceTotalRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.Accepted.GetDescription(), Counter1 = testSet.ExpressAcceptanceTotalRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.AceptacionTacita.GetDescription(), Counter1 = testSet.AutomaticAcceptanceTotalRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.Avales.GetDescription(), Counter1 = testSet.GuaranteeTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.SolicitudDisponibilizacion.GetDescription(), Counter1 = testSet.ApplicationAvailableTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.NegotiatedInvoice.GetDescription(), Counter1 = testSet.CirculationLimitationTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.AnulacionLimitacionCirculacion.GetDescription(), Counter1 = testSet.EndCirculationLimitationTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.Mandato.GetDescription(), Counter1 = testSet.ElectronicMandateTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.TerminacionMandato.GetDescription(), Counter1 = testSet.EndMandateTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.NotificacionPagoTotalParcial.GetDescription(), Counter1 = testSet.PaymentNotificationTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.InvoiceOfferedForNegotiation.GetDescription(), Counter1 = testSet.EndorsementCancellationTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoPropiedad.GetDescription(), Counter1 = testSet.EndorsementPropertyTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoGarantia.GetDescription(), Counter1 = testSet.EndorsementGuaranteeTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoProcuracion.GetDescription(), Counter1 = testSet.EndorsementProcurementTotalAcceptedRequired, Counter2 = 0, Counter3 = 0 });
+                // Acuse de recibo
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Received.GetDescription(), Counter1 = testSet.ReceiptNoticeTotalAcceptedRequired, Counter2 = testSet.ReceiptNoticeTotalRequired, Counter3 = 0 });
+
+                //Recibo del bien
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Receipt.GetDescription(), Counter1 = testSet.ReceiptNoticeTotalAcceptedRequired, Counter2 = testSet.ReceiptServiceTotalRequired, Counter3 = 0 });
+
+                // Aceptación expresa
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Accepted.GetDescription(), Counter1 = testSet.ExpressAcceptanceTotalAcceptedRequired, Counter2 = testSet.ExpressAcceptanceTotalRequired, Counter3 = 0 });
+
+                //Manifestación de aceptación
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.AceptacionTacita.GetDescription(), Counter1 = testSet.AutomaticAcceptanceTotalAcceptedRequired, Counter2 = testSet.AutomaticAcceptanceTotalRequired, Counter3 = 0 });
+
+                //Rechazo factura electrónica
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Rejected.GetDescription(), Counter1 = testSet.RejectInvoiceTotalAcceptedRequired, Counter2 = testSet.RejectInvoiceTotalAcceptedRequired, Counter3 = 0 });
+
+                // Solicitud disponibilización
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.SolicitudDisponibilizacion.GetDescription(), Counter1 = testSet.ApplicationAvailableTotalAcceptedRequired, Counter2 = testSet.ApplicationAvailableTotalRequired, Counter3 = 0 });
+
+                // Endoso en Propiedad
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoPropiedad.GetDescription(), Counter1 = testSet.EndorsementPropertyTotalAcceptedRequired, Counter2 = testSet.EndorsementPropertyTotalRequired, Counter3 = 0 });
+
+                // Endoso en Procuracion
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoProcuracion.GetDescription(), Counter1 = testSet.EndorsementProcurementTotalAcceptedRequired, Counter2 = testSet.EndorsementProcurementTotalRequired, Counter3 = 0 });
+
+                // Endoso en Garantia
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.EndosoGarantia.GetDescription(), Counter1 = testSet.EndorsementGuaranteeTotalAcceptedRequired, Counter2 = testSet.EndorsementGuaranteeTotalRequired, Counter3 = 0 });
+
+                // Cancelación de endoso
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.InvoiceOfferedForNegotiation.GetDescription(), Counter1 = testSet.EndorsementCancellationTotalAcceptedRequired, Counter2 = testSet.EndorsementCancellationTotalRequired, Counter3 = 0 });
+
+                // Avales
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Avales.GetDescription(), Counter1 = testSet.GuaranteeTotalAcceptedRequired, Counter2 = testSet.GuaranteeTotalRequired, Counter3 = 0 });
+
+                // Mandato electrónico
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Mandato.GetDescription(), Counter1 = testSet.ElectronicMandateTotalAcceptedRequired, Counter2 = testSet.ElectronicMandateTotalRequired, Counter3 = 0 });
+
+                // Terminación mandato
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.TerminacionMandato.GetDescription(), Counter1 = testSet.EndMandateTotalAcceptedRequired, Counter2 = testSet.EndMandateTotalRequired, Counter3 = 0 });
+
+                // Notificación de pago
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.NotificacionPagoTotalParcial.GetDescription(), Counter1 = testSet.PaymentNotificationTotalAcceptedRequired, Counter2 = testSet.PaymentNotificationTotalRequired, Counter3 = 0 });
+
+                // Limitación de circulación
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.NegotiatedInvoice.GetDescription(), Counter1 = testSet.CirculationLimitationTotalAcceptedRequired, Counter2 = testSet.CirculationLimitationTotalRequired, Counter3 = 0 });
+
+                // Terminación limitación 
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.AnulacionLimitacionCirculacion.GetDescription(), Counter1 = testSet.EndCirculationLimitationTotalAcceptedRequired, Counter2 = testSet.EndCirculationLimitationTotalRequired, Counter3 = 0 });
             }
             return Json(events, JsonRequestBehavior.AllowGet);
+
+
         }
 
 

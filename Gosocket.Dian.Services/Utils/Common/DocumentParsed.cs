@@ -19,6 +19,7 @@
         public string IssuerPartyCode { get; set; }
         public string IssuerPartyName { get; set; }
         public string ProviderCode { get; set; }
+        public string ValidityPeriodEndDate { get; set; }
 
 
         public static void SetValues(ref DocumentParsed documentParsed)
@@ -32,6 +33,7 @@
             documentParsed.IssuerPartyName = documentParsed?.IssuerPartyName;
             documentParsed.IssuerPartyCode = documentParsed?.IssuerPartyCode;
             documentParsed.ProviderCode = documentParsed.ProviderCode;
+            documentParsed.ValidityPeriodEndDate = documentParsed?.ValidityPeriodEndDate;
         }
     }
 }
