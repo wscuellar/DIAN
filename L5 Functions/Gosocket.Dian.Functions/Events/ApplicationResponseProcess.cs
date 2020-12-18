@@ -91,10 +91,10 @@ namespace Gosocket.Dian.Functions.Events
             if (globalDataDocument == null)
                 return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
 
-            // Validate reception date
-            var receptionDateValidation = Validator.ValidateReceptionDate(globalDataDocument);
-            if (!receptionDateValidation.Item1)
-                return receptionDateValidation.Item2;
+            //// Validate reception date
+            //var receptionDateValidation = Validator.ValidateReceptionDate(globalDataDocument);
+            //if (!receptionDateValidation.Item1)
+            //    return receptionDateValidation.Item2;
 
             // Validate event
             var eventValidation = Validator.ValidateEvent(globalDataDocument, responseCode);

@@ -104,15 +104,15 @@
                     operationClick = true;
 
                     var electronicDocumentId = $(this).attr('idElectronicDocument');
-                    var ValidacionOtherElectronicDocumentsViewModel = {
+                    var ValidacionOtherDocsElecViewModel = {
                         UserCode: '@ViewBag.UserCode',
                         Accion: 'SeleccionElectronicDocument',
                         ElectronicDocument: $(this).attr('idElectronicDocument'),
                         complementoTexto: $(this).attr('textElectronicDocument'),
                     };
 
-                    CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
-                        function (param) {
+                    CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherDocsElecViewModel,
+                        function (param) { 
                             var url = "@Url.Action("AddParticipants", "OthersElectronicDocuments")" + "?electronicDocumentId=" + electronicDocumentId;
                             window.location.href = url;
                          }, true, () => hideLoading('#panel-form')

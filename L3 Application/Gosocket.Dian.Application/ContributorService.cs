@@ -563,5 +563,47 @@ namespace Gosocket.Dian.Application
 
 
         #endregion
+
+        public Contributor GetContributorByUserId(string userId, int contributorTypeId)
+        {
+            Contributor contributor =null;
+            var re = (from u in sqlDBContext.UserContributors.Where(t => t.UserId == userId)
+                        join c in sqlDBContext.Contributors on u.ContributorId equals c.Id
+                        where c.ContributorTypeId == contributorTypeId
+                      select c).FirstOrDefault();
+
+            if(re != null)
+            {
+                contributor = new Contributor()
+                {
+                    Id = re.Id,
+                    Code = re.Code,
+                    Name = re.Name,
+                    BusinessName = re.BusinessName,
+                    Email = re.Email,
+                    StartDate = re.StartDate,
+                    EndDate = re.EndDate, 
+                    StartDateNumber = re.StartDateNumber,
+                    AcceptanceStatus = re.AcceptanceStatus,
+                    Status = re.Status,
+                    Deleted = re.Deleted,
+                    Timestamp = re.Timestamp,
+                    Updated = re.Updated,
+                    CreatedBy = re.CreatedBy,
+                    ContributorTypeId = re.ContributorTypeId,
+                    OperationModeId = re.OperationModeId,
+                    ProviderId = re.ProviderId,
+                    PrincipalActivityCode = re.PrincipalActivityCode,
+                    PersonType = re.PersonType,
+                    HabilitationDate = re.HabilitationDate,
+                    ProductionDate = re.ProductionDate,
+                    StatusRut = re.StatusRut,
+                    ExchangeEmail = re.ExchangeEmail
+                };
+            }
+
+            return contributor;
+        }
+
     }
 }
