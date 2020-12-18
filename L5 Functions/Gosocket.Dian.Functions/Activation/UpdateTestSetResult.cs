@@ -274,7 +274,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (radianTesSetResult.Status == (int)TestSetStatus.Accepted)
-                    {
+                    {                       
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")

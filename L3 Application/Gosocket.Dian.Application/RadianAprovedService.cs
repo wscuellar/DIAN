@@ -217,18 +217,25 @@ namespace Gosocket.Dian.Application
         private void ApplyTestSet(RadianContributorOperation radianContributorOperation, RadianTestSet testSet, RadianContributor radianContributor, RadianContributorOperation existingOperation)
         {
             Contributor contributor = radianContributor.Contributor;
-            GlobalRadianOperations operation = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString())
-            {
-                RadianState = radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test.GetDescription() : RadianState.Registrado.GetDescription(),
-                SoftwareType = existingOperation.SoftwareType,
-                RadianContributorTypeId = radianContributor.RadianContributorTypeId,
-                ElectronicInvoicer = radianContributor.RadianContributorTypeId ==  (int)Domain.Common.RadianContributorType.ElectronicInvoice,
-                TecnologicalSupplier = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider,
-                Factor = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor,
-                NegotiationSystem = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem,
-                IndirectElectronicInvoicer = radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect,
-                Deleted = false
-            };
+            GlobalRadianOperations operation = _globalRadianOperationService.GetOperation(contributor.Code, existingOperation.SoftwareId);
+            if (operation == null)
+                operation = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString());
+
+            if (radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect)
+                operation.IndirectElectronicInvoicer = radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice)
+                operation.ElectronicInvoicer = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider)
+                operation.TecnologicalSupplier = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem)
+                operation.NegotiationSystem = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor)
+                operation.Factor = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor;
+
+            operation.RadianState = radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test.GetDescription() : RadianState.Registrado.GetDescription();
+            operation.SoftwareType = existingOperation.SoftwareType;
+            operation.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
+            operation.Deleted = false;
 
             if (_globalRadianOperationService.Insert(operation, existingOperation.Software))
             {
@@ -243,7 +250,7 @@ namespace Gosocket.Dian.Application
                     ContributorTypeId = radianContributor.RadianContributorTypeId.ToString(),
                     // Totales Generales
                     TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
-                    TotalDocumentAcceptedRequired= testSet.TotalDocumentAcceptedRequired,
+                    TotalDocumentAcceptedRequired = testSet.TotalDocumentAcceptedRequired,
                     // Acuse de recibo
                     ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalRequired,
                     ReceiptNoticeTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
@@ -252,13 +259,13 @@ namespace Gosocket.Dian.Application
                     ReceiptServiceTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
                     // Aceptación expresa
                     ExpressAcceptanceTotalRequired = testSet.ExpressAcceptanceTotalRequired,
-                    ExpressAcceptanceTotalAcceptedRequired= testSet.ExpressAcceptanceTotalAcceptedRequired,
+                    ExpressAcceptanceTotalAcceptedRequired = testSet.ExpressAcceptanceTotalAcceptedRequired,
                     //Manifestación de aceptación
                     AutomaticAcceptanceTotalRequired = testSet.AutomaticAcceptanceTotalRequired,
-                    AutomaticAcceptanceTotalAcceptedRequired= testSet.AutomaticAcceptanceTotalAcceptedRequired,
+                    AutomaticAcceptanceTotalAcceptedRequired = testSet.AutomaticAcceptanceTotalAcceptedRequired,
                     //Rechazo factura electrónica
                     RejectInvoiceTotalRequired = testSet.RejectInvoiceTotalRequired,
-                    RejectInvoiceTotalAcceptedRequired= testSet.RejectInvoiceTotalAcceptedRequired,
+                    RejectInvoiceTotalAcceptedRequired = testSet.RejectInvoiceTotalAcceptedRequired,
                     // Solicitud disponibilización
                     ApplicationAvailableTotalRequired = testSet.ApplicationAvailableTotalRequired,
                     ApplicationAvailableTotalAcceptedRequired = testSet.ApplicationAvailableTotalAcceptedRequired,

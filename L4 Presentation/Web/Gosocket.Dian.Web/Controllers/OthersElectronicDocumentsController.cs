@@ -1,4 +1,6 @@
 ﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
@@ -7,9 +9,11 @@ using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
@@ -41,99 +45,210 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.UserCode = User.UserCode();
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-            ViewBag.ListElectronicDocuments = new ElectronicDocumentService().GetElectronicDocuments()
-                .Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            ViewBag.ListElectronicDocuments = new ElectronicDocumentService().GetElectronicDocuments().Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
             ViewBag.ContributorId = User.ContributorId();
 
-            NameValueCollection result = _othersDocsElecContributorService.Summary(User.UserCode());
-            ViewBag.ContributorId = result["ContributorId"];
-            ViewBag.ElectronicInvoice_OtherDocElecContributorTypeId = result["ElectronicInvoice_OtherDocElecContributorTypeId"];
-            ViewBag.ElectronicInvoice_OtherDocElecOperationModeId = result["ElectronicInvoice_OtherDocElecOperationModeId"];
-            ViewBag.TechnologyProvider_OtherDocElecContributorTypeId = result["TechnologyProvider_OtherDocElecContributorTypeId"];
-            ViewBag.TechnologyProvider_OtherDocElecOperationModeId = result["TechnologyProvider_OtherDocElecOperationModeId"];
-            ViewBag.TradingSystem_OtherDocElecContributorTypeId = result["TradingSystem_OtherDocElecContributorTypeId"];
-            ViewBag.TradingSystem_OtherDocElecOperationModeId = result["TradingSystem_OtherDocElecOperationModeId"];
-            ViewBag.Factor_OtherDocElecContributorTypeId = result["Factor_OtherDocElecContributorTypeId"];
-            ViewBag.Factor_OtherDocElecOperationModeId = result["Factor_OtherDocElecOperationModeId"];
-            return View(); 
+            return View();
         }
 
-        public ActionResult AddOrUpdate(int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0 )
+        [HttpGet]
+        public ActionResult AddOrUpdate(ValidacionOtherDocsElecViewModel dataentity)
         {
             List<ElectronicDocument> listED = new ElectronicDocumentService().GetElectronicDocuments();
-            List<OperationModeViewModel> listOM = new TestSetViewModel().GetOperationModes();
+            List<Domain.Sql.OtherDocElecOperationMode> listOM = _othersDocsElecContributorService.GetOperationModes();
             OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
-            List<ContributorViewModel> listContri = new List<ContributorViewModel>()
-            {
-                new ContributorViewModel() { Id=0, Name= "Seleccione..."}
-            };
+            List<ContributorViewModel> listContri = new List<ContributorViewModel>();// { new ContributorViewModel() { Id = 0, Name = "Seleccione..." } };
 
-            ViewBag.ListSoftwares = new List<SoftwareViewModel>()
-            {
-                new SoftwareViewModel() { Id = System.Guid.Empty, Name = "Seleccione..."}
-            };
+            ViewBag.ListSoftwares = new List<SoftwareViewModel>();// { new SoftwareViewModel() { Id = System.Guid.Empty, Name = "Seleccione..." } };
 
-            var listCont = _contributorService.GetContributors(ContributorType.Provider.GetHashCode(), 
-                ContributorStatus.Enabled.GetHashCode()).ToList();
+            var listCont = _contributorService.GetContributors((int)Domain.Common.ContributorType.Provider.GetHashCode(), ContributorStatus.Enabled.GetHashCode()).ToList();
 
-            if(listCont != null)
-            {
-                listContri.AddRange(listCont.Select(c => new ContributorViewModel
-                {
-                    Id = c.Id,
-                    Name = c.Name
-                }).ToList());
-            }
+            if (listCont != null)
+                listContri.AddRange(listCont.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
 
+            ViewBag.softwareActive = _othersDocsElecContributorService.ValidateSoftwareActive(User.ContributorId(), (int)dataentity.ContributorIdType, (int)dataentity.OperationModeId, (int)OtherDocElecSoftwaresStatus.InProcess);
             ViewBag.ListTechnoProviders = listContri;
 
-            var opeMode = listOM.FirstOrDefault(o => o.Id == operationModeId);
+            var opeMode = listOM.FirstOrDefault(o => o.Id == (int)dataentity.OperationModeId);
             if (opeMode != null)
                 model.OperationMode = opeMode.Name;
 
-            ViewBag.Title = $"Asociar modo de operación {model.OperationMode}";
+            model.ElectronicDocumentId = dataentity.ElectronicDocumentId;
+            model.OperationModeId = (int)dataentity.OperationModeId;
+            model.ContributorIdType = (int)dataentity.ContributorIdType;
+            model.OtherDocElecContributorId = (int)dataentity.ContributorId;
 
+            PagedResult<OtherDocsElectList> List = _othersDocsElecContributorService.List(User.UserCode(), (int)dataentity.OperationModeId);
+
+            model.ListTable = List.Results.Select(t => new OtherDocsElectListViewModel()
+            {
+                Id = t.Id,
+                ContributorId = t.ContributorId,
+                OperationMode = t.OperationMode,
+                ContibutorType = t.ContibutorType,
+                ElectronicDoc = t.ElectronicDoc,
+                Software = t.Software,
+                PinSW = t.PinSW,
+                StateSoftware = t.StateSoftware,
+                StateContributor = t.StateContributor,
+                Url = t.Url,
+                CreatedDate = t.CreatedDate,
+            }).ToList();
+
+
+            ViewBag.Title = $"Asociar modo de operación {model.OperationMode}";
 
             return View(model);
         }
+
+
+        [HttpPost]
+        public ActionResult AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
+        {
+            ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
+
+            if (!ModelState.IsValid)
+            {
+                IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var item in allErrors) ModelState.AddModelError("", item.ErrorMessage);
+                return View("AddOrUpdate", new ValidacionOtherDocsElecViewModel { ContributorId = 1 });
+            }
+
+            var IdS = new Guid();
+            OtherDocElecSoftware software = new OtherDocElecSoftware()
+            {
+                Id = IdS,
+                Url = model.UrlEventReception,
+                Name = model.SoftwareName,
+                Pin = model.PinSW,
+                ProviderId = model.ProviderId,
+                CreatedBy = User.UserName(),
+                Deleted = false,
+                Status = true,
+                OtherDocElecSoftwareStatusId = (int)OtherDocElecSoftwaresStatus.InProcess,
+                SoftwareDate = DateTime.Now,
+                Timestamp = DateTime.Now,
+                Updated = DateTime.Now,
+                SoftwareId = new Guid(model.SoftwareId),
+                OtherDocElecContributorId = model.OtherDocElecContributorId
+            };
+            OtherDocElecContributorOperations contributorOperation = new OtherDocElecContributorOperations()
+            {
+                OtherDocElecContributorId = model.OtherDocElecContributorId,
+                OperationStatusId = (int)OtherDocElecState.Test,
+                Deleted = false,
+                Timestamp = DateTime.Now,
+                SoftwareType = model.SoftwareType,
+                SoftwareId = IdS
+            };
+
+            ResponseMessage response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperation(contributorOperation, software, true, true);
+            if (response.Code != 500)
+            {
+                _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
+            }
+
+            return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = model.Id });
+        }
+
 
         public ActionResult AddParticipants(int electronicDocumentId)
         {
             ViewBag.UserCode = User.UserCode();
             ViewBag.electronicDocumentId = electronicDocumentId;
 
-            IEnumerable<SelectListItem> OperationsModes = _othersDocsElecContributorService.GetOperationModes()
-             .Select(c => new SelectListItem
-             {
-                 Value = c.Id.ToString(),
-                 Text = c.Name
-             });
+            IEnumerable<SelectListItem> OperationsModes = _othersDocsElecContributorService.GetOperationModes().Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Name });
             ViewBag.ListOperationMode = OperationsModes;
-            
+
             return View();
         }
 
-        [HttpPost]
-        public JsonResult Validation(ValidacionOtherElectronicDocumentsViewModel ValidacionOtherElectronicDocuments)
-        {
-            ResponseMessage validation =
-                _othersElectronicDocumentsService.Validation(ValidacionOtherElectronicDocuments.UserCode.ToString(),
-                ValidacionOtherElectronicDocuments.Accion,
-                ValidacionOtherElectronicDocuments.ElectronicDocument,
-                   ValidacionOtherElectronicDocuments.ComplementoTexto,
-                   ValidacionOtherElectronicDocuments.ContributorIdType
-                );
 
-            return Json(validation, JsonRequestBehavior.AllowGet);
+        [HttpPost]
+        public JsonResult Add(ValidacionOtherDocsElecViewModel registrationData)
+        {
+            OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(registrationData.UserCode.ToString(),
+                                                OtherDocElecState.Registrado,
+                                                registrationData.ContributorIdType,
+                                                registrationData.OperationModeId,
+                                                registrationData.ElectronicDocumentId,
+                                                User.UserName());
+
+            ResponseMessage result = new ResponseMessage(TextResources.OtherSuccessSoftware, TextResources.alertType);
+            result.data = otherDocElecContributor.Id.ToString();
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+
+
+        [HttpPost]
+        public JsonResult Validation(ValidacionOtherDocsElecViewModel ValidacionOtherDocs)
+        {
+            Contributor contributor = _contributorService.GetByCode(ValidacionOtherDocs.UserCode.ToString());
+            if (contributor == null || contributor.AcceptanceStatusId != 4)
+                return Json(new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType), JsonRequestBehavior.AllowGet);
+
+
+            if (ValidacionOtherDocs.Accion == "SeleccionElectronicDocument")
+                return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelect_Confirm.Replace("@docume", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+
+            if (ValidacionOtherDocs.Accion == "SeleccionParticipante")
+                return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectParticipante_Confirm.Replace("@Participante", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+
+            if (ValidacionOtherDocs.Accion == "SeleccionOperationMode")
+            {
+                List<OtherDocElecContributor> Lista = _othersDocsElecContributorService.ValidateExistenciaContribuitor(contributor.Id, (int)ValidacionOtherDocs.OperationModeId, OtherDocElecState.Cancelado.GetDescription());
+                if (Lista.Any())
+                {
+                    string ContributorId = null;
+                    var ResponseMessageRedirectTo = new ResponseMessage("", TextResources.redirectType);
+                    if (!Lista.Where(x => x.ElectronicDocumentId == ValidacionOtherDocs.ElectronicDocumentId).Any())
+                    {
+                        OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(
+                                                            ValidacionOtherDocs.UserCode.ToString(),
+                                                            OtherDocElecState.Registrado,
+                                                            ValidacionOtherDocs.ContributorIdType,
+                                                            ValidacionOtherDocs.OperationModeId,
+                                                            ValidacionOtherDocs.ElectronicDocumentId,
+                                                            User.UserName());
+
+                        ContributorId = otherDocElecContributor.Id.ToString();
+                    }
+                    else
+                    {
+                        ContributorId = Lista.Where(x => x.ElectronicDocumentId == ValidacionOtherDocs.ElectronicDocumentId).FirstOrDefault().Id.ToString();
+                    }
+
+
+                    ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
+                                            new
+                                            {
+                                                ElectronicDocumentId = ValidacionOtherDocs.ElectronicDocumentId,
+                                                OperationModeId = (int)ValidacionOtherDocs.OperationModeId,
+                                                ContributorIdType = (int)ValidacionOtherDocs.ContributorIdType,
+                                                ContributorId
+                                            });
+                    return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
+
+                }
+                return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+            }
+
+            if (ValidacionOtherDocs.Accion == "CancelRegister")
+                return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+
+
+            return Json(new ResponseMessage(TextResources.FailedValidation, TextResources.alertType), JsonRequestBehavior.AllowGet);
+
         }
 
         [HttpPost]
         public JsonResult GetSoftwaresByContributorId(int id)
         {
-            List<SoftwareViewModel> softwareList=new List<SoftwareViewModel>();
+            List<SoftwareViewModel> softwareList = new List<SoftwareViewModel>();
             var softs = new SoftwareService().GetSoftwaresByContributorAndState(id, true);
 
-            if(softs != null)
+            if (softs != null)
             {
                 softwareList = softs.Select(s => new SoftwareViewModel
                 {
@@ -145,5 +260,25 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(new { res = softwareList }, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
+        public JsonResult GetDataBySoftwareId(Guid SoftwareId)
+        {
+            var soft = new SoftwareService().Get(SoftwareId);
+
+            if (soft != null)
+            {
+                return Json(new
+                {
+                    url = soft.Url,
+                    SoftwareType = 1
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new
+            {
+                url = string.Empty,
+                SoftwareType = 1
+            }, JsonRequestBehavior.AllowGet);
+        }
     }
 }

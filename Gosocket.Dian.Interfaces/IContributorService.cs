@@ -52,5 +52,7 @@ namespace Gosocket.Dian.Interfaces
         List<OperationMode> GetOperationModes();
 
         List<Software> GetBaseSoftwareForRadian(int contributorid);
+
+        Contributor GetContributorByUserId(string userId,int contributorTypeId);
     }
 }
