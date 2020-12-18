@@ -86,7 +86,7 @@ namespace Gosocket.Dian.Web.Controllers
             this.staticProfiles = this.GetProfiles();
             model.DocTypes = this.staticTypeDoc;
             model.Profiles = this.staticProfiles;
-            model.Users = this.Datausuarios(); //new List<UserFreeBillerModel>();
+            model.Users = this.GetUsers(); 
             return View(model);
         }
 
@@ -97,6 +97,7 @@ namespace Gosocket.Dian.Web.Controllers
             var algo = model;
             return RedirectToAction("FreeBillerUser");
         }
+
         /// <summary>
         /// Cargue de información para editar.
         /// </summary>
@@ -112,7 +113,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.Name = data.UserName;
             model.Email = data.Email;
             model.LastUpdate = data.LastUpdated;
-            model.Profiles = this.DataPerfiles();
+            model.Profiles = this.GetProfiles();
             model.LastName = "Perez";
             model.FullName = data.Name;
             model.NumberDoc = data.IdentificationId;
@@ -390,7 +391,7 @@ namespace Gosocket.Dian.Web.Controllers
             return selectTypesId;
         }
 
-        private List<UserFreeBillerModel> Datausuarios()
+        private List<UserFreeBillerModel> GetUsers()
         {
             List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
             List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(ClaimProfile);

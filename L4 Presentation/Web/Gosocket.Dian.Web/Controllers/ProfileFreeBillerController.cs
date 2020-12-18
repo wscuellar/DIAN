@@ -17,6 +17,8 @@ namespace Gosocket.Dian.Web.Controllers
         /// </summary>
         private readonly ProfileService profileService = new ProfileService();
 
+        private string[,] staticMenuOptions { get; set; }
+
         // GET: ProfileFreeBiller
         public ActionResult Index()
         {
@@ -34,8 +36,7 @@ namespace Gosocket.Dian.Web.Controllers
         private void GetMenuOption() {
 
             var options = profileService.GetMenuOptions();
-
-
+            this.staticMenuOptions = new string[,] { };
         }
 
     }
