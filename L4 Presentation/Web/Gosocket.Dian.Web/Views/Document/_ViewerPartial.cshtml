@@ -12,6 +12,8 @@
     {
         status = "danger";
     }
+
+    int counter = 0;
 }
 
 @section css
@@ -35,7 +37,7 @@
         font-size: 14px;
         line-height: 14px;
         color: #348441;
-        cursor:     inter;
+        cursor: inter;
     }
 
     .render-row {
@@ -141,22 +143,43 @@
         <h4 class="subtitle-radian-status">ESTADO EN EL REGISTRO DE FACTURAS ELECTRÓNICAS</h4>
     </div>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-6">
             <div style="display:inline-flex">
-                <div style="display:grid">
-                    <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
-                    <span>Título Valor</span>
-                </div>
-                <div class="radian-state-ef-line"></div>
-                <div style="display: grid; padding-left: 21px; padding-top: 4px;">
-                    <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
-                    <span>
-                        @*@foreach (var item in Model.IconsData)
+                @if (Model.IconsData != null)
+                {
+                    foreach (var statusIcons in Model.IconsData.OrderBy(s => s.Key).ToList())
+                    {
+                        if (statusIcons.Key == 1)
                         {
-                            <span>@item.Value.ToString()</span>
-                        }*@
-                    </span>
-                </div>
+                            <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                            <span>@statusIcons.Value</span>
+                        }
+
+                        if (statusIcons.Key != Model.IconsData.First().Key)
+                        {
+                            <div style="display:grid">
+                                <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
+                                <span>@statusIcons.Value</span>
+                            </div>
+                            <div class="radian-state-ef-line"></div>
+                        }
+                        else
+                        {
+                            <div style="display:grid">
+                                <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
+                                <span>@statusIcons.Value</span>
+                            </div>
+
+                        }
+                    }
+                }
+                else
+                {
+                    <div style="display:grid">
+                        <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                        <span>Factura Electrónica</span>
+                    </div>
+                }
             </div>
         </div>
         <div class="col-md-4 row-fe-states">

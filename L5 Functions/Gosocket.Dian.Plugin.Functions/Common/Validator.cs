@@ -417,7 +417,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var softwareProviderCode = nitModel.SoftwareProviderCode;
             var softwareProviderCodeDigit = nitModel.SoftwareProviderCodeDigit;
-
             var providerCode = nitModel.ProviderCode;
             var providerCodeDigit = nitModel.ProviderCodeDigit;
 
@@ -781,7 +780,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     return responses;
                 case (int)EventStatus.Avales:
-
                     //valida si existe los permisos del mandatario 
                     var responseAval = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
                         party.ResponseCode, xmlParserCude.NoteMandato);
@@ -824,9 +822,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-
                     return responses;
-
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     if (party.SenderParty != senderCode)
                     {
@@ -960,8 +956,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     //    });
                     //}
-
-
                     return responses;
                 case (int)EventStatus.NegotiatedInvoice:
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
@@ -1126,7 +1120,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-
                     ////valida si existe los permisos del mandatario 
                     //var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, receiverCode,
                     //    party.ResponseCode, xmlParserCude.NoteMandato);
@@ -1145,7 +1138,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     //    });
                     //}
-
                     return responses;
                 //Valor Informe 3 dias pago
                 case (int)EventStatus.ValInfoPago:
@@ -1196,7 +1188,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
             }
-
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
@@ -1208,7 +1199,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
-
             string valueTotalEndoso = nitModel.ValorTotalEndoso;
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
@@ -1288,7 +1278,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
             }
-
             return null;
         }
         #endregion
@@ -1397,7 +1386,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 else
                                     valid = true;
-
                             }
                         }
                         validError = false;
@@ -1407,7 +1395,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         validError = true;
                     }
-
                 }
                 if (validError)
                 {
@@ -1431,9 +1418,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
                 }
-
-            }
-         
+            }         
             return null;
         }
 
@@ -1504,7 +1489,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return rs;
         }
         #endregion
-
 
         #region Validate Reference Attorney
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
@@ -2049,7 +2033,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return contributor;
         }
         #endregion
-
 
         private List<GlobalNumberRange> GetNumberRangeInstanceCache(string senderCode)
         {
@@ -3601,7 +3584,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             public string errorMessageigningTimeRecibo { get; set; }
             public string errorCodeEndoso { get; set; }
             public string errorMessageEndoso { get; set; }
-
 
         }
 
