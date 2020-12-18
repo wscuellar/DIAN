@@ -956,8 +956,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     //    });
                     //}
-
-
                     return responses;
                 case (int)EventStatus.NegotiatedInvoice:
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
@@ -1122,7 +1120,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-
                     ////valida si existe los permisos del mandatario 
                     //var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, receiverCode,
                     //    party.ResponseCode, xmlParserCude.NoteMandato);
@@ -1141,7 +1138,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     //    });
                     //}
-
                     return responses;
                 //Valor Informe 3 dias pago
                 case (int)EventStatus.ValInfoPago:
