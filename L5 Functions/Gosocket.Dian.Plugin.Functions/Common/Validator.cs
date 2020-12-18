@@ -1386,7 +1386,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 else
                                     valid = true;
-
                             }
                         }
                         validError = false;
@@ -1396,7 +1395,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         validError = true;
                     }
-
                 }
                 if (validError)
                 {
@@ -1420,9 +1418,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
                 }
-
-            }
-         
+            }         
             return null;
         }
 
