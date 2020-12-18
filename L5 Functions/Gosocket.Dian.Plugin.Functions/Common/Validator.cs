@@ -1505,7 +1505,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
-
         #region Validate Reference Attorney
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
         {
@@ -2049,7 +2048,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return contributor;
         }
         #endregion
-
 
         private List<GlobalNumberRange> GetNumberRangeInstanceCache(string senderCode)
         {
@@ -3601,7 +3599,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             public string errorMessageigningTimeRecibo { get; set; }
             public string errorCodeEndoso { get; set; }
             public string errorMessageEndoso { get; set; }
-
 
         }
 
