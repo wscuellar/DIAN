@@ -33,8 +33,13 @@ namespace Gosocket.Dian.Functions.Radian
         public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
+
+            SetLogger(null, "Step 00", " Ingresamos a ActivateRadianOperation ");
+
             if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
+                SetLogger(null, "Step 01", " Ingresamos a ActivateRadianOperation Ambiente Prod ");
+
                 RadianContributor radianContributor = null;
                 GlobalContributorActivation contributorActivation = null;
                 RadianaActivateContributorRequestObject requestObject = null;
@@ -47,18 +52,14 @@ namespace Gosocket.Dian.Functions.Radian
                     //Contributorid = RadiancontributoriD
                     radianContributor = contributorService.GetRadian(requestObject.ContributorId, requestObject.RadianContributorTypeId);
 
-                    string resultJson = JsonConvert.SerializeObject(requestObject);
-                    var lastZone = new GlobalLogger("RadianActivateContributor", "Step 1") { Message = resultJson };
-                    TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+                    SetLogger(requestObject, "Step 1", "RadianContributor ");
 
                     // Step 3 Activo RadianContributor
 
                     radianContributor.RadianContributorTypeId = requestObject.RadianContributorTypeId;
                     contributorService.ActivateRadian(radianContributor);
 
-                    resultJson = JsonConvert.SerializeObject(radianContributor);
-                    lastZone = new GlobalLogger("RadianActivateContributor", "Step 3") { Message = "ActivateRadian --> " + resultJson };
-                    TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+                    SetLogger(radianContributor, "Step 2", "ActivateRadian -->  ");
 
                     // Step 4 Actualizo RadianSoftware en SQL 
 
@@ -73,6 +74,7 @@ namespace Gosocket.Dian.Functions.Radian
                     };
 
                     int radianContributorId = contributorService.AddOrUpdateRadianContributor(newRadianContributor);
+                    SetLogger(radianContributorId, "Step 4", " -- contributorService.AddOrUpdateRadianContributor -- ");
 
                     // si el software No Existe
                     if (Convert.ToInt32(requestObject.SoftwareType) == (int)Domain.Common.RadianOperationModeTestSet.OwnSoftware)
@@ -196,6 +198,23 @@ namespace Gosocket.Dian.Functions.Radian
             public string SoftwarePassword { get; set; }
         }
 
+        /// <summary>
+        /// Metodo que permite registrar en el Log cualquier mensaje o evento que deeemos
+        /// </summary>
+        /// <param name="objData">Un Objeto que se serializara en Json a String y se mostrara en el Logger</param>
+        /// <param name="Step">El paso del Log o de los mensajes</param>
+        /// <param name="msg">Un mensaje adicional si no hay objdata, por ejemplo</param>
+        private static void SetLogger(object objData, string Step, string msg)
+        {
+            object resultJson;
 
+            if (objData != null)
+                resultJson = JsonConvert.SerializeObject(objData);
+            else
+                resultJson = String.Empty;
+
+            var lastZone = new GlobalLogger("202012", "202012") { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+            TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+        }
     }
 }

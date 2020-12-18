@@ -292,6 +292,8 @@ namespace Gosocket.Dian.Functions.Activation
                                 //Verificamos si quedo habilitado sino termina
                                 if (isPartipantActive.RadianState != Domain.Common.RadianState.Habilitado.GetDescription()) return;
 
+                                SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
+
                                 //Habilitamos en RADIAN en HAB
                                 //--Habilitamos SQL
                                 //contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
@@ -323,6 +325,8 @@ namespace Gosocket.Dian.Functions.Activation
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
                                 var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
 
+                                SetLogger(activation, "Step 21", " functionPath " + functionPath);
+
                                 var guid = Guid.NewGuid().ToString();
                                 var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
                                 {
@@ -339,6 +343,7 @@ namespace Gosocket.Dian.Functions.Activation
                                 };
                                 await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
 
+                                SetLogger(contributorActivation, "Step 22", " contributorActivationTableManager.InsertOrUpdateAsync " );
 
                                 #endregion
                             }
