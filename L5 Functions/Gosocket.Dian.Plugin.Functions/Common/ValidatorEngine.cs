@@ -308,7 +308,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> StartNoteReferenceValidation(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
-
             // Validator instance
             var validator = new Validator();
             validateResponses.Add(validator.ValidateNoteReference(trackId));
@@ -337,7 +336,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             cmObject.NitNIE = Convert.ToString(xmlParser.globalDocPayrolls.Emp_NIT);
             cmObject.DocEmp = Convert.ToString(xmlParser.globalDocPayrolls.NumeroDocumento);
             cmObject.TipAmb = Convert.ToString(xmlParser.globalDocPayrolls.Ambiente);
-
 
             // Validator instance
             var validator = new Validator();
@@ -396,7 +394,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var validator = new Validator();
             validateResponses.AddRange(validator.EventApproveCufe(nitModel, eventApproveCufe));
-
             return validateResponses;
         }
 
@@ -410,7 +407,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 throw new Exception(xmlParser.ParserError);
 
             var numberRangeModel = xmlParser.Fields.ToObject<NumberRangeModel>();
-
             // Validator instance
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateNumberingRange(numberRangeModel, trackId));
