@@ -45,6 +45,9 @@ namespace Gosocket.Dian.Functions.Batch
             GlobalBatchFileStatus batchFileStatus = null;
             try
             {
+
+                SetLogger("", "Step 1", "Ingreso a ProcessBatchDocumentsZipFile");
+
                 var data = string.Empty;
                 try
                 {
@@ -127,7 +130,9 @@ namespace Gosocket.Dian.Functions.Batch
                     batchFileStatus.StatusDescription = "Lote de documentos contenidos en el archivo zip deben pertenecer todos a un mismo emisor.";
                     await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
                     return;
-                }          
+                }
+
+                SetLogger(nits, "Step 2", "Ingreso a ProcessBatchDocumentsZipFile");
 
                 // Check xpaths
                 var xpathValuesValidationResult = ValidateXpathValues(multipleResponsesXpathDataValue, flagApplicationResponse);             
@@ -141,15 +146,21 @@ namespace Gosocket.Dian.Functions.Batch
                     responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"]}-{responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"]}";
                 }
 
+                SetLogger(multipleResponsesXpathDataValue, "Step 3", "Ingreso a ProcessBatchDocumentsZipFile");
+
                 // Check permissions
                 var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, flagApplicationResponse);
                 if (result.Count > 0)
                 {
+                    //SetLogger(result, "Step 3.1", "Check permissions");
+
                     batchFileStatus.StatusCode = "2";
                     batchFileStatus.StatusDescription = result[0].ProcessedMessage;
                     await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
                     return;
                 }
+
+                SetLogger(null, "Step 4", "Ingreso a ProcessBatchDocumentsZipFile");
 
                 // Select unique elements grouping by document key
                 multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"]).Select(y => y.First()).ToList();
@@ -293,16 +304,24 @@ namespace Gosocket.Dian.Functions.Batch
         }
 
         private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, Boolean flagApplicationResponse = false)
-        {
+        {                      
+
             var result = new List<XmlParamsResponseTrackId>();
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
 
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
+
+            SetLogger(codes, "Step 3.3", "CheckPermissions ");
+
+            SetLogger(softwareIds, "Step 3.4", "CheckPermissions ");
+
             foreach (var code in codes.ToList())
             {
                 var trimAuthCode = authCode.Trim();
                 var newAuthCode = trimAuthCode.Substring(0, trimAuthCode.Length - 1);
                 GlobalAuthorization authEntity = null;
+
+                SetLogger(null, "Step 3.5", "Estoy AquiCheckPermissions " + newAuthCode);
 
                 if (string.IsNullOrEmpty(trimAuthCode))
                     result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT de la empresa no encontrado en el certificado." });
@@ -311,12 +330,17 @@ namespace Gosocket.Dian.Functions.Batch
                     if (!string.IsNullOrEmpty(testSetId))
                     {
                         List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
+                       
+                        //SetLogger(null, "Step 5", testSetId);
 
                         RadianTestSetResult objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(),StringComparison.OrdinalIgnoreCase));
+                        SetLogger(lstResult, "Step 3.6", "CheckPermissions");
                         var softwareId = softwareIds.Last();
 
                         if (objRadianTestSetResult == null)
                         {
+                            //SetLogger(lstResult, "Step 3.7", "CheckPermissions");
+
                             authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
                             if (authEntity == null)
                                 authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(newAuthCode, code);
@@ -355,15 +379,22 @@ namespace Gosocket.Dian.Functions.Batch
                             else if (testSetResultEntity.Status == (int)TestSetStatus.Rejected)
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
 
+
+                           // SetLogger(lstResult, "Step 3.7", "CheckPermissions salida");
+
+
                         }
                         else
                         {
+                            SetLogger(lstResult, "Step 3.6", "CheckPermissions");
+
                             bool isActive = globalRadianOperationService.IsActive(code, new Guid(softwareId));
                             if (isActive)
                             {
-                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} ya esta autorizado con el software {softwareId}." });
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} ya esta habilitado con el software {softwareId}." });
                                 return result;
                             }
+
 
                             // Validations to RADIAN  
                             var radianTestSetResults = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
@@ -567,6 +598,25 @@ namespace Gosocket.Dian.Functions.Batch
 
 
             return result;
+        }
+
+        /// <summary>
+        /// Metodo que permite registrar en el Log cualquier mensaje o evento que deeemos
+        /// </summary>
+        /// <param name="objData">Un Objeto que se serializara en Json a String y se mostrara en el Logger</param>
+        /// <param name="Step">El paso del Log o de los mensajes</param>
+        /// <param name="msg">Un mensaje adicional si no hay objdata, por ejemplo</param>
+        private static void SetLogger(object objData, string Step, string msg)
+        {
+            object resultJson;
+
+            if (objData != null)
+                resultJson = JsonConvert.SerializeObject(objData);
+            else
+                resultJson = String.Empty;
+
+            var lastZone = new GlobalLogger("202012", "202012") { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+            TableManagerGlobalLogger.InsertOrUpdate(lastZone);
         }
 
         public class RequestObject
