@@ -234,4 +234,7 @@
   <data name="OperationFailOtherInProcess" xml:space="preserve">
     <value>No puede registrar esta operación, tiene software en proceso!!.</value>
   </data>
+  <data name="OtherSuccessSoftware" xml:space="preserve">
+    <value>Datos asociados correctamente.</value>
+  </data>
 </root>

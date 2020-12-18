@@ -10,7 +10,7 @@ namespace Gosocket.Dian.Domain.Sql
         [ForeignKey("OtherDocElecContributor")]
         public int OtherDocElecContributorId { get; set; }  
         public  OtherDocElecContributor OtherDocElecContributor { get; set; }
-        //public int OperationStatusId { get; set; }
+        public int OperationStatusId { get; set; }
         public int SoftwareType { get; set; }
         public Guid SoftwareId { get; set; }
         public OtherDocElecSoftware Software { get; set; }

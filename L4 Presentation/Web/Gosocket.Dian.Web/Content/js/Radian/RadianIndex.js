@@ -59,6 +59,38 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFu
     });
 }
 
+function CallExecutionWithData(callMethod, url, jsonvalue, method, showMessage, cancelFunction) {
+    $.ajax({
+        url: url,
+        type: callMethod,
+        data: jsonvalue,
+        success: function (data) {
+            if (showMessage) {
+                if (data.MessageType === "alert") {
+                    showConfirmation(data.Message, AlertExec(cancelFunction));
+                }
+                if (data.MessageType === "confirm") {
+                    showConfirmation(data.Message, ConfirmExec(method, jsonvalue, cancelFunction));
+                }
+                if (data.MessageType === "redirect") {
+                    operationClick = false;
+                    window.location.href = data.RedirectTo;
+                }
+            }
+            else {
+                if (data.Code == "500" && data.MessageType === "alert") {
+                    showConfirmation(data.Message, AlertExec(cancelFunction));
+                }
+                else {
+                    method(jsonvalue, data);
+                }
+
+            }
+
+        }
+    });
+}
+
 function showConfirmation(confirmMessage, buttons, className, operationCancel) {
     bootbox.dialog({
         className: className && className,
