@@ -253,14 +253,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return validateResponses;
                 }
             }
-
             var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
-
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel));
 
