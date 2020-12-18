@@ -236,32 +236,55 @@ namespace Gosocket.Dian.Application
                     Status = (int)TestSetStatus.InProcess,
                     StatusDescription = TestSetStatus.InProcess.GetDescription(),
                     ContributorTypeId = radianContributor.RadianContributorTypeId.ToString(),
+                    // Totales Generales
                     TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
-                    ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
-                    ReceiptServiceTotalRequired = testSet.ReceiptServiceTotalAcceptedRequired,
-                    ExpressAcceptanceTotalRequired = testSet.ExpressAcceptanceTotalAcceptedRequired,
-                    AutomaticAcceptanceTotalRequired = testSet.AutomaticAcceptanceTotalAcceptedRequired,
-                    RejectInvoiceTotalRequired = testSet.RejectInvoiceTotalAcceptedRequired,
+                    TotalDocumentAcceptedRequired= testSet.TotalDocumentAcceptedRequired,
+                    // Acuse de recibo
+                    ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalRequired,
+                    ReceiptNoticeTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
+                    //Recibo del bien
+                    ReceiptServiceTotalRequired = testSet.ReceiptServiceTotalRequired,
+                    ReceiptServiceTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
+                    // Aceptación expresa
+                    ExpressAcceptanceTotalRequired = testSet.ExpressAcceptanceTotalRequired,
+                    ExpressAcceptanceTotalAcceptedRequired= testSet.ExpressAcceptanceTotalAcceptedRequired,
+                    //Manifestación de aceptación
+                    AutomaticAcceptanceTotalRequired = testSet.AutomaticAcceptanceTotalRequired,
+                    AutomaticAcceptanceTotalAcceptedRequired= testSet.AutomaticAcceptanceTotalAcceptedRequired,
+                    //Rechazo factura electrónica
+                    RejectInvoiceTotalRequired = testSet.RejectInvoiceTotalRequired,
+                    RejectInvoiceTotalAcceptedRequired= testSet.RejectInvoiceTotalAcceptedRequired,
+                    // Solicitud disponibilización
                     ApplicationAvailableTotalRequired = testSet.ApplicationAvailableTotalRequired,
                     ApplicationAvailableTotalAcceptedRequired = testSet.ApplicationAvailableTotalAcceptedRequired,
+                    // Endoso en Propiedad
                     EndorsementPropertyTotalRequired = testSet.EndorsementPropertyTotalRequired,
                     EndorsementPropertyTotalAcceptedRequired = testSet.EndorsementPropertyTotalAcceptedRequired,
+                    // Endoso en Procuracion
                     EndorsementProcurementTotalRequired = testSet.EndorsementProcurementTotalRequired,
                     EndorsementProcurementTotalAcceptedRequired = testSet.EndorsementProcurementTotalAcceptedRequired,
+                    // Endoso en Garantia
                     EndorsementGuaranteeTotalRequired = testSet.EndorsementGuaranteeTotalRequired,
                     EndorsementGuaranteeTotalAcceptedRequired = testSet.EndorsementGuaranteeTotalAcceptedRequired,
+                    // Cancelación de endoso
                     EndorsementCancellationTotalRequired = testSet.EndorsementCancellationTotalRequired,
                     EndorsementCancellationTotalAcceptedRequired = testSet.EndorsementCancellationTotalAcceptedRequired,
+                    // Avales
                     GuaranteeTotalRequired = testSet.GuaranteeTotalRequired,
                     GuaranteeTotalAcceptedRequired = testSet.GuaranteeTotalAcceptedRequired,
+                    // Mandato electrónico
                     ElectronicMandateTotalRequired = testSet.ElectronicMandateTotalRequired,
                     ElectronicMandateTotalAcceptedRequired = testSet.ElectronicMandateTotalAcceptedRequired,
+                    // Terminación mandato
                     EndMandateTotalRequired = testSet.EndMandateTotalRequired,
                     EndMandateTotalAcceptedRequired = testSet.EndMandateTotalAcceptedRequired,
+                    // Notificación de pago
                     PaymentNotificationTotalRequired = testSet.PaymentNotificationTotalRequired,
                     PaymentNotificationTotalAcceptedRequired = testSet.PaymentNotificationTotalAcceptedRequired,
+                    // Limitación de circulación
                     CirculationLimitationTotalRequired = testSet.CirculationLimitationTotalRequired,
                     CirculationLimitationTotalAcceptedRequired = testSet.CirculationLimitationTotalAcceptedRequired,
+                    // Terminación limitación 
                     EndCirculationLimitationTotalRequired = testSet.EndCirculationLimitationTotalRequired,
                     EndCirculationLimitationTotalAcceptedRequired = testSet.EndCirculationLimitationTotalAcceptedRequired
                 };
