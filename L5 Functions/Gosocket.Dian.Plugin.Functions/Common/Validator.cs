@@ -417,7 +417,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var softwareProviderCode = nitModel.SoftwareProviderCode;
             var softwareProviderCodeDigit = nitModel.SoftwareProviderCodeDigit;
-
             var providerCode = nitModel.ProviderCode;
             var providerCodeDigit = nitModel.ProviderCodeDigit;
 
@@ -781,7 +780,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     return responses;
                 case (int)EventStatus.Avales:
-
                     //valida si existe los permisos del mandatario 
                     var responseAval = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
                         party.ResponseCode, xmlParserCude.NoteMandato);
@@ -824,9 +822,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-
                     return responses;
-
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     if (party.SenderParty != senderCode)
                     {
