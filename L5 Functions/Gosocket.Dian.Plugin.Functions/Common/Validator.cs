@@ -3274,9 +3274,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.ValInfoPago:
-                    if (Convert.ToDateTime(data.SigningTime) == Convert.ToDateTime(dataModel.PaymentDueDate))
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(data.EndDate), Convert.ToDateTime(data.SigningTime));
+                    if (Convert.ToDateTime(data.EndDate) == Convert.ToDateTime(dataModel.PaymentDueDate))
                     {
-                        responses.Add(businessDays < 3
+                        responses.Add(businessDays == 3
                         ? new ValidateListResponse
                         {
                             IsValid = true,
