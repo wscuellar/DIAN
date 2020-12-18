@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Domain.Sql.FreeBiller;
+using Gosocket.Dian.Domain.Utils;
 using Gosocket.Dian.Infrastructure;
 using System;
 using System.Data.Entity;
@@ -174,21 +175,29 @@ namespace Gosocket.Dian.DataContext
         /// </summary>
         public DbSet<Domain.Sql.ElectronicDocument> ElectronicDocuments { set; get; }
 
-
         /// <summary>
-        /// 
+        /// Opciones de Menu para el Facturador Gratuito.
+        /// FreeBiller.
         /// </summary>
         public DbSet<MenuOptions> MenuOptions { get; set; }
 
         /// <summary>
-        /// 
+        /// Opciones de Menu por Perfil para el Facturador Gratuito.
+        /// FreeBiller.
         /// </summary>
         public DbSet<MenuOptionsByProfiles> MenuOptionsByProfiles { get; set; }
 
         /// <summary>
-        /// 
+        /// Perfiles usados para Facturador Gratuito.
+        /// FreeBiller.
         /// </summary>
         public DbSet<Profile> Profile { get; set; }
+
+        /// <summary>
+        /// Claims de AspNet Identy para poder trabajar con perfiles del Facturador Gratuito.
+        /// Tabla: AspNetUserClaims.
+        /// </summary>
+        public DbSet<ClaimsDb> ClaimsDbs { get; set; }
 
     }
 

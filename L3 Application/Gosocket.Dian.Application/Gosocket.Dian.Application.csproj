@@ -196,6 +196,8 @@
     <Compile Include="Common\CertificateExtensions.cs" />
     <Compile Include="Common\RedisExtensions.cs" />
     <Compile Include="ElectronicDocumentService.cs" />
+    <Compile Include="FreeBiller\ClaimsDbService.cs" />
+    <Compile Include="FreeBiller\ProfileService.cs" />
     <Compile Include="GlobalRadianOperationService.cs" />
     <Compile Include="Managers\TestSetOthersDocumentsManager.cs" />
     <Compile Include="IdentificationTypeService.cs" />

@@ -13,11 +13,16 @@ using Microsoft.AspNet.Identity.Owin;
 using Newtonsoft.Json;
 using System.Text;
 using Gosocket.Dian.Application;
+using Gosocket.Dian.Application.FreeBiller;
+using Gosocket.Dian.Domain.Utils;
 
 namespace Gosocket.Dian.Web.Controllers
 {
     public class FreeBillerController : Controller
     {
+
+        #region variables privadas
+        
         /// <summary>
         /// Servicio que contiene las operaciones de los usuarios de Entrega Factura.
         /// </summary>
@@ -28,6 +33,38 @@ namespace Gosocket.Dian.Web.Controllers
         /// Tabla: IdentificationType.
         /// </summary>
         private readonly IdentificationTypeService identificationTypeService = new IdentificationTypeService();
+
+        /// <summary>
+        /// Servicio para obtener los perfiles de Facturador gratuito.
+        /// Tabla: ProfilesFreeBiller.
+        /// </summary>
+        private readonly ProfileService profileService = new ProfileService();
+
+
+        private readonly ClaimsDbService claimsDbService = new ClaimsDbService();
+
+        /// <summary>
+        /// Listas parametrica "estaticas" para no tener que consultar muchas veces la DB.
+        /// Tipos de Documento.
+        /// </summary>
+        private List<SelectListItem> staticTypeDoc { get; set; }
+
+        /// <summary>
+        /// Listas parametrica "estaticas" para no tener que consultar muchas veces la DB.
+        /// Perfiles.
+        /// </summary>
+        private List<SelectListItem> staticProfiles { get; set; }
+
+
+        /// <summary>
+        /// Identificador para poder guardar Claims con el Perfil del usuario.
+        /// </summary>
+        private const string ClaimProfile = "PROFILE_FREEBILLER";
+
+        #endregion
+
+
+
         private ApplicationUserManager userManager
         {
             get
@@ -44,8 +81,10 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult FreeBillerUser()
         {
             UserFiltersFreeBillerModel model = new UserFiltersFreeBillerModel();
-            model.DocTypes = this.GetTypesDoc();
-            model.Profiles = this.DataPerfiles();
+            this.staticTypeDoc = this.GetTypesDoc();
+            this.staticProfiles = this.GetProfiles();
+            model.DocTypes = this.staticTypeDoc;
+            model.Profiles = this.staticProfiles;
             model.Users = this.Datausuarios(); //new List<UserFreeBillerModel>();
             return View(model);
         }
@@ -67,8 +106,8 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult CreateUser()
         {
             UserFreeBillerModel model = new UserFreeBillerModel();
-            model.TypesDoc = this.GetTypesDoc();
-            model.Profiles = this.DataPerfiles();
+            model.TypesDoc = this.staticTypeDoc;
+            model.Profiles = this.staticProfiles;
 
             return View(model);
         }
@@ -113,6 +152,7 @@ namespace Gosocket.Dian.Web.Controllers
                 CreationDate = DateTime.Now,
                 UpdatedBy = User.Identity.Name,
                 LastUpdated = DateTime.Now,
+                Active = 1
                 //PasswordHash = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0])
             };
             model.Password = userManager.PasswordHasher.HashPassword(model.Email.Split('@')[0]);
@@ -140,6 +180,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             IdentityResult result = userManager.Create(user, model.Password);
+            
 
             if (result.Succeeded)
             {
@@ -161,6 +202,9 @@ namespace Gosocket.Dian.Web.Controllers
                 // Revisar calse estatica para colocar el valor del nuevo rol.
                 var resultRole = userManager.AddToRole(user.Id, "UsuarioFacturadorGratuito");
 
+                // Claim para reconocer el perfi del nuevo usuario para el Facturador Gratuito.
+                userManager.AddClaim(user.Id, new System.Security.Claims.Claim(ClaimProfile, model.ProfileId.ToString()));
+                
 
                 //Envio de notificacion por correo
                 var envio = SendMailCreate(model);
@@ -237,15 +281,30 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-        #region data test
-        private List<SelectListItem> DataPerfiles()
+        /// <summary>
+        /// Método encargado de obtener los perfiles del Facturador Gratuito y asignarlos a 
+        /// una lista para usarlos en las vistas.
+        /// </summary>
+        /// <returns>List<SelectListItem([Id],[Name])></returns>
+        private List<SelectListItem> GetProfiles()
         {
-            return new List<SelectListItem> {
-                new SelectListItem{ Value="1", Text= "Administrador (TODOS)" },
-                new SelectListItem{ Value="2", Text= "Contador" },
-                new SelectListItem{ Value="3", Text= "Facturador" },
-                new SelectListItem{ Value="4", Text= "Fiscal" }
-            };
+            List<SelectListItem> selectTypesId = new List<SelectListItem>();
+            var profiles = profileService.GetAll();
+
+            if (profiles?.Count > 0)
+            {
+                foreach (var item in profiles)
+                {
+                    selectTypesId.Add(
+                        new SelectListItem
+                        {
+                            Value = item.Id.ToString(),
+                            Text = item.Name
+                        });
+                }
+            }
+
+            return selectTypesId;
         }
 
         /// <summary>
@@ -279,27 +338,31 @@ namespace Gosocket.Dian.Web.Controllers
 
         private List<UserFreeBillerModel> Datausuarios()
         {
-            return new List<UserFreeBillerModel>{
-                new UserFreeBillerModel{
-                    Id = new Guid().ToString(),
-                    FullName= "Pepito perez",
-                    DescriptionTypeDoc = "Cedula de ciudadanía",
-                    DescriptionProfile = "Facturador",
-                    NumberDoc = "1000223674",
-                    //LastUpdate = DateTime.Now,
-                    IsActive = true
-                },
-                new UserFreeBillerModel{
-                    Id = new Guid().ToString(),
-                    FullName= "lala lolo",
-                    DescriptionTypeDoc = "Cedula de ciudadanía",
-                    DescriptionProfile = "Fiscal",
-                    NumberDoc = "45722258",
-                    LastUpdate = DateTime.Now,
-                    IsActive = false
+            List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
+            List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(ClaimProfile);
+
+            var users = userService.GetUsers(userIdsFreeBiller.Select(u=> u.UserId).ToList());
+
+            if (users != null)
+            {
+                foreach (var item in users)
+                {
+                    string perfilId = userIdsFreeBiller.FirstOrDefault(u => u.UserId == item.Id).ClaimValue;
+                    listUsers.Add(new UserFreeBillerModel
+                    {
+                        Id = item.Id,
+                        FullName = item.Name,
+                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
+                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
+                        NumberDoc = item.IdentificationId,
+                        LastUpdate = item.LastUpdated,
+                        IsActive = Convert.ToBoolean(item.Active)
+                    });
                 }
-            };
+
+            }
+
+            return listUsers;
         }
-        #endregion
     }
 }
