@@ -123,7 +123,7 @@ namespace Gosocket.Dian.Functions.Radian
                                 {
                                     Deleted = false,
                                     RadianContributorTypeId = radianContributor.RadianContributorTypeId,
-                                    RadianStatus = Domain.Common.RadianState.Habilitado.GetDescription(),
+                                    RadianState = Domain.Common.RadianState.Habilitado.GetDescription(),
                                     SoftwareType = Convert.ToInt32(requestObject.SoftwareType)
                                 };
 
