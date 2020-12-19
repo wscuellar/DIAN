@@ -63,7 +63,7 @@
                         @Html.ActionLink("Ver detalles","Details")
                     </td>
                     <td>
-                        @Html.ActionLink("E", "EditFreeBillerUser")
+                        @Html.ActionLink("E", "EditFreeBillerUser", new { user.Id })
                     </td>
                     <td class="text-nowrap">
                         <input type="checkbox" checked="@user.IsActive" />

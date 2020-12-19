@@ -83,7 +83,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             UserFiltersFreeBillerModel model = new UserFiltersFreeBillerModel();
             this.staticTypeDoc = this.GetTypesDoc();
-            this.staticProfiles = this.GetProfiles();
+          //  this.staticProfiles = this.GetProfiles();
             model.DocTypes = this.staticTypeDoc;
             model.Profiles = this.staticProfiles;
             model.Users = this.GetUsers(); 
@@ -106,19 +106,20 @@ namespace Gosocket.Dian.Web.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult EditFreeBillerUser(string guid ="7713a5d0-fe76-4e9a-b704-d05a7d7b7f07")
+        public ActionResult EditFreeBillerUser(string id)
         {
             var tdocs = GetTypesDoc();
+            GetMenuProfiles();
             //dropdown
             ViewBag.tdocs = tdocs.Select(p => new SelectListItem() { Value = p.Value.ToString(), Text = p.Text }).ToList<SelectListItem>();
             UserService user = new UserService();
-            var data = user.Get(guid);
+            var data = user.Get(id);
             UserFreeBillerModel model = new UserFreeBillerModel();
             model.Id = data.Id;
             model.Name = data.UserName;
             model.Email = data.Email;
             model.LastUpdate = data.LastUpdated;
-            model.Profiles = this.GetProfiles();
+           // model.Profiles = this.GetProfiles();
             model.LastName = "Perez";
             model.FullName = data.Name;
             model.NumberDoc = data.IdentificationId;
@@ -144,8 +145,11 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("Not found");
             }else
             {
-                user.Name = model.Name;
-                user.Name = model.NumberDoc;
+                user.Name = model.FullName;
+                user.IdentificationTypeId = Convert.ToInt32(model.TypeDocId);
+                user.IdentificationId = model.NumberDoc;
+                user.Email = model.Email;
+                user.PasswordHash = model.Password;
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
@@ -169,7 +173,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.Profiles = this.staticProfiles;
 
             model.TypesDoc = this.GetTypesDoc();
-            model.Profiles = this.GetProfiles();
+            //model.Profiles = this.GetProfiles();
 
             return View(model);
         }
@@ -346,7 +350,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// una lista para usarlos en las vistas.
         /// </summary>
         /// <returns>List<SelectListItem([Id],[Name])></returns>
-        private List<SelectListItem> GetProfiles()
+        private List<SelectListItem> GetProfiles(string id)
         {
             List<SelectListItem> selectTypesId = new List<SelectListItem>();
             var profiles = profileService.GetAll();
@@ -396,7 +400,27 @@ namespace Gosocket.Dian.Web.Controllers
 
             return selectTypesId;
         }
+        private List<SelectListItem> GetMenuProfiles()
+        {
+            List<SelectListItem> selectTypesId = new List<SelectListItem>();
+            var types = identificationTypeService.List()?.ToList();
 
+            if (types?.Count > 0)
+            {
+                foreach (var item in types)
+                {
+                    selectTypesId.Add(
+                        new SelectListItem
+                        {
+                            Value = item.Code,
+                            Text = item.Description
+                        });
+                }
+
+            }
+
+            return selectTypesId;
+        }
         private List<UserFreeBillerModel> GetUsers()
         {
             List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
