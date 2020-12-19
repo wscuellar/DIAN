@@ -3,8 +3,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+
 using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Infrastructure
@@ -286,6 +285,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (StorageException ex)
             {
+                _ = ex.Message;
                 return null;
             }
         }
