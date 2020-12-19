@@ -149,13 +149,14 @@
     <script>
         $(document).ready(function () {
             var urlNewUser = "@Url.Action("CreateUser")";
+            var urlNewProfile = "@Url.Action("CreateProfile", "ProfileFreeBiller")";
 
             $("#btnUser").click(function () {
                 window.location.href = urlNewUser;
             });
 
             $("#btnProfile").click(function () {
-                alert('no está listo');
+                window.location.href = urlNewProfile;
             });
         });
     </script>

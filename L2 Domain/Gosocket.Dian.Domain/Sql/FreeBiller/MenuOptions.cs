@@ -8,14 +8,16 @@ namespace Gosocket.Dian.Domain.Sql.FreeBiller
     public class MenuOptions
     {
         [Key]
-        public int Key { get; set; }
+        public int Id { get; set; }
 
         [StringLength(50)]
-        public string MyProperty { get; set; }
+        public string Name { get; set; }
 
-        public int ParentId { get; set; }
+        public int? ParentId { get; set; }
 
         public bool IsActive { get; set; }
+
+        public int MenuLevel { get; set; }
 
     }
 }
