@@ -592,7 +592,7 @@ namespace Gosocket.Dian.Web.Services
                 {
                     StatusCode = "500",
                     StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.",
-                    XmlFileName = "SendEventUpdateStatus",
+                    XmlFileName = "SendEventNominaStatus",
                     IsValid = false,
                     StatusMessage = "Documento XML ApplicationResponse"
                 };
