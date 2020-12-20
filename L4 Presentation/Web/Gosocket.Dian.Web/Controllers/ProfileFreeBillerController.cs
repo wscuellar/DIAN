@@ -57,7 +57,7 @@ namespace Gosocket.Dian.Web.Controllers
                     this.staticMenuOptions.Add(
                         new MenuOptionsModel
                         {
-                            MenuId = item.Id.ToString(),
+                            MenuId = item.Id,
                             Name = item.Name,
                             FatherId = item.ParentId,
                             Level = item.MenuLevel

@@ -83,7 +83,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             UserFiltersFreeBillerModel model = new UserFiltersFreeBillerModel();
             this.staticTypeDoc = this.GetTypesDoc();
-          //  this.staticProfiles = this.GetProfiles();
+            this.staticProfiles = this.GetProfiles();
             model.DocTypes = this.staticTypeDoc;
             model.Profiles = this.staticProfiles;
             model.Users = this.GetUsers(); 
@@ -350,7 +350,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// una lista para usarlos en las vistas.
         /// </summary>
         /// <returns>List<SelectListItem([Id],[Name])></returns>
-        private List<SelectListItem> GetProfiles(string id)
+        private List<SelectListItem> GetProfiles()
         {
             List<SelectListItem> selectTypesId = new List<SelectListItem>();
             var profiles = profileService.GetAll();
@@ -433,16 +433,25 @@ namespace Gosocket.Dian.Web.Controllers
                 foreach (var item in users)
                 {
                     string perfilId = userIdsFreeBiller.FirstOrDefault(u => u.UserId == item.Id).ClaimValue;
-                    listUsers.Add(new UserFreeBillerModel
-                    {
-                        Id = item.Id,
-                        FullName = item.Name,
-                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
-                        NumberDoc = item.IdentificationId,
-                        LastUpdate = item.LastUpdated,
-                        IsActive = Convert.ToBoolean(item.Active)
-                    });
+                    //listUsers.Add(new UserFreeBillerModel
+                    //{
+                    //    Id = item.Id,
+                    //    FullName = item.Name,
+                    //    DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
+                    //    DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
+                    //    NumberDoc = item.IdentificationId,
+                    //    LastUpdate = item.LastUpdated,
+                    //    IsActive = Convert.ToBoolean(item.Active)
+                    //});
+                    var ne = new UserFreeBillerModel();
+                    ne.Id = item.Id;
+                    ne.FullName = item.Name;
+                    ne.DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text;
+                    ne.DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text;
+                    ne.NumberDoc = item.IdentificationId;
+                    ne.LastUpdate = item.LastUpdated;
+                    ne.IsActive = Convert.ToBoolean(item.Active);
+
                 }
 
             }

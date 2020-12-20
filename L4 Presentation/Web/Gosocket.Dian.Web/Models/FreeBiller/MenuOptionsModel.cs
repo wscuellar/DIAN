@@ -2,12 +2,14 @@
 {
     public class MenuOptionsModel
     {
-        public string MenuId { get; set; }
+        public int MenuId { get; set; }
 
         public string Name { get; set; }
 
         public int? FatherId { get; set; }
 
         public int Level { get; set; }
+
+        public bool IsChecked { get; set; }
     }
 }
