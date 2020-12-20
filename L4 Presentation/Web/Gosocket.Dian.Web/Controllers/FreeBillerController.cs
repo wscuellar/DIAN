@@ -109,7 +109,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult EditFreeBillerUser(string id)
         {
             var tdocs = GetTypesDoc();
-            GetMenuProfiles();
+            var MenuProfiles = GetMenuProfile();
             //dropdown
             ViewBag.tdocs = tdocs.Select(p => new SelectListItem() { Value = p.Value.ToString(), Text = p.Text }).ToList<SelectListItem>();
             UserService user = new UserService();
@@ -168,10 +168,10 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult CreateUser()
         {
             UserFreeBillerModel model = new UserFreeBillerModel();
-
+           
             model.TypesDoc = this.staticTypeDoc;
             model.Profiles = this.staticProfiles;
-
+            model.IsActive = true;
             model.TypesDoc = this.GetTypesDoc();
             //model.Profiles = this.GetProfiles();
 
@@ -400,26 +400,26 @@ namespace Gosocket.Dian.Web.Controllers
 
             return selectTypesId;
         }
-        private List<SelectListItem> GetMenuProfiles()
+        private List<SelectListItem> GetMenuProfile()
         {
-            List<SelectListItem> selectTypesId = new List<SelectListItem>();
-            var types = identificationTypeService.List()?.ToList();
+            List<SelectListItem> selectProfiles = new List<SelectListItem>();
+            var types = profileService.GetMenuOptions().ToList();
 
             if (types?.Count > 0)
             {
                 foreach (var item in types)
                 {
-                    selectTypesId.Add(
+                    selectProfiles.Add(
                         new SelectListItem
                         {
-                            Value = item.Code,
-                            Text = item.Description
-                        });
+                            Value = item.MenuLevel.ToString(),
+                            Text = item.Name.ToString()
+                        }); 
                 }
 
             }
 
-            return selectTypesId;
+            return selectProfiles;
         }
         private List<UserFreeBillerModel> GetUsers()
         {
