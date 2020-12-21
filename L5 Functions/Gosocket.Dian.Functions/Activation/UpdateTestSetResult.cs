@@ -56,39 +56,20 @@ namespace Gosocket.Dian.Functions.Activation
                 await globalTestSetTrackingTableManager.InsertOrUpdateAsync(globalTestSetTracking);
                 var allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
 
-                List<RadianTestSet> radianTestSet = new List<RadianTestSet>();
-                GlobalRadianOperations operation = globalRadianOperations.Find<GlobalRadianOperations>(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
-                if (operation != null && operation.RadianState == Domain.Common.RadianState.Test.GetDescription())
-                    radianTestSet = radianTestSetTableManager.FindByPartition<RadianTestSet>(operation.SoftwareType.ToString());
-
-                string resultJson;
-                GlobalLogger lastZone;
-
-                SetLogger(radianTestSet, "Step 1", "Ingreso a UpdateTestSetResult" );
-
-
+                var radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
+                SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
+                
                 //Valida RADIAN
-                if (radianTestSet.Any())
+                if (radianTesSetResult != null)
                 {
-                    // Roberto Alvarado 20202/11/25
-                    // Proceso de RADIAN TestSetResults
 
+                    
                     // traigo los datos de RadianTestSetResult
-                    var radianTestSetResults = radianTestSetResultTableManager.FindByPartition<RadianTestSetResult>(globalTestSetTracking.SenderCode);
-
-                    // Valido que este en Process el registro de Set de pruebas
-                    RadianTestSetResult radianTesSetResult = radianTestSetResults.SingleOrDefault(t => !t.Deleted &&
-                                                                                t.Id == globalTestSetTracking.TestSetId &&
-                                                                                t.Status == (int)TestSetStatus.InProcess);
-
-                    if (radianTesSetResult == null)
-                        return;
-
-                    SetLogger(radianTesSetResult, "Step 2", "");
-
+                    SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN");
 
                     // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
-                    bool isActive = globalRadianOperationService.IsActive(globalTestSetTracking.SenderCode, new Guid(globalTestSetTracking.SoftwareId));
+                    string code = radianTesSetResult.PartitionKey;
+                    bool isActive = globalRadianOperationService.IsActive(code, new Guid(globalTestSetTracking.SoftwareId));
                     if (isActive)
                         return;
 
@@ -267,7 +248,7 @@ namespace Gosocket.Dian.Functions.Activation
                             && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
 
-                    SetLogger(null, "Step 19", " radianTesSetResult.Status " + radianTesSetResult.Status);
+                    SetLogger(radianTesSetResult, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status);
 
                     // Escribo el registro de RadianTestResult
                     await globalTestSetResultTableManager.InsertOrUpdateAsync(radianTesSetResult);
@@ -287,7 +268,7 @@ namespace Gosocket.Dian.Functions.Activation
                                 var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
 
                                 //Habilitamos el participante en GlobalRadianOperations
-                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
+                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(radianTesSetResult.PartitionKey, globalTestSetTracking.SoftwareId);
 
                                 //Verificamos si quedo habilitado sino termina
                                 if (isPartipantActive.RadianState != Domain.Common.RadianState.Habilitado.GetDescription()) return;
