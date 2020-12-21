@@ -63,6 +63,18 @@
         background: #E9E8E8;
         border-radius: 2px;
     }
+
+    .titleMenu {
+        font-size: 16px;
+        line-height: 18px;
+        color: #2C323C;
+    }
+
+    .subTitleMenu {
+        font-size: 16px;
+        line-height: 16px;
+        color: #2C323C;
+    }
 </style>
 
 <div class="page-content margin-15">
@@ -105,30 +117,32 @@
                                                         <div class="row">
                                                             @foreach (var menuMain in Model.MenuOptionsByProfile.Where(m => m.Level == 1))
                                                             {
-                                                                <div class="col-sm-2">
-                                                                    <div style="position:relative;">
-                                                                        <spam>@menuMain.Name</spam>
+                                                                <div class="col-sm-1">
+                                                                    <div class="row">
+                                                                        <spam class="titleMenu">@menuMain.Name</spam>
                                                                     </div>
                                                                     @foreach (var subMenuItems in Model.MenuOptionsByProfile.Where(m => m.FatherId == (Nullable<int>)menuMain.MenuId))
                                                                     {
                                                                         if (subMenuItems.Level == 2)
                                                                         {
-                                                                            <div style="position:relative;">
-                                                                                <b>@subMenuItems.Name</b>
+                                                                            <div class="row">
+                                                                                <span class="subTitleMenu">@subMenuItems.Name</span>
                                                                             </div>
                                                                             foreach (var subSubMenuItems in Model.MenuOptionsByProfile.Where(m => m.FatherId == (Nullable<int>
                                                                                 )subMenuItems.MenuId))
                                                                             {
-                                                                                <div style="position: relative;">
-                                                                                    <input type="checkbox" value="@subSubMenuItems.IsChecked" />
-                                                                                    <label for="@subSubMenuItems.Name">@subSubMenuItems.Name</label>
+                                                                                <div class="row-cols-1">
+                                                                                    <label>
+                                                                                        <input type="checkbox" name="ValuesSelected" value="@menuMain.MenuId,@subMenuItems.MenuId,@subSubMenuItems.MenuId" checked="@subSubMenuItems.IsChecked" />
+                                                                                        @subSubMenuItems.Name
+                                                                                    </label>
                                                                                 </div>
                                                                             }
                                                                         }
                                                                         else
                                                                         {
-                                                                            <div style="position: relative;">
-                                                                                <input type="checkbox" value="@subMenuItems.IsChecked" />
+                                                                            <div class="row">
+                                                                                <input type="checkbox" name="ValuesSelected" value="@menuMain.MenuId,@subMenuItems.MenuId" checked="@subMenuItems.IsChecked" />
                                                                                 <label for="@subMenuItems.Name">@subMenuItems.Name</label>
                                                                             </div>
                                                                         }
@@ -141,7 +155,7 @@
 
                                                     <div class="panel-footer-grey text-right submit-container">
                                                         <button id="btnCancel" type="button" class="btn btn-success btn-radian-default">Cancelar</button>
-                                                        <button type="submit" class="btn btn-success btn-radian-success">Crear Usuario</button>
+                                                        <button type="submit" class="btn btn-success btn-radian-success">Crear Perfil</button>
                                                     </div>
 
                                                 </div>
