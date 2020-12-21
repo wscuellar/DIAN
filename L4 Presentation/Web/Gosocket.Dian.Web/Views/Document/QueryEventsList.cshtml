@@ -57,13 +57,13 @@
             {
                 <thead>
                     <tr>
-                        <th>Código</th>
-                        <th>Descripción</th>
-                        <th>Fecha</th>
-                        <th>Nit Emisor</th>
-                        <th>Emisor</th>
-                        <th>Nit Receptor</th>
-                        <th>Receptor</th>
+                        <th class="text-center">Código</th>
+                        <th class="text-left">Descripción</th>
+                        <th class="text-center">Fecha</th>
+                        <th class="text-center">Nit Emisor</th>
+                        <th class="text-left">Emisor</th>
+                        <th class="text-center">Nit Receptor</th>
+                        <th class="text-left">Receptor</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -71,13 +71,13 @@
                     @foreach (var set in Model.Events)
                     {
                         <tr>
-                            <td>@set.EventCode</td>
-                            <td>@set.Description</td>
-                            <td style="width:100px;">@set.EventDate.ToString("yyyy-MM-dd")</td>
-                            <td style="width:100px;">@set.SenderCode</td>
-                            <td>@set.Sender</td>
-                            <td style="width:100px;">@set.ReceiverCode</td>
-                            <td>@set.Receiver</td>
+                            <td class="text-center" style="width:100px;">@set.EventCode</td>
+                            <td class="text-left">@set.Description</td>
+                            <td class="text-center" style="width:100px;">@set.EventDate.ToString("yyyy-MM-dd")</td>
+                            <td class="text-center" style="width:100px;">@set.SenderCode</td>
+                            <td class="text-left">@set.Sender</td>
+                            <td class="text-center" style="width:100px;">@set.ReceiverCode</td>
+                            <td class="text-left">@set.Receiver</td>
                             <td style="width:100px;" class="eventlink">
                                 <a class="eventView"><i class="fa fa-eye"></i>Ver detalle</a>
                                 <input type="hidden" id="DocumentKey" value="@set.DocumentKey" />
