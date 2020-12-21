@@ -204,12 +204,12 @@
 
                 <div class="row aditional-data-section padding-panel">
                     <div class="col-sm-4">
-                        <h5>Datos del Emisor del evento </h5>
+                        <h5><strong>Datos del Emisor del evento </strong></h5>
                         <p class="p-event-issuer">NIT: @Model.SenderCode</p>
                         <p class="p-event-issuer">Nombre: @Model.SenderName</p>
                     </div>
                     <div class="col-sm-4">
-                        <h5>Datos del Receptor del Evento </h5>
+                        <h5><strong>Datos del Receptor del Evento </strong></h5>
                         <p class="p-event-issuer">NIT: @Model.ReceiverCode</p>
                         <p class="p-event-issuer">Nombre: @Model.ReceiverName</p>
                     </div>
@@ -315,13 +315,13 @@
                     <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
                         <thead>
                             <tr>
-                                <th class="th-left-align">Tipo de documento</th>
-                                <th class="text-left">Fecha</th>
-                                <th class="th-left-align">Descripción</th>
-                                <th class="text-left">NIT del Emisor</th>
-                                <th class="th-left-align">Emisor</th>
-                                <th class="text-left">NIT del Receptor</th>
-                                <th class="text-left">Receptor</th>
+                                <th class="text-left">Tipo de documento</th>
+                                <th class="text-center">Fecha</th>
+                                <th class="text-center">Descripción</th>
+                                <th class="text-center">NIT del Emisor</th>
+                                <th class="text-center">Emisor</th>
+                                <th class="text-center">NIT del Receptor</th>
+                                <th class="text-center">Receptor</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -329,12 +329,12 @@
                             {
                                 <tr>
                                     <td class="text-left">@item.Document</td>
-                                    <td class="text-left" style="width: 100px;">@item.DateOfIssue.ToString("yyyy-MM-dd")</td>
-                                    <td class="text-left">@item.Description</td>
-                                    <td class="text-left">@item.SenderCode</td>
-                                    <td class="text-left">@item.SenderName</td>
-                                    <td class="text-left">@item.ReceiverCode</td>
-                                    <td class="text-left">@item.ReceiverName</td>
+                                    <td class="text-center" style="width: 100px;">@item.DateOfIssue.ToString("yyyy-MM-dd")</td>
+                                    <td class="text-center">@item.Description</td>
+                                    <td class="text-center">@item.SenderCode</td>
+                                    <td class="text-center">@item.SenderName</td>
+                                    <td class="text-center">@item.ReceiverCode</td>
+                                    <td class="text-center">@item.ReceiverName</td>
 
                                 </tr>
                             }

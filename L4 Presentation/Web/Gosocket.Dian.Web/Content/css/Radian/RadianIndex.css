@@ -1498,3 +1498,8 @@ a.badge {
         margin: 20px;
         position: absolute;
     }
+
+.text-underline {
+    text-decoration: underline;
+    padding: 0px;
+}
