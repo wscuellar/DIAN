@@ -86,7 +86,7 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> Details(string trackId)
         {
             DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
-            //model.IconsData = _queryAssociatedEventsService.IconType(model.eve);
+            model.IconsData = _queryAssociatedEventsService.IconType(null, trackId);
 
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
             return View(model);
@@ -632,7 +632,7 @@ namespace Gosocket.Dian.Web.Controllers
                 pks = new List<string> { $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{model.DocumentKey.Substring(0, 2)}" };
             }
 
-            if (model.RadianStatus > 0 && model.RadianStatus < 6 && model.DocumentTypeId.Equals("00"))
+            if (model.RadianStatus > 0 && model.RadianStatus < 7 && model.DocumentTypeId.Equals("00"))
                 model.DocumentTypeId = "01";
 
             (bool hasMoreResults, string continuation, List<GlobalDataDocument> globalDataDocuments) cosmosResponse =

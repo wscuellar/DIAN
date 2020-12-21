@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                 List<RadianTestSet> radianTestSet = new List<RadianTestSet>();
                 GlobalRadianOperations operation = globalRadianOperations.Find<GlobalRadianOperations>(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
-                if (operation != null && operation.RadianStatus == Domain.Common.RadianState.Test.GetDescription())
+                if (operation != null && operation.RadianState == Domain.Common.RadianState.Test.GetDescription())
                     radianTestSet = radianTestSetTableManager.FindByPartition<RadianTestSet>(operation.SoftwareType.ToString());
 
                 string resultJson;
@@ -290,7 +290,9 @@ namespace Gosocket.Dian.Functions.Activation
                                 GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
 
                                 //Verificamos si quedo habilitado sino termina
-                                if (isPartipantActive.RadianStatus != Domain.Common.RadianState.Habilitado.GetDescription()) return;
+                                if (isPartipantActive.RadianState != Domain.Common.RadianState.Habilitado.GetDescription()) return;
+
+                                SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
 
                                 //Habilitamos en RADIAN en HAB
                                 //--Habilitamos SQL
@@ -323,6 +325,8 @@ namespace Gosocket.Dian.Functions.Activation
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
                                 var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
 
+                                SetLogger(activation, "Step 21", " functionPath " + functionPath);
+
                                 var guid = Guid.NewGuid().ToString();
                                 var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
                                 {
@@ -339,6 +343,7 @@ namespace Gosocket.Dian.Functions.Activation
                                 };
                                 await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
 
+                                SetLogger(contributorActivation, "Step 22", " contributorActivationTableManager.InsertOrUpdateAsync " );
 
                                 #endregion
                             }

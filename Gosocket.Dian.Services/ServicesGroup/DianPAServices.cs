@@ -733,6 +733,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var documentTypeIdRef = documentParsed.DocumentTypeIdRef;
             var issuerPartyCode = documentParsed.IssuerPartyCode;
             var issuerPartyName = documentParsed.IssuerPartyName;
+            var endDate = documentParsed.ValidityPeriodEndDate;
 
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -741,41 +742,45 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName);
             if (!documentReferenceCufe.IsValid)
             {
+                flagMeta = true;
                 dianResponse = documentReferenceCufe;
                 dianResponse.XmlDocumentKey = trackIdCude;
                 dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                 dianResponse.IsValid = false;
-                return dianResponse;
+                //return dianResponse;
             }
 
             //validation if is an endoso of endorsement (Code 037-038-039)
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-                         
-            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad 
-                || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia 
-                || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
+            if(validatorDocumentMeta != null )
             {
-                if (!validatorDocumentMeta.InTransaction)
+                if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad
+               || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia
+               || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
                 {
-                    validatorDocumentMeta.InTransaction = true;
-                    arrayTasks.Add(
-                        TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
-                }
-                else
-                {
-                    dianResponse = new DianResponse()
+                    if (!validatorDocumentMeta.InTransaction)
                     {
-                        StatusMessage = "CUFE relacionado ya cuenta con un proceso En Negociación",
-                        StatusCode = Properties.Settings.Default.Code_89,
-                        IsValid = false
-                    };
-                    ;
-                    dianResponse.XmlDocumentKey = trackIdCude;
-                    dianResponse.XmlFileName = contentFileList[0].XmlFileName;
-                    dianResponse.IsValid = false;
-                    return dianResponse;
+                        validatorDocumentMeta.InTransaction = true;
+                        arrayTasks.Add(
+                            TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
+                    }
+                    else
+                    {
+                        dianResponse = new DianResponse()
+                        {
+                            StatusMessage = "CUFE relacionado ya cuenta con un proceso En Negociación",
+                            StatusCode = Properties.Settings.Default.Code_89,
+                            IsValid = false
+                        };
+                        ;
+                        dianResponse.XmlDocumentKey = trackIdCude;
+                        dianResponse.XmlFileName = contentFileList[0].XmlFileName;
+                        dianResponse.IsValid = false;
+                        return dianResponse;
+                    }
                 }
             }
+           
 
             //Solicitud de Disponibilizacion
             if (Convert.ToInt32(eventCode) == (int)EventStatus.SolicitudDisponibilizacion)
@@ -929,7 +934,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var validateEventCode = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             // Valida fechas y dia habil SigningTime
-            var validationAcceptanceTacitaExpresa = ValidationSigningTime(documentParsed.DocumentKey.ToLower(), eventCode, signingTime, docTypeCode, customizationID, dianResponse);
+            var validationAcceptanceTacitaExpresa = ValidationSigningTime(documentParsed.DocumentKey.ToLower(), eventCode, signingTime, docTypeCode, customizationID, endDate, dianResponse);
             if (!validationAcceptanceTacitaExpresa.IsValid)
             {
                 flagMeta = true;
@@ -1599,9 +1604,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return response;
         }
 
-        private DianResponse ValidationSigningTime(string trackId, string eventCode, string signingTime, string documentTypeId, string customizationID, DianResponse response)
+        private DianResponse ValidationSigningTime(string trackId, string eventCode, string signingTime, string documentTypeId, string customizationID, string endDate,  DianResponse response)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId, customizationID });            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId, customizationID, endDate });            
             
             if (validations.Count > 0)
             {
@@ -1689,12 +1694,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var arrayTasks = new List<Task>();
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             
-            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad
-              || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia
-              || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
+            if(validatorDocumentMeta != null)
             {
-                validatorDocumentMeta.InTransaction = false;
-                arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
+                if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad
+             || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia
+             || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
+                {
+                    validatorDocumentMeta.InTransaction = false;
+                    arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
+                }
             }
         }
 

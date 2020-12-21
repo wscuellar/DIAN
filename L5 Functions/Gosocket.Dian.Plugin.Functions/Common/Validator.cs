@@ -431,7 +431,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
             else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
-            else if (documentMeta.DocumentTypeId == "96") senderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ24;
+            
             if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
             if (((documentMeta.EventCode == "037" || documentMeta.EventCode == "038" || documentMeta.EventCode == "039") && nitModel.listID == "2") || ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -2206,7 +2206,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
 
-                return responses;
+                //return responses;
             }
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
@@ -2419,9 +2419,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "Regla: 202-(R): ",
-                                                ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
-                                                "ya existe un evento (033) Aceptación Expresaa",
+                                                ErrorCode = "Regla: LGC02-(R): ",
+                                                ErrorMessage = "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente.",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -2432,9 +2431,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "Regla: 202-(R): ",
-                                                ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
-                                                "ya existe un evento (034) Aceptación Tacita de la factura",
+                                                ErrorCode = "Regla: LGC02-(R): ",
+                                                ErrorMessage = "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente.",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -3258,9 +3256,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.ValInfoPago:
-                    if (Convert.ToDateTime(data.SigningTime) == Convert.ToDateTime(dataModel.PaymentDueDate))
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(data.EndDate), Convert.ToDateTime(data.SigningTime));
+                    if (Convert.ToDateTime(data.EndDate) == Convert.ToDateTime(dataModel.PaymentDueDate))
                     {
-                        responses.Add(businessDays < 3
+                        responses.Add(businessDays == 3
                         ? new ValidateListResponse
                         {
                             IsValid = true,

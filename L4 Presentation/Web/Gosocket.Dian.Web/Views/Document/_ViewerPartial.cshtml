@@ -12,8 +12,6 @@
     {
         status = "danger";
     }
-
-    int counter = 0;
 }
 
 @section css
@@ -37,7 +35,7 @@
         font-size: 14px;
         line-height: 14px;
         color: #348441;
-        cursor: inter;
+        cursor: pointer;
     }
 
     .render-row {
@@ -68,6 +66,16 @@
         border: 1px dashed #2C323C;
         margin-top: 20px;
     }
+
+    .icon-card {
+        display: grid;
+    }
+
+        .icon-card p {
+            max-width: 95px;
+            text-align: center;
+            overflow-wrap: break-word;
+        }
 </style>
 
 <!--Message-->
@@ -147,37 +155,77 @@
             <div style="display:inline-flex">
                 @if (Model.IconsData != null)
                 {
-                    foreach (var statusIcons in Model.IconsData.OrderBy(s => s.Key).ToList())
-                    {
-                        if (statusIcons.Key == 1)
-                        {
-                            <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
-                            <span>@statusIcons.Value</span>
-                        }
+                    var iconList = Model.IconsData.OrderBy(s => s.Key).ToList();
+                    int minIndex = iconList[0].Key;
+                    int maxIndex = iconList[iconList.Count - 1].Key;
 
-                        if (statusIcons.Key != Model.IconsData.First().Key)
+                    foreach (var statusIcons in iconList)
+                    {
+                        if (minIndex == statusIcons.Key)
                         {
-                            <div style="display:grid">
-                                <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
-                                <span>@statusIcons.Value</span>
-                            </div>
-                            <div class="radian-state-ef-line"></div>
+                            if (statusIcons.Key == 1)
+                            {
+                                <div style="display:grid">
+                                    <div class="text-center">
+                                        <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                                    </div>
+                                    <p>@statusIcons.Value</p>
+                                </div>
+                            }
+                            else
+                            {
+                                if (maxIndex != statusIcons.Key)
+                                {
+                                    <div class="icon-card">
+                                        <div class="text-center">
+                                            <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
+                                        </div>
+                                        <p>@statusIcons.Value</p>
+                                    </div>
+                                    <div class="radian-state-ef-line"></div>
+                                }
+                                else
+                                {
+                                    <div class="icon-card">
+                                        <div class="text-center padding-top-5">
+                                            <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
+                                        </div>
+                                        <p>@statusIcons.Value</p>
+                                    </div>
+                                }
+                            }
                         }
                         else
                         {
-                            <div style="display:grid">
-                                <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
-                                <span>@statusIcons.Value</span>
-                            </div>
-
+                            if (maxIndex != statusIcons.Key)
+                            {
+                                <div class="icon-card">
+                                    <div class="text-center">
+                                        <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
+                                    </div>
+                                    <p>@statusIcons.Value</p>
+                                </div>
+                                <div class="radian-state-ef-line"></div>
+                            }
+                            else
+                            {
+                                <div class="icon-card">
+                                    <div class="text-center padding-top-5">
+                                        <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
+                                    </div>
+                                    <p>@statusIcons.Value</p>
+                                </div>
+                            }
                         }
                     }
                 }
                 else
                 {
-                    <div style="display:grid">
-                        <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
-                        <span>Factura Electrónica</span>
+                    <div class="icon-card">
+                        <div class="text-center">
+                            <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                        </div>
+                        <p>Factura Electrónica</p>
                     </div>
                 }
             </div>
@@ -187,7 +235,7 @@
                 Legítimo Tenedor actual: @Model.Document.SenderName
             </span>
             <span class="cufe-text">
-                Fecha de autorización para circulación: @Model.Document.EmissionDate
+                Fecha de autorización para circulación: @string.Format("{0:dd/MM/yyyy}", Model.Document.EmissionDate)
             </span>
         </div>
     </div>
@@ -218,17 +266,17 @@ else
 
         <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
             <thead>
-                <tr>
+                <tr class="text-left">
                     <th>Nombre</th>
-                    <th>Estado</th>
+                    <th>Resultado</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model.Validations)
                 {
-                    <tr>
+                    <tr class="text-left">
                         <td>@item.Name</td>
-                        <td>
+                        <td style="display:flex">
                             <label class="label label-primary">@item.Status</label>
                             <span class="fa fa fa-info-circle add-tooltip" data-original-title="@item.ErrorMessage"></span>
                         </td>

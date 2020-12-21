@@ -11,7 +11,7 @@ namespace Gosocket.Dian.Interfaces.Services
         string EventTitle(EventStatus eventStatus, string customizationId, string eventCode);
         Domain.Entity.GlobalDocValidatorDocument EventVerification(string eventItemIdentifier);
         Domain.Entity.GlobalDocValidatorDocument GlobalDocValidatorDocumentByGlobalId(string globalDocumentId);
-        Dictionary<int, string> IconType(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments);
+        Dictionary<int, string> IconType(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments, string documentKey = "");
         EventStatus IdentifyEvent(GlobalDocValidatorDocumentMeta eventItem);
         Tuple<Domain.Entity.GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> InvoiceAndNotes(string documentKey);
         bool IsVerificated(GlobalDocValidatorDocumentMeta otherEvent);

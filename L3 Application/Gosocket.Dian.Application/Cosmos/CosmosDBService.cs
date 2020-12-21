@@ -607,15 +607,6 @@ namespace Gosocket.Dian.Application.Cosmos
                             $"0{(int)EventStatus.NegotiatedInvoice}", $"0{(int)EventStatus.AnulacionLimitacionCirculacion}"
                         };
                         break;
-                    case 6:
-                        if (documentTypeId == "01")
-                        {
-                            radianStatusFilter = new List<string>() {
-                                $"0{(int)EventStatus.Received}", $"0{(int)EventStatus.Receipt}",
-                                $"0{(int)EventStatus.Accepted}"
-                            };
-                        }
-                        break;
                     case 7:
                         if (documentTypeId == "00")
                         {
@@ -642,7 +633,13 @@ namespace Gosocket.Dian.Application.Cosmos
                     break;
                 case 6:
                     if (documentTypeId == "01")
-                        goto default;
+                    {
+                        radianStatusFilter = new List<string>() {
+                            $"0{(int)EventStatus.Received}", $"0{(int)EventStatus.Receipt}", $"0{(int)EventStatus.Accepted}"
+                        };
+
+                        globalDocuments = globalDocuments.Where(g => g.Events.Any(e => !radianStatusFilter.Contains(e.Code))).Take(10).ToList();
+                    }
                     break;
                 default:
                     List<GlobalDataDocument> globalDocRadianStateFiltered = new List<GlobalDataDocument>();
