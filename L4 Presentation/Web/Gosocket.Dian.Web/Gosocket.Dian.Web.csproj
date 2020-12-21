@@ -372,6 +372,7 @@
     <Compile Include="Models\AutoListModel.cs" />
     <Compile Include="Models\EventsCounterViewModel.cs" />
     <Compile Include="Models\FileHistoryFilterViewModel.cs" />
+    <Compile Include="Models\FreeBiller\MenuOptionsByProfileFreeBillerModel.cs" />
     <Compile Include="Models\FreeBiller\MenuOptionsFreeBillerModel.cs" />
     <Compile Include="Models\FreeBiller\MenuOptionsModel.cs" />
     <Compile Include="Models\FreeBiller\ProfileFreeBillerModel.cs" />
