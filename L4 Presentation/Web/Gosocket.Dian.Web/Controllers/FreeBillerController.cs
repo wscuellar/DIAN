@@ -121,7 +121,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.Name = data.UserName;
             model.Email = data.Email;
             model.LastUpdate = data.LastUpdated;
-           // model.Profiles = this.GetProfiles();
+            model.Profiles = this.GetProfiles();
             model.LastName = "Perez";
             model.FullName = data.Name;
             model.NumberDoc = data.IdentificationId;
@@ -412,16 +412,17 @@ namespace Gosocket.Dian.Web.Controllers
         {
             List<SelectListItem> selectProfiles = new List<SelectListItem>();
             var types = profileService.GetMenuOptions().ToList();
+            var OptProf = profileService.GetMenuOptionsByProfile().Where(x =>x.ProfileId == 1).ToList();
 
             if (types?.Count > 0)
             {
-                foreach (var item in types)
+                foreach (var item in OptProf)
                 {
                     selectProfiles.Add(
                         new SelectListItem
                         {
-                            Value = item.MenuLevel.ToString(),
-                            Text = item.Name.ToString()
+                            Value = item.ProfileId.ToString(),
+                            Text = item.MenuOptionId.ToString()
                         }); 
                 }
 

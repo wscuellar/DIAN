@@ -41,8 +41,17 @@
 
     .bootstrap-select button {
         padding-left: 10px !important;
+        
     }
+   
 </style>
+<script type="text/javascript">
+    function seleccionar() {
+       
+        if (document.miFormulario.FacturaVenta.type == "checkbox")
+            document.miFormulario.FacturaVenta.checked = 1
+    }
+</script>
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
@@ -218,7 +227,7 @@
             </div>
         </div>
     </div>
-    <div class="row margin-vertical-0">
+    <div class="row margin-vertical-0" >
         <div class="tab-base">
             <!--Tabs Content-->
             <div class="tab-content padding-0">
@@ -226,17 +235,18 @@
                     <div class="panel">
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
-                                <div class="margin-vertical-0">
+                                <form class="margin-vertical-0" name="miFormulario" onload="seleccionar();">
                                   
                                     <div class="margin-vertical-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                         <div class="col-md-2">
                                             <h3 class="panel-title">Facturación</h3>
                                             <!-- Default checkbox -->
                                             <div class="form-check">
-                                                <input class="form-check-input"
+                                                <input class="text-nowrap"
                                                        type="checkbox"
+                                                       name="FacturaVenta"
                                                        value=""
-                                                       id="flexCheckDefault" />
+                                                       id="FacturaVenta" disabled />
                                                 <label class="form-check-label" for="flexCheckDefault">
                                                     Factura de Venta
                                                 </label>
@@ -247,8 +257,8 @@
                                                 <input class="form-check-input"
                                                        type="checkbox"
                                                        value=""
-                                                       id="flexCheckChecked"
-                                                       checked />
+                                                       id="FacturaContingencia"
+                                                       disabled />
                                                 <label class="form-check-label" for="flexCheckChecked">
                                                     Factura de Contingencia
                                                 </label>
@@ -259,7 +269,7 @@
                                                 <input class="form-check-input"
                                                        type="checkbox"
                                                        value=""
-                                                       id="flexCheckDefault" />
+                                                       id="NotaCredito" disabled/>
                                                 <label class="form-check-label" for="flexCheckDefault">
                                                     Nota Credito
                                                 </label>
@@ -270,8 +280,8 @@
                                                 <input class="form-check-input"
                                                        type="checkbox"
                                                        value=""
-                                                       id="flexCheckChecked"
-                                                       checked />
+                                                       id="NotaDebito"
+                                                       disabled />
                                                 <label class="form-check-label" for="flexCheckChecked">
                                                     Nota Debito
                                                 </label>
@@ -281,8 +291,8 @@
                                                 <input class="form-check-input"
                                                        type="checkbox"
                                                        value=""
-                                                       id="flexCheckChecked"
-                                                       checked />
+                                                       id="FacturaMandato"
+                                                       disabled />
                                                 <label class="form-check-label" for="flexCheckChecked">
                                                     Factura de Mandato
                                                 </label>
@@ -292,8 +302,8 @@
                                                 <input class="form-check-input"
                                                        type="checkbox"
                                                        value=""
-                                                       id="flexCheckChecked"
-                                                       checked />
+                                                       id="FacturaAIU"
+                                                       disabled/>
                                                 <label class="form-check-label" for="flexCheckChecked">
                                                     Factura AIU
                                                 </label>
@@ -303,8 +313,8 @@
                                                 <input class="form-check-input"
                                                        type="checkbox"
                                                        value=""
-                                                       id="flexCheckChecked"
-                                                       checked />
+                                                       id="FacturaExportacion"
+                                                       disabled/>
                                                 <label class="form-check-label" for="flexCheckChecked">
                                                     Factura de Exportación
                                                 </label>
@@ -314,23 +324,13 @@
                                                 <input class="form-check-input"
                                                        type="checkbox"
                                                        value=""
-                                                       id="flexCheckChecked"
-                                                       checked />
+                                                       id="DocumentoSoporte"
+                                                       disabled/>
                                                 <label class="form-check-label" for="flexCheckChecked">
                                                     Documento de Soporte
                                                 </label>
                                             </div>
-                                            <!-- Checked checkbox -->
-                                            <div class="form-check">
-                                                <input class="form-check-input"
-                                                       type="checkbox"
-                                                       value=""
-                                                       id="flexCheckChecked"
-                                                       checked />
-                                                <label class="form-check-label" for="flexCheckChecked">
-                                                    Documento de Soporte
-                                                </label>
-                                            </div>
+                                           
                                         </div>
                                         <div class="col-md-2">
                                             <h3 class="panel-title">Configuración</h3>
@@ -340,7 +340,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckDefault" />
+                                                           id="Seguridad" disabled/>
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Seguridad
                                                     </label>
@@ -350,10 +350,11 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input"
                                                            type="checkbox"
+                                                           checked="checked"
                                                            value=""
-                                                           id="flexCheckChecked"
-                                                           checked />
-                                                    <label class="form-check-label" for="flexCheckChecked">
+                                                           id="CertificadosDigitales" disabled
+                                                            />
+                                                    <label class="form-check-label" for="CertificadosDigitales">
                                                         Certificados Digitales
                                                     </label>
                                                 </div>
@@ -362,7 +363,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckDefault" />
+                                                           id="Administrar" disabled/>
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Administrar
                                                     </label>
@@ -372,7 +373,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckDefault" />
+                                                           id="clientes" disabled/>
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Clientes - Adquirientes
                                                     </label>
@@ -382,7 +383,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckDefault" />
+                                                           id="RangosNum" disabled/>
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Rangos de numeración
                                                     </label>
@@ -392,7 +393,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckDefault" />
+                                                           id="Productos" disabled/>
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Productos
                                                     </label>
@@ -410,7 +411,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckDefault" />
+                                                           id="NuevaPlantilla" disabled/>
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                        Nueva Plantilla
                                                     </label>
@@ -421,8 +422,8 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckChecked"
-                                                           checked />
+                                                           id="FacturaVenta"
+                                                           disabled />
                                                     <label class="form-check-label" for="flexCheckChecked">
                                                        Factura de Venta
                                                     </label>
@@ -437,7 +438,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckDefault" />
+                                                           id="FacturaExportacion" disabled/>
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                       Factura de Exportación
                                                     </label>
@@ -448,8 +449,8 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckChecked"
-                                                           checked />
+                                                           id="FacturaContingencia"
+                                                           disabled />
                                                     <label class="form-check-label" for="flexCheckChecked">
                                                       Factura de Contingencia
                                                     </label>
@@ -464,7 +465,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckDefault" />
+                                                           id="AdminPlantillas" disabled />
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Administrar Plantillas
                                                     </label>
@@ -475,8 +476,8 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="flexCheckChecked"
-                                                           checked />
+                                                           id="EmitirPlantillas"
+                                                           disabled />
                                                     <label class="form-check-label" for="flexCheckChecked">
                                                         Usar/Emitir Plantillas
                                                     </label>
@@ -487,7 +488,7 @@
                                        
 
                                     
-                                </div>
+                                </form>
 
                             </div>
                         </div>

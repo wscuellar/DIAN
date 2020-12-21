@@ -60,5 +60,10 @@ namespace Gosocket.Dian.Application.FreeBiller
             return sqlDBContext.SaveChanges() > 0;
         }
 
+        public List<MenuOptionsByProfiles> GetMenuOptionsByProfile()
+        {
+            return sqlDBContext.MenuOptionsByProfiles.ToList();
+        }
+
     }
 }
