@@ -148,6 +148,12 @@ namespace Gosocket.Dian.Application
             return sqlDBContext.Contributors.FirstOrDefault(p => p.Code == code);
         }
 
+        public RadianContributorOperation GetRadianOperations(int radianContributorId, string softwareId)
+        {
+            Guid SoftId = new Guid(softwareId);
+            return sqlDBContext.RadianContributorOperations.FirstOrDefault(p => p.RadianContributorId == radianContributorId && p.SoftwareId == SoftId );
+        }
+
         public Contributor GetByCode(string code, string connectionString)
         {
             using (var context = new SqlDBContext(connectionString))
@@ -475,7 +481,10 @@ namespace Gosocket.Dian.Application
 
                     RadianContributorOperation radianOperation = context.RadianContributorOperations.FirstOrDefault(
                                                  t => t.RadianContributorId == radianc.Id
-                                                 && t.SoftwareType == softwareType && t.SoftwareId == softId);
+                                                 && t.SoftwareType == softwareType 
+                                                 && t.SoftwareId == softId
+                                                 && t.OperationStatusId ==(int) Domain.Common.RadianState.Test
+                                                 );
                     radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado;
 
                     context.SaveChanges();
@@ -561,7 +570,67 @@ namespace Gosocket.Dian.Application
             return affectedRecords > 0 ? operation.Id : 0;
         }
 
+        public bool UpdateRadianOperation(RadianContributorOperation contributorOperation)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var radianContributorOperationInstance = context.RadianContributorOperations.FirstOrDefault(c => c.Id == contributorOperation.Id);
+
+                radianContributorOperationInstance.OperationStatusId = contributorOperation.OperationStatusId;
+                radianContributorOperationInstance.RadianContributorId = contributorOperation.RadianContributorId;
+                radianContributorOperationInstance.SoftwareId = contributorOperation.SoftwareId;
+                radianContributorOperationInstance.SoftwareType = contributorOperation.SoftwareType;
+                radianContributorOperationInstance.Deleted = contributorOperation.Deleted;
+                radianContributorOperationInstance.Timestamp = System.DateTime.Now;
+                context.Entry(radianContributorOperationInstance).State = System.Data.Entity.EntityState.Modified;
+                context.SaveChanges();
+                return true;
+            }
+        }
+
 
         #endregion
+
+        public Contributor GetContributorByUserId(string userId, int contributorTypeId)
+        {
+            Contributor contributor =null;
+            var re = (from u in sqlDBContext.UserContributors.Where(t => t.UserId == userId)
+                        join c in sqlDBContext.Contributors on u.ContributorId equals c.Id
+                        where c.ContributorTypeId == contributorTypeId
+                      select c).FirstOrDefault();
+
+            if(re != null)
+            {
+                contributor = new Contributor()
+                {
+                    Id = re.Id,
+                    Code = re.Code,
+                    Name = re.Name,
+                    BusinessName = re.BusinessName,
+                    Email = re.Email,
+                    StartDate = re.StartDate,
+                    EndDate = re.EndDate, 
+                    StartDateNumber = re.StartDateNumber,
+                    AcceptanceStatus = re.AcceptanceStatus,
+                    Status = re.Status,
+                    Deleted = re.Deleted,
+                    Timestamp = re.Timestamp,
+                    Updated = re.Updated,
+                    CreatedBy = re.CreatedBy,
+                    ContributorTypeId = re.ContributorTypeId,
+                    OperationModeId = re.OperationModeId,
+                    ProviderId = re.ProviderId,
+                    PrincipalActivityCode = re.PrincipalActivityCode,
+                    PersonType = re.PersonType,
+                    HabilitationDate = re.HabilitationDate,
+                    ProductionDate = re.ProductionDate,
+                    StatusRut = re.StatusRut,
+                    ExchangeEmail = re.ExchangeEmail
+                };
+            }
+
+            return contributor;
+        }
+
     }
 }

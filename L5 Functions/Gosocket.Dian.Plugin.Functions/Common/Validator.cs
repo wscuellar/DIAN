@@ -417,7 +417,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var softwareProviderCode = nitModel.SoftwareProviderCode;
             var softwareProviderCodeDigit = nitModel.SoftwareProviderCodeDigit;
-
             var providerCode = nitModel.ProviderCode;
             var providerCodeDigit = nitModel.ProviderCodeDigit;
 
@@ -432,7 +431,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
             else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
-            else if (documentMeta.DocumentTypeId == "96") senderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ24;
+            
             if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
             if (((documentMeta.EventCode == "037" || documentMeta.EventCode == "038" || documentMeta.EventCode == "039") && nitModel.listID == "2") || ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -445,7 +444,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 string sender2DvErrorCode = "FAJ47";
                 if (documentMeta.DocumentTypeId == "91") sender2DvErrorCode = "CAJ47";
                 else if (documentMeta.DocumentTypeId == "92") sender2DvErrorCode = "DAJ47";
-                else if (documentMeta.DocumentTypeId == "96") sender2DvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ47;
+                
                 sender2 = GetContributorInstanceCache(senderCodeProvider);
                 if (string.IsNullOrEmpty(senderCodeProviderDigit) || senderCodeProviderDigit == "undefined") senderCodeProviderDigit = "11";
                 if (ValidateDigitCode(senderCodeProvider, int.Parse(senderCodeProviderDigit)))
@@ -475,12 +474,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string sender2ErrorCode = "FAJ44";
             if (documentMeta.DocumentTypeId == "91") sender2ErrorCode = "CAJ44";
             else if (documentMeta.DocumentTypeId == "92") sender2ErrorCode = "DAJ44";
-            else if (documentMeta.DocumentTypeId == "96") sender2ErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAJ44;
+            
 
             string softwareProviderErrorCode = "FAB19b";
             if (documentMeta.DocumentTypeId == "05") softwareProviderErrorCode = "DSAB19b";
             else if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
             else if (documentMeta.DocumentTypeId == "92") softwareProviderErrorCode = "DAB19b";
+            //Validar habilitacion RADIAN
             else if (documentMeta.DocumentTypeId == "96") softwareProviderErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB19b;
 
             if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
@@ -780,7 +780,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     return responses;
                 case (int)EventStatus.Avales:
-
                     //valida si existe los permisos del mandatario 
                     var responseAval = ValidateFacultityAttorney(party.TrackId, party.SenderParty, senderCode,
                         party.ResponseCode, xmlParserCude.NoteMandato);
@@ -823,9 +822,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-
                     return responses;
-
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     if (party.SenderParty != senderCode)
                     {
@@ -959,8 +956,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     //    });
                     //}
-
-
                     return responses;
                 case (int)EventStatus.NegotiatedInvoice:
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
@@ -1125,7 +1120,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-
                     ////valida si existe los permisos del mandatario 
                     //var response = ValidateFacultityAttorney(party.TrackId, party.SenderParty, receiverCode,
                     //    party.ResponseCode, xmlParserCude.NoteMandato);
@@ -1144,7 +1138,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     //    });
                     //}
-
                     return responses;
                 //Valor Informe 3 dias pago
                 case (int)EventStatus.ValInfoPago:
@@ -1195,7 +1188,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
             }
-
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
@@ -1207,7 +1199,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
-
             string valueTotalEndoso = nitModel.ValorTotalEndoso;
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
@@ -1287,7 +1278,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
             }
-
             return null;
         }
         #endregion
@@ -1396,7 +1386,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 else
                                     valid = true;
-
                             }
                         }
                         validError = false;
@@ -1406,7 +1395,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         validError = true;
                     }
-
                 }
                 if (validError)
                 {
@@ -1430,9 +1418,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
                 }
-
-            }
-         
+            }         
             return null;
         }
 
@@ -1503,7 +1489,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return rs;
         }
         #endregion
-
 
         #region Validate Reference Attorney
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
@@ -2049,7 +2034,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
-
         private List<GlobalNumberRange> GetNumberRangeInstanceCache(string senderCode)
         {
             var env = ConfigurationManager.GetValue("Environment");
@@ -2435,9 +2419,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "Regla: 202-(R): ",
-                                                ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
-                                                "ya existe un evento (033) Aceptación Expresaa",
+                                                ErrorCode = "Regla: LGC02-(R): ",
+                                                ErrorMessage = "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente.",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -2448,9 +2431,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "Regla: 202-(R): ",
-                                                ErrorMessage = "No se puede rechazar un documento que ha sido aceptado previamente, " +
-                                                "ya existe un evento (034) Aceptación Tacita de la factura",
+                                                ErrorCode = "Regla: LGC02-(R): ",
+                                                ErrorMessage = "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente.",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -3274,9 +3256,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.ValInfoPago:
-                    if (Convert.ToDateTime(data.SigningTime) == Convert.ToDateTime(dataModel.PaymentDueDate))
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(data.EndDate), Convert.ToDateTime(data.SigningTime));
+                    if (Convert.ToDateTime(data.EndDate) == Convert.ToDateTime(dataModel.PaymentDueDate))
                     {
-                        responses.Add(businessDays < 3
+                        responses.Add(businessDays == 3
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -3600,7 +3583,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             public string errorMessageigningTimeRecibo { get; set; }
             public string errorCodeEndoso { get; set; }
             public string errorMessageEndoso { get; set; }
-
 
         }
 

@@ -19,7 +19,16 @@ namespace Gosocket.Dian.Application.Managers
 
         public GlobalTestSetOthersDocuments GetTestSet(string partitionKey, string rowKey)
         {
-            return testSetManager.Find<GlobalTestSetOthersDocuments>(partitionKey, rowKey);
+            try
+            {
+                return testSetManager.Find<GlobalTestSetOthersDocuments>(partitionKey, rowKey);
+            }
+            catch(Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
+
+            return null;
         }
 
         public bool InsertTestSet(GlobalTestSetOthersDocuments testSet)

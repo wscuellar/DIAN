@@ -371,6 +371,7 @@
     <Compile Include="Models\AutoListModel.cs" />
     <Compile Include="Models\EventsCounterViewModel.cs" />
     <Compile Include="Models\FileHistoryFilterViewModel.cs" />
+    <Compile Include="Models\OtherDocsElectListViewModel.cs" />
     <Compile Include="Models\OthersElectronicDocAssociatedViewModel.cs" />
     <Compile Include="Models\OthersElectronicDocumentsViewModel.cs" />
     <Compile Include="Models\ParametersDataViewModel.cs" />

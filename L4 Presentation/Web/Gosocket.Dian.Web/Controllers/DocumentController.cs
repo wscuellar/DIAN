@@ -82,7 +82,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [CustomRoleAuthorization(CustomRoles = "Proveedor")]
         public async Task<ActionResult> Provider(SearchDocumentViewModel model) => await GetDocuments(model, 4);
-
+                
         public async Task<ActionResult> Details(string trackId)
         {
             DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
@@ -91,8 +91,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
             return View(model);
         }
-
-        
+                
 
         public ActionResult Viewer(Navigation.NavigationEnum nav)
         {
@@ -179,7 +178,6 @@ namespace Gosocket.Dian.Web.Controllers
                 Debug.WriteLine(ex.Message);
                 return File(new byte[1], "application/zip", $"error");
             }
-
 
         }
 
@@ -278,6 +276,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View();
         }
 
+        [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintDocument(string cufe)
         {
             byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe);
@@ -632,7 +631,7 @@ namespace Gosocket.Dian.Web.Controllers
                 pks = new List<string> { $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{model.DocumentKey.Substring(0, 2)}" };
             }
 
-            if (model.RadianStatus > 0 && model.RadianStatus < 6 && model.DocumentTypeId.Equals("00"))
+            if (model.RadianStatus > 0 && model.RadianStatus < 7 && model.DocumentTypeId.Equals("00"))
                 model.DocumentTypeId = "01";
 
             (bool hasMoreResults, string continuation, List<GlobalDataDocument> globalDataDocuments) cosmosResponse =
