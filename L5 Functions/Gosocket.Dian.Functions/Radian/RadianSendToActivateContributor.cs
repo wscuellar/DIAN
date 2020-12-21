@@ -37,9 +37,8 @@ namespace Gosocket.Dian.Functions.Radian
             {
                 RadianContributor radianContributor = null;
                 Contributor contributor = null;
-                //var activateContributorRequestObject = new ActivateContributorRequestObject();
+                
                 var sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnectionProd");
-
                 SetLogger(null, "Step 1", " -- Ingreso a If Environment = Hab -- ");
 
 
