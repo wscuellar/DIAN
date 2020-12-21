@@ -2206,7 +2206,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
 
-                return responses;
+                //return responses;
             }
             //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
             if (documentMeta.SerieAndNumber != idDocumentReference)
