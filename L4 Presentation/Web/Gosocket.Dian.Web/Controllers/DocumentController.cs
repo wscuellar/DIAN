@@ -340,76 +340,81 @@ namespace Gosocket.Dian.Web.Controllers
             if (globalDataDocument == null)
                 globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(globalDocValidatorDocumentMeta.DocumentKey, partitionKey, date);
 
-            DocumentViewModel document = new DocumentViewModel
+            DocumentViewModel document = new DocumentViewModel();
+
+            if (globalDataDocument != null)
             {
-                DocumentKey = globalDataDocument.DocumentKey,
-                Amount = globalDataDocument.FreeAmount,
-                DocumentTypeId = globalDataDocument.DocumentTypeId,
-                DocumentTypeName = globalDataDocument.DocumentTypeName,
-                GenerationDate = globalDataDocument.GenerationTimeStamp,
-                Id = globalDataDocument.DocumentKey,
-                EmissionDate = globalDataDocument.EmissionDate,
-                Number = Services.Utils.StringUtil.TextAfter(globalDataDocument.SerieAndNumber, globalDataDocument.Serie),
-                //TechProviderName = globalDataDocument?.TechProviderInfo?.TechProviderName,
-                TechProviderCode = globalDataDocument?.TechProviderInfo?.TechProviderCode,
-                ReceiverName = globalDataDocument.ReceiverName,
-                ReceiverCode = globalDataDocument.ReceiverCode,
-                ReceptionDate = globalDataDocument.ReceptionTimeStamp,
-                Serie = globalDataDocument.Serie,
-                SenderName = globalDataDocument.SenderName,
-                SenderCode = globalDataDocument.SenderCode,
-                Status = globalDataDocument.ValidationResultInfo.Status,
-                StatusName = globalDataDocument.ValidationResultInfo.StatusName,
-                TaxAmountIva = globalDataDocument.TaxAmountIva,
-                TotalAmount = globalDataDocument.TotalAmount
-            };
+                document = new DocumentViewModel
+                {
+                    DocumentKey = globalDataDocument.DocumentKey,
+                    Amount = globalDataDocument.FreeAmount,
+                    DocumentTypeId = globalDataDocument.DocumentTypeId,
+                    DocumentTypeName = globalDataDocument.DocumentTypeName,
+                    GenerationDate = globalDataDocument.GenerationTimeStamp,
+                    Id = globalDataDocument.DocumentKey,
+                    EmissionDate = globalDataDocument.EmissionDate,
+                    Number = Services.Utils.StringUtil.TextAfter(globalDataDocument.SerieAndNumber, globalDataDocument.Serie),
+                    //TechProviderName = globalDataDocument?.TechProviderInfo?.TechProviderName,
+                    TechProviderCode = globalDataDocument?.TechProviderInfo?.TechProviderCode,
+                    ReceiverName = globalDataDocument.ReceiverName,
+                    ReceiverCode = globalDataDocument.ReceiverCode,
+                    ReceptionDate = globalDataDocument.ReceptionTimeStamp,
+                    Serie = globalDataDocument.Serie,
+                    SenderName = globalDataDocument.SenderName,
+                    SenderCode = globalDataDocument.SenderCode,
+                    Status = globalDataDocument.ValidationResultInfo.Status,
+                    StatusName = globalDataDocument.ValidationResultInfo.StatusName,
+                    TaxAmountIva = globalDataDocument.TaxAmountIva,
+                    TotalAmount = globalDataDocument.TotalAmount
+                };
 
-            document.TaxesDetail.TaxAmountIva5Percent = globalDataDocument.TaxesDetail?.TaxAmountIva5Percent ?? 0;
-            document.TaxesDetail.TaxAmountIva14Percent = globalDataDocument.TaxesDetail?.TaxAmountIva14Percent ?? 0;
-            document.TaxesDetail.TaxAmountIva16Percent = globalDataDocument.TaxesDetail?.TaxAmountIva16Percent ?? 0;
-            document.TaxesDetail.TaxAmountIva19Percent = globalDataDocument.TaxesDetail?.TaxAmountIva19Percent ?? 0;
-            document.TaxesDetail.TaxAmountIva = globalDataDocument.TaxesDetail?.TaxAmountIva ?? 0;
-            document.TaxesDetail.TaxAmountIca = globalDataDocument.TaxesDetail?.TaxAmountIca ?? 0;
-            document.TaxesDetail.TaxAmountIpc = globalDataDocument.TaxesDetail?.TaxAmountIpc ?? 0;
+                document.TaxesDetail.TaxAmountIva5Percent = globalDataDocument.TaxesDetail?.TaxAmountIva5Percent ?? 0;
+                document.TaxesDetail.TaxAmountIva14Percent = globalDataDocument.TaxesDetail?.TaxAmountIva14Percent ?? 0;
+                document.TaxesDetail.TaxAmountIva16Percent = globalDataDocument.TaxesDetail?.TaxAmountIva16Percent ?? 0;
+                document.TaxesDetail.TaxAmountIva19Percent = globalDataDocument.TaxesDetail?.TaxAmountIva19Percent ?? 0;
+                document.TaxesDetail.TaxAmountIva = globalDataDocument.TaxesDetail?.TaxAmountIva ?? 0;
+                document.TaxesDetail.TaxAmountIca = globalDataDocument.TaxesDetail?.TaxAmountIca ?? 0;
+                document.TaxesDetail.TaxAmountIpc = globalDataDocument.TaxesDetail?.TaxAmountIpc ?? 0;
 
-            document.DocumentTags = globalDataDocument.DocumentTags.Select(t => new DocumentTagViewModel()
-            {
+                document.DocumentTags = globalDataDocument.DocumentTags.Select(t => new DocumentTagViewModel()
+                {
 
-                Code = t.Value,
-                Description = t.Description,
-                Value = t.Value,
-                TimeStamp = t.TimeStamp
-            }).ToList();
+                    Code = t.Value,
+                    Description = t.Description,
+                    Value = t.Value,
+                    TimeStamp = t.TimeStamp
+                }).ToList();
 
-            document.Events = globalDataDocument.Events.Select(e => new EventViewModel()
-            {
-                DocumentKey = e.DocumentKey,
-                Code = e.Code,
-                Date = e.Date,
-                DateNumber = e.DateNumber,
-                Description = e.Description,
-                ReceiverCode = e.ReceiverCode,
-                ReceiverName = e.ReceiverName,
-                SenderCode = e.SenderCode,
-                SenderName = e.SenderName,
-                TimeStamp = e.TimeStamp
-            }).ToList();
+                document.Events = globalDataDocument.Events.Select(e => new EventViewModel()
+                {
+                    DocumentKey = e.DocumentKey,
+                    Code = e.Code,
+                    Date = e.Date,
+                    DateNumber = e.DateNumber,
+                    Description = e.Description,
+                    ReceiverCode = e.ReceiverCode,
+                    ReceiverName = e.ReceiverName,
+                    SenderCode = e.SenderCode,
+                    SenderName = e.SenderName,
+                    TimeStamp = e.TimeStamp
+                }).ToList();
 
-            document.References = globalDataDocument.References.Select(r => new ReferenceViewModel()
-            {
-                DocumentKey = r.DocumentKey,
-                DocumentTypeId = r.DocumentTypeId,
-                DocumenTypeName = r.DocumenTypeName,
-                Date = r.Date,
-                DateNumber = r.DateNumber,
-                Description = r.Description,
-                ReceiverCode = r.ReceiverCode,
-                ReceiverName = r.ReceiverName,
-                SenderCode = r.SenderCode,
-                SenderName = r.SenderName,
-                TimeStamp = r.TimeStamp,
-                ShowAsReference = true
-            }).ToList();
+                document.References = globalDataDocument.References.Select(r => new ReferenceViewModel()
+                {
+                    DocumentKey = r.DocumentKey,
+                    DocumentTypeId = r.DocumentTypeId,
+                    DocumenTypeName = r.DocumenTypeName,
+                    Date = r.Date,
+                    DateNumber = r.DateNumber,
+                    Description = r.Description,
+                    ReceiverCode = r.ReceiverCode,
+                    ReceiverName = r.ReceiverName,
+                    SenderCode = r.SenderCode,
+                    SenderName = r.SenderName,
+                    TimeStamp = r.TimeStamp,
+                    ShowAsReference = true
+                }).ToList();
+            }
 
             var model = new DocValidatorModel
             {
@@ -420,33 +425,34 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.Events = new List<EventsViewModel>();
             List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
-            if (eventsByInvoice.Any())
-            {
-
-                foreach (var eventItem in eventsByInvoice)
+                if (eventsByInvoice.Any())
                 {
-                    if (!string.IsNullOrEmpty(eventItem.EventCode))
-                    {
-                        GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
-                        if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
-                        {
-                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
-                            model.Events.Add(new EventsViewModel()
-                            {
-                                DocumentKey = eventItem.DocumentKey,
-                                EventCode = eventItem.EventCode,
-                                Description = eventcodetext,
-                                EventDate = eventItem.SigningTimeStamp,
-                                SenderCode = eventItem.SenderCode,
-                                Sender = eventItem.SenderName,
-                                ReceiverCode = eventItem.ReceiverCode,
-                                Receiver = eventItem.ReceiverName
-                            });
-                            model.Events = model.Events.OrderBy(t => t.EventCode).ToList();
-                        }
 
+                    foreach (var eventItem in eventsByInvoice)
+                    {
+                        if (!string.IsNullOrEmpty(eventItem.EventCode))
+                        {
+                            GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
+                            if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
+                            {
+                                string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                                model.Events.Add(new EventsViewModel()
+                                {
+                                    DocumentKey = eventItem.DocumentKey,
+                                    EventCode = eventItem.EventCode,
+                                    Description = eventcodetext,
+                                    EventDate = eventItem.SigningTimeStamp,
+                                    SenderCode = eventItem.SenderCode,
+                                    Sender = eventItem.SenderName,
+                                    ReceiverCode = eventItem.ReceiverCode,
+                                    Receiver = eventItem.ReceiverName
+                                });
+                                model.Events = model.Events.OrderBy(t => t.EventCode).ToList();
+                            }
+
+                        }
                     }
-                }
+                
             }
 
             return model;
