@@ -23,7 +23,9 @@ namespace Gosocket.Dian.Interfaces.Services
 
         bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware);
 
-        PagedResult<OtherDocsElectList> List(string userCode, int OperationModeId);
+        PagedResult<OtherDocsElectData> List(string userCode, int OperationModeId);
+
+        OtherDocsElectData GetCOntrinutorODE(int Id);
 
         /// <summary>
         /// Cancelar un registro en la tabla OtherDocElecContributor
@@ -32,5 +34,9 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <param name="description">Motivo por el cual se hace la cancelación</param>
         /// <returns></returns>
         ResponseMessage CancelRegister(int contributorId,string description);
+
+
+        GlobalTestSetOthersDocuments GetTestResult(int OperatonModeId, int ElectronicDocumentId);
+
     }
 }

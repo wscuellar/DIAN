@@ -121,6 +121,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                                                           join o in sqlDBContext.OtherDocElecSoftwares on p.Id equals o.OtherDocElecContributorId
                                                           where p.OtherDocElecOperationModeId == OperationModeId
                                                           && o.OtherDocElecSoftwareStatusId == statusSowftware
+                                                          && o.Deleted==false
                                                           select p).ToList().Any();
         }
     }

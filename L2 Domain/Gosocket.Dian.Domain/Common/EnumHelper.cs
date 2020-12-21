@@ -519,13 +519,13 @@ namespace Gosocket.Dian.Domain.Common
         Registrado = 1,
         [Display(Name = "En pruebas")]
         [Description("En pruebas")]
-        Test = 3,
+        Test = 2,
         [Display(Name = "Habilitado")]
         [Description("Habilitado")]
-        Habilitado = 4,
+        Habilitado = 3,
         [Display(Name = "Cancelado")]
         [Description("Cancelado")]
-        Cancelado = 5
+        Cancelado = 4
     }
 
     public enum OtherDocElecOperationMode

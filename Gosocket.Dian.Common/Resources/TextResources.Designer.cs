@@ -214,6 +214,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Este modo de operación y documento electrónico carece de Set de Pruebas!!!.
+        /// </summary>
+        public static string ModeElectroniDocWithoutTestSet {
+            get {
+                return ResourceManager.GetString("ModeElectroniDocWithoutTestSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Este modo de operación carece de Set de Pruebas!!!.
         /// </summary>
         public static string ModeWithoutTestSet {

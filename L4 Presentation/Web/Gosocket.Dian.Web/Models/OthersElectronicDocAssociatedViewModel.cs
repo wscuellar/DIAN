@@ -14,6 +14,7 @@ namespace Gosocket.Dian.Web.Models
             PageTable = 1;
         }
 
+        public int Id { get; set; }
         public int PageTable { get; set; }
         public int Step { get; set; }
 
@@ -38,10 +39,15 @@ namespace Gosocket.Dian.Web.Models
         public string State { get; set; }
 
         public Software Software { get; set; }
-         
+
         // public TestSetResult TestSetResult { get; set; }
         //public ContributorOperationWithSoftware ContributorOperations { get; set; }
-
+        public string OperationMode { get; set; }
+        public int OperationModeId { get; set; }
+        public string ElectronicDoc { get; set; }
+        public int ElectronicDocId { get; set; }
+        public string ContibutorType { get; set; }
+        public int ContibutorTypeId { get; set; }
 
     }
 }
