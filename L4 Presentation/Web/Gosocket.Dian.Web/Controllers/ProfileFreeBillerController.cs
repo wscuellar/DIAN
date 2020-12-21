@@ -13,15 +13,6 @@ namespace Gosocket.Dian.Web.Controllers
     public class ProfileFreeBillerController : Controller
     {
 
-
-        private const int LevelOne = 1;
-
-        private const int LevelTwo = 2;
-
-        private const int LevelThree = 3;
-
-
-
         /// <summary>
         /// Servicio para obtener los perfiles de Facturador gratuito.
         /// Tabla: ProfilesFreeBiller.
@@ -57,7 +48,6 @@ namespace Gosocket.Dian.Web.Controllers
                 return View(model);
             }
             
-
             Profile newProfile = profileService.CreateNewProfile(
                 new Profile
                 {
@@ -110,7 +100,6 @@ namespace Gosocket.Dian.Web.Controllers
                         });
                 }
             }
-
         }
 
         private List<string> VerificationFatherIds(string[] valuesSelected)

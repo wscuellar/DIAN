@@ -133,7 +133,7 @@
                                                                             {
                                                                                 <div class="row-cols-1">
                                                                                     <label>
-                                                                                        <input type="checkbox" name="ValuesSelected" value="@menuMain.MenuId,@subMenuItems.MenuId,@subSubMenuItems.MenuId" checked="@subSubMenuItems.IsChecked" />
+                                                                                        <input type="checkbox" name="ValuesSelected" value="@menuMain.MenuId,@subMenuItems.MenuId,@subSubMenuItems.MenuId" />
                                                                                         @subSubMenuItems.Name
                                                                                     </label>
                                                                                 </div>
@@ -142,7 +142,7 @@
                                                                         else
                                                                         {
                                                                             <div class="row">
-                                                                                <input type="checkbox" name="ValuesSelected" value="@menuMain.MenuId,@subMenuItems.MenuId" checked="@subMenuItems.IsChecked" />
+                                                                                <input type="checkbox" name="ValuesSelected" value="@menuMain.MenuId,@subMenuItems.MenuId" />
                                                                                 <label for="@subMenuItems.Name">@subMenuItems.Name</label>
                                                                             </div>
                                                                         }
