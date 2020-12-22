@@ -75,11 +75,13 @@ namespace Gosocket.Dian.Functions.Radian
 
                     // Step 3 RadianTestSetResult
                     string key = data.SoftwareType + '|' + data.SoftwareId;
+                    SetLogger(null, "Step STA-4.1", data.Code, "code123");
+                    SetLogger(null, "Step STA-4.2", key, "key123");
                     var results = globalTestSetResultTableManager.Find<RadianTestSetResult>(data.Code, key);
-                    SetLogger(results, "Step STA-5", " -- RadianSendToActivateContributor -- ");
 
-                    if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || !results.Deleted)
+                    SetLogger(null, "Step STA-5", "Pase " + results.Status.ToString());
 
+                    if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
                         throw new Exception("Contribuyente no a pasado set de pruebas.");
 
                     SetLogger(results, "Step STA-5.1", " -- RadianSendToActivateContributor -- ");
@@ -116,7 +118,7 @@ namespace Gosocket.Dian.Functions.Radian
                         Url = data.Url
                     };
 
-                    //    await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
+                       await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
 
                         SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
 
@@ -150,6 +152,8 @@ namespace Gosocket.Dian.Functions.Radian
                     DataVersion = "2.0"
                 }
             };
+            //string keyProd = ConfigurationManager.GetValue("EventGridProcess"); //EventGridKeyProd
+            //string topicProd = ConfigurationManager.GetValue("EventGridTopicProcess"); //EventGridTopicEndpointProd
             await EventGridManager.Instance("EventGridKeyProd", "EventGridTopicEndpointProd").SendMessagesToEventGridAsync(eventsList);
         }
 
@@ -234,7 +238,7 @@ namespace Gosocket.Dian.Functions.Radian
         /// <param name="objData">Un Objeto que se serializara en Json a String y se mostrara en el Logger</param>
         /// <param name="Step">El paso del Log o de los mensajes</param>
         /// <param name="msg">Un mensaje adicional si no hay objdata, por ejemplo</param>
-        private static void SetLogger(object objData, string Step, string msg)
+        private static void SetLogger(object objData, string Step, string msg, string keyUnique = "")
         {
             object resultJson;
 
@@ -243,9 +247,15 @@ namespace Gosocket.Dian.Functions.Radian
             else
                 resultJson = String.Empty;
 
-            var lastZone = new GlobalLogger("202015", "202015") { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+            GlobalLogger lastZone;
+            if (string.IsNullOrEmpty(keyUnique))
+                lastZone = new GlobalLogger("202015", "202015") { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+            else
+                lastZone = new GlobalLogger(keyUnique, keyUnique) { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+
             TableManagerGlobalLogger.InsertOrUpdate(lastZone);
         }
+
 
     }
 }
