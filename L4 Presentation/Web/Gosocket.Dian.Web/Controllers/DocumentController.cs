@@ -259,15 +259,7 @@ namespace Gosocket.Dian.Web.Controllers
             var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
             if (globalDocValidatorDocumentMeta == null) return RedirectToAction(nameof(SearchInvalidQR));
 
-            var identifier = globalDocValidatorDocumentMeta.Identifier;
-            var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
-            if (globalDocValidatorDocument == null) return RedirectToAction(nameof(SearchInvalidQR));
-
-            if (globalDocValidatorDocument.DocumentKey != documentKey) return RedirectToAction(nameof(SearchInvalidQR));
-
-            var partitionKey = $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocument.DocumentKey.Substring(0, 2)}";
-
-            return RedirectToAction(nameof(FindDocument), new { documentKey = globalDocValidatorDocument.DocumentKey, partitionKey, emissionDate = globalDocValidatorDocument.EmissionDateNumber });
+            return RedirectToAction(nameof(ShowDocumentToPublic), new { id = documentKey });
         }
 
         [ExcludeFilter(typeof(Authorization))]
