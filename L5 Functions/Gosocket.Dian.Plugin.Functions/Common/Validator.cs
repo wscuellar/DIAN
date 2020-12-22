@@ -35,6 +35,7 @@ using Gosocket.Dian.Plugin.Functions.Predecesor;
 using System.Threading.Tasks;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Services.Utils;
+using Gosocket.Dian.Plugin.Functions.Series;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -1195,27 +1196,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndoso
-        private ValidateListResponse ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode)
+        private List<ValidateListResponse> ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
             string valueTotalEndoso = nitModel.ValorTotalEndoso;
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validEndoso = false;
 
             //Valida informacion Endoso                           
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
             {
                 if(String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
                 {
-                    return new ValidateListResponse
+                    validEndoso = true;
+                    responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "Regla: AAI07b-(R): ",
                         ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
+                    });
                 }
 
                 //Valida precio a pagar endoso
@@ -1224,14 +1228,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultValuePriceToPay)
                 {
-                    return new ValidateListResponse
+                    validEndoso = true;
+                    responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "Regla: AAI07b-(R): ",
                         ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
+                    });
                 }
 
                 if (xmlParserCude.Fields["listID"].ToString() != "2")
@@ -1254,30 +1259,36 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     if (totalValueReceiver != totalValueSender)
                     {
-                        return new ValidateListResponse
+                        validEndoso = true;
+                        responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "Regla: AAF19-(R): ",
                             ErrorMessage = $"{(string)null} El valor no coincide con la sumatoria del evento //cac:ReceiverParty/cac:PartyLegalEntity/cbc:CorporateStockAmount.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        };
+                        });
                     }
 
                     if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
                     {
-                        return new ValidateListResponse
+                        validEndoso = true;
+                        responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: AAI07C-(R): ",
+                            ErrorCode = "Regla: AAI07c-(R): ",
                             ErrorMessage = $"{(string)null} El valor informado es diferente a la sumatoria de los elementos cbd:CorporateStockAmount del titular del evento.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        };
+                        });
                     }
                 }
 
             }
+
+            if (validEndoso)
+                return responses;
+
             return null;
         }
         #endregion
@@ -2742,11 +2753,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 //Solicitud de Disponibilización
                                 else if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
                                 {
-                                    var response = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode);
-                                    if (response != null)
+                                    var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode);
+                                    if (responseListEndoso.Count > 0)
                                     {
                                         validFor = true;
-                                        responses.Add(response);
+                                        //var failedList = new List<string>();
+                                        foreach (var item in responseListEndoso)
+                                        {
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = item.IsValid,
+                                                Mandatory = item.Mandatory,
+                                                ErrorCode = item.ErrorCode,
+                                                ErrorMessage = item.ErrorMessage,
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                                                       
                                     }
                                     else
                                     {
@@ -3487,14 +3510,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region validation for CBC ID
-        public List<ValidateListResponse> ValidateSerieAndNumber(string trackId, string number, string documentTypeId)
+        public List<ValidateListResponse> ValidateSerieAndNumber(ValidateSerieAndNumber.RequestObject data)
         {
             bool validFor = false;
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            trackId = trackId.ToLower();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId, documentTypeId);
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();      
+            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(data.TrackId, data.DocumentTypeId);
 
             if (documentMeta.Count > 0)
             {
@@ -3503,7 +3525,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier?.Identifier, documentIdentifier?.Identifier);
                     if (document != null)
                     {
-                        if (documentMeta.Where(t => t.Number == number
+                        //Valida GlobalDocRegisterProviderAR  Rowkey =  data.ProviderCode y SerieAndNumber = data.Number y documentType = 96
+                        //Si diferente de null genera le regla de error
+
+
+                        if (documentMeta.Where(t => t.Number == data.Number                        
                         && t.Identifier == document.PartitionKey
                         ).ToList().Count > decimal.Zero)
                         {
@@ -3524,7 +3550,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "100",
-                                ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
+                                ErrorMessage = " El Identificador (" + data.Number + ") ApplicationResponse no existe para este CUFE",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -3536,7 +3562,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = true,
                             Mandatory = true,
                             ErrorCode = "100",
-                            ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
+                            ErrorMessage = " El Identificador (" + data.Number + ") ApplicationResponse no existe para este CUFE",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -3553,7 +3579,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = true,
                     Mandatory = true,
                     ErrorCode = "100",
-                    ErrorMessage = " El Identificador (" + number + ") ApplicationResponse no existe para este CUFE",
+                    ErrorMessage = " El Identificador (" + data.Number + ") ApplicationResponse no existe para este CUFE",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }

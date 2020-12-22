@@ -16,6 +16,7 @@ using static Gosocket.Dian.Domain.Common.EnumHelper;
 using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
 using Gosocket.Dian.Plugin.Functions.Cufe;
+using Gosocket.Dian.Plugin.Functions.Series;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -280,12 +281,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-        public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId, string number, string documentTypeId)
+        public List<ValidateListResponse> StartValidateSerieAndNumberAsync(ValidateSerieAndNumber.RequestObject data)
         {
             var validateResponses = new List<ValidateListResponse>();
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSerieAndNumber(trackId, number, documentTypeId));
+            validateResponses.AddRange(validator.ValidateSerieAndNumber(data));
             return validateResponses;
         }
         public async Task<List<ValidateListResponse>> StartNitValidationAsync(string trackId)
