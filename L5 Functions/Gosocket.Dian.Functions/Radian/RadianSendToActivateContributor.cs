@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Data.Entity.Core;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Gosocket.Dian.Application;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
@@ -14,6 +7,12 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity.Core;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Functions.Radian
 {
@@ -31,7 +30,7 @@ namespace Gosocket.Dian.Functions.Radian
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            SetLogger(null, "Step 00", " -- Ingreso a SendToActivateRadianOperation -- ");
+            SetLogger(null, "Step STA-00", " -- Ingreso a SendToActivateRadianOperation -- ");
 
             if (ConfigurationManager.GetValue("Environment") == "Hab")
             {
@@ -39,7 +38,7 @@ namespace Gosocket.Dian.Functions.Radian
                 Contributor contributor = null;
                 
                 var sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnectionProd");
-                SetLogger(null, "Step 1", " -- Ingreso a If Environment = Hab -- ");
+                SetLogger(null, "Step STA-1", " -- Ingreso a If Environment = Hab -- ");
 
 
                 try
@@ -51,7 +50,7 @@ namespace Gosocket.Dian.Functions.Radian
                     if (data.ContributorId == 0)
                         throw new Exception("Please pass a contributor ud in the request body.");
 
-                    SetLogger(null, "Step 2", " -- Validaciones OK-- ");
+                    SetLogger(null, "Step STA-2", " -- Validaciones OK-- ");
 
                     contributor = contributorService.Get(data.ContributorId);
                     if (contributor == null)
@@ -62,14 +61,14 @@ namespace Gosocket.Dian.Functions.Radian
                     if (contributorProd == null)
                         throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {data.Code}.");
 
-                    SetLogger(contributorProd, "Step 3", " -- RadianSendToActivateContributor-- ");
+                    SetLogger(contributorProd, "Step STA-3", " -- RadianSendToActivateContributor-- ");
 
                     // Step 2 Get RadianContributor
                     radianContributor = contributorService.GetRadian(data.ContributorId, data.ContributorTypeId);
                     if (radianContributor == null)
                         throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
 
-                    SetLogger(radianContributor, "Step 4", " -- RadianSendToActivateContributor -- ");
+                    SetLogger(radianContributor, "Step STA-4", " -- RadianSendToActivateContributor -- ");
 
 
                     // Step 3 RadianTestSetResult
@@ -78,7 +77,7 @@ namespace Gosocket.Dian.Functions.Radian
                     if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || !results.Deleted)
                         throw new Exception("Contribuyente no a pasado set de pruebas.");
 
-                    SetLogger(results, "Step 5", " -- RadianSendToActivateContributor -- ");
+                    SetLogger(results, "Step STA-5", " -- RadianSendToActivateContributor -- ");
 
                     // Step 4  Enable Contributor
                     contributorService.SetToEnabledRadian(
@@ -87,7 +86,7 @@ namespace Gosocket.Dian.Functions.Radian
                         data.SoftwareId,
                         Convert.ToInt32(data.SoftwareType));
 
-                    SetLogger(null, "Step 6", " -- RadianSendToActivateContributor -- " +
+                    SetLogger(null, "Step STA-6", " -- RadianSendToActivateContributor -- " +
                         radianContributor.ContributorId + " "
                         + radianContributor.RadianContributorTypeId + " "
                         + data.SoftwareId + " "
@@ -114,7 +113,7 @@ namespace Gosocket.Dian.Functions.Radian
 
                     await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
 
-                    SetLogger(activateRadianContributorRequestObject, "Step 6", " -- SendToActivateRadianContributorToProduction -- ");
+                    SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
 
                 }
                 catch (Exception ex)
@@ -122,7 +121,7 @@ namespace Gosocket.Dian.Functions.Radian
                     log.Error($"Error al enviar a activar contribuyente con id {radianContributor?.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                     var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producción.", detail = ex.Message, trace = ex.StackTrace };
 
-                    SetLogger(failResponse, "Exception", " ---------------------------------------- " + ex.Message + " ---> " + ex);
+                    SetLogger(failResponse, "STA-Exception", " ---------------------------------------- " + ex.Message + " ---> " + ex);
 
                     return req.CreateResponse(HttpStatusCode.InternalServerError, failResponse);
                 }

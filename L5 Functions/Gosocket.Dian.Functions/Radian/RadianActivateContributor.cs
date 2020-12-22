@@ -28,11 +28,11 @@ namespace Gosocket.Dian.Functions.Radian
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 
-            SetLogger(null, "Step 00", " Ingresamos a ActivateRadianOperation ");
+            SetLogger(null, "Step RA-00", " Ingresamos a RadianActivateOperation ");
 
             if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
-                SetLogger(null, "Step 01", " Ingresamos a ActivateRadianOperation Ambiente Prod ");
+                SetLogger(null, "Step RA-01", " Ingresamos a ActivateRadianOperation Ambiente Prod ");
 
                 RadianContributor radianContributor = null;
                 GlobalContributorActivation contributorActivation = null;
@@ -46,7 +46,7 @@ namespace Gosocket.Dian.Functions.Radian
                     //Contributorid = RadiancontributoriD
                     int radianContributorId = 0;
                     radianContributor = contributorService.GetRadian(requestObject.ContributorId, requestObject.RadianContributorTypeId);
-                    SetLogger(requestObject, "Step 1", "RadianContributor ");
+                    SetLogger(requestObject, "Step RA-1", "RadianContributor ");
                     if (radianContributor != null)
                     {
                         // Step 3 Activo RadianContributor
@@ -54,7 +54,7 @@ namespace Gosocket.Dian.Functions.Radian
                         radianContributor.RadianContributorTypeId = requestObject.RadianContributorTypeId;
                         contributorService.ActivateRadian(radianContributor);
                         radianContributorId = radianContributor.Id;
-                        SetLogger(radianContributor, "Step 3", "ActivateRadian -->  ");
+                        SetLogger(radianContributor, "Step RA-3", "ActivateRadian -->  ");
 
                     }
                     else  //si el sujeto en radian no existe
@@ -71,7 +71,7 @@ namespace Gosocket.Dian.Functions.Radian
                         };
 
                         radianContributorId = contributorService.AddOrUpdateRadianContributor(radianContributor);
-                        SetLogger(radianContributorId, "Step 4", " -- contributorService.AddOrUpdateRadianContributor -- ");
+                        SetLogger(radianContributorId, "Step RA-4", " -- contributorService.AddOrUpdateRadianContributor -- ");
                     }
 
 
@@ -97,7 +97,7 @@ namespace Gosocket.Dian.Functions.Radian
 
                         softwareService.AddOrUpdateRadianSoftware(newSoftware);
 
-                        SetLogger(newSoftware, "Step 5", " -- softwareService.AddOrUpdateRadianSoftware -- ");
+                        SetLogger(newSoftware, "Step RA-5", " -- softwareService.AddOrUpdateRadianSoftware -- ");
 
                         // Crear Software en TableSTorage
                         GlobalSoftware globalSoftware = new GlobalSoftware(requestObject.SoftwareId, requestObject.SoftwareId)
@@ -109,7 +109,7 @@ namespace Gosocket.Dian.Functions.Radian
                         };
                         softwareTableManager.InsertOrUpdateAsync(globalSoftware).Wait();
 
-                        SetLogger(globalSoftware, "Step 6", " -- softwareTableManager.InsertOrUpdateAsync -- ");
+                        SetLogger(globalSoftware, "Step RA-6", " -- softwareTableManager.InsertOrUpdateAsync -- ");
                     }
 
 
@@ -131,7 +131,7 @@ namespace Gosocket.Dian.Functions.Radian
 
                         int oper = contributorService.AddRadianOperation(radianOperation);
 
-                        SetLogger(radianOperation, "Step 7", " -- contributorService.AddRadianOperation -- ");
+                        SetLogger(radianOperation, "Step RA-7", " -- contributorService.AddRadianOperation -- ");
                     }
                     else //---3. si existe se actualiza.
                     {
@@ -140,7 +140,7 @@ namespace Gosocket.Dian.Functions.Radian
                         radianOperation.RadianContributorId = radianContributorId;
                         radianOperation.SoftwareType = Convert.ToInt32(requestObject.SoftwareType);
                         contributorService.UpdateRadianOperation(radianOperation);
-                        SetLogger(radianOperation, "Step 7", " -- contributorService.UpdateRadianOperation -- ");
+                        SetLogger(radianOperation, "Step RA-8", " -- contributorService.UpdateRadianOperation -- ");
                     }
                     
 
@@ -170,7 +170,7 @@ namespace Gosocket.Dian.Functions.Radian
                     //--3. Si no existe si se crea.    //-----Razon los estados deben mantenerse en la actualizacion. mismo nit y software pueden usar diferentes modos.
                     GlobalRadianOperationsTableManager.InsertOrUpdateAsync(globalRadianOperations).Wait();
 
-                    SetLogger(globalRadianOperations, "Step 8", " -- globalRadianOperations -- ");
+                    SetLogger(globalRadianOperations, "Step RA-9", " -- globalRadianOperations -- ");
 
 
                     log.Info($"Activation Radian successfully completed. Contributor with given id: {radianContributor.Id}");
@@ -188,7 +188,7 @@ namespace Gosocket.Dian.Functions.Radian
                     contributorActivation.Trace = ex.StackTrace;
                     contributorActivationTableManager.InsertOrUpdate(contributorActivation);
 
-                    SetLogger(contributorActivation, "Exception", ex.Message + " -- -- " + ex);
+                    SetLogger(contributorActivation, "RA-Exception", ex.Message + " -- -- " + ex);
 
                     log.Error($"Exception in RadianActivateContributor. {ex.Message}", ex);
                     throw;
