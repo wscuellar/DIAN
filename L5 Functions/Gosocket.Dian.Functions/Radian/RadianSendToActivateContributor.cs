@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Functions.Radian
 {
-    public static class RadianSendToActivateContributor
+    public static class SendToActivateRadianOperation
     {
 
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
@@ -30,15 +30,15 @@ namespace Gosocket.Dian.Functions.Radian
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            SetLogger(null, "Step STA-00", " -- Ingreso a SendToActivateRadianOperation -- ");
+            SetLogger(null, "Step STA-00", ConfigurationManager.GetValue("Environment"));
 
             if (ConfigurationManager.GetValue("Environment") == "Hab")
             {
                 RadianContributor radianContributor = null;
                 Contributor contributor = null;
-                
+
                 var sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnectionProd");
-                SetLogger(null, "Step STA-1", " -- Ingreso a If Environment = Hab -- ");
+                SetLogger(null, "Step STA-1", sqlConnectionStringProd);
 
 
                 try
@@ -47,37 +47,44 @@ namespace Gosocket.Dian.Functions.Radian
                     if (data == null)
                         throw new Exception("Request body is empty.");
 
+                    SetLogger(data, "Step STA-1.1", "Data");
+
                     if (data.ContributorId == 0)
                         throw new Exception("Please pass a contributor ud in the request body.");
 
                     SetLogger(null, "Step STA-2", " -- Validaciones OK-- ");
 
                     contributor = contributorService.Get(data.ContributorId);
+                    SetLogger(null, "Step STA-2.1", contributor != null ? contributor.Id.ToString() : "no tiene");
                     if (contributor == null)
                         throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
 
                     // Step 1 Contributor Production
                     var contributorProd = contributorService.GetByCode(data.Code, sqlConnectionStringProd);
+                    SetLogger(null, "Step STA-3", contributorProd != null ? contributorProd.Id.ToString() : "no tiene en prod");
                     if (contributorProd == null)
                         throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {data.Code}.");
 
-                    SetLogger(contributorProd, "Step STA-3", " -- RadianSendToActivateContributor-- ");
 
-                    // Step 2 Get RadianContributor
+
+                    //    // Step 2 Get RadianContributor
                     radianContributor = contributorService.GetRadian(data.ContributorId, data.ContributorTypeId);
+                    SetLogger(null, "Step STA-4", radianContributor != null ? radianContributor.Id.ToString() : "no hay radian contributor");
                     if (radianContributor == null)
                         throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
 
-                    SetLogger(radianContributor, "Step STA-4", " -- RadianSendToActivateContributor -- ");
-
-
                     // Step 3 RadianTestSetResult
                     string key = data.SoftwareType + '|' + data.SoftwareId;
+                    SetLogger(null, "Step STA-4.1", data.Code, "code123");
+                    SetLogger(null, "Step STA-4.2", key, "key123");
                     var results = globalTestSetResultTableManager.Find<RadianTestSetResult>(data.Code, key);
-                    if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || !results.Deleted)
+
+                    SetLogger(null, "Step STA-5", "Pase " + results.Status.ToString());
+
+                    if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
                         throw new Exception("Contribuyente no a pasado set de pruebas.");
 
-                    SetLogger(results, "Step STA-5", " -- RadianSendToActivateContributor -- ");
+                    SetLogger(results, "Step STA-5.1", " -- RadianSendToActivateContributor -- ");
 
                     // Step 4  Enable Contributor
                     contributorService.SetToEnabledRadian(
@@ -111,9 +118,9 @@ namespace Gosocket.Dian.Functions.Radian
                         Url = data.Url
                     };
 
-                    await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
+                       await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
 
-                    SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
+                        SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
 
                 }
                 catch (Exception ex)
@@ -145,6 +152,8 @@ namespace Gosocket.Dian.Functions.Radian
                     DataVersion = "2.0"
                 }
             };
+            //string keyProd = ConfigurationManager.GetValue("EventGridProcess"); //EventGridKeyProd
+            //string topicProd = ConfigurationManager.GetValue("EventGridTopicProcess"); //EventGridTopicEndpointProd
             await EventGridManager.Instance("EventGridKeyProd", "EventGridTopicEndpointProd").SendMessagesToEventGridAsync(eventsList);
         }
 
@@ -229,7 +238,7 @@ namespace Gosocket.Dian.Functions.Radian
         /// <param name="objData">Un Objeto que se serializara en Json a String y se mostrara en el Logger</param>
         /// <param name="Step">El paso del Log o de los mensajes</param>
         /// <param name="msg">Un mensaje adicional si no hay objdata, por ejemplo</param>
-        private static void SetLogger(object objData, string Step, string msg)
+        private static void SetLogger(object objData, string Step, string msg, string keyUnique = "")
         {
             object resultJson;
 
@@ -238,9 +247,15 @@ namespace Gosocket.Dian.Functions.Radian
             else
                 resultJson = String.Empty;
 
-            var lastZone = new GlobalLogger("202012", "202012") { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+            GlobalLogger lastZone;
+            if (string.IsNullOrEmpty(keyUnique))
+                lastZone = new GlobalLogger("202015", "202015") { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+            else
+                lastZone = new GlobalLogger(keyUnique, keyUnique) { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+
             TableManagerGlobalLogger.InsertOrUpdate(lastZone);
         }
+
 
     }
 }
