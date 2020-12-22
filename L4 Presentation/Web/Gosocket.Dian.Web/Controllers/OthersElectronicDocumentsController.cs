@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Mvc;
+using System.Web.Mvc; 
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -78,7 +78,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.ContributorIdType = (int)dataentity.ContributorIdType;
             model.OtherDocElecContributorId = (int)dataentity.ContributorId;
 
-            PagedResult<OtherDocsElectList> List = _othersDocsElecContributorService.List(User.UserCode(), (int)dataentity.OperationModeId);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.UserCode(), (int)dataentity.OperationModeId);
 
             model.ListTable = List.Results.Select(t => new OtherDocsElectListViewModel()
             {
@@ -88,6 +88,7 @@ namespace Gosocket.Dian.Web.Controllers
                 ContibutorType = t.ContibutorType,
                 ElectronicDoc = t.ElectronicDoc,
                 Software = t.Software,
+                SoftwareId = t.SoftwareId,
                 PinSW = t.PinSW,
                 StateSoftware = t.StateSoftware,
                 StateContributor = t.StateContributor,
@@ -145,10 +146,10 @@ namespace Gosocket.Dian.Web.Controllers
             ResponseMessage response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperation(contributorOperation, software, true, true);
             if (response.Code != 500)
             {
-                _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
+                _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Registrado.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
             }
 
-            return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = model.Id });
+            return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = model.OtherDocElecContributorId });
         }
 
 
@@ -167,6 +168,12 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult Add(ValidacionOtherDocsElecViewModel registrationData)
         {
+            GlobalTestSetOthersDocuments testSet = null;
+
+            testSet = _othersDocsElecContributorService.GetTestResult((int)registrationData.OperationModeId, registrationData.ElectronicDocumentId);
+            if (testSet == null)
+                return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+
             OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(registrationData.UserCode.ToString(),
                                                 OtherDocElecState.Registrado,
                                                 registrationData.ContributorIdType,
@@ -204,6 +211,13 @@ namespace Gosocket.Dian.Web.Controllers
                     var ResponseMessageRedirectTo = new ResponseMessage("", TextResources.redirectType);
                     if (!Lista.Where(x => x.ElectronicDocumentId == ValidacionOtherDocs.ElectronicDocumentId).Any())
                     {
+                        GlobalTestSetOthersDocuments testSet = null;
+
+                        testSet = _othersDocsElecContributorService.GetTestResult((int)ValidacionOtherDocs.OperationModeId, ValidacionOtherDocs.ElectronicDocumentId);
+                        if (testSet == null)
+                            return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+
+
                         OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(
                                                             ValidacionOtherDocs.UserCode.ToString(),
                                                             OtherDocElecState.Registrado,

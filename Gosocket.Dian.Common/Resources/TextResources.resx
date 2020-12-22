@@ -237,4 +237,7 @@
   <data name="OtherSuccessSoftware" xml:space="preserve">
     <value>Datos asociados correctamente.</value>
   </data>
+  <data name="ModeElectroniDocWithoutTestSet" xml:space="preserve">
+    <value>Este modo de operación y documento electrónico carece de Set de Pruebas!!!</value>
+  </data>
 </root>

@@ -13,11 +13,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Gosocket.Dian.DataContext.Middle;
+using Gosocket.Dian.Infrastructure;
 
 namespace Gosocket.Dian.Application
 {
     public class OthersDocsElecContributorService : IOthersDocsElecContributorService
     {
+        private static readonly TableManager testSetManager = new TableManager("GlobalTestSetOthersDocuments");
         private SqlDBContext sqlDBContext;
         private readonly IContributorService _contributorService;
         private readonly IOthersDocsElecContributorRepository _othersDocsElecContributorRepository;
@@ -134,40 +136,68 @@ namespace Gosocket.Dian.Application
         }
 
 
-        public PagedResult<OtherDocsElectList> List(string userCode, int OperationModeId)
+        public PagedResult<OtherDocsElectData> List(string userCode, int OperationModeId)
         {
             Contributor contributor = _contributorService.GetByCode(userCode);
 
 
 
-            IQueryable<OtherDocsElectList> query = (from oc in sqlDBContext.OtherDocElecContributors
+            IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
                                                     join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
-                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on s.Id equals oco.SoftwareId
+                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on oc.Id equals oco.OtherDocElecContributorId
                                                     join ocs in sqlDBContext.OtherDocElecSoftwareStatus on s.OtherDocElecSoftwareStatusId equals ocs.Id
                                                     join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
                                                     join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
                                                     join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
                                                     where oc.ContributorId == contributor.Id
                                                      && oc.State != "Cancelado"
+                                                     && s.Deleted == false
+                                                     && oco.Deleted == false
 
-                                                    select new OtherDocsElectList()
+                                                    select new OtherDocsElectData()
                                                     {
                                                         Id = oc.Id,
                                                         ContributorId = oc.ContributorId,
                                                         OperationMode = ope.Name,
                                                         ContibutorType = oty.Name,
-                                                        Software =s.Name,
-                                                        PinSW =s.Pin,
-                                                        StateSoftware =ocs.Name, 
-                                                        StateContributor =oc.State,
+                                                        Software = s.Name,
+                                                        PinSW = s.Pin,
+                                                        SoftwareId = s.Id.ToString(),
+                                                        StateSoftware = ocs.Name,
+                                                        StateContributor = oc.State,
                                                         CreatedDate = oc.CreatedDate,
-                                                        ElectronicDoc= eld.Name,
-                                                        Url =s.Url, 
+                                                        ElectronicDoc = eld.Name,
+                                                        Url = s.Url,
                                                     }).Distinct();
             return query.Paginate(0, 100, t => t.Id.ToString());
- 
+
         }
 
+        public OtherDocsElectData GetCOntrinutorODE(int Id)
+        {
+            return (from oc in sqlDBContext.OtherDocElecContributors
+                    join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
+                    join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
+                    join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
+                    where oc.Id == Id
+                     && oc.State != "Cancelado"
+
+                    select new OtherDocsElectData()
+                    {
+                        Id = oc.Id,
+                        ContributorId = oc.ContributorId,
+                        OperationMode = ope.Name,
+                        ContibutorType = oty.Name,
+                        StateContributor = oc.State,
+                        CreatedDate = oc.CreatedDate,
+                        ElectronicDoc = eld.Name,
+                        OperationModeId = oc.OtherDocElecOperationModeId,
+                        ContibutorTypeId = oc.OtherDocElecContributorTypeId,
+                        ElectronicDocId = oc.ElectronicDocumentId,
+                        Step = oc.Step,
+                        State = oc.State
+                    }).Distinct().FirstOrDefault();
+        }
 
         /// <summary>
         /// Cancelar un registro en la tabla OtherDocElecContributor
@@ -193,7 +223,7 @@ namespace Gosocket.Dian.Application
                 result.Code = System.Net.HttpStatusCode.OK.GetHashCode();
                 result.Message = "Se cancelo el registro exitosamente";
 
-                if(re1 > 0) //Update operations state
+                if (re1 > 0) //Update operations state
                 {
                     var contriOpera = sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(c => c.OtherDocElecContributorId == contributorId);
                     Guid softId;
@@ -207,7 +237,7 @@ namespace Gosocket.Dian.Application
                         sqlDBContext.Entry(contriOpera).State = System.Data.Entity.EntityState.Modified;
 
                         int re2 = sqlDBContext.SaveChanges();
-                        
+
                         if (re2 > 0) //Update operations SUCCESS
                         {
                             var contriSoftware = sqlDBContext.OtherDocElecSoftwares.FirstOrDefault(c => c.OtherDocElecContributorId == contributorId && c.Id == softId);
@@ -242,5 +272,16 @@ namespace Gosocket.Dian.Application
             return result;
 
         }
+
+        public GlobalTestSetOthersDocuments GetTestResult(int OperatonModeId, int ElectronicDocumentId)
+        {
+            var _OperationMode= sqlDBContext.OtherDocElecOperationModes.FirstOrDefault(c => c.Id == OperatonModeId);
+            var res = testSetManager.GetOthersDocuments<GlobalTestSetOthersDocuments>(ElectronicDocumentId.ToString(), _OperationMode.OperationModeId.ToString());
+            if (res != null && res.Count > 0)
+                return res.FirstOrDefault();
+            else
+                return null;
+        }
+
     }
 }

@@ -7,6 +7,7 @@ using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -37,12 +38,15 @@ namespace Gosocket.Dian.Web.Controllers
 
         private readonly IContributorService _contributorService;
         private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
+        private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
 
         public OthersElectronicDocAssociatedController(IContributorService contributorService,
-            IOthersDocsElecContributorService othersDocsElecContributorService)
+            IOthersDocsElecContributorService othersDocsElecContributorService,
+            IOthersElectronicDocumentsService othersElectronicDocumentsService)
         {
             _contributorService = contributorService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
+            _othersElectronicDocumentsService = othersElectronicDocumentsService;
         }
 
         /// <summary>
@@ -53,41 +57,42 @@ namespace Gosocket.Dian.Web.Controllers
         /// <param name="operationModeId"></param>
         /// <param name="ContributorIdType"></param>
         /// <returns></returns>
-        public ActionResult Index(int id=0, int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0)//TODO:
+        public ActionResult Index(int Id = 0)//TODO:
         {
-            ViewBag.OtherDocElecContributorId = id;
-            ViewBag.Participant = "Emisor";//TODO:
+            ViewBag.ValidateRequest = true;
+            OtherDocsElectData entity = _othersDocsElecContributorService.GetCOntrinutorODE(Id);
 
-            var electronicDoc = new ElectronicDocumentService().GetElectronicDocuments()
-                .Where(d => d.Id == electronicDocumentId).FirstOrDefault();/*.Select(e => new ElectronicDocumentViewModel
-                {
-                    Id = e.Id,
-                    Name = e.Name
-                });*/
-
-            if (electronicDoc != null)
+            if (entity == null)
             {
-                ViewBag.ElectronicDocumentId = electronicDoc.Id;
-                ViewBag.ElectronicDocumentName = electronicDoc.Name;
+                ViewBag.ValidateRequest = false;
+                return View(new OthersElectronicDocAssociatedViewModel());
             }
-
-            var contributor = _contributorService.GetContributorByUserId(User.Identity.GetUserId(), ContributorIdType);
+            var contributor = _contributorService.GetContributorById(entity.ContributorId, entity.ContibutorTypeId);
+            ViewBag.ValidateRequest = true;
 
             if (contributor == null)
             {
+                ViewBag.ValidateRequest = false;
                 ModelState.AddModelError("", "No existe contribuyente!");
-                return View();
+                return View(new OthersElectronicDocAssociatedViewModel());
             }
 
             OthersElectronicDocAssociatedViewModel model = new OthersElectronicDocAssociatedViewModel()
             {
+                Id = entity.Id,
                 ContributorId = contributor.Id,
                 Name = contributor.Name,
                 Nit = contributor.Code,
                 BusinessName = contributor.BusinessName,
                 Email = contributor.Email,
-                Step = 1,//TODO:
-                State = "Dev",//TODO:
+                Step = entity.Step,
+                State = entity.State,//TODO:
+                OperationMode = entity.OperationMode,
+                OperationModeId = entity.OperationModeId,
+                ElectronicDoc = entity.ElectronicDoc,
+                ElectronicDocId = entity.ElectronicDocId,
+                ContibutorType = entity.ContibutorType,
+                ContibutorTypeId = entity.ContibutorTypeId,
             };
 
             return View(model);
@@ -116,5 +121,42 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
+        public JsonResult EnviarContributor(OthersElectronicDocAssociatedViewModel entity)
+        {
+            bool updated = _othersElectronicDocumentsService.ChangeContributorStep(entity.Id, entity.Step + 1);
+
+            if (updated)
+            {
+                return Json(new
+                {
+                    message = "Datos enviados correctamente.",
+                    success = true,
+                    data = new { Id = entity.Id }
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new ResponseMessage($"El registro no pudo ser actualizado", "Nulo"), JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpPost]
+        public ActionResult GetSetTestResult(int Id)
+        {
+            OtherDocsElectData entity = _othersDocsElecContributorService.GetCOntrinutorODE(Id);
+
+            /*GlobalTestSetOthersDocuments testSet = null;
+
+            testSet = _othersDocsElecContributorService.GetTestResult((int)registrationData.OperationModeId, registrationData.ElectronicDocumentId);
+            if (testSet == null)
+                return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+
+            model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(model.Nit, key);
+            RadianTestSet testSet = _radianTestSetService.GetTestSet(sType, sType);
+            model.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), sType)));
+            model.RadianTestSetResult.StatusDescription = testSet.Description;
+            model.Software = software;*/
+            return View();
+        }
     }
 }

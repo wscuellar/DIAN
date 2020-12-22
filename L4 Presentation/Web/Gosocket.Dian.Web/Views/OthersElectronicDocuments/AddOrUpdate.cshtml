@@ -113,8 +113,7 @@
                                         if (!ViewBag.softwareActive)
                                         {
                                             <div class="panel-footer text-right">
-                                                <a href="@Url.Action("Index", "OthersElectronicDocAssociated", new { electronicDocumentId = 0,  operationModeId = 0,  ContributorIdType = 0 })" class="btnBackTop">Siguiente Pruebas</a>
-
+                                                 
                                                 <button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave">Asociar</button>
                                             </div>
                                         }
@@ -136,11 +135,11 @@
                                             <thead>
                                                 <tr>
                                                     <th class="text-left">Modo de operación</th>
-                                                    <th class="text-left">Tipo Participante</th>
                                                     <th class="text-left">Documento Electrónicos</th>
-                                                    <th class="text-center">Registro</th>
-                                                    <th class="text-center">Estado (Participante - Software)</th>
+                                                    <th class="text-center">&nbsp;&nbsp;Registro&nbsp;&nbsp;</th>
+                                                    <th class="text-center">Estado<br /> (Participante - Software)</th>
                                                     <th class="text-center">Nombre del Software</th>
+                                                    <th class="text-center">ID</th>
                                                     <th class="text-center">PIN del SW </th>
                                                     <th class="text-center">URL</th>
                                                     <th class="text-center"></th>
@@ -153,12 +152,12 @@
                                                     foreach (var item in (List<Gosocket.Dian.Web.Models.OtherDocsElectListViewModel>)Model.ListTable)
                                                     {
                                                         <tr>
-                                                            <td class="text-left">@item.OperationMode</td>
-                                                            <td class="text-center">@item.ContibutorType</td>
+                                                            <td class="text-left">@item.OperationMode - @item.ContibutorType</td>
                                                             <td class="text-center">@item.ElectronicDoc</td>
                                                             <td class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
                                                             <td class="text-center">@item.StateContributor - @item.StateSoftware</td>
                                                             <td class="text-center">@item.Software</td>
+                                                            <td class="text-center">@item.SoftwareId</td>
                                                             <td class="text-center">@item.PinSW</td>
                                                             <td class="text-center">  @item.Url  </td>
                                                             <td class="text-center">
@@ -211,7 +210,7 @@
                 var form = $('#frmOthersElectronicDocuments');
                 console.log(form);
                 console.log(form.valid());
-                if (form.valid()) { 
+                if (form.valid()) {
                     form.submit();
                 }
             });
@@ -284,7 +283,7 @@
                 datatype: "json",
                 success: function (result) {
 
-                    if (result != null) { 
+                    if (result != null) {
                         console.log(result);
                         $('#UrlEventReception').val(result.url);
                         $('#SoftwareType').val(result.SoftwareType)

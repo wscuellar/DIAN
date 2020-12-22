@@ -24,7 +24,7 @@
             <div class="form-group">
                 @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
                 @Html.TextBoxFor(m => m.SoftwareName, new { @class = "form-control input-general fields captureFields" })
-                @Html.ValidationMessageFor(m => m.UrlEventReception, "", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(m => m.SoftwareName, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="col-sm-5 padding-xs-0">

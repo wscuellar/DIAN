@@ -1,6 +1,6 @@
 ﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
 @{
-    ViewBag.Title = "TODO:";
+    ViewBag.Title = Model.ContibutorType + " de " + Model.ElectronicDoc;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -55,7 +55,7 @@
             }
 
         #steps-otherdocELectAssociate .steps li:nth-child(3).disabled a {
-            background: url(../Content/images/png/pruebas3.png);
+            background: url(../../Content/images/png/pruebas3.png);
             background-repeat: no-repeat;
             background-position: center;
             margin: 0px;
@@ -63,7 +63,7 @@
         }
 
         #steps-otherdocELectAssociate .steps li:nth-child(2).current a {
-            background: url(../Content/images/png/pendiente2.png);
+            background: url(../../Content/images/png/pendiente2.png);
             background-repeat: no-repeat;
             background-position: center;
             margin: 0px;
@@ -72,7 +72,7 @@
 
 
         #steps-otherdocELectAssociate .steps li:nth-child(3).current a {
-            background: url(../Content/images/png/pruebas2.png);
+            background: url(../../Content/images/png/pruebas2.png);
             background-repeat: no-repeat;
             background-position: center;
             margin: 0px;
@@ -80,7 +80,7 @@
         }
 
         #steps-otherdocELectAssociate .steps li:nth-child(1).done a {
-            background: url(../Content/images/png/ingreso1.png);
+            background: url(../../Content/images/png/ingreso1.png);
             background-repeat: no-repeat;
             background-position: center;
             margin: 0px;
@@ -88,7 +88,7 @@
         }
 
         #steps-otherdocELectAssociate .steps li:nth-child(2).done a {
-            background: url(../Content/images/png/pendiente1.png);
+            background: url(../../Content/images/png/pendiente1.png);
             background-repeat: no-repeat;
             background-position: center;
             margin: 0px;
@@ -97,7 +97,7 @@
 
 
         #steps-otherdocELectAssociate .steps li:nth-child(3).done a {
-            background: url(../Content/images/png/pruebas1.png);
+            background: url(../../Content/images/png/pruebas1.png);
             background-repeat: no-repeat;
             background-position: center;
             margin: 0px;
@@ -105,7 +105,7 @@
         }
 
         #steps-otherdocELectAssociate .steps li.last a {
-            background: url(../Content/images/png/flagFinish.png);
+            background: url(../../Content/images/png/flagFinish.png);
             background-repeat: no-repeat;
             background-position: center;
             margin: 0px;
@@ -120,7 +120,7 @@
             width: 35px;
             height: 35px;
             background-repeat: no-repeat;
-            background-image: url(../Content/images/png/done.png);
+            background-image: url(../../Content/images/png/done.png);
             z-index: 1;
         }
 
@@ -221,6 +221,11 @@
                     </section>
                     <h3><span class="name-state">Pruebas de aceptación</span></h3>
                     <section style="border: 0px !important;">
+                        <div class="panel-footer text-right">
+                            <div class="form-group">
+                                <button name="Submit" class="btn btn-radian-success submit-button Set-Prueba">Set de Pruebas</button>
+                            </div>
+                        </div>
                     </section>
                     <h3></h3>
                     <section style="border: 0px !important;">
@@ -230,15 +235,7 @@
 
             </div>
 
-            @{ if (@Model.State != "En pruebas" && Model.Step == 2)
-                {
-                    <div class="panel-footer text-right">
-                        <div class="form-group">
-                            <button name="Submit" class="btn btn-radian-success submit-button Set-Prueba">Set de Pruebas</button>
-                        </div>
-                    </div>
-                }
-            }
+
         </div>
 
 
@@ -248,7 +245,7 @@
 
                     <div class="modal-header">
                         <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
-                        <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @ViewBag.Participant de @ViewBag.ElectronicDocumentName</h4>
+                        <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @Model.ContibutorType de @Model.ElectronicDoc</h4>
                     </div>
                     <div class="modal-body">
                         <div class="bootbox-body">
@@ -278,7 +275,7 @@
         $(document).ready(function () {
             //howLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
 
-            var index = '@Model.State' == "En pruebas" ? 3 : @Model.Step;
+            var index =  @Model.Step;//'@Model.State' == "En pruebas" ? 3 :
             RenderStepsOtherDoc(index);
 
             $(".cancel-register").click(function () {
@@ -295,13 +292,13 @@
                 }
 
                 $("#dialogcancelarregistro").modal('hide');
-                    showConfirmation("¿Desea cancelar el registro del participante @ViewBag.Participant de @ViewBag.ElectronicDocumentName ?", ConfirmExec(
+                showConfirmation("¿Desea cancelar el registro del participante @Model.ContibutorType de @Model.ElectronicDoc ?", ConfirmExec(
                         function () {
 
                             $.ajax({
                             url: "@Url.Action("CancelRegister", "OthersElectronicDocAssociated")",
                             type: "POST",
-                                data: { id: @Convert.ToInt32(ViewBag.OtherDocElecContributorId), description: $("#txtCancelRegistro").val() },
+                                data: { id: @Convert.ToInt32(Model.Id), description: $("#txtCancelRegistro").val() },
                             datatype: "json",
                             success: function (result) {
 
@@ -338,6 +335,42 @@
                     , "", () => hideLoading('#panel-form')));
               });
 
+            $('.submit-button').click(function (e) {
+                showConfirmation("¿Esta seguro de enviar el @ViewBag.Title ?", ConfirmExec(
+                        function () {
+                                    showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
+
+                                    var entity = {
+                                                    Id :@Model.Id,
+                                                    ContributorId :@Model.ContributorId,
+                                                    Name : '@Model.Name',
+                                                    Nit : @Model.Nit,
+                                                    BusinessName :'@Model.BusinessName',
+                                                    Email : '@Model.Email',
+                                                    Step : @Model.Step,
+                                                    State: '@Model.State',
+                                                    OperationMode:'@Model.OperationMode',
+                                                    OperationModeId :@Model.OperationModeId,
+                                                    ElectronicDoc :'',
+                                                    ElectronicDocId : @Model.ElectronicDocId,
+                                                    ContibutorType : '',
+                                                    ContibutorTypeId : @Model.ContibutorTypeId,
+                                                 };
+
+                                    CallExecutionWithData("POST", '@Url.Action("EnviarContributor", "OthersElectronicDocAssociated")', entity,
+                                         function (param, data) {
+                                             bootbox.dialog({
+                                                 message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>" + data.message+"</h4></div></div>",
+                                                 onEscape: () => { 
+                                                        var url = "@Url.Action("Index", "OthersElectronicDocAssociated")";
+                                                        window.location.href = url;
+                                                 }
+                                                });
+                                         }, false, () => hideLoading('#panel-form')
+                                     );
+                     }
+                     , "", () => hideLoading('#panel-form'))); 
+              });
 
 
              function RenderStepsOtherDoc(index) {

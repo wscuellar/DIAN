@@ -2912,6 +2912,7 @@
     <Content Include="Views\OthersElectronicDocAssociated\_finish.cshtml" />
     <Content Include="Views\OthersElectronicDocAssociated\_pending.cshtml" />
     <Content Include="Views\RadianTestSet\_detailsTestSet.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\GetSetTestResult.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

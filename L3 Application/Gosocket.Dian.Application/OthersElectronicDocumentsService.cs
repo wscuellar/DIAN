@@ -101,42 +101,24 @@ namespace Gosocket.Dian.Application
             if (entity.State == OtherDocElecState.Cancelado.GetDescription())
                 CancelParticipant(entity);
 
-            //UpdateGlobalRadianOperation(radianContributorTypeId, competitor);
-
             _othersDocsElecContributorRepository.AddOrUpdate(entity);
 
             return true;
 
         }
 
+        public bool ChangeContributorStep(int  ContributorId, int step)
+        {
+            OtherDocElecContributor entity = _othersDocsElecContributorRepository.Get(t => t.Id == ContributorId);
+
+            if (entity == null)  return false;
+            entity.Step = step;
+            _othersDocsElecContributorRepository.AddOrUpdate(entity);
+            return true;
+        }
+
 
         #region Private methods Cancel Participant
-
-        private void UpdateGlobalRadianOperation(int ContributorTypeId, OtherDocElecContributor competitor)
-        {
-           /* List<GlobalRadianOperations> radianOperations = _globalRadianOperationService.OperationList(competitor.Contributor.Code);
-            if (radianOperations.Any())
-            {
-                List<GlobalRadianOperations> operations = radianOperations.Where(t => t.RadianContributorTypeId == radianContributorTypeId).ToList();
-                if (competitor.RadianState == RadianState.Test.GetDescription())
-                {
-                    GlobalRadianOperations operation = radianOperations.OrderByDescending(t => t.Timestamp).FirstOrDefault(t => t.RadianContributorTypeId == radianContributorTypeId);
-                    operation.Deleted = false;
-                    operation.RadianStatus = competitor.RadianState;
-                    _globalRadianOperationService.Update(operation);
-                }
-                else
-                {
-                    foreach (GlobalRadianOperations operation in operations)
-                    {
-                        operation.Deleted = true;
-                        operation.RadianStatus = competitor.RadianState;
-                        _globalRadianOperationService.Update(operation);
-                    }
-                }
-
-            }*/
-        }
 
         private void CancelParticipant(OtherDocElecContributor entity)
         {
@@ -156,19 +138,7 @@ namespace Gosocket.Dian.Application
                     _othersDocsElecContributorOperationRepository.Update(operation);
                 }
             }
-        }
-
-        public void UpdateRadianOperation(int radiancontributorId, int softwareType)
-        {
-            /*List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radiancontributorId && !t.Deleted && t.SoftwareType == softwareType && t.OperationStatusId == 1);
-            foreach (RadianContributorOperation operation in operations)
-            {
-                operation.OperationStatusId = (int)RadianState.Test;
-                _radianContributorOperationRepository.Update(operation);
-            }*/
-        }
-
-       
+        }      
       
         #endregion
     }
