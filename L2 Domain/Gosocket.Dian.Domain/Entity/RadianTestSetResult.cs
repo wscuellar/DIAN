@@ -291,32 +291,92 @@ namespace Gosocket.Dian.Domain.Entity
         /// </summary>
         public int ElectronicMandateRejected { get; set; }
 
-        // Terminación mandato
+        // 
+        /// <summary>
+        /// Terminación mandato - Total requerido
+        /// </summary>
         public int EndMandateTotalRequired { get; set; }
+        /// <summary>
+        /// Terminación mandato - Total aceptado requerido
+        /// </summary>
         public int EndMandateTotalAcceptedRequired { get; set; }
+        /// <summary>
+        /// Terminación mandato - Total enviados 
+        /// </summary>
         public int TotalEndMandateSent { get; set; }
+        /// <summary>
+        /// Terminación mandato - Total Aceptados
+        /// </summary>
         public int EndMandateAccepted { get; set; }
+        /// <summary>
+        /// Terminación mandato - Total Rechazados
+        /// </summary>
         public int EndMandateRejected { get; set; }
 
-        // Notificación de pago
+        // 
+        /// <summary>
+        /// Notificación de pago - Total requerido
+        /// </summary>
         public int PaymentNotificationTotalRequired { get; set; }
+        /// <summary>
+        /// Notificación de pago - Total aceptado requerido
+        /// </summary>
         public int PaymentNotificationTotalAcceptedRequired { get; set; }
+        /// <summary>
+        /// Notificación de pago - Total enviados
+        /// </summary>
         public int TotalPaymentNotificationSent { get; set; }
+        /// <summary>
+        /// Notificación de pago - Total Aceptados
+        /// </summary>
         public int PaymentNotificationAccepted { get; set; }
+        /// <summary>
+        /// Notificación de pago - Total rechazados
+        /// </summary>
         public int PaymentNotificationRejected { get; set; }
 
-        // Limitación de circulación
+        // 
+        /// <summary>
+        /// Limitación de circulación - Total Requerido
+        /// </summary>
         public int CirculationLimitationTotalRequired { get; set; }
+        /// <summary>
+        /// Limitación de circulación - Total Aceptados Requeridos
+        /// </summary>
         public int CirculationLimitationTotalAcceptedRequired { get; set; }
+        /// <summary>
+        /// Limitación de circulación - Total Enviados
+        /// </summary>
         public int TotalCirculationLimitationSent { get; set; }
+        /// <summary>
+        /// Limitación de circulación - Total Aceptados
+        /// </summary>
         public int CirculationLimitationAccepted { get; set; }
+        /// <summary>
+        /// Limitación de circulación - Total rechazados
+        /// </summary>
         public int CirculationLimitationRejected { get; set; }
 
-        // Terminación limitación  
+        //  
+        /// <summary>
+        /// Terminación limitación - Total Requerido
+        /// </summary>
         public int EndCirculationLimitationTotalRequired { get; set; }
+        /// <summary>
+        /// Terminación limitación - Total Aceptados Requeridos
+        /// </summary>
         public int EndCirculationLimitationTotalAcceptedRequired { get; set; }
+        /// <summary>
+        /// Terminación limitación - Total Enviados
+        /// </summary>
         public int TotalEndCirculationLimitationSent { get; set; }
+        /// <summary>
+        /// Terminación limitación - Total Aceptados
+        /// </summary>
         public int EndCirculationLimitationAccepted { get; set; }
+        /// <summary>
+        /// Terminación limitación - Total Rechazados
+        /// </summary>
         public int EndCirculationLimitationRejected { get; set; }
 
 
