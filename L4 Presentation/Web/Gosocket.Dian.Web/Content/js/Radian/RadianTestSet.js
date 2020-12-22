@@ -6,6 +6,29 @@
 $('#TotalDocumentRequired').attr('readonly', true);
 $('#TotalDocumentAcceptedRequired').attr('redonly', true);
 
+
+$("#EndorsementWarrantyTotalRequired").change(function () {
+    var noticeTotal = parseInt($("#EndorsementWarrantyTotalRequired").val());
+    if (noticeTotal < 0) {
+        showErrorMessage(0);
+        $("#EndorsementWarrantyTotalRequired").val(0);
+    }
+    else {
+        updateTotal();
+    }
+});
+
+$("#EndorsementProcurationTotalRequired").change(function () {debugger
+    var noticeTotal = parseInt($("#EndorsementProcurationTotalRequired").val());
+    if (noticeTotal < 0) {
+        showErrorMessage(0);
+        $("#EndorsementProcurationTotalRequired").val(0);
+    }
+    else {
+        updateTotal();
+    }
+});
+
 $("#ReceiptNoticeTotalRequired").change(function () {
     var noticeTotal = parseInt($("#ReceiptNoticeTotalRequired").val());
     if (noticeTotal < 0) {
@@ -290,6 +313,28 @@ $("#EndCirculationLimitationTotalAcceptedRequired").change(function () {
     }
 });
 
+$("#EndorsementWarrantyTotalAcceptedRequired").change(function () {
+    var endcirculationNotificationTotal0 = parseInt($("#EndorsementWarrantyTotalAcceptedRequired").val());
+    if (endcirculationNotificationTotal0 < 0) {
+        showErrorMessage(0);
+        $("#EndorsementWarrantyTotalAcceptedRequired").val(0);
+    }
+    else {
+        updateTotalRequired();
+    }
+});
+
+$("#EndorsementProcurationTotalAcceptedRequired").change(function () {
+    var endcirculationNotificationTotal0 = parseInt($("#EndorsementProcurationTotalAcceptedRequired").val());
+    if (endcirculationNotificationTotal0 < 0) {
+        showErrorMessage(0);
+        $("#EndorsementProcurationTotalAcceptedRequired").val(0);
+    }
+    else {
+        updateTotalRequired();
+    }
+});
+
 
 $('.btn-save').click(function () {
 
@@ -308,6 +353,8 @@ function updateTotal() {
     var rejectInvoiceTotal = parseInt($("#RejectInvoiceTotalRequired").val());
     var appAvailableTotal = parseInt($("#ApplicationAvailableTotalRequired").val());
     var endorsementTotal = parseInt($("#EndorsementTotalRequired").val());
+    var endorsmentWarranty = parseInt($("#EndorsementWarrantyTotalRequired").val());
+    var endorsmentProcuration = parseInt($("#EndorsementProcurationTotalRequired").val());
     var endorsementCancelTotal = parseInt($("#EndorsementCancellationTotalRequired").val());
     var garanteeTotal = parseInt($("#GuaranteeTotalRequired").val());
     var electronicMandateTotal = parseInt($("#EndMandateTotalRequired").val());
@@ -319,7 +366,7 @@ function updateTotal() {
     $("#TotalDocumentRequired").val(noticeTotal + receiptServiceTotal + expressAcceptanceTotal + automaticAcceptanceTotal
         + rejectInvoiceTotal + appAvailableTotal + endorsementTotal + endorsementCancelTotal + garanteeTotal +
         electronicMandateTotal + endMandateTotal + paymentNotificationTotal + circulationNotificationTotal +
-        endcirculationNotificationTotal);
+        endcirculationNotificationTotal + endorsmentWarranty + endorsmentProcuration);
 }
 
 function updateTotalRequired() {
@@ -331,6 +378,8 @@ function updateTotalRequired() {
     var appAvailableTotal0 = parseInt($("#ApplicationAvailableTotalAcceptedRequired").val());
     var endorsementTotal0 = parseInt($("#EndorsementTotalAcceptedRequired").val());
     var endorsementCancelTotal0 = parseInt($("#EndorsementCancellationTotalAcceptedRequired").val());
+    var endorsmentWarranty0 = parseInt($("#EndorsementWarrantyTotalAcceptedRequired").val());
+    var endorsmentProcuration0 = parseInt($("#EndorsementProcurationTotalAcceptedRequired").val());
     var garanteeTotal0 = parseInt($("#GuaranteeTotalAcceptedRequired").val());
     var electronicMandateTotal0 = parseInt($("#EndMandateTotalAcceptedRequired").val());
     var endMandateTotal0 = parseInt($("#ElectronicMandateTotalAcceptedRequired").val());
@@ -341,7 +390,7 @@ function updateTotalRequired() {
     $("#TotalDocumentAcceptedRequired").val(noticeTotal0 + receiptServiceTotal0 + expressAcceptanceTotal0 + automaticAcceptanceTotal0
         + rejectInvoiceTotal0 + appAvailableTotal0 + endorsementTotal0 + endorsementCancelTotal0 + garanteeTotal0 +
         electronicMandateTotal0 + endMandateTotal0 + paymentNotificationTotal0 + circulationNotificationTotal0 +
-        endcirculationNotificationTotal0);
+        endcirculationNotificationTotal0 + endorsmentWarranty0 + endorsmentProcuration0);
 }
 
 function showErrorMessage(total) {

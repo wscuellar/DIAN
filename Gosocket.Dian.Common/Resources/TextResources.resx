@@ -142,7 +142,7 @@
     <value>Mandato por documento</value>
   </data>
   <data name="Event_ReferenceTitle" xml:space="preserve">
-    <value>Referencias del Evento</value>
+    <value>Referencias del evento</value>
   </data>
   <data name="Event_RequestType" xml:space="preserve">
     <value>Solicitud de Disponibilización para Negociaciación General</value>
@@ -154,7 +154,7 @@
     <value>Documento validado por la DIAN</value>
   </data>
   <data name="Event_ValidationTitle" xml:space="preserve">
-    <value>Validaciones del Evento</value>
+    <value>Validaciones del evento</value>
   </data>
   <data name="ExistingSoftware" xml:space="preserve">
     <value>El participante ya tiene asociado el software asignado!!!</value>
@@ -184,7 +184,7 @@
     <value>https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey={CUFE}</value>
   </data>
   <data name="Receipt" xml:space="preserve">
-    <value>Constancia de Recibo de mercancia</value>
+    <value>Constancia de Recibo de mercancía</value>
   </data>
   <data name="Received" xml:space="preserve">
     <value>Acuse de Recibo de Factura Electrónica</value>
