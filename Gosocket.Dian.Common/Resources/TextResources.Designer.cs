@@ -115,7 +115,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Factura Electronica.
+        ///   Busca una cadena traducida similar a Factura Electrónica.
         /// </summary>
         public static string Event_DocumentType {
             get {

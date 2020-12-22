@@ -136,7 +136,7 @@
     <value>Endoso Electronico</value>
   </data>
   <data name="Event_DocumentType" xml:space="preserve">
-    <value>Factura Electronica</value>
+    <value>Factura Electrónica</value>
   </data>
   <data name="Event_MandateType" xml:space="preserve">
     <value>Mandato por documento</value>

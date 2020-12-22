@@ -186,6 +186,8 @@ namespace Gosocket.Dian.Domain.Entity
         /// Endoso en Procuracion - Total requerido
         /// </summary>
         public int EndorsementProcurementTotalRequired { get; set; }
+
+        public int EndorsementTotalRequired { get; set; }
         /// <summary>
         /// Endoso en Procuracion - Total Aceptado
         /// </summary>
