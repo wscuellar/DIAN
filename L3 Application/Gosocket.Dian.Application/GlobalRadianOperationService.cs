@@ -24,7 +24,6 @@ namespace Gosocket.Dian.Application
                 Timestamp = DateTime.Now,
                 StatusId = 1
             };
-            ;
             return SoftwareAdd(soft) && globalRadianOperations.InsertOrUpdate(item);
         }
 
