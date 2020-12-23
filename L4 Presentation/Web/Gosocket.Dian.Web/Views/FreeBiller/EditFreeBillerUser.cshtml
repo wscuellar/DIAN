@@ -10,6 +10,9 @@
     <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
 }
+
+
+
 <style>
     .form-control {
         border-radius: 4px;
@@ -41,21 +44,123 @@
 
     .bootstrap-select button {
         padding-left: 10px !important;
-        
     }
-   
 </style>
-<script type="text/javascript">
-    function seleccionar() {
-       
-        if (document.miFormulario.FacturaVenta.type == "checkbox")
-            document.miFormulario.FacturaVenta.checked = 1
-    }
-</script>
+
+
+
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript">
 
+    $(document).ready(function () {
+        $("input:checkbox:checked").attr("checked", true);
+        if (@ViewBag.valor= true) {
+            if (@ViewBag.valor= 1) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+            if (@ViewBag.valor= 2) {
+                document.getElementById("FacturaContingencia").checked = true;
+            }
+             if (@ViewBag.valor= 3) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 4) {
+                 document.getElementById("NotaCredito").checked = true;
+            }
+             if (@ViewBag.valor= 5) {
+                 document.getElementById("NotaDebito").checked = true;
+            }
+             if (@ViewBag.valor= 6) {
+                 document.getElementById("FacturaMandato").checked = true;
+            }
+             if (@ViewBag.valor= 7) {
+                 document.getElementById("FacturaAIU").checked = true;
+            }
+             if (@ViewBag.valor= 8) {
+                 document.getElementById("FacturaExportacion").checked = true;
+            }
+             if (@ViewBag.valor= 9) {
+                 document.getElementById("DocumentoSoporte").checked = true;
+            }
+             if (@ViewBag.valor= 10) {
+                 document.getElementById("Seguridad").checked = true;
+            }
+             if (@ViewBag.valor= 11) {
+                 document.getElementById("CertificadosDigitales").checked = true;
+            }
+             if (@ViewBag.valor= 12) {
+                 document.getElementById("Administrar").checked = true;
+            }
+             if (@ViewBag.valor= 13) {
+                 document.getElementById("clientes").checked = true;
+            }
+             if (@ViewBag.valor= 14) {
+                 document.getElementById("RangosNum").checked = true;
+            }
+             if (@ViewBag.valor= 15) {
+                 document.getElementById("Productos").checked = true;
+            }
+             if (@ViewBag.valor= 16) {
+                 document.getElementById("NuevaPlantilla").checked = true;
+            }
+             if (@ViewBag.valor= 17) {
+                 document.getElementById("FacturaExportacion").checked = true;
+            }
+             if (@ViewBag.valor= 18) {
+                 document.getElementById("AdminPlantillas").checked = true;
+            }
+             if (@ViewBag.valor= 19) {
+                 document.getElementById("EmitirPlantillas").checked = true;
+            }
+             if (@ViewBag.valor= 20) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 21) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 22) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 23) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 24) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 25) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 26) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 27) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 28) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 29) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 30) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 31) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 32) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+            console.log("Ok¡¡");
+        }
+        else {
+            console.log("No Ok¡¡");
+        }
+    });
+    </script>
     <div class="page-content margin-15">
         <div class="row margin-horizontal-0">
             <div class="tab-base">
@@ -93,26 +198,26 @@
                                                         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                                                         @Html.HiddenFor(model => model.Id)
                                                         @*<div class="col-md-3 padding-xs-0">
-            <div class="form-group">
+                                                                <div class="form-group">
 
 
-                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                                    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
 
-                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                                                                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
 
-            </div>
-        </div>
-        <div class="col-md-3 padding-xs-0">
-            <div class="form-group">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3 padding-xs-0">
+                                                                <div class="form-group">
 
-                @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                                    @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
 
-                @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                                                                    @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
 
-            </div>
-        </div>*@
+                                                                </div>
+                                                            </div>*@
                                                         <div class="col-md-3 padding-xs-0">
                                                             <div class="form-group">
 
@@ -167,15 +272,15 @@
                                                             </div>
                                                         </div>
                                                         @*<div class="col-md-3 padding-xs-0">
-                                                            <div class="form-group">
+                                                                <div class="form-group">
 
-                                                                @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2", @type = "password" })
+                                                                    @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2", @type = "password" })
 
-                                                                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
-                                                                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                                                                    @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                                                                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
 
-                                                            </div>
-                                                        </div>*@
+                                                                </div>
+                                                            </div>*@
                                                         <div class="col-md-3 padding-xs-0">
                                                             <div class="form-group">
 
@@ -227,7 +332,7 @@
             </div>
         </div>
     </div>
-    <div class="row margin-vertical-0" >
+    <div class="row margin-vertical-0">
         <div class="tab-base">
             <!--Tabs Content-->
             <div class="tab-content padding-0">
@@ -235,19 +340,23 @@
                     <div class="panel">
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
-                                <form class="margin-vertical-0" name="miFormulario" onload="seleccionar();">
-                                  
+                                <form class="margin-vertical-0">
+
                                     <div class="margin-vertical-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                         <div class="col-md-2">
                                             <h3 class="panel-title">Facturación</h3>
                                             <!-- Default checkbox -->
+                                            @*<input type="radio" id="radio" name="groups" value="1" checked="checked" />*@
                                             <div class="form-check">
                                                 <input class="text-nowrap"
                                                        type="checkbox"
                                                        name="FacturaVenta"
-                                                       value=""
-                                                       id="FacturaVenta" disabled />
-                                                <label class="form-check-label" for="flexCheckDefault">
+                                                       value="1"
+                                                       id="FacturaVenta"
+                                                       runat="server"
+                                                       
+                                                       disabled />
+                                                <label class="form-check-label" for="FacturaVenta">
                                                     Factura de Venta
                                                 </label>
                                             </div>
@@ -269,7 +378,7 @@
                                                 <input class="form-check-input"
                                                        type="checkbox"
                                                        value=""
-                                                       id="NotaCredito" disabled/>
+                                                       id="NotaCredito" disabled />
                                                 <label class="form-check-label" for="flexCheckDefault">
                                                     Nota Credito
                                                 </label>
@@ -303,7 +412,7 @@
                                                        type="checkbox"
                                                        value=""
                                                        id="FacturaAIU"
-                                                       disabled/>
+                                                       disabled />
                                                 <label class="form-check-label" for="flexCheckChecked">
                                                     Factura AIU
                                                 </label>
@@ -314,7 +423,7 @@
                                                        type="checkbox"
                                                        value=""
                                                        id="FacturaExportacion"
-                                                       disabled/>
+                                                       disabled />
                                                 <label class="form-check-label" for="flexCheckChecked">
                                                     Factura de Exportación
                                                 </label>
@@ -325,12 +434,12 @@
                                                        type="checkbox"
                                                        value=""
                                                        id="DocumentoSoporte"
-                                                       disabled/>
+                                                       disabled />
                                                 <label class="form-check-label" for="flexCheckChecked">
                                                     Documento de Soporte
                                                 </label>
                                             </div>
-                                           
+
                                         </div>
                                         <div class="col-md-2">
                                             <h3 class="panel-title">Configuración</h3>
@@ -340,7 +449,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="Seguridad" disabled/>
+                                                           id="Seguridad" disabled />
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Seguridad
                                                     </label>
@@ -352,8 +461,7 @@
                                                            type="checkbox"
                                                            checked="checked"
                                                            value=""
-                                                           id="CertificadosDigitales" disabled
-                                                            />
+                                                           id="CertificadosDigitales" disabled />
                                                     <label class="form-check-label" for="CertificadosDigitales">
                                                         Certificados Digitales
                                                     </label>
@@ -363,7 +471,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="Administrar" disabled/>
+                                                           id="Administrar" disabled />
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Administrar
                                                     </label>
@@ -373,7 +481,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="clientes" disabled/>
+                                                           id="clientes" disabled />
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Clientes - Adquirientes
                                                     </label>
@@ -383,7 +491,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="RangosNum" disabled/>
+                                                           id="RangosNum" disabled />
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Rangos de numeración
                                                     </label>
@@ -393,7 +501,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="Productos" disabled/>
+                                                           id="Productos" disabled />
                                                     <label class="form-check-label" for="flexCheckDefault">
                                                         Productos
                                                     </label>
@@ -402,7 +510,7 @@
 
 
                                         </div>
-                                       
+
                                         <div class="col-md-2">
                                             <h3 class="panel-title">Plantillas</h3>
                                             <div class="d-flex align-items-end bg-light mb-3" style="height: 100px;">
@@ -411,9 +519,9 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="NuevaPlantilla" disabled/>
+                                                           id="NuevaPlantilla" disabled />
                                                     <label class="form-check-label" for="flexCheckDefault">
-                                                       Nueva Plantilla
+                                                        Nueva Plantilla
                                                     </label>
                                                 </div>
 
@@ -425,7 +533,7 @@
                                                            id="FacturaVenta"
                                                            disabled />
                                                     <label class="form-check-label" for="flexCheckChecked">
-                                                       Factura de Venta
+                                                        Factura de Venta
                                                     </label>
                                                 </div>
                                             </div>
@@ -438,9 +546,9 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            value=""
-                                                           id="FacturaExportacion" disabled/>
+                                                           id="FacturaExportacion" disabled />
                                                     <label class="form-check-label" for="flexCheckDefault">
-                                                      Factura de Exportación
+                                                        Factura de Exportación
                                                     </label>
                                                 </div>
 
@@ -452,7 +560,7 @@
                                                            id="FacturaContingencia"
                                                            disabled />
                                                     <label class="form-check-label" for="flexCheckChecked">
-                                                      Factura de Contingencia
+                                                        Factura de Contingencia
                                                     </label>
                                                 </div>
                                             </div>
@@ -485,9 +593,24 @@
                                             </div>
                                         </div>
                                     </div>
-                                       
 
-                                    
+                                    @*<script>
+                                        function seleccionar() {
+
+                                            document.getElementById("FacturaVenta").checked = true;
+                                            //document.getElementById("radio").checked = false;
+                                            console.log("seleccionar");
+
+                                        }
+                                    </script>
+                                    @if (ViewBag.valor)
+                                    {
+                                        <script>
+                                            seleccionar();
+                                        </script>
+                                    }*@
+
+
                                 </form>
 
                             </div>

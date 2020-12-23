@@ -76,7 +76,20 @@
         color: #2C323C;
     }
 </style>
+<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
 
+    $(document).ready(function () {
+        $("input:checkbox:checked").attr("checked", true);
+        if (@ViewBag.activo = true) {
+            document.getElementById("activo").checked = true;
+            console.log("Ok¡¡");
+        }
+        else {
+            console.log("No Ok¡¡");
+        }
+    });
+</script>
 <div class="page-content margin-15">
 
     <div class="title-container">

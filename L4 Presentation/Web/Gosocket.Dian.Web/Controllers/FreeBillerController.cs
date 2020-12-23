@@ -17,6 +17,7 @@ using Gosocket.Dian.Application.FreeBiller;
 using Gosocket.Dian.Domain.Utils;
 using System.Threading.Tasks;
 
+
 namespace Gosocket.Dian.Web.Controllers
 {
     public class FreeBillerController : Controller
@@ -80,25 +81,67 @@ namespace Gosocket.Dian.Web.Controllers
                 userManager = value;
             }
         }
+        /// <summary>
+        /// Cargue de información para editar la condición Activo o Inactivo de un Usuario.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="activo"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> EditUserActive(string id, string activo)
+        {          
+            var user = await userManager.FindByIdAsync(id);
+            int dt = 0;
+            if (activo == "true")
+            {
+                dt = 1;
+            }
+            if (user == null)
+            {
+                ViewBag.message = "No se encontro el ID";
+                return View("Not found");
+            }
+            else
+            {
+                user.Active = Convert.ToByte(dt);
+               
+                var result = await userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("FreeBillerUser");
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.ToString());
+                }
+                return RedirectToAction("FreeBillerUser");
+            }
+          
+        }
 
         // GET: FreeBiller
         public ActionResult FreeBillerUser()
         {
+            ViewBag.activo = false;
             UserFiltersFreeBillerModel model = new UserFiltersFreeBillerModel();
             this.staticTypeDoc = this.GetTypesDoc();
             this.staticProfiles = this.GetProfiles();
+            
             model.DocTypes = this.staticTypeDoc;
             model.Profiles = this.staticProfiles;
-            model.Users = this.GetUsers(); 
+            model.Users = this.GetUsers();
+            foreach (var item in model.Users.ToList())
+            {
+                var activo = item.IsActive;
+                ViewBag.activo = activo;
+            }
             return View(model);
+          
         }
-
+       
         [HttpPost]
         public ActionResult FreeBillerUser(UserFiltersFreeBillerModel model)
         {
-
-
-            
             return View(model);
         }
 
@@ -111,7 +154,154 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult EditFreeBillerUser(string id)
         {
             var tdocs = GetTypesDoc();
-            var MenuProfiles = GetMenuProfile();
+            var MenuProfiles = GetMenuProfile(id);
+            //perfiles y permisos
+            if (MenuProfiles != null)
+            {
+                ViewBag.valor = true;
+                foreach (var item in MenuProfiles)
+                {
+                    for (int i = 0; i<= MenuProfiles.Count; i++)
+                    {
+                        if (item.Text == i.ToString())
+                        {
+                            if(i == 1)
+                            {
+                                ViewBag.menu1 = item.Text;
+                            }
+                            if (i == 2)
+                            {
+                                ViewBag.menu2 = item.Text;
+                            }
+                            if (i == 3)
+                            {
+                                ViewBag.menu3 = item.Text;
+                            }
+                            if (i == 4)
+                            {
+                                ViewBag.menu4 = item.Text;
+                            }
+                            if (i == 5)
+                            {
+                                ViewBag.menu5 = item.Text;
+                            }
+                            if (i == 6)
+                            {
+                                ViewBag.menu6 = item.Text;
+                            }
+                            if (i == 7)
+                            {
+                                ViewBag.menu7 = item.Text;
+                            }
+                            if (i == 8)
+                            {
+                                ViewBag.menu8 = item.Text;
+                            }
+                            if (i == 9)
+                            {
+                                ViewBag.menu9 = item.Text;
+                            }
+                            if (i == 10)
+                            {
+                                ViewBag.menu10 = item.Text;
+                            }
+                            if (i == 11)
+                            {
+                                ViewBag.menu11 = item.Text;
+                            }
+                            if (i == 12)
+                            {
+                                ViewBag.menu12 = item.Text;
+                            }
+                            if (i == 13)
+                            {
+                                ViewBag.menu13 = item.Text;
+                            }
+                            if (i == 14)
+                            {
+                                ViewBag.menu14 = item.Text;
+                            }
+                            if (i == 15)
+                            {
+                                ViewBag.menu15 = item.Text;
+                            }
+                            if (i == 16)
+                            {
+                                ViewBag.menu16 = item.Text;
+                            }
+                            if (i == 17)
+                            {
+                                ViewBag.menu17 = item.Text;
+                            }
+                            if (i == 18)
+                            {
+                                ViewBag.menu18 = item.Text;
+                            }
+                            if (i == 19)
+                            {
+                                ViewBag.menu19 = item.Text;
+                            }
+                            if (i == 20)
+                            {
+                                ViewBag.menu20 = item.Text;
+                            }
+                            if (i == 21)
+                            {
+                                ViewBag.menu21 = item.Text;
+                            }
+                            if (i == 22)
+                            {
+                                ViewBag.menu22 = item.Text;
+                            }
+                            if (i == 23)
+                            {
+                                ViewBag.menu23 = item.Text;
+                            }
+                            if (i == 24)
+                            {
+                                ViewBag.menu24 = item.Text;
+                            }
+                            if (i == 25)
+                            {
+                                ViewBag.menu25 = item.Text;
+                            }
+                            if (i == 26)
+                            {
+                                ViewBag.menu26 = item.Text;
+                            }
+                            if (i == 27)
+                            {
+                                ViewBag.menu27 = item.Text;
+                            }
+                            if (i == 28)
+                            {
+                                ViewBag.menu28 = item.Text;
+                            }
+                            if (i == 29)
+                            {
+                                ViewBag.menu29 = item.Text;
+                            }
+                            if (i == 30)
+                            {
+                                ViewBag.menu30 = item.Text;
+                            }
+                            if (i == 31)
+                            {
+                                ViewBag.menu31 = item.Text;
+                            }
+                            if (i == 32)
+                            {
+                                ViewBag.menu31 = item.Text;
+                            }
+                        }
+                    }
+                   
+                    
+                }
+
+            }
+          
+            
             //dropdown
             ViewBag.tdocs = tdocs.Select(p => new SelectListItem() { Value = p.Value.ToString(), Text = p.Text }).ToList<SelectListItem>();
             UserService user = new UserService();
@@ -171,6 +361,8 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult CreateUser()
         {
             UserFreeBillerModel model = new UserFreeBillerModel();
+
+           
            
             model.TypesDoc = this.staticTypeDoc;
             model.Profiles = this.staticProfiles;
@@ -178,6 +370,10 @@ namespace Gosocket.Dian.Web.Controllers
             model.TypesDoc = this.GetTypesDoc();
             model.Profiles = this.GetProfiles();
 
+            if (model.IsActive)
+            {
+                ViewBag.activo = true;
+            }
             return View(model);
         }
 
@@ -408,23 +604,47 @@ namespace Gosocket.Dian.Web.Controllers
         /// Método encargado de obtener todos los perfiles para los usuarios del Facturador Gratuito.
         /// </summary>
         /// <returns>List<SelectListItem></returns>
-        private List<SelectListItem> GetMenuProfile()
+        private List<SelectListItem> GetMenuProfile(string id)
         {
-            List<SelectListItem> selectProfiles = new List<SelectListItem>();
+            List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
+            List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
+
+            var users = userService.GetUsers(userIdsFreeBiller.Select(u => u.UserId).ToList());
+
+            if (users != null)
+            {
+                foreach (var item in users.Where(x => x.Id == id).ToList() )
+                {
+                    foreach(var item2 in userIdsFreeBiller.Where(x => x.UserId == item.Id).ToList())
+                    {
+                        listUsers.Add(new UserFreeBillerModel
+                        {
+                            Id = item2.ClaimValue
+                        });
+                    }
+                    
+                }
+            }
+            List <SelectListItem> selectProfiles = new List<SelectListItem>();
             var types = profileService.GetMenuOptions().ToList();
-            var OptProf = profileService.GetMenuOptionsByProfile().Where(x =>x.ProfileId == 1).ToList();
+           
 
             if (types?.Count > 0)
             {
-                foreach (var item in OptProf)
+                foreach(var item in listUsers.ToList())
                 {
-                    selectProfiles.Add(
-                        new SelectListItem
-                        {
-                            Value = item.ProfileId.ToString(),
-                            Text = item.MenuOptionId.ToString()
-                        }); 
+                    var OptProf = profileService.GetMenuOptionsByProfile().Where(x => x.ProfileId == Convert.ToInt32(item.Id)).ToList();
+                    foreach (var item1 in OptProf.ToList())
+                    {
+                        selectProfiles.Add(
+                            new SelectListItem
+                            {
+                                Value = item1.ProfileId.ToString(),
+                                Text = item1.MenuOptionId.ToString()
+                            });
+                    }
                 }
+              
 
             }
 
