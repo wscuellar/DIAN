@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
 using static Gosocket.Dian.Logger.Logger;
 
 namespace Gosocket.Dian.Services.ServicesGroup
@@ -39,6 +40,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+        private TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
 
         private FileManager fileManager = new FileManager();
 
@@ -1073,6 +1075,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         }
                     }
                     UpdateFinishAttorney(trackIdCude, documentParsed.DocumentKey.ToLower(), eventCode);
+                    UpdateMandato(xmlParser, documentParsed);
                 }
                 else
                 {
@@ -1575,7 +1578,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID, DianResponse response)
         {
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
-            
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
+
+
             if (validations.Count > 0)
             {
                 if(response.ErrorMessage.Count == 0)
@@ -1721,6 +1726,37 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     documentAttorney.Active = false;
                     documentAttorney.DocReferencedEndAthorney = trackId;
                     arrayTasks.Add(TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(documentAttorney));
+                }
+            }
+        }
+
+        private void UpdateMandato(XmlParser xmlParser, DocumentParsed documentParsed)
+        {
+            //validation if is an anulacion de mandato (Code 044)
+            var arrayTasks = new List<Task>();
+            if (Convert.ToInt32(documentParsed.ResponseCode) == (int)EventStatus.EndosoPropiedad)
+            {
+                List<GlobalDocHolderExchange> documentsHolderExchange = TableManagerGlobalDocHolderExchange.FindpartitionKey<GlobalDocHolderExchange>(documentParsed.DocumentKey.ToLower()).ToList();
+                foreach (var documentHolderExchange in documentsHolderExchange)
+                {
+                    documentHolderExchange.Active = false;
+                    arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(documentHolderExchange));
+                }
+                XmlNodeList valueListSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+                for (int i = 0; i < valueListSender.Count; i++)
+                {
+                    string companyId = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CompanyID']").Item(i)?.InnerText.ToString();
+                    string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                    string rowKey = documentParsed.ReceiverCode + "|" + companyId;
+                    GlobalDocHolderExchange globalDocHolderExchange = new GlobalDocHolderExchange(documentParsed.DocumentKey.ToLower(), rowKey)
+                    {
+                        Timestamp = DateTime.Now,
+                        Active = true,
+                        CorporateStockAmount = valueStockAmount,
+                        GlobalDocumentId = documentParsed.Cude,
+                        PartyLegalEntity = companyId
+                    };
+                    arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(globalDocHolderExchange));
                 }
             }
         }
