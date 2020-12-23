@@ -56,39 +56,20 @@ namespace Gosocket.Dian.Functions.Activation
                 await globalTestSetTrackingTableManager.InsertOrUpdateAsync(globalTestSetTracking);
                 var allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
 
-                List<RadianTestSet> radianTestSet = new List<RadianTestSet>();
-                GlobalRadianOperations operation = globalRadianOperations.Find<GlobalRadianOperations>(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
-                if (operation != null && operation.RadianState == Domain.Common.RadianState.Test.GetDescription())
-                    radianTestSet = radianTestSetTableManager.FindByPartition<RadianTestSet>(operation.SoftwareType.ToString());
-
-                string resultJson;
-                GlobalLogger lastZone;
-
-                SetLogger(radianTestSet, "Step 1", "Ingreso a UpdateTestSetResult" );
-
-
+                var radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
+                SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
+                
                 //Valida RADIAN
-                if (radianTestSet.Any())
+                if (radianTesSetResult != null)
                 {
-                    // Roberto Alvarado 20202/11/25
-                    // Proceso de RADIAN TestSetResults
 
+                    
                     // traigo los datos de RadianTestSetResult
-                    var radianTestSetResults = radianTestSetResultTableManager.FindByPartition<RadianTestSetResult>(globalTestSetTracking.SenderCode);
-
-                    // Valido que este en Process el registro de Set de pruebas
-                    RadianTestSetResult radianTesSetResult = radianTestSetResults.SingleOrDefault(t => !t.Deleted &&
-                                                                                t.Id == globalTestSetTracking.TestSetId &&
-                                                                                t.Status == (int)TestSetStatus.InProcess);
-
-                    if (radianTesSetResult == null)
-                        return;
-
-                    SetLogger(radianTesSetResult, "Step 2", "");
-
+                    SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN");
 
                     // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
-                    bool isActive = globalRadianOperationService.IsActive(globalTestSetTracking.SenderCode, new Guid(globalTestSetTracking.SoftwareId));
+                    string code = radianTesSetResult.PartitionKey;
+                    bool isActive = globalRadianOperationService.IsActive(code, new Guid(globalTestSetTracking.SoftwareId));
                     if (isActive)
                         return;
 
@@ -261,20 +242,28 @@ namespace Gosocket.Dian.Functions.Activation
                             && radianTesSetResult.CirculationLimitationTotalRequired >= radianTesSetResult.CirculationLimitationTotalAcceptedRequired
                             && radianTesSetResult.EndCirculationLimitationTotalRequired >= radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired
                             && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
+                    {
                         radianTesSetResult.Status = (int)TestSetStatus.Accepted;
-
+                        radianTesSetResult.StatusDescription = TestSetStatus.Accepted.GetDescription();
+                    }
+                        
                     if (radianTesSetResult.TotalDocumentsRejected > (radianTesSetResult.TotalDocumentRequired - radianTesSetResult.TotalDocumentAcceptedRequired)
                             && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
+                    {
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
+                        radianTesSetResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
+                    }   
 
-                    SetLogger(null, "Step 19", " radianTesSetResult.Status " + radianTesSetResult.Status);
+                    SetLogger(null, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status);
 
                     // Escribo el registro de RadianTestResult
-                    await globalTestSetResultTableManager.InsertOrUpdateAsync(radianTesSetResult);
+                    
+                    await radianTestSetResultTableManager.InsertOrUpdateAsync(radianTesSetResult);
 
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (radianTesSetResult.Status == (int)TestSetStatus.Accepted)
-                    {                       
+                    {
+                        SetLogger(null, "Step 19.1", "Fui aceptado","1111111111");
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
@@ -282,27 +271,27 @@ namespace Gosocket.Dian.Functions.Activation
 
                             try
                             {
+                                SetLogger(null, "Step 19.2", "Estoy en habilitacion", "1111111112");
+
                                 #region Proceso Radian Habilitacion
                                 //Traemos el contribuyente
                                 var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
 
                                 //Habilitamos el participante en GlobalRadianOperations
-                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(globalTestSetTracking.SenderCode, globalTestSetTracking.SoftwareId);
+                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(radianTesSetResult.PartitionKey, globalTestSetTracking.SoftwareId);
+
+
+                                SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
 
                                 //Verificamos si quedo habilitado sino termina
                                 if (isPartipantActive.RadianState != Domain.Common.RadianState.Habilitado.GetDescription()) return;
 
                                 SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
 
-                                //Habilitamos en RADIAN en HAB
-                                //--Habilitamos SQL
-                                //contributorService.SetToEnabledRadian(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
 
                                 //--GlobalSoftware 
                                 var softwareId = isPartipantActive.RowKey;
                                 var software = softwareService.GetByRadian(Guid.Parse(softwareId));
-                                //var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.RadianSoftwareStatusId };
-                                //await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
 
                                 #endregion
 
@@ -323,9 +312,14 @@ namespace Gosocket.Dian.Functions.Activation
                                 };
 
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
-                                var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
+                                SetLogger(null, "Funciton Path",  functionPath, "6333333");
+                                SetLogger(requestObject, "Funciton Path", functionPath, "7333333");
 
-                                SetLogger(activation, "Step 21", " functionPath " + functionPath);
+
+                                var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
+                                
+
+                                SetLogger(activation, "Step 21", " functionPath " + functionPath, "21212121");
 
                                 var guid = Guid.NewGuid().ToString();
                                 var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
@@ -349,6 +343,7 @@ namespace Gosocket.Dian.Functions.Activation
                             }
                             catch (Exception ex)
                             {
+                                SetLogger(null, "Error", ex.Message, "Error123");
                                 log.Error($"Error al enviar a activar RADIAN contribuyente con id {globalTestSetTracking.SenderCode} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                                 throw;
                             }
@@ -477,7 +472,7 @@ namespace Gosocket.Dian.Functions.Activation
         /// <param name="objData">Un Objeto que se serializara en Json a String y se mostrara en el Logger</param>
         /// <param name="Step">El paso del Log o de los mensajes</param>
         /// <param name="msg">Un mensaje adicional si no hay objdata, por ejemplo</param>
-        private static void SetLogger(object objData, string Step, string msg )
+        private static void SetLogger(object objData, string Step, string msg, string keyUnique = "")
         {
             object resultJson;
 
@@ -486,7 +481,12 @@ namespace Gosocket.Dian.Functions.Activation
             else
                 resultJson = String.Empty;
 
-            var lastZone = new GlobalLogger("202012", "202012") { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+            GlobalLogger lastZone;
+            if (string.IsNullOrEmpty(keyUnique))
+                lastZone = new GlobalLogger("202012", "202012") { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+            else
+                lastZone = new GlobalLogger(keyUnique, keyUnique) { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
+
             TableManagerGlobalLogger.InsertOrUpdate(lastZone);
         }
 

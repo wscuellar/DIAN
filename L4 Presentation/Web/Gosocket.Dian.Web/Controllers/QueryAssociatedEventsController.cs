@@ -79,6 +79,8 @@ namespace Gosocket.Dian.Web.Controllers
                             model.AssociatedEvents.Add(new AssociatedEventsViewModel(otherEvent));
                     }
                 }
+
+                //incluir los mandatos
             }
         }
 
