@@ -806,7 +806,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             //Si no es un endoso en blanco valida autorizacion
             if(listId != "2")
             {
-                string listIdMessage = listId == "1" ? "Evento endoso en blanco ResponseCode/listID debe ser diferente de 1" : $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
+                string listIdMessage = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
 
                 var authEntity = GetAuthorization(senderCode, authCode);
                 if (authEntity == null)
