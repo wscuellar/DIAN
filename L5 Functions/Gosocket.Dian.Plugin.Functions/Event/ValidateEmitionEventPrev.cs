@@ -62,7 +62,7 @@ namespace Gosocket.Dian.Plugin.Functions.Event
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "VALIDATEEMITIONEVENTPLGNS",
-                        ErrorMessage = $"No se pudo validar los eventos previos  del documento."
+                        ErrorMessage = $"No se pudo validar los eventos previos del documento."
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
