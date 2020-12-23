@@ -32,6 +32,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalBatchFileResult = new TableManager("GlobalBatchFileResult");
         private TableManager TableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
         private TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
+        private TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
 
         private TableManager TableManagerGlobalNumberRange = new TableManager("GlobalNumberRange");
         //private TableManager TableManagerDianOfeControl = new TableManager("DianOfeControl");
@@ -839,16 +840,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 return dianResponse;
             }
            
-            // OJO NO SE HACE EL INSERT EN ESTE PUNTO SI NO HASTA EL FINAL CUANDO TERMINE TODAS LAS VALIDACIONES EXITOSAS
-
-                //inserte  GlobalDocRegisterProviderAR
-                //CUDE
-                //providerCode
-                //serieAndNumber
-                //    senderCode
-                //    docTypeCode
-           
-
             var validateSerie = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
 
             // Duplicity
@@ -1090,9 +1081,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         }
                     }
                     UpdateFinishAttorney(trackIdCude, documentParsed.DocumentKey.ToLower(), eventCode);
-
+                    InsertGlobalDocRegisterProviderAR(trackId, serieAndNumber, docTypeCode, senderCode, providerCode);
                     //Registra informacion GlobalDocRegisterProviderAR
 
+                    //inserte  GlobalDocRegisterProviderAR
+                    //CUDE PartitionKey
+                    //providerCode rowKey
+                    //serieAndNumber 
+                    //    senderCode
+                    //    docTypeCode documentType
 
                 }
                 else
@@ -1750,6 +1747,20 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     arrayTasks.Add(TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(documentAttorney));
                 }
             }
+        }
+
+        private void InsertGlobalDocRegisterProviderAR(string trackId, string serieAndNumber, string docTypeCode, string senderCode, string providerCode)
+        {
+            var arrayTasks = new List<Task>();
+            GlobalDocRegisterProviderAR documentRegisterAR = new GlobalDocRegisterProviderAR(trackId, providerCode)
+            {
+                docTypeCode = docTypeCode,
+                serieAndNumber = serieAndNumber,
+                senderCode = senderCode,
+                Timestamp = new DateTime()
+            };
+            arrayTasks.Add(TableManagerGlobalDocRegisterProviderAR.InsertOrUpdateAsync(documentRegisterAR));
+
         }
 
     }

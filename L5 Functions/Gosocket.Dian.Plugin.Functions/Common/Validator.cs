@@ -53,6 +53,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
         private TableManager TableManagerGlobalAttorneyFacultity = new TableManager("GlobalAttorneyFacultity");
         private TableManager TableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
+        private TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -3512,74 +3513,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region validation for CBC ID
         public List<ValidateListResponse> ValidateSerieAndNumber(ValidateSerieAndNumber.RequestObject data)
         {
-            bool validFor = false;
             DateTime startDate = DateTime.UtcNow;
-            GlobalDocValidatorDocument document = null;
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();      
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(data.TrackId, data.DocumentTypeId);
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            var documentReference = TableManagerGlobalDocRegisterProviderAR.FindDocumentRegisterAR<GlobalDocRegisterProviderAR>(data.ProviderCode, data.DocumentTypeId, data.Number);
 
-            if (documentMeta.Count > 0)
-            {
-                foreach (var documentIdentifier in documentMeta)
-                {
-                    document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier?.Identifier, documentIdentifier?.Identifier);
-                    if (document != null)
-                    {
-                        //Valida GlobalDocRegisterProviderAR  Rowkey =  data.ProviderCode y SerieAndNumber = data.Number y documentType = 96
-                        //Si diferente de null genera le regla de error
-
-
-                        if (documentMeta.Where(t => t.Number == data.Number                        
-                        && t.Identifier == document.PartitionKey
-                        ).ToList().Count > decimal.Zero)
-                        {
-                            validFor = true;
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "Regla: AAD05b-(R): ",
-                                ErrorMessage = "No se puede repetir el numero para el tipo de evento.",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                        else
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = " El Identificador (" + data.Number + ") ApplicationResponse no existe para este CUFE",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
-                    else
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = true,
-                            Mandatory = true,
-                            ErrorCode = "100",
-                            ErrorMessage = " El Identificador (" + data.Number + ") ApplicationResponse no existe para este CUFE",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    if (validFor)
-                    {
-                        return responses;
-                    }
-                }
-            }
-            else
+            if (documentReference.Count() == 0)
             {
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = true,
                     Mandatory = true,
                     ErrorCode = "100",
-                    ErrorMessage = " El Identificador (" + data.Number + ") ApplicationResponse no existe para este CUFE",
+                    ErrorMessage = " El Identificador (" + data.Number + ") ApplicationResponse no existe para este CUDE",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            else
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAD05b-(R): ",
+                    ErrorMessage = "No se puede repetir el numero para el tipo de evento.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -3588,7 +3544,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
-        #region Error Code Message
+            #region Error Code Message
         private class ErrorCodeMessage
         {
             public string errorCode = string.Empty;
