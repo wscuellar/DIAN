@@ -223,7 +223,7 @@
                     <section style="border: 0px !important;">
                         <div class="panel-footer text-right">
                             <div class="form-group">
-                                <button name="Submit" class="btn btn-radian-success submit-button Set-Prueba">Set de Pruebas</button>
+                                <button name="SubmitPrueba" class="btn btn-radian-success Set-Prueba">Set de Pruebas</button>
                             </div>
                         </div>
                     </section>
@@ -361,7 +361,7 @@
                                          function (param, data) {
                                              bootbox.dialog({
                                                  message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>" + data.message+"</h4></div></div>",
-                                                 onEscape: () => { 
+                                                 onEscape: () => {
                                                         var url = "@Url.Action("Index", "OthersElectronicDocAssociated")";
                                                         window.location.href = url;
                                                  }
@@ -369,8 +369,13 @@
                                          }, false, () => hideLoading('#panel-form')
                                      );
                      }
-                     , "", () => hideLoading('#panel-form'))); 
+                     , "", () => hideLoading('#panel-form')));
               });
+
+            $('.Set-Prueba').click(function (e) {
+                 var url = "@Url.Action("GetSetTestResult", "OthersElectronicDocAssociated")" + "/" + @Model.Id;
+                 window.location.href = url;
+            });
 
 
              function RenderStepsOtherDoc(index) {

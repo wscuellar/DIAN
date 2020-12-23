@@ -188,10 +188,12 @@
     <Compile Include="Entity\GlobalLogger.cs" />
     <Compile Include="Entity\GlobalNumberRange.cs" />
     <Compile Include="Entity\GlobalBatchFileResult.cs" />
+    <Compile Include="Entity\GlobalOtherDocElecOperation.cs" />
     <Compile Include="Entity\GlobalRadianOperations.cs" />
     <Compile Include="Entity\GlobalRejectedDocument.cs" />
     <Compile Include="Entity\GlobalSoftware.cs" />
     <Compile Include="Entity\GlobalTask.cs" />
+    <Compile Include="Entity\GlobalTestSetOthersDocumentsResult.cs" />
     <Compile Include="Entity\GlobalTestSetOthersDocuments.cs" />
     <Compile Include="Entity\GlobalTestSetResult.cs" />
     <Compile Include="Entity\GlobalTestSet.cs" />
