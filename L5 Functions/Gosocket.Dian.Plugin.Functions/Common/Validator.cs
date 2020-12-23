@@ -781,7 +781,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Private methods
         private GlobalContributor GetContributorInstanceCache(string code)
         {
-            var contributorInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("ContributorInstanceCacheTimePolicyInMinutes")) ? (int) ConfigurationManager.GetValue("ContributorInstanceCacheTimePolicyInMinutes") : CacheTimePolicy24HoursInMinutes;
+            var contributorInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("ContributorInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("ContributorInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
             var itemKey = $"contributor-{code}";
             GlobalContributor contributor = null;
             var cacheItem = InstanceCache.ContributorInstanceCache.GetCacheItem(itemKey);
@@ -804,7 +804,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private List<GlobalNumberRange> GetNumberRangeInstanceCache(string senderCode)
         {
             var env = ConfigurationManager.GetValue("Environment");
-            var numberRangesInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("NumberRangesInstanceCacheTimePolicyInMinutes")) ? (int) ConfigurationManager.GetValue("NumberRangesInstanceCacheTimePolicyInMinutes") : CacheTimePolicy1HourInMinutes;
+            var numberRangesInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("NumberRangesInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("NumberRangesInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy1HourInMinutes;
             List<GlobalNumberRange> numberRanges = new List<GlobalNumberRange>();
             var cacheItemKey = $"number-range-{senderCode}";
             if (env == "Hab")
@@ -840,7 +840,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             var itemKey = id;
             GlobalSoftware software = null;
-            var softwareInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) ? (int) ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes") : CacheTimePolicy24HoursInMinutes;
+            var softwareInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
             var cacheItem = InstanceCache.SoftwareInstanceCache.GetCacheItem(itemKey);
             if (cacheItem == null)
             {
@@ -861,7 +861,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             GlobalTypeList typeList = null;
             List<GlobalTypeList> typesList;
-            var typesListInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) ? (int) ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes") : CacheTimePolicy24HoursInMinutes;
+            var typesListInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
             var cacheItem = InstanceCache.TypesListInstanceCache.GetCacheItem("TypesList");
             if (cacheItem == null)
             {
