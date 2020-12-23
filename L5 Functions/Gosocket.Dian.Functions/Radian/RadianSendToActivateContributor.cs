@@ -79,7 +79,7 @@ namespace Gosocket.Dian.Functions.Radian
                     SetLogger(null, "Step STA-4.2", key, "key123");
                     var results = globalTestSetResultTableManager.Find<RadianTestSetResult>(data.Code, key);
 
-                    SetLogger(null, "Step STA-5", "Pase " + results.Status.ToString());
+                    SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(),"sta5-2020");
 
                     if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
                         throw new Exception("Contribuyente no a pasado set de pruebas.");
@@ -87,6 +87,10 @@ namespace Gosocket.Dian.Functions.Radian
                     SetLogger(results, "Step STA-5.1", " -- RadianSendToActivateContributor -- ");
 
                     // Step 4  Enable Contributor
+
+                    SetLogger(radianContributor, "Step STA-5.2", " Radiancontributor", "Radiancontributor_01");
+                    SetLogger(data, "Step STA-5.1", "data", "data_01");
+                    
                     contributorService.SetToEnabledRadian(
                         radianContributor.ContributorId,
                         radianContributor.RadianContributorTypeId,
@@ -118,9 +122,9 @@ namespace Gosocket.Dian.Functions.Radian
                         Url = data.Url
                     };
 
-                     //  await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
+                    //  await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
 
-                        SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
+                    SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
 
                 }
                 catch (Exception ex)
