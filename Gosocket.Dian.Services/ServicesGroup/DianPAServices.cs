@@ -1095,7 +1095,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     //    senderCode
                     //    docTypeCode documentType
 
-                    UpdateMandato(xmlParser, documentParsed);
+                    UpdateEndoso(xmlParser, documentParsed);
                 }
                 else
                 {
@@ -1770,7 +1770,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         }
 
-        private void UpdateMandato(XmlParser xmlParser, DocumentParsed documentParsed)
+        private void UpdateEndoso(XmlParser xmlParser, DocumentParsed documentParsed)
         {
             //validation if is an Endoso en propiedad (Code 037)
             var arrayTasks = new List<Task>();
