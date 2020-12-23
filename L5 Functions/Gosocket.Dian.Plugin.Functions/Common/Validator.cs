@@ -571,14 +571,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, GlobalDocValidatorDocumentMeta documentMeta)
         {
             DateTime startDate = DateTime.UtcNow;
             party.TrackId = party.TrackId.ToLower();
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(party.ResponseCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string eventCode = party.ResponseCode;
-            var senderCode = nitModel.SenderCode;
+            string senderCode;
+            if(documentMeta != null && ((Convert.ToInt16(party.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion && (party.CustomizationID == "363" || party.CustomizationID == "364")) || Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad))
+            {
+                senderCode = documentMeta.ReceiverCode;
+            }
+            else
+            {
+                senderCode = nitModel.SenderCode;
+            }
             var receiverCode = nitModel.ReceiverCode;            
             string sender2DvErrorCode = "Regla: 89-(R): ";
             switch (Convert.ToInt16(party.ResponseCode))
@@ -2757,7 +2765,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
                                 //Solicitud de Disponibilización
-                                else if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
+                                else if (documentMeta.Where(t => t.EventCode == "036" && t.SenderCode == nitModel.SenderCode).ToList().Count > decimal.Zero)
                                 {
                                     var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode);
                                     if (responseListEndoso.Count > 0)

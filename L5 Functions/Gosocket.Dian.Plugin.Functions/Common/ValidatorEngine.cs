@@ -376,8 +376,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
 
+            GlobalDocValidatorDocumentMeta globalDocumentMeta = null;
+            if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion || Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad)
+            {
+                var documentMetaValues = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeIdNotPartitionKey<GlobalDocValidatorDocumentMeta>(party.TrackId.ToLower(), "96", "037", party.TrackIdCude);
+                if (documentMetaValues != null)
+                {
+                    globalDocumentMeta = documentMetaValues.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault();
+                }
+            }
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude));
+            validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude, globalDocumentMeta));
 
             return validateResponses;
         }
