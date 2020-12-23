@@ -118,7 +118,7 @@ namespace Gosocket.Dian.Functions.Radian
                         Url = data.Url
                     };
 
-                       await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
+                     //  await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
 
                         SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
 
@@ -145,15 +145,13 @@ namespace Gosocket.Dian.Functions.Radian
                 new EventGridEvent()
                 {
                     Id = Guid.NewGuid().ToString(),
-                    EventType = "Activate.RadianOperation.Event", //andres proporciona este dato.
+                    EventType = "Activate.Radian.Operation.Event", //andres proporciona este dato.
                     Data = JsonConvert.SerializeObject(activateContributorRequestObject),
                     EventTime = DateTime.UtcNow,
                     Subject = $"|PRIORITY:1|",
                     DataVersion = "2.0"
                 }
             };
-            //string keyProd = ConfigurationManager.GetValue("EventGridProcess"); //EventGridKeyProd
-            //string topicProd = ConfigurationManager.GetValue("EventGridTopicProcess"); //EventGridTopicEndpointProd
             await EventGridManager.Instance("EventGridKeyProd", "EventGridTopicEndpointProd").SendMessagesToEventGridAsync(eventsList);
         }
 
