@@ -1772,7 +1772,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private void UpdateMandato(XmlParser xmlParser, DocumentParsed documentParsed)
         {
-            //validation if is an anulacion de mandato (Code 044)
+            //validation if is an Endoso en propiedad (Code 037)
             var arrayTasks = new List<Task>();
             if (Convert.ToInt32(documentParsed.ResponseCode) == (int)EventStatus.EndosoPropiedad)
             {
