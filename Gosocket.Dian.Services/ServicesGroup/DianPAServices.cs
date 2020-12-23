@@ -1754,10 +1754,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var arrayTasks = new List<Task>();
             GlobalDocRegisterProviderAR documentRegisterAR = new GlobalDocRegisterProviderAR(trackId, providerCode)
             {
-                docTypeCode = docTypeCode,
-                serieAndNumber = serieAndNumber,
-                senderCode = senderCode,
-                Timestamp = new DateTime()
+                DocumentTypeId = docTypeCode,
+                SerieAndNumber = serieAndNumber,
+                SenderCode = senderCode
             };
             arrayTasks.Add(TableManagerGlobalDocRegisterProviderAR.InsertOrUpdateAsync(documentRegisterAR));
 

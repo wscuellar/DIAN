@@ -18,8 +18,8 @@ namespace Gosocket.Dian.Domain.Entity
 
         public string trackId { get; set; }
         public string providerCode { get; set; }
-        public string serieAndNumber { get; set; }
-        public string senderCode { get; set; }
-        public string docTypeCode { get; set; }
+        public string SerieAndNumber { get; set; }
+        public string SenderCode { get; set; }
+        public string DocumentTypeId { get; set; }
     }
 }
