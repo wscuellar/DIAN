@@ -553,11 +553,15 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ExternalUserAuthentication(UserLoginViewModel model, string returnUrl)
-        {           
-            return RedirectToAction(nameof(HomeController.Dashboard), "Home");
+        {
+            //return RedirectToAction(nameof(HomeController.Dashboard), "Home");
+
+            //return RedirectToAction("RedirectToBiller", "User");
+            var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk=1014556699|999999999&rk=999999999&token=9d15b522-024b-424d-a10a-549fd5c728b1";
+            return Redirect(redirectUrl);
         }
 
-            [HttpPost]
+        [HttpPost]
         [ExcludeFilter(typeof(Authorization))]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> PersonAuthentication(UserLoginViewModel model, string returnUrl)
@@ -984,12 +988,13 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpGet]
+        [ExcludeFilter(typeof(Authorization))]
         public RedirectResult RedirectToBiller()
         {
             var auth = new AuthToken();
             if (!User.IsInAnyRole("Administrador", "Super"))
             {
-                auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
+               auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
             }
             else
             {
@@ -1028,6 +1033,7 @@ namespace Gosocket.Dian.Web.Controllers
             return Redirect(redirectUrl);
         }
 
+        [ExcludeFilter(typeof(Authorization))]
         public RedirectResult RedirectToBiller2()
         {
             var auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());

@@ -63,10 +63,15 @@
                         @Html.ActionLink("Ver detalles","Details")
                     </td>
                     <td>
-                        @Html.ActionLink("E", "EditFreeBillerUser", new { user.Id })
+                        <img src="~/Content/images/Svg/edti.svg"></img>
+                        @Html.ActionLink("E", "EditFreeBillerUser", new { user.Id }, new { @class = "bi bi-pencil-fill" })
                     </td>
                     <td class="text-nowrap">
-                        <input type="checkbox" checked="@user.IsActive" />
+                        @*<input type="checkbox" class="form-check-input" checked="@user.IsActive" />*@
+                        <label class="switch">
+                            <input type="checkbox" checked="checked" >
+                                <span class="slider round"></span>
+                        </label>
                     </td>
                 </tr>
             }

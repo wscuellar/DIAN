@@ -594,6 +594,7 @@
     <Content Include="Content\images\puerbas-2.png" />
     <Content Include="Content\images\reject.png" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\edti.svg" />
     <Content Include="Content\images\Svg\EstadoFacturaRadian1.svg" />
     <Content Include="Content\images\Svg\EstadoFacturaRadian2.svg" />
     <Content Include="Content\images\Svg\Emisor.svg" />

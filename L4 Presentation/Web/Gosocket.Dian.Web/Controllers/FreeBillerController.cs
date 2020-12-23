@@ -212,6 +212,7 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatorNit = uCompany?.Code ?? "999999999",
                 IdentificationTypeId = Convert.ToInt32(model.TypeDocId),
                 IdentificationId = model.NumberDoc,
+                Code = model.NumberDoc,
                 Name = model.FullName,
                 Email = model.Email,
                 UserName = model.Email,
@@ -247,7 +248,6 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             IdentityResult result = userManager.Create(user, model.Password);
-            
 
             if (result.Succeeded)
             {
@@ -468,12 +468,78 @@ namespace Gosocket.Dian.Web.Controllers
         /// Obtiene todos los usuarios creados para el facturador gratuito.
         /// </summary>
         /// <returns>List<UserFreeBillerModel></returns>
-        private List<UserFreeBillerModel> GetUsersByDocument()
+        private List<UserFreeBillerModel> GetUsersByDocument(int typeDocId, string numberDoc)
         {
             List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
             List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
 
             var users = userService.GetUsers(userIdsFreeBiller.Select(u => u.UserId).ToList());
+
+            if (users != null)
+            {
+                foreach (var item in users.Where(u=> u.IdentificationTypeId == typeDocId && u.IdentificationId == numberDoc))
+                {
+                    string perfilId = userIdsFreeBiller.FirstOrDefault(u => u.UserId == item.Id).ClaimValue;
+                    listUsers.Add(new UserFreeBillerModel
+                    {
+                        Id = item.Id,
+                        FullName = item.Name,
+                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
+                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
+                        NumberDoc = item.IdentificationId,
+                        LastUpdate = item.LastUpdated,
+                        IsActive = Convert.ToBoolean(item.Active)
+                    });
+                }
+
+            }
+
+            return listUsers;
+        }
+
+        /// <summary>
+        /// Obtiene todos los usuarios creados para el facturador gratuito dependiendo del nombre.
+        /// </summary>
+        /// <returns>List<UserFreeBillerModel></returns>
+        private List<UserFreeBillerModel> GetUsersByName(string name)
+        {
+            List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
+            List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
+
+            var users = userService.GetUsers(userIdsFreeBiller.Select(u => u.UserId).ToList());
+
+            if (users != null)
+            {
+                foreach (var item in users.Where(u => u.Name.ToLower().Contains(name.ToLower())))
+                {
+                    string perfilId = userIdsFreeBiller.FirstOrDefault(u => u.UserId == item.Id).ClaimValue;
+                    listUsers.Add(new UserFreeBillerModel
+                    {
+                        Id = item.Id,
+                        FullName = item.Name,
+                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
+                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
+                        NumberDoc = item.IdentificationId,
+                        LastUpdate = item.LastUpdated,
+                        IsActive = Convert.ToBoolean(item.Active)
+                    });
+                }
+
+            }
+
+            return listUsers;
+        }
+
+        /// <summary>
+        /// Obtiene todos los usuarios creados para el facturador gratuito dependiendo del nombre.
+        /// </summary>
+        /// <returns>List<UserFreeBillerModel></returns>
+        private List<UserFreeBillerModel> GetUsersByProfile(int profileId)
+        {
+            List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
+            List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
+
+            var users = userService.GetUsers(userIdsFreeBiller.Where(u=> u.ClaimValue == profileId.ToString()).Select(u => u.UserId).ToList());
 
             if (users != null)
             {
@@ -496,7 +562,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             return listUsers;
         }
-
     }
     
 }
