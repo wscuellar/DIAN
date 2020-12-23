@@ -64,9 +64,9 @@
                 <table id="table-contributor-files" class="table table-striped">
                     <thead>
                         <tr>
-                            <th class="text-left">Archivo</th>
-                            <th class="text-center">Estado</th>
-                            <th class="text-center"></th>
+                            <th class="text-left" style="width: 45%;">Archivo</th>
+                            <th class="text-left" style="width: 30%;">Estado</th>
+                            <th class="text-center" style="width: 25%;"></th>
                         </tr>
                     </thead>
                     @if (Model.RadianContributorFiles != null && Model.RadianContributorFiles.Count > 0)
@@ -123,7 +123,7 @@
 </div>
 
     <div class="row dropdown-state">
-        <div class="col-sm-6 padding-xs-0">
+        <div class="col-sm-3 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.RadianApprovalState, new { @class = "control-label" })
                 @Html.EnumDropDownListFor(m => m.RadianApprovalState, "Seleccióne el estado de la aprobación", new { @class = "form-control input-general" })
