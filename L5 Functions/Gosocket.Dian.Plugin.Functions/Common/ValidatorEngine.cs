@@ -350,6 +350,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
 
+            //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
+            if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
+                Convert.ToInt32(party.ResponseCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+            {
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(party.TrackId, party.TrackId);
+                if (documentMeta != null)
+                {
+                    //Obtiene el CUFE
+                    party.TrackId = documentMeta.DocumentReferencedKey;
+                }
+            }
+
             //Obtiene XML Factura Electornica CUFE
             var xmlBytes = await GetXmlFromStorageAsync(party.TrackId);
             xmlParserCufe = new XmlParser(xmlBytes);

@@ -421,36 +421,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var providerCode = nitModel.ProviderCode;
             var providerCodeDigit = nitModel.ProviderCodeDigit;
 
-            // Sender
-            var sender = GetContributorInstanceCache(senderCode);
-            string senderDvErrorCode = "FAJ24";
-            string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
-            if (documentMeta.DocumentTypeId == "05")
-            {
-                senderDvErrorCode = "DSAJ24b";
-                senderDvrErrorDescription = "El DV del NIT no es correcto";
-            }
-            else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
-            else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
-            
-            if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
-            if (((documentMeta.EventCode == "037" || documentMeta.EventCode == "038" || documentMeta.EventCode == "039") && nitModel.listID == "2") || ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-            else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = senderDvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
-            // Sender2
             GlobalContributor sender2 = null;
-            if (senderCode != senderCodeProvider)
+            var sender = GetContributorInstanceCache(senderCode);
+            if (documentMeta.DocumentTypeId != "96")
             {
-                string sender2DvErrorCode = "FAJ47";
-                if (documentMeta.DocumentTypeId == "91") sender2DvErrorCode = "CAJ47";
-                else if (documentMeta.DocumentTypeId == "92") sender2DvErrorCode = "DAJ47";
+                // Sender
                 
-                sender2 = GetContributorInstanceCache(senderCodeProvider);
-                if (string.IsNullOrEmpty(senderCodeProviderDigit) || senderCodeProviderDigit == "undefined") senderCodeProviderDigit = "11";
-                if (ValidateDigitCode(senderCodeProvider, int.Parse(senderCodeProviderDigit)))
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                string senderDvErrorCode = "FAJ24";
+                string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
+                if (documentMeta.DocumentTypeId == "05")
+                {
+                    senderDvErrorCode = "DSAJ24b";
+                    senderDvrErrorDescription = "El DV del NIT no es correcto";
+                }
+                else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
+                else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
+
+                if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
+                if (ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = senderDvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+
+                // Sender2               
+                if (senderCode != senderCodeProvider)
+                {
+                    string sender2DvErrorCode = "FAJ47";
+                    if (documentMeta.DocumentTypeId == "91") sender2DvErrorCode = "CAJ47";
+                    else if (documentMeta.DocumentTypeId == "92") sender2DvErrorCode = "DAJ47";
+
+                    sender2 = GetContributorInstanceCache(senderCodeProvider);
+                    if (string.IsNullOrEmpty(senderCodeProviderDigit) || senderCodeProviderDigit == "undefined") senderCodeProviderDigit = "11";
+                    if (ValidateDigitCode(senderCodeProvider, int.Parse(senderCodeProviderDigit)))
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
             }
 
             // Software provider
@@ -491,7 +496,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 else
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
-                if (!string.IsNullOrEmpty(senderCodeProvider) && senderCode != senderCodeProvider)
+                if (!string.IsNullOrEmpty(senderCodeProvider) && senderCode != senderCodeProvider && documentMeta.DocumentTypeId != "96")
                 {
                     if (sender2 != null)
                         responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -2909,7 +2914,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 //Anulacion de Endoso solo aplica para Endoso en Garantia o Endoso en Procuracion
                                 else if (documentMeta
-                                .Where(t => t.EventCode == "038" || t.EventCode == "039 " && t.Identifier == document.PartitionKey).ToList()
+                                .Where(t => t.EventCode == "038" || t.EventCode == "039" && t.Identifier == document.PartitionKey).ToList()
                                 .Count > decimal.Zero)
                                 {
                                     responses.Add(new ValidateListResponse
@@ -2921,18 +2926,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
-                                else
-                                {
-                                    validFor = true;
-                                    responses.Add(new ValidateListResponse
-                                    {
-                                        IsValid = false,
-                                        Mandatory = true,
-                                        ErrorCode = "Regla: 89-(R): ",
-                                        ErrorMessage = "No es posible realizar la Anulación de Endoso, no existe un evento 038 Endoso en Garantía y/o 039 Endoso en Procuración",
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
-                                }
+                               
                                 break;
                             //Validación de la existencia de limitación de circulación (041)
                             case (int)EventStatus.AnulacionLimitacionCirculacion:
@@ -3192,6 +3186,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string errorCodeRef = data.EventCode == "030" ? errorCodeMessage.errorCodeSigningTimeAcuse : errorCodeMessage.errorCodeSigningTimeRecibo;
             string errorMesaageRef = data.EventCode == "030" ? errorCodeMessage.errorMessageigningTimeAcuse : errorCodeMessage.errorMessageigningTimeRecibo;
 
+            if(data.EventCode == "043")
+            {
+                errorCodeRef = "Regla: DC24r-(R): ";
+                errorMesaageRef = "No se puede generar el evento mandato antes de la fecha de generación del documento referenciado";
+            }
+            else
+            {
+                errorCodeRef = "Regla: 89-(R): ";
+                errorMesaageRef = "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE";
+            }
+
             switch (int.Parse(data.EventCode))
             {
                 case (int)EventStatus.Received:
@@ -3211,8 +3216,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = (data.EventCode == "030" || data.EventCode == "032") ? errorCodeRef : "Regla: 89-(R): ",
-                            ErrorMessage = (data.EventCode == "030" || data.EventCode == "032") ? errorMesaageRef : "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
+                            ErrorCode = errorCodeRef,
+                            ErrorMessage = errorMesaageRef,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
