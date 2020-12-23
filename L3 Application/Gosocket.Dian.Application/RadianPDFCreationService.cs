@@ -39,7 +39,7 @@ namespace Gosocket.Dian.Application
 
         #region GetElectronicInvoicePdf
 
-        public async Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier)
+        public async Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier, string webPath)
         {
             // Load Templates            
 
@@ -69,7 +69,7 @@ namespace Gosocket.Dian.Application
 
             // Set Variables
             DateTime expeditionDate = DateTime.Now;
-            Bitmap qrCode = GenerateQR(TextResources.RadianReportQRCode.Replace("{CUFE}", documentMeta.PartitionKey));
+            Bitmap qrCode = GenerateQR($"{webPath}?documentkey={documentMeta.PartitionKey}");
             int page = 1;
 
             string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);

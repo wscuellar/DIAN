@@ -82,7 +82,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [CustomRoleAuthorization(CustomRoles = "Proveedor")]
         public async Task<ActionResult> Provider(SearchDocumentViewModel model) => await GetDocuments(model, 4);
-                
+               
         public async Task<ActionResult> Details(string trackId)
         {
             DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
@@ -271,7 +271,8 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintDocument(string cufe)
         {
-            byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe);
+            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
+            byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
             String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
