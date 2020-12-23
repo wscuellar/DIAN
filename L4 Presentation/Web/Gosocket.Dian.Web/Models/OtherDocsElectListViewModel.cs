@@ -13,6 +13,9 @@ namespace Gosocket.Dian.Web.Models
         public string ContibutorType { get; set; }
         public string ElectronicDoc { get; set; }
         public string Software { get; set; }
+
+        public string SoftwareId { get; set; }
+        
         public string PinSW { get; set; }
         public string StateSoftware { get; set; }
 
