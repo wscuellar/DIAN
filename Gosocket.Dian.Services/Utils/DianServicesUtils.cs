@@ -771,25 +771,25 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
-                if (string.IsNullOrEmpty(eventCode))
-                {
-                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Código tipo de evento no puede estar vacío.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                    flagEvento = false;
-                }
-                else if (!(eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034"
-                    || eventCode == "035" || eventCode == "036" || eventCode == "037" || eventCode == "038" || eventCode == "039"
-                    || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
-                    || eventCode == "045"))
-                {
-                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                    flagEvento = false;
-                }
+                //if (string.IsNullOrEmpty(eventCode))
+                //{
+                //    stringBuilder.AppendLine($"{codeMessage}H03-(R): Código tipo de evento no puede estar vacío.");
+                //    errors.Add(stringBuilder.ToString());
+                //    stringBuilder.Clear();
+                //    isValid = false;
+                //    flagEvento = false;
+                //}
+                //else if (!(eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034"
+                //    || eventCode == "035" || eventCode == "036" || eventCode == "037" || eventCode == "038" || eventCode == "039"
+                //    || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
+                //    || eventCode == "045"))
+                //{
+                //    stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
+                //    errors.Add(stringBuilder.ToString());
+                //    stringBuilder.Clear();
+                //    isValid = false;
+                //    flagEvento = false;
+                //}
 
                 if (flagEvento)
                 {
@@ -811,60 +811,60 @@ namespace Gosocket.Dian.Services.Utils
                         }
                     }
 
-                    if ((Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) && string.IsNullOrEmpty(receiverCode) && flagEvento)
-                    {
-                        stringBuilder.AppendLine($"{codeMessage}G04-(R): El ID de receptor del evento no es Válido");
-                        errors.Add(stringBuilder.ToString());
-                        stringBuilder.Clear();
-                        isValid = false;
-                    }
-                    else if ((Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(receiverCode) && flagEvento)
-                    {
-                        stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el documento del endosatario");
-                        errors.Add(stringBuilder.ToString());
-                        stringBuilder.Clear();
-                        isValid = false;
-                    }
-                    else if (Convert.ToInt32(eventCode) == 45 && string.IsNullOrEmpty(receiverCode) && flagEvento)
-                    {
-                        stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el número de identificación.");
-                        errors.Add(stringBuilder.ToString());
-                        stringBuilder.Clear();
-                        isValid = false;
-                    }
-                    else if (string.IsNullOrEmpty(receiverCode))
-                    {
-                        stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el literal “800197268”");
-                        errors.Add(stringBuilder.ToString());
-                        stringBuilder.Clear();
-                        isValid = false;
-                    }
+                    //if ((Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) && string.IsNullOrEmpty(receiverCode) && flagEvento)
+                    //{
+                    //    stringBuilder.AppendLine($"{codeMessage}G04-(R): El ID de receptor del evento no es Válido");
+                    //    errors.Add(stringBuilder.ToString());
+                    //    stringBuilder.Clear();
+                    //    isValid = false;
+                    //}
+                    //else if ((Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(receiverCode) && flagEvento)
+                    //{
+                    //    stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el documento del endosatario");
+                    //    errors.Add(stringBuilder.ToString());
+                    //    stringBuilder.Clear();
+                    //    isValid = false;
+                    //}
+                    //else if (Convert.ToInt32(eventCode) == 45 && string.IsNullOrEmpty(receiverCode) && flagEvento)
+                    //{
+                    //    stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el número de identificación.");
+                    //    errors.Add(stringBuilder.ToString());
+                    //    stringBuilder.Clear();
+                    //    isValid = false;
+                    //}
+                    //else if (string.IsNullOrEmpty(receiverCode))
+                    //{
+                    //    stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el literal “800197268”");
+                    //    errors.Add(stringBuilder.ToString());
+                    //    stringBuilder.Clear();
+                    //    isValid = false;
+                    //}
 
-                    if (listID == "1" && (Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(senderCode) && flagEvento)
-                    {
-                        stringBuilder.AppendLine($"{codeMessage}F04-(R): No fue informado el Nit.");
-                        errors.Add(stringBuilder.ToString());
-                        stringBuilder.Clear();
-                        isValid = false;
-                    }
-                    else if ((Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 46) && string.IsNullOrEmpty(senderCode) && flagEvento)
-                    {
-                        if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34)
-                        {
+                    //if (listID == "1" && (Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(senderCode) && flagEvento)
+                    //{
+                    //    stringBuilder.AppendLine($"{codeMessage}F04-(R): No fue informado el Nit.");
+                    //    errors.Add(stringBuilder.ToString());
+                    //    stringBuilder.Clear();
+                    //    isValid = false;
+                    //}
+                    //else if ((Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 46) && string.IsNullOrEmpty(senderCode) && flagEvento)
+                    //{
+                    //    if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34)
+                    //    {
 
-                            stringBuilder.AppendLine($"{codeMessage}F04-(R): El ID de emisor del evento no es Valido..");
-                            errors.Add(stringBuilder.ToString());
-                            stringBuilder.Clear();
-                            isValid = false;
-                        }
-                        else if(!(listID == "2" && (eventCode == "037" || eventCode == "038" || eventCode =="039")))
-                        {
-                            stringBuilder.AppendLine($"{codeMessage}F04-(R): No fue informado el Nit.");
-                            errors.Add(stringBuilder.ToString());
-                            stringBuilder.Clear();
-                            isValid = false;
-                        }
-                    }
+                    //        stringBuilder.AppendLine($"{codeMessage}F04-(R): El ID de emisor del evento no es Valido..");
+                    //        errors.Add(stringBuilder.ToString());
+                    //        stringBuilder.Clear();
+                    //        isValid = false;
+                    //    }
+                    //    else if(!(listID == "2" && (eventCode == "037" || eventCode == "038" || eventCode =="039")))
+                    //    {
+                    //        stringBuilder.AppendLine($"{codeMessage}F04-(R): No fue informado el Nit.");
+                    //        errors.Add(stringBuilder.ToString());
+                    //        stringBuilder.Clear();
+                    //        isValid = false;
+                    //    }
+                    //}
                 }
                
 

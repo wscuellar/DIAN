@@ -806,12 +806,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
             //Si no es un endoso en blanco valida autorizacion
             if(listId != "2")
             {
+                string listIdMessage = listId == "1" ? "Evento endoso en blanco ResponseCode/listID debe ser diferente de 1" : $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
+
                 var authEntity = GetAuthorization(senderCode, authCode);
                 if (authEntity == null)
                 {
                     dianResponse.XmlFileName = Properties.Settings.Default.Param_ApplicationResponse;
                     dianResponse.StatusCode = Properties.Settings.Default.Code_89;
-                    dianResponse.StatusDescription = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
+                    dianResponse.StatusDescription = listIdMessage;                    
                     var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
                     if (globalEnd >= 10)
                     {
@@ -1510,7 +1512,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidateSerie(string trackId, string serieAndNumber, string documentTypeId, string senderCode, string providerCode)
         {
             var number = serieAndNumber;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number, documentTypeId, senderCode, providerCode });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId, number, documentTypeId, senderCode, providerCode });            
+
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
