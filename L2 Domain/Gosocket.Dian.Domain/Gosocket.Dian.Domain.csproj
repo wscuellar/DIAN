@@ -175,6 +175,7 @@
     <Compile Include="Entity\GlobalDocPayroll.cs" />
     <Compile Include="Entity\GlobalDocReference.cs" />
     <Compile Include="Entity\GlobalDocReferenceAttorney.cs" />
+    <Compile Include="Entity\GlobalDocRegisterProviderAR.cs" />
     <Compile Include="Entity\GlobalDocValidatorDocument.cs" />
     <Compile Include="Entity\GlobalDataDocument.cs" />
     <Compile Include="Entity\GlobalDocumentType.cs" />
@@ -187,10 +188,12 @@
     <Compile Include="Entity\GlobalLogger.cs" />
     <Compile Include="Entity\GlobalNumberRange.cs" />
     <Compile Include="Entity\GlobalBatchFileResult.cs" />
+    <Compile Include="Entity\GlobalOtherDocElecOperation.cs" />
     <Compile Include="Entity\GlobalRadianOperations.cs" />
     <Compile Include="Entity\GlobalRejectedDocument.cs" />
     <Compile Include="Entity\GlobalSoftware.cs" />
     <Compile Include="Entity\GlobalTask.cs" />
+    <Compile Include="Entity\GlobalTestSetOthersDocumentsResult.cs" />
     <Compile Include="Entity\GlobalTestSetOthersDocuments.cs" />
     <Compile Include="Entity\GlobalTestSetResult.cs" />
     <Compile Include="Entity\GlobalTestSet.cs" />
@@ -205,7 +208,7 @@
     <Compile Include="Entity\PagedResultBase.cs" />
     <Compile Include="Entity\EventDataModel.cs" />
     <Compile Include="Entity\RadianContributorOperationWithSoftware.cs" />
-    <Compile Include="Entity\OtherDocsElectList.cs" />
+    <Compile Include="Entity\OtherDocsElectData.cs" />
     <Compile Include="Entity\RadianCustomerList.cs" />
     <Compile Include="Entity\RadianLogger.cs" />
     <Compile Include="Entity\RadianUserData.cs" />

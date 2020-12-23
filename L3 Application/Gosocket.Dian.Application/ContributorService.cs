@@ -526,7 +526,7 @@ namespace Gosocket.Dian.Application
 
 
 
-        public int  AddOrUpdateRadianContributor(RadianContributor radianContributor)
+        public int AddOrUpdateRadianContributor(RadianContributor radianContributor)
         {
             using (var context = new SqlDBContext())
             {
@@ -591,15 +591,14 @@ namespace Gosocket.Dian.Application
 
         #endregion
 
-        public Contributor GetContributorByUserId(string userId, int contributorTypeId)
+        public Contributor GetContributorById(int Id, int contributorTypeId)
         {
-            Contributor contributor =null;
-            var re = (from u in sqlDBContext.UserContributors.Where(t => t.UserId == userId)
-                        join c in sqlDBContext.Contributors on u.ContributorId equals c.Id
-                        where c.ContributorTypeId == contributorTypeId
+            Contributor contributor = null;
+            var re = (from c in sqlDBContext.Contributors
+                      where c.Id == Id
                       select c).FirstOrDefault();
 
-            if(re != null)
+            if (re != null)
             {
                 contributor = new Contributor()
                 {
@@ -609,7 +608,7 @@ namespace Gosocket.Dian.Application
                     BusinessName = re.BusinessName,
                     Email = re.Email,
                     StartDate = re.StartDate,
-                    EndDate = re.EndDate, 
+                    EndDate = re.EndDate,
                     StartDateNumber = re.StartDateNumber,
                     AcceptanceStatus = re.AcceptanceStatus,
                     Status = re.Status,
