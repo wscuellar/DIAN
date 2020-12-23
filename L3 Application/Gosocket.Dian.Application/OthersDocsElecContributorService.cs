@@ -179,8 +179,10 @@ namespace Gosocket.Dian.Application
                     join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
                     join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
                     join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
+                    join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId 
                     where oc.Id == Id
                      && oc.State != "Cancelado"
+                     && s.Deleted==false
 
                     select new OtherDocsElectData()
                     {
@@ -195,7 +197,8 @@ namespace Gosocket.Dian.Application
                         ContibutorTypeId = oc.OtherDocElecContributorTypeId,
                         ElectronicDocId = oc.ElectronicDocumentId,
                         Step = oc.Step,
-                        State = oc.State
+                        State = oc.State,
+                        SoftwareId=s.Id.ToString()
                     }).Distinct().FirstOrDefault();
         }
 
