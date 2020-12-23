@@ -433,6 +433,27 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+        public List<T> FindDocumentRegisterAR<T>(string providerCode, string documentTypeId, string serieandNumber) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    providerCode),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("SerieAndNumber",
+              QueryComparisons.Equal,
+              serieandNumber));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
         public List<T> FindpartitionKey<T>(string partitionKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));

@@ -35,25 +35,16 @@ namespace Gosocket.Dian.Plugin.Functions.Series
             if (string.IsNullOrEmpty(data.DocumentTypeId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId in the request body");
 
-            var trackId = data.TrackId;
-            var number = data.Number;
-            var documentTypeId = data.DocumentTypeId;
-
-            if (trackId == null)
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
-            if (number == null)
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a Number on the query string or in the request body");
-            if (documentTypeId == null)
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId on the query string or in the request body");
+         
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateSerieAndNumberAsync(trackId, number, documentTypeId);
+                var validateResponses = ValidatorEngine.Instance.StartValidateSerieAndNumberAsync(data);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALIDATESERIEPLGNS-{DateTime.UtcNow:yyyyMMdd}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATESERIEPLGNS-{DateTime.UtcNow:yyyyMMdd}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -63,7 +54,7 @@ namespace Gosocket.Dian.Plugin.Functions.Series
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "VALIDATESERIEPLGNS",
-                        ErrorMessage = $"No se pudo validar los eventos previos  del documento."
+                        ErrorMessage = $"No se pudo validar serie del ApplicationResponse con el Nit del emisor."
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
@@ -74,10 +65,14 @@ namespace Gosocket.Dian.Plugin.Functions.Series
         {
             [JsonProperty(PropertyName = "trackId")]
             public string TrackId { get; set; }
-            [JsonProperty(PropertyName = "Number")]
+            [JsonProperty(PropertyName = "number")]
             public string Number { get; set; }
-            [JsonProperty(PropertyName = "DocumentTypeId")]
+            [JsonProperty(PropertyName = "documentTypeId")]
             public string DocumentTypeId { get; set; }
+            [JsonProperty(PropertyName = "senderCode")]
+            public string SenderCode { get; set; }
+            [JsonProperty(PropertyName = "providerCode")]
+            public string ProviderCode { get; set; }
         }
     }
 }
