@@ -11,5 +11,6 @@ namespace Gosocket.Dian.Domain.Entity
         public int StatusId { get; set; }
         public string Code { get; set; }
         public int? TypeId { get; set; }
+        public int StatusRut { get; set; }
     }
 }

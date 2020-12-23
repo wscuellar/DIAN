@@ -679,9 +679,20 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
 
-                var appResponseKey = documentParsed.Cude;
+                var appResponseKey = documentParsed.Cude.ToLower();
                 var documentKey = documentParsed.DocumentKey.ToLower();
                 var responseCode = documentParsed.ResponseCode;
+
+                if (appResponseKey == documentKey)
+                {
+                    var eventResponse = new EventResponse()
+                    {
+                        Code = "Error",
+                        Message = "CUDE no puede ser igual al CUFE"
+                    };
+                    eventsResponse.Add(eventResponse);
+                    continue;
+                }
 
                 var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
 
@@ -956,24 +967,16 @@ namespace Gosocket.Dian.Services.ServicesGroup
             CheckDocument(ref response, document);
 
             // Check if response has errors
-            if (response.ErrorMessage.Any())
-            {
-                //
-                var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
-                if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
-
-                //
-                return response;
-            }
+            if (response.ErrorMessage.Any()) return response;
 
             var number = StringUtil.TextAfter(serieAndNumber, serie).TrimStart('0');
             if (string.IsNullOrEmpty(number))
             {
-                var failedList = new List<string> { $"" };
+                var failedList = new List<string> { $"El número del documento no puede ser vacío." };
                 response.IsValid = false;
                 response.StatusCode = "99";
-                response.StatusMessage = ".";
-                response.StatusDescription = ".";
+                response.StatusMessage = "El número del documento no puede ser vacío.";
+                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
                 response.ErrorMessage.AddRange(failedList);
                 return response;
             }
@@ -985,15 +988,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             CheckDocument(ref response, document);
 
             // Check if response has errors
-            if (response.ErrorMessage.Any())
-            {
-                //
-                var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
-                if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
-
-                //
-                return response;
-            }
+            if (response.ErrorMessage.Any()) return response;
 
             // third check
             var meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
@@ -1001,16 +996,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             {
                 document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
                 CheckDocument(ref response, document, meta);
-                // Check if response has errors
-                if (response.ErrorMessage.Any())
-                {
-                    //
-                    var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
-                    if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
 
-                    //
-                    return response;
-                }
+                // Check if response has errors
+                if (response.ErrorMessage.Any()) return response;
             }
 
             return null;
