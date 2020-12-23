@@ -148,6 +148,12 @@ namespace Gosocket.Dian.Application
             return sqlDBContext.Contributors.FirstOrDefault(p => p.Code == code);
         }
 
+        public RadianContributorOperation GetRadianOperations(int radianContributorId, string softwareId)
+        {
+            Guid SoftId = new Guid(softwareId);
+            return sqlDBContext.RadianContributorOperations.FirstOrDefault(p => p.RadianContributorId == radianContributorId && p.SoftwareId == SoftId );
+        }
+
         public Contributor GetByCode(string code, string connectionString)
         {
             using (var context = new SqlDBContext(connectionString))
@@ -475,7 +481,10 @@ namespace Gosocket.Dian.Application
 
                     RadianContributorOperation radianOperation = context.RadianContributorOperations.FirstOrDefault(
                                                  t => t.RadianContributorId == radianc.Id
-                                                 && t.SoftwareType == softwareType && t.SoftwareId == softId);
+                                                 && t.SoftwareType == softwareType 
+                                                 && t.SoftwareId == softId
+                                                 && t.OperationStatusId ==(int) Domain.Common.RadianState.Test
+                                                 );
                     radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado;
 
                     context.SaveChanges();
@@ -517,7 +526,7 @@ namespace Gosocket.Dian.Application
 
 
 
-        public int  AddOrUpdateRadianContributor(RadianContributor radianContributor)
+        public int AddOrUpdateRadianContributor(RadianContributor radianContributor)
         {
             using (var context = new SqlDBContext())
             {
@@ -561,18 +570,35 @@ namespace Gosocket.Dian.Application
             return affectedRecords > 0 ? operation.Id : 0;
         }
 
+        public bool UpdateRadianOperation(RadianContributorOperation contributorOperation)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var radianContributorOperationInstance = context.RadianContributorOperations.FirstOrDefault(c => c.Id == contributorOperation.Id);
+
+                radianContributorOperationInstance.OperationStatusId = contributorOperation.OperationStatusId;
+                radianContributorOperationInstance.RadianContributorId = contributorOperation.RadianContributorId;
+                radianContributorOperationInstance.SoftwareId = contributorOperation.SoftwareId;
+                radianContributorOperationInstance.SoftwareType = contributorOperation.SoftwareType;
+                radianContributorOperationInstance.Deleted = contributorOperation.Deleted;
+                radianContributorOperationInstance.Timestamp = System.DateTime.Now;
+                context.Entry(radianContributorOperationInstance).State = System.Data.Entity.EntityState.Modified;
+                context.SaveChanges();
+                return true;
+            }
+        }
+
 
         #endregion
 
-        public Contributor GetContributorByUserId(string userId, int contributorTypeId)
+        public Contributor GetContributorById(int Id, int contributorTypeId)
         {
-            Contributor contributor =null;
-            var re = (from u in sqlDBContext.UserContributors.Where(t => t.UserId == userId)
-                        join c in sqlDBContext.Contributors on u.ContributorId equals c.Id
-                        where c.ContributorTypeId == contributorTypeId
+            Contributor contributor = null;
+            var re = (from c in sqlDBContext.Contributors
+                      where c.Id == Id
                       select c).FirstOrDefault();
 
-            if(re != null)
+            if (re != null)
             {
                 contributor = new Contributor()
                 {
@@ -582,7 +608,7 @@ namespace Gosocket.Dian.Application
                     BusinessName = re.BusinessName,
                     Email = re.Email,
                     StartDate = re.StartDate,
-                    EndDate = re.EndDate, 
+                    EndDate = re.EndDate,
                     StartDateNumber = re.StartDateNumber,
                     AcceptanceStatus = re.AcceptanceStatus,
                     Status = re.Status,

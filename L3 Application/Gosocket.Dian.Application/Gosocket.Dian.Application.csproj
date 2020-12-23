@@ -196,7 +196,9 @@
     <Compile Include="Common\CertificateExtensions.cs" />
     <Compile Include="Common\RedisExtensions.cs" />
     <Compile Include="ElectronicDocumentService.cs" />
+    <Compile Include="GlobalOtherDocElecOperationService.cs" />
     <Compile Include="GlobalRadianOperationService.cs" />
+    <Compile Include="Managers\TestSetOthersDocumentsResultManager.cs" />
     <Compile Include="Managers\TestSetOthersDocumentsManager.cs" />
     <Compile Include="IdentificationTypeService.cs" />
     <Compile Include="GlobalDocValidationDocumentMetaService.cs" />
@@ -210,6 +212,7 @@
     <Compile Include="PdfCreatorEvents.cs" />
     <Compile Include="PdfCreatorModel.cs" />
     <Compile Include="RadianAprovedService.cs" />
+    <Compile Include="OthersDocsElecSoftwareService.cs" />
     <Compile Include="RadianCallSoftwareService.cs" />
     <Compile Include="RadianContributorFileTypeService.cs" />
     <Compile Include="ContributorOperationsService.cs" />
@@ -232,6 +235,7 @@
     <Compile Include="RadianPDFCreationService.cs" />
     <Compile Include="RadianGraphicRepresentationService .cs" />
     <Compile Include="RadianTestSetAppliedService.cs" />
+    <Compile Include="TestSetOthersDocumentsResultService.cs" />
     <Compile Include="RadianTestSetResultService.cs" />
     <Compile Include="RadianTestSetService.cs" />
     <Compile Include="RadianValidationService.cs" />

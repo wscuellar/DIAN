@@ -29,7 +29,10 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IRadianContributorOperationRepository, RadianContributorOperationRepository>();
             container.RegisterType<IRadianSoftwareRepository, RadianSoftwareRepository>();
             container.RegisterType<IPermissionRepository, PermissionRepository>();
-            container.RegisterType<IOthersDocsElecContributorRepository, OthersDocsElecContributorRepository>();
+            container.RegisterType<IOthersDocsElecContributorRepository, OthersDocsElecContributorRepository>(); 
+            container.RegisterType<IOthersDocsElecContributorOperationRepository, OthersDocsElecContributorOperationRepository>();
+            container.RegisterType<IOthersDocsElecSoftwareRepository, OthersDocsElecSoftwareRepository>();
+
 
             #endregion
 
@@ -55,7 +58,9 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IGlobalRadianOperationService, GlobalRadianOperationService>();
             container.RegisterType<IOthersElectronicDocumentsService, OthersElectronicDocumentsService>();
             container.RegisterType<IOthersDocsElecContributorService, OthersDocsElecContributorService>();
-             
+            container.RegisterType<IOthersDocsElecSoftwareService, OthersDocsElecSoftwareService>();
+            container.RegisterType<IGlobalOtherDocElecOperationService, GlobalOtherDocElecOperationService>();
+            container.RegisterType<ITestSetOthersDocumentsResultService, TestSetOthersDocumentsResultService>();
             #endregion
 
             #region Managers
@@ -63,7 +68,8 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IRadianTestSetResultManager, RadianTestSetResultManager>();
             container.RegisterType<IRadianTestSetManager, RadianTestSetManager>();
             container.RegisterType<IRadianLoggerManager, RadianLoggerManager>();
-            container.RegisterType<IGlobalDocValidationDocumentMetaService, GlobalDocValidationDocumentMetaService>();            
+            container.RegisterType<IGlobalDocValidationDocumentMetaService, GlobalDocValidationDocumentMetaService>();
+            container.RegisterType<ITestSetOthersDocumentsResultManager, TestSetOthersDocumentsResultManager>();
 
             #endregion
 

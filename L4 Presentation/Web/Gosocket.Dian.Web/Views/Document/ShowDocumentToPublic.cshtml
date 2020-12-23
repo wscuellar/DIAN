@@ -11,17 +11,36 @@
 {
 
     <style>
-        .container {
+        .container-md {
             background-color: #fff;
+            margin: 0 35px;
+            padding: 0 20px;
         }
 
         .text-wrap {
             word-wrap: break-word;
         }
+
+        .btn-volver {
+            color: #348441;
+            margin-left: 35px;
+            margin-bottom: 10px;
+            margin-top: -15px;
+            font-size: 16px;
+        }
     </style>
 }
 
-<div class="container">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="~/Content/js/common/common.js"></script>
+
+<div class="btn-volver">
+    < <a href="@Url.Action("SearchDocument", "User")" style="font-size:15px; text-decoration:underline;">Volver</a>
+</div>
+
+<div class="container-md">
 
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#home"><span class="h5">Factura Electrónica</span></a></li>
@@ -31,10 +50,10 @@
         }
     </ul>
 
-    <div class="tab-content">
+    <div class="tab-content" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
         <div id="home" class="tab-pane fade in active">
-            <div>                
-                @Html.Partial("_ViewerPartial", invoiceDocValidatorModel);
+            <div>
+                @Html.Partial("_ViewerPartial", invoiceDocValidatorModel)
                 @*<div>CUFE:</div>
                     <div>@Model.GlobalDocValidatorDocument.GlobalDocumentId</div>*@
             </div>
@@ -43,33 +62,58 @@
         @foreach (var item in Model.ListDocValidatorModels.Where(d => d.Document.DocumentKey != "01"))
         {
             <div id="@item.Document.DocumentKey" class="tab-pane fade">
-                @Html.Partial("_ViewerPartial", item);
+                @Html.Partial("_ViewerPartial", item)
             </div>
         }
     </div>
-    <div class="panel-body padding-top-20">
-        <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
-            <a href="@Url.Action("SearchDocument", "User")" class="btn btn-gosocket btn-lg btn-block margin-top-40">Regresar</a>
-        </div>
-        <div class="col-md-3" style="padding-left: 0;padding-top:7px;"></div>
-        <div class="col-md-3" style="padding-left: 0;padding-top:7px;"></div>
-        @if (Model.GlobalDocValidatorDocument.ValidationStatus != 2)
-        {
+    @*<div class="panel-body padding-top-20">
             <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
-                <a href="@Url.Action("DownloadPDF", "Document", new { trackId = Model.GlobalDocValidatorDocument.GlobalDocumentId})" class="btn btn-gosocket btn-lg btn-block margin-top-40 downloadPDFUrl">
-                    <i class="fa fa-download"></i> Descargar PDF
-                </a>
+                <a href="@Url.Action("SearchDocument", "User")" class="btn btn-gosocket btn-lg btn-block margin-top-40">Regresar</a>
             </div>
-        }
+            <div class="col-md-3" style="padding-left: 0;padding-top:7px;"></div>
+            <div class="col-md-3" style="padding-left: 0;padding-top:7px;"></div>
+            @if (Model.GlobalDocValidatorDocument.ValidationStatus != 2)
+            {
+                <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
+                    <a href="@Url.Action("DownloadPDF", "Document", new { trackId = Model.GlobalDocValidatorDocument.GlobalDocumentId})" class="btn btn-gosocket btn-lg btn-block margin-top-40 downloadPDFUrl">
+                        <i class="fa fa-download"></i> Descargar PDF
+                    </a>
+                </div>
+            }
+        </div>*@
+</div>
+<div class="tab-content">
+    <div id="modifyWrapper">
     </div>
 </div>
 
 @section scripts{
-    <script src="~/Content/js/bootstrap.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    
+    <script src="~/Content/js/file-validator.js"></script>
+    <script src="~/Content/js/Radian/RadianPrintDocumentPdf.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+
     <script>
+
+        function showModal(cude) {
+            showPdfModal("#show-graphic-document",cude,'@Url.Action("PrintGraphicRepresentation", "Document")');
+        }
+
         $(document).ready(function () {
+            showPdfModal("#show-document", "@Model.GlobalDocValidatorDocument.DocumentKey", '@Url.Action("PrintDocument", "Document")');
+            $('#container1-title').hide();
+            $('.document-row').click('onClick', function () {
+                if (!$(this).hasClass('not-redirect')) {
+                        var id = $(this).context.getAttribute('data-id');
+                        var partitionKey = $(this).context.getAttribute('data-partitionKey');
+                        window.location.href = "/Document/Details?trackId=" + id + "&partitionKey=" + partitionKey;
+                }
+                else
+                    $(this).removeClass('not-redirect')
+            });
+
             $(".eventView").click(function () {
-                debugger
                 var documentKey = $(this).parent().find("#DocumentKey").val()
                 $('#container1').fadeOut(200);
                 GetEventsPartialView(documentKey);
@@ -78,7 +122,61 @@
                     $('#divPageContent').css('max-height', '623px');
                 }, 200)
             })
+
+            $('#divViewMoreQueryList').hide();
+        });
+
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
         })
+
+        function GetEventsPartialView(id) {
+            var url = '/QueryAssociatedEvents/EventsView?id=' + id + "&cufe=" + '@Model.GlobalDocValidatorDocument.DocumentKey'
+            $.ajax({
+                url: '/QueryAssociatedEvents/EventsView?id=' + id + "&cufe=" + '@Model.GlobalDocValidatorDocument.DocumentKey',
+                success: function (data, status, xhr) {
+                    var injectingPartialView = xhr.getResponseHeader('InjectingPartialView');
+                    if (injectingPartialView == "true") {
+                        $('#modifyWrapper').html(data);
+                        $('#modifyWrapper').fadeIn(300);
+                        $('#modifyWrapper').css("margin-top", "-160px");
+                        $('#container1-title').fadeIn(300);                        
+                        $('#divChildrenModifyWrapper').css("padding-top", "100px");
+                        $('[data-toggle="popover"]').popover();
+                    }
+                    else {
+                        window.location.href = '/User/Login';
+                    }
+                }
+            });
+
+        };
+
+        function changeTab(id) {
+            window.location.href = "/Document/Details?trackId=" + id;
+        }
+
+        function darClick() {
+            $('#modifyWrapper').fadeOut(300);
+            $('#container1-title').fadeOut(300);
+            $('#divViewerPartial').css('height', '');
+            $('#divPageContent').css('max-height', '');
+            $('#divChildrenModifyWrapper').css('padding-top', '');
+            setTimeout(function () {
+                $('#container1').fadeIn(300);
+            }, 500);
+        }
+
+        function showMore() {
+            $('#modifyWrapper').fadeOut(300);
+            $('#container1-title').fadeOut(300);
+            $('#divViewerPartial').css('height', '');
+            $('#divPageContent').css('max-height', '');
+            $('#divChildrenModifyWrapper').css('padding-top', '');
+            setTimeout(function () {
+                $('#container1').fadeIn(300);
+            }, 500);
+        }
 
     </script>
 }

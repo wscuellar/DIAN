@@ -10,8 +10,8 @@ namespace Gosocket.Dian.Application
     public class GlobalRadianOperationService : IGlobalRadianOperationService
     {
 
-        private readonly TableManager globalSoftware = new TableManager("GlobalSoftware");
-        private readonly TableManager globalRadianOperations = new TableManager("GlobalRadianOperations");
+        private static readonly TableManager globalSoftware = new TableManager("GlobalSoftware");
+        private static readonly TableManager globalRadianOperations = new TableManager("GlobalRadianOperations");
 
         #region GlobalRadianOperation
 
@@ -24,7 +24,6 @@ namespace Gosocket.Dian.Application
                 Timestamp = DateTime.Now,
                 StatusId = 1
             };
-            ;
             return SoftwareAdd(soft) && globalRadianOperations.InsertOrUpdate(item);
         }
 
@@ -46,7 +45,7 @@ namespace Gosocket.Dian.Application
         public bool IsActive(string code, Guid softwareId)
         {
             GlobalRadianOperations item = globalRadianOperations.Find<GlobalRadianOperations>(code, softwareId.ToString());
-            return item.RadianStatus == Domain.Common.RadianState.Habilitado.ToString();
+            return item.RadianState == Domain.Common.RadianState.Habilitado.ToString();
         }
 
 
@@ -62,9 +61,9 @@ namespace Gosocket.Dian.Application
         public GlobalRadianOperations EnableParticipantRadian(string code, string softwareId)
         {
             GlobalRadianOperations operation = globalRadianOperations.Find<GlobalRadianOperations>(code, softwareId.ToString());
-            if (operation.RadianStatus != Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Test))
+            if (operation.RadianState != Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Test))
                 return new GlobalRadianOperations();
-            operation.RadianStatus = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
+            operation.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
             _ = Update(operation);
             return operation;
         }

@@ -115,7 +115,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Factura Electronica.
+        ///   Busca una cadena traducida similar a Factura Electrónica.
         /// </summary>
         public static string Event_DocumentType {
             get {
@@ -133,7 +133,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Referencias del Evento.
+        ///   Busca una cadena traducida similar a Referencias del evento.
         /// </summary>
         public static string Event_ReferenceTitle {
             get {
@@ -169,7 +169,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Validaciones del Evento.
+        ///   Busca una cadena traducida similar a Validaciones del evento.
         /// </summary>
         public static string Event_ValidationTitle {
             get {
@@ -210,6 +210,15 @@ namespace Gosocket.Dian.Common.Resources {
         public static string Mandato {
             get {
                 return ResourceManager.GetString("Mandato", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Este modo de operación y documento electrónico carece de Set de Pruebas!!!.
+        /// </summary>
+        public static string ModeElectroniDocWithoutTestSet {
+            get {
+                return ResourceManager.GetString("ModeElectroniDocWithoutTestSet", resourceCulture);
             }
         }
         
@@ -277,6 +286,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Datos asociados correctamente..
+        /// </summary>
+        public static string OtherSuccessSoftware {
+            get {
+                return ResourceManager.GetString("OtherSuccessSoftware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El participante no cuenta con un software propio activo en el sistema.
         /// </summary>
         public static string ParticipantWithoutSoftware {
@@ -295,7 +313,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Constancia de Recibo de mercancia.
+        ///   Busca una cadena traducida similar a Constancia de Recibo de mercancía.
         /// </summary>
         public static string Receipt {
             get {

@@ -1,0 +1,61 @@
+﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" }, { "readonly", "true" } };}
+@{
+    ViewBag.title = "SET DE PRUEBAS - " + Model.ContibutorType + " " + Model.ElectronicDoc;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section css
+{
+    <style type="text/css">
+        .setTestODE {
+            padding: 0px 20px 20px 30px;
+            box-sizing: border-box;
+            border-radius: 0px 5px 0px 0px;
+            margin-top: 20px;
+        }
+
+        hr {
+            margin-top: 20px !important;
+            margin-bottom: 20px !important;
+            border: 1px !important;
+            border-top: 2px solid #E9E8E8 !important;
+        }
+    </style>
+}
+
+
+
+<div class="page-content radian-view margin-20">
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+        <div class="back-button"><a href="javascript:history.back()"><i class="fa fa-chevron-left"></i> Volver</a></div>
+    </div>
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+
+            <div class="panel-body padding-top-20">
+                <div class="row margin-horizontal-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+
+                        @using (Html.BeginForm("SetTestDetails", "OthersElectronicDocAssociated", FormMethod.Post))
+                        {
+                            <div class="setTestODE">
+                                @Html.HiddenFor(m => m.Id)
+                                @Html.Partial("_setTestResult")
+                            </div>
+                            <div class="panel-footer text-right">
+                                <button type="submit" class="btn btn-success btn-radian-success">Detalles</button>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,9 +1,16 @@
-﻿using Gosocket.Dian.Domain.Entity;
+﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
+using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
@@ -30,45 +37,211 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
-        public readonly IContributorService _contributorService;
+        private readonly IContributorService _contributorService;
+        private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
+        private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
+        private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
+        private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
 
-        public OthersElectronicDocAssociatedController(IContributorService contributorService)
+        public OthersElectronicDocAssociatedController(IContributorService contributorService,
+            IOthersDocsElecContributorService othersDocsElecContributorService,
+            IOthersElectronicDocumentsService othersElectronicDocumentsService,
+            ITestSetOthersDocumentsResultService testSetOthersDocumentsResultService,
+            IOthersDocsElecSoftwareService othersDocsElecSoftwareService)
         {
             _contributorService = contributorService;
+            _othersDocsElecContributorService = othersDocsElecContributorService;
+            _othersElectronicDocumentsService = othersElectronicDocumentsService;
+            _testSetOthersDocumentsResultService = testSetOthersDocumentsResultService;
+            _othersDocsElecSoftwareService = othersDocsElecSoftwareService;
         }
 
-        public ActionResult Index(int electronicDocumentId = 0, int operationModeId = 0, int ContributorIdType = 0)
+
+        private OthersElectronicDocAssociatedViewModel DataAssociate(int Id)
         {
-            var contributor = _contributorService.GetContributorByUserId(User.Identity.GetUserId(), ContributorIdType);
+            OtherDocsElectData entity = _othersDocsElecContributorService.GetCOntrinutorODE(Id);
+
+            if (entity == null)
+            {
+                return new OthersElectronicDocAssociatedViewModel()
+                {
+                    Id = -1,
+                };
+            }
+            var contributor = _contributorService.GetContributorById(entity.ContributorId, entity.ContibutorTypeId);
 
             if (contributor == null)
             {
-                ModelState.AddModelError("", "No existe contribuyente!");
-                return View();
+                return new OthersElectronicDocAssociatedViewModel()
+                {
+                    Id = -2,
+                };
             }
 
-            OthersElectronicDocAssociatedViewModel model = new OthersElectronicDocAssociatedViewModel()
+            return new OthersElectronicDocAssociatedViewModel()
             {
+                Id = entity.Id,
                 ContributorId = contributor.Id,
                 Name = contributor.Name,
                 Nit = contributor.Code,
                 BusinessName = contributor.BusinessName,
                 Email = contributor.Email,
-                Step = 1,
-                State = "Dev",
+                Step = entity.Step,
+                State = entity.State,//TODO:
+                OperationMode = entity.OperationMode,
+                OperationModeId = entity.OperationModeId,
+                ElectronicDoc = entity.ElectronicDoc,
+                ElectronicDocId = entity.ElectronicDocId,
+                ContibutorType = entity.ContibutorType,
+                ContibutorTypeId = entity.ContibutorTypeId,
+                SoftwareId = entity.SoftwareId
             };
 
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">Id de la tabla OtherDocElecContributor</param>
+        /// <param name="electronicDocumentId"></param>
+        /// <param name="operationModeId"></param>
+        /// <param name="ContributorIdType"></param>
+        /// <returns></returns>
+        public ActionResult Index(int Id = 0)//TODO:
+        {
+            ViewBag.ValidateRequest = true;
+
+            OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
+
+            if (model.Id == -1)
+                return RedirectToAction("Index", "OthersElectronicDocuments");
+
+            ViewBag.ValidateRequest = true;
+
+            if (model.Id == -2)
+            {
+                ViewBag.ValidateRequest = false;
+                ModelState.AddModelError("", "No existe contribuyente!");
+                return View(new OthersElectronicDocAssociatedViewModel());
+            }
             return View(model);
         }
 
 
+        //[HttpPost]
+        //public ActionResult CancelRegister(int ContributorId, int ContributorTypeId, string State, string description)
+        //{
+        //    ResponseMessage response = new ResponseMessage();
+
+        //    return Json(response, JsonRequestBehavior.AllowGet);
+        //}
+
+        /// <summary>
+        /// Cancelar una asociación de la tabla OtherDocElecContributor, OtherDocElecContributorOperations y OtherDocElecSoftware
+        /// </summary>
+        /// <param name="id">Id de la tabla OtherDocElecContributor</param>
+        /// <param name="desciption">Descripción de por que se cancela</param>
+        /// <returns><see cref="ResponseMessage"/></returns>
         [HttpPost]
-        public ActionResult CancelRegister(int ContributorId, int ContributorTypeId, string State, string description)
+        public JsonResult CancelRegister(int id, string description)
         {
-            ResponseMessage response = new ResponseMessage();
+            ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
 
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
+        public JsonResult EnviarContributor(OthersElectronicDocAssociatedViewModel entity)
+        {
+            bool updated = _othersElectronicDocumentsService.ChangeContributorStep(entity.Id, entity.Step + 1);
+
+            if (updated)
+            {
+                return Json(new
+                {
+                    message = "Datos enviados correctamente.",
+                    success = true,
+                    data = new { Id = entity.Id }
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new ResponseMessage($"El registro no pudo ser actualizado", "Nulo"), JsonRequestBehavior.AllowGet);
+        }
+
+
+        public ActionResult GetSetTestResult(int Id)
+        {
+            OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
+
+            if (model.Id == -1)
+                return RedirectToAction("Index", "OthersElectronicDocuments");
+
+            ViewBag.ValidateRequest = true;
+
+            if (model.Id == -2)
+            {
+                ViewBag.ValidateRequest = false;
+                ModelState.AddModelError("", "No existe contribuyente!");
+                return View(new OthersElectronicDocAssociatedViewModel());
+            }
+
+            GlobalTestSetOthersDocuments testSet = null;
+
+            testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
+            if (testSet == null)
+                return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
+
+            string key = "1|" + model.SoftwareId.ToString();
+            model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
+
+            model.GTestSetOthersDocumentsResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.OtherDocElecOperationMode), model.OperationModeId.ToString())));
+            model.GTestSetOthersDocumentsResult.StatusDescription = testSet.Description;
+            model.Software = new OtherDocElecSoftwareViewModel()
+            {
+                Id = software.Id,
+                Name = software.Name,
+                Pin = software.Pin,
+                Url = software.Url,
+                Status = software.Status,
+                OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId,
+                ProviderId = software.ProviderId,
+                SoftwareId = software.SoftwareId,
+            };
+             
+            model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
+            model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
+            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
+
+            return View(model);
+        }
+
+        [HttpPost] 
+        public ActionResult SetTestDetails(int Id)
+        {
+            OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
+
+            if (model.Id == -1)
+                return RedirectToAction("Index", "OthersElectronicDocuments");
+
+
+            if (model.Id == -2)
+            {
+                ViewBag.ValidateRequest = false;
+                ModelState.AddModelError("", "No existe contribuyente!");
+                return View(new OthersElectronicDocAssociatedViewModel());
+            }
+ 
+             string key = "1|" + model.SoftwareId.ToString();
+            model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
+
+            model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
+            model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
+            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
+
+            return View(model);
+        }
+
+ 
     }
 }

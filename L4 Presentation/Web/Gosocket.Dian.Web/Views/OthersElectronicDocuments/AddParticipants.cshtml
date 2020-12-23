@@ -12,6 +12,7 @@
         .modal-body .close, .modal-header .close {
             background-color: #348441 !important;
         }
+
         .btnCloseOtherDocument {
             color: #fff;
             background: #348441 !important;
@@ -35,7 +36,6 @@
             color: #fff !important;
         }
 
-        ​​​​​​
 
     </style>
 }
@@ -173,22 +173,31 @@
                 $("#dialogModeOperation").modal('hide');
                 showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
 
-                var ValidacionOtherElectronicDocumentsViewModel = {
+                var ValidacionOtherDocs = {
                     UserCode: '@ViewBag.UserCode',
                     Accion: 'SeleccionOperationMode',
-                    ElectronicDocument: electronicDocumentId,
+                    ElectronicDocumentId: electronicDocumentId,
                     complementoTexto: complementoTexto,
-                    ContributorIdType: ContributorIdType
+                    ContributorIdType: ContributorIdType,
+                    OperationModeId: OperationMode
                 };
 
-                CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
+                CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherDocs,
                     function (param) {
 
-                        var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
-                            + "?electronicDocumentId=" + electronicDocumentId
-                            + "&operationModeId=" + OperationMode
-                            + "&ContributorIdType=" + ContributorIdType;
-                        window.location.href = url;
+                        CallExecutionWithData("POST", '@Url.Action("Add", "OthersElectronicDocuments")', ValidacionOtherDocs,
+                            function (param, data) { 
+                                    var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
+                                        + "?ElectronicDocumentId=" + electronicDocumentId
+                                        + "&OperationModeId=" + OperationMode
+                                        + "&ContributorIdType=" + ContributorIdType
+                                        + "&ContributorId=" + data.data;
+
+                                        window.location.href = url;
+                                }, false, () => hideLoading('#panel-form')
+                        );
+
+
 
 
                     }, true, () => hideLoading('#panel-form')

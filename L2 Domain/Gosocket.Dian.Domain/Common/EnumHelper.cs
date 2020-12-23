@@ -503,4 +503,38 @@ namespace Gosocket.Dian.Domain.Common
         Rejected = 3,
     }
 
+    public enum OtherDocElecContributorType
+    {
+        [Description("Emisor")]
+        Transmitter = 1, 
+        [Description("Proveedor Tecnologico")]
+        TechnologyProvider = 2,
+    }
+
+    public enum OtherDocElecState
+    {
+        none = 0,
+        [Display(Name = "Registrado")]
+        [Description("Registrado")]
+        Registrado = 1,
+        [Display(Name = "En pruebas")]
+        [Description("En pruebas")]
+        Test = 2,
+        [Display(Name = "Habilitado")]
+        [Description("Habilitado")]
+        Habilitado = 3,
+        [Display(Name = "Cancelado")]
+        [Description("Cancelado")]
+        Cancelado = 4
+    }
+
+    public enum OtherDocElecOperationMode
+    {
+        [Display(Name = "Software Propio")]
+        [Description("Software Propio")]
+        OwnSoftware = 1,
+        [Display(Name = "Software de un proveedor tecnológico")]
+        [Description("Software de un proveedor tecnológico")]
+        SoftwareTechnologyProvider = 2
+    }
 }

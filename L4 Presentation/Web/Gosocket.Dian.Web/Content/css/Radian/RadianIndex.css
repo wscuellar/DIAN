@@ -431,7 +431,7 @@ button.edit-state {
     border-radius: 10px;
     color: white;
     padding: 8px 20px;
-    font-size: 12px;
+    font-size: 14px !important;
     line-height: 16px;
     border-color: #348441;
 }
@@ -751,7 +751,8 @@ h4.text-thin {
     color: white;
     background: #348441;
     height: 31px;
-    line-height: 2 !important;
+    line-height: 1.6 !important;
+    font-size: 14px;
 }
 
 #steps-approved .steps {
@@ -1474,16 +1475,14 @@ a.badge {
 .popover-body {
     width: 80%;
     overflow: hidden;
-    margin: 20px;
+    margin: 20px 20px 20px 0px;
     display: inline-block;
     float: right;
     border-left: solid 1px #EA965A;
     padding-left: 20px;
     color: #2c323c;
 }
-.arrow {
-    background-color: #F2ECE7;
-}
+
 .popover {
     background-color: #F2ECE7;
     border-radius: 0px;
@@ -1498,3 +1497,25 @@ a.badge {
         margin: 20px;
         position: absolute;
     }
+
+.text-underline {
+    text-decoration: underline;
+    padding: 0px;
+}
+.test-set-dots .custom-badget-red {
+    display: none;
+}
+
+.popover > .arrow:after {
+    border-left-color: #F2ECE7 !important;
+}
+
+.icon-alert {
+    display: inline-flex;
+    text-align: center;
+}
+
+.icon-alert .fa-exclamation-circle {
+    margin: 20px auto;
+    width: 44px;
+}

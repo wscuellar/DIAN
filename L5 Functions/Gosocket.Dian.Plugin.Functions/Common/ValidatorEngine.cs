@@ -16,6 +16,7 @@ using static Gosocket.Dian.Domain.Common.EnumHelper;
 using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
 using Gosocket.Dian.Plugin.Functions.Cufe;
+using Gosocket.Dian.Plugin.Functions.Series;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -253,14 +254,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return validateResponses;
                 }
             }
-
             var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
-
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel));
 
@@ -282,12 +281,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-        public List<ValidateListResponse> StartValidateSerieAndNumberAsync(string trackId, string number, string documentTypeId)
+        public List<ValidateListResponse> StartValidateSerieAndNumberAsync(ValidateSerieAndNumber.RequestObject data)
         {
             var validateResponses = new List<ValidateListResponse>();
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSerieAndNumber(trackId, number, documentTypeId));
+            validateResponses.AddRange(validator.ValidateSerieAndNumber(data));
             return validateResponses;
         }
         public async Task<List<ValidateListResponse>> StartNitValidationAsync(string trackId)
@@ -310,7 +309,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> StartNoteReferenceValidation(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
-
             // Validator instance
             var validator = new Validator();
             validateResponses.Add(validator.ValidateNoteReference(trackId));
@@ -340,7 +338,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             cmObject.DocEmp = Convert.ToString(xmlParser.globalDocPayrolls.NumeroDocumento);
             cmObject.TipAmb = Convert.ToString(xmlParser.globalDocPayrolls.Ambiente);
 
-
             // Validator instance
             var validator = new Validator();
             validateResponses.Add(validator.ValidateCune(cmObject, cune));
@@ -352,6 +349,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
+
+            //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
+            if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
+                Convert.ToInt32(party.ResponseCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+            {
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(party.TrackId, party.TrackId);
+                if (documentMeta != null)
+                {
+                    //Obtiene el CUFE
+                    party.TrackId = documentMeta.DocumentReferencedKey;
+                }
+            }
 
             //Obtiene XML Factura Electornica CUFE
             var xmlBytes = await GetXmlFromStorageAsync(party.TrackId);
@@ -407,7 +416,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var validator = new Validator();
             validateResponses.AddRange(validator.EventApproveCufe(nitModel, eventApproveCufe));
-
             return validateResponses;
         }
 
@@ -421,7 +429,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 throw new Exception(xmlParser.ParserError);
 
             var numberRangeModel = xmlParser.Fields.ToObject<NumberRangeModel>();
-
             // Validator instance
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateNumberingRange(numberRangeModel, trackId));

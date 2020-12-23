@@ -14,7 +14,9 @@ namespace Gosocket.Dian.Domain.Sql
         public int OtherDocElecContributorTypeId { get; set; }
         public OtherDocElecContributorType OtherDocElecContributorType { get; set; }
         public int OtherDocElecOperationModeId { get; set; }
-        public OtherDocElecOperationMode OtherDocElecOperationMode { get; set; }
+        public OtherDocElecOperationMode OtherDocElecOperationMode { get; set; } 
+        public int ElectronicDocumentId { get; set; }
+        public ElectronicDocument ElectronicDocument { get; set; }
         public string State { get; set; }
         public DateTime CreatedDate { get; set; }
         public int Step { get; set; }

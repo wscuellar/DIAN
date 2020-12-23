@@ -59,6 +59,38 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFu
     });
 }
 
+function CallExecutionWithData(callMethod, url, jsonvalue, method, showMessage, cancelFunction) {
+    $.ajax({
+        url: url,
+        type: callMethod,
+        data: jsonvalue,
+        success: function (data) {
+            if (showMessage) {
+                if (data.MessageType === "alert") {
+                    showConfirmation(data.Message, AlertExec(cancelFunction));
+                }
+                if (data.MessageType === "confirm") {
+                    showConfirmation(data.Message, ConfirmExec(method, jsonvalue, cancelFunction));
+                }
+                if (data.MessageType === "redirect") {
+                    operationClick = false;
+                    window.location.href = data.RedirectTo;
+                }
+            }
+            else {
+                if (data.Code == "500" && data.MessageType === "alert") {
+                    showConfirmation(data.Message, AlertExec(cancelFunction));
+                }
+                else {
+                    method(jsonvalue, data);
+                }
+
+            }
+
+        }
+    });
+}
+
 function showConfirmation(confirmMessage, buttons, className, operationCancel) {
     bootbox.dialog({
         className: className && className,
@@ -176,7 +208,7 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
 
 }
 
-function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {debugger
+function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {
     var data = {
         code: id,
         softwareId: softwareId,
@@ -189,7 +221,7 @@ function ShowDetailsTestSetConfig(htmlPartial, data, url) {
     customDialog(htmlPartial, data, url);
 }
 
-function customDialog(htmlPartial, data, url) {debugger
+function customDialog(htmlPartial, data, url) {
     var actionError = (error) => {
         console.log(success);
     }

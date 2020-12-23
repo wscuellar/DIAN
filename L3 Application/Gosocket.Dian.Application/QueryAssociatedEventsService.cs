@@ -126,34 +126,38 @@ namespace Gosocket.Dian.Application
             return EventStatus.None;
         }
 
-        public Dictionary<int, string> IconType(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments)
+        public Dictionary<int, string> IconType(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments, string documentKey = "")
         {
             Dictionary<int, string> statusValue = new Dictionary<int, string>();
             int securityTitleCounter = 0;
             statusValue.Add(1, $"{RadianDocumentStatus.ElectronicInvoice.GetDescription()}");
+
+            if (documentKey != "")
+            {
+                allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
+                allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null).ToList();
+            }
 
             foreach (GlobalDocValidatorDocumentMeta documentMeta in allReferencedDocuments)
             {
                 if (documentMeta.EventCode != null)
                 {
                     if (TITULOVALORCODES.Contains(documentMeta.EventCode.Trim()))
-                    {
                         securityTitleCounter++;
-                    }
 
-                    if (securityTitleCounter >= 3)
+                    if (!statusValue.ContainsKey(2) && securityTitleCounter >= 3)
                         statusValue.Add(2, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");//5
 
-                    if (DISPONIBILIZACIONCODES.Contains(documentMeta.EventCode.Trim()))
+                    if (!statusValue.ContainsKey(3) && DISPONIBILIZACIONCODES.Contains(documentMeta.EventCode.Trim()))
                         statusValue.Add(3, $"{RadianDocumentStatus.Readiness.GetDescription()}");//4 //INSCRITA
 
-                    if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim()))
+                    if (!statusValue.ContainsKey(4) && ENDOSOCODES.Contains(documentMeta.EventCode.Trim()))
                         statusValue.Add(4, $"{RadianDocumentStatus.Endorsed.GetDescription()}");//3       
 
-                    if (PAGADACODES.Contains(documentMeta.EventCode.Trim()))
+                    if (!statusValue.ContainsKey(5) && PAGADACODES.Contains(documentMeta.EventCode.Trim()))
                         statusValue.Add(5, $"{RadianDocumentStatus.Paid.GetDescription()}");//2
 
-                    if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()))
+                    if (!statusValue.ContainsKey(6) && LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()))
                         statusValue.Add(6, $"{RadianDocumentStatus.Limited.GetDescription()}");//1 
                 }
             }
