@@ -1782,10 +1782,16 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     sender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CompanyID']").Item(i)?.InnerText.ToString();
                     valueStockAmountSender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                                        
-                    senderList += sender + "|" ;
-                    valueStockAmountSenderList += valueStockAmountSender + "|";
-
+                    if(i == 0)
+                    {
+                        senderList += sender;
+                        valueStockAmountSenderList += valueStockAmountSender;
+                    }
+                    else
+                    {
+                        senderList += "|" + sender  ;
+                        valueStockAmountSenderList += "|" + valueStockAmountSender ;
+                    }
                 }
 
                 //Lista de endosatrios
