@@ -771,25 +771,25 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
-                if (string.IsNullOrEmpty(eventCode))
-                {
-                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Código tipo de evento no puede estar vacío.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                    flagEvento = false;
-                }
-                else if (!(eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034"
-                    || eventCode == "035" || eventCode == "036" || eventCode == "037" || eventCode == "038" || eventCode == "039"
-                    || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
-                    || eventCode == "045"))
-                {
-                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                    flagEvento = false;
-                }
+                //if (string.IsNullOrEmpty(eventCode))
+                //{
+                //    stringBuilder.AppendLine($"{codeMessage}H03-(R): Código tipo de evento no puede estar vacío.");
+                //    errors.Add(stringBuilder.ToString());
+                //    stringBuilder.Clear();
+                //    isValid = false;
+                //    flagEvento = false;
+                //}
+                //else if (!(eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034"
+                //    || eventCode == "035" || eventCode == "036" || eventCode == "037" || eventCode == "038" || eventCode == "039"
+                //    || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
+                //    || eventCode == "045"))
+                //{
+                //    stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
+                //    errors.Add(stringBuilder.ToString());
+                //    stringBuilder.Clear();
+                //    isValid = false;
+                //    flagEvento = false;
+                //}
 
                 if (flagEvento)
                 {
@@ -857,7 +857,7 @@ namespace Gosocket.Dian.Services.Utils
                             stringBuilder.Clear();
                             isValid = false;
                         }
-                        else if(!(listID == "2" && (eventCode == "037" || eventCode == "038" || eventCode =="039")))
+                        else if (!(listID == "2" && (eventCode == "037" || eventCode == "038" || eventCode == "039")))
                         {
                             stringBuilder.AppendLine($"{codeMessage}F04-(R): No fue informado el Nit.");
                             errors.Add(stringBuilder.ToString());

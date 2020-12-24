@@ -46,6 +46,15 @@ th {
     margin: 25px 0px;
     cursor: pointer;
 }
+
+.text-muted strong {
+    color: #2C323C;
+}
+
+.table-toolbar-left {
+    margin: 8px 0;
+    padding-bottom: 0px;
+}
 /*    general Styles      */
 .RadianContainerBegin {
     margin: 50px 0px 15px;
@@ -280,18 +289,26 @@ th {
 
 .input-general {
     height: 41px !important;
-    background: #F7F7F7;
+    background: #FFF !important;
     border: 1px solid #CCCCCC !important;
     box-sizing: border-box;
     border-radius: 4px !important;
 }
 
+    .input-general[disabled], .file-input-disabled input{
+        background: #F7F7F7 !important;
+    }
+
 .radian-conventions i, #table-contributor-files i {
-    margin: 0px 7px;
+    margin: 0px 7px 0px 16px;
     font-style: normal;
     font-weight: 900;
     font-size: 16px;
     line-height: 16px;
+}
+
+.list-inline-item img {
+    margin: 0 7px 0 0;
 }
 
 .radian-convention li {
@@ -382,7 +399,7 @@ button.edit-state {
     line-height: 16px;
     text-decoration-line: underline;
     color: #348441;
-    padding: 0px 10px;
+    padding: 0;
 }
 
 .radian-view {
@@ -431,7 +448,7 @@ button.edit-state {
     border-radius: 10px;
     color: white;
     padding: 8px 20px;
-    font-size: 12px;
+    font-size: 14px !important;
     line-height: 16px;
     border-color: #348441;
 }
@@ -730,7 +747,7 @@ h4.text-thin {
 }
 
 #steps-approved .radian-conventions {
-    margin: 20px 0;
+    margin: 10px 0 20px;
 }
 
 .radian-file-label {
@@ -751,7 +768,8 @@ h4.text-thin {
     color: white;
     background: #348441;
     height: 31px;
-    line-height: 2 !important;
+    line-height: 1.6 !important;
+    font-size: 14px;
 }
 
 #steps-approved .steps {
@@ -896,10 +914,6 @@ span.state-file.status-4 {
     background-image: url(../../images/observations.png);
 }
 
-.file-input-disabled {
-    position: relative;
-    width: 50%;
-}
 
 .highcharts-figure, .highcharts-data-table table {
     min-width: 310px;
@@ -1474,16 +1488,14 @@ a.badge {
 .popover-body {
     width: 80%;
     overflow: hidden;
-    margin: 20px;
+    margin: 20px 20px 20px 0px;
     display: inline-block;
     float: right;
     border-left: solid 1px #EA965A;
     padding-left: 20px;
     color: #2c323c;
 }
-.arrow {
-    background-color: #F2ECE7;
-}
+
 .popover {
     background-color: #F2ECE7;
     border-radius: 0px;
@@ -1498,3 +1510,49 @@ a.badge {
         margin: 20px;
         position: absolute;
     }
+
+.text-underline {
+    text-decoration: underline;
+    padding: 0px;
+}
+.test-set-dots .custom-badget-red {
+    display: none;
+}
+
+.popover > .arrow:after {
+    border-left-color: #F2ECE7 !important;
+}
+
+.icon-alert {
+    display: inline-flex;
+    text-align: center;
+}
+
+.icon-alert .fa-exclamation-circle {
+    margin: 20px auto;
+    width: 44px;
+}
+
+.adm-radian-view {
+    padding: 25px 12px 20px !important;
+    margin-top: 15px;
+}
+
+.underline-subtitle {
+    width: 100%;
+    left: 250px;
+    top: 170px;
+    border-radius: 2px;
+    background: #E9E8E8;
+    height: 2px;
+}
+
+.table-width-80 {
+    width: 80%;
+    margin: auto;
+}
+
+.panel-title.no-nifty {
+    padding: 0px;
+    font-size: 18px;
+}

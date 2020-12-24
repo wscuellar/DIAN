@@ -5,7 +5,7 @@
         var actionSuccess = (docBase) => {
             hideLoading('#panel-form');
             bootbox.dialog({
-                message: '<object data="data:application/pdf;base64,' + docBase + '" width="1024" height="768" type="application/pdf"></object>',
+                message: '<object data="data:application/pdf;base64,' + docBase + '" width="860" height="768" type="application/pdf"></object>',
                 size: 'large',
                 backdrop: false
             });

@@ -208,7 +208,7 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
 
 }
 
-function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {debugger
+function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {
     var data = {
         code: id,
         softwareId: softwareId,
@@ -221,7 +221,7 @@ function ShowDetailsTestSetConfig(htmlPartial, data, url) {
     customDialog(htmlPartial, data, url);
 }
 
-function customDialog(htmlPartial, data, url) {debugger
+function customDialog(htmlPartial, data, url) {
     var actionError = (error) => {
         console.log(success);
     }

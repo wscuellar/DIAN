@@ -171,6 +171,7 @@
     <Compile Include="Entity\GlobalContingency.cs" />
     <Compile Include="Entity\GlobalContributor.cs" />
     <Compile Include="Entity\GlobalContributorActivation.cs" />
+    <Compile Include="Entity\GlobalDocHolderExchange.cs" />
     <Compile Include="Entity\GlobalDocModelFolio.cs" />
     <Compile Include="Entity\GlobalDocPayroll.cs" />
     <Compile Include="Entity\GlobalDocReference.cs" />

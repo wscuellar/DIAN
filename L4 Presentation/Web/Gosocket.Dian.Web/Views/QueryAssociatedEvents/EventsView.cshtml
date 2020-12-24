@@ -3,7 +3,15 @@
 <style>
     /* Acuse de Recibo de Factura Electrónica */
 
-    eventTittle {
+    th {
+        font-size: 16px;
+    }
+
+    td {
+        font-size: 14px;
+    }
+
+    .eventTittle {
         font-family: Arial;
         font-style: normal;
         font-weight: bold;
@@ -152,7 +160,6 @@
         text-decoration: underline;
         color: #348441;
     }
-
 </style>
 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
@@ -160,7 +167,7 @@
 <div class="event-section page-content radian-view margin-15">
 
     <div id="divChildrenModifyWrapper" class="row margin-horizontal-0">
-        <div class="panel panel-event" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" >
+        <div class="panel panel-event" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
             <div class="panel-heading padding-15">
                 <div class="row">
                     <div class="col-sm-8 left-section">
@@ -191,18 +198,18 @@
                     <div class="col-sm-8 text-right right-section">
                         <span>Prefijo: @Model.Prefix </span>
                         <span>Número: @Model.Number</span>
-                        <span>Fecha de emisión del Evento: @Model.DateOfIssue.ToString("yyyy-MM-dd")</span>
+                        <span>Fecha de emisión del evento: @Model.DateOfIssue.ToString("yyyy-MM-dd")</span>
                     </div>
                 </div>
 
                 <div class="row aditional-data-section padding-panel">
                     <div class="col-sm-4">
-                        <h5>Datos del Emisor del evento </h5>
+                        <h5><strong>Datos del Emisor del Evento </strong></h5>
                         <p class="p-event-issuer">NIT: @Model.SenderCode</p>
                         <p class="p-event-issuer">Nombre: @Model.SenderName</p>
                     </div>
                     <div class="col-sm-4">
-                        <h5>Datos del Receptor del Evento </h5>
+                        <h5><strong>Datos del Receptor del Evento </strong></h5>
                         <p class="p-event-issuer">NIT: @Model.ReceiverCode</p>
                         <p class="p-event-issuer">Nombre: @Model.ReceiverName</p>
                     </div>
@@ -225,14 +232,14 @@
                         }
                         @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.SolicitudDisponibilizacion)
                         {
-                            <h5>Tipo de solicitud de Disponibilización </h5>
+                            <h5>Tipo de Solicitud de Disponibilización </h5>
                             <span>@Model.RequestType</span>
                         }
 
                         @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia ||
                              Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
-                        { 
-                            <h5>Datos del Mandato </h5>
+                        {
+                            <h5>Datos del Endoso </h5>
                             <span>NIT: @Model.Endoso.ReceiverCode</span>
                             <span>ENDOSATARIO: @Model.Endoso.ReceiverName</span>
                             <span>NIT: @Model.Endoso.SenderCode</span>
@@ -308,24 +315,24 @@
                     <table class="documents-table table table-striped align-middle margin-bottom-0" data-int="0">
                         <thead>
                             <tr>
-                                <th class="th-left-align">Tipo de documento</th>
-                                <th>Fecha</th>
-                                <th class="th-left-align">Descripción</th>
-                                <th>NIT del Emisor</th>
-                                <th class="th-left-align">Emisor</th>
-                                <th>NIT del Receptor</th>
-                                <th>Receptor</th>
+                                <th class="text-left">Tipo de documento</th>
+                                <th class="text-center">Fecha</th>
+                                <th class="text-center">Descripción</th>
+                                <th class="text-center">NIT del Emisor</th>
+                                <th class="text-center">Emisor</th>
+                                <th class="text-center">NIT del Receptor</th>
+                                <th class="text-center">Receptor</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model.References)
                             {
                                 <tr>
-                                    <td>@item.Document</td>
-                                    <td class="text-center">@item.DateOfIssue.ToString("yyyy-MM-dd")</td>
-                                    <td>@item.Description</td>
+                                    <td class="text-left">@item.Document</td>
+                                    <td class="text-center" style="width: 100px;">@item.DateOfIssue.ToString("yyyy-MM-dd")</td>
+                                    <td class="text-center">@item.Description</td>
                                     <td class="text-center">@item.SenderCode</td>
-                                    <td>@item.SenderName</td>
+                                    <td class="text-center">@item.SenderName</td>
                                     <td class="text-center">@item.ReceiverCode</td>
                                     <td class="text-center">@item.ReceiverName</td>
 
