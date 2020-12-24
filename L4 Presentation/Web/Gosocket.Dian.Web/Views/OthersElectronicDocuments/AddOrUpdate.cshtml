@@ -84,6 +84,13 @@
             font-size: 14pt;
             text-decoration: underline;
         }
+
+        hr {
+            margin-top: 20px !important;
+            margin-bottom: 20px !important;
+            border: 1px !important;
+            border-top: 2px solid #E9E8E8 !important;
+        }
     </style>
 }
 <div class="page-content margin-15">
@@ -113,7 +120,7 @@
                                         if (!ViewBag.softwareActive)
                                         {
                                             <div class="panel-footer text-right">
-                                                 
+
                                                 <button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave">Asociar</button>
                                             </div>
                                         }
@@ -160,7 +167,8 @@
                                                             <td class="text-center">@item.SoftwareId</td>
                                                             <td class="text-center">@item.PinSW</td>
                                                             <td class="text-center">  @item.Url  </td>
-                                                            <td class="text-center">
+                                                            <td class="text-center"> 
+                                                                <a style="font-size: 14px; color: #348441;" href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })"><i class="fa fa-eye"></i> Ver más</a>
                                                             </td>
                                                         </tr>
                                                     }
@@ -199,9 +207,9 @@
 
             if ('@ViewBag.softwareActive'=='True'){
                 console.log('d');
-                var sms ='No puede ' + '@ViewBag.title' + ', tiene uno en estado "En Proceso"';
+                var sms ='No se puede ' + '@ViewBag.title' + ', ya que tiene uno en estado: "En Proceso"';
                  bootbox.dialog({
-                     message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'></div><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
+                     message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
                                 onEscape: () => {  }
                  });
 
@@ -231,6 +239,8 @@
             $('#SoftwareId').change(function () {
                 getDataSoftwareSeleccionado($('#SoftwareId').val());
             });
+
+
 
         });//ready
 
