@@ -579,7 +579,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string eventCode = party.ResponseCode;
             string senderCode;
-            if(documentMeta != null && ((Convert.ToInt16(party.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion && (party.CustomizationID == "363" || party.CustomizationID == "364")) || Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad))
+            //Valida cambio legitimo tenedor
+            if(documentMeta != null 
+                && ((Convert.ToInt16(party.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion 
+                && (party.CustomizationID == "363" || party.CustomizationID == "364")) 
+                || Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad))
             {
                 senderCode = documentMeta.ReceiverCode;
             }

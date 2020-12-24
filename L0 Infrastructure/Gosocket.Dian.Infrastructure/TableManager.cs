@@ -887,7 +887,7 @@ namespace Gosocket.Dian.Infrastructure
             prefixCondition = TableQuery.CombineFilters(
                 prefixCondition,
                 TableOperators.And,
-                TableQuery.GenerateFilterCondition("RadianStatus",
+                TableQuery.GenerateFilterCondition("RadianState",
                     QueryComparisons.Equal,
                     radianStatus));
 

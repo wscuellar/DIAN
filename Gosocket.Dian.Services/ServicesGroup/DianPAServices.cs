@@ -1085,16 +1085,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         }
                     }
                     UpdateFinishAttorney(trackIdCude, documentParsed.DocumentKey.ToLower(), eventCode);
-                    InsertGlobalDocRegisterProviderAR(trackId, serieAndNumber, docTypeCode, senderCode, providerCode);
-                    //Registra informacion GlobalDocRegisterProviderAR
-
-                    //inserte  GlobalDocRegisterProviderAR
-                    //CUDE PartitionKey
-                    //providerCode rowKey
-                    //serieAndNumber 
-                    //    senderCode
-                    //    docTypeCode documentType
-
+                    InsertGlobalDocRegisterProviderAR(trackId, serieAndNumber, docTypeCode, senderCode, providerCode);                  
                     UpdateEndoso(xmlParser, documentParsed);
                 }
                 else
@@ -1773,6 +1764,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
         {
             //validation if is an Endoso en propiedad (Code 037)
             var arrayTasks = new List<Task>();
+            string sender = string.Empty;
+            string senderList = string.Empty;
+            string valueStockAmountSender = string.Empty;
+            string valueStockAmountSenderList = string.Empty;
             if (Convert.ToInt32(documentParsed.ResponseCode) == (int)EventStatus.EndosoPropiedad)
             {
                 List<GlobalDocHolderExchange> documentsHolderExchange = TableManagerGlobalDocHolderExchange.FindpartitionKey<GlobalDocHolderExchange>(documentParsed.DocumentKey.ToLower()).ToList();
@@ -1781,19 +1776,34 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     documentHolderExchange.Active = false;
                     arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(documentHolderExchange));
                 }
+                //Lista de endosantes
                 XmlNodeList valueListSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
                 for (int i = 0; i < valueListSender.Count; i++)
                 {
-                    string companyId = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CompanyID']").Item(i)?.InnerText.ToString();
-                    string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    string rowKey = documentParsed.ReceiverCode + "|" + companyId;
+                    sender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CompanyID']").Item(i)?.InnerText.ToString();
+                    valueStockAmountSender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                                        
+                    senderList += sender + "|" ;
+                    valueStockAmountSenderList += valueStockAmountSender + "|";
+
+                }
+
+                //Lista de endosatrios
+                XmlNodeList valueListReceiver = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
+                for (int i = 0; i < valueListReceiver.Count; i++)
+                {
+                    string companyId = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CompanyID']").Item(i)?.InnerText.ToString();
+                    string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                    string rowKey = senderList + "|" + companyId;
                     GlobalDocHolderExchange globalDocHolderExchange = new GlobalDocHolderExchange(documentParsed.DocumentKey.ToLower(), rowKey)
                     {
                         Timestamp = DateTime.Now,
                         Active = true,
                         CorporateStockAmount = valueStockAmount,
                         GlobalDocumentId = documentParsed.Cude,
-                        PartyLegalEntity = companyId
+                        PartyLegalEntity = companyId,
+                        SenderCode = senderList,
+                        CorporateStockAmountSender = valueStockAmountSenderList
                     };
                     arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(globalDocHolderExchange));
                 }

@@ -10,11 +10,14 @@ public class GlobalDocHolderExchange : TableEntity
 
     }
 
-    public DateTime Timestamp { get; set; }
+    public new DateTime Timestamp { get; set; }
     public bool Active { get; set; }
     public string CorporateStockAmount { get; set; }
     public string GlobalDocumentId { get; set; }
     public string PartyLegalEntity { get; set; }
+    public string SenderCode { get; set; }
+    public string CorporateStockAmountSender { get; set; }
+
 }
 
 
