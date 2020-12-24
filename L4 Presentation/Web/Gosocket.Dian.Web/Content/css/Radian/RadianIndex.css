@@ -1602,6 +1602,7 @@ a.badge {
 
 .margin-boton {
     margin: 23px auto;
+    padding: initial;
 }
 
 .text-left-radian{
@@ -1615,6 +1616,7 @@ a.badge {
 #table-history td:nth-child(2) {
     text-align: center;
     padding-left: 18px;
+    color: initial
 }
 
 .edit-state-td{
