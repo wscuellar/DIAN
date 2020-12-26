@@ -206,6 +206,7 @@
     <Compile Include="Entity\GlobalOseTrackIdMapper.cs" />
     <Compile Include="Entity\GlobalTypeList.cs" />
     <Compile Include="Entity\KeyValue.cs" />
+    <Compile Include="Entity\OtherDocElecCustomerList.cs" />
     <Compile Include="Entity\PagedResultBase.cs" />
     <Compile Include="Entity\EventDataModel.cs" />
     <Compile Include="Entity\RadianContributorOperationWithSoftware.cs" />

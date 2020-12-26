@@ -99,6 +99,11 @@ namespace Gosocket.Dian.Web.Controllers
 
             ViewBag.Title = $"Asociar modo de operación {model.OperationMode}";
 
+            if (model.OperationModeId == 2)
+            {
+                model.SoftwareName = " ";
+                model.PinSW = " ";
+            }
             return View(model);
         }
 

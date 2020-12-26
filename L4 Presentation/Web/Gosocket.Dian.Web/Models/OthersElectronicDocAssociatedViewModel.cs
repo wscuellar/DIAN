@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Common;
 
 namespace Gosocket.Dian.Web.Models
 {
@@ -13,6 +14,7 @@ namespace Gosocket.Dian.Web.Models
         public OthersElectronicDocAssociatedViewModel()
         {
             PageTable = 1;
+            LegalRepresentativeList = new List<UserViewModel>();
         }
 
         public int Id { get; set; } 
@@ -42,7 +44,8 @@ namespace Gosocket.Dian.Web.Models
         public int OperationModeId { get; set; }
         public string ElectronicDoc { get; set; }
         public int ElectronicDocId { get; set; }
-        public string ContibutorType { get; set; }
+        [Display(Name = "Tipo de participante")]
+        public string ContributorType { get; set; }
         public int ContibutorTypeId { get; set; }
         public string SoftwareId { get; set; }
 
@@ -55,5 +58,11 @@ namespace Gosocket.Dian.Web.Models
 
         public int PageTable { get; set; }
         public int CustomerTotalCount { get; internal set; }
+
+        public OtherDocElecState StateSelect { get; set; }
+        [Display(Name = "Nit Facturador")]
+        public string NitSearch { get; set; }
+        public List<OtherDocElecCustomerListViewModel> Customers { get; set; }
+        public List<UserViewModel> LegalRepresentativeList { get; set; }
     }
 }

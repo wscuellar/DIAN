@@ -6,7 +6,7 @@
     <p class="subtitle-view">
         @ViewBag.title
     </p>
-    <div class="radian-subtitle-line"></div>
+    <div class="radian-subtitle-line" style="width: 98%;"></div>
 </div>
 <div class="row radian-personal-info"  style="margin:12px;">
     <div class="row">
@@ -41,12 +41,14 @@
         <div class="row">
             <div class="col-sm-3">
                 <div class="form-group">
-                   Estado 
+                    @Html.LabelFor(m => m.State, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.State, new { @class = "form-control contributorFileType-props input-general", disabled = "disabled" })
                 </div>
             </div>
             <div class="col-sm-3">
                 <div class="form-group">
-                    Tipo de participante
+                    @Html.LabelFor(m => m.ContributorType, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.ContributorType, new { @class = "form-control contributorFileType-props input-general", disabled = "disabled" })
                 </div>
             </div>
         </div>
