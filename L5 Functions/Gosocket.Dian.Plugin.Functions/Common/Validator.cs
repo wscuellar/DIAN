@@ -2822,7 +2822,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         if (eventPrev.EventCode == "038")
                                         {
                                             if (documentMeta
-                                               .Where(t => t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                               .Where(t => t.EventCode == "039" || t.EventCode == "041").ToList()
                                                .Count > decimal.Zero)
                                             {
                                                 validFor = true;
@@ -2851,7 +2851,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         else if (eventPrev.EventCode == "039")
                                         {
                                             if (documentMeta
-                                                  .Where(t => t.EventCode == "038" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                                  .Where(t => t.EventCode == "038" || t.EventCode == "041").ToList()
                                                   .Count > decimal.Zero)
                                             {
                                                 validFor = true;
@@ -2880,7 +2880,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         else if (eventPrev.EventCode == "037")
                                         {
                                             if (documentMeta
-                                                 .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                                 .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041").ToList()
                                                  .Count > decimal.Zero)
                                             {
                                                 validFor = true;
@@ -2938,7 +2938,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             //Validación de la existencia de Endosos y Limitaciones TASK  730
                             case (int)EventStatus.InvoiceOfferedForNegotiation:
                                 if (documentMeta
-                                    .Where(t => t.EventCode == "037" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                    .Where(t => t.EventCode == "037" || t.EventCode == "041").ToList()
                                     .Count > decimal.Zero)
                                 {
                                     validFor = true;
@@ -2954,7 +2954,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 //Anulacion de Endoso solo aplica para Endoso en Garantia o Endoso en Procuracion
                                 else if (documentMeta
-                                .Where(t => t.EventCode == "038" || t.EventCode == "039" && t.Identifier == document.PartitionKey).ToList()
+                                .Where(t => t.EventCode == "038" || t.EventCode == "039").ToList()
                                 .Count > decimal.Zero)
                                 {
                                     responses.Add(new ValidateListResponse
