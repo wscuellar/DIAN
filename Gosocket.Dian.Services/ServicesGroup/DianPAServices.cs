@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
 using static Gosocket.Dian.Logger.Logger;
 
 namespace Gosocket.Dian.Services.ServicesGroup
@@ -40,6 +41,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+        private TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
 
         private FileManager fileManager = new FileManager();
 
@@ -1083,16 +1085,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         }
                     }
                     UpdateFinishAttorney(trackIdCude, documentParsed.DocumentKey.ToLower(), eventCode);
-                    InsertGlobalDocRegisterProviderAR(trackId, serieAndNumber, docTypeCode, senderCode, providerCode);
-                    //Registra informacion GlobalDocRegisterProviderAR
-
-                    //inserte  GlobalDocRegisterProviderAR
-                    //CUDE PartitionKey
-                    //providerCode rowKey
-                    //serieAndNumber 
-                    //    senderCode
-                    //    docTypeCode documentType
-
+                    InsertGlobalDocRegisterProviderAR(trackId, serieAndNumber, docTypeCode, senderCode, providerCode);                  
+                    UpdateEndoso(xmlParser, documentParsed);
                 }
                 else
                 {
@@ -1598,7 +1592,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID, DianResponse response)
         {
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
-            
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
+
 
             if (validations.Count > 0)
             {
@@ -1757,13 +1752,62 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var arrayTasks = new List<Task>();
             GlobalDocRegisterProviderAR documentRegisterAR = new GlobalDocRegisterProviderAR(trackId, providerCode)
             {
-                docTypeCode = docTypeCode,
-                serieAndNumber = serieAndNumber,
-                senderCode = senderCode,
-                Timestamp = new DateTime()
+                DocumentTypeId = docTypeCode,
+                SerieAndNumber = serieAndNumber,
+                SenderCode = senderCode
             };
             arrayTasks.Add(TableManagerGlobalDocRegisterProviderAR.InsertOrUpdateAsync(documentRegisterAR));
 
+        }
+
+        private void UpdateEndoso(XmlParser xmlParser, DocumentParsed documentParsed)
+        {
+            //validation if is an Endoso en propiedad (Code 037)
+            var arrayTasks = new List<Task>();
+            string sender = string.Empty;
+            string senderList = string.Empty;
+            string valueStockAmountSender = string.Empty;
+            string valueStockAmountSenderList = string.Empty;
+            if (Convert.ToInt32(documentParsed.ResponseCode) == (int)EventStatus.EndosoPropiedad)
+            {
+                List<GlobalDocHolderExchange> documentsHolderExchange = TableManagerGlobalDocHolderExchange.FindpartitionKey<GlobalDocHolderExchange>(documentParsed.DocumentKey.ToLower()).ToList();
+                foreach (var documentHolderExchange in documentsHolderExchange)
+                {
+                    documentHolderExchange.Active = false;
+                    arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(documentHolderExchange));
+                }
+                //Lista de endosantes
+                XmlNodeList valueListSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+                for (int i = 0; i < valueListSender.Count; i++)
+                {
+                    sender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CompanyID']").Item(i)?.InnerText.ToString();
+                    valueStockAmountSender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                                        
+                    senderList += sender + "|" ;
+                    valueStockAmountSenderList += valueStockAmountSender + "|";
+
+                }
+
+                //Lista de endosatrios
+                XmlNodeList valueListReceiver = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
+                for (int i = 0; i < valueListReceiver.Count; i++)
+                {
+                    string companyId = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CompanyID']").Item(i)?.InnerText.ToString();
+                    string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                    string rowKey = senderList + "|" + companyId;
+                    GlobalDocHolderExchange globalDocHolderExchange = new GlobalDocHolderExchange(documentParsed.DocumentKey.ToLower(), rowKey)
+                    {
+                        Timestamp = DateTime.Now,
+                        Active = true,
+                        CorporateStockAmount = valueStockAmount,
+                        GlobalDocumentId = documentParsed.Cude,
+                        PartyLegalEntity = companyId,
+                        SenderCode = senderList,
+                        CorporateStockAmountSender = valueStockAmountSenderList
+                    };
+                    arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(globalDocHolderExchange));
+                }
+            }
         }
 
     }
