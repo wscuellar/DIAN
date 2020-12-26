@@ -74,7 +74,8 @@ namespace Gosocket.Dian.Functions.Events
                 return new EventResponse { Code = ((int)EventValidationMessage.NotImplemented).ToString(), Message = message };
             }
 
-            TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+            TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");           
+
             //Obtiene informacion del CUFE
             var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             if (documentMeta == null)
@@ -84,37 +85,82 @@ namespace Gosocket.Dian.Functions.Events
             var documentMetaCUDE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
             if (documentMetaCUDE == null)
                 return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
+     
 
-            var partitionKey = $"co|{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}|{documentMeta.DocumentKey.Substring(0, 2)}";
-
-            var globalDataDocument = await CosmosDBService.Instance(documentMeta.EmissionDate).ReadDocumentAsync(documentMeta.DocumentKey, partitionKey, documentMeta.EmissionDate);
-
-            if (globalDataDocument == null)
-                return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
-
-            //// Validate reception date
-            //var receptionDateValidation = Validator.ValidateReceptionDate(globalDataDocument);
-            //if (!receptionDateValidation.Item1)
-            //    return receptionDateValidation.Item2;
-
-            // Validate event
-            var eventValidation = Validator.ValidateEvent(globalDataDocument, responseCode);
-            if (!eventValidation.Item1)
-                return eventValidation.Item2;
-            else if (globalDataDocument.Events.Count == 0)
+            //Obtiene informacion del CUFE Anulacion Endoso, Terminacion Limitacion de Circulacion
+            if (Convert.ToInt32(responseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
+                Convert.ToInt32(responseCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
-                globalDataDocument.Events = new List<Event>()
+                var documentMetaReferenced = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(documentMeta.DocumentReferencedKey, documentMeta.DocumentReferencedKey);
+                if (documentMetaReferenced == null)
+                    return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
+
+                var partitionKey = $"co|{documentMetaReferenced.EmissionDate.Day.ToString().PadLeft(2, '0')}|{documentMetaReferenced.DocumentKey.Substring(0, 2)}";
+
+                var globalDataDocument = await CosmosDBService.Instance(documentMetaReferenced.EmissionDate).ReadDocumentAsync(documentMetaReferenced.DocumentKey, partitionKey, documentMetaReferenced.EmissionDate);
+                if (globalDataDocument == null)
+                    return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
+
+                //// Validate reception date
+                //var receptionDateValidation = Validator.ValidateReceptionDate(globalDataDocument);
+                //if (!receptionDateValidation.Item1)
+                //    return receptionDateValidation.Item2;
+
+                // Validate event
+                var eventValidation = Validator.ValidateEvent(globalDataDocument, responseCode);
+                if (!eventValidation.Item1)
+                    return eventValidation.Item2;
+                else if (globalDataDocument.Events.Count == 0)
+                {
+                    globalDataDocument.Events = new List<Event>()
                 {
                     InstanceEventObject(documentMetaCUDE, responseCode)
                 };
+                }
+                else
+                    globalDataDocument.Events.Add(InstanceEventObject(documentMetaCUDE, responseCode));
+
+                // upsert document in cosmos
+                var result = CosmosDBService.Instance(documentMetaReferenced.EmissionDate).UpdateDocument(globalDataDocument);
+                if (result == null)
+                    return new EventResponse { Code = ((int)EventValidationMessage.Error).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.Error) };
+
+
             }
             else
-                globalDataDocument.Events.Add(InstanceEventObject(documentMetaCUDE, responseCode));
+            {
+                var partitionKey = $"co|{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}|{documentMeta.DocumentKey.Substring(0, 2)}";
 
-            // upsert document in cosmos
-            var result = CosmosDBService.Instance(documentMeta.EmissionDate).UpdateDocument(globalDataDocument);
-            if (result == null)
-                return new EventResponse { Code = ((int)EventValidationMessage.Error).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.Error) };
+                var globalDataDocument = await CosmosDBService.Instance(documentMeta.EmissionDate).ReadDocumentAsync(documentMeta.DocumentKey, partitionKey, documentMeta.EmissionDate);
+                if (globalDataDocument == null)
+                    return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
+
+
+                //// Validate reception date
+                //var receptionDateValidation = Validator.ValidateReceptionDate(globalDataDocument);
+                //if (!receptionDateValidation.Item1)
+                //    return receptionDateValidation.Item2;
+
+                // Validate event
+                var eventValidation = Validator.ValidateEvent(globalDataDocument, responseCode);
+                if (!eventValidation.Item1)
+                    return eventValidation.Item2;
+                else if (globalDataDocument.Events.Count == 0)
+                {
+                    globalDataDocument.Events = new List<Event>()
+                {
+                    InstanceEventObject(documentMetaCUDE, responseCode)
+                };
+                }
+                else
+                    globalDataDocument.Events.Add(InstanceEventObject(documentMetaCUDE, responseCode));
+
+                // upsert document in cosmos
+                var result = CosmosDBService.Instance(documentMeta.EmissionDate).UpdateDocument(globalDataDocument);
+                if (result == null)
+                    return new EventResponse { Code = ((int)EventValidationMessage.Error).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.Error) };
+
+            }
 
             var response = new EventResponse { Code = ((int)EventValidationMessage.Success).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.Success) };
             return response;
@@ -134,7 +180,8 @@ namespace Gosocket.Dian.Functions.Events
                 SenderCode = globalDataDocumentCude.SenderCode,
                 SenderName = globalDataDocumentCude.SenderName,
                 ReceiverCode = globalDataDocumentCude.ReceiverCode,
-                ReceiverName = globalDataDocumentCude.ReceiverName
+                ReceiverName = globalDataDocumentCude.ReceiverName,
+                CancelElectronicEvent = globalDataDocumentCude.CancelElectronicEvent
             };
         }
 
