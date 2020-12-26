@@ -83,6 +83,7 @@ namespace Gosocket.Dian.Domain.Cosmos
         public string SenderName { get; set; }
         public string ReceiverCode { get; set; }
         public string ReceiverName { get; set; }
+        public string CancelElectronicEvent { get; set; }
     }
     public class Reference
     {
