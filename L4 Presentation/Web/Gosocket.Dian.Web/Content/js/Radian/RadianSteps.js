@@ -124,7 +124,7 @@ function RenderTable(paramsObject) {
         }
     });
     $(paramsObject.element + "_filter > label").hide();
-    $(paramsObject.element + "_wrapper").append("<div><span>Mostrando " + paramsObject.ajaxData.Page + " de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.Page, paramsObject.customersTotalCount, paramsObject.data.length));
+    $(paramsObject.element + "_wrapper").append("<div><span class='counter-data'>Mostrando " + paramsObject.ajaxData.Page + " de " + totalPages + " páginas</span>" + TablePagination(paramsObject.ajaxData.Page, paramsObject.customersTotalCount, paramsObject.data.length));
     $(paramsObject.element + "_filter").append(paramsObject.form);
     LoadEventsToSearch(paramsObject);
     LoadEventsToPagiantion(paramsObject);

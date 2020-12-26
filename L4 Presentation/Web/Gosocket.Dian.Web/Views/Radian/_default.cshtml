@@ -58,15 +58,15 @@
 @Html.Partial("_iconsState")
 
 <div id="row-provider" class="row padding-top-10">
-    <div class="col-sm-6 padding-xs-0">
+    <div class="col-sm-7 padding-xs-0">
         <div class="form-group">
             <div class="table-responsive">
                 <table id="table-contributor-files" class="table table-striped">
                     <thead>
                         <tr>
-                            <th class="text-left" style="width: 45%;">Archivo</th>
-                            <th class="text-left" style="width: 30%;">Estado</th>
-                            <th class="text-center" style="width: 25%;"></th>
+                            <th class="text-left" style="width: 40%;">Archivo</th>
+                            <th class="text-left" style="width: 37%;">Estado</th>
+                            <th class="text-center" style="width: 23%;"></th>
                         </tr>
                     </thead>
                     @if (Model.RadianContributorFiles != null && Model.RadianContributorFiles.Count > 0)
@@ -105,9 +105,9 @@
                                         break;
                                 };
                                 <tr data-id="@f.ContributorFileType.Id" data-idFile="@f.Id" class="select-radian-contributor">
-                                    <td width="33%" class="text-left"><span class="fa fa fa-download @(f.ContributorFileStatus.Id != 0 ? "download-contributor-files" : "")" title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span><span>@f.ContributorFileType.Name</span></td>
-                                    <td width="33%" class="text-left init-hide @statusId"><input type="hidden" class="list-change-status" id="status-file-@index" value=""></td>
-                                    <td width="33%" class="text-left init-show">
+                                    <td class="text-left"><span class="fa fa fa-download @(f.ContributorFileStatus.Id != 0 ? "download-contributor-files" : "")" title="Descargar fichero" data-code="@Model.Code" data-fileName="@f.FileName" id="@f.Id"></span><span>@f.ContributorFileType.Name</span></td>
+                                    <td class="text-left init-hide @statusId"><input type="hidden" class="list-change-status" id="status-file-@index" value=""></td>
+                                    <td class="text-left init-show">
                                         <div class="dis-flex">@Html.Raw(label)<span class=""> @f.ContributorFileStatus.Name</span></div>
                                     </td>
                                     <td width="33%" class="text-center edit-state-td">@if(f.ContributorFileStatus.Id != 0){<i class="fa fa-pencil edit-state"></i>}<button type="button" class="btn btn-link edit-state" @(f.ContributorFileStatus.Id == 0 ? "disabled" : "")>Editar</button></td>

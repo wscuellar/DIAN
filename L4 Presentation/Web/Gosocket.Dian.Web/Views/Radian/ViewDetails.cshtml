@@ -136,6 +136,7 @@
 
             $(".jqcs_option").click(function () {
                 var element = this;
+                $(".jqcs_value").css("padding", "0px");
                 var confirmationMessage = bootboxMessage.CHANGE_STATE;
                 var idFile = $(element).parents("tr").attr("data-idFile");
                 var newState = element.dataset.selectValue;

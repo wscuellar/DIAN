@@ -59,7 +59,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         [Display(Name = "Nit Facturador")]
         public string NitSearch { get; set; }
 
-        [Display(Name = "Nombre archivo")]
+        [Display(Name = "Nombre de archivo")]
         public string NameSearch { get; set; }
 
         [Display(Name = "Estado de aprobación")]
