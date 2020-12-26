@@ -124,7 +124,7 @@ namespace Gosocket.Dian.Functions.Radian
                         Url = data.Url
                     };
 
-                    //  await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
+                    await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
 
                     SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
 
