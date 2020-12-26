@@ -88,21 +88,23 @@ namespace Gosocket.Dian.Functions.Radian
 
                     // Step 4  Enable Contributor
 
-                    SetLogger(radianContributor, "Step STA-5.2", " Radiancontributor", "Radiancontributor_01");
+                    SetLogger(null, "Step STA-5.2", " Radiancontributor", "Radiancontributor_01");
                     SetLogger(data, "Step STA-5.1", "data", "data_01");
-                    
-                    contributorService.SetToEnabledRadian(
-                        radianContributor.ContributorId,
-                        radianContributor.RadianContributorTypeId,
-                        data.SoftwareId,
-                        Convert.ToInt32(data.SoftwareType));
+
 
                     SetLogger(null, "Step STA-6", " -- RadianSendToActivateContributor -- " +
                         radianContributor.ContributorId + " "
                         + radianContributor.RadianContributorTypeId + " "
                         + data.SoftwareId + " "
                         + data.SoftwareType
-                        );
+                        , "Step STA-6");
+
+
+                    contributorService.SetToEnabledRadian(
+                        radianContributor.ContributorId,
+                        radianContributor.RadianContributorTypeId,
+                        data.SoftwareId,
+                        Convert.ToInt32(data.SoftwareType));
 
 
                     // Step 5 Contributor Operations
