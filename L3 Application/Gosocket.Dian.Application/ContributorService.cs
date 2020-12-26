@@ -151,7 +151,7 @@ namespace Gosocket.Dian.Application
         public RadianContributorOperation GetRadianOperations(int radianContributorId, string softwareId)
         {
             Guid SoftId = new Guid(softwareId);
-            return sqlDBContext.RadianContributorOperations.FirstOrDefault(p => p.RadianContributorId == radianContributorId && p.SoftwareId == SoftId );
+            return sqlDBContext.RadianContributorOperations.FirstOrDefault(p => p.RadianContributorId == radianContributorId && p.SoftwareId == SoftId);
         }
 
         public Contributor GetByCode(string code, string connectionString)
@@ -475,17 +475,18 @@ namespace Gosocket.Dian.Application
                     Guid softId = new Guid(softwareId);
                     if (radianc.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
                     {
-                        RadianSoftware soft = context.RadianSoftwares.FirstOrDefault(t => t.Id == softId);
+                        RadianSoftware soft = context.RadianSoftwares.FirstOrDefault(t => t.Id.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase));
                         soft.RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted;
                     }
 
                     RadianContributorOperation radianOperation = context.RadianContributorOperations.FirstOrDefault(
                                                  t => t.RadianContributorId == radianc.Id
-                                                 && t.SoftwareType == softwareType 
-                                                 && t.SoftwareId == softId
-                                                 && t.OperationStatusId ==(int) Domain.Common.RadianState.Test
+                                                 && t.SoftwareType == softwareType
+                                                 && t.SoftwareId.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase)
+                                                 && t.OperationStatusId == (int)Domain.Common.RadianState.Test
                                                  );
-                    radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado;
+                    if (radianOperation != null)
+                        radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado;
 
                     context.SaveChanges();
                 }
