@@ -64,6 +64,7 @@ namespace Gosocket.Dian.Functions.Events
                         ((int)EventStatus.Mandato).ToString().PadLeft(3, '0'),
                         ((int)EventStatus.TerminacionMandato).ToString().PadLeft(3, '0'),
                         ((int)EventStatus.NotificacionPagoTotalParcial).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.ValInfoPago).ToString().PadLeft(3, '0'),
                     };
             //Validate response code is implemented
             if (!eventCodesImplemented.Contains(responseCode))
@@ -128,6 +129,7 @@ namespace Gosocket.Dian.Functions.Events
                 DateNumber = int.Parse(DateTime.UtcNow.ToString("yyyyMMdd")),
                 TimeStamp = DateTime.UtcNow,
                 Code = code,
+                CustomizationID = globalDataDocumentCude.CustomizationID,
                 Description = EnumHelper.GetEnumDescription((EventStatus)int.Parse(code)),
                 SenderCode = globalDataDocumentCude.SenderCode,
                 SenderName = globalDataDocumentCude.SenderName,
