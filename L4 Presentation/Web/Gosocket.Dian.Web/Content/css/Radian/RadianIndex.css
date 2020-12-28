@@ -1622,3 +1622,7 @@ a.badge {
 .edit-state-td{
     padding: 0px;
 }
+
+.actions{
+    padding: 0 5px;
+}
