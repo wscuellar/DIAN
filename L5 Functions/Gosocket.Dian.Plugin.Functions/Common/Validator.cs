@@ -1524,7 +1524,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             NitModel nitModel = new NitModel();
             string issuerPartyName = string.Empty;
-            int attorneyLimit = Properties.Settings.Default.MAX_Attorney;
+            int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
             bool validate = true;
             string validateCufeErrorCode = "Regla: 89-(R): ";
             string startDateAttorney = string.Empty;

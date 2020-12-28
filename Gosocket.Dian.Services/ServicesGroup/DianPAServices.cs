@@ -1094,7 +1094,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.StatusCode = Properties.Settings.Default.Code_99;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Error_FieldMandatori;
                     dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios.";
-                    dianResponse.XmlBase64Bytes = null;
+                    dianResponse.XmlBase64Bytes = errors.Any() ? dianResponse.XmlBase64Bytes : null;
                 }
                 var application = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_7AplicattionSendEvent) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 // ZONE APPLICATION
@@ -1592,8 +1592,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID, DianResponse response)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
-            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });            
             if (validations.Count > 0)
             {
                 if(response.ErrorMessage.Count == 0)
