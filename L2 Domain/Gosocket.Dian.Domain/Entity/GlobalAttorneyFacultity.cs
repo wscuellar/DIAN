@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Gosocket.Dian.Domain.Entity
 {
+    [ExcludeFromCodeCoverage]
     public class GlobalAttorneyFacultity : TableEntity
     {
         public GlobalAttorneyFacultity()
