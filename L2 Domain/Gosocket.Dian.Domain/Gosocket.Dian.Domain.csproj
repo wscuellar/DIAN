@@ -171,6 +171,7 @@
     <Compile Include="Entity\GlobalContingency.cs" />
     <Compile Include="Entity\GlobalContributor.cs" />
     <Compile Include="Entity\GlobalContributorActivation.cs" />
+    <Compile Include="Entity\GlobalDocHolderExchange.cs" />
     <Compile Include="Entity\GlobalDocModelFolio.cs" />
     <Compile Include="Entity\GlobalDocPayroll.cs" />
     <Compile Include="Entity\GlobalDocReference.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="Entity\GlobalOseTrackIdMapper.cs" />
     <Compile Include="Entity\GlobalTypeList.cs" />
     <Compile Include="Entity\KeyValue.cs" />
+    <Compile Include="Entity\OtherDocElecCustomerList.cs" />
     <Compile Include="Entity\PagedResultBase.cs" />
     <Compile Include="Entity\EventDataModel.cs" />
     <Compile Include="Entity\RadianContributorOperationWithSoftware.cs" />

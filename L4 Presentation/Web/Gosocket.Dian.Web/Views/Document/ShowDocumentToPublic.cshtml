@@ -1,4 +1,5 @@
-﻿@model Gosocket.Dian.Web.Models.InvoiceNotesViewModel
+﻿@using Gosocket.Dian.Infrastructure
+@model Gosocket.Dian.Web.Models.InvoiceNotesViewModel
 
 @{
     ViewBag.Title = "Detalles del documento";
@@ -9,7 +10,6 @@
 
 @section css
 {
-
     <style>
         .container-md {
             background-color: #fff;
@@ -66,21 +66,6 @@
             </div>
         }
     </div>
-    @*<div class="panel-body padding-top-20">
-            <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
-                <a href="@Url.Action("SearchDocument", "User")" class="btn btn-gosocket btn-lg btn-block margin-top-40">Regresar</a>
-            </div>
-            <div class="col-md-3" style="padding-left: 0;padding-top:7px;"></div>
-            <div class="col-md-3" style="padding-left: 0;padding-top:7px;"></div>
-            @if (Model.GlobalDocValidatorDocument.ValidationStatus != 2)
-            {
-                <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
-                    <a href="@Url.Action("DownloadPDF", "Document", new { trackId = Model.GlobalDocValidatorDocument.GlobalDocumentId})" class="btn btn-gosocket btn-lg btn-block margin-top-40 downloadPDFUrl">
-                        <i class="fa fa-download"></i> Descargar PDF
-                    </a>
-                </div>
-            }
-        </div>*@
 </div>
 <div class="tab-content">
     <div id="modifyWrapper">
@@ -89,7 +74,13 @@
 
 @section scripts{
     @Scripts.Render("~/bundles/jqueryval")
-    
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=@ConfigurationManager.GetValue("Recaptcha")"></script>
+
     <script src="~/Content/js/file-validator.js"></script>
     <script src="~/Content/js/Radian/RadianPrintDocumentPdf.js"></script>
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
@@ -123,7 +114,7 @@
                 }, 200)
             })
 
-            $('#divViewMoreQueryList').hide();
+            $('#divViewMoreQueryList').hide();            
         });
 
         $(function () {
@@ -140,7 +131,7 @@
                         $('#modifyWrapper').html(data);
                         $('#modifyWrapper').fadeIn(300);
                         $('#modifyWrapper').css("margin-top", "-160px");
-                        $('#container1-title').fadeIn(300);                        
+                        $('#container1-title').fadeIn(300);
                         $('#divChildrenModifyWrapper').css("padding-top", "100px");
                         $('[data-toggle="popover"]').popover();
                     }
@@ -177,6 +168,5 @@
                 $('#container1').fadeIn(300);
             }, 500);
         }
-
     </script>
 }

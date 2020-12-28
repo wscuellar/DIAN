@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
@@ -23,7 +24,6 @@ namespace Gosocket.Dian.Web.Controllers
     public class OthersElectronicDocAssociatedController : Controller
     {
         private UserService userService = new UserService();
-
         private ApplicationUserManager _userManager;
         public ApplicationUserManager UserManager
         {
@@ -59,8 +59,8 @@ namespace Gosocket.Dian.Web.Controllers
 
         private OthersElectronicDocAssociatedViewModel DataAssociate(int Id)
         {
+            List<UserViewModel> LegalRepresentativeList = new List<UserViewModel>();
             OtherDocsElectData entity = _othersDocsElecContributorService.GetCOntrinutorODE(Id);
-
             if (entity == null)
             {
                 return new OthersElectronicDocAssociatedViewModel()
@@ -78,6 +78,18 @@ namespace Gosocket.Dian.Web.Controllers
                 };
             }
 
+            
+            if (entity.Step == 3)
+            {
+                LegalRepresentativeList = userService.GetUsers(entity.LegalRepresentativeIds).Select(u => new UserViewModel
+                {
+                    Id = u.Id,
+                    Code = u.Code,
+                    Name = u.Name,
+                    Email = u.Email
+                }).ToList();
+            }
+
             return new OthersElectronicDocAssociatedViewModel()
             {
                 Id = entity.Id,
@@ -92,9 +104,10 @@ namespace Gosocket.Dian.Web.Controllers
                 OperationModeId = entity.OperationModeId,
                 ElectronicDoc = entity.ElectronicDoc,
                 ElectronicDocId = entity.ElectronicDocId,
-                ContibutorType = entity.ContibutorType,
+                ContributorType = entity.ContibutorType,
                 ContibutorTypeId = entity.ContibutorTypeId,
-                SoftwareId = entity.SoftwareId
+                SoftwareId = entity.SoftwareId,
+                LegalRepresentativeList = LegalRepresentativeList 
             };
 
         }
@@ -123,17 +136,29 @@ namespace Gosocket.Dian.Web.Controllers
                 ModelState.AddModelError("", "No existe contribuyente!");
                 return View(new OthersElectronicDocAssociatedViewModel());
             }
+
+            if (model.Step == 3 && model.ContibutorTypeId == 2)
+            {
+                PagedResult<OtherDocElecCustomerList> customers = _othersElectronicDocumentsService.CustormerList(model.Id, string.Empty, OtherDocElecState.none, 1, 10);
+
+                model.Customers = customers.Results.Select(t => new OtherDocElecCustomerListViewModel()
+                {
+                    BussinessName = t.BussinessName,
+                    Nit = t.Nit,
+                    State = t.State,
+                    Page = t.Page,
+                    Lenght = t.Length
+                }).ToList();
+                model.CustomerTotalCount = customers.RowCount;
+            }
+            else
+            {
+                model.Customers = new List<OtherDocElecCustomerListViewModel>();
+                model.CustomerTotalCount = 0;
+            }
             return View(model);
         }
 
-
-        //[HttpPost]
-        //public ActionResult CancelRegister(int ContributorId, int ContributorTypeId, string State, string description)
-        //{
-        //    ResponseMessage response = new ResponseMessage();
-
-        //    return Json(response, JsonRequestBehavior.AllowGet);
-        //}
 
         /// <summary>
         /// Cancelar una asociación de la tabla OtherDocElecContributor, OtherDocElecContributorOperations y OtherDocElecSoftware
@@ -242,6 +267,27 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
- 
+        public ActionResult CustomersList(int ContributorId, string code, OtherDocElecState State, int page, int pagesize)
+        {
+            PagedResult<OtherDocElecCustomerList> customers = _othersElectronicDocumentsService.CustormerList(ContributorId, code, State, page, pagesize);
+
+            List<OtherDocElecCustomerListViewModel> customerModel = customers.Results.Select(t => new OtherDocElecCustomerListViewModel()
+            {
+                BussinessName = t.BussinessName,
+                Nit = t.Nit,
+                State = t.State,
+                Page = t.Page,
+                Lenght = t.Length
+            }).ToList();
+
+            OthersElectronicDocAssociatedViewModel model = new OthersElectronicDocAssociatedViewModel()
+            {
+                CustomerTotalCount = customers.RowCount,
+                Customers = customerModel
+            };
+
+            return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

@@ -371,6 +371,7 @@
     <Compile Include="Models\AutoListModel.cs" />
     <Compile Include="Models\EventsCounterViewModel.cs" />
     <Compile Include="Models\FileHistoryFilterViewModel.cs" />
+    <Compile Include="Models\OtherDocElecCustomerListViewModel.cs" />
     <Compile Include="Models\OtherDocElecSoftwareViewModel.cs" />
     <Compile Include="Models\OtherDocsElectListViewModel.cs" />
     <Compile Include="Models\OthersElectronicDocAssociatedViewModel.cs" />
@@ -2916,6 +2917,9 @@
     <Content Include="Views\OthersElectronicDocAssociated\GetSetTestResult.cshtml" />
     <Content Include="Views\OthersElectronicDocAssociated\_setTestResult.cshtml" />
     <Content Include="Views\OthersElectronicDocAssociated\SetTestDetails.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\_customers.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\_formSearch.cshtml" />
+    <Content Include="Views\OthersElectronicDocAssociated\_usersLegal.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,9 +1,6 @@
 ﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocumentsViewModel
 
 <div class="row">
-    <h4 class="panel-title-radian padding-0"><strong>Datos del software</strong></h4>
-    <hr class="margin-5 margin-bottom-20" />
-
     <div class="col-sm-5 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.ProviderId, new { @class = "control-label" })
@@ -18,28 +15,12 @@
             @Html.ValidationMessageFor(m => m.SoftwareId, "", new { @class = "text-danger" })
         </div>
     </div>
-    @if (Model.OperationModeId != 2)
-    {
-        <div class="col-sm-5 padding-xs-0">
-            <div class="form-group">
-                @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.SoftwareName, new { @class = "form-control input-general fields captureFields" })
-                @Html.ValidationMessageFor(m => m.SoftwareName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        <div class="col-sm-5 padding-xs-0">
-            <div class="form-group">
-                @Html.LabelFor(m => m.PinSW, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.PinSW, new { @class = "form-control input-general fields captureFields" })
-                @Html.ValidationMessageFor(m => m.PinSW, "", new { @class = "text-danger" })
-            </div>
-        </div>
-    }
+
 </div>
 
 <div class="row">
     <h4 class="panel-title-radian padding-0"><strong>Datos del software</strong></h4>
-    <hr class="margin-5 margin-bottom-20" />
+    <hr class="margin-5 margin-bottom-20" style="border-radius: 2px;" />
 
 
     <div class="col-sm-5 padding-xs-0">
@@ -56,4 +37,21 @@
             @Html.ValidationMessageFor(m => m.UrlEventReception, "", new { @class = "text-danger" })
         </div>
     </div>
+    @if (Model.OperationModeId != 2)
+    {
+        <div class="col-sm-5 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.SoftwareName, new { placeholder = "Nombre", @class = "form-control input-general fields captureFields" })
+                @Html.ValidationMessageFor(m => m.SoftwareName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-sm-5 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.PinSW, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.PinSW, new { placeholder = "Pin", @class = "form-control input-general fields captureFields" })
+                @Html.ValidationMessageFor(m => m.PinSW, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    }
 </div>
