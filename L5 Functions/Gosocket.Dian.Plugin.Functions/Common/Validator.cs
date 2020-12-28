@@ -2621,34 +2621,38 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             case (int)EventStatus.SolicitudDisponibilizacion:
-                                //Validacion exista solo una primera disponibilizacion
-                                if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362")
+                                if(document != null)
                                 {
-                                    if (documentMeta.Where(t => t.EventCode == "036" &&
-                                   (t.CustomizationID == "361" || t.CustomizationID == "362")).ToList().Count > decimal.Zero)
+                                    //Validacion exista solo una primera disponibilizacion
+                                    if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362")
                                     {
-                                        validFor = true;
-                                        responses.Add(new ValidateListResponse
+                                        if (documentMeta.Where(t => t.EventCode == "036" &&
+                                       (t.CustomizationID == "361" || t.CustomizationID == "362")).ToList().Count > decimal.Zero)
                                         {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = "Regla: 89-(R): ",
-                                            ErrorMessage = "Ya existe un tipo de instrumento de Primera inscripción de la factura electrónica de venta como título valor",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
-                                    else
-                                    {
-                                        responses.Add(new ValidateListResponse
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = "Regla: 89-(R): ",
+                                                ErrorMessage = "Ya existe un tipo de instrumento de Primera inscripción de la factura electrónica de venta como título valor",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                        else
                                         {
-                                            IsValid = true,
-                                            Mandatory = true,
-                                            ErrorCode = "100",
-                                            ErrorMessage = "Evento referenciado correctamente",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = true,
+                                                Mandatory = true,
+                                                ErrorCode = "100",
+                                                ErrorMessage = "Evento referenciado correctamente",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
                                     }
-                                }                               
+                                }
+                                               
                                 //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
                                 else if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                                 {
