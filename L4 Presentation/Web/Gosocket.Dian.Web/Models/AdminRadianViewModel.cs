@@ -1,15 +1,14 @@
 ﻿using System;
-using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Web.Utils;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
-using System.Linq;
-using System.Web;
 using Gosocket.Dian.Domain;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Gosocket.Dian.Web.Models
 {
+    [ExcludeFromCodeCoverage]
     public class AdminRadianViewModel
     {
         public AdminRadianViewModel()

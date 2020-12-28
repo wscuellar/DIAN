@@ -2,7 +2,6 @@
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
-using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 
