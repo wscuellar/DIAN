@@ -93,7 +93,7 @@
             return this;
         };
 
-        $('.RadianCardContainer').click(function () {
+        $('.RadianCardContainer').click(function () {debugger
             showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
             existingModes.clean("");
             if ($(this).attr('operationMode') === "1" && !existingModes.includes($(this).attr('contributorType')))
