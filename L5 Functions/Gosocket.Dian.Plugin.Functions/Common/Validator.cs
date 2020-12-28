@@ -2621,40 +2621,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             case (int)EventStatus.SolicitudDisponibilizacion:
-                                if(document != null)
-                                {
-                                    //Validacion exista solo una primera disponibilizacion
-                                    if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362")
-                                    {
-                                        if (documentMeta.Where(t => t.EventCode == "036" &&
-                                       (t.CustomizationID == "361" || t.CustomizationID == "362")).ToList().Count > decimal.Zero)
-                                        {
-                                            validFor = true;
-                                            responses.Add(new ValidateListResponse
-                                            {
-                                                IsValid = false,
-                                                Mandatory = true,
-                                                ErrorCode = "Regla: 89-(R): ",
-                                                ErrorMessage = "Ya existe un tipo de instrumento de Primera inscripción de la factura electrónica de venta como título valor",
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                        }
-                                        else
-                                        {
-                                            responses.Add(new ValidateListResponse
-                                            {
-                                                IsValid = true,
-                                                Mandatory = true,
-                                                ErrorCode = "100",
-                                                ErrorMessage = "Evento referenciado correctamente",
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                        }
-                                    }
-                                }
-                                               
-                                //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
-                                else if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
+                                 //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
+                                if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                                 {
                                     //Valida que exista una Primera Disponibilizacion
                                     if (documentMeta.Where(t => t.EventCode == "036" &&
