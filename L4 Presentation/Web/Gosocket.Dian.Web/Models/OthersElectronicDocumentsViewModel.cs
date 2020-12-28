@@ -22,12 +22,12 @@ namespace Gosocket.Dian.Web.Models
         public string SoftwareId { get; set; }
 
         [Display(Name = "Nombre de software")] 
-        [RequiredIf("OperationModeId == 1", ErrorMessage = "{0}1 es requerido")]
+        [Required(ErrorMessage = "{0} 1 es requerido")]
         //Es requerido cuando es softwarepropio
         public string SoftwareName { get; set; }
 
         [Display(Name = "PIN del SW")]
-        [RequiredIf("OperationModeId == 1", ErrorMessage = "{0}2 es requerido")]
+        [Required(ErrorMessage = "{0} 2 es requerido")]
         public string PinSW { get; set; }
         public int ModoOperacionId { get; set; }
 

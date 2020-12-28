@@ -1,0 +1,30 @@
+﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
+
+<div class="radian-personal-info panel-body margin-10">
+    <div class="panel-heading">
+        <h3 class="panel-title-radian padding-0"><b>Lista de representantes legales asociados</b></h3>
+        <hr class="margin-0" />
+    </div>
+
+    <div class="table-responsive padding-top-15">
+        <table id="table-users" class="table-contributor table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+            <thead>
+                <tr style="font-size:16px;">
+                    <th>NIT</th>
+                    <th>Nombre</th>
+                    <th>Correo electrónico</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.LegalRepresentativeList)
+                {
+                    <tr>
+                        <td class="text-nowrap"><a>@user.Code</a></td>
+                        <td class="text-nowrap"><a>@user.Name</a></td>
+                        <td class="text-nowrap"><a>@user.Email</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

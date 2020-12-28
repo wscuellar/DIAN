@@ -571,14 +571,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, GlobalDocValidatorDocumentMeta documentMeta)
         {
             DateTime startDate = DateTime.UtcNow;
             party.TrackId = party.TrackId.ToLower();
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(party.ResponseCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string eventCode = party.ResponseCode;
-            var senderCode = nitModel.SenderCode;
+            string senderCode;
+            //Valida cambio legitimo tenedor
+            if(documentMeta != null 
+                && ((Convert.ToInt16(party.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion 
+                && (party.CustomizationID == "363" || party.CustomizationID == "364")) 
+                || Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad))
+            {
+                senderCode = documentMeta.ReceiverCode;
+            }
+            else
+            {
+                senderCode = nitModel.SenderCode;
+            }
             var receiverCode = nitModel.ReceiverCode;            
             string sender2DvErrorCode = "Regla: 89-(R): ";
             switch (Convert.ToInt16(party.ResponseCode))
@@ -2609,8 +2621,36 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             case (int)EventStatus.SolicitudDisponibilizacion:
+                                //Validacion exista solo una primera disponibilizacion
+                                if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362")
+                                {
+                                    if (documentMeta.Where(t => t.EventCode == "036" &&
+                                   (t.CustomizationID == "361" || t.CustomizationID == "362")).ToList().Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: 89-(R): ",
+                                            ErrorMessage = "Ya existe un tipo de instrumento de Primera inscripción de la factura electrónica de venta como título valor",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }                               
                                 //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
-                                if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
+                                else if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                                 {
                                     //Valida que exista una Primera Disponibilizacion
                                     if (documentMeta.Where(t => t.EventCode == "036" &&
@@ -2650,7 +2690,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             IsValid = false,
                                             Mandatory = true,
                                             ErrorCode = "Regla: 89-(R): ",
-                                            ErrorMessage = "No existe una Primera Disponibilización para este CUFE",
+                                            ErrorMessage = "No existe un tipo de instrumento de Primera inscripción de la factura electrónica de venta como título valor",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
@@ -2757,13 +2797,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
                                 //Solicitud de Disponibilización
-                                else if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
+                                else if (documentMeta.Where(t => t.EventCode == "036" && t.SenderCode == nitModel.SenderCode).ToList().Count > decimal.Zero)
                                 {
                                     var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode);
-                                    if (responseListEndoso.Count > 0)
+                                    if (responseListEndoso != null)
                                     {
-                                        validFor = true;
-                                        //var failedList = new List<string>();
+                                        validFor = true;                                        
                                         foreach (var item in responseListEndoso)
                                         {
                                             responses.Add(new ValidateListResponse
@@ -2891,7 +2930,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "Regla: LGC24-(R): ",
-                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Solicitud de disponibilización",
+                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Inscripción de la factura electrónica de venta como título valor",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }

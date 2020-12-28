@@ -23,6 +23,7 @@ namespace Gosocket.Dian.Domain.Entity
         public string PinSW { get; set; }
         public string StateSoftware { get; set; }
 
+        public List<string> LegalRepresentativeIds { get; set; }
         public string StateContributor { get; set; }
         public string Url { get; set; }
         public DateTime CreatedDate { get; set; }

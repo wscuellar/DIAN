@@ -77,11 +77,13 @@ namespace Gosocket.Dian.Domain.Cosmos
         public int DateNumber { get; set; }
         public DateTime TimeStamp { get; set; }
         public string Code { get; set; }
+        public string CustomizationID { get; set; }
         public string Description { get; set; }
         public string SenderCode { get; set; }
         public string SenderName { get; set; }
         public string ReceiverCode { get; set; }
         public string ReceiverName { get; set; }
+        public string CancelElectronicEvent { get; set; }
     }
     public class Reference
     {

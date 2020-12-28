@@ -20,13 +20,13 @@ namespace Gosocket.Dian.Application
     {
         private SqlDBContext sqlDBContext;
         private readonly IContributorService _contributorService;
-        private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
-
+        private readonly IOthersDocsElecContributorService _othersDocsElecContributorService; 
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
-        private readonly IOthersDocsElecContributorRepository _othersDocsElecContributorRepository;
-        private readonly IOthersDocsElecContributorOperationRepository _othersDocsElecContributorOperationRepository;
         private readonly IGlobalOtherDocElecOperationService _globalOtherDocElecOperationService;
         private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
+
+        private readonly IOthersDocsElecContributorRepository _othersDocsElecContributorRepository;
+        private readonly IOthersDocsElecContributorOperationRepository _othersDocsElecContributorOperationRepository;
 
         public OthersElectronicDocumentsService(IContributorService contributorService,
             IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
@@ -123,6 +123,13 @@ namespace Gosocket.Dian.Application
             entity.Step = step;
             _othersDocsElecContributorRepository.AddOrUpdate(entity);
             return true;
+        }
+
+        public PagedResult<OtherDocElecCustomerList> CustormerList(int ContributorId, string code, OtherDocElecState State, int page, int pagesize)
+        {
+            string StateText = State != OtherDocElecState.none ? State.GetDescription() : string.Empty;
+            PagedResult<OtherDocElecCustomerList> customers = _othersDocsElecContributorRepository.CustomerList(ContributorId, code, StateText, page, pagesize);
+            return customers;
         }
 
 
