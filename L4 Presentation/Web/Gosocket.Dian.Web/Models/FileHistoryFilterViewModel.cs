@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Gosocket.Dian.Web.Models
 {
+    [ExcludeFromCodeCoverage]
     public class FileHistoryFilterViewModel
     {
 
