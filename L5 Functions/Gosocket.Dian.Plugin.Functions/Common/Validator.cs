@@ -1524,7 +1524,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             NitModel nitModel = new NitModel();
             string issuerPartyName = string.Empty;
-            int attorneyLimit = Properties.Settings.Default.MAX_Attorney;
+            int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
             bool validate = true;
             string validateCufeErrorCode = "Regla: 89-(R): ";
             string startDateAttorney = string.Empty;
@@ -2621,7 +2621,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             case (int)EventStatus.SolicitudDisponibilizacion:
-                                //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
+                                 //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
                                 if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                                 {
                                     //Valida que exista una Primera Disponibilizacion
@@ -2662,7 +2662,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             IsValid = false,
                                             Mandatory = true,
                                             ErrorCode = "Regla: 89-(R): ",
-                                            ErrorMessage = "No existe una Primera Disponibilización para este CUFE",
+                                            ErrorMessage = "No existe un tipo de instrumento de Primera inscripción de la factura electrónica de venta como título valor",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
@@ -2772,10 +2772,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 else if (documentMeta.Where(t => t.EventCode == "036" && t.SenderCode == nitModel.SenderCode).ToList().Count > decimal.Zero)
                                 {
                                     var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode);
-                                    if (responseListEndoso.Count > 0)
+                                    if (responseListEndoso != null)
                                     {
-                                        validFor = true;
-                                        //var failedList = new List<string>();
+                                        validFor = true;                                        
                                         foreach (var item in responseListEndoso)
                                         {
                                             responses.Add(new ValidateListResponse
@@ -2795,7 +2794,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         if (eventPrev.EventCode == "038")
                                         {
                                             if (documentMeta
-                                               .Where(t => t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                               .Where(t => t.EventCode == "039" || t.EventCode == "041").ToList()
                                                .Count > decimal.Zero)
                                             {
                                                 validFor = true;
@@ -2824,7 +2823,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         else if (eventPrev.EventCode == "039")
                                         {
                                             if (documentMeta
-                                                  .Where(t => t.EventCode == "038" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                                  .Where(t => t.EventCode == "038" || t.EventCode == "041").ToList()
                                                   .Count > decimal.Zero)
                                             {
                                                 validFor = true;
@@ -2853,7 +2852,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         else if (eventPrev.EventCode == "037")
                                         {
                                             if (documentMeta
-                                                 .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                                 .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041").ToList()
                                                  .Count > decimal.Zero)
                                             {
                                                 validFor = true;
@@ -2903,7 +2902,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "Regla: LGC24-(R): ",
-                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Solicitud de disponibilización",
+                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Inscripción de la factura electrónica de venta como título valor",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -2911,7 +2910,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             //Validación de la existencia de Endosos y Limitaciones TASK  730
                             case (int)EventStatus.InvoiceOfferedForNegotiation:
                                 if (documentMeta
-                                    .Where(t => t.EventCode == "037" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                    .Where(t => t.EventCode == "037" || t.EventCode == "041").ToList()
                                     .Count > decimal.Zero)
                                 {
                                     validFor = true;
@@ -2927,7 +2926,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 //Anulacion de Endoso solo aplica para Endoso en Garantia o Endoso en Procuracion
                                 else if (documentMeta
-                                .Where(t => t.EventCode == "038" || t.EventCode == "039" && t.Identifier == document.PartitionKey).ToList()
+                                .Where(t => t.EventCode == "038" || t.EventCode == "039").ToList()
                                 .Count > decimal.Zero)
                                 {
                                     responses.Add(new ValidateListResponse

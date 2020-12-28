@@ -29,13 +29,6 @@
     .set-test-counts .modal .panel-body {
         padding-left: 50px;
     }
-    .file-input-disabled {
-        position: relative;
-        width: 28%;
-    }
-    .file-input-disabled input{
-        padding-right: 30px;
-    }
 }
 
 @media (max-width: 1299px) {

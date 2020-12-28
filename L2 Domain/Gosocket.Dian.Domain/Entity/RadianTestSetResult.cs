@@ -380,7 +380,22 @@ namespace Gosocket.Dian.Domain.Entity
         /// Terminación limitación - Total Rechazados
         /// </summary>
         public int EndCirculationLimitationRejected { get; set; }
-
+        /// <summary>
+        /// Endoso - Total aceptados requeridos
+        /// </summary>
+        public int EndorsementTotalAcceptedRequired { get; set; }
+        /// <summary>
+        /// Endoso en garantía - Total requeridos
+        /// </summary>
+        public int EndorsementWarrantyTotalRequired { get; set; }
+        /// <summary>
+        /// Endoso en garantía - Total aceptados requeridos
+        /// </summary>
+        public int EndorsementWarrantyTotalAcceptedRequired { get; set; }
+        /// <summary>
+        /// Endoso en procuración - Total aceptados requeridos
+        /// </summary>
+        public int EndorsementProcurationTotalRequired { get; set; }
 
         public string StatusDescription { get; set; }
         public int Status { get; set; }

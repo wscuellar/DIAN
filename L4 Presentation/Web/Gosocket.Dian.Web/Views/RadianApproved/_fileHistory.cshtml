@@ -15,11 +15,11 @@
 <table id="table-history" class="table table-striped" style="width:100%" data-order='[[ 1, "des" ]]'>
     <thead>
         <tr>
-            <th>Nombre</th>
+            <th class="text-left-radian">Nombre de archivo</th>
             <th>Fecha</th>
-            <th>Usuario</th>
-            <th>Estado</th>
-            <th>Detalle</th>
+            <th class="text-left-radian">Usuario</th>
+            <th class="text-left-radian">Estado</th>
+            <th class="text-left-radian">Detalle</th>
         </tr>
     </thead>
     <tbody>
@@ -61,11 +61,11 @@
                     break;
             };
             <tr>
-                <td>@d.FileName</td>
+                <td class="text-left-radian">@d.FileName</td>
                 <td>@d.Updated.ToString("MM/dd/yyyy")</td>
-                <td>@d.CreatedBy</td>
-                <td class="@statusId">@Html.Raw(label) @test</td>
-                <td>@d.Comments</td>
+                <td class="text-left-radian">@d.CreatedBy</td>
+                <td class="@statusId text-left-radian">@Html.Raw(label) @test</td>
+                <td class="text-left-radian">@d.Comments</td>
 
             </tr>
         }

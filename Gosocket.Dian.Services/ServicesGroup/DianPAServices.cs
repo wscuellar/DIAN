@@ -804,31 +804,31 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var approveCufe = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_ValidateParty) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
           
             // Auth
-            start = DateTime.UtcNow;
-            //Si no es un endoso en blanco valida autorizacion
-            if(listId != "2")
-            {
-                string listIdMessage = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
+            //start = DateTime.UtcNow;
+            ////Si no es un endoso en blanco valida autorizacion
+            //if(listId != "2")
+            //{
+            //    string listIdMessage = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
 
-                var authEntity = GetAuthorization(senderCode, authCode);
-                if (authEntity == null)
-                {
-                    dianResponse.XmlFileName = Properties.Settings.Default.Param_ApplicationResponse;
-                    dianResponse.StatusCode = Properties.Settings.Default.Code_89;
-                    dianResponse.StatusDescription = listIdMessage;                    
-                    var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-                    if (globalEnd >= 10)
-                    {
-                        var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Auth };
-                        TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
-                    }
-                    UpdateInTransactions(trackId, eventCode);
+            //    var authEntity = GetAuthorization(senderCode, authCode);
+            //    if (authEntity == null)
+            //    {
+            //        dianResponse.XmlFileName = Properties.Settings.Default.Param_ApplicationResponse;
+            //        dianResponse.StatusCode = Properties.Settings.Default.Code_89;
+            //        dianResponse.StatusDescription = listIdMessage;                    
+            //        var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
+            //        if (globalEnd >= 10)
+            //        {
+            //            var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Auth };
+            //            TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+            //        }
+            //        UpdateInTransactions(trackId, eventCode);
 
-                    return dianResponse;
-                }
-            }
+            //        return dianResponse;
+            //    }
+            //}
            
-            var auth = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Auth3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+            //var auth = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Auth3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // Auth
 
             // Validate serie
@@ -859,7 +859,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             unzip.PartitionKey = trackIdCude;
             parser.PartitionKey = trackIdCude;
-            auth.PartitionKey = trackIdCude;
+            //auth.PartitionKey = trackIdCude;
             zone1.PartitionKey = trackIdCude;
             zone2.PartitionKey = trackIdCude;
             zone3.PartitionKey = trackIdCude;
@@ -1010,7 +1010,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var failedList = new List<string>();
                     foreach (var f in errors)
                         failedList.Add($"Regla: {f.ErrorCode}, Rechazo: {f.ErrorMessage}");
-                    flagMeta = true;
+                    
                     dianResponse.IsValid = false;
                     dianResponse.StatusMessage = Properties.Settings.Default.Msg_Error_FieldMandatori;
                     dianResponse.ErrorMessage.AddRange(failedList);
@@ -1046,7 +1046,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse.XmlDocumentKey = trackIdCude;
 
                 GlobalDocValidatorDocument validatorDocument = null;
-                //Registra Mandato
+                //Registra Mandato, no hay errores validation y el CUDE esta bien armado
                 if(!errors.Any() && Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && !flag)
                 {
                     var documentReferenceAttorney = ValidationReferenceAttorney(trackIdCude);
@@ -1064,7 +1064,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     }
                 }
 
-                if (dianResponse.IsValid)
+                if (dianResponse.IsValid && !flagMeta)
                 {
                     dianResponse.StatusCode = Properties.Settings.Default.Code_00;
                     dianResponse.StatusMessage = message;
@@ -1094,6 +1094,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.StatusCode = Properties.Settings.Default.Code_99;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Error_FieldMandatori;
                     dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios.";
+                    dianResponse.XmlBase64Bytes = errors.Any() ? dianResponse.XmlBase64Bytes : null;
                 }
                 var application = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_7AplicattionSendEvent) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 // ZONE APPLICATION
@@ -1104,7 +1105,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     TableManagerGlobalLogger.InsertOrUpdateAsync(unzip),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(parser),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(auth),
+                    //TableManagerGlobalLogger.InsertOrUpdateAsync(auth),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(duplicity),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(upload),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validate),
@@ -1118,7 +1119,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validateParty),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validateSinginTime)
                 };
-                if (dianResponse.IsValid && !existDocument)
+                if (dianResponse.IsValid && !existDocument && !flagMeta)
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
                 
                 if(!flag)
@@ -1133,7 +1134,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 }
 
                 //Elimina informacion de la GlobalDocValidatorDocumentMeta si hay error en los plugIn
-                if (flagMeta)
+                if (flagMeta || (errors.Any()))
                     DeleteTransactions(trackIdCude);
                 Task.WhenAll(arrayTasks);
 
@@ -1591,10 +1592,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID, DianResponse response)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
-
-
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });            
             if (validations.Count > 0)
             {
                 if(response.ErrorMessage.Count == 0)
