@@ -19,6 +19,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Gosocket.Dian.Domain.Entity;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -151,7 +152,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.Page = Page;
             model.Users = this.LoadExternalUsersViewBags(uCompany.Code, model.Page, 10);
-            
+
             ViewBag.ExternalUsersList = model.Users;
 
             return View(model);
@@ -216,7 +217,7 @@ namespace Gosocket.Dian.Web.Controllers
             //var userExt2 = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id)).ToList();
 
             //ViewBag.Menu = this.MenuApp();
-            ViewBag.Menu = _permisionService.GetAppMenu().Select(m =>
+            ViewBag.Menu = _permisionService.GetAppMenu(Roles.UsuarioExterno).Select(m =>
                 new MenuViewModel
                 {
                     Id = m.Id,
@@ -224,7 +225,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Title = m.Title,
                     Description = m.Description,
                     Icon = m.Icon,
-                    Options = _permisionService.GetSubMenusByMenuId(m.Id).Select(s =>
+                    Options = _permisionService.GetSubMenusByMenuId(m.Id, Roles.UsuarioExterno).Select(s =>
                         new SubMenuViewModel()
                         {
                             Id = s.Id,
@@ -325,7 +326,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 //validar si ya existe un Usuario con el tipo documento y documento suministrados
-                var vUserDB = userService.FindUserByIdentificationAndTypeId(model.IdentificationTypeId, model.IdentificationId);
+                var vUserDB = userService.FindUserByIdentificationAndTypeId(model.Id, model.IdentificationTypeId, model.IdentificationId);
 
                 if (vUserDB != null)
                 {
@@ -555,6 +556,42 @@ namespace Gosocket.Dian.Web.Controllers
             emailService.SendEmail(email, "DIAN - Cambio de Estado de Usuario Registrado", dic);
 
             return true;
+        }
+
+        [HttpPost]
+        public JsonResult ValidateExistsUserExternal(ExternalUserViewModel model)
+        {
+            var smsresult = String.Empty;
+
+            if (!ModelState.IsValid)
+            {
+                IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var item in allErrors)
+                    smsresult = smsresult + item.ErrorMessage + ".";
+
+                if (!string.IsNullOrEmpty(smsresult))
+                    return Json(new { smsresult }, JsonRequestBehavior.AllowGet);
+            }
+
+
+            //validar si ya existe un Usuario con el tipo documento y documento suministrados
+            var vUserDB = userService.FindUserByIdentificationAndTypeId(model.Id, model.IdentificationTypeId, model.IdentificationId);
+
+            if (vUserDB != null)
+            {
+                smsresult = "Ya existe un Usuario con el Tipo de Documento y Documento suministrados";
+                return Json(new { smsresult }, JsonRequestBehavior.AllowGet);
+            }
+
+            vUserDB = userService.FindUserByEmail(model.Id, model.Email);
+
+            if (vUserDB != null)
+            {
+                smsresult = "Ya existe un Usuario con el Email en el sistema";
+                return Json(new { smsresult }, JsonRequestBehavior.AllowGet);
+            }
+            
+            return Json(new { smsresult }, JsonRequestBehavior.AllowGet);
         }
 
     }

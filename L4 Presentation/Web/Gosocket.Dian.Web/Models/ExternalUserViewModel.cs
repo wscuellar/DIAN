@@ -36,7 +36,7 @@ namespace Gosocket.Dian.Web.Models
         public int IdentificationTypeId { get; set; }
 
         [DataType(DataType.Text)]
-        [Display(Name = "Número de identificaión")]
+        [Display(Name = "Número de identificación")]
         [Required(ErrorMessage = "{0} es requerido.")]
         [MaxLength(30, ErrorMessage = "Solo se permiten 30 caracteres")]
         [RegularExpression(@"^[0-9]+$", ErrorMessage = "Solo se permiten números 0-9")]
