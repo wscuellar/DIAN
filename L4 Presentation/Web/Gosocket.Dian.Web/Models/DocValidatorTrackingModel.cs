@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Gosocket.Dian.Web.Models
 {
+    [ExcludeFromCodeCoverage]
     public class DocValidatorModel
     {
         public DocValidatorModel()
