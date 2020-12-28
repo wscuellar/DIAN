@@ -691,6 +691,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         events = TableManagerGlobalDocValidatorDocumentMeta.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId, "96");
                         if(events != null && events.Count > 0)
                         {
+                            events = events.OrderBy(x => x.SigningTimeStamp).ToList();
                             events.ForEach(e =>
                             {
                                 // se consulta el evento por el código y así obtener su descripción.
@@ -719,7 +720,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     Task.WhenAll(arrayTasks).Wait();
 
                     var applicationResponse = XmlUtilEvents.GetApplicationResponseIfExist(documentMeta);
-                    response.XmlBase64Bytes = applicationResponse ?? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations);
+                    //response.XmlBase64Bytes = applicationResponse ?? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations);
+                    response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations) : null;
 
                     response.XmlDocumentKey = trackId;
                     response.XmlFileName = documentMeta.FileName;

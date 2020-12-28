@@ -248,7 +248,7 @@ namespace Gosocket.Dian.Services.Utils
                             new XElement(cbc + "RegistrationName", $"{originalEvent.ReceiverName}"),
                             new XElement(cbc + "CompanyID", $"{originalEvent.ReceiverCode}",
                                 new XAttribute("schemeID", $"{originalEvent.ReceiverTypeCode}"),
-                                new XAttribute("schemeName", $"{originalEvent.SenderSchemeCode}")),
+                                new XAttribute("schemeName", $"{originalEvent.ReceiverSchemeCode}")),
                             new XElement(cac + "TaxScheme",
                                 new XElement(cbc + "ID", "01"),
                                 new XElement(cbc + "Name", "IVA"))));
