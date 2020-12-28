@@ -41,6 +41,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
+        private readonly RadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
 
         #region Constructor
@@ -274,14 +275,14 @@ namespace Gosocket.Dian.Web.Controllers
         {
             string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
             byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
-            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
+            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
 
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
-            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
+            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
 
