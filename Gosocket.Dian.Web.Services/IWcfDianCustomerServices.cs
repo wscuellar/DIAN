@@ -38,6 +38,15 @@ namespace Gosocket.Dian.Web.Services
         [CustomOperation]
         List<DianResponse> GetStatusZip(string trackId);
 
+        /// <summary>
+        /// Obtener los eventos asociados a una factura por medio del trackId.
+        /// </summary>
+        /// <param name="trackId" type="string"></param>
+        /// <returns></returns>
+        [OperationContract]
+        [CustomOperation]
+        DianResponse GetStatusEvent(string trackId);
+
 
         /// <summary>
         /// 
