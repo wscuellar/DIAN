@@ -9,7 +9,7 @@ namespace Gosocket.Dian.Interfaces.Services
         /// Obtener todo el Menu de la aplicación
         /// </summary>
         /// <returns></returns>
-        List<Menu> GetAppMenu();
+        List<Menu> GetAppMenu(string RolName);
 
         /// <summary>
         /// Agregar o actualizar los permisos por Usuario externo
@@ -18,6 +18,6 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <returns></returns>
         int AddOrUpdate(List<Permission> permissionList);
         List<Permission> GetPermissionsByUser(string userId);
-        List<SubMenu> GetSubMenusByMenuId(int menuId);
+        List<SubMenu> GetSubMenusByMenuId(int menuId, string RolName);
     }
 }
