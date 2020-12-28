@@ -171,11 +171,13 @@
     <Compile Include="Entity\GlobalContingency.cs" />
     <Compile Include="Entity\GlobalContributor.cs" />
     <Compile Include="Entity\GlobalContributorActivation.cs" />
+    <Compile Include="Entity\GlobalDocHolderExchange.cs" />
     <Compile Include="Entity\GlobalDocEvent.cs" />
     <Compile Include="Entity\GlobalDocModelFolio.cs" />
     <Compile Include="Entity\GlobalDocPayroll.cs" />
     <Compile Include="Entity\GlobalDocReference.cs" />
     <Compile Include="Entity\GlobalDocReferenceAttorney.cs" />
+    <Compile Include="Entity\GlobalDocRegisterProviderAR.cs" />
     <Compile Include="Entity\GlobalDocValidatorDocument.cs" />
     <Compile Include="Entity\GlobalDataDocument.cs" />
     <Compile Include="Entity\GlobalDocumentType.cs" />
@@ -188,10 +190,12 @@
     <Compile Include="Entity\GlobalLogger.cs" />
     <Compile Include="Entity\GlobalNumberRange.cs" />
     <Compile Include="Entity\GlobalBatchFileResult.cs" />
+    <Compile Include="Entity\GlobalOtherDocElecOperation.cs" />
     <Compile Include="Entity\GlobalRadianOperations.cs" />
     <Compile Include="Entity\GlobalRejectedDocument.cs" />
     <Compile Include="Entity\GlobalSoftware.cs" />
     <Compile Include="Entity\GlobalTask.cs" />
+    <Compile Include="Entity\GlobalTestSetOthersDocumentsResult.cs" />
     <Compile Include="Entity\GlobalTestSetOthersDocuments.cs" />
     <Compile Include="Entity\GlobalTestSetResult.cs" />
     <Compile Include="Entity\GlobalTestSet.cs" />
@@ -203,6 +207,7 @@
     <Compile Include="Entity\GlobalOseTrackIdMapper.cs" />
     <Compile Include="Entity\GlobalTypeList.cs" />
     <Compile Include="Entity\KeyValue.cs" />
+    <Compile Include="Entity\OtherDocElecCustomerList.cs" />
     <Compile Include="Entity\PagedResultBase.cs" />
     <Compile Include="Entity\EventDataModel.cs" />
     <Compile Include="Entity\RadianContributorOperationWithSoftware.cs" />

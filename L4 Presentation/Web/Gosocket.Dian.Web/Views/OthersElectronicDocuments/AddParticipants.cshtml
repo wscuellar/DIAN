@@ -36,7 +36,6 @@
             color: #fff !important;
         }
 
-
     </style>
 }
 <div class="page-content radian-view margin-20">
@@ -58,25 +57,25 @@
             <div class="row-fluid">
 
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="card RadianCardContainer pull-left" style="width: 92% !important; height: 240px !important;" id="1" ContributorIdType="1" Participantetexto="Emisor">
-                        <div class="RadianImgContainer">
+                    <div class="card RadianCardContainer pull-left" style="width: 90% !important; height: 244px !important;" id="1" ContributorIdType="1" Participantetexto="Emisor">
+                        <div class="RadianImgContainer" style="margin:10px;">
                             <img class="RadianimgSvg" src="~/Content/images/Svg/Emisor.svg" />
                         </div>
                         <div class="card-body">
                             <p class="RadianTittleCard">Emisor</p>
-                            <p class="RadianTittleCard2">Otros documentos electrónicos</p>
+                            <p class="RadianTittleCard2" style="margin-top: -8px !important;">Otros documentos electrónicos</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="card RadianCardContainer pull-right" style="width: 92% !important; height: 240px !important;" ContributorIdType="2" Participantetexto="Proveedor Tecnológico">
-                        <div class="RadianImgContainer">
+                    <div class="card RadianCardContainer pull-right" style="width: 90% !important; height: 244px !important;" ContributorIdType="2" Participantetexto="Proveedor Tecnológico">
+                        <div class="RadianImgContainer" style="margin:10px;">
                             <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologicoII.svg" />
                         </div>
                         <div class="card-body">
                             <p class="RadianTittleCard">Proveedor Tecnológico</p>
-                            <p class="RadianTittleCard2">Otros Documentos Electrónicos</p>
+                            <p class="RadianTittleCard2" tyle="margin-top: -8px !important;">Otros Documentos Electrónicos</p>
                         </div>
                     </div>
                 </div>
@@ -95,7 +94,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body" style="padding-left: 1px !important;display: block; width: 95% !important;">
+                    <div class="modal-body" style="padding-left: 1px !important;display: block; width: 100% !important;">
                         <div class="row" style="margin-left: 8px; margin-top: 20px;">
                             <div class="col-md-10 col-lg-10">
                                 @Html.DropDownList("OperationMode", (IEnumerable<SelectListItem>)ViewBag.ListOperationMode, "Seleccione un modo de operación", new { @class = "form-control selectpicker" })

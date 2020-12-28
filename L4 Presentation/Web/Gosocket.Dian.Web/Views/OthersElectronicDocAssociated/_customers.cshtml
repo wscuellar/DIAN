@@ -1,0 +1,33 @@
+﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
+@{
+    ViewBag.title = "Ver mis clientes asociados";
+}
+<div class="page-content radian-view margin-15">
+    <div class="row title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+</div>
+
+<table id="table-customers" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>Nit</th>
+            <th>Razon Social</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @*@foreach (var d in Model.Customers)
+            {
+                <tr>
+                    <td>@d.Nit</td>
+                    <td>@d.BussinessName</td>
+                    <td>@d.RadianState</td>>
+                </tr>
+            }*@
+    </tbody>
+</table>
+

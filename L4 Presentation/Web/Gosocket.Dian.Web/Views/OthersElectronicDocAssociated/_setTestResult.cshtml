@@ -1,0 +1,111 @@
+﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" }, { "readonly", "true" } };}
+
+@section css
+{
+    <style type="text/css">
+ 
+        hr {
+            margin-top: 20px !important;
+            margin-bottom: 20px !important;
+            border: 1px !important;
+            border-top: 2px solid #E9E8E8 !important;
+        }
+    </style>
+}
+<div class="row">
+    <h4 class="panel-title-radian padding-0"><strong>Datos del modo de operación</strong></h4>
+    <hr class="margin-5 margin-bottom-20" />
+
+    <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+        <div class="form-group">
+            @Html.Label("Modo de operación", new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.OperationModeName, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-12 col-xs-12 col-md-3 padding-xs-0">
+        <div class="form-group">
+            @Html.Label("Descripción", new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.StatusDescription, defaultHtmlAttr)
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h4 class="panel-title-radian padding-0"><strong>Datos del modo de operación</strong></h4>
+    <hr class="margin-5 margin-bottom-20" />
+
+    <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+        <div class="form-group">
+            @Html.Label("Identificación", new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Software.Id, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+        <div class="form-group">
+            @Html.Label("Nombre", new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Software.Name, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+        <div class="form-group">
+            @Html.Label("Pin", new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Software.Pin, defaultHtmlAttr)
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h4 class="panel-title-radian padding-0"><strong>Total de documentos requeridos</strong></h4>
+    <hr class="margin-5 margin-bottom-20" />
+
+    <div class="col-sm-6 col-xs-12 col-md-2  padding-xs-0">
+        <div class="form-group">
+            @Html.Label("Documentos  (Total)", new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.TotalDocumentRequired, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+        <div class="form-group">
+            @Html.Label(Model.TitleDoc1, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.OthersDocumentsRequired, defaultHtmlAttr)
+        </div>
+    </div>
+    @if (Model.EsElectronicDocNomina == true)
+    {
+        <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+            <div class="form-group">
+                @Html.Label(Model.TitleDoc2, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.ElectronicPayrollAjustmentRequired, defaultHtmlAttr)
+            </div>
+        </div>
+    }
+</div>
+
+<div class="row">
+    <h4 class="panel-title-radian padding-0"><strong>Total de documentos aceptados requeridos</strong></h4>
+    <hr class="margin-5 margin-bottom-20" />
+
+    <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+        <div class="form-group">
+            @Html.Label("Documentos  (Total)", new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.TotalDocumentAcceptedRequired, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+        <div class="form-group">
+            @Html.Label(Model.TitleDoc1, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.OthersDocumentsAcceptedRequired, defaultHtmlAttr)
+        </div>
+    </div>
+    @if (Model.EsElectronicDocNomina == true)
+    {
+        <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+            <div class="form-group">
+                @Html.Label(Model.TitleDoc2, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.ElectronicPayrollAjustmentAcceptedRequired, defaultHtmlAttr)
+            </div>
+        </div>
+    }
+</div>
+

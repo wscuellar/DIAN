@@ -99,6 +99,11 @@ namespace Gosocket.Dian.Web.Controllers
 
             ViewBag.Title = $"Asociar modo de operación {model.OperationMode}";
 
+            if (model.OperationModeId == 2)
+            {
+                model.SoftwareName = " ";
+                model.PinSW = " ";
+            }
             return View(model);
         }
 
@@ -107,6 +112,12 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
+
+            GlobalTestSetOthersDocuments testSet = null;
+
+            testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocumentId);
+            if (testSet == null)
+                return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
             if (!ModelState.IsValid)
             {

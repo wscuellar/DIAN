@@ -1,8 +1,6 @@
-﻿using Gosocket.Dian.Domain.Sql;
+﻿using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Gosocket.Dian.Domain.Sql;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
@@ -16,5 +14,6 @@ namespace Gosocket.Dian.Interfaces.Services
         bool ChangeParticipantStatus(int contributorId, string newState, int ContributorTypeId, string actualState, string description);
 
         bool ChangeContributorStep(int ContributorId, int step);
+        PagedResult<OtherDocElecCustomerList> CustormerList(int ContributorId, string code, OtherDocElecState nState, int page, int pagesize);
     }
 }

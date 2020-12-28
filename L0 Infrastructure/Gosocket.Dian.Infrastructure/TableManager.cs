@@ -433,6 +433,27 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+        public List<T> FindDocumentRegisterAR<T>(string providerCode, string documentTypeId, string serieandNumber) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    providerCode),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("SerieAndNumber",
+              QueryComparisons.Equal,
+              serieandNumber));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
         public List<T> FindpartitionKey<T>(string partitionKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
@@ -505,6 +526,33 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
+        public List<T> FindDocumentReferenced_EventCode_TypeIdNotPartitionKey<T>(string documentReferencedKey, string documentTypeId, string eventCode, string partitionKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
+                    QueryComparisons.Equal,
+                    documentReferencedKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("DocumentTypeId",
+                    QueryComparisons.Equal,
+                    documentTypeId));
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
+               QueryComparisons.Equal,
+               eventCode));
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("PartitionKey",
+               QueryComparisons.NotEqual,
+               partitionKey));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+
         public List<T> FindDocumentReferenced_EventCode_TypeId_CustomizationID<T>(string documentReferencedKey, string documentTypeId, string eventCode, string customizationId, string customizationId2) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -839,12 +887,22 @@ namespace Gosocket.Dian.Infrastructure
             prefixCondition = TableQuery.CombineFilters(
                 prefixCondition,
                 TableOperators.And,
-                TableQuery.GenerateFilterCondition("RadianStatus",
+                TableQuery.GenerateFilterCondition("RadianState",
                     QueryComparisons.Equal,
                     radianStatus));
 
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
+
+        public T FindByTestSetId<T>(string TestSetId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("Id", QueryComparisons.Equal, TestSetId));
+
+            var entities = CloudTable.ExecuteQuery(query);
 
             return entities.FirstOrDefault();
         }

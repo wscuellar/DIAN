@@ -115,7 +115,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Factura Electronica.
+        ///   Busca una cadena traducida similar a Factura Electrónica.
         /// </summary>
         public static string Event_DocumentType {
             get {
@@ -133,7 +133,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Referencias del Evento.
+        ///   Busca una cadena traducida similar a Referencias del evento.
         /// </summary>
         public static string Event_ReferenceTitle {
             get {
@@ -169,7 +169,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Validaciones del Evento.
+        ///   Busca una cadena traducida similar a Validaciones del evento.
         /// </summary>
         public static string Event_ValidationTitle {
             get {
@@ -313,7 +313,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Constancia de Recibo de mercancia.
+        ///   Busca una cadena traducida similar a Constancia de Recibo de mercancía.
         /// </summary>
         public static string Receipt {
             get {

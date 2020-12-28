@@ -1,6 +1,7 @@
 ﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
+@using Newtonsoft.Json
 @{
-    ViewBag.Title = Model.ContibutorType + " de " + Model.ElectronicDoc;
+    ViewBag.Title = Model.ContributorType + " de " + Model.ElectronicDoc;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -187,7 +188,14 @@
             margin-top: 20px;
             min-height: auto !important;
             margin: 0px !important;
+            -webkit-border-radius: 0px !important;
+            border-radius: 0px !important;
         }
+
+        .panel-footer {
+            padding: 15px 15px !important;
+        }
+
     </style>
 }
 <div class="page-content radian-view margin-20">
@@ -200,41 +208,50 @@
     <div class="row margin-horizontal-0 margin-top-50">
         <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
             <div class="padding-top-20">
+                <div class="margin-20 padding-bottom-25">
+                    <div id="steps-otherdocELectAssociate">
+                        <div class="radian-personal-info panel-body ">
 
-                <div id="steps-otherdocELectAssociate" style="margin:0px !important;">
-                    <div class="radian-personal-info panel-body ">
-                        @Html.Partial("_personalInfo")
+                        </div>
+                        <h3><span class="name-state">Ingreso de solicitud</span></h3>
+                        <section>
+                        </section>
+                        <h3><span class="name-state">En Pruebas</span></h3>
+                        <section>
+                            @Html.Partial("_personalInfo")
+                            <div class="panel-footer text-right">
+                                
+                                    <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
+                                    <button name="Submit" class="btn btn-radian-success submit-button">Enviar</button>
+                                
+                            </div>
+
+                        </section>
+                        <h3><span class="name-state">Pruebas de aceptación</span></h3>
+                        <section>
+                            @Html.Partial("_personalInfo")
+                            <div class="panel-footer text-right">
+                                
+                                    <button name="SubmitPrueba" class="btn btn-radian-success Set-Prueba">Set de Pruebas</button>
+                                
+                            </div>
+                        </section>
+                        <h3></h3>
+                        <section>
+                            @Html.Partial("_personalInfo")
+                            @Html.Partial("_finish")
+                        </section>
                     </div>
-                    <h3><span class="name-state">Ingreso de solicitud</span></h3>
-                    <section>
-                    </section>
-                    <h3><span class="name-state">En Pruebas</span></h3>
-                    <section style="border: 0px !important;">
-
-                        <div class="panel-footer text-right">
-                            <div class="form-group">
-                                <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
-                                <button name="Submit" class="btn btn-radian-success submit-button">Enviar</button>
+                    @if (Model.Step == 3)
+                    {
+                        <div class="footer-table">
+                            <div class="row margin-horizontal-0">
+                                @Html.Partial("_usersLegal")
                             </div>
                         </div>
-
-                    </section>
-                    <h3><span class="name-state">Pruebas de aceptación</span></h3>
-                    <section style="border: 0px !important;">
-                        <div class="panel-footer text-right">
-                            <div class="form-group">
-                                <button name="Submit" class="btn btn-radian-success submit-button Set-Prueba">Set de Pruebas</button>
-                            </div>
-                        </div>
-                    </section>
-                    <h3></h3>
-                    <section style="border: 0px !important;">
-                        @Html.Partial("_finish")
-                    </section>
+                    }
                 </div>
-
             </div>
-
 
         </div>
 
@@ -245,13 +262,13 @@
 
                     <div class="modal-header">
                         <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
-                        <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @Model.ContibutorType de @Model.ElectronicDoc</h4>
+                        <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @Model.ContributorType de @Model.ElectronicDoc</h4>
                     </div>
                     <div class="modal-body">
                         <div class="bootbox-body">
                             <Label id="lbldangercancelregister" class="control-label">Describa el motivo de la cancelación del registro</Label>
                             <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
-                                      maxlength="300" name="txtCancelRegistro" rows="3" style="height: auto !important;background: white !important;"></textarea>
+                                      maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
 
                         </div>
                     </div><div class="modal-footer">
@@ -292,7 +309,7 @@
                 }
 
                 $("#dialogcancelarregistro").modal('hide');
-                showConfirmation("¿Desea cancelar el registro del participante @Model.ContibutorType de @Model.ElectronicDoc ?", ConfirmExec(
+                showConfirmation("¿Desea cancelar el registro del participante @Model.ContributorType de @Model.ElectronicDoc ?", ConfirmExec(
                         function () {
 
                             $.ajax({
@@ -361,7 +378,7 @@
                                          function (param, data) {
                                              bootbox.dialog({
                                                  message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>" + data.message+"</h4></div></div>",
-                                                 onEscape: () => { 
+                                                 onEscape: () => {
                                                         var url = "@Url.Action("Index", "OthersElectronicDocAssociated")";
                                                         window.location.href = url;
                                                  }
@@ -369,9 +386,57 @@
                                          }, false, () => hideLoading('#panel-form')
                                      );
                      }
-                     , "", () => hideLoading('#panel-form'))); 
+                     , "", () => hideLoading('#panel-form')));
               });
 
+            $('.Set-Prueba').click(function (e) {
+                 var url = "@Url.Action("GetSetTestResult", "OthersElectronicDocAssociated")" + "/" + @Model.Id;
+                 window.location.href = url;
+            });
+
+
+            $("#view-costumers").click(function () {
+                var page = @Model.PageTable;
+                var element = '#table-customers';
+                var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_customers").ToString().Trim('"'))));
+                var urlSearch = '@Url.Action("CustomersList", "OthersElectronicDocAssociated")';
+                var form = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_formSearch").ToString().Trim('"'))));
+                var Id = "@Model.Id";
+                var dialog = bootbox.dialog({
+                    message: htmlPartial,
+                    className: "table-data modal-radian",
+                    size: 'large'
+                });
+                dialog.init(function (e) {
+                    var dataTable = JSON.parse('@Html.Raw(Json.Encode(Model.Customers))');
+                    var customersTotalCount = @Model.CustomerTotalCount;
+                    var columns = [
+                        { data: 'Nit' },
+                        { data: 'BussinessName' },
+                        { data: 'State' }
+                    ]
+                    var ajaxData = {
+                        ContributorId: @Model.Id,
+                        code: "#NitSearch",
+                        State: "#StateSelect",
+                        Page: page,
+                        pagesize: 10
+                    };
+                    var paramsObject = {
+                        element: element,
+                        data: dataTable,
+                        form: form,
+                        urlSearch: urlSearch,
+                        Id: Id,
+                        page: page,
+                        tableRendered: null,
+                        customersTotalCount: customersTotalCount,
+                        columns: columns,
+                        ajaxData: ajaxData
+                    }
+                    RenderTable(paramsObject);
+                })
+            });
 
              function RenderStepsOtherDoc(index) {
                  var validator;

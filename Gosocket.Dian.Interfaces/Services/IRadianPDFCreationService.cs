@@ -4,6 +4,6 @@ namespace Gosocket.Dian.Interfaces.Services
 {
     public interface IRadianPdfCreationService
     {
-        Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier);
+        Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier, string webPath);
     }
 }

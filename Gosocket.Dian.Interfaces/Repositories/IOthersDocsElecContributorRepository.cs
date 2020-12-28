@@ -17,6 +17,8 @@ namespace Gosocket.Dian.Interfaces.Repositories
         void RemoveOthersDocsElecContributor(OtherDocElecContributor othersDocsElecContributor);
 
         bool GetParticipantWithActiveProcess(int contributorId, int contributorTypeId, int OperationModeId, int statusSowftware);
+
+        PagedResult<OtherDocElecCustomerList> CustomerList(int id, string code, string State, int page = 0, int length = 0);
     }
 
 }
