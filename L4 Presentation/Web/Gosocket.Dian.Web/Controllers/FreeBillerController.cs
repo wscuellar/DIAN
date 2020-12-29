@@ -42,7 +42,6 @@ namespace Gosocket.Dian.Web.Controllers
         /// </summary>
         private readonly ProfileService profileService = new ProfileService();
 
-
         private readonly ClaimsDbService claimsDbService = new ClaimsDbService();
 
         /// <summary>
@@ -67,8 +66,6 @@ namespace Gosocket.Dian.Web.Controllers
         /// </summary>
         private const string ROLEFREEBILLER = "UsuarioFacturadorGratuito";
         #endregion
-
-
 
         private ApplicationUserManager userManager
         {
@@ -142,6 +139,12 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult FreeBillerUser(UserFiltersFreeBillerModel model)
         {
+            model.Profiles = this.staticProfiles;
+            if (model.DocTypeId > default(int) && !string.IsNullOrWhiteSpace(model.DocNumber))
+            {
+               model.Users = this.GetUsersByDocument(model.DocTypeId, model.DocNumber);
+            }
+
             return View(model);
         }
 
@@ -361,14 +364,9 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult CreateUser()
         {
             UserFreeBillerModel model = new UserFreeBillerModel();
-
-           
-           
             model.TypesDoc = this.staticTypeDoc;
             model.Profiles = this.staticProfiles;
             model.IsActive = true;
-            model.TypesDoc = this.GetTypesDoc();
-            model.Profiles = this.GetProfiles();
 
             if (model.IsActive)
             {
@@ -460,7 +458,6 @@ namespace Gosocket.Dian.Web.Controllers
                     CreatorNit = user.CreatorNit
                 }), "Creación");
 
-                //var resultUser = userManager.AddToRoleAsync(user.Id, Roles.UsuarioExterno);
 
                 // Revisar calse estatica para colocar el valor del nuevo rol.
                 var resultRole = userManager.AddToRole(user.Id, ROLEFREEBILLER);

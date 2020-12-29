@@ -146,8 +146,11 @@
                         @Html.ActionLink("Ver detalles", "Details")
                     </td>
                     <td>
-                        <img src="~/Content/images/Svg/edti.svg"></img>
-                        @Html.ActionLink("E", "EditFreeBillerUser", new { user.Id }, new { @class = "bi bi-pencil-fill" })
+                        <a href="@Url.Action("EditFreeBillerUser","FreeBiller", new { user.Id })" id="@user.Id">
+                            <img src="@Url.Content("~/Content/images/Svg/edti.svg")" />
+                        </a>
+                        @*<img src="~/Content/images/Svg/edti.svg"></img>*@
+                        @*@Html.ActionLink("E", "EditFreeBillerUser", new { user.Id }, new { @class = "bi bi-pencil-fill" })*@
                     </td>
                     <td class="text-nowrap">
                         <input type="checkbox" name="activo" id="activo" value="1" runat="server" onchange="activo(this, '@user.Id' )"/>
