@@ -214,6 +214,7 @@
     <Compile Include="Entity\RadianCustomerList.cs" />
     <Compile Include="Entity\RadianLogger.cs" />
     <Compile Include="Entity\RadianUserData.cs" />
+    <Compile Include="Sql\MenuRole.cs" />
     <Compile Include="Sql\OtherDocElecContributor.cs" />
     <Compile Include="Sql\OtherDocElecContributorOperations.cs" />
     <Compile Include="Sql\OtherDocElecContributorType.cs" />
@@ -252,6 +253,7 @@
     <Compile Include="Sql\RadianContributorFiles\RadianContributorFileType.cs" />
     <Compile Include="Sql\RadianOperationMode.cs" />
     <Compile Include="Sql\RadianSoftware.cs" />
+    <Compile Include="Sql\Role.cs" />
     <Compile Include="Sql\Software.cs" />
     <Compile Include="Sql\ContributorOperations.cs" />
     <Compile Include="Sql\SubMenu.cs" />

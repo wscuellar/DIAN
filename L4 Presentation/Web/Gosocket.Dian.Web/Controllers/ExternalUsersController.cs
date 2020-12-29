@@ -19,6 +19,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Web.Common;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -151,7 +153,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.Page = Page;
             model.Users = this.LoadExternalUsersViewBags(uCompany.Code, model.Page, 10);
-            
+
             ViewBag.ExternalUsersList = model.Users;
 
             return View(model);
@@ -216,25 +218,26 @@ namespace Gosocket.Dian.Web.Controllers
             //var userExt2 = _context.Users.Where(u => u.Roles.Any(r => r.RoleId == role.Id)).ToList();
 
             //ViewBag.Menu = this.MenuApp();
-            ViewBag.Menu = _permisionService.GetAppMenu().Select(m =>
-                new MenuViewModel
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    Title = m.Title,
-                    Description = m.Description,
-                    Icon = m.Icon,
-                    Options = _permisionService.GetSubMenusByMenuId(m.Id).Select(s =>
-                        new SubMenuViewModel()
-                        {
-                            Id = s.Id,
-                            MenuId = m.Id,
-                            Name = s.Name,
-                            Title = s.Title,
-                            Description = s.Description
-                        }).ToList()
-                }).ToList();
-
+            var OperationModeIdUser = User.ContributorOperationModeId();
+            var OmitirFacturadorGratuito = OperationModeIdUser == 1 ? null : "Facturador Gratuito";
+            ViewBag.Menu = _permisionService.GetAppMenu(Roles.UsuarioExterno).Where(m => m.Name != OmitirFacturadorGratuito).Select(m =>
+                   new MenuViewModel
+                   {
+                       Id = m.Id,
+                       Name = m.Name,
+                       Title = m.Title,
+                       Description = m.Description,
+                       Icon = m.Icon,
+                       Options = _permisionService.GetSubMenusByMenuId(m.Id, Roles.UsuarioExterno).Select(s =>
+                           new SubMenuViewModel()
+                           {
+                               Id = s.Id,
+                               MenuId = m.Id,
+                               Name = s.Name,
+                               Title = s.Title,
+                               Description = s.Description
+                           }).ToList()
+                   }).ToList();
         }
 
         [HttpPost]
@@ -325,7 +328,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 //validar si ya existe un Usuario con el tipo documento y documento suministrados
-                var vUserDB = userService.FindUserByIdentificationAndTypeId(model.IdentificationTypeId, model.IdentificationId);
+                var vUserDB = userService.FindUserByIdentificationAndTypeId(model.Id, model.IdentificationTypeId, model.IdentificationId);
 
                 if (vUserDB != null)
                 {
@@ -517,7 +520,7 @@ namespace Gosocket.Dian.Web.Controllers
             message.Append("</br> Su información de registro y acceso al Catalogo de DIAN ha sido actualizada satisfactoriamente.");
             message.AppendFormat("</br> Tipo de documento: {0}", model.IdentificationTypeId);
             message.AppendFormat("</br> Numero  de documento: {0}", model.IdentificationId);
-            message.AppendFormat("</br> Correo electronico: {0}", model.Email);
+            message.AppendFormat("</br> Correo electrónico: {0}", model.Email);
             message.AppendFormat("</br> Clave de acceso: {0}", model.Password);
 
             message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
@@ -555,6 +558,42 @@ namespace Gosocket.Dian.Web.Controllers
             emailService.SendEmail(email, "DIAN - Cambio de Estado de Usuario Registrado", dic);
 
             return true;
+        }
+
+        [HttpPost]
+        public JsonResult ValidateExistsUserExternal(ExternalUserViewModel model)
+        {
+            var smsresult = String.Empty;
+
+            if (!ModelState.IsValid)
+            {
+                IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var item in allErrors)
+                    smsresult = smsresult + item.ErrorMessage + ".";
+
+                if (!string.IsNullOrEmpty(smsresult))
+                    return Json(new { smsresult }, JsonRequestBehavior.AllowGet);
+            }
+
+
+            //validar si ya existe un Usuario con el tipo documento y documento suministrados
+            var vUserDB = userService.FindUserByIdentificationAndTypeId(model.Id, model.IdentificationTypeId, model.IdentificationId);
+
+            if (vUserDB != null)
+            {
+                smsresult = "Ya existe un Usuario con el Tipo de Documento y Documento suministrados";
+                return Json(new { smsresult }, JsonRequestBehavior.AllowGet);
+            }
+
+            vUserDB = userService.FindUserByEmail(model.Id, model.Email);
+
+            if (vUserDB != null)
+            {
+                smsresult = "Ya existe un Usuario con el Email en el sistema";
+                return Json(new { smsresult }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new { smsresult }, JsonRequestBehavior.AllowGet);
         }
 
     }
