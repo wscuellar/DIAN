@@ -1542,6 +1542,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string serieAndNumber = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string senderName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='RegistrationName']").Item(0)?.InnerText.ToString();
             //string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
+            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
             data.EventCode = "043";
             data.SigningTime = xmlParser.SigningTime;
             data.DocumentTypeId = "96";
@@ -1651,48 +1652,50 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                 }
-                attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
-                attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
-                attorneyModel.idTypeDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
-                //Valida CUFE referenciado existe en sistema DIAN                
-                var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference, issuerPartyCode, issuerPartyName);
-                if (resultValidateCufe[0].IsValid)
-                    attorney.Add(attorneyModel);
-                else
+                if(listID != "3")
                 {
-                    validate = false;
-                    responses.Add(new ValidateListResponse
+                    attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                    attorneyModel.idTypeDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
+                    //Valida CUFE referenciado existe en sistema DIAN                
+                    var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference, issuerPartyCode, issuerPartyName);
+                    if (resultValidateCufe[0].IsValid)
+                        attorney.Add(attorneyModel);
+                    else
                     {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAL07-(R): ",
-                        ErrorMessage = "Error en la validación del CUFE referenciado, No existe en sistema DIAN",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: AAL07-(R): ",
+                            ErrorMessage = "Error en la validación del CUFE referenciado, No existe en sistema DIAN",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
 
-                ValidatorEngine validatorEngine = new ValidatorEngine();
-                data.TrackId = attorneyModel.cufe;
-                var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
-                var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
-                if (!xmlParserCufe.Parser())
-                    throw new Exception(xmlParserCufe.ParserError);
+                    ValidatorEngine validatorEngine = new ValidatorEngine();
+                    data.TrackId = attorneyModel.cufe;
+                    var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+                    var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
+                    if (!xmlParserCufe.Parser())
+                        throw new Exception(xmlParserCufe.ParserError);
 
-                //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-                var resultValidateSingInTime = ValidateSigningTime(data, xmlParserCufe, nitModel);
-                if (!resultValidateSingInTime[0].IsValid)
-                {
-                    validate = false;
-                    responses.Add(new ValidateListResponse
+                    //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
+                    var resultValidateSingInTime = ValidateSigningTime(data, xmlParserCufe, nitModel);
+                    if (!resultValidateSingInTime[0].IsValid)
                     {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: 89-(R): ",
-                        ErrorMessage = "La fecha debe ser mayor o igual al evento de la factura referenciada",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: 89-(R): ",
+                            ErrorMessage = "La fecha debe ser mayor o igual al evento de la factura referenciada",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                 }
-
             }
             if (validate)
             {
@@ -2745,6 +2748,51 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+
+                                break;
+                            //Validacion de la existensia eventos previos informe de pago
+                            case (int)EventStatus.ValInfoPago:
+                                if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
+                                {
+                                    //Valida Pago Total FETV
+                                    if (documentMeta
+                                             .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                             .Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: 89-(R): ",
+                                            ErrorMessage = "No se pueda transmitir el evento Informe Pago porque ya existe un pago total FETV",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }
+                                else
+                                {
+                                    validFor = true;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "Regla: LGC24-(R): ",
+                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Solicitud de disponibilización",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }                                
 
                                 break;
                             //Validacion de la existensia eventos previos Avales
