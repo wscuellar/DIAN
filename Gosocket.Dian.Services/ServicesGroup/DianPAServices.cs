@@ -1278,11 +1278,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 Task.WhenAll(arrayTasks);
 
                 //No hay errores de raglas, evento es mandato y la regla no es AAD06, elimina informacion de la Meta para evento Mandato
-                if (!errors.Any() && Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && !flag)
-                {
-                    var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-                    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
-                }
+                //if (!errors.Any() && Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && !flag)
+                //{
+                //    var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                //    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
+                //}
 
                 //Elimina informacion de la GlobalDocValidatorDocumentMeta si hay error en los plugIn
                 if (flagMeta || (errors.Any()))
@@ -1796,7 +1796,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
         
         private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef, string issuerPartyCode, string issuerPartyName)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName });            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName });
+            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1823,7 +1824,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
         
         private DianResponse ValidationReferenceAttorney(string trackId)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });                        
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId }); 
+            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
