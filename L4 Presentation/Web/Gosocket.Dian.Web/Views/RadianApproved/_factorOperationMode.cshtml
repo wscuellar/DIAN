@@ -6,7 +6,7 @@
     string contributorId = Request.Params["ContributorId"];
     string radianContributorType = Request.Params["RadianContributorTypeId"];
 
-    var classMarginTop = operationMode == "1" ? "margin-top-50" : "";
+    var classMarginTop = operationMode == "2" ? "margin-top-50" : "";
 }
 
 <div class="page-content radian-view margin-20">
@@ -25,7 +25,7 @@
         }
 
     </div>
-    <div class="@classMarginTop">
+    <div>
         <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" >
             <div class="panel-body padding-top-20">
                 <div class="pad-btm padding-bottom-0">
@@ -184,10 +184,8 @@
                                                 <td class="largeText iffyTip">@oper.Software.Id</td>
                                                 <td class="largeText iffyTip">@oper.Software.Pin</td>
                                                 <td class="largeText iffyTip">@oper.Software.Url</td>
-                                                <td>
-                                                    <span id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer actions"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span>  
-                                                    <span id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer actions"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = Model.Contributor.RadianContributorTypeId, softwareId = oper.Software.Id, softwareType=oper.SoftwareType})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></span>
-                                                </td>
+                                                <td id="delete-software" data-id="@oper.Id" class="largeText iffyTip pointer delete-software"><span><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></span></td>
+                                                <td id="set-test" data-id="@oper.Id" class="largeText iffyTip pointer"><a href="@Url.Action("ViewTestSet","RadianApproved", new { id = Model.Contributor.Id, radianTypeId = Model.Contributor.RadianContributorTypeId, softwareId = oper.Software.Id, softwareType=oper.SoftwareType})"><span><i title="Set de pruebas" class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></span></a></td>
                                             </tr>
                                             }
                                         </tbody>

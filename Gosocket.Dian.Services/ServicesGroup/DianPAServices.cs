@@ -43,8 +43,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
         private TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
 
-        private TableManager TableManagerGlobalDocEvent = new TableManager("GlobalDocEvent");
-
         private FileManager fileManager = new FileManager();
 
         private readonly string blobContainer = "global";
@@ -652,154 +650,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="trackId"></param>
-        /// <returns></returns>
-        public DianResponse GetStatusEvent(string trackId)
-        {
-            var globalStart = DateTime.UtcNow;
-            var start = DateTime.UtcNow;
-
-            var response = new DianResponse() { ErrorMessage = new List<string>() };
-            var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
-            var runtime = new GlobalLogger(trackId, "1 GetStatus Runtime") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
-
-            if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD"))
-            {
-                if (validatorRuntimes.Any(v => v.RowKey == "END"))
-                {
-                    start = DateTime.UtcNow;
-                    GlobalDocValidatorDocumentMeta documentMeta = null;
-                    bool applicationResponseExist = false;
-                    bool existDocument = false;
-                    var validations = new List<GlobalDocValidatorTracking>();
-                    List<Task> arrayTasks = new List<Task>();
-                    var events = new List<GlobalDocValidatorDocumentMeta>();
-                    var originalEvents = new List<GlobalDocValidatorDocumentMeta>();
-                    var originalEventsValidations = new List<GlobalDocValidatorTracking>();
-
-                    Task firstLocalRun = Task.Run(() =>
-                    {
-                        documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-                        if (!string.IsNullOrEmpty(documentMeta.Identifier))
-                            existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
-                        applicationResponseExist = XmlUtilEvents.ApplicationResponseExist(documentMeta);
-                    });
-
-                    Task secondLocalRun = Task.Run(() =>
-                    {
-                        // se consultan los eventos asociados al trackId.
-                        events = TableManagerGlobalDocValidatorDocumentMeta.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId, "96");
-                        if(events != null && events.Count > 0)
-                        {
-                            events = events.OrderBy(x => x.SigningTimeStamp).ToList();
-                            events.ForEach(e =>
-                            {
-                                // se consulta el evento por el código y así obtener su descripción.
-                                var docEvent = TableManagerGlobalDocEvent.FindGlobalEvent<GlobalDocEvent>(e.EventCode, e.CustomizationID, "96");
-                                e.EventCodeDescription = (docEvent != null) ? docEvent.Description : string.Empty;
-                                // se consulta la información del evento original.
-                                originalEvents.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(e.DocumentKey, e.DocumentKey));
-                                // se consulta las validaciones del evento original.
-                                var originalValidations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(e.DocumentKey);
-                                if(originalValidations != null && originalValidations.Count > 0)
-                                {
-                                    originalEventsValidations.AddRange(originalValidations);
-                                }
-                            });
-                        }
-                    });
-
-                    Task thirdLocalRun = Task.Run(() =>
-                    {
-                        validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
-                    });
-
-                    arrayTasks.Add(firstLocalRun);
-                    arrayTasks.Add(secondLocalRun);
-                    arrayTasks.Add(thirdLocalRun);
-                    Task.WhenAll(arrayTasks).Wait();
-
-                    var applicationResponse = XmlUtilEvents.GetApplicationResponseIfExist(documentMeta);
-                    //response.XmlBase64Bytes = applicationResponse ?? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations);
-                    response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations) : null;
-
-                    response.XmlDocumentKey = trackId;
-                    response.XmlFileName = documentMeta.FileName;
-
-                    if (documentMeta == null)
-                    {
-                        response.StatusCode = "66";
-                        response.StatusDescription = "TrackId no encontrado.";
-                        return response;
-                    }
-
-                    var failed = validations.Where(r => r.Mandatory && !r.IsValid).ToList();
-                    var notifications = validations.Where(r => r.IsNotification).ToList();
-                    var message = (string.IsNullOrEmpty(documentMeta.Serie)) ? $"La {documentMeta.DocumentTypeName} {documentMeta.Number}, ha sido autorizada." : $"La {documentMeta.DocumentTypeName} {documentMeta.Serie}-{documentMeta.Number}, ha sido autorizada.";
-
-                    if (!failed.Any() && !notifications.Any())
-                    {
-                        response.IsValid = true;
-                        response.StatusMessage = message;
-                    }
-
-                    if (failed.Any() && !applicationResponseExist)
-                    {
-                        var failedList = new List<string>();
-                        foreach (var f in failed)
-                            failedList.Add($"Regla: {f.ErrorCode}, Rechazo: {f.ErrorMessage}");
-
-                        response.IsValid = false;
-                        response.StatusMessage = "Documento con errores en campos mandatorios.";
-                        response.ErrorMessage.AddRange(failedList);
-                    }
-
-                    if (notifications.Any())
-                    {
-                        var notificationList = new List<string>();
-                        foreach (var n in notifications)
-                            notificationList.Add($"Regla: {n.ErrorCode}, Notificación: {n.ErrorMessage}");
-
-                        response.IsValid = failed.Any() ? response.IsValid : true;
-                        response.StatusMessage = failed.Any() ? response.StatusMessage : message;
-                        response.ErrorMessage.AddRange(notificationList);
-                    }
-
-                    if (response.IsValid || applicationResponseExist)
-                    {
-                        response.IsValid = true;
-                        response.StatusCode = "00";
-                        response.StatusMessage = message;
-                        response.StatusDescription = "Procesado Correctamente.";
-                    }
-                    else
-                    {
-                        response.StatusCode = "99";
-                        response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                    }
-                }
-                else
-                {
-                    response.StatusCode = "98";
-                    response.StatusDescription = "En Proceso";
-                }
-            }
-            else
-            {
-                response.StatusCode = "66";
-                response.StatusDescription = "TrackId no existe en los registros de la DIAN.";
-            }
-
-            var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-            var finish = new GlobalLogger("GetStatus", trackId) { Message = globalEnd.ToString() };
-            TableManagerGlobalLogger.InsertOrUpdate(finish);
-
-            return response;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="contentFile"></param>
         /// <returns></returns>
         public DianResponse SendEventUpdateStatus(byte[] contentFile, string authCode)
@@ -892,7 +742,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
-            //Validation of the DocumentReference Section - Informed CUFE and CUDE
+            //Validation of the DocumentReference Section - Informed CUFE and CUDE         
             var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName);
             if (!documentReferenceCufe.IsValid)
             {
@@ -1221,8 +1071,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Procees_Sucessfull;
                     validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { GlobalDocumentId = trackIdCude, DocumentKey = trackIdCude, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };
 
-                    if(Convert.ToInt32(eventCode) != (int)EventStatus.Mandato
-                        && Convert.ToInt32(eventCode) != (int)EventStatus.TerminacionMandato)
+                    if(Convert.ToInt32(eventCode) != (int)EventStatus.Mandato)
                     {
                         var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude });
                         if (processEventResponse.Code != Properties.Settings.Default.Code_100)
@@ -1245,7 +1094,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.StatusCode = Properties.Settings.Default.Code_99;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Error_FieldMandatori;
                     dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios.";
-                    dianResponse.XmlBase64Bytes = errors.Any() ? dianResponse.XmlBase64Bytes : null;
+                    dianResponse.XmlBase64Bytes = null;
                 }
                 var application = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_7AplicattionSendEvent) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 // ZONE APPLICATION
@@ -1278,11 +1127,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 Task.WhenAll(arrayTasks);
 
                 //No hay errores de raglas, evento es mandato y la regla no es AAD06, elimina informacion de la Meta para evento Mandato
-                //if (!errors.Any() && Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && !flag)
-                //{
-                //    var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-                //    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
-                //}
+                if (!errors.Any() && Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && !flag)
+                {
+                    var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
+                }
 
                 //Elimina informacion de la GlobalDocValidatorDocumentMeta si hay error en los plugIn
                 if (flagMeta || (errors.Any()))
@@ -1743,7 +1592,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID, DianResponse response)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
+            
             if (validations.Count > 0)
             {
                 if(response.ErrorMessage.Count == 0)
@@ -1796,7 +1646,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         
         private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef, string issuerPartyCode, string issuerPartyName)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName });            
             
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
@@ -1824,8 +1674,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
         
         private DianResponse ValidationReferenceAttorney(string trackId)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId }); 
-            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });            
+                                                                                         
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

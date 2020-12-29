@@ -1,36 +1,19 @@
-﻿using Gosocket.Dian.Common.Resources;
-using Gosocket.Dian.Domain;
-using Gosocket.Dian.Domain.Common;
-using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Interfaces.Services;
-using Gosocket.Dian.Web.Models;
-using Gosocket.Dian.Web.Models.RadianApproved;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Web;
-using System.Web.Mvc;
+using Gosocket.Dian.Interfaces.Services;
 
 namespace Gosocket.Dian.Web.Controllers.Tests
 {
     [TestClass()]
     public class RadianApprovedControllerTests
     {
-        private readonly RadianApprovedController _radianApprovedController;
+        private readonly RadianApprovedController _current;
         private readonly Mock<IRadianContributorService> _radianContributorService = new Mock<IRadianContributorService>();
         private readonly Mock<IRadianTestSetService> _radianTestSetService = new Mock<IRadianTestSetService>();
         private readonly Mock<IRadianApprovedService> _radianApprovedService = new Mock<IRadianApprovedService>();
         private readonly Mock<IRadianTestSetResultService> _radianTestSetResultService = new Mock<IRadianTestSetResultService>();
 
-        public RadianApprovedControllerTests() => _radianApprovedController = new RadianApprovedController(_radianContributorService.Object,
-                                                                                                           _radianTestSetService.Object,
-                                                                                                           _radianApprovedService.Object,
-                                                                                                           _radianTestSetResultService.Object);
-
-        [TestMethod()]
-        public void Index_View_CanceledContributor_Test()
+        public RadianApprovedControllerTests()
         {
             RegistrationDataViewModel registrationData = new RegistrationDataViewModel
             {
@@ -114,27 +97,23 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     }
                 });
 
-            _radianApprovedService.Setup(ras => ras.FileHistoryFilter(It.IsAny<int>(),
-                                                                      It.IsAny<string>(),
-                                                                      It.IsAny<string>(),
-                                                                      It.IsAny<string>(),
-                                                                      It.IsAny<int>(),
-                                                                      It.IsAny<int>()))
-                .Returns(new PagedResult<RadianContributorFileHistory>()
-                {
-                    Results = new List<RadianContributorFileHistory>()
-                    {
-                        new RadianContributorFileHistory()
-                        {
-                            FileName = string.Empty,
-                            Comments = string.Empty,
-                            CreatedBy = string.Empty,
-                            Status = 1,
-                            Timestamp = DateTime.Now
-                        }
-                    }
-                });
 
+
+            ViewResult result = _radianApprovedController.Index(registrationData) as ViewResult;
+
+            Assert.AreEqual("Index", result.ViewName);
+        }
+
+
+        [TestMethod()]
+        [DataRow(1, 1)]
+        public void Index_View_Contributor(int contributorId, Domain.Common.RadianContributorType radianContributorType)
+        {
+            RegistrationDataViewModel registrationData = new RegistrationDataViewModel
+            {
+                ContributorId = contributorId,
+                RadianContributorType = radianContributorType
+            };
 
             ViewResult result = _radianApprovedController.Index(registrationData) as ViewResult;
 
@@ -183,164 +162,6 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             _radianTestSetService.Setup(rts => rts.OperationModeList(It.IsAny<Domain.Common.RadianOperationMode>())).Returns(new List<Domain.RadianOperationMode>());
             _radianApprovedService.Setup(ras => ras.ListRadianContributorOperations(It.IsAny<int>())).Returns(new RadianContributorOperationWithSoftware());
 
-            ViewResult result = _radianApprovedController.SetTestDetails(radianApprovedViewModel) as ViewResult;
-            Assert.AreEqual("GetFactorOperationMode", result.ViewName);
-            Assert.IsInstanceOfType(result.ViewData.Model, typeof(RadianApprovedOperationModeViewModel));
-        }
-
-
-        [TestMethod()]
-        public void Add_Result_RadianOperationModeDirect_Test()
-        {
-            RegistrationDataViewModel registrationData = new RegistrationDataViewModel() { RadianOperationMode = Domain.Common.RadianOperationMode.Direct };
-            _radianApprovedService.Setup(ras => ras.GetTestResult(It.IsAny<string>())).Returns<RadianTestSet>(null);
-            ResponseMessage result = _radianApprovedController.Add(registrationData).Data as ResponseMessage;
-            Assert.IsTrue(result.Code == 500);
-        }
-
-        [TestMethod()]
-        public void Add_Result_RadianOperationModeIndirect_Test()
-        {
-            RegistrationDataViewModel registrationData = new RegistrationDataViewModel() { RadianOperationMode = Domain.Common.RadianOperationMode.Indirect };
-
-            _radianContributorService.Setup(rcs => rcs.CreateContributor(registrationData.ContributorId,
-                                                                     RadianState.Registrado,
-                                                                     registrationData.RadianContributorType,
-                                                                     registrationData.RadianOperationMode,
-                                                                     It.IsAny<string>())).Returns<RadianContributor>(null);
-
-            ResponseMessage result = _radianApprovedController.Add(registrationData).Data as ResponseMessage;
-            Assert.IsTrue(result.Message.Equals(TextResources.SuccessSoftware));
-        }
-
-        [TestMethod()]
-        public void Add_Result_WithoutSoftware_Test()
-        {
-            RegistrationDataViewModel registrationData = new RegistrationDataViewModel() { RadianOperationMode = Domain.Common.RadianOperationMode.None };
-
-            _radianContributorService.Setup(rcs => rcs.CreateContributor(registrationData.ContributorId,
-                                                                     RadianState.Registrado,
-                                                                     registrationData.RadianContributorType,
-                                                                     registrationData.RadianOperationMode,
-                                                                     It.IsAny<string>())).Returns(new RadianContributor());
-
-            ResponseMessage result = _radianApprovedController.Add(registrationData).Data as ResponseMessage;
-            Assert.IsTrue(result.Message.Equals(TextResources.ParticipantWithoutSoftware));
-        }
-
-        [TestMethod()]
-        public void Add_Result_WithSoftware_ModeWithoutTestSet_Test()
-        {
-            RegistrationDataViewModel registrationData = new RegistrationDataViewModel() { RadianOperationMode = Domain.Common.RadianOperationMode.None };
-
-            _radianContributorService.Setup(rcs => rcs.CreateContributor(registrationData.ContributorId,
-                                                                         RadianState.Registrado,
-                                                                         registrationData.RadianContributorType,
-                                                                         registrationData.RadianOperationMode,
-                                                                         It.IsAny<string>())).Returns(new RadianContributor()
-                                                                         {
-                                                                             Id = 10,
-                                                                             RadianSoftwares = new List<RadianSoftware>()
-                                                                             {
-                                                                                 new RadianSoftware() { Id = Guid.NewGuid() }
-                                                                             }
-                                                                         });
-
-            ResponseMessage result = _radianApprovedController.Add(registrationData).Data as ResponseMessage;
-            Assert.IsTrue(result.Message.Equals(TextResources.ModeWithoutTestSet));
-        }
-
-        [TestMethod()]
-        public void Add_Result_WithSoftware_Test()
-        {
-            RegistrationDataViewModel registrationData = new RegistrationDataViewModel() { RadianOperationMode = Domain.Common.RadianOperationMode.None };
-
-            _radianContributorService.Setup(rcs => rcs.CreateContributor(registrationData.ContributorId,
-                                                                         RadianState.Registrado,
-                                                                         registrationData.RadianContributorType,
-                                                                         registrationData.RadianOperationMode,
-                                                                         It.IsAny<string>())).Returns(new RadianContributor()
-                                                                         {
-                                                                             Id = 10,
-                                                                             RadianSoftwares = new List<RadianSoftware>()
-                                                                             {
-                                                                                 new RadianSoftware() { Id = Guid.NewGuid() }
-                                                                             }
-                                                                         });
-
-            _radianApprovedService.Setup(ras => ras.AddRadianContributorOperation(It.IsAny<RadianContributorOperation>(),
-                                                                                     It.IsAny<RadianSoftware>(),
-                                                                                     It.IsAny<RadianTestSet>(),
-                                                                                     true,
-                                                                                     false)).Returns(new ResponseMessage(TextResources.SuccessSoftware,
-                                                                                                                         TextResources.alertType));
-
-            ResponseMessage result = _radianApprovedController.Add(registrationData).Data as ResponseMessage;
-            Assert.IsTrue(result.Message.Equals(TextResources.SuccessSoftware));
-        }
-
-        [TestMethod()]
-        public void UploadFiles_Result_Test()
-        {
-            Mock<HttpContextBase> moqContext = new Mock<HttpContextBase>();
-            Mock<HttpRequestBase> moqRequest = new Mock<HttpRequestBase>();
-            Mock<HttpFileCollectionBase> mockCollection = new Mock<HttpFileCollectionBase>();
-
-            NameValueCollection formValues = new NameValueCollection() {
-                { "contributorId", "" },
-                { "radianContributorType", "" },
-                { "radianOperationMode", "" },
-                { "filesNumber", "2" }
-            };
-
-            moqContext.Setup(mc => mc.Request).Returns(moqRequest.Object);
-            moqRequest.Setup(mr => mr.Form).Returns(formValues);
-
-            _radianApprovedService.Setup(ras => ras.RadianContributorId(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(1);
-
-            mockCollection.Setup(x => x.Count).Returns(0);
-
-            ResponseMessage result = _radianApprovedController.UploadFiles().Data as ResponseMessage;
-            Assert.IsTrue(result.Message.Equals("Datos actualizados correctamente."));
-        }
-
-        [TestMethod()]
-        public void UpdateFactorOperationMode_Result_Test()
-        {
-            Mock<SetOperationViewModel> setOperationViewModel = new Mock<SetOperationViewModel>();
-            setOperationViewModel.Setup(x => x.RadianContributorId).Returns(1);
-            setOperationViewModel.Setup(x => x.SoftwareType).Returns(1);
-            setOperationViewModel.Setup(x => x.SoftwareId).Returns(Guid.NewGuid().ToString());
-            setOperationViewModel.Setup(x => x.Url).Returns("http:");
-            setOperationViewModel.Setup(x => x.SoftwareName).Returns("SoftName");
-            setOperationViewModel.Setup(x => x.Pin).Returns("pin");
-
-            _radianApprovedService.Setup(ras => ras.GetTestResult(It.IsAny<string>())).Returns(new RadianTestSet());
-
-            _radianApprovedService.Setup(ras => ras.AddRadianContributorOperation(It.IsAny<RadianContributorOperation>(),
-                                                                                  It.IsAny<RadianSoftware>(),
-                                                                                  It.IsAny<RadianTestSet>(),
-                                                                                  true,
-                                                                                  false)).Returns(new ResponseMessage(TextResources.SuccessSoftware,
-                                                                                                                      TextResources.alertType));
-
-            ResponseMessage result = _radianApprovedController.UpdateFactorOperationMode(setOperationViewModel.Object).Data as ResponseMessage;
-            Assert.IsTrue(result.Message.Equals(TextResources.SuccessSoftware));
-        }
-
-        [TestMethod()]
-        public void DeleteUser_Result_Test()
-        {
-            _radianContributorService.Setup(rcs => rcs.ChangeParticipantStatus(It.IsAny<int>(),
-                                                                               It.IsAny<string>(),
-                                                                               It.IsAny<int>(),
-                                                                               It.IsAny<string>(),
-                                                                               It.IsAny<string>())).Returns(true);
-
-            ViewResult result = _radianApprovedController.DeleteUser(1, 1, string.Empty, string.Empty) as ViewResult;
-            string message = (string)result.ViewData.Model.GetType().GetProperty("message").GetValue(result.ViewData.Model, null);
-
-            Assert.AreEqual("Datos actualizados", message);
-        }
+       
     }
 }

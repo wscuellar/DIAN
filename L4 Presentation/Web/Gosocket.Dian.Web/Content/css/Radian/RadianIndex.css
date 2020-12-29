@@ -296,7 +296,7 @@ th {
     border-radius: 4px !important;
 }
 
-    .input-general[disabled], .file-input-disabled input{
+    .input-general[disabled], .file-input-disabled input {
         background: #F7F7F7 !important;
     }
 
@@ -571,19 +571,19 @@ h4.text-thin {
     position: relative;
 }
 
-#steps-approved .steps li.done::after {
-    content: "";
-    width: 108px;
-    height: 130px;
-    background: transparent;
-    position: absolute;
-    top: 0px;
-}
+    #steps-approved .steps li.done::after {
+        content: "";
+        width: 108px;
+        height: 130px;
+        background: transparent;
+        position: absolute;
+        top: 0px;
+    }
 
-#steps-approved .steps li.done::before {
-    width: 20px;
-    height: 20px;
-}
+    #steps-approved .steps li.done::before {
+        width: 20px;
+        height: 20px;
+    }
 
 #steps-approved .steps li:nth-child(3).disabled a {
     background: url(../../images/png/validado3.png);
@@ -838,20 +838,20 @@ h4.text-thin {
     right: 21px;
 }
 
-#progress-wrp .progress-bar {
-    height: 11px;
-    border-radius: 3px;
-    background-color: #348441;
-    box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.11);
-}
+    #progress-wrp .progress-bar {
+        height: 11px;
+        border-radius: 3px;
+        background-color: #348441;
+        box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.11);
+    }
 
-#progress-wrp .status {
-    top: 3px;
-    left: 50%;
-    position: absolute;
-    display: inline-block;
-    color: #000000;
-}
+    #progress-wrp .status {
+        top: 3px;
+        left: 50%;
+        position: absolute;
+        display: inline-block;
+        color: #000000;
+    }
 
 .event-section .cude-section span {
     display: block;
@@ -904,21 +904,21 @@ span.state-file {
     margin: 11px;
 }
 
-span.state-file.status-1 {
-    background-image: url(../../images/Svg/Loaded.svg);
-}
+    span.state-file.status-1 {
+        background-image: url(../../images/Svg/Loaded.svg);
+    }
 
-span.state-file.status-2 {
-    background-image: url(../../images/aproved.png);
-}
+    span.state-file.status-2 {
+        background-image: url(../../images/aproved.png);
+    }
 
-span.state-file.status-3 {
-    background-image: url(../../images/reject.png);
-}
+    span.state-file.status-3 {
+        background-image: url(../../images/reject.png);
+    }
 
-span.state-file.status-4 {
-    background-image: url(../../images/observations.png);
-}
+    span.state-file.status-4 {
+        background-image: url(../../images/observations.png);
+    }
 
 
 .highcharts-figure, .highcharts-data-table table {
@@ -1065,9 +1065,9 @@ span.close {
     background: #F4F5F7;
 }
 
-.test-redirect .panel-body {
-    padding: 15px 20px;
-}
+    .test-redirect .panel-body {
+        padding: 15px 20px;
+    }
 
 #table-customers {
     width: 95%;
@@ -1178,10 +1178,10 @@ button.selectpicker {
     border-radius: 4px;
 }
 
-button.selectpicker .fa-caret-down {
-    right: 15px;
-    position: absolute;
-}
+    button.selectpicker .fa-caret-down {
+        right: 15px;
+        position: absolute;
+    }
 
 .custom-combobox {
     position: relative;
@@ -1249,50 +1249,50 @@ button.selectpicker .fa-caret-down {
     font-size: 24px;
 }
 
-.prompt-comment .modal-title {
-    font-size: 24px;
-    width: fit-content;
-    border-bottom: 2px solid #62C7AB;
-    padding-right: 20px;
-    padding-bottom: 4px;
-}
+    .prompt-comment .modal-title {
+        font-size: 24px;
+        width: fit-content;
+        border-bottom: 2px solid #62C7AB;
+        padding-right: 20px;
+        padding-bottom: 4px;
+    }
 
-.prompt-comment .modal-header:after {
-    display: none;
-}
+    .prompt-comment .modal-header:after {
+        display: none;
+    }
 
-.prompt-comment .modal-body {
-    display: inline-flex;
-    width: 80%;
-    padding-top: 0px;
-    padding-bottom: 20px;
-}
+    .prompt-comment .modal-body {
+        display: inline-flex;
+        width: 80%;
+        padding-top: 0px;
+        padding-bottom: 20px;
+    }
 
-.prompt-comment .modal-footer {
-    position: absolute;
-    display: inline-flex;
-    width: 20%;
-    padding-bottom: 0px;
-    bottom: 21px;
-}
+    .prompt-comment .modal-footer {
+        position: absolute;
+        display: inline-flex;
+        width: 20%;
+        padding-bottom: 0px;
+        bottom: 21px;
+    }
 
-.prompt-comment button.btn-radian-default {
-    display: none;
-}
+    .prompt-comment button.btn-radian-default {
+        display: none;
+    }
 
-.prompt-comment .bootbox-body {
-    width: 100%;
-}
+    .prompt-comment .bootbox-body {
+        width: 100%;
+    }
 
-.prompt-comment .modal-header {
-    padding-bottom: 5px;
-    padding-top: 27px;
-}
+    .prompt-comment .modal-header {
+        padding-bottom: 5px;
+        padding-top: 27px;
+    }
 
-.prompt-comment .modal-content {
-    padding-right: 40px;
-    padding-left: 10px;
-}
+    .prompt-comment .modal-content {
+        padding-right: 40px;
+        padding-left: 10px;
+    }
 
 .cancel-confirmation .modal-body {
 }
@@ -1318,9 +1318,9 @@ button.selectpicker .fa-caret-down {
     margin: 0px;
 }
 
-.input-daterange label {
-    width: 85%;
-}
+    .input-daterange label {
+        width: 85%;
+    }
 
 .table-contributor {
     text-align: center;
@@ -1333,29 +1333,29 @@ button.selectpicker .fa-caret-down {
     z-index: 1;
 }
 
-/* Tooltip text */
-.tooltip-custom .tooltiptext {
-    font-size: 9px;
-    visibility: hidden;
-    width: auto;
-    background: #F2ECE7;
-    color: black;
-    text-align: justify;
-    padding: 14px;
-    border-radius: 6px;
-    position: absolute;
-    bottom: 100%;
-    right: 15px;
-    border: solid 1px;
-}
+    /* Tooltip text */
+    .tooltip-custom .tooltiptext {
+        font-size: 9px;
+        visibility: hidden;
+        width: auto;
+        background: #F2ECE7;
+        color: black;
+        text-align: justify;
+        padding: 14px;
+        border-radius: 6px;
+        position: absolute;
+        bottom: 100%;
+        right: 15px;
+        border: solid 1px;
+    }
 
 
-/* Show the tooltip text when you mouse over the tooltip container */
-.tooltip-custom:hover .tooltiptext {
-    visibility: visible;
-}
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .tooltip-custom:hover .tooltiptext {
+        visibility: visible;
+    }
 
-.underline-reject-text img{
+.underline-reject-text img {
     margin: 0 1px;
 }
 
@@ -1381,28 +1381,28 @@ button.selectpicker .fa-caret-down {
     bottom: 11px;
 }
 
-.dis-flex{
+.dis-flex {
     display: flex;
 }
 
-.dis-flex img{
-    margin: 0 9px;
-}
+    .dis-flex img {
+        margin: 0 9px;
+    }
 
 .table-set-files {
     width: 70%;
     margin: auto;
 }
 
-.table-set-files table{
-    table-layout: fixed;
-    text-align: center;
-}
+    .table-set-files table {
+        table-layout: fixed;
+        text-align: center;
+    }
 
-.table-set-files table td:first-child {
-    white-space: inherit;
-    text-align: left;
-}
+        .table-set-files table td:first-child {
+            white-space: inherit;
+            text-align: left;
+        }
 
 .underline-subrow {
     border-bottom: 2px solid #E9E8E8;
@@ -1411,14 +1411,16 @@ button.selectpicker .fa-caret-down {
 .custom-styles-files {
     font-size: 14px;
 }
-.custom-styles-files i{
-    font-size: 18px !important;
-}
-.full-width{
+
+    .custom-styles-files i {
+        font-size: 18px !important;
+    }
+
+.full-width {
     width: 100%;
 }
 
-.select-radian-contributor td:first-child{
+.select-radian-contributor td:first-child {
     display: inline-flex;
     width: 100%;
 }
@@ -1435,7 +1437,7 @@ button.selectpicker .fa-caret-down {
     font-size: 22px;
 }
 
-.htmlalert ul{
+.htmlalert ul {
     text-align: left;
     font-size: 14px;
 }
@@ -1443,6 +1445,7 @@ button.selectpicker .fa-caret-down {
 .list-unstyled {
     list-style: none;
 }
+
 .set-details {
     display: inline-flex;
     width: 100%;
@@ -1451,24 +1454,29 @@ button.selectpicker .fa-caret-down {
     color: #707782;
     font-size: 14px;
 }
+
 .set-test-counts .modal-dialog {
     margin-bottom: 0px;
 }
+
 .set-details span {
     width: 90%;
     margin: auto;
 }
+
 .set-details > div {
     width: 10%;
 }
 
-.set-details-conventions span{
+.set-details-conventions span {
     margin-right: 6px;
 }
+
 .show-details-set {
     color: #348441;
     font-size: 13px;
 }
+
 .documents-table {
     text-align: center;
 }
@@ -1477,14 +1485,17 @@ button.selectpicker .fa-caret-down {
     background-color: #028AB7;
     color: white;
 }
+
 .custom-badget-green {
     background-color: #348441;
     color: white;
 }
+
 .custom-badget-red {
     background-color: #B81818;
     color: white;
 }
+
 .col-pr-50 {
     padding-right: 50px !important;
 }
@@ -1492,11 +1503,12 @@ button.selectpicker .fa-caret-down {
 a.badge {
     display: table-caption;
 }
+
 .set-test-counts .panel-body {
     padding-left: 40px;
 }
 
-.set-test-counts .panel{
+.set-test-counts .panel {
     box-shadow: none;
 }
 
@@ -1504,9 +1516,9 @@ a.badge {
     color: #348441;
 }
 
-.show-details a{
-    padding: 0px;
-}
+    .show-details a {
+        padding: 0px;
+    }
 
 .popover-body {
     width: 80%;
@@ -1525,10 +1537,12 @@ a.badge {
     width: 340px;
     max-width: none;
 }
+
 .icon-alert {
     display: inline-flex;
     font-size: 14px;
 }
+
     .icon-alert fa-exclamation-circle {
         margin: 20px;
         position: absolute;
@@ -1538,6 +1552,7 @@ a.badge {
     text-decoration: underline;
     padding: 0px;
 }
+
 .test-set-dots .custom-badget-red {
     display: none;
 }
@@ -1551,10 +1566,10 @@ a.badge {
     text-align: center;
 }
 
-.icon-alert .fa-exclamation-circle {
-    margin: 20px auto;
-    width: 44px;
-}
+    .icon-alert .fa-exclamation-circle {
+        margin: 20px auto;
+        width: 44px;
+    }
 
 .adm-radian-view {
     padding: 25px 12px 20px !important;
@@ -1611,24 +1626,25 @@ a.badge {
     padding: initial;
 }
 
-.text-left-radian{
+.text-left-radian {
     text-align: left !important;
 }
+
 #table-history td {
     text-align: left;
     padding-left: 17px;
 }
 
-#table-history td:nth-child(2) {
-    text-align: center;
-    padding-left: 18px;
-    color: initial
-}
+    #table-history td:nth-child(2) {
+        text-align: center;
+        padding-left: 18px;
+        color: initial
+    }
 
-.edit-state-td{
+.edit-state-td {
     padding: 0px;
 }
 
-.actions{
+.actions {
     padding: 0 5px;
 }

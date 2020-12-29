@@ -1,8 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 
 namespace Gosocket.Dian.Web.Models
 {
-    [ExcludeFromCodeCoverage]
     public class AutoListModel
     {
         public string text;

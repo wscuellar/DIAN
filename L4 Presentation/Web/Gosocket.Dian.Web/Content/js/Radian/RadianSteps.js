@@ -43,7 +43,7 @@ function RenderSteps(index) {
         var actualFileSize = Math.round(actualFileObj.size / 10000) / 100;
         var fileObj = "";
         var fileSize = "";
-        for (var i = 0; i < files.length; i++) {   
+        for (var i = 0; i < files.length; i++) {
             if (files[i].type == "file" && files[i].id == "") {
                 fileObj = files[i].files[0];
                 fileSize = fileObj ? Math.round(fileObj.size / 10000) / 100 : 0;
@@ -82,11 +82,11 @@ function RenderSteps(index) {
         if (isValid) {
             $(this).parent().children().html(actualFileObj.name + "  (" + actualFileSize + " Mb)");
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").toggle();
-            $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle(); 
+            $(this).parents(".inputs-dinamics").children(".file-input-enabled").toggle();
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").children("input").attr("value", actualFileObj.name);
             $(this).parents(".inputs-dinamics").children(".file-input-disabled").children(".file-size").html("(" + actualFileSize + " Mb)");
         }
-           
+
         validator = form.validate({
             messages: messages
         });
@@ -103,7 +103,7 @@ function RenderSteps(index) {
 }
 
 function RenderTable(paramsObject) {
-    var totalPages = Math.trunc(paramsObject.customersTotalCount / 10) + 1 ;
+    var totalPages = Math.trunc(paramsObject.customersTotalCount / 10) + 1;
     paramsObject.tableRendered && paramsObject.tableRendered.destroy();
     paramsObject.tableRendered = $(paramsObject.element).DataTable({
         paging: false,
@@ -168,8 +168,9 @@ function LoadEventsToPagiantion(paramsObject) {
     });
 }
 
-function TablePagination(page, totalCount, countPage) {debugger
-    var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : ""; 
+function TablePagination(page, totalCount, countPage) {
+    debugger
+    var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : "";
     var disabledPrev = page == 1 ? 'disabled="disabled"' : "";
     var min = (page - 1) * 10 + 1;
     var max = 10 > countPage ? (page - 1) * 10 + countPage : (page) * 10;
@@ -191,8 +192,8 @@ function changeToSpanish() {
     $('.input-daterange').datepicker({
         language: "es"
     });
-    $(".input-daterange input").change(function(){
-        $(".datepicker-dropdown").css("display","none");
+    $(".input-daterange input").change(function () {
+        $(".datepicker-dropdown").css("display", "none");
     });
 }
 
@@ -202,13 +203,13 @@ function cancelRegister(cancelData) {
     var successAction = () => {
         var message = bootboxMessage.CANCEL_RESPONSE_CORRECT;
         var operation = () => window.location.href = cancelData.href
-        showConfirmation(message, AlertExec(operation), "cancel-confirmation", operation); 
+        showConfirmation(message, AlertExec(operation), "cancel-confirmation", operation);
     };
     var dataAjax = {
         id: cancelData.id,
         radianContributorTypeId: cancelData.type,
         radianState: cancelData.state
-                };
+    };
     var label = bootboxMessage.CANCEL_DESCRIPTION;
     CancelRegister(url, dataAjax, confirmationMessage, successAction, label);
 }

@@ -472,7 +472,7 @@ namespace Gosocket.Dian.Infrastructure
         }
 
 
-         public T FindDocumentReferenceAttorney<T>(string partitionKey) where T : ITableEntity, new()
+        public T FindDocumentReferenceAttorney<T>(string partitionKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
@@ -581,7 +581,7 @@ namespace Gosocket.Dian.Infrastructure
             prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
                 QueryComparisons.Equal,
                 eventCode));
-            
+
             var customization1 = TableQuery.GenerateFilterCondition("CustomizationID",
                 QueryComparisons.Equal,
                 customizationId);
@@ -590,8 +590,8 @@ namespace Gosocket.Dian.Infrastructure
                 QueryComparisons.Equal,
                 customizationId2);
 
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.CombineFilters(customization1, 
-                TableOperators.Or, 
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.CombineFilters(customization1,
+                TableOperators.Or,
                 customization2));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));

@@ -160,14 +160,5 @@ namespace Gosocket.Dian.Web.Common
             return int.Parse(claimsPrincipal.FindFirst(CustomClaimTypes.IdentificationTypeId).Value);
         }
 
-        public static int PersonType(this IPrincipal principal)
-        {
-            if (!(principal is ClaimsPrincipal claimsPrincipal))
-                return 0;
-            if (claimsPrincipal.FindFirst(CustomClaimTypes.PersonType) == null)
-                return 0;
-            return int.Parse(claimsPrincipal.FindFirst(CustomClaimTypes.PersonType).Value);
-        }
-
     }
 }
