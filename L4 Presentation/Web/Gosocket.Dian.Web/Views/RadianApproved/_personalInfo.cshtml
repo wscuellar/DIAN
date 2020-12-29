@@ -17,9 +17,10 @@
             contributorType = "Factor";
             break;
     }
-            }
-            @if (Request.Params["RadianOperationMode"] != "2")
-            {
+    string classInput = Model.Step == 4 ? "col-sm-2" : "col-sm-3";
+}
+@if (Request.Params["RadianOperationMode"] != "2")
+{
     <div class="row radian-subtitle-container">
         <p class="subtitle-view">
             @ViewBag.title
@@ -29,7 +30,7 @@
 }
 <div class="row radian-personal-info">
     <div class="row">
-        <div class="col-sm-3">
+        <div class="@classInput">
             <div class="form-group">
                 @Html.LabelFor(m => m.Nit, new { @class = "control-label" })
                 @Html.TextBoxFor(m => m.Nit, new { @class = "form-control contributorFileType-props input-general", disabled="disabled" })
@@ -57,7 +58,7 @@
     @if (Model.Step == 4 || Request.Params["RadianOperationMode"] == "2")
     {
         <div class="row">
-            <div class="col-sm-3">
+            <div class="@classInput">
                 <div class="form-group">
                     @Html.LabelFor(m => m.RadianState, new { @class = "control-label" })
                     @Html.TextBoxFor(m => m.RadianState, new { @class = "form-control contributorFileType-props input-general", disabled = "disabled" })

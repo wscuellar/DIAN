@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
-using System;
+using System.Diagnostics.CodeAnalysis;
 
+[ExcludeFromCodeCoverage]
 public class GlobalDocReferenceAttorney : TableEntity
 {
     public GlobalDocReferenceAttorney() { }

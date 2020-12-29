@@ -61,6 +61,7 @@
             @Html.LabelFor(m => m.ElectronicPayrollAjustmentRequired, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.ElectronicPayrollAjustmentRequired, new { @class = "form-control input-general fields captureFields" })
             @Html.ValidationMessage("validpayrollAjustment", new { @class = "text-danger" })
+            @Html.ValidationMessageFor(m => m.ElectronicPayrollAjustmentRequired, "", new { @class = "text-danger" })
         </div>
     </div>
 </div>
@@ -89,7 +90,8 @@
         <div class="form-group">
             @Html.LabelFor(m => m.ElectronicPayrollAjustmentAcceptedRequired, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.ElectronicPayrollAjustmentAcceptedRequired, new { @class = "form-control input-general fields captureFields" })
-            @Html.ValidationMessage("validpayrollAjustmentAccepted", new { @class = "text-danger" })
+            @Html.ValidationMessage("validpayrollAjustmentAccepted", new { @class = "text-danger" }) 
+            @Html.ValidationMessageFor(m => m.ElectronicPayrollAjustmentAcceptedRequired, "", new { @class = "text-danger" })
         </div>
     </div>
 
