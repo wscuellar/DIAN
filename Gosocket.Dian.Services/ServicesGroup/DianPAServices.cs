@@ -892,7 +892,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
-            //Validation of the DocumentReference Section - Informed CUFE and CUDE         
+            //Validation of the DocumentReference Section - Informed CUFE and CUDE
             var documentReferenceCufe = ValidationDocumentReferenceCufe(trackId, documentReferenceId, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName);
             if (!documentReferenceCufe.IsValid)
             {
@@ -1221,7 +1221,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Procees_Sucessfull;
                     validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { GlobalDocumentId = trackIdCude, DocumentKey = trackIdCude, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };
 
-                    if(Convert.ToInt32(eventCode) != (int)EventStatus.Mandato)
+                    if(Convert.ToInt32(eventCode) != (int)EventStatus.Mandato
+                        && Convert.ToInt32(eventCode) != (int)EventStatus.TerminacionMandato)
                     {
                         var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude });
                         if (processEventResponse.Code != Properties.Settings.Default.Code_100)
@@ -1796,7 +1797,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef, string issuerPartyCode, string issuerPartyName)
         {
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName });            
-            
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
@@ -1823,8 +1823,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         
         private DianResponse ValidationReferenceAttorney(string trackId)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });            
-                                                                                         
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });                        
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {
