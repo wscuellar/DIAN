@@ -1542,6 +1542,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
             data.EventCode = "043";
             data.SigningTime = xmlParser.SigningTime;
+            data.DocumentTypeId = "96";
+            data.CustomizationID = customizationID;
+            data.EndDate = "";
             string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string factor = string.Empty;
             switch (factorTemp)
@@ -1667,6 +1670,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 ValidatorEngine validatorEngine = new ValidatorEngine();
+                data.TrackId = attorneyModel.cufe;
                 var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
                 var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
                 if (!xmlParserCufe.Parser())
@@ -3296,7 +3300,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.ValInfoPago:
-                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(data.EndDate), Convert.ToDateTime(data.SigningTime));
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(data.SigningTime), Convert.ToDateTime(data.EndDate));
                     if (Convert.ToDateTime(data.EndDate) == Convert.ToDateTime(dataModel.PaymentDueDate))
                     {
                         responses.Add(businessDays == 3
@@ -3319,14 +3323,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else
                     {
-                        new ValidateListResponse
+                        responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "Regla: AAH42-(R): ",
                             ErrorMessage = "EndDate del evento no coincide con el PaymentDueDate de la factura referenciada",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        };
+                        });
                     }
                     break;
                 case (int)EventStatus.SolicitudDisponibilizacion:
