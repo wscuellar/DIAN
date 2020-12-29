@@ -83,8 +83,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [CustomRoleAuthorization(CustomRoles = "Proveedor")]
         public async Task<ActionResult> Provider(SearchDocumentViewModel model) => await GetDocuments(model, 4);
-
-        [ExcludeFilter(typeof(Authorization))]
+                
         public async Task<ActionResult> Details(string trackId)
         {
             DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
@@ -165,7 +164,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-                IsValidCaptcha(recaptchaToken);
+                //IsValidCaptcha(recaptchaToken);
                 string url = ConfigurationManager.GetValue("GetPdfUrl");
 
                 var requestObj = new { trackId };
