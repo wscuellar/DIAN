@@ -256,7 +256,7 @@ namespace Gosocket.Dian.Application
                     ReceiptNoticeTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
                     //Recibo del bien
                     ReceiptServiceTotalRequired = testSet.ReceiptServiceTotalRequired,
-                    ReceiptServiceTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
+                    ReceiptServiceTotalAcceptedRequired = testSet.ReceiptServiceTotalAcceptedRequired,
                     // Aceptación expresa
                     ExpressAcceptanceTotalRequired = testSet.ExpressAcceptanceTotalRequired,
                     ExpressAcceptanceTotalAcceptedRequired = testSet.ExpressAcceptanceTotalAcceptedRequired,

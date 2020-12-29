@@ -520,7 +520,7 @@ namespace Gosocket.Dian.Web.Controllers
             message.Append("</br> Su información de registro y acceso al Catalogo de DIAN ha sido actualizada satisfactoriamente.");
             message.AppendFormat("</br> Tipo de documento: {0}", model.IdentificationTypeId);
             message.AppendFormat("</br> Numero  de documento: {0}", model.IdentificationId);
-            message.AppendFormat("</br> Correo electronico: {0}", model.Email);
+            message.AppendFormat("</br> Correo electrónico: {0}", model.Email);
             message.AppendFormat("</br> Clave de acceso: {0}", model.Password);
 
             message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");

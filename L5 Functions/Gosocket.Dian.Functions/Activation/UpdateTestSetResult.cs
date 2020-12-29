@@ -278,6 +278,9 @@ namespace Gosocket.Dian.Functions.Activation
                                 var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
 
                                 //Habilitamos el participante en GlobalRadianOperations
+                                SetLogger(null, "Step 19.3", radianTesSetResult.PartitionKey, "1111111113");
+                                SetLogger(null, "Step 19.4", globalTestSetTracking.SoftwareId, "1111111114");
+
                                 GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(radianTesSetResult.PartitionKey, globalTestSetTracking.SoftwareId);
 
 
