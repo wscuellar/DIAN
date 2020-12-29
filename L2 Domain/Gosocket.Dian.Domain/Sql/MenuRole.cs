@@ -3,15 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gosocket.Dian.Domain.Sql
 {
-    [Table("SubMenu")]
-    public class SubMenu
+    [Table("MenuRole")]
+    public class MenuRole
     {
         [Key]
         public int Id { get; set; }
         public int MenuId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Title { get; set; }
-        public int Order { get; set; }
+        public int? SubMenuId { get; set; }
+        public string RoleId { get; set; }
+        public int Order { get; set; } 
     }
 }
