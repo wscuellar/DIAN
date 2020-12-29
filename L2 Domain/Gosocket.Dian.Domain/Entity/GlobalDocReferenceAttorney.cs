@@ -1,7 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
-using System.Diagnostics.CodeAnalysis;
+using System;
 
-[ExcludeFromCodeCoverage]
 public class GlobalDocReferenceAttorney : TableEntity
 {
     public GlobalDocReferenceAttorney() { }
@@ -20,9 +19,5 @@ public class GlobalDocReferenceAttorney : TableEntity
     public string SenderCode { get; set; }
     public string StartDate { get; set; }
     public string DocReferencedEndAthorney { get; set; }
-    public string AttorneyType { get; set; }
-    public string IssuerAttorneyName { get; set; }
-    public string SenderName { get; set; }
-    public string SerieAndNumber { get; set; }
 }
 

@@ -116,7 +116,7 @@ namespace Gosocket.Dian.Web.Utils
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 result = -1;
                 System.Diagnostics.Debug.WriteLine("UserService:UpdateActive: " + ex);
@@ -178,30 +178,13 @@ namespace Gosocket.Dian.Web.Utils
                 StackTrace = null
             };
 
-            new TableManager("GlobalLogger").InsertOrUpdate(logger);
+            new TableManager("GlobalLogger").InsertOrUpdate(logger); 
         }
 
-        public ApplicationUser FindUserByIdentificationAndTypeId(string Id, int identificationTypeId, string identificationId)
+        public ApplicationUser FindUserByIdentificationAndTypeId(int identificationTypeId, string identificationId)
         {
-            if (string.IsNullOrEmpty(Id))
-                return _sqlDBContext.Users.FirstOrDefault(u => u.IdentificationTypeId == identificationTypeId && u.IdentificationId == identificationId);
-            else
-                return _sqlDBContext.Users.
-                FirstOrDefault(u => u.IdentificationTypeId == identificationTypeId
-                            && u.IdentificationId == identificationId
-                            && u.Id != Id);
+            return _sqlDBContext.Users.FirstOrDefault(u => u.IdentificationTypeId == identificationTypeId && u.IdentificationId == identificationId);
         }
-
-        public ApplicationUser FindUserByEmail(string Id, string Email)
-        {
-            if (string.IsNullOrEmpty(Id))
-                return _sqlDBContext.Users.FirstOrDefault(u => u.Email == Email);
-            else
-                return _sqlDBContext.Users.
-                FirstOrDefault(u => u.Email == Email
-                            && u.Id != Id);
-        }
-
 
         /// <summary>
         /// Buscar/Listar los Usuarios Externos

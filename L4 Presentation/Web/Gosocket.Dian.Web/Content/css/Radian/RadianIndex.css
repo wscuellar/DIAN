@@ -1051,7 +1051,7 @@ span.close {
 }
 
 .modal-radian .title-container {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .underline-title-grey {
@@ -1060,18 +1060,12 @@ span.close {
     width: calc(95% + 5%) !important
 }
 
-.test-redirect {
-    border: none !important;
-    background: #F4F5F7;
-}
-
-.test-redirect .panel-body {
-    padding: 15px 20px;
-}
-
-#table-customers {
-    width: 95%;
-}
+/*.bootbox-close-button {
+    background-color: #348441 !important;
+    width: 20px;
+    height: 20px;
+    margin: 0px 8px !important;
+}*/
 
 #table-history .btn-radian-success {
     width: 10%;
@@ -1627,8 +1621,4 @@ a.badge {
 
 .edit-state-td{
     padding: 0px;
-}
-
-.actions{
-    padding: 0 5px;
 }

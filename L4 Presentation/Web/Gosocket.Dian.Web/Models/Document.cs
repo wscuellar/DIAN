@@ -208,7 +208,7 @@ namespace Gosocket.Dian.Web.Models
                 new DocumentRadianStatusViewModel() { Code = "3", Name = "Endosada" },
                 new DocumentRadianStatusViewModel() { Code = "4", Name = "Pagada" },
                 new DocumentRadianStatusViewModel() { Code = "5", Name = "Limitada" },
-                new DocumentRadianStatusViewModel() { Code = "6", Name = "Factura Electrónica" },
+                new DocumentRadianStatusViewModel() { Code = "6", Name = "Factura Electronica" },
                 new DocumentRadianStatusViewModel() { Code = "7", Name = "No Aplica" }
             };
         }

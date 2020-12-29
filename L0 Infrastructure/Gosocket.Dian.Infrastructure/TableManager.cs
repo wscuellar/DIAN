@@ -471,18 +471,6 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
-
-         public T FindDocumentReferenceAttorney<T>(string partitionKey) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
-
-
-            var entities = CloudTable.ExecuteQuery(query);
-
-            return entities.FirstOrDefault();
-        }
-
-
         public List<T> FindDocumentByReference<T>(string documentReferencedKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -979,29 +967,5 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
-        public T FindGlobalEvent<T>(string partitionKey, string rowKey, string documentTypeId) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>();
-
-            var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("RowKey",
-                    QueryComparisons.Equal,
-                    rowKey),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("PartitionKey",
-                    QueryComparisons.Equal,
-                    partitionKey));
-
-            prefixCondition = TableQuery.CombineFilters(
-                prefixCondition,
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("DocumentTypeId",
-                    QueryComparisons.Equal,
-                    documentTypeId));
-
-            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
-
-            return entities.FirstOrDefault();
-        }
     }
 }

@@ -209,11 +209,7 @@
         $(document).ready(function ($) {
 
             if ('@ViewBag.ErrorExistsTestSet' == 'True') {
-                var sms = 'Ya se encuentra registrado un set de pruebas para este Documento eletrónico y modo de operación';
-                bootbox.dialog({
-                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
-                    onEscape: () => { }
-                }); 
+                showNotification('warning', 'fa fa-check fa-2x', 'floating', 'Aviso.', 'Ya se encuentra registrado un set de pruebas para este Documento eletrónico y modo de operación.');
             }
 
             $('.btn-save').click(function () {
@@ -262,7 +258,8 @@
         });//ready
 
 
-    function showHideElectronicPayroll() { 
+    function showHideElectronicPayroll() {
+
         if ($('#ElectronicDocumentId').val() == enumElectronicsDocuments.ElectronicPayroll) {
             $("#divPayrollAjustment").show();
             $("#divPayrollAjustmentAcepted").show();
@@ -271,10 +268,10 @@
             $("#lblOthersDocumentsAcceptedRequired").text('Nomina electrónica');
 
             if ($("#TestSetId").val() == '' || $("#TestSetId").val() == null) {
-                $("#OthersDocumentsRequired").val('0');
-                $("#ElectronicPayrollAjustmentRequired").val('0');
-                $("#OthersDocumentsAcceptedRequired").val('0');
-                $("#ElectronicPayrollAjustmentAcceptedRequired").val('0');
+                $("#OthersDocumentsRequired").val('');
+                $("#ElectronicPayrollAjustmentRequired").val('');
+                $("#OthersDocumentsAcceptedRequired").val('');
+                $("#ElectronicPayrollAjustmentAcceptedRequired").val('');
             }
         }
         else {
@@ -285,14 +282,13 @@
             $("#lblOthersDocumentsAcceptedRequired").text($('#ElectronicDocumentId option:selected').text());
 
             if ($("#TestSetId").val() == '' || $("#TestSetId").val() == null) {
-                $("#OthersDocumentsRequired").val('0');
-                $("#ElectronicPayrollAjustmentRequired").val('0');
-                $("#OthersDocumentsAcceptedRequired").val('0');
-                $("#ElectronicPayrollAjustmentAcceptedRequired").val('0');
+                $("#OthersDocumentsRequired").val('');
+                $("#ElectronicPayrollAjustmentRequired").val('');
+                //$("#OthersDocumentsAcceptedRequired").val('');
+                //$("#ElectronicPayrollAjustmentAcceptedRequired").val('');
             }
 
         }
-        updateTotalOthersDocuments();
     }
 
     function updateTotalOthersDocuments() {

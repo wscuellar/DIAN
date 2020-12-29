@@ -13,9 +13,9 @@ namespace Gosocket.Dian.Interfaces.Services
             _permissionRepository = permissionRepository;
         }
 
-        public List<Menu> GetAppMenu(string RolName)
+        public List<Menu> GetAppMenu()
         {
-            return _permissionRepository.GetAppMenu(RolName);
+            return _permissionRepository.GetAppMenu();
         }
 
         public int AddOrUpdate(List<Permission> permissionList)
@@ -27,9 +27,9 @@ namespace Gosocket.Dian.Interfaces.Services
             return _permissionRepository.GetPermissionsByUser(userId);
         }
 
-        public List<SubMenu> GetSubMenusByMenuId(int menuId, string RolName)
+        public List<SubMenu> GetSubMenusByMenuId(int menuId)
         {
-            return _permissionRepository.GetSubMenusByMenuId(menuId, RolName);
+            return _permissionRepository.GetSubMenusByMenuId(menuId);
         }
 
     }

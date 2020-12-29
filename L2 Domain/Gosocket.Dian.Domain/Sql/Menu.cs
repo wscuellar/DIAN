@@ -14,6 +14,5 @@ namespace Gosocket.Dian.Domain.Sql
         public string Title { get; set; }
         public string Icon { get; set; }
         public List<SubMenu> Options { get; set; }
-        public int Order { get; set; }
     }
 }

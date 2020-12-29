@@ -9,36 +9,15 @@ namespace Gosocket.Dian.DataContext.Repositories
     public class PermissionRepository : IPermissionRepository
     {
 
-        public List<Menu> GetAppMenu(string rolname)
+        public List<Menu> GetAppMenu()
         {
+            List<Menu> list = null;
+
             try
             {
                 using (var context = new SqlDBContext())
                 {
-                    var query = (from m in context.Menus
-                                 join mrol in context.MenuRoles on m.Id equals mrol.MenuId
-                                 join rol in context.Roles on mrol.RoleId equals rol.Id
-                                 where rol.Name == rolname && mrol.SubMenuId == null
-                                 select new 
-                                 {
-                                     m.Id,
-                                     m.Name,
-                                     m.Description,
-                                     m.Title,
-                                     m.Icon,
-                                     mrol.Order
-                                 }).Distinct().ToList()
-                                 .Select(x => new Menu()
-                                 {
-                                     Id = x.Id,
-                                     Name = x.Name,
-                                     Description = x.Description,
-                                     Title = x.Title,
-                                     Icon = x.Icon,
-                                     Order = x.Order
-                                 }).OrderBy(x => x.Order).ToList();
-                    return query;
-
+                    list = context.Menus.ToList();
                 }
             }
             catch (Exception ex)
@@ -46,43 +25,18 @@ namespace Gosocket.Dian.DataContext.Repositories
                 System.Diagnostics.Debug.WriteLine("PermissionRepository:GetAppMenu: " + ex);
             }
 
-            return new List<Menu>();
+            return list;
         }
 
-        public List<SubMenu> GetSubMenusByMenuId(int menuId, string rolname)
+        public List<SubMenu> GetSubMenusByMenuId(int menuId)
         {
+            List<SubMenu> list = null;
+
             try
             {
                 using (var context = new SqlDBContext())
                 {
-                    //list = context.SubMenus.Where(s => s.MenuId == menuId).ToList();
-                    var query = (from sm in context.SubMenus
-                                 join mrol in context.MenuRoles on sm.Id equals mrol.SubMenuId
-                                 join rol in context.Roles on mrol.RoleId equals rol.Id
-                                 where rol.Name == rolname
-                                 && sm.MenuId == menuId
-                                 && sm.MenuId == mrol.MenuId
-                                 select new
-                                 {
-                                     sm.Id,
-                                     sm.MenuId,
-                                     sm.Name,
-                                     sm.Description,
-                                     sm.Title,
-                                     mrol.Order,
-                                 }).Distinct().ToList()
-                                 .Select(x => new SubMenu()
-                                 {
-                                     Id = x.Id,
-                                     MenuId=x.MenuId,
-                                     Name = x.Name,
-                                     Description = x.Description,
-                                     Title = x.Title, 
-                                     Order = x.Order
-                                 }).OrderBy(x => x.Order).ToList(); ;
-
-                    return query;
-
+                    list = context.SubMenus.Where(s => s.MenuId == menuId).ToList();
                 }
             }
             catch (Exception ex)
@@ -90,7 +44,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                 System.Diagnostics.Debug.WriteLine("PermissionRepository:GetSubMenus: " + ex);
             }
 
-            return new List<SubMenu>();
+            return list;
         }
 
         public int AddOrUpdate(List<Permission> permissionList)

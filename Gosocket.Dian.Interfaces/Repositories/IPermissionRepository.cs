@@ -5,11 +5,11 @@ namespace Gosocket.Dian.Interfaces.Repositories
 {
     public interface IPermissionRepository
     {
-        List<Menu> GetAppMenu(string rolsearch);
+        List<Menu> GetAppMenu();
 
         int AddOrUpdate(List<Permission> permissionList);
 
         List<Permission> GetPermissionsByUser(string userId);
-        List<SubMenu> GetSubMenusByMenuId(int menuId, string rolname);
+        List<SubMenu> GetSubMenusByMenuId(int menuId);
     }
 }

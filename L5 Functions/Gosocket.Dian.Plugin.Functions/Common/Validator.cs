@@ -1524,7 +1524,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             NitModel nitModel = new NitModel();
             string issuerPartyName = string.Empty;
-            int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
+            int attorneyLimit = Properties.Settings.Default.MAX_Attorney;
             bool validate = true;
             string validateCufeErrorCode = "Regla: 89-(R): ";
             string startDateAttorney = string.Empty;
@@ -1539,14 +1539,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0)?.InnerText.ToString();
             XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
-            string serieAndNumber = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            string senderName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='RegistrationName']").Item(0)?.InnerText.ToString();
             //string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
             data.EventCode = "043";
             data.SigningTime = xmlParser.SigningTime;
-            data.DocumentTypeId = "96";
-            data.CustomizationID = customizationID;
-            data.EndDate = "";
             string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string factor = string.Empty;
             switch (factorTemp)
@@ -1672,7 +1667,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 ValidatorEngine validatorEngine = new ValidatorEngine();
-                data.TrackId = attorneyModel.cufe;
                 var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
                 var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
                 if (!xmlParserCufe.Parser())
@@ -1707,10 +1701,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         FacultityCode = attorneyDocument.facultityCode,
                         IssuerAttorney = issuerPartyCode,
                         SenderCode = senderCode,
-                        StartDate = startDateAttorney,
-                        AttorneyType = customizationID,
-                        SerieAndNumber = serieAndNumber,
-                        SenderName = senderName
+                        StartDate = startDateAttorney
                     };
                     TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
                     var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), new { TrackId = attorneyDocument.cufe, ResponseCode = data.EventCode, TrackIdCude = trackId });
@@ -2235,141 +2226,84 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(trackId.ToLower()).FirstOrDefault();
             if (documentMeta == null)
             {
-                //Valida referencia evento terminacion de mandato
-                if (Convert.ToInt32(eventCode) == (int)EventStatus.TerminacionMandato)
-                {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = "Evento referenciado correctamente",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-
-                    var referenceAttorneyResult = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(trackId.ToLower());
-                    if(referenceAttorneyResult == null)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: AAH07-(R): ",
-                            ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    else
-                    {
-                        //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
-                        if(referenceAttorneyResult.SerieAndNumber != idDocumentReference)
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "Regla: AAH06-(R) ",
-                                ErrorMessage = "El número de documento electrónico referenciado no coinciden con reportado.",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-
-                        //Valida DocumentTypeCode coincida con el documento informado
-                        if ("96" != documentTypeIdRef)
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "Regla: AAH09-(R): ",
-                                ErrorMessage = "No corresponde a un tipo de documento valido",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
-                }
-                else
-                {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAH07-(R): ",
-                        ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-            }
-            else
-            {
                 responses.Add(new ValidateListResponse
                 {
-                    IsValid = true,
+                    IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "100",
-                    ErrorMessage = "Evento referenciado correctamente",
+                    ErrorCode = "Regla: AAH07-(R): ",
+                    ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
 
-                //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
-                if (documentMeta.SerieAndNumber != idDocumentReference)
-                {
-                    string message = Convert.ToInt32(eventCode) == (int)EventStatus.Mandato
-                        ? "El número de documento electrónico referenciado no coinciden con un mandato reportado."
-                        : "El número de documento electrónico referenciado no coinciden con reportado.";
-
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAH06-(R) ",
-                        ErrorMessage = message,
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-                //Valida DocumentTypeCode coincida con el documento informado
-                if (documentMeta.DocumentTypeId != documentTypeIdRef)
-                {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAH09-(R): ",
-                        ErrorMessage = messageTypeId,
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-                if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad ||
-                   Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia ||
-                   Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
-                {
-                    //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
-                    if (documentMeta.ReceiverCode != issuerPartyCode)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: AAH26b-(R): ",
-                            ErrorMessage = "El documento de identidad no corresponde al del documento electronico referenciado",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
-                    if (documentMeta.ReceiverName != issuerPartyName)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: AAH25b-(R): ",
-                            ErrorMessage = "El nombre o razon social no corresponde al del documento electronico referenciado",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                }               
+                //return responses;
             }
+            //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
+            if (documentMeta.SerieAndNumber != idDocumentReference)
+            {
+                string message = Convert.ToInt32(eventCode) == (int)EventStatus.Mandato
+                    ? "El número de documento electrónico referenciado no coinciden con un mandato reportado."
+                    : "El número de documento electrónico referenciado no coinciden con reportado.";
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAH06-(R) ",
+                    ErrorMessage = message,
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            //Valida DocumentTypeCode coincida con el documento informado
+            if (documentMeta.DocumentTypeId != documentTypeIdRef)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAH09-(R): ",
+                    ErrorMessage = messageTypeId,
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad ||
+               Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia ||
+               Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
+            {
+                //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
+                if (documentMeta.ReceiverCode != issuerPartyCode)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAH26b-(R): ",
+                        ErrorMessage = "El documento de identidad no corresponde al del documento electronico referenciado",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
+                if (documentMeta.ReceiverName != issuerPartyName)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAH25b-(R): ",
+                        ErrorMessage = "El nombre o razon social no corresponde al del documento electronico referenciado",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
 
             return responses;
         }
@@ -2687,8 +2621,36 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             case (int)EventStatus.SolicitudDisponibilizacion:
-                                 //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
-                                if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
+                                //Validacion exista solo una primera disponibilizacion
+                                if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362")
+                                {
+                                    if (documentMeta.Where(t => t.EventCode == "036" &&
+                                   (t.CustomizationID == "361" || t.CustomizationID == "362")).ToList().Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: 89-(R): ",
+                                            ErrorMessage = "Ya existe un tipo de instrumento de Primera inscripción de la factura electrónica de venta como título valor",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }                               
+                                //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
+                                else if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                                 {
                                     //Valida que exista una Primera Disponibilizacion
                                     if (documentMeta.Where(t => t.EventCode == "036" &&
@@ -2860,7 +2822,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         if (eventPrev.EventCode == "038")
                                         {
                                             if (documentMeta
-                                               .Where(t => t.EventCode == "039" || t.EventCode == "041").ToList()
+                                               .Where(t => t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
                                                .Count > decimal.Zero)
                                             {
                                                 validFor = true;
@@ -2889,7 +2851,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         else if (eventPrev.EventCode == "039")
                                         {
                                             if (documentMeta
-                                                  .Where(t => t.EventCode == "038" || t.EventCode == "041").ToList()
+                                                  .Where(t => t.EventCode == "038" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
                                                   .Count > decimal.Zero)
                                             {
                                                 validFor = true;
@@ -2918,7 +2880,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         else if (eventPrev.EventCode == "037")
                                         {
                                             if (documentMeta
-                                                 .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041").ToList()
+                                                 .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
                                                  .Count > decimal.Zero)
                                             {
                                                 validFor = true;
@@ -2976,7 +2938,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             //Validación de la existencia de Endosos y Limitaciones TASK  730
                             case (int)EventStatus.InvoiceOfferedForNegotiation:
                                 if (documentMeta
-                                    .Where(t => t.EventCode == "037" || t.EventCode == "041").ToList()
+                                    .Where(t => t.EventCode == "037" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
                                     .Count > decimal.Zero)
                                 {
                                     validFor = true;
@@ -2992,7 +2954,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 //Anulacion de Endoso solo aplica para Endoso en Garantia o Endoso en Procuracion
                                 else if (documentMeta
-                                .Where(t => t.EventCode == "038" || t.EventCode == "039").ToList()
+                                .Where(t => t.EventCode == "038" || t.EventCode == "039" && t.Identifier == document.PartitionKey).ToList()
                                 .Count > decimal.Zero)
                                 {
                                     responses.Add(new ValidateListResponse
@@ -3362,7 +3324,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.ValInfoPago:
-                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(data.SigningTime), Convert.ToDateTime(data.EndDate));
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(data.EndDate), Convert.ToDateTime(data.SigningTime));
                     if (Convert.ToDateTime(data.EndDate) == Convert.ToDateTime(dataModel.PaymentDueDate))
                     {
                         responses.Add(businessDays == 3
@@ -3385,14 +3347,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else
                     {
-                        responses.Add(new ValidateListResponse
+                        new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "Regla: AAH42-(R): ",
                             ErrorMessage = "EndDate del evento no coincide con el PaymentDueDate de la factura referenciada",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                        };
                     }
                     break;
                 case (int)EventStatus.SolicitudDisponibilizacion:

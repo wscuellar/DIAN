@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Xml.Serialization;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Gosocket.Dian.Domain.Entity
 {
-    [ExcludeFromCodeCoverage]
     public class GlobalDocPayroll : TableEntity
     {
 
