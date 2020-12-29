@@ -40,7 +40,7 @@ namespace Gosocket.Dian.Application
 
         #region GetPdfReport
 
-        public async Task<byte[]> GetGraphicRepresentation(string cufe)
+        public async Task<byte[]> GetGraphicRepresentation(string cude)
         {
             // Load Templates            
             StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaDocumentoSoporte.html"));
@@ -54,10 +54,10 @@ namespace Gosocket.Dian.Application
 
             try
             {
-                var fieldValue = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
+                var fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
 
                 // Mapping Fields
-                template = template.Replace("SupportDocumentNumber", fieldValue.XpathsValues.Values.ToString());
+                template = TemplateGlobalMapping(template, fieldValues);
 
 
             }
@@ -107,7 +107,7 @@ namespace Gosocket.Dian.Application
                 { "XmlBase64", xmlBase64},
                 { "FileName", fileName},
                 { "SupportDocumentNumber", "/*[local-name()='Invoice']/*[local-name()='ID']" },
-                { "Cufe", "/*[local-name() = 'Invoice']/*[local-name() = 'UUID']" },
+                { "Cude", "/*[local-name() = 'Invoice']/*[local-name() = 'UUID']" },
                 { "EmissionDate", "/*[local-name() = 'Invoice']/*[local-name() = 'IssueDate']" },
                 { "OperationType", "/*[local-name() = 'Invoice']/*[local-name() = 'CustomizationID'] " },
                 { "Prefix", "/*[local-name()='Invoice']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='DianExtensions']/*[local-name()='InvoiceControl']/*[local-name()='AuthorizedInvoices']/*[local-name()='Prefix']" },
@@ -176,7 +176,7 @@ namespace Gosocket.Dian.Application
                 { "AuthorizationNumber", "//*[local-name() = 'UBLExtensions']/*[local-name() = 'UBLExtension']/*[local-name() = 'ExtensionContent']/*[local-name() = 'DianExtensions']/*[local-name() = 'InvoiceControl']/*[local-name() = 'InvoiceAuthorization']" },
                 { "AuthorizedRangeFrom", "//*[local-name() = 'UBLExtensions']/*[local-name() = 'UBLExtension']/*[local-name() = 'ExtensionContent']/*[local-name() = 'DianExtensions']/*[local-name() = 'InvoiceControl']/*[local-name() = 'AuthorizedInvoices']/*[local-name() = 'From']" },
                 { "AuthorizedRangeTo", "//*[local-name() = 'UBLExtensions']/*[local-name() = 'UBLExtension']/*[local-name() = 'ExtensionContent']/*[local-name() = 'DianExtensions']/*[local-name() = 'InvoiceControl']/*[local-name() = 'AuthorizedInvoices']/*[local-name() = 'To']" },
-                { "Validity", "//*[local-name() = 'UBLExtensions']/*[local-name() = 'UBLExtension']/*[local-name() = 'ExtensionContent']/*[local-name() = 'DianExtensions']/*[local-name() = 'InvoiceControl']/*[local-name() = 'AuthorizationPeriod']/*[local-name() = 'EndDate']" },
+                { "ValidityDate", "//*[local-name() = 'UBLExtensions']/*[local-name() = 'UBLExtension']/*[local-name() = 'ExtensionContent']/*[local-name() = 'DianExtensions']/*[local-name() = 'InvoiceControl']/*[local-name() = 'AuthorizationPeriod']/*[local-name() = 'EndDate']" },
             };
             return requestObj;
         }
@@ -187,77 +187,86 @@ namespace Gosocket.Dian.Application
 
         private StringBuilder TemplateGlobalMapping(StringBuilder template, ResponseXpathDataValue dataValues)
         {
-            template = template.Replace( "SupportDocumentNumber", dataValues.XpathsValues["SupportDocumentNumber"]);
-            template = template.Replace( "Cufe", dataValues.XpathsValues["Cufe"]);
-            template = template.Replace( "EmissionDate", dataValues.XpathsValues["EmissionDate"]);
-            template = template.Replace( "OperationType", dataValues.XpathsValues["OperationType"]);
-            template = template.Replace( "Prefix", dataValues.XpathsValues["Prefix"]);
+            template = template.Replace( "{SupportDocumentNumber}", dataValues.XpathsValues["SupportDocumentNumber"]);
+            template = template.Replace( "{Cude}", dataValues.XpathsValues["Cude"]);
+            template = template.Replace( "{EmissionDate}", dataValues.XpathsValues["EmissionDate"]);
+            template = template.Replace( "{OperationType}", dataValues.XpathsValues["OperationType"]);
+            template = template.Replace( "{PaymentWay}", string.Empty);
+            template = template.Replace( "{ExpirationDate}", string.Empty);
+            template = template.Replace( "{PaymentMethod}", string.Empty);
+            template = template.Replace( "{Prefix}", dataValues.XpathsValues["Prefix"]);
             // Seller Data
-            template = template.Replace( "SellerNit", dataValues.XpathsValues["SellerNit"]);
-            template = template.Replace( "SellerBusinessName", dataValues.XpathsValues["SellerBusinessName"]);
-            template = template.Replace( "SellerDocumentType", dataValues.XpathsValues["SellerDocumentType"]);
-            template = template.Replace( "SellerTaxpayerType", dataValues.XpathsValues["SellerTaxpayerType"]);
-            template = template.Replace( "SellerResponsibilityType", dataValues.XpathsValues["SellerResponsibilityType"]);
-            template = template.Replace( "SellerAddress", dataValues.XpathsValues["SellerAddress"]);
-            template = template.Replace( "SellerState", "" );
-            template = template.Replace( "SellerMunicipality", dataValues.XpathsValues["SellerMunicipality"]);
-            template = template.Replace( "SellerEmail", dataValues.XpathsValues["SellerEmail"]);
-            template = template.Replace( "SellerPhoneNumber", dataValues.XpathsValues["SellerPhoneNumber"]);
+            template = template.Replace( "{SellerNit}", dataValues.XpathsValues["SellerNit"]);
+            template = template.Replace( "{SellerBusinessName}", dataValues.XpathsValues["SellerBusinessName"]);
+            template = template.Replace( "{SellerDocumentType}", dataValues.XpathsValues["SellerDocumentType"]);
+            template = template.Replace( "{SellerDocumentNumber}", string.Empty);
+            template = template.Replace( "{SellerOrigin}", string.Empty);
+            template = template.Replace( "{SellerTaxpayerType}", dataValues.XpathsValues["SellerTaxpayerType"]);
+            template = template.Replace( "{SellerResponsibilityType}", dataValues.XpathsValues["SellerResponsibilityType"]);
+            template = template.Replace( "{SellerAddress}", dataValues.XpathsValues["SellerAddress"]);
+            template = template.Replace( "{SellerState}", string.Empty );
+            template = template.Replace( "{SellerMunicipality}", dataValues.XpathsValues["SellerMunicipality"]);
+            template = template.Replace( "{SellerEmail}", dataValues.XpathsValues["SellerEmail"]);
+            template = template.Replace( "{SellerPhoneNumber}", dataValues.XpathsValues["SellerPhoneNumber"]);
             // Acquirer Data
-            template = template.Replace( "AcquirerNit", dataValues.XpathsValues["AcquirerNit"]);
-            template = template.Replace( "AcquirerBusinessName", dataValues.XpathsValues["AcquirerBusinessName"]);
-            template = template.Replace( "AcquirerDocumentType", dataValues.XpathsValues["AcquirerDocumentType"]);
-            template = template.Replace( "AcquirerTradeName", dataValues.XpathsValues["AcquirerTradeName"]);
-            template = template.Replace( "AcquirerTaxpayerType", dataValues.XpathsValues["AcquirerTaxpayerType"]);
-            template = template.Replace( "AcquirerMainEconomicActivity", dataValues.XpathsValues["AcquirerMainEconomicActivity"]);
-            template = template.Replace( "AcquirerResponsibilityType", dataValues.XpathsValues["AcquirerResponsibilityType"]);
-            template = template.Replace( "AcquirerAddress", dataValues.XpathsValues["AcquirerAddress"]);
-            template = template.Replace( "AcquirerMunicipality", dataValues.XpathsValues["AcquirerMunicipality"]);
-            template = template.Replace( "AcquirerEmail", dataValues.XpathsValues["AcquirerEmail"]);
-            template = template.Replace( "AcquirerPhoneNumber", dataValues.XpathsValues["AcquirerPhoneNumber"]);
+            template = template.Replace( "{AcquirerNit}", dataValues.XpathsValues["AcquirerNit"]);
+            template = template.Replace( "{AcquirerBusinessName}", dataValues.XpathsValues["AcquirerBusinessName"]);
+            template = template.Replace( "{AcquirerDocumentType}", dataValues.XpathsValues["AcquirerDocumentType"]);
+            template = template.Replace(" {AcquirerDocumentNumber}", string.Empty);
+            template = template.Replace( "{AcquirerTradeName}", dataValues.XpathsValues["AcquirerTradeName"]);
+            template = template.Replace( "{AcquirerTaxpayerType}", dataValues.XpathsValues["AcquirerTaxpayerType"]);
+            template = template.Replace( "{AcquirerMainEconomicActivity}", dataValues.XpathsValues["AcquirerMainEconomicActivity"]);
+            template = template.Replace( "{AcquirerResponsibilityType}", dataValues.XpathsValues["AcquirerResponsibilityType"]);
+            template = template.Replace( "{AcquirerAddress}", dataValues.XpathsValues["AcquirerAddress"]);
+            template = template.Replace( "{AcquirerState}", string.Empty);
+            template = template.Replace( "{AcquirerMunicipality}", dataValues.XpathsValues["AcquirerMunicipality"]);
+            template = template.Replace( "{AcquirerEmail}", dataValues.XpathsValues["AcquirerEmail"]);
+            template = template.Replace( "{AcquirerPhoneNumber}", dataValues.XpathsValues["AcquirerPhoneNumber"]);
             // Product Data
-            template = template.Replace( "ProductNumber", "" );
-            template = template.Replace( "ProductCode", "" );
-            template = template.Replace( "ProductDescription", "" );
-            template = template.Replace( "ProductUM", "" );
-            template = template.Replace( "ProductQuantity", "" );
-            template = template.Replace( "ProductUnitPrice", "" );
-            template = template.Replace( "ProductChargeIndicator", "" );
-            template = template.Replace( "ProductDiscount", "" );
-            template = template.Replace( "ProductSurcharge", "" );
-            template = template.Replace( "ProductIvaTax", "" );
-            template = template.Replace( "ProductSellValue", "" );
+            template = template.Replace( "{ProductNumber}", "" );
+            template = template.Replace( "{ProductCode}", "" );
+            template = template.Replace( "{ProductDescription}", "" );
+            template = template.Replace( "{ProductUM}", "" );
+            template = template.Replace( "{ProductQuantity}", "" );
+            template = template.Replace( "{ProductUnitPrice}", "" );
+            template = template.Replace( "{ProductChargeIndicator}", "" );
+            template = template.Replace( "{ProductDiscount}", "" );
+            template = template.Replace( "{ProductSurcharge}", "" );
+            template = template.Replace( "{ProductIvaTax}", "" );
+            template = template.Replace( "{ProductSellValue}", "" );
             // Global Discounts and Surcharges
-            template = template.Replace( "DiscountNumber", "" );
-            template = template.Replace( "DiscountType", "" );
-            template = template.Replace( "DiscountCode", "" );
-            template = template.Replace( "DiscountDescription", "" );
-            template = template.Replace( "DiscountPercentage", "" );
-            template = template.Replace( "DiscountAmount", "" );
+            template = template.Replace( "{DiscountNumber}", "" );
+            template = template.Replace( "{DiscountType}", "" );
+            template = template.Replace( "{DiscountCode}", "" );
+            template = template.Replace( "{DiscountDescription}", "" );
+            template = template.Replace( "{DiscountPercentage}", "" );
+            template = template.Replace( "{DiscountAmount}", "" );
             // ToTal Advances
-            template = template.Replace( "AdvanceNumber", dataValues.XpathsValues["AdvanceNumber"]);
-            template = template.Replace( "AdvanceAmount", dataValues.XpathsValues["AdvanceAmount"]);
+            template = template.Replace( "{AdvanceNumber}", dataValues.XpathsValues["AdvanceNumber"]);
+            template = template.Replace( "{AdvanceAmount}", dataValues.XpathsValues["AdvanceAmount"]);
             // ToTal Retentions
-            template = template.Replace( "RetentionNumber", dataValues.XpathsValues["RetentionNumber"]);
-            template = template.Replace( "RetentionAmount", dataValues.XpathsValues["RetentionAmount"]);
+            template = template.Replace( "{RetentionNumber}", dataValues.XpathsValues["RetentionNumber"]);
+            template = template.Replace( "{RetentionAmount}", dataValues.XpathsValues["RetentionAmount"]);
             // Total Data
-            template = template.Replace( "TotalCurrency", dataValues.XpathsValues["TotalCurrency"]);
-            template = template.Replace( "TotalExchangeRate", dataValues.XpathsValues["TotalExchangeRate"]);
-            template = template.Replace( "TotalUnitPrice", dataValues.XpathsValues["TotalUnitPrice"]);
-            template = template.Replace( "TotalDiscountsDetail", dataValues.XpathsValues["TotalDiscountsDetail"]);
-            template = template.Replace( "TotalSurchargesDetail", dataValues.XpathsValues["TotalSurchargesDetail"]);
-            template = template.Replace( "TotalTaxableBase", dataValues.XpathsValues["TotalTaxableBase"]);
-            template = template.Replace( "TotalTaxesDetail", dataValues.XpathsValues["TotalTaxesDetail"]);
-            template = template.Replace( "TotalOtherTaxes", dataValues.XpathsValues["TotalOtherTaxes"]);
-            template = template.Replace( "TotalTaxes", dataValues.XpathsValues["TotalTaxes"]);
-            template = template.Replace( "GlobalDiscounts", dataValues.XpathsValues["GlobalDiscounts"]);
-            template = template.Replace( "GlobalSurcharges", dataValues.XpathsValues["GlobalSurcharges"]);
-            template = template.Replace( "TotalAmount", dataValues.XpathsValues["TotalAmount"]);
+            template = template.Replace("{ValidationDate}", string.Empty);
+            template = template.Replace("{GenerationDate}", DateTime.Now.ToShortDateString());
+            template = template.Replace( "{TotalCurrency}", dataValues.XpathsValues["TotalCurrency"]);
+            template = template.Replace( "{TotalExchangeRate}", dataValues.XpathsValues["TotalExchangeRate"]);
+            template = template.Replace( "{TotalUnitPrice}", dataValues.XpathsValues["TotalUnitPrice"]);
+            template = template.Replace( "{TotalDiscountsDetail}", dataValues.XpathsValues["TotalDiscountsDetail"]);
+            template = template.Replace( "{TotalSurchargesDetail}", dataValues.XpathsValues["TotalSurchargesDetail"]);
+            template = template.Replace( "{TotalTaxableBase}", dataValues.XpathsValues["TotalTaxableBase"]);
+            template = template.Replace( "{TotalTaxesDetail}", dataValues.XpathsValues["TotalTaxesDetail"]);
+            template = template.Replace( "{TotalOtherTaxes}", dataValues.XpathsValues["TotalOtherTaxes"]);
+            template = template.Replace( "{TotalTaxes}", dataValues.XpathsValues["TotalTaxes"]);
+            template = template.Replace( "{GlobalDiscounts}", dataValues.XpathsValues["GlobalDiscounts"]);
+            template = template.Replace( "{GlobalSurcharges}", dataValues.XpathsValues["GlobalSurcharges"]);
+            template = template.Replace( "{TotalAmount}", dataValues.XpathsValues["TotalAmount"]);
             // Final Data
-            template = template.Replace( "AuthorizationNumber", dataValues.XpathsValues["AuthorizationNumber"]);
-            template = template.Replace( "AuthorizedRangeFrom", dataValues.XpathsValues["AuthorizedRangeFrom"]);
-            template = template.Replace( "AuthorizedRangeTo", dataValues.XpathsValues["AuthorizedRangeTo"]);
-            template = template.Replace("Validity", dataValues.XpathsValues["Validity"]);
+            template = template.Replace( "{AuthorizationNumber}", dataValues.XpathsValues["AuthorizationNumber"]);
+            template = template.Replace( "{AuthorizedRangeFrom}", dataValues.XpathsValues["AuthorizedRangeFrom"]);
+            template = template.Replace( "{AuthorizedRangeTo}", dataValues.XpathsValues["AuthorizedRangeTo"]);
+            template = template.Replace( "{ValidityDate}", dataValues.XpathsValues["ValidityDate"]);
 
             return template;
         }

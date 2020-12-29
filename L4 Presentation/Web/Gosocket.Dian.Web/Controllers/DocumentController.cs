@@ -276,15 +276,15 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintDocument(string cufe)
         {
-            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
-            byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
+            byte[] pdfDocument = await _radianSupportDocument.GetGraphicRepresentation(cufe);
+            // string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
+            // byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
             String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
 
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
-            //byte[] suportDoc = await _radianSupportDocument.GetGraphicRepresentation(cufe);
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
             String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);

@@ -21,7 +21,7 @@ namespace Gosocket.Dian.Functions.Radian
         private static readonly TableManager GlobalRadianOperationsTableManager = new TableManager("GlobalRadianOperations");
 
         // Set queue name
-        private const string queueName = "activate-radian-operation-input%Slot%";
+        private const string queueName = "activate-radian-operation-input";
 
         [FunctionName("ActivateRadianOperation")]
         public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
@@ -51,12 +51,12 @@ namespace Gosocket.Dian.Functions.Radian
 
                     if (radianContributor != null)
                     {
-                        //        // Step 3 Activo RadianContributor
+                        // Step 3 Activo RadianContributor
 
-                        //        radianContributor.RadianContributorTypeId = requestObject.RadianContributorTypeId;
-                        //        contributorService.ActivateRadian(radianContributor);
-                        //        radianContributorId = radianContributor.Id;
-                        //        SetLogger(radianContributor, "Step RA-3", "ActivateRadian -->  ");
+                        radianContributor.RadianContributorTypeId = requestObject.RadianContributorTypeId;
+                        contributorService.ActivateRadian(radianContributor);
+                        radianContributorId = radianContributor.Id;
+                        SetLogger(radianContributor, "Step RA-3", "ActivateRadian -->  ");
 
                     }
                     else  //si el sujeto en radian no existe
@@ -69,131 +69,135 @@ namespace Gosocket.Dian.Functions.Radian
                             RadianContributorTypeId = requestObject.RadianContributorTypeId,
                             RadianOperationModeId = requestObject.RadianOperationModeId,
                             RadianState = Domain.Common.RadianState.Habilitado.GetDescription(),
+                            CreatedDate = System.DateTime.Now,
+                            Update = System.DateTime.Now,
                             Step = 4
                         };
                         SetLogger(radianContributor, "Step RA-4", " -- contributorService.AddOrUpdateRadianContributor -- ", "Paso3");
 
-                        //        radianContributorId = contributorService.AddOrUpdateRadianContributor(radianContributor);
-                        //        SetLogger(radianContributorId, "Step RA-4", " -- contributorService.AddOrUpdateRadianContributor -- ");
+                        radianContributorId = contributorService.AddOrUpdateRadianContributor(radianContributor);
+                        SetLogger(radianContributorId, "Step RA-4", " -- contributorService.AddOrUpdateRadianContributor -- ");
                     }
 
 
 
-                    //    // si el software No Existe
-                    //    if (Convert.ToInt32(requestObject.SoftwareType) == (int)Domain.Common.RadianOperationModeTestSet.OwnSoftware)
-                    //    {
-                    //        RadianSoftware newSoftware = new RadianSoftware()
-                    //        {
-                    //            Id = new Guid(requestObject.SoftwareId),
-                    //            Deleted = false,
-                    //            Name = requestObject.SoftwareName,
-                    //            Pin = requestObject.Pin,
-                    //            SoftwareDate = DateTime.Now,
-                    //            SoftwareUser = requestObject.SoftwareUser,
-                    //            SoftwarePassword = requestObject.SoftwarePassword,
-                    //            Status = true,
-                    //            RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted,
-                    //            Url = requestObject.Url,
-                    //            CreatedBy = requestObject.CreatedBy,
-                    //            RadianContributorId = radianContributorId
-                    //        };
+                    // si el software No Existe
+                    if (Convert.ToInt32(requestObject.SoftwareType) == (int)Domain.Common.RadianOperationModeTestSet.OwnSoftware)
+                    {
+                        RadianSoftware newSoftware = new RadianSoftware()
+                        {
+                            Id = new Guid(requestObject.SoftwareId),
+                            Deleted = false,
+                            Name = requestObject.SoftwareName,
+                            Pin = requestObject.Pin,
+                            SoftwareDate = DateTime.Now,
+                            SoftwareUser = requestObject.SoftwareUser,
+                            SoftwarePassword = requestObject.SoftwarePassword,
+                            Status = true,
+                            RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted,
+                            Url = requestObject.Url,
+                            CreatedBy = requestObject.CreatedBy,
+                            RadianContributorId = radianContributorId
+                        };
 
-                    //        softwareService.AddOrUpdateRadianSoftware(newSoftware);
+                        softwareService.AddOrUpdateRadianSoftware(newSoftware);
 
-                    //        SetLogger(newSoftware, "Step RA-5", " -- softwareService.AddOrUpdateRadianSoftware -- ");
+                        SetLogger(newSoftware, "Step RA-5", " -- softwareService.AddOrUpdateRadianSoftware -- ");
 
-                    //        // Crear Software en TableSTorage
-                    //        GlobalSoftware globalSoftware = new GlobalSoftware(requestObject.SoftwareId, requestObject.SoftwareId)
-                    //        {
-                    //            Id = new Guid(requestObject.SoftwareId),
-                    //            Deleted = false,
-                    //            Pin = requestObject.Pin,
-                    //            StatusId = (int)Domain.Common.SoftwareStatus.Production
-                    //        };
-                    //        softwareTableManager.InsertOrUpdateAsync(globalSoftware).Wait();
+                        // Crear Software en TableSTorage
+                        GlobalSoftware globalSoftware = new GlobalSoftware(requestObject.SoftwareId, requestObject.SoftwareId)
+                        {
+                            Id = new Guid(requestObject.SoftwareId),
+                            Deleted = false,
+                            Pin = requestObject.Pin,
+                            StatusId = (int)Domain.Common.SoftwareStatus.Production
+                        };
+                        softwareTableManager.InsertOrUpdateAsync(globalSoftware).Wait();
 
-                    //        SetLogger(globalSoftware, "Step RA-6", " -- softwareTableManager.InsertOrUpdateAsync -- ");
-                    //    }
+                        SetLogger(globalSoftware, "Step RA-6", " -- softwareTableManager.InsertOrUpdateAsync -- ");
+                    }
 
 
                     //    //--1. se busac operation por radiancontributorid y software 
 
-                    //    RadianContributorOperation radianOperation = contributorService.GetRadianOperations(radianContributorId, requestObject.SoftwareId);
+                    RadianContributorOperation radianOperation = contributorService.GetRadianOperations(radianContributorId, requestObject.SoftwareId);
 
-                    //    //---2.. si no existe se crea  
-                    //    if (radianOperation == null)
-                    //    {
-                    //        radianOperation = new RadianContributorOperation()
-                    //        {
-                    //            Deleted = false,
-                    //            OperationStatusId = (int)Domain.Common.RadianState.Habilitado,
-                    //            SoftwareId = new Guid(requestObject.SoftwareId),
-                    //            RadianContributorId = radianContributorId,
-                    //            SoftwareType = Convert.ToInt32(requestObject.SoftwareType)
-                    //        };
+                    //---2.. si no existe se crea  
+                    if (radianOperation == null)
+                    {
+                        radianOperation = new RadianContributorOperation()
+                        {
+                            Deleted = false,
+                            OperationStatusId = (int)Domain.Common.RadianState.Habilitado,
+                            SoftwareId = new Guid(requestObject.SoftwareId),
+                            RadianContributorId = radianContributorId,
+                            Timestamp = System.DateTime.Now,
+                            SoftwareType = Convert.ToInt32(requestObject.SoftwareType)
+                        };
 
-                    //        int oper = contributorService.AddRadianOperation(radianOperation);
+                        int oper = contributorService.AddRadianOperation(radianOperation);
 
-                    //        SetLogger(radianOperation, "Step RA-7", " -- contributorService.AddRadianOperation -- ");
-                    //    }
-                    //    else //---3. si existe se actualiza.
-                    //    {
-                    //        radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado;
-                    //        radianOperation.SoftwareId = new Guid(requestObject.SoftwareId);
-                    //        radianOperation.RadianContributorId = radianContributorId;
-                    //        radianOperation.SoftwareType = Convert.ToInt32(requestObject.SoftwareType);
-                    //        contributorService.UpdateRadianOperation(radianOperation);
-                    //        SetLogger(radianOperation, "Step RA-8", " -- contributorService.UpdateRadianOperation -- ");
-                    //    }
+                        SetLogger(radianOperation, "Step RA-7", " -- contributorService.AddRadianOperation -- ");
+                    }
+                    else //---3. si existe se actualiza.
+                    {
+                        radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado;
+                        radianOperation.SoftwareId = new Guid(requestObject.SoftwareId);
+                        radianOperation.RadianContributorId = radianContributorId;
+                        radianOperation.SoftwareType = Convert.ToInt32(requestObject.SoftwareType);
+                        radianOperation.Timestamp = System.DateTime.Now;
+                        contributorService.UpdateRadianOperation(radianOperation);
+                        SetLogger(radianOperation, "Step RA-8", " -- contributorService.UpdateRadianOperation -- ");
+                    }
 
 
 
                     //    //--1. COnsultar previo por si ya existe
-                    //    GlobalRadianOperations globalRadianOperations = GlobalRadianOperationsTableManager.Find<GlobalRadianOperations>(requestObject.Code, requestObject.SoftwareId);
-                    //    if (globalRadianOperations == null)
-                    //        globalRadianOperations = new GlobalRadianOperations(requestObject.Code, requestObject.SoftwareId);
+                    GlobalRadianOperations globalRadianOperations = GlobalRadianOperationsTableManager.Find<GlobalRadianOperations>(requestObject.Code, requestObject.SoftwareId);
+                    if (globalRadianOperations == null)
+                        globalRadianOperations = new GlobalRadianOperations(requestObject.Code, requestObject.SoftwareId);
 
-                    //    //--2. si existe solo actualizar lo que llega
-                    //    if (radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect)
-                    //        globalRadianOperations.IndirectElectronicInvoicer = radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect;
-                    //    if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice)
-                    //        globalRadianOperations.ElectronicInvoicer = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice;
-                    //    if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider)
-                    //        globalRadianOperations.TecnologicalSupplier = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider;
-                    //    if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem)
-                    //        globalRadianOperations.NegotiationSystem = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem;
-                    //    if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor)
-                    //        globalRadianOperations.Factor = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor;
+                    //--2. si existe solo actualizar lo que llega
+                    if (radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect)
+                        globalRadianOperations.IndirectElectronicInvoicer = radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect;
+                    if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice)
+                        globalRadianOperations.ElectronicInvoicer = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice;
+                    if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider)
+                        globalRadianOperations.TecnologicalSupplier = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider;
+                    if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem)
+                        globalRadianOperations.NegotiationSystem = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem;
+                    if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor)
+                        globalRadianOperations.Factor = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor;
 
-                    //    globalRadianOperations.Deleted = false;
-                    //    globalRadianOperations.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
-                    //    globalRadianOperations.RadianState = Domain.Common.RadianState.Habilitado.GetDescription();
-                    //    globalRadianOperations.SoftwareType = Convert.ToInt32(requestObject.SoftwareType);
+                    globalRadianOperations.Deleted = false;
+                    globalRadianOperations.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
+                    globalRadianOperations.RadianState = Domain.Common.RadianState.Habilitado.GetDescription();
+                    globalRadianOperations.SoftwareType = Convert.ToInt32(requestObject.SoftwareType);
 
-                    //    //--3. Si no existe si se crea.    //-----Razon los estados deben mantenerse en la actualizacion. mismo nit y software pueden usar diferentes modos.
-                    //    GlobalRadianOperationsTableManager.InsertOrUpdateAsync(globalRadianOperations).Wait();
+                    //--3. Si no existe si se crea.    //-----Razon los estados deben mantenerse en la actualizacion. mismo nit y software pueden usar diferentes modos.
+                    GlobalRadianOperationsTableManager.InsertOrUpdateAsync(globalRadianOperations).Wait();
 
-                    //    SetLogger(globalRadianOperations, "Step RA-9", " -- globalRadianOperations -- ");
+                    SetLogger(globalRadianOperations, "Step RA-9", " -- globalRadianOperations -- ");
 
 
-                    //    log.Info($"Activation Radian successfully completed. Contributor with given id: {radianContributor.Id}");
+                    log.Info($"Activation Radian successfully completed. Contributor with given id: {radianContributor.Id}");
 
                 }
                 catch (Exception ex)
                 {
 
-                    //    if (contributorActivation == null)
-                    //        contributorActivation = new GlobalContributorActivation(requestObject.ContributorId.ToString(), Guid.NewGuid().ToString());
+                    if (contributorActivation == null)
+                        contributorActivation = new GlobalContributorActivation(requestObject.ContributorId.ToString(), Guid.NewGuid().ToString());
 
-                    //    contributorActivation.Success = false;
-                    //    contributorActivation.Message = "Error al activar contribuyente en producción.";
-                    //    contributorActivation.Detail = ex.Message;
-                    //    contributorActivation.Trace = ex.StackTrace;
-                    //    contributorActivationTableManager.InsertOrUpdate(contributorActivation);
+                    contributorActivation.Success = false;
+                    contributorActivation.Message = "Error al activar contribuyente en producción.";
+                    contributorActivation.Detail = ex.Message;
+                    contributorActivation.Trace = ex.StackTrace;
+                    contributorActivationTableManager.InsertOrUpdate(contributorActivation);
 
                     SetLogger(contributorActivation, "RA-Exception", ex.Message + " -- -- " + ex);
 
-                    //    log.Error($"Exception in RadianActivateContributor. {ex.Message}", ex);
+                    log.Error($"Exception in RadianActivateContributor. {ex.Message}", ex);
                     //    throw;
                 }
             }
