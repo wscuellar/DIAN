@@ -88,7 +88,7 @@ namespace Gosocket.Dian.Web.Models
         public List<RadianContributorAcceptanceStatusViewModel> AcceptanceStatuses { get; set; }
 
 
-        [Display(Name = "Correo electronico")]
+        [Display(Name = "Correo electrónico")]
         public string Email { get; set; }
 
         [Display(Name = "Fecha ingreso de solicitud")]
