@@ -10,7 +10,6 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 
@@ -31,14 +30,75 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                                                                                                            _radianTestSetResultService.Object);
 
         [TestMethod()]
-        [DataRow(1, 1)]
-        public void Index_View_CanceledContributor_Test(int contributorId, Domain.Common.RadianContributorType radianContributorType)
+        public void Index_View_CanceledContributor_Test()
         {
             RegistrationDataViewModel registrationData = new RegistrationDataViewModel
             {
-                ContributorId = contributorId,
-                RadianContributorType = radianContributorType
+                ContributorId = 1,
+                RadianContributorType = Domain.Common.RadianContributorType.ElectronicInvoice,
+                RadianOperationMode = 0
             };
+
+            _radianApprovedService.Setup(ras => ras.ContributorSummary(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(new RadianAdmin()
+                {
+                    Files = new List<RadianContributorFile>(),
+                    Contributor = new RedianContributorWithTypes()
+                    {
+                        Id = 1,
+                        TradeName = string.Empty,
+                        Code = string.Empty,
+                        BusinessName = string.Empty,
+                        Email = string.Empty,
+                        Step = 1,
+                        RadianState = string.Empty,
+                        RadianContributorTypeId = 1,
+                    },
+                    LegalRepresentativeIds = new List<string>() { "00003BD4-3F33-4EEE-9205-6C01DD8EAE95" }
+                });
+
+            _radianApprovedService.Setup(ras => ras.ContributorFileTypeList(It.IsAny<int>())).Returns(new List<RadianContributorFileType>());
+            _radianApprovedService.Setup(ras => ras.CustormerList(It.IsAny<int>(),
+                                                                  It.IsAny<string>(),
+                                                                  It.IsAny<RadianState>(),
+                                                                  It.IsAny<int>(),
+                                                                  It.IsAny<int>()))
+                .Returns(new PagedResult<RadianCustomerList>()
+                {
+                    Results = new List<RadianCustomerList>()
+                    {
+                        new RadianCustomerList()
+                        {
+                            BussinessName = string.Empty,
+                            Nit = string.Empty,
+                            RadianState = string.Empty,
+                            Page = 1,
+                            Length = 0
+                        }
+                    }
+                });
+
+            _radianApprovedService.Setup(ras => ras.FileHistoryFilter(It.IsAny<int>(),
+                                                                      It.IsAny<string>(),
+                                                                      It.IsAny<string>(),
+                                                                      It.IsAny<string>(),
+                                                                      It.IsAny<int>(),
+                                                                      It.IsAny<int>()))
+                .Returns(new PagedResult<RadianContributorFileHistory>()
+                {
+                    Results = new List<RadianContributorFileHistory>()
+                    {
+                        new RadianContributorFileHistory()
+                        {
+                            FileName = string.Empty,
+                            Comments = string.Empty,
+                            CreatedBy = string.Empty,
+                            Status = 1,
+                            Timestamp = DateTime.Now
+                        }
+                    }
+                });
+
 
             ViewResult result = _radianApprovedController.Index(registrationData) as ViewResult;
 
