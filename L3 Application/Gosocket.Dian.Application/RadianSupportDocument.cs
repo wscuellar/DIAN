@@ -12,6 +12,7 @@ namespace Gosocket.Dian.Application
     using Gosocket.Dian.Services.Utils.Helpers;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -162,13 +163,13 @@ namespace Gosocket.Dian.Application
                 // Total Data
                 { "TotalCurrency", "/*/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'LineExtensionAmount']/@currencyID" },
                 { "TotalExchangeRate", "/*[local-name() = 'Invoice']/*[local-name() = 'PaymentAlternativeExchangeRate']/*[local-name() = 'CalculationRate']" },
-                { "TotalUnitPrice", "//cac:LegalMonetaryTotal/cbc:LineExtensionAmount + Sum(//cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = false()]/cbc:Amount) - Sum(//cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = true()]/cbc:Amount)" },
-                { "TotalDiscountsDetail", "Sum(//cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = false()]/cbc:Amount)" },
-                { "TotalSurchargesDetail", "Sum(//cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = true()]/cbc:Amount)" },
+                { "TotalUnitPrice", "format-number(number(//cac:LegalMonetaryTotal/cbc:LineExtensionAmount) + sum(//cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = false()]/cbc:Amount) - sum(//cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = true()]/cbc:Amount), '#.##0,00', 'CountryDecimalFormat')" },
+                { "TotalDiscountsDetail", "/*/cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = false()]/cbc:Amount" },
+                { "TotalSurchargesDetail", "//cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = true()]/cbc:Amount" },
                 { "TotalTaxableBase", "/*[local-name() = 'Invoice']/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'TaxExclusiveAmount'] | /*[local-name() = 'CreditNote']/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'TaxExclusiveAmount']" },
-                { "TotalTaxesDetail", "Sum(/*/*[local-name() = 'TaxTotal'][*[local-name() = 'TaxSubtotal']/*[local-name() = 'TaxCategory']/*[local-name() = 'TaxScheme']/*[local-name() = 'ID'] = '01']/*[local-name() = 'TaxAmount'])" },
-                { "TotalOtherTaxes", "Sum(/*/*[local-name() = 'TaxTotal']/*[local-name() = 'TaxSubtotal']/*[local-name() = 'TaxAmount'])" },
-                { "TotalTaxes", "Sum(/*/*[local-name() = 'WithholdingTaxTotal']/*[local-name() = 'TaxAmount'])" },
+                { "TotalTaxesDetail", "/*/*[local-name() = 'TaxTotal'][*[local-name() = 'TaxSubtotal']/*[local-name() = 'TaxCategory']/*[local-name() = 'TaxScheme']/*[local-name() = 'ID'] = '01']/*[local-name() = 'TaxAmount']" },
+                { "TotalOtherTaxes", "/*/*[local-name() = 'TaxTotal']/*[local-name() = 'TaxSubtotal']/*[local-name() = 'TaxAmount']" },
+                { "TotalTaxes", "/*/*[local-name() = 'WithholdingTaxTotal']/*[local-name() = 'TaxAmount']" },
                 { "GlobalDiscounts", "/*[local-name() = 'Invoice']/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'AllowanceTotalAmount']" },
                 { "GlobalSurcharges", "/*[local-name() = 'Invoice']/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'ChargeTotalAmount']" },
                 { "TotalAmount", "/*/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'LineExtensionAmount']" },
@@ -247,18 +248,19 @@ namespace Gosocket.Dian.Application
             // ToTal Retentions
             template = template.Replace( "{RetentionNumber}", dataValues.XpathsValues["RetentionNumber"]);
             template = template.Replace( "{RetentionAmount}", dataValues.XpathsValues["RetentionAmount"]);
+
             // Total Data
             template = template.Replace("{ValidationDate}", string.Empty);
             template = template.Replace("{GenerationDate}", DateTime.Now.ToShortDateString());
             template = template.Replace( "{TotalCurrency}", dataValues.XpathsValues["TotalCurrency"]);
             template = template.Replace( "{TotalExchangeRate}", dataValues.XpathsValues["TotalExchangeRate"]);
             template = template.Replace( "{TotalUnitPrice}", dataValues.XpathsValues["TotalUnitPrice"]);
-            template = template.Replace( "{TotalDiscountsDetail}", dataValues.XpathsValues["TotalDiscountsDetail"]);
-            template = template.Replace( "{TotalSurchargesDetail}", dataValues.XpathsValues["TotalSurchargesDetail"]);
+            template = template.Replace( "{TotalDiscountsDetail}", SplitAndSum(dataValues.XpathsValues["TotalDiscountsDetail"]).ToString());
+            template = template.Replace( "{TotalSurchargesDetail}", SplitAndSum(dataValues.XpathsValues["TotalSurchargesDetail"]).ToString());
             template = template.Replace( "{TotalTaxableBase}", dataValues.XpathsValues["TotalTaxableBase"]);
-            template = template.Replace( "{TotalTaxesDetail}", dataValues.XpathsValues["TotalTaxesDetail"]);
-            template = template.Replace( "{TotalOtherTaxes}", dataValues.XpathsValues["TotalOtherTaxes"]);
-            template = template.Replace( "{TotalTaxes}", dataValues.XpathsValues["TotalTaxes"]);
+            template = template.Replace( "{TotalTaxesDetail}", SplitAndSum(dataValues.XpathsValues["TotalTaxesDetail"]).ToString());
+            template = template.Replace( "{TotalOtherTaxes}", SplitAndSum(dataValues.XpathsValues["TotalOtherTaxes"]).ToString());
+            template = template.Replace( "{TotalTaxes}", SplitAndSum(dataValues.XpathsValues["TotalTaxes"]).ToString());
             template = template.Replace( "{GlobalDiscounts}", dataValues.XpathsValues["GlobalDiscounts"]);
             template = template.Replace( "{GlobalSurcharges}", dataValues.XpathsValues["GlobalSurcharges"]);
             template = template.Replace( "{TotalAmount}", dataValues.XpathsValues["TotalAmount"]);
@@ -267,11 +269,31 @@ namespace Gosocket.Dian.Application
             template = template.Replace( "{AuthorizedRangeFrom}", dataValues.XpathsValues["AuthorizedRangeFrom"]);
             template = template.Replace( "{AuthorizedRangeTo}", dataValues.XpathsValues["AuthorizedRangeTo"]);
             template = template.Replace( "{ValidityDate}", dataValues.XpathsValues["ValidityDate"]);
-
             return template;
         }
 
         #endregion
+
+        #region SplitAndSum
+
+        private double SplitAndSum(string concateField)
+        {
+            // TotalDiscountsDetail
+            var aux = concateField.Split('|');
+            double fieldValue = 0;
+
+            foreach (var dataField in aux)
+            {
+                if (!string.IsNullOrEmpty(dataField))
+                {
+                    fieldValue += double.Parse(dataField, CultureInfo.InvariantCulture);
+                }
+            }
+            return fieldValue;
+        }
+
+        #endregion
+
 
     }
 }
