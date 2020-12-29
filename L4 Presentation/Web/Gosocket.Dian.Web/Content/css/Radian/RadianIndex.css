@@ -1622,3 +1622,12 @@ a.badge {
 .edit-state-td{
     padding: 0px;
 }
+
+.set-test-details .panel-body {
+    background-color: #F4F5F7;
+    padding: 20px !important;
+}
+
+.set-test-details {
+    border: none !important;
+}
