@@ -14,7 +14,6 @@
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
 
     <style>
-        
     </style>
 }
 
@@ -67,15 +66,14 @@
     <script>
         $(document).ready(function () {
             grecaptcha.ready(function () {
-
-                grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
-                    $(".downloadPDFUrl").attr("href", $(".downloadPDFUrl").attr("href") + "&recaptchaToken=" + token);
-                });
+                    grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
+                        $(".downloadPDFUrl").attr("href", $(".downloadPDFUrl").attr("href") + "&recaptchaToken=" + token);
+                    });
             });
         });
-                function downloadFiles(id) {
-                window.location.href = "/Document/DownloadPDF?trackId=" + id;
-            }
+        function downloadFiles(id) {
+            window.location.href = "/Document/DownloadPDF?trackId=" + id;
+        }
     </script>
 
 }

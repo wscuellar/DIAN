@@ -5,7 +5,6 @@ using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gosocket.Dian.Application
 {
@@ -172,10 +171,14 @@ namespace Gosocket.Dian.Application
         public Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> InvoiceAndNotes(string documentKey)
         {
             List<GlobalDocValidatorDocumentMeta> allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
+            Dictionary<int, string> icons = new Dictionary<int, string>();
 
-            Dictionary<int, string> icons = IconType(allReferencedDocuments);
+            GlobalDocValidatorDocument globalDocValidatorDocument = GlobalDocValidatorDocumentByGlobalId(documentKey);
 
-            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> tuple = Tuple.Create(GlobalDocValidatorDocumentByGlobalId(documentKey), CreditAndDebitNotes(allReferencedDocuments), icons);
+            if (!string.IsNullOrEmpty(documentKey) && globalDocValidatorDocument.DocumentTypeId == "01")
+                icons = IconType(allReferencedDocuments);
+
+            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> tuple = Tuple.Create(globalDocValidatorDocument, CreditAndDebitNotes(allReferencedDocuments), icons);
 
             return tuple;
         }
