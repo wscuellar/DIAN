@@ -51,6 +51,42 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                         BusinessName = string.Empty,
                         Email = string.Empty,
                         Step = 1,
+                        RadianState = "Cancelado",
+                        RadianContributorTypeId = 1,
+                    },
+                    LegalRepresentativeIds = new List<string>() { "00003BD4-3F33-4EEE-9205-6C01DD8EAE95" }
+                });
+
+            _radianApprovedService.Setup(ras => ras.ContributorFileTypeList(It.IsAny<int>())).Returns(new List<RadianContributorFileType>());
+
+            ViewResult result = _radianApprovedController.Index(registrationData) as ViewResult;
+
+            Assert.AreEqual("Index", result.ViewName);
+        }
+
+
+        [TestMethod()]
+        public void Index_View_Contributor()
+        {
+            RegistrationDataViewModel registrationData = new RegistrationDataViewModel
+            {
+                ContributorId = 1,
+                RadianContributorType = Domain.Common.RadianContributorType.ElectronicInvoice,
+                RadianOperationMode = 0
+            };
+
+            _radianApprovedService.Setup(ras => ras.ContributorSummary(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(new RadianAdmin()
+                {
+                    Files = new List<RadianContributorFile>(),
+                    Contributor = new RedianContributorWithTypes()
+                    {
+                        Id = 1,
+                        TradeName = string.Empty,
+                        Code = string.Empty,
+                        BusinessName = string.Empty,
+                        Email = string.Empty,
+                        Step = 1,
                         RadianState = string.Empty,
                         RadianContributorTypeId = 1,
                     },
@@ -99,22 +135,6 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     }
                 });
 
-
-            ViewResult result = _radianApprovedController.Index(registrationData) as ViewResult;
-
-            Assert.AreEqual("Index", result.ViewName);
-        }
-
-
-        [TestMethod()]
-        [DataRow(1, 1)]
-        public void Index_View_Contributor(int contributorId, Domain.Common.RadianContributorType radianContributorType)
-        {
-            RegistrationDataViewModel registrationData = new RegistrationDataViewModel
-            {
-                ContributorId = contributorId,
-                RadianContributorType = radianContributorType
-            };
 
             ViewResult result = _radianApprovedController.Index(registrationData) as ViewResult;
 
