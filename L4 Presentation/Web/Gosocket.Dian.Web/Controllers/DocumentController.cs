@@ -165,7 +165,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-                IsValidCaptcha(recaptchaToken);
+                //IsValidCaptcha(recaptchaToken);
                 string url = ConfigurationManager.GetValue("GetPdfUrl");
 
                 var requestObj = new { trackId };
