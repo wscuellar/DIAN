@@ -1,9 +1,9 @@
-﻿function showPdfModal(element, cufe, url) {
+﻿function showPdfModal(element, cufe, url, panel) {
     $(element).click(() => {
-        showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
+        showLoading(panel, 'Cargando', 'Procesando datos, por favor espere.');
         var data = { cufe }
         var actionSuccess = (docBase) => {
-            hideLoading('#panel-form');
+            hideLoading(panel);
             bootbox.dialog({
                 message: '<object data="data:application/pdf;base64,' + docBase + '" width="860" height="768" type="application/pdf"></object>',
                 size: 'large',

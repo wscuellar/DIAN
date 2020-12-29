@@ -48,14 +48,15 @@ namespace Gosocket.Dian.Application
 
             // Load xml        
             // TODO: Cargar documento con cufe
-            var xmlBytes = _fileManager.GetBytes("radian-documents-templates", "XMLDocumentoSoporte.xml");
+            byte[] xmlBytes = await GetXmlFromStorageAsync(cude);
+            //_fileManager.GetBytes("radian-documents-templates", "XMLDocumentoSoporte.xml");
 
             // Load xpaths
-            var xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
+            Dictionary<string, string> xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
             try
             {
-                var fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
+                ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
 
                 // Mapping Fields
                 template = TemplateGlobalMapping(template, fieldValues);
@@ -255,12 +256,12 @@ namespace Gosocket.Dian.Application
             template = template.Replace( "{TotalCurrency}", dataValues.XpathsValues["TotalCurrency"]);
             template = template.Replace( "{TotalExchangeRate}", dataValues.XpathsValues["TotalExchangeRate"]);
             template = template.Replace( "{TotalUnitPrice}", dataValues.XpathsValues["TotalUnitPrice"]);
-            template = template.Replace( "{TotalDiscountsDetail}", SplitAndSum(dataValues.XpathsValues["TotalDiscountsDetail"]).ToString());
-            template = template.Replace( "{TotalSurchargesDetail}", SplitAndSum(dataValues.XpathsValues["TotalSurchargesDetail"]).ToString());
-            template = template.Replace( "{TotalTaxableBase}", dataValues.XpathsValues["TotalTaxableBase"]);
-            template = template.Replace( "{TotalTaxesDetail}", SplitAndSum(dataValues.XpathsValues["TotalTaxesDetail"]).ToString());
-            template = template.Replace( "{TotalOtherTaxes}", SplitAndSum(dataValues.XpathsValues["TotalOtherTaxes"]).ToString());
-            template = template.Replace( "{TotalTaxes}", SplitAndSum(dataValues.XpathsValues["TotalTaxes"]).ToString());
+            //template = template.Replace( "{TotalDiscountsDetail}", SplitAndSum(dataValues.XpathsValues["TotalDiscountsDetail"]).ToString());
+            //template = template.Replace( "{TotalSurchargesDetail}", SplitAndSum(dataValues.XpathsValues["TotalSurchargesDetail"]).ToString());
+            //template = template.Replace( "{TotalTaxableBase}", dataValues.XpathsValues["TotalTaxableBase"]);
+            //template = template.Replace( "{TotalTaxesDetail}", SplitAndSum(dataValues.XpathsValues["TotalTaxesDetail"]).ToString());
+            //template = template.Replace( "{TotalOtherTaxes}", SplitAndSum(dataValues.XpathsValues["TotalOtherTaxes"]).ToString());
+            //template = template.Replace( "{TotalTaxes}", SplitAndSum(dataValues.XpathsValues["TotalTaxes"]).ToString());
             template = template.Replace( "{GlobalDiscounts}", dataValues.XpathsValues["GlobalDiscounts"]);
             template = template.Replace( "{GlobalSurcharges}", dataValues.XpathsValues["GlobalSurcharges"]);
             template = template.Replace( "{TotalAmount}", dataValues.XpathsValues["TotalAmount"]);
@@ -273,27 +274,5 @@ namespace Gosocket.Dian.Application
         }
 
         #endregion
-
-        #region SplitAndSum
-
-        private double SplitAndSum(string concateField)
-        {
-            // TotalDiscountsDetail
-            var aux = concateField.Split('|');
-            double fieldValue = 0;
-
-            foreach (var dataField in aux)
-            {
-                if (!string.IsNullOrEmpty(dataField))
-                {
-                    fieldValue += double.Parse(dataField, CultureInfo.InvariantCulture);
-                }
-            }
-            return fieldValue;
-        }
-
-        #endregion
-
-
     }
 }
