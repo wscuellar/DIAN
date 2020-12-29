@@ -47,14 +47,15 @@ namespace Gosocket.Dian.Application
 
             // Load xml        
             // TODO: Cargar documento con cufe
-            var xmlBytes = _fileManager.GetBytes("radian-documents-templates", "XMLDocumentoSoporte.xml");
+            byte[] xmlBytes = await GetXmlFromStorageAsync(cude);
+            //_fileManager.GetBytes("radian-documents-templates", "XMLDocumentoSoporte.xml");
 
             // Load xpaths
-            var xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
+            Dictionary<string, string> xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
             try
             {
-                var fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
+                ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
 
                 // Mapping Fields
                 template = TemplateGlobalMapping(template, fieldValues);
@@ -272,6 +273,5 @@ namespace Gosocket.Dian.Application
         }
 
         #endregion
-
     }
 }
