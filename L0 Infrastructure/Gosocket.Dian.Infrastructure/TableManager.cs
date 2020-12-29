@@ -471,6 +471,18 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
+
+         public T FindDocumentReferenceAttorney<T>(string partitionKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+
+
+            var entities = CloudTable.ExecuteQuery(query);
+
+            return entities.FirstOrDefault();
+        }
+
+
         public List<T> FindDocumentByReference<T>(string documentReferencedKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
