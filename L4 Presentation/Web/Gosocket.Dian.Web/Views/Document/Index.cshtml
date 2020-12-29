@@ -214,8 +214,7 @@
                     $(this).removeClass('not-redirect')
             });
 
-            $(".download-document").click(function(){debugger
-                showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
+            $(".download-document").click(function(){
                 var cufe = this.id;
                 window.location.href = "/Document/DownloadZipFiles?trackId=" + cufe;
             })
