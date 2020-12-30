@@ -23,6 +23,7 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string ReceiverCode { get; set; }
     public string ReceiverName { get; set; }
     public string ReceiverTypeCode { get; set; }
+    public string ReceiverSchemeCode { get; set; }
     public string Number { get; set; }
     public string Serie { get; set; }
     public string SerieAndNumber { get; set; }
@@ -44,6 +45,7 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string UblVersion { get; set; }
     public string ZipKey { get; set; }
     public string EventCode { get; set; }
+    public string EventCodeDescription { get; set; }
     public bool InTransaction { get; set; }
     public DateTime SigningTimeStamp { get; set; }
 }
