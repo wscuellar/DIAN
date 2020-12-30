@@ -83,7 +83,7 @@ namespace Gosocket.Dian.Application
         /// </summary>
         /// <param name="trackId"></param>
         /// <returns></returns>
-        public async Task<byte[]> GetXmlFromStorageAsync(string trackId)
+        private async Task<byte[]> GetXmlFromStorageAsync(string trackId)
         {
             var TableManager = new TableManager("GlobalDocValidatorRuntime");
             var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
@@ -256,12 +256,12 @@ namespace Gosocket.Dian.Application
             template = template.Replace( "{TotalCurrency}", dataValues.XpathsValues["TotalCurrency"]);
             template = template.Replace( "{TotalExchangeRate}", dataValues.XpathsValues["TotalExchangeRate"]);
             template = template.Replace( "{TotalUnitPrice}", dataValues.XpathsValues["TotalUnitPrice"]);
-            //template = template.Replace( "{TotalDiscountsDetail}", SplitAndSum(dataValues.XpathsValues["TotalDiscountsDetail"]).ToString());
-            //template = template.Replace( "{TotalSurchargesDetail}", SplitAndSum(dataValues.XpathsValues["TotalSurchargesDetail"]).ToString());
-            //template = template.Replace( "{TotalTaxableBase}", dataValues.XpathsValues["TotalTaxableBase"]);
-            //template = template.Replace( "{TotalTaxesDetail}", SplitAndSum(dataValues.XpathsValues["TotalTaxesDetail"]).ToString());
-            //template = template.Replace( "{TotalOtherTaxes}", SplitAndSum(dataValues.XpathsValues["TotalOtherTaxes"]).ToString());
-            //template = template.Replace( "{TotalTaxes}", SplitAndSum(dataValues.XpathsValues["TotalTaxes"]).ToString());
+            template = template.Replace("{TotalDiscountsDetail}", SplitAndSum(dataValues.XpathsValues["TotalDiscountsDetail"]).ToString());
+            template = template.Replace("{TotalSurchargesDetail}", SplitAndSum(dataValues.XpathsValues["TotalSurchargesDetail"]).ToString());
+            template = template.Replace("{TotalTaxableBase}", dataValues.XpathsValues["TotalTaxableBase"]);
+            template = template.Replace("{TotalTaxesDetail}", SplitAndSum(dataValues.XpathsValues["TotalTaxesDetail"]).ToString());
+            template = template.Replace("{TotalOtherTaxes}", SplitAndSum(dataValues.XpathsValues["TotalOtherTaxes"]).ToString());
+            template = template.Replace("{TotalTaxes}", SplitAndSum(dataValues.XpathsValues["TotalTaxes"]).ToString());
             template = template.Replace( "{GlobalDiscounts}", dataValues.XpathsValues["GlobalDiscounts"]);
             template = template.Replace( "{GlobalSurcharges}", dataValues.XpathsValues["GlobalSurcharges"]);
             template = template.Replace( "{TotalAmount}", dataValues.XpathsValues["TotalAmount"]);
@@ -271,6 +271,26 @@ namespace Gosocket.Dian.Application
             template = template.Replace( "{AuthorizedRangeTo}", dataValues.XpathsValues["AuthorizedRangeTo"]);
             template = template.Replace( "{ValidityDate}", dataValues.XpathsValues["ValidityDate"]);
             return template;
+        }
+
+        #endregion
+
+        #region SplitAndSum
+
+        private double SplitAndSum(string concateField)
+        {
+            // TotalDiscountsDetail
+            var aux = concateField.Split('|');
+            double fieldValue = 0;
+
+            foreach (var dataField in aux)
+            {
+                if (!string.IsNullOrEmpty(dataField))
+                {
+                    fieldValue += double.Parse(dataField, CultureInfo.InvariantCulture);
+                }
+            }
+            return fieldValue;
         }
 
         #endregion
