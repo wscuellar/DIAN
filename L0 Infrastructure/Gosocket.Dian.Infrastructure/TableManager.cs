@@ -909,6 +909,50 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+        public T FindhByCufeExchange<T> (string partitionKey, bool active) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterConditionForBool("Active",
+                    QueryComparisons.Equal,
+                    active));
+
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
+        public T FindhByCufeSenderAttorney<T>(string rowKey, string senderCode, string issuerAttorney) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    rowKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("SenderCode",
+                    QueryComparisons.Equal,
+                    senderCode));
+            prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("IssuerAttorney",
+                    QueryComparisons.Equal,
+                    issuerAttorney));
+
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
 
         public T FindByTestSetId<T>(string TestSetId) where T : ITableEntity, new()
         {
