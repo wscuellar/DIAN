@@ -747,6 +747,14 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
+                if (string.IsNullOrEmpty(providerCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}B19a-(R): NIT del Prestador de Servicio no fue informado");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
                 if (!UBLVersionID.Equals("UBL 2.1"))
                 {
                     stringBuilder.AppendLine($"{codeMessage}D01-(R): El elemento no contiene el literal 'UBL 2.1'");
