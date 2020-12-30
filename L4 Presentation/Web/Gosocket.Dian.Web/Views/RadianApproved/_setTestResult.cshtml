@@ -1,7 +1,22 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@using Gosocket.Dian.Domain.Common;
 @{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" }, { "readonly", "true" } };}
 @{
     ViewBag.title = "Datos del set de pruebas";
+    var status = "";
+    switch (Model.RadianTestSetResult.Status)
+    {
+        case (int)TestSetStatus.InProcess:
+            status = "En Proceso";
+            break;
+        case (int)TestSetStatus.Accepted:
+            status = "Aceptado";
+            break;
+        case (int)TestSetStatus.Rejected:
+            status = "Rechazado";
+            break;
+
+    }
 }
 
 
@@ -23,7 +38,7 @@
                     <div class="col-sm-11">
                         <span class="warning-title">¡Importante!</span>
                         <p>
-                            Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta en <b>@Model.RadianTestSetResult.Status</b>.<br>
+                            Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta <b>@status</b>.<br>
                             Usted debe proporcinar el identificador del st de pruebas (TestSetld) <b>@Model.RadianTestSetResult.Id</b> en el web service  para el envío de su set de pruebas.
                         </p>
                     </div>
