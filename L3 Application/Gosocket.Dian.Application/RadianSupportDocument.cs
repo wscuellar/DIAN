@@ -55,7 +55,7 @@ namespace Gosocket.Dian.Application
             // Load xml        
             // TODO: Cargar documento con cufe
             byte[] xmlBytes = GetXmlFromStorageAsync(cude);
-            //_fileManager.GetBytes("radian-documents-templates", "XMLDocumentoSoporte.xml");
+
 
             // Load xpaths
             Dictionary<string, string> xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");

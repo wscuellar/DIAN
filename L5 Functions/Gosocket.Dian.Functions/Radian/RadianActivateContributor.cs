@@ -52,7 +52,7 @@ namespace Gosocket.Dian.Functions.Radian
                     if (radianContributor != null)
                     {
                         // Step 3 Activo RadianContributor
-
+                        radianContributor.Step = 4;
                         radianContributor.RadianContributorTypeId = requestObject.RadianContributorTypeId;
                         contributorService.ActivateRadian(radianContributor);
                         radianContributorId = radianContributor.Id;

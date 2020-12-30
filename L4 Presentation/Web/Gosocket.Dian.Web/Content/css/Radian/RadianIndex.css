@@ -904,22 +904,39 @@ span.state-file {
     margin: 11px;
 }
 
-    span.state-file.status-1 {
-        background-image: url(../../images/Svg/Loaded.svg);
-    }
+span.state-file.status-1 {
+    background-image: url(../../images/Svg/Loaded.svg);
+}
 
-    span.state-file.status-2 {
-        background-image: url(../../images/aproved.png);
-    }
+span.state-file.status-2 {
+    background-image: url(../../images/aproved.png);
+}
 
-    span.state-file.status-3 {
-        background-image: url(../../images/reject.png);
-    }
+span.state-file.status-3 {
+    background-image: url(../../images/reject.png);
+}
 
-    span.state-file.status-4 {
-        background-image: url(../../images/observations.png);
-    }
+span.state-file.status-4 {
+    background-image: url(../../images/observations.png);
+}
 
+span.state-file-rejected.status-4 {
+    background-image: url(../../images/observations.png);
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    bottom: 12px;
+    background-repeat: no-repeat;
+}
+
+span.state-file-rejected.status-3 {
+    background-image: url(../../images/reject.png);
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    bottom: 12px;
+    background-repeat: no-repeat;
+}
 
 .highcharts-figure, .highcharts-data-table table {
     min-width: 310px;
@@ -1097,6 +1114,8 @@ span.close {
     display: inline-block;
     margin-left: 1.5em;
     margin: 4px 0px;
+    top: 4px;
+    position: relative;
 }
 
 .jqcs_options {
@@ -1566,10 +1585,10 @@ a.badge {
     text-align: center;
 }
 
-    .icon-alert .fa-exclamation-circle {
-        margin: 20px auto;
-        width: 44px;
-    }
+.icon-alert .fa-exclamation-circle {
+    margin: 20px auto;
+    width: 44px;
+}
 
 .adm-radian-view {
     padding: 25px 12px 20px !important;
@@ -1586,7 +1605,7 @@ a.badge {
 }
 
 .table-width-80 {
-    width: 80%;
+    width: 90%;
     margin: auto;
 }
 
@@ -1597,11 +1616,12 @@ a.badge {
 
 #table-history tr th:nth-child(1) {
     background-position: 151px;
+    width: 25% !important;
 }
 
 
 #table-history tr th:nth-child(2) {
-    background-position: 100px;
+    background-position: 73px;
 }
 
 #table-history tr th:nth-child(3) {
@@ -1635,11 +1655,11 @@ a.badge {
     padding-left: 17px;
 }
 
-    #table-history td:nth-child(2) {
-        text-align: center;
-        padding-left: 18px;
-        color: initial
-    }
+#table-history td:nth-child(2) {
+    text-align: center;
+    padding-left: 18px;
+    color: initial
+}
 
 .edit-state-td {
     padding: 0px;
@@ -1647,4 +1667,17 @@ a.badge {
 
 .actions {
     padding: 0 5px;
+}
+
+.state-file-rejected{
+
+}
+
+.thirth-step .label-file-name {
+    color: #2458C5;
+    font-weight: bold;
+}
+
+.thirth-step .label-file-name {
+    padding-left: 25px;
 }
