@@ -471,7 +471,7 @@ namespace Gosocket.Dian.Application
                 if (radianc != null)
                 {
                     radianc.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
-
+                    radianc.Step = 4;
                     Guid softId = new Guid(softwareId);
                     if (radianc.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
                     {
@@ -482,7 +482,7 @@ namespace Gosocket.Dian.Application
                     RadianContributorOperation radianOperation = context.RadianContributorOperations.FirstOrDefault(
                                                  t => t.RadianContributorId == radianc.Id
                                                  && t.SoftwareType == softwareType
-                                                 && t.SoftwareId.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase)
+                                                 && t.SoftwareId.ToString().Trim().ToLower().Equals(softId.ToString().Trim().ToLower(), StringComparison.OrdinalIgnoreCase)
                                                  && t.OperationStatusId == (int)Domain.Common.RadianState.Test
                                                  );
                     if (radianOperation != null)
