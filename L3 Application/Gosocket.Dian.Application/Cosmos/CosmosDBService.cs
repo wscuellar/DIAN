@@ -633,7 +633,9 @@ namespace Gosocket.Dian.Application.Cosmos
             switch (radianStatus)
             {
                 case 0:
+                    break;
                 case 7:
+                    globalDocuments = globalDocuments.Take(10).ToList();
                     break;
                 case 1:
                 case 6:
@@ -662,7 +664,10 @@ namespace Gosocket.Dian.Application.Cosmos
                     }
 
                     if (documentTypeId == "01")
+                    {
                         globalDocuments.RemoveAll(g => globalDocRadianStateFiltered.Any(f => f == g));
+                        globalDocuments = globalDocuments.Take(10).ToList();
+                    }
 
                     break;
                 default:
