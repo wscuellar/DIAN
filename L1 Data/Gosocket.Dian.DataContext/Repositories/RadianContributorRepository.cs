@@ -38,11 +38,11 @@ namespace Gosocket.Dian.DataContext.Repositories
         public bool GetParticipantWithActiveProcess(int contributorId, int contributorTypeId)
         {
             List<RadianContributor> participants = (from p in sqlDBContext.RadianContributors.Where(t => t.ContributorId == contributorId)
-                                                   join o in sqlDBContext.RadianContributorOperations on p.Id equals o.RadianContributorId
-                                                   where p.RadianContributorTypeId != contributorTypeId
-                                                   && p.RadianOperationModeId == 1
-                                                   &&  o.OperationStatusId< 4
-                                                   select p).ToList();
+                                                    join o in sqlDBContext.RadianContributorOperations on p.Id equals o.RadianContributorId
+                                                    where p.RadianContributorTypeId != contributorTypeId
+                                                    && p.RadianOperationModeId == 1
+                                                    && o.OperationStatusId < 4
+                                                    select p).ToList();
             return participants.Any();
 
         }
@@ -61,7 +61,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                                                     && rc2.RadianState != "Cancelado"
                                                     && (string.IsNullOrEmpty(code) || c.Code == code)
                                                     && (string.IsNullOrEmpty(radianState) || rc2.RadianState == radianState)
-                                                    
+
                                                     select new RadianCustomerList()
                                                     {
                                                         Id = rc2.Id,
@@ -90,6 +90,19 @@ namespace Gosocket.Dian.DataContext.Repositories
                 .Include("RadianContributorFile")
                 .Include("RadianContributorOperations");
             return query.Paginate(page, length, t => t.Id.ToString());
+        }
+
+
+
+        public List<RadianContributor> ActiveParticipantsWithSoftware(int radianContributorTypeId)
+        {
+            string radianStatus = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
+            int softwareStatus = (int)Domain.Common.RadianSoftwareStatus.Accepted;
+            List<RadianContributor> query = sqlDBContext.RadianContributors.Where(t => t.RadianContributorTypeId == radianContributorTypeId && t.RadianState == radianStatus).Include("Contributor").ToList();
+            query = (from rc in query
+                     join s in sqlDBContext.RadianSoftwares.Where(t => t.RadianSoftwareStatusId == softwareStatus) on rc.Id equals s.RadianContributorId
+                     select rc).ToList();
+            return query;
         }
 
         /// <summary>
