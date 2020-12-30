@@ -328,6 +328,7 @@
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ExternalUsersController.cs" />
+    <Compile Include="Controllers\OthersDocumentsController.cs" />
     <Compile Include="Controllers\OthersElectronicDocAssociatedController.cs" />
     <Compile Include="Controllers\OthersElectronicDocumentsController.cs" />
     <Compile Include="Controllers\QueryAssociatedEventsController.cs" />

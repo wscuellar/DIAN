@@ -61,52 +61,52 @@
                     status = "danger";
                     isDisabled = "disabled";
                 }
-                <tr>
+                <tr data-id="@document.Id" data-partitionKey="@document.PartitionKey" class="document-row">
                     <td>
                         @if (document.Status != 2)
                         {
-                            <span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                            <span class="fa fa fa-download add-tooltip" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
                         }
                         else
                         {
                             <span class="fa fa fa-close add-tooltip" data-original-title="Descarga desahabilitada"></span>
                         }
                     </td>
-                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap">
                         <a>@document.ReceptionDate.AddHours(-5).ToString("dd-MM-yyyy")</a>
                     </td>
-                    <td class="text-nowrap text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap text-center">
                         <a>@document.EmissionDate.ToString("dd-MM-yyyy")</a>
                     </td>
-                    <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-center text-nowrap">
                         @document.Serie
                     </td>
-                    <td class="text-nowrap text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap text-center">
                         @document.SerieAndNumber
                     </td>
-                    <td class="text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-center">
                         <div class="iffyTip hideText2">@document.DocumentTypeName</div>
                     </td>
-                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap">
                         @document.SenderCode
                     </td>
-                    <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td>
                         <div class="iffyTip hideText2">@document.SenderName</div>
                     </td>
-                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap">
                         @document.ReceiverCode
                     </td>
-                    <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td>
                         <div class="iffyTip hideText2">@document.ReceiverName</div>
                     </td>
-                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap">
                         @document.StatusName
                     </td>
-                    <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td>
                         <i class="fa fa-circle radian-status-circle"></i>
                         @document.RadianStatusName
                     </td>
-                    <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-center text-nowrap">
                         @document.TotalAmount.ToString("C0")
                     </td>
                 </tr>

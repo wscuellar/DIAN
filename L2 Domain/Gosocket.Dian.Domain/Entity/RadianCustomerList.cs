@@ -1,8 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Domain.Entity
 {
-    [ExcludeFromCodeCoverage]
     public class RadianCustomerList
     {
         public RadianCustomerList()

@@ -5,7 +5,7 @@
     <hr class="margin-5 margin-bottom-20" />
 
     <div class="col-sm-3 padding-xs-0 buttonAddRightOtherDoc">
-        <div class="form-group">
+        <div class="form-group" id="divElectronicDocumentId">
             @Html.Label("Seleccione el Documento electronico", new { @class = "control-label" })
             @Html.DropDownListFor(m => m.ElectronicDocumentId, new SelectList(ViewBag.listElectronicDocuments, "Id", "Name"), new { @class = "form-control selectpicker" })
         </div>
@@ -22,7 +22,7 @@
     <hr class="margin-5 margin-bottom-20" />
 
     <div class="col-sm-3 padding-xs-0">
-        <div class="form-group">
+        <div class="form-group" id="divOperationModeId">
             @Html.Label("Seleccione el modo de operación", new { @class = "control-label" })
             @Html.DropDownListFor(m => m.OperationModeId, new SelectList(ViewBag.listOperationModes, "Id", "Name"), new { @class = "form-control selectpicker" })
         </div>
@@ -61,7 +61,6 @@
             @Html.LabelFor(m => m.ElectronicPayrollAjustmentRequired, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.ElectronicPayrollAjustmentRequired, new { @class = "form-control input-general fields captureFields" })
             @Html.ValidationMessage("validpayrollAjustment", new { @class = "text-danger" })
-            @Html.ValidationMessageFor(m => m.ElectronicPayrollAjustmentRequired, "", new { @class = "text-danger" })
         </div>
     </div>
 </div>
@@ -90,8 +89,7 @@
         <div class="form-group">
             @Html.LabelFor(m => m.ElectronicPayrollAjustmentAcceptedRequired, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.ElectronicPayrollAjustmentAcceptedRequired, new { @class = "form-control input-general fields captureFields" })
-            @Html.ValidationMessage("validpayrollAjustmentAccepted", new { @class = "text-danger" }) 
-            @Html.ValidationMessageFor(m => m.ElectronicPayrollAjustmentAcceptedRequired, "", new { @class = "text-danger" })
+            @Html.ValidationMessage("validpayrollAjustmentAccepted", new { @class = "text-danger" })
         </div>
     </div>
 

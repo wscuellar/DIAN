@@ -138,7 +138,6 @@ namespace Gosocket.Dian.Web
             current.AddClaim(new Claim(CustomClaimTypes.ContributorOperationModeId, currentContributor.OperationModeId.ToString()));
             current.AddClaim(new Claim(CustomClaimTypes.ContributorTypeId, currentContributor.ContributorTypeId.ToString()));
             current.AddClaim(new Claim(CustomClaimTypes.IdentificationTypeId, user.IdentificationTypeId.ToString()));
-            current.AddClaim(new Claim(CustomClaimTypes.PersonType, currentContributor.PersonType.ToString()));
 
             // Invoicer claims
             bool goToInvoicer = false;

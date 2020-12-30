@@ -747,6 +747,14 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
+                if (string.IsNullOrEmpty(providerCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}B19a-(R): NIT del Prestador de Servicio no fue informado");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
                 if (!UBLVersionID.Equals("UBL 2.1"))
                 {
                     stringBuilder.AppendLine($"{codeMessage}D01-(R): El elemento no contiene el literal 'UBL 2.1'");
@@ -870,7 +878,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentCude))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D06-(R): el valor UUID no está correctamente calculado");
+                    stringBuilder.AppendLine($"{codeMessage}D06-(R): CUDE del UBL no puede estar vacío.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;

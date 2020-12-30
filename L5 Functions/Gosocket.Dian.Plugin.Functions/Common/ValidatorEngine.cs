@@ -112,6 +112,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     throw new Exception(xmlParserCude.ParserError);
 
                 nitModel = xmlParserCude.Fields.ToObject<NitModel>();
+
+                //Si el endoso esta en blanco o el senderCode es diferente a providerCode                
+                nitModel.SenderCode = (nitModel.listID == "2" || (nitModel.SenderCode != nitModel.ProviderCode)) ? nitModel.ProviderCode : nitModel.SenderCode;
             }
 
             var validator = new Validator();           
@@ -169,7 +172,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.ValInfoPago
                 )
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,

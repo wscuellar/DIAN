@@ -94,7 +94,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.FileHistories = resultH;
             model.FileHistoriesRowCount = data.RowCount;
 
-            if ((int)registrationData.RadianOperationMode == 1)
+            if ((int)registrationData.RadianOperationMode == 2)
             {
                 if (model.RadianState == "Habilitado")
                     return View(model);
