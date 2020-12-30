@@ -1277,14 +1277,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 
                 if(!flag)
                     UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
-                Task.WhenAll(arrayTasks);
-
-                //No hay errores de raglas, evento es mandato y la regla no es AAD06, elimina informacion de la Meta para evento Mandato
-                //if (!errors.Any() && Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && !flag)
-                //{
-                //    var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-                //    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
-                //}
+                Task.WhenAll(arrayTasks);                
 
                 //Elimina informacion de la GlobalDocValidatorDocumentMeta si hay error en los plugIn
                 if (flagMeta || (errors.Any()))
