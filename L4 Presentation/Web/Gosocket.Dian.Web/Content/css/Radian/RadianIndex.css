@@ -1114,6 +1114,8 @@ span.close {
     display: inline-block;
     margin-left: 1.5em;
     margin: 4px 0px;
+    top: 4px;
+    position: relative;
 }
 
 .jqcs_options {

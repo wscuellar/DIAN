@@ -104,8 +104,9 @@
 
     <script>
         $(document).ready(function () {
-        var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
-        RenderSteps(index);
+            var validator;
+            var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
+            RenderSteps(index);
 
 
         $(".show-history").click(function () {
@@ -154,7 +155,8 @@
                 })
             });
 
-        $('.submit-button').click(function (e) {
+        $('.submit-button').click(function (e) {           
+            validator && validator.destroy();
             showLoading('#panel-form', 'Cargando', 'Cargando archivos, por favor espere.');
             var form = $(this).parents("form");
             var files = $(form)[0];
@@ -176,9 +178,10 @@
                     files[i].files.length > 0 &&
                     filteredFiles.push(files[i]);
             }
-            form.validate({
+            validator = form.validate({
                 messages: messages
             });
+            $(form).valid();
             e.preventDefault();
             if (filteredFiles.length > 0 && form.valid()) {
                     var formdata = new FormData();
