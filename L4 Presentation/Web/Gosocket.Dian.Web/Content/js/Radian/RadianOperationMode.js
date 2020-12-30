@@ -45,6 +45,7 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
             console.log(error);
         };
     var actionSuccess = (response) => {
+                $("#SoftwareNameList").html("");
                 $("#bussiness-name").html("");
                 response.length == 0 && hideLoading('#panel-form');
                 if (response.length) {
