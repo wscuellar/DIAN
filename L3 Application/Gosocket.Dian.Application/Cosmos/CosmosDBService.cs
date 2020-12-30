@@ -607,6 +607,9 @@ namespace Gosocket.Dian.Application.Cosmos
                             $"0{(int)EventStatus.NegotiatedInvoice}", $"0{(int)EventStatus.AnulacionLimitacionCirculacion}"
                         };
                         break;
+                    case 6:
+                        radianStatusFilter = new List<string>() { $"0{(int)EventStatus.Received}" };
+                        break;
                     case 7:
                         if (documentTypeId == "00")
                         {
@@ -634,9 +637,6 @@ namespace Gosocket.Dian.Application.Cosmos
                     break;
                 case 1:
                 case 6:
-                    //if (radianStatus == 6)
-                    //    globalDocuments = globalDocuments.Where(g => g.Events.Count >= 3).ToList();
-
                     foreach (GlobalDataDocument globalDocu in globalDocuments)
                     {
                         if ((globalDocu.Events?.Count() ?? 0) == 0 || globalDocu.Events.Count() < 3)
