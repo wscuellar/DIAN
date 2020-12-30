@@ -41,14 +41,18 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
+        private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
 
         #region Constructor
 
         public DocumentController(IRadianPdfCreationService radianPdfCreationService,
                                   IRadianGraphicRepresentationService radianGraphicRepresentationService,
-                                  IQueryAssociatedEventsService queryAssociatedEventsService)
+                                  IQueryAssociatedEventsService queryAssociatedEventsService,
+                                  IRadianSupportDocument radianSupportDocument)
         {
+            _radianSupportDocument = radianSupportDocument;
+            _radianPdfCreationService = radianPdfCreationService;
             _radianPdfCreationService = radianPdfCreationService;
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
             _queryAssociatedEventsService = queryAssociatedEventsService;
@@ -82,7 +86,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [CustomRoleAuthorization(CustomRoles = "Proveedor")]
         public async Task<ActionResult> Provider(SearchDocumentViewModel model) => await GetDocuments(model, 4);
-               
+                
         public async Task<ActionResult> Details(string trackId)
         {
             DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
@@ -163,7 +167,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-                IsValidCaptcha(recaptchaToken);
+                //IsValidCaptcha(recaptchaToken);
                 string url = ConfigurationManager.GetValue("GetPdfUrl");
 
                 var requestObj = new { trackId };
@@ -273,14 +277,14 @@ namespace Gosocket.Dian.Web.Controllers
         {
             string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
             byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
-            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
+            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
-
+        
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
-            String base64EncodedPdf = System.Convert.ToBase64String(pdfDocument);
+            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
 

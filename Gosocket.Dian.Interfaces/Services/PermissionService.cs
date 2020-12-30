@@ -7,7 +7,6 @@ namespace Gosocket.Dian.Interfaces.Services
     public class PermissionService : IPermissionService
     {
         private readonly IPermissionRepository _permissionRepository;
-
         public PermissionService(IPermissionRepository permissionRepository)
         {
             _permissionRepository = permissionRepository;
@@ -22,6 +21,7 @@ namespace Gosocket.Dian.Interfaces.Services
         {
             return _permissionRepository.AddOrUpdate(permissionList);
         }
+
         public List<Permission> GetPermissionsByUser(string userId)
         {
             return _permissionRepository.GetPermissionsByUser(userId);
@@ -31,6 +31,5 @@ namespace Gosocket.Dian.Interfaces.Services
         {
             return _permissionRepository.GetSubMenusByMenuId(menuId, RolName);
         }
-
     }
 }

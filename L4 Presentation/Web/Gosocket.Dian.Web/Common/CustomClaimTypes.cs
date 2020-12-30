@@ -17,7 +17,6 @@ namespace Gosocket.Dian.Web.Common
         public const string UserFullName = "http://dian/claim/userFullName";
         public const string ShowTestSet = "http://dian/claim/showTestSet";
         public const string IdentificationTypeId = "http://dian/claim/identificationTypeId";
-        public const string PersonType = "http://dian/claim/PersonType";
 
         [Obsolete]
         public const string ProviderId = "http://dian/claim/showTestSet";

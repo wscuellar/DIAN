@@ -105,7 +105,6 @@
     <Compile Include="Utils\UploadDocumentResponse.cs" />
     <Compile Include="Utils\XmlBytesArrayParams.cs" />
     <Compile Include="Utils\XmlParamsResponseTrackId.cs" />
-    <Compile Include="Utils\XmlUtilEvents.cs" />
     <Compile Include="Utils\XmlUtils.cs" />
     <Compile Include="Utils\ZipExtensions.cs" />
   </ItemGroup>
