@@ -169,7 +169,6 @@ function LoadEventsToPagiantion(paramsObject) {
 }
 
 function TablePagination(page, totalCount, countPage) {
-    debugger
     var disabledNext = (page * 10) >= totalCount ? 'disabled="disabled"' : "";
     var disabledPrev = page == 1 ? 'disabled="disabled"' : "";
     var min = (page - 1) * 10 + 1;
