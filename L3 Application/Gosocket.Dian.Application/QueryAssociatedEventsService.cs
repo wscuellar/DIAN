@@ -206,11 +206,6 @@ namespace Gosocket.Dian.Application
             return validateNotes;
         }
 
-        public List<GlobalDocValidatorDocumentMeta> FindDebitNotes(string documentReferencedKey)
-        {
-            return _radianGlobalDocValidationDocumentMeta.FindReferencedDocuments(documentReferencedKey, DEBITNOTE);
-        }
-
         public GlobalDocValidatorDocument GlobalDocValidatorDocumentByGlobalId(string globalDocumentId)
         {
             return _globalDocValidatorDocument.FindByGlobalDocumentId(globalDocumentId);
