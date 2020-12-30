@@ -5,7 +5,6 @@ using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gosocket.Dian.Application
 {
@@ -187,21 +186,24 @@ namespace Gosocket.Dian.Application
         //Join Credit and Debit Notes in one list
         public List<GlobalDocValidatorDocumentMeta> CreditAndDebitNotes(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments)
         {
-            Tuple<List<GlobalDocValidatorDocumentMeta>, List<GlobalDocValidatorDocumentMeta>> creditDebitNotes = FindAllNotes(allReferencedDocuments);
-            List<GlobalDocValidatorDocumentMeta> creditNotes = creditDebitNotes.Item1;
-            List<GlobalDocValidatorDocumentMeta> debitNotes = creditDebitNotes.Item2;
-            List<GlobalDocValidatorDocumentMeta> joinNotes = creditNotes.Concat(debitNotes).ToList();
-
-            return joinNotes.OrderBy(n => n.EmissionDate).ToList();
+            List<GlobalDocValidatorDocumentMeta> creditDebitNotes = FindAllNotes(allReferencedDocuments);
+            return creditDebitNotes.OrderBy(n => n.EmissionDate).ToList();
         }
 
         //
-        public Tuple<List<GlobalDocValidatorDocumentMeta>, List<GlobalDocValidatorDocumentMeta>> FindAllNotes(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments)
+        public List<GlobalDocValidatorDocumentMeta> FindAllNotes(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments)
         {
-            List<GlobalDocValidatorDocumentMeta> creditNotes = allReferencedDocuments.Where(c => c.DocumentTypeId == CREDITNOTE).ToList();
-            List<GlobalDocValidatorDocumentMeta> debitNotes = allReferencedDocuments.Where(c => c.DocumentTypeId == DEBITNOTE).ToList();
+            List<GlobalDocValidatorDocumentMeta> notes = allReferencedDocuments.Where(c => c.DocumentTypeId == CREDITNOTE || c.DocumentTypeId == DEBITNOTE).ToList();
 
-            return Tuple.Create(creditNotes, debitNotes);
+            List<GlobalDocValidatorDocumentMeta> validateNotes = new List<GlobalDocValidatorDocumentMeta>();
+
+            foreach(var note in notes)
+            {
+                if (IsVerifiedNote(note.DocumentKey))
+                    validateNotes.Add(note);
+            }
+
+            return validateNotes;
         }
 
         public List<GlobalDocValidatorDocumentMeta> FindDebitNotes(string documentReferencedKey)
@@ -212,6 +214,14 @@ namespace Gosocket.Dian.Application
         public GlobalDocValidatorDocument GlobalDocValidatorDocumentByGlobalId(string globalDocumentId)
         {
             return _globalDocValidatorDocument.FindByGlobalDocumentId(globalDocumentId);
+        }
+
+        private bool IsVerifiedNote(string documentKey)
+        {
+            if (_globalDocValidatorDocument.FindByGlobalDocumentId(documentKey) != null)
+                return true;
+
+            return false;
         }
     }
 }
