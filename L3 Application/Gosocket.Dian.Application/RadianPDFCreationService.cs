@@ -21,6 +21,7 @@ namespace Gosocket.Dian.Application
         #region Properties
 
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
+        private readonly IGlobalDocValidationDocumentMetaService _globalDocValidationDocumentMetaService;
         private readonly FileManager _fileManager;
         private readonly CosmosDBService _cosmosDBService;
 
@@ -28,11 +29,12 @@ namespace Gosocket.Dian.Application
 
         #region Constructor
 
-        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, CosmosDBService cosmosDBService)
+        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, CosmosDBService cosmosDBService, IGlobalDocValidationDocumentMetaService globalDocValidationDocumentMetaService)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
             _cosmosDBService = cosmosDBService;
+            _globalDocValidationDocumentMetaService = globalDocValidationDocumentMetaService;
         }
 
         #endregion
@@ -49,8 +51,7 @@ namespace Gosocket.Dian.Application
             // Load Document Data
             GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
             EventStatus eventStatus;
-
-            var x = await _cosmosDBService.ReadDocumentAsync(documentMeta.DocumentKey, documentMeta.PartitionKey, documentMeta.EmissionDate);
+            _ = await _cosmosDBService.ReadDocumentAsync(documentMeta.DocumentKey, documentMeta.PartitionKey, documentMeta.EmissionDate);
 
             //if (documentMeta.EventCode != null)
             //    eventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), documentMeta.EventCode);
@@ -65,7 +66,11 @@ namespace Gosocket.Dian.Application
 
             //Load Events
             GlobalDataDocument cosmosDocument = await DocumentInfoFromCosmos(documentMeta);
-            List<Event> events = cosmosDocument.Events;
+
+            List<Event> eventsCosmos = cosmosDocument.Events;
+            List<GlobalDocValidatorDocumentMeta> storageEvents = _globalDocValidationDocumentMetaService.FindDocumentByReference(documentMeta.DocumentKey);
+
+            List<Event> events = ListEvents(eventsCosmos, storageEvents);
 
             // Set Variables
             DateTime expeditionDate = DateTime.Now;
@@ -237,6 +242,28 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{ReceiverBusinessName" + subEvent + "}", eventObj.ReceiverName);
 
             return template;
+        }
+
+        private List<Event> ListEvents(List<Event> events, List<GlobalDocValidatorDocumentMeta> documents)
+        {
+            List<Event> finalEvents = new List<Event>();
+
+            foreach (var item in documents)
+            {
+                GlobalDocValidatorDocumentMeta document = documents.LastOrDefault(d => d.DocumentKey == item.DocumentKey);
+
+                if (!string.IsNullOrEmpty(document.EventCode))
+                {
+                    Event newEvent = events.LastOrDefault(e => e.DocumentKey == item.DocumentKey);
+
+                    if (newEvent !=null) 
+                        finalEvents.Add(newEvent);
+                }
+            }
+
+            finalEvents = finalEvents.Where(e=>e.Code!=null).ToList();
+
+            return finalEvents;
         }
 
         #endregion
