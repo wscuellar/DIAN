@@ -107,6 +107,7 @@
 
         $(document).ready(function () {
             showPdfModal("#show-document", "@Model.Document.DocumentKey", '@Url.Action("PrintDocument", "Document")', '#panel-form');
+            showPdfModal("#show-supportdocument", "@Model.Document.DocumentKey", '@Url.Action("PrintSupportDocument", "Document")', '#panel-form');
             $('#container1-title').hide();
             $('.document-row').click('onClick', function () {
                 if (!$(this).hasClass('not-redirect')) {

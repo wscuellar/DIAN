@@ -252,9 +252,18 @@
         <div class="ContainerDownload">
             <p>
                 <i class="fa fa-download"></i>
-                <um id="show-document">
-                    <ins>Certificado de existencia</ins>
-                </um>
+                @if (Model.Document.DocumentTypeId == "05")
+                {
+                    <um id="show-supportdocument">
+                        <ins>Documento soporte</ins>
+                    </um>
+                }
+                else
+                {
+                    <um id="show-document">
+                        <ins>Certificado de existencia</ins>
+                    </um>
+                }
             </p>
         </div>
     </div>
