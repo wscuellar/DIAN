@@ -70,15 +70,10 @@ namespace Gosocket.Dian.Application
                 // Mapping Fields
                 template = TemplateGlobalMapping(template, fieldValues);
                 template = MappingProducts(xmlBytes, template);
-<<<<<<< HEAD
                 template = MappingDiscounts(xmlBytes, template);
                 template = MappingRetentions(xmlBytes, template);
                 template = MappingAdvances(xmlBytes, template);
-                
 
-=======
-                template = MappingAdvances(xmlBytes, template);
->>>>>>> e597bd7a4fa048dc9fbca2a369a651cd60ca8668
 
             }
             catch (Exception ex)
