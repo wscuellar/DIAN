@@ -18,7 +18,7 @@ namespace Gosocket.Dian.Application
     using System.Text;
     using System.Threading.Tasks;
     using System.Xml;
-    using System.Xml.XPath;
+    using System.Xml.Linq;
 
     #endregion
 
@@ -47,15 +47,11 @@ namespace Gosocket.Dian.Application
 
         public async Task<byte[]> GetGraphicRepresentation(string cude, string webPath)
         {
-            cude = "8bd6a4cf6b4e2ee29e608d38880669512256f9c1b054813467e41ce6330848852da3bf8b0310bf941aa7becea3e6740c";
-
             // Load Templates            
             StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaDocumentoSoporte.html"));
 
-            // Load xml        
-            // TODO: Cargar documento con cufe
+            // Load xml
             byte[] xmlBytes = GetXmlFromStorageAsync(cude);
-
 
             // Load xpaths
             Dictionary<string, string> xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
@@ -73,8 +69,10 @@ namespace Gosocket.Dian.Application
 
                 // Mapping Fields
                 template = TemplateGlobalMapping(template, fieldValues);
-
                 template = MappingProducts(xmlBytes, template);
+                template = MappingDiscounts(xmlBytes, template);
+                template = MappingRetentions(xmlBytes, template);
+                template = MappingAdvances(xmlBytes, template);
 
 
             }
@@ -351,37 +349,170 @@ namespace Gosocket.Dian.Application
         private StringBuilder MappingProducts(byte[] xmlBytes, StringBuilder template)
         {
             string data = Encoding.UTF8.GetString(xmlBytes);
+            StringBuilder productsTemplates = new StringBuilder();
 
-            XmlReader xmlReader = XmlReader.Create(new StringReader(data));
-            XPathDocument products = new XPathDocument(xmlReader);
+            XElement xelement = XElement.Load(new StringReader(data));
+            var nsm = new XmlNamespaceManager(new NameTable());
 
-            XPathNavigator navigator = products.CreateNavigator();
+            XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+            XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
 
-            StringBuilder product = new StringBuilder();
-
-            XPathNodeIterator iterator = navigator.Select("/*[local-name() = 'Invoice']/*[local-name() = 'InvoiceLine']");
-
-
-            while(iterator.MoveNext())
+            var products = xelement.Elements(cac + "InvoiceLine");
+            foreach (XElement product in products)
             {
-                var iNavigator = iterator.Current;
-                var x = iNavigator.Select("/*[local-name() = 'ID']");
+                productsTemplates.Append("<tr>");
 
-                product.Append(iterator.Current.ReadSubtree().ReadInnerXml());
+                productsTemplates.Append($"<td>{product.Element(cbc + "ID").Value}</td>");
+                productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cac + "SellersItemIdentification").Element(cbc + "ID").Value}</td>");
+                productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cbc + "Description").Value}</td>");
+                productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Attribute("unitCode").Value}</td>");
+                productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Value}</td>");
+                productsTemplates.Append($"<td>{product.Element(cbc + "LineExtensionAmount").Value}</td>");
+
+                // Discounts and surcharges
+                if (product.Element(cac + "AllowanceCharge") != null)
+                {
+                    if (!Convert.ToBoolean(product.Element(cac + "AllowanceCharge").Element(cbc + "ChargeIndicator").Value))
+                    {
+                        productsTemplates.Append($"<td>{product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value}</td>");
+                        productsTemplates.Append("<td></td>");
+                    }
+                    else
+                    {
+                        productsTemplates.Append("<td></td>");
+                        productsTemplates.Append($"<td>{product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value}</td>");
+                    }
+                }
+                else
+                {
+                    productsTemplates.Append("<td></td>");
+                    productsTemplates.Append("<td></td>");
+                }
+
+                if (product.Element(cac + "TaxTotal") != null && product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount") != null)
+                {
+                    productsTemplates.Append($"<td>{product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount").Value}</td>");
+                }
+                else
+                {
+                    productsTemplates.Append("<td></td>");
+                }
+
+                productsTemplates.Append($"<td>{product.Element(cbc + "LineExtensionAmount").Value}</td>");
+
+                productsTemplates.Append("</tr>");
             }
-            
-            navigator.MoveToChild("InvoiceLine", ""); 
 
-            XmlReader book = navigator.ReadSubtree();
-
-            while(book.Read())
-            {
-                product.Append(book.ReadInnerXml());
-            }
+            template = template.Replace("{ProductDetails}", productsTemplates.ToString());
 
             return template;
         }
 
         #endregion
+
+        #region MappingDiscounts
+
+        private StringBuilder MappingDiscounts(byte[] xmlBytes, StringBuilder template)
+        {
+            string data = Encoding.UTF8.GetString(xmlBytes);
+            StringBuilder discountsTemplates = new StringBuilder();
+
+            XElement xelement = XElement.Load(new StringReader(data));
+            var nsm = new XmlNamespaceManager(new NameTable());
+
+            XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+            XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
+
+            var details = xelement.Elements(cac + "AllowanceCharge");
+            foreach (XElement detail in details)
+            {
+                discountsTemplates.Append("<tr>");
+
+                discountsTemplates.Append($"<td>{detail.Element(cbc + "ID").Value}</td>");
+
+                if (!Convert.ToBoolean(detail.Element(cbc + "ChargeIndicator").Value))
+                {
+                    discountsTemplates.Append($"<td>Descuento</td>");
+                }
+                else
+                {
+                    discountsTemplates.Append("<td>Recargo</td>");
+                }
+                discountsTemplates.Append($"<td>{(detail.Element(cbc + "AllowanceChargeReasonCode") != null?  detail.Element(cbc + "AllowanceChargeReasonCode").Value : string.Empty)}</td>");
+                discountsTemplates.Append($"<td>{detail.Element(cbc + "AllowanceChargeReason").Value}</td>");
+                discountsTemplates.Append($"<td>{detail.Element(cbc + "MultiplierFactorNumeric").Value}</td>");
+                discountsTemplates.Append($"<td>{detail.Element(cbc + "Amount").Value}</td>");
+
+                discountsTemplates.Append("</tr>");
+            }
+
+            template = template.Replace("{DiscountDetails}", discountsTemplates.ToString());
+
+            return template;
+        }
+
+        #endregion
+
+        #region MappingAdvances
+
+        private StringBuilder MappingAdvances(byte[] xmlBytes, StringBuilder template)
+        {
+            string data = Encoding.UTF8.GetString(xmlBytes);
+            XmlDocument invoiceDoc = new XmlDocument();
+            int counter = 1;
+
+            invoiceDoc.LoadXml(data);
+            XmlNodeList advanceNodes = invoiceDoc.GetElementsByTagName("cac:PrepaidPayment");
+
+            // Product Data mapping logic
+            StringBuilder advances = new StringBuilder();
+
+            foreach (XmlNode element in advanceNodes)
+            {
+                advances.Append("<tr>");
+                advances.Append($"<td class='text-centered'>{counter}</td>");
+                advances.Append($"<td class='text-currency'>$ {element["cbc:PaidAmount"].InnerText}</td>");
+                advances.Append("</tr>");
+
+                counter++;
+            }
+
+            template.Replace("{TotalAdvances}", advances.ToString());
+
+            return template;
+        }
+
+        #endregion
+
+        #region MappingRetentions
+
+        private StringBuilder MappingRetentions(byte[] xmlBytes, StringBuilder template)
+        {
+            string data = Encoding.UTF8.GetString(xmlBytes);
+            XmlDocument invoiceDoc = new XmlDocument();
+            int counter = 1;
+
+            invoiceDoc.LoadXml(data);
+            XmlNodeList retentionsNodes = invoiceDoc.GetElementsByTagName("cac:WithholdingTaxTotal");
+
+            // Product Data mapping logic
+            StringBuilder retentions = new StringBuilder();
+
+            foreach (XmlNode element in retentionsNodes)
+            {
+                retentions.Append("<tr>");
+                retentions.Append($"<td class='text-centered'>{counter}</td>");
+                retentions.Append($"<td class='text-currency'>$ {element["cbc:TaxAmount"].InnerText}</td>");
+                retentions.Append("</tr>");
+                counter++;
+            }
+
+            template.Replace("{TotalRetentions}", retentions.ToString());
+
+            return template;
+        } 
+
+        #endregion
+
     }
 }
