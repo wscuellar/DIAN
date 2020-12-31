@@ -18,7 +18,7 @@ namespace Gosocket.Dian.Application
     using System.Text;
     using System.Threading.Tasks;
     using System.Xml;
-    using System.Xml.XPath;
+    using System.Xml.Linq;
 
     #endregion
 
@@ -352,33 +352,57 @@ namespace Gosocket.Dian.Application
         private StringBuilder MappingProducts(byte[] xmlBytes, StringBuilder template)
         {
             string data = Encoding.UTF8.GetString(xmlBytes);
+            StringBuilder productsTemplates = new StringBuilder();
 
-            XmlReader xmlReader = XmlReader.Create(new StringReader(data));
-            XPathDocument products = new XPathDocument(xmlReader);
+            XElement xelement = XElement.Load(new StringReader(data));
+            var nsm = new XmlNamespaceManager(new NameTable());
 
-            XPathNavigator navigator = products.CreateNavigator();
+            XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+            XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
 
-            StringBuilder product = new StringBuilder();
-
-            XPathNodeIterator iterator = navigator.Select("/*[local-name() = 'Invoice']/*[local-name() = 'InvoiceLine']");
-
-
-            while(iterator.MoveNext())
+            var products = xelement.Elements(cac + "InvoiceLine");
+            foreach (XElement product in products)
             {
-                var iNavigator = iterator.Current;
-                var x = iNavigator.Select("/*[local-name() = 'ID']");
+                productsTemplates.Append("<tr>");
 
-                product.Append(iterator.Current.ReadSubtree().ReadInnerXml());
+                productsTemplates.Append($"<td>{product.Element(cbc + "ID").Value}</td>");
+
+                productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cbc + "Description").Value}</td>");
+                productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Attribute("unitCode").Value}</td>");
+                productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Value}</td>");
+                productsTemplates.Append($"<td>{product.Element(cbc + "LineExtensionAmount").Value}</td>");
+
+                // Discounts and surcharges
+                if (product.Element(cac + "AllowanceCharge") != null)
+                {
+                    if (!Convert.ToBoolean(product.Element(cac + "AllowanceCharge").Element(cbc + "ChargeIndicator").Value))
+                    {
+                        productsTemplates.Append($"<td>{product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value}</td>");
+                        productsTemplates.Append("<td></td>");
+                    }
+                    else
+                    {
+                        productsTemplates.Append("<td></td>");
+                        productsTemplates.Append($"<td>{product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value}</td>");
+                    }
+                }
+                else
+                {
+                    productsTemplates.Append("<td></td>");
+                    productsTemplates.Append("<td></td>");
+                }
+
+                if (product.Element(cac + "TaxTotal") != null && product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount") != null)
+                {
+                    productsTemplates.Append($"<td>{product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount").Value}</td>");
+                }
+
+                productsTemplates.Append($"<td>{product.Element(cbc + "LineExtensionAmount").Value}</td>");
+
+                productsTemplates.Append("</tr>");
             }
-            
-            navigator.MoveToChild("InvoiceLine", ""); 
 
-            XmlReader book = navigator.ReadSubtree();
-
-            while(book.Read())
-            {
-                product.Append(book.ReadInnerXml());
-            }
+            template = template.Replace("{ProductDetails}", productsTemplates.ToString());
 
             return template;
         }
