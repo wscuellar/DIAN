@@ -49,5 +49,8 @@ namespace Gosocket.Dian.Domain.Entity
         public string CreatedBy { get; set; }
         public string UpdateBy { get; set; }
         public bool Active { get; set; }
+        public int Status { get; set; }
+        public bool Deleted { get; set; }
+        public string Id { get; set; }
     }
 }
