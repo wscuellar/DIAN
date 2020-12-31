@@ -47,7 +47,6 @@ namespace Gosocket.Dian.Application
 
         public async Task<byte[]> GetGraphicRepresentation(string cude, string webPath)
         {
-            cude = "8bd6a4cf6b4e2ee29e608d38880669512256f9c1b054813467e41ce6330848852da3bf8b0310bf941aa7becea3e6740c";
             // Load Templates            
             StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaDocumentoSoporte.html"));
 
