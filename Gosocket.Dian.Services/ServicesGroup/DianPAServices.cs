@@ -689,7 +689,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     {
                         // se consultan los eventos asociados al trackId.
                         events = TableManagerGlobalDocValidatorDocumentMeta.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId, "96");
-                        if(events != null && events.Count > 0)
+                        if (events != null && events.Count > 0)
                         {
                             events = events.OrderBy(x => x.SigningTimeStamp).ToList();
                             events.ForEach(e =>
@@ -701,7 +701,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                                 originalEvents.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(e.DocumentKey, e.DocumentKey));
                                 // se consulta las validaciones del evento original.
                                 var originalValidations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(e.DocumentKey);
-                                if(originalValidations != null && originalValidations.Count > 0)
+                                if (originalValidations != null && originalValidations.Count > 0)
                                 {
                                     originalEventsValidations.AddRange(originalValidations);
                                 }
@@ -720,8 +720,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     Task.WhenAll(arrayTasks).Wait();
 
                     var applicationResponse = XmlUtilEvents.GetApplicationResponseIfExist(documentMeta);
-                    //response.XmlBase64Bytes = applicationResponse ?? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations);
-                    response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations) : null;
+                    response.XmlBase64Bytes = applicationResponse ?? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations);
+                    //response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations) : null;
 
                     response.XmlDocumentKey = trackId;
                     response.XmlFileName = documentMeta.FileName;
@@ -888,6 +888,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var issuerPartyName = documentParsed.IssuerPartyName;
             var endDate = documentParsed.ValidityPeriodEndDate;
             var providerCode = documentParsed.ProviderCode;
+
+            //Si el endoso esta en blanco o el senderCode es diferente a providerCode
+            senderCode = (listId == "2" || (senderCode != providerCode)) ? providerCode : senderCode;
 
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -1244,7 +1247,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.StatusCode = Properties.Settings.Default.Code_99;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Error_FieldMandatori;
                     dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios.";
-                    dianResponse.XmlBase64Bytes = errors.Any() ? dianResponse.XmlBase64Bytes : null;
+                    dianResponse.XmlBase64Bytes = null;
                 }
                 var application = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_7AplicattionSendEvent) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 // ZONE APPLICATION
@@ -1274,14 +1277,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 
                 if(!flag)
                     UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
-                Task.WhenAll(arrayTasks);
-
-                //No hay errores de raglas, evento es mandato y la regla no es AAD06, elimina informacion de la Meta para evento Mandato
-                if (!errors.Any() && Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && !flag)
-                {
-                    var documentMetaDelete = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-                    TableManagerGlobalDocValidatorDocumentMeta.Delete(documentMetaDelete);
-                }
+                Task.WhenAll(arrayTasks);                
 
                 //Elimina informacion de la GlobalDocValidatorDocumentMeta si hay error en los plugIn
                 if (flagMeta || (errors.Any()))
@@ -1731,9 +1727,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 }
                 var failedList = new List<string>();
                 foreach (var item in validations)
+                {
                     if (!item.IsValid)
+                    {
                         failedList.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                        response.IsValid = false;
+                    }
 
+                }
                 response.ErrorMessage.AddRange(failedList);
                 response.StatusDescription = "Validación contiene errores en campos mandatorios.";
             }
@@ -1742,7 +1743,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID, DianResponse response)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });            
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
+            
             if (validations.Count > 0)
             {
                 if(response.ErrorMessage.Count == 0)
@@ -1753,13 +1755,20 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         StatusCode = Properties.Settings.Default.Code_89,
                         IsValid = validations[0].IsValid,
                         ErrorMessage = new List<string>()
-                };
+                    };
                 }
+
                 var failedList = new List<string>();
-                foreach (var item in validations)               
-                    if (!item.IsValid)                   
-                        failedList.Add($"{item.ErrorCode} - {item.ErrorMessage}");                                                                  
-                
+                foreach (var item in validations)
+                {
+                    if (!item.IsValid)
+                    {
+                        failedList.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                        response.IsValid = false;
+                    }
+                       
+                }            
+
                 response.ErrorMessage.AddRange(failedList);         
                 response.StatusDescription = "Validación contiene errores en campos mandatorios.";
             }
@@ -1784,9 +1793,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 }
                 var failedList = new List<string>();
                 foreach (var item in validations)
+                {
                     if (!item.IsValid)
+                    {
                         failedList.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                        response.IsValid = false;
+                    }
 
+                }
+               
                 response.ErrorMessage.AddRange(failedList);
                 response.StatusDescription = "Validación contiene errores en campos mandatorios.";
             }
@@ -1823,8 +1838,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
         
         private DianResponse ValidationReferenceAttorney(string trackId)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });            
-                                                                                         
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateReferenceAttorney", new { trackId });
+
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

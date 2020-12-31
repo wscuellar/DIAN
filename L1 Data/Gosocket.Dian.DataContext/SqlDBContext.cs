@@ -208,7 +208,7 @@ namespace Gosocket.Dian.DataContext
         public DbSet<Menu> Menus { set; get; }
         public DbSet<SubMenu> SubMenus { set; get; }
         public DbSet<Permission> Permissions { set; get; }
-        public DbSet<MenuRole> MenuRoles { set; get; } 
+        public DbSet<MenuRole> MenuRoles { set; get; }
         public DbSet<Role> Roles { set; get; }
 
         /// <summary>

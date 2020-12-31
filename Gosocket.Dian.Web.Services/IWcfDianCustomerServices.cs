@@ -47,7 +47,6 @@ namespace Gosocket.Dian.Web.Services
         [CustomOperation]
         DianResponse GetStatusEvent(string trackId);
 
-
         /// <summary>
         /// 
         /// </summary>

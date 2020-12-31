@@ -1,4 +1,6 @@
-﻿@model Gosocket.Dian.Web.Models.DocValidatorModel
+﻿@using Gosocket.Dian.Web.Utils;
+@using Gosocket.Dian.Infrastructure
+@model Gosocket.Dian.Web.Models.DocValidatorModel
 @using Newtonsoft.Json
 
 @{
@@ -100,14 +102,20 @@
                 <div class="col-md-4" style="padding-top: 7px; padding-left: 0;">
                     <p style="text-align: right;">
                         <span class="tipo-doc">@Model.Document.DocumentTypeName</span>
-                        <br>
+                        <br />
                         @if (!string.IsNullOrEmpty(Model.Document.Serie))
                         {
                             @Html.Raw($"Serie: {Model.Document.Serie}<br>");
                         }
                         Folio: @Model.Document.Number<br>
-                        Fecha de emisión de la factura Electrónica: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br>
-                    </p>
+                        Fecha de emisión de la factura Electrónica: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br />
+                        @if (Model.Document.Status != 2)
+                        {
+                            <a href="@Url.Action("DownloadPDF", "Document", new { trackId = Model.Document.Id})" class="downloadPDFUrl" style="font-size:15px; text-decoration:underline;">
+                                <i class="fa fa-download"></i> Descargar PDF
+                            </a>
+                        }
+                    </p>                    
                 </div>
             </div>
 
@@ -163,36 +171,37 @@
                     {
                         if (minIndex == statusIcons.Key)
                         {
-                            if (statusIcons.Key == 1)
+                            if (maxIndex != statusIcons.Key)
                             {
-                                <div style="display:grid">
+                                <div class="icon-card">
                                     <div class="text-center">
-                                        <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                                        @if (minIndex == 1)
+                                        {
+                                            <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                                        }
+                                        else
+                                        {
+                                            <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
+                                        }
                                     </div>
                                     <p>@statusIcons.Value</p>
                                 </div>
+                                <div class="radian-state-ef-line"></div>
                             }
                             else
                             {
-                                if (maxIndex != statusIcons.Key)
-                                {
-                                    <div class="icon-card">
-                                        <div class="text-center">
-                                            <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
-                                        </div>
-                                        <p>@statusIcons.Value</p>
+                                <div class="icon-card">
+                                    <div class="text-center padding-top-5">
+                                        @if (minIndex == 1)
+                                        {
+                                            <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                                        }
+                                        else
+                                        {
+                                            <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />}
                                     </div>
-                                    <div class="radian-state-ef-line"></div>
-                                }
-                                else
-                                {
-                                    <div class="icon-card">
-                                        <div class="text-center padding-top-5">
-                                            <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
-                                        </div>
-                                        <p>@statusIcons.Value</p>
-                                    </div>
-                                }
+                                    <p>@statusIcons.Value</p>
+                                </div>
                             }
                         }
                         else
@@ -243,9 +252,18 @@
         <div class="ContainerDownload">
             <p>
                 <i class="fa fa-download"></i>
-                <um id="show-document">
-                    <ins>Certificado de existencia</ins>
-                </um>
+                @if (Model.Document.DocumentTypeId == "05")
+                {
+                    <um id="show-supportdocument">
+                        <ins>Documento soporte</ins>
+                    </um>
+                }
+                else
+                {
+                    <um id="show-document">
+                        <ins>Certificado de existencia</ins>
+                    </um>
+                }
             </p>
         </div>
     </div>
@@ -330,3 +348,27 @@ else
     </div>
 }
 
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=@ConfigurationManager.GetValue("Recaptcha")"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            grecaptcha.ready(function () {
+                grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
+                    $(".downloadPDFUrl").attr("href", $(".downloadPDFUrl").attr("href") + "&recaptchaToken=" + token);
+                });
+            });
+        });
+                function downloadFiles(id) {
+                window.location.href = "/Document/DownloadPDF?trackId=" + id;
+            }
+    </script>
+
+}
