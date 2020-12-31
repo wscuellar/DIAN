@@ -189,7 +189,8 @@ namespace Gosocket.Dian.Application
 
             if (validateOperation)
             {
-                List<RadianContributorOperation> currentOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareType == radianContributorOperation.SoftwareType && t.OperationStatusId != (int)RadianState.Habilitado && !t.Deleted);
+                //&& t.SoftwareType == radianContributorOperation.SoftwareType
+                List<RadianContributorOperation> currentOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorOperation.RadianContributorId  && t.OperationStatusId != (int)RadianState.Habilitado && !t.Deleted);
                 if (currentOperations.Any())
                     return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
             }
