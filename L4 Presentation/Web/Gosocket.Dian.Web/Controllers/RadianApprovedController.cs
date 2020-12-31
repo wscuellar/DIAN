@@ -231,7 +231,6 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult GetSetTestResult(RadianApprovedViewModel model)
         {
-
             const int softwareType = 1;
             string sType = softwareType.ToString();
             RadianSoftware software = _radianAprovedService.GetSoftware(model.Contributor.RadianContributorId, softwareType);
