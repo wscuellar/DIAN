@@ -47,7 +47,7 @@ namespace Gosocket.Dian.Application
 
         public async Task<byte[]> GetGraphicRepresentation(string cude, string webPath)
         {
-            //cude = "8bd6a4cf6b4e2ee29e608d38880669512256f9c1b054813467e41ce6330848852da3bf8b0310bf941aa7becea3e6740c";
+            cude = "8bd6a4cf6b4e2ee29e608d38880669512256f9c1b054813467e41ce6330848852da3bf8b0310bf941aa7becea3e6740c";
 
             // Load Templates            
             StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaDocumentoSoporte.html"));
@@ -76,7 +76,7 @@ namespace Gosocket.Dian.Application
 
                 template = MappingRetentions(xmlBytes, template);
                 template = MappingProducts(xmlBytes, template);
-
+                template = MappingAdvances(xmlBytes, template);
 
             }
             catch (Exception ex)
@@ -423,7 +423,7 @@ namespace Gosocket.Dian.Application
             {
                 advances.Append("<tr>");
                 advances.Append($"<td>{counter}</td>");
-                advances.Append($"<td>{element["cbc:PaidAmount"].InnerText}</td>");
+                advances.Append($"<td>{element["cbc:PaidAmount"].InnerText:C}</td>");
                 advances.Append("</tr>");
 
                 counter++;
@@ -450,7 +450,7 @@ namespace Gosocket.Dian.Application
             {
                 retentions.Append("<tr>");
                 retentions.Append($"<td>{counter}</td>");
-                retentions.Append($"<td>{element["cbc:TaxAmount"].InnerText}</td>");
+                retentions.Append($"<td>{element["cbc:TaxAmount"].InnerText:C}</td>");
                 retentions.Append("</tr>");
                 counter++;
             }
