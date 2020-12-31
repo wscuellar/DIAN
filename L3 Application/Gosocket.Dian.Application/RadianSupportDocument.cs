@@ -70,11 +70,15 @@ namespace Gosocket.Dian.Application
                 // Mapping Fields
                 template = TemplateGlobalMapping(template, fieldValues);
                 template = MappingProducts(xmlBytes, template);
+<<<<<<< HEAD
                 template = MappingDiscounts(xmlBytes, template);
                 template = MappingRetentions(xmlBytes, template);
                 template = MappingAdvances(xmlBytes, template);
                 
 
+=======
+                template = MappingAdvances(xmlBytes, template);
+>>>>>>> e597bd7a4fa048dc9fbca2a369a651cd60ca8668
 
             }
             catch (Exception ex)
@@ -472,7 +476,7 @@ namespace Gosocket.Dian.Application
             {
                 advances.Append("<tr>");
                 advances.Append($"<td>{counter}</td>");
-                advances.Append($"<td>{element["cbc:PaidAmount"].InnerText}</td>");
+                advances.Append($"<td>{element["cbc:PaidAmount"].InnerText:C}</td>");
                 advances.Append("</tr>");
 
                 counter++;
@@ -503,7 +507,7 @@ namespace Gosocket.Dian.Application
             {
                 retentions.Append("<tr>");
                 retentions.Append($"<td>{counter}</td>");
-                retentions.Append($"<td>{element["cbc:TaxAmount"].InnerText}</td>");
+                retentions.Append($"<td>{element["cbc:TaxAmount"].InnerText:C}</td>");
                 retentions.Append("</tr>");
                 counter++;
             }
