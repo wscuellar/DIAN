@@ -1,0 +1,7 @@
+﻿@model byte[]
+
+@{
+    String base64EncodedPdf = System.Convert.ToBase64String(Model);
+}
+
+<object data="data:application/pdf;base64,@base64EncodedPdf" width="1024" height="768" type="application/pdf"></object>

@@ -47,7 +47,7 @@ namespace Gosocket.Dian.Application
 
         public async Task<byte[]> GetGraphicRepresentation(string cude, string webPath)
         {
-            cude = "8bd6a4cf6b4e2ee29e608d38880669512256f9c1b054813467e41ce6330848852da3bf8b0310bf941aa7becea3e6740c";
+            //cude = "8bd6a4cf6b4e2ee29e608d38880669512256f9c1b054813467e41ce6330848852da3bf8b0310bf941aa7becea3e6740c";
 
             // Load Templates            
             StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaDocumentoSoporte.html"));
@@ -74,6 +74,7 @@ namespace Gosocket.Dian.Application
                 // Mapping Fields
                 template = TemplateGlobalMapping(template, fieldValues);
 
+                template = MappingRetentions(xmlBytes, template);
                 template = MappingProducts(xmlBytes, template);
 
 
@@ -378,6 +379,59 @@ namespace Gosocket.Dian.Application
             {
                 product.Append(book.ReadInnerXml());
             }
+
+            return template;
+        }
+
+        private StringBuilder MappingAdvances(byte[] xmlBytes, StringBuilder template)
+        {
+            string data = Encoding.UTF8.GetString(xmlBytes);            
+            XmlDocument invoiceDoc = new XmlDocument();
+            int counter = 1;
+
+            invoiceDoc.LoadXml(data);
+            XmlNodeList advanceNodes = invoiceDoc.GetElementsByTagName("cac:PrepaidPayment");
+
+            // Product Data mapping logic
+            StringBuilder advances = new StringBuilder();
+
+            foreach (XmlNode element in advanceNodes)
+            {
+                advances.Append("<tr>");
+                advances.Append($"<td>{counter}</td>");
+                advances.Append($"<td>{element["cbc:PaidAmount"].InnerText}</td>");
+                advances.Append("</tr>");
+
+                counter++;
+            }
+
+            template.Replace("{TotalAdvances}", advances.ToString());
+
+            return template;
+        }
+
+        private StringBuilder MappingRetentions(byte[] xmlBytes, StringBuilder template)
+        {
+            string data = Encoding.UTF8.GetString(xmlBytes);
+            XmlDocument invoiceDoc = new XmlDocument();
+            int counter = 1;
+
+            invoiceDoc.LoadXml(data);
+            XmlNodeList retentionsNodes = invoiceDoc.GetElementsByTagName("cac:WithholdingTaxTotal");
+
+            // Product Data mapping logic
+            StringBuilder retentions = new StringBuilder();
+
+            foreach (XmlNode element in retentionsNodes)
+            {
+                retentions.Append("<tr>");
+                retentions.Append($"<td>{counter}</td>");
+                retentions.Append($"<td>{element["cbc:TaxAmount"].InnerText}</td>");
+                retentions.Append("</tr>");
+                counter++;
+            }
+
+            template.Replace("{TotalRetentions}", retentions.ToString());
 
             return template;
         }
