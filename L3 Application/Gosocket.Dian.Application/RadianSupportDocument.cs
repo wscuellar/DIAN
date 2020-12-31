@@ -47,15 +47,11 @@ namespace Gosocket.Dian.Application
 
         public async Task<byte[]> GetGraphicRepresentation(string cude, string webPath)
         {
-            //cude = "8bd6a4cf6b4e2ee29e608d38880669512256f9c1b054813467e41ce6330848852da3bf8b0310bf941aa7becea3e6740c";
-
             // Load Templates            
             StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaDocumentoSoporte.html"));
 
-            // Load xml        
-            // TODO: Cargar documento con cufe
+            // Load xml
             byte[] xmlBytes = GetXmlFromStorageAsync(cude);
-
 
             // Load xpaths
             Dictionary<string, string> xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
@@ -73,9 +69,10 @@ namespace Gosocket.Dian.Application
 
                 // Mapping Fields
                 template = TemplateGlobalMapping(template, fieldValues);
-
-                template = MappingRetentions(xmlBytes, template);
                 template = MappingProducts(xmlBytes, template);
+                template = MappingDiscounts(xmlBytes, template);
+                template = MappingRetentions(xmlBytes, template);
+                template = MappingAdvances(xmlBytes, template);
 
 
             }
@@ -366,7 +363,7 @@ namespace Gosocket.Dian.Application
                 productsTemplates.Append("<tr>");
 
                 productsTemplates.Append($"<td>{product.Element(cbc + "ID").Value}</td>");
-
+                productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cac + "SellersItemIdentification").Element(cbc + "ID").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cbc + "Description").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Attribute("unitCode").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Value}</td>");
@@ -396,6 +393,10 @@ namespace Gosocket.Dian.Application
                 {
                     productsTemplates.Append($"<td>{product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount").Value}</td>");
                 }
+                else
+                {
+                    productsTemplates.Append("<td></td>");
+                }
 
                 productsTemplates.Append($"<td>{product.Element(cbc + "LineExtensionAmount").Value}</td>");
 
@@ -407,9 +408,56 @@ namespace Gosocket.Dian.Application
             return template;
         }
 
+        #endregion
+
+        #region MappingDiscounts
+
+        private StringBuilder MappingDiscounts(byte[] xmlBytes, StringBuilder template)
+        {
+            string data = Encoding.UTF8.GetString(xmlBytes);
+            StringBuilder discountsTemplates = new StringBuilder();
+
+            XElement xelement = XElement.Load(new StringReader(data));
+            var nsm = new XmlNamespaceManager(new NameTable());
+
+            XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+            XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
+
+            var details = xelement.Elements(cac + "AllowanceCharge");
+            foreach (XElement detail in details)
+            {
+                discountsTemplates.Append("<tr>");
+
+                discountsTemplates.Append($"<td>{detail.Element(cbc + "ID").Value}</td>");
+
+                if (!Convert.ToBoolean(detail.Element(cbc + "ChargeIndicator").Value))
+                {
+                    discountsTemplates.Append($"<td>Descuento</td>");
+                }
+                else
+                {
+                    discountsTemplates.Append("<td>Recargo</td>");
+                }
+                discountsTemplates.Append($"<td>{(detail.Element(cbc + "AllowanceChargeReasonCode") != null?  detail.Element(cbc + "AllowanceChargeReasonCode").Value : string.Empty)}</td>");
+                discountsTemplates.Append($"<td>{detail.Element(cbc + "AllowanceChargeReason").Value}</td>");
+                discountsTemplates.Append($"<td>{detail.Element(cbc + "MultiplierFactorNumeric").Value}</td>");
+                discountsTemplates.Append($"<td>{detail.Element(cbc + "Amount").Value}</td>");
+
+                discountsTemplates.Append("</tr>");
+            }
+
+            template = template.Replace("{DiscountDetails}", discountsTemplates.ToString());
+
+            return template;
+        }
+
+        #endregion
+
+        #region MappingAdvances
+
         private StringBuilder MappingAdvances(byte[] xmlBytes, StringBuilder template)
         {
-            string data = Encoding.UTF8.GetString(xmlBytes);            
+            string data = Encoding.UTF8.GetString(xmlBytes);
             XmlDocument invoiceDoc = new XmlDocument();
             int counter = 1;
 
@@ -422,8 +470,8 @@ namespace Gosocket.Dian.Application
             foreach (XmlNode element in advanceNodes)
             {
                 advances.Append("<tr>");
-                advances.Append($"<td>{counter}</td>");
-                advances.Append($"<td>{element["cbc:PaidAmount"].InnerText}</td>");
+                advances.Append($"<td class='text-centered'>{counter}</td>");
+                advances.Append($"<td class='text-currency'>$ {element["cbc:PaidAmount"].InnerText}</td>");
                 advances.Append("</tr>");
 
                 counter++;
@@ -433,6 +481,10 @@ namespace Gosocket.Dian.Application
 
             return template;
         }
+
+        #endregion
+
+        #region MappingRetentions
 
         private StringBuilder MappingRetentions(byte[] xmlBytes, StringBuilder template)
         {
@@ -449,8 +501,8 @@ namespace Gosocket.Dian.Application
             foreach (XmlNode element in retentionsNodes)
             {
                 retentions.Append("<tr>");
-                retentions.Append($"<td>{counter}</td>");
-                retentions.Append($"<td>{element["cbc:TaxAmount"].InnerText}</td>");
+                retentions.Append($"<td class='text-centered'>{counter}</td>");
+                retentions.Append($"<td class='text-currency'>$ {element["cbc:TaxAmount"].InnerText}</td>");
                 retentions.Append("</tr>");
                 counter++;
             }
@@ -458,8 +510,9 @@ namespace Gosocket.Dian.Application
             template.Replace("{TotalRetentions}", retentions.ToString());
 
             return template;
-        }
+        } 
 
         #endregion
+
     }
 }

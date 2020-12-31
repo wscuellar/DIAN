@@ -1,6 +1,6 @@
 ﻿
 function DeleteOperationMode(url) {
-    $(".delete-software").click(function () {
+    $("#delete-software").click(function () {
         showLoading('#table-modes', 'Cargando', 'Buscando datos, por favor espere.');
         var metod = 'POST';
         var data = {

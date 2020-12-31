@@ -571,27 +571,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, GlobalDocValidatorDocumentMeta documentMeta)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude)
         {
             DateTime startDate = DateTime.UtcNow;
             party.TrackId = party.TrackId.ToLower();
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(party.ResponseCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string eventCode = party.ResponseCode;
-            string senderCode;
             //Valida cambio legitimo tenedor
-            if (documentMeta != null
-                && ((Convert.ToInt16(party.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion
-                && (party.CustomizationID == "363" || party.CustomizationID == "364"))
-                || Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad))
-            {
-                senderCode = documentMeta.ReceiverCode;
-            }
-            else
-            {
-                senderCode = nitModel.SenderCode;
-            }
-            var receiverCode = nitModel.ReceiverCode;
+            string senderCode = nitModel.SenderCode;
+            var receiverCode = nitModel.ReceiverCode;            
             string sender2DvErrorCode = "Regla: 89-(R): ";
             switch (Convert.ToInt16(party.ResponseCode))
             {
@@ -1543,6 +1532,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='RegistrationName']").Item(0)?.InnerText.ToString();
             //string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
             string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
+            string firstName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FirstName']").Item(0)?.InnerText.ToString();
+            string familyName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FamilyName']").Item(0)?.InnerText.ToString();
+            string name = firstName + " " + familyName;
             data.EventCode = "043";
             data.SigningTime = xmlParser.SigningTime;
             data.DocumentTypeId = "96";
@@ -1713,7 +1705,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         StartDate = startDateAttorney,
                         AttorneyType = customizationID,
                         SerieAndNumber = serieAndNumber,
-                        SenderName = senderName
+                        SenderName = senderName,
+                        IssuerAttorneyName = name
                     };
                     TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
                     var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), new { TrackId = attorneyDocument.cufe, ResponseCode = data.EventCode, TrackIdCude = trackId });
