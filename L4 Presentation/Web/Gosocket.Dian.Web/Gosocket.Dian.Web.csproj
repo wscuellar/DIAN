@@ -2921,6 +2921,7 @@
     <Content Include="Views\OthersElectronicDocAssociated\_customers.cshtml" />
     <Content Include="Views\OthersElectronicDocAssociated\_formSearch.cshtml" />
     <Content Include="Views\OthersElectronicDocAssociated\_usersLegal.cshtml" />
+    <Content Include="Views\Document\PrintSupportDocument.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

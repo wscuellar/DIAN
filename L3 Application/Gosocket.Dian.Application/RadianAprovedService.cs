@@ -189,7 +189,8 @@ namespace Gosocket.Dian.Application
 
             if (validateOperation)
             {
-                List<RadianContributorOperation> currentOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareType == radianContributorOperation.SoftwareType && t.OperationStatusId != (int)RadianState.Habilitado && !t.Deleted);
+                //&& t.SoftwareType == radianContributorOperation.SoftwareType
+                List<RadianContributorOperation> currentOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorOperation.RadianContributorId  && t.OperationStatusId != (int)RadianState.Habilitado && !t.Deleted);
                 if (currentOperations.Any())
                     return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
             }
@@ -256,7 +257,7 @@ namespace Gosocket.Dian.Application
                     ReceiptNoticeTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
                     //Recibo del bien
                     ReceiptServiceTotalRequired = testSet.ReceiptServiceTotalRequired,
-                    ReceiptServiceTotalAcceptedRequired = testSet.ReceiptNoticeTotalAcceptedRequired,
+                    ReceiptServiceTotalAcceptedRequired = testSet.ReceiptServiceTotalAcceptedRequired,
                     // Aceptación expresa
                     ExpressAcceptanceTotalRequired = testSet.ExpressAcceptanceTotalRequired,
                     ExpressAcceptanceTotalAcceptedRequired = testSet.ExpressAcceptanceTotalAcceptedRequired,
@@ -364,10 +365,10 @@ namespace Gosocket.Dian.Application
                 participants = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.BusinessName.Contains(term)).Results;
             else
             {
-                string radianState = RadianState.Habilitado.GetDescription();
-                participants = _radianContributorRepository.List(t => t.RadianState == radianState && t.RadianContributorTypeId == (int)softwareType && t.Contributor.BusinessName.Contains(term)).Results;
-
+                participants = _radianContributorRepository.ActiveParticipantsWithSoftware((int)softwareType);
+                
             }
+                
             return participants.Distinct().ToList();
         }
 

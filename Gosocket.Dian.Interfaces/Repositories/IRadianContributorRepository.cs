@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Gosocket.Dian.Interfaces.Repositories
@@ -17,6 +18,7 @@ namespace Gosocket.Dian.Interfaces.Repositories
         
         void RemoveRadianContributor(RadianContributor radianContributor);
         PagedResult<RadianCustomerList> CustomerList(int id, string code, string radianState, int page = 0, int length = 0);
+        List<RadianContributor> ActiveParticipantsWithSoftware(int radianContributorTypeId);
     }
 
 }

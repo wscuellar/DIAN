@@ -466,9 +466,12 @@ namespace Gosocket.Dian.Application
             List<string> softwareAccepted = new List<string>();
             foreach (var item in contributorOperations)
             {
-                GlobalTestSetResult testset = GetTestSetResult(testSetResults, item, contributor.ContributorTypeId.Value);
-                if (testset != null && ((TestSetStatus)testset.Status) == TestSetStatus.Accepted)
-                    softwareAccepted.Add(testset.SoftwareId);
+                if(item.SoftwareId != null)
+                {
+                    GlobalTestSetResult testset = GetTestSetResult(testSetResults, item, contributor.ContributorTypeId.Value);
+                    if (testset != null && ((TestSetStatus)testset.Status) == TestSetStatus.Accepted)
+                        softwareAccepted.Add(testset.SoftwareId);
+                }               
             }
 
             return softwareAccepted;

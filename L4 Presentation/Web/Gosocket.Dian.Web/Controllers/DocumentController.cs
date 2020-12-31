@@ -86,8 +86,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [CustomRoleAuthorization(CustomRoles = "Proveedor")]
         public async Task<ActionResult> Provider(SearchDocumentViewModel model) => await GetDocuments(model, 4);
-
-        [ExcludeFilter(typeof(Authorization))]
+                
         public async Task<ActionResult> Details(string trackId)
         {
             DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
@@ -168,7 +167,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-                IsValidCaptcha(recaptchaToken);
+                //IsValidCaptcha(recaptchaToken);
                 string url = ConfigurationManager.GetValue("GetPdfUrl");
 
                 var requestObj = new { trackId };
@@ -276,16 +275,24 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintDocument(string cufe)
         {
-            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
+            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);            
             byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
             String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
-
+        
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
-            //byte[] suportDoc = await _radianSupportDocument.GetGraphicRepresentation(cufe);
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
+            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
+            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public async Task<JsonResult> PrintSupportDocument(string id)
+        {
+            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
+            byte[] pdfDocument = await _radianSupportDocument.GetGraphicRepresentation(id, webPath);
             String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
