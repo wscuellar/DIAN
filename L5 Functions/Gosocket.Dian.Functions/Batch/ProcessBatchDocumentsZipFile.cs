@@ -5,6 +5,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Functions.Common;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Services.Utils;
+using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
@@ -112,6 +113,10 @@ namespace Gosocket.Dian.Functions.Batch
                 {
                     xpathRequest = requestObjects.FirstOrDefault();
                     xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+
+                    var xmlBytes = contentFileList.First().XmlBytes;
+                    var xmlParser = new XmlParseNomina(xmlBytes);
+
                     var nitBigContributor = xpathResponse.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"];
 
                     var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(nitBigContributor, nitBigContributor);
