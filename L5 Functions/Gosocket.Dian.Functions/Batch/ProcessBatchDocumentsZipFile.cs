@@ -32,6 +32,8 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerGlobalTestSetResult = new TableManager("GlobalTestSetResult");
         private static readonly TableManager tableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableManager tableManagerGlobalTestSetOthersDocumentResult = new TableManager("GlobalTestSetOthersDocumentsResult");
+        private static readonly TableManager tableMaganerGlobalTestSetOthersDocuments = new TableManager("GlobalTestSetOthersDocuments");
         private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
         // Set queue name
         private const string queueName = "global-process-batch-zip-input%Slot%";
@@ -41,6 +43,7 @@ namespace Gosocket.Dian.Functions.Batch
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             var testSetId = string.Empty;
+            var habNomina = string.Empty;
             var zipKey = string.Empty;
             GlobalBatchFileStatus batchFileStatus = null;
             try
@@ -58,6 +61,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 var obj = JsonConvert.DeserializeObject<RequestObject>(data);
                 testSetId = obj.TestSetId;
+                habNomina = obj.othersDocument;
                 zipKey = obj.ZipKey;
                 log.Info($"Init batch process for zipKey {zipKey}.");
                 tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "START", ""));
@@ -89,6 +93,22 @@ namespace Gosocket.Dian.Functions.Batch
 
                 // Check big contributor
                 if (string.IsNullOrEmpty(testSetId))
+                {
+                    xpathRequest = requestObjects.FirstOrDefault();
+                    xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+                    var nitBigContributor = xpathResponse.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"];
+
+                    var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(nitBigContributor, nitBigContributor);
+                    if (bigContributorRequestAuthorization?.StatusCode != (int)BigContributorAuthorizationStatus.Authorized)
+                    {
+                        batchFileStatus.StatusCode = "2";
+                        batchFileStatus.StatusDescription = $"Empresa emisora con NIT {nitBigContributor} no se encuentra autorizada para enviar documentos por los lotes.";
+                        await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
+                        return;
+                    }
+                }
+                // Check big contributor
+                if (string.IsNullOrEmpty(habNomina))
                 {
                     xpathRequest = requestObjects.FirstOrDefault();
                     xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
@@ -142,7 +162,7 @@ namespace Gosocket.Dian.Functions.Batch
                 }
 
                 // Check permissions
-                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, flagApplicationResponse);
+                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, habNomina, flagApplicationResponse);
                 if (result.Count > 0)
                 {
                     batchFileStatus.StatusCode = "2";
@@ -293,7 +313,7 @@ namespace Gosocket.Dian.Functions.Batch
             return requestObj;
         }
 
-        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, Boolean flagApplicationResponse = false)
+        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, string habNomina = null, Boolean flagApplicationResponse = false)
         {
             var result = new List<XmlParamsResponseTrackId>();
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResProviderIdXpath" : "SenderCodeXpath"]).Distinct();
@@ -357,6 +377,53 @@ namespace Gosocket.Dian.Functions.Batch
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
 
                         }
+                        else if (!string.IsNullOrEmpty(habNomina))
+                        {
+                            List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(code);
+                            GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(habNomina.Trim(), StringComparison.OrdinalIgnoreCase));
+                            var idSoftware = softwareIds.Last();
+
+                            if (objGlobalTestSetOthersDocumentResult == null)
+                            {
+                                authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
+                                if (authEntity == null)
+                                    authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(newAuthCode, code);
+                                if (authEntity == null)
+                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {trimAuthCode} no autorizado a enviar documentos para emisor con NIT {code}." });
+
+                                GlobalTestSetOthersDocuments testSetOthersDocumentsResultEntity = null;
+                                var testResult = tableMaganerGlobalTestSetOthersDocuments.FindByPartition<GlobalTestSetOthersDocuments>(code);
+
+                                if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
+                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
+
+                                else if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
+                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
+
+                                else if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
+                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
+
+                                else if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
+                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
+
+                                else if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
+                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
+
+                                else if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
+                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
+
+
+                                if (testSetOthersDocumentsResultEntity == null)
+                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} no tiene habilitado set de prueba para software con id {softwareId}" });
+                                else if (testSetOthersDocumentsResultEntity.Id != testSetId)
+                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} es incorrecto." });
+                                else if (testSetOthersDocumentsResultEntity.Status == (int)TestSetStatus.Accepted)
+                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Accepted)}." });
+                                else if (testSetOthersDocumentsResultEntity.Status == (int)TestSetStatus.Rejected)
+                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
+
+                            }
+                        }
                         else
                         {
                             // Validations to RADIAN  
@@ -383,161 +450,161 @@ namespace Gosocket.Dian.Functions.Batch
                             else if (radianTestSetResultEntity.Status == (int)TestSetStatus.Rejected)
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba RADIAN con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
                         }
+                        }
                     }
                 }
+
+                return result;
             }
 
-            return result;
-        }
 
-
-        private static async Task ProcessBatchFileResults(IEnumerable<GlobalBatchFileResult> batchFileResults)
-        {
-            var table = AzureTableManager.GetTableRef("GlobalBatchFileResult");
-            await AzureTableManager.InsertOrUpdateBatchAsync(batchFileResults, table);
-        }
-
-        private static async Task ProcessUploadFailed(string zipKey, IEnumerable<ResponseUploadXml> uploadFailed)
-        {
-            var list = uploadFailed.Select(f => new GlobalBatchFileFailed(zipKey, f.DocumentKey)
+            private static async Task ProcessBatchFileResults(IEnumerable<GlobalBatchFileResult> batchFileResults)
             {
-                DocumentKey = f.DocumentKey,
-                FileName = f.FileName,
-                Message = f.Message,
-                ZipKey = zipKey
-            });
-            var table = AzureTableManager.GetTableRef("GlobalBatchFileFailed");
-            await AzureTableManager.InsertOrUpdateBatchAsync(list, table);
-        }
+                var table = AzureTableManager.GetTableRef("GlobalBatchFileResult");
+                await AzureTableManager.InsertOrUpdateBatchAsync(batchFileResults, table);
+            }
 
-        private static GlobalBatchFileResult GetBatchFileResult(string zipKey, string documentKey, IEnumerable<GlobalDocValidatorTracking> globalDocValidatorList)
-        {
-            var batchFileResult = tableManagerbatchFileResult.Find<GlobalBatchFileResult>(zipKey, documentKey);
-
-            if (batchFileResult != null)
+            private static async Task ProcessUploadFailed(string zipKey, IEnumerable<ResponseUploadXml> uploadFailed)
             {
-                if (globalDocValidatorList.Count(v => !v.IsValid && v.Mandatory) == 0 && globalDocValidatorList.Count(v => v.IsNotification) == 0)
+                var list = uploadFailed.Select(f => new GlobalBatchFileFailed(zipKey, f.DocumentKey)
                 {
-                    batchFileResult.StatusCode = (int)BatchFileStatus.Accepted;
-                    batchFileResult.StatusDescription = EnumHelper.GetEnumDescription(BatchFileStatus.Accepted);
-                }
-                if (globalDocValidatorList.Any(v => v.IsNotification))
-                {
-                    batchFileResult.StatusCode = (int)BatchFileStatus.Notification;
-                    batchFileResult.StatusDescription = EnumHelper.GetEnumDescription(BatchFileStatus.Notification);
-                }
-                if (globalDocValidatorList.Count(v => !v.IsValid && v.Mandatory) > 0)
-                {
-                    batchFileResult.StatusCode = (int)BatchFileStatus.Rejected;
-                    batchFileResult.StatusDescription = EnumHelper.GetEnumDescription(BatchFileStatus.Rejected);
-                }
+                    DocumentKey = f.DocumentKey,
+                    FileName = f.FileName,
+                    Message = f.Message,
+                    ZipKey = zipKey
+                });
+                var table = AzureTableManager.GetTableRef("GlobalBatchFileFailed");
+                await AzureTableManager.InsertOrUpdateBatchAsync(list, table);
             }
-            return batchFileResult;
-        }
 
-        private static async Task UploadXmlsAsync(string testSetId, string zipKey, ResponseXpathDataValue response, BlockingCollection<ResponseUploadXml> uploadResponses)
-        {
-            try
+            private static GlobalBatchFileResult GetBatchFileResult(string zipKey, string documentKey, IEnumerable<GlobalDocValidatorTracking> globalDocValidatorList)
             {
-                var xmlBase64 = response.XpathsValues["XmlBase64"];
-                var fileName = response.XpathsValues["FileName"];
-                var documentTypeId = response.XpathsValues["DocumentTypeXpath"];
-                var trackId = response.XpathsValues["DocumentKeyXpath"];
-                var softwareId = response.XpathsValues["SoftwareIdXpath"];
-                var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId };
-                var uploadXmlResponse = await ApiHelpers.ExecuteRequestAsync<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
-                uploadResponses.Add(uploadXmlResponse);
-            }
-            catch (Exception ex)
-            {
-                uploadResponses.Add(new ResponseUploadXml { Success = false, Message = ex.Message, DocumentKey = response.XpathsValues["DocumentTypeXpath"] });
-            }
-        }
+                var batchFileResult = tableManagerbatchFileResult.Find<GlobalBatchFileResult>(zipKey, documentKey);
 
-        private static async Task ValidateDocumentsAsync(string zipKey, string trackId, BlockingCollection<ValidationResult> validationResults, BlockingCollection<GlobalBatchFileResult> batchFileResults)
-        {
-            try
-            {
-                var draft = false;
-                var request = new { trackId, draft };
-                var validations = await ApiHelpers.ExecuteRequestAsync<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), request);
-
-                var batchFileResult = GetBatchFileResult(zipKey, trackId, validations);
                 if (batchFileResult != null)
-                    batchFileResults.Add(batchFileResult);
-
-                validationResults.Add(new ValidationResult { DocumentKey = trackId, Success = true, Message = "OK", Validations = validations });
-            }
-            catch (Exception ex)
-            {
-                validationResults.Add(new ValidationResult { DocumentKey = trackId, Success = false, Message = ex.Message, });
-            }
-        }
-
-        private static async Task GetApplicationResponse(string trackId, BlockingCollection<ResponseApplicationResponse> appResponses)
-        {
-            try
-            {
-                var applicationResponse = await ApiHelpers.ExecuteRequestAsync<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
-                if (applicationResponse.Content != null)
-                    appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = applicationResponse.Content, Success = true });
-                else
-                    appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
-            }
-            catch (Exception ex)
-            {
-                appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false, Message = ex.Message });
-            }
-        }
-
-        private static List<XmlParamsResponseTrackId> ValidateXpathValues(List<ResponseXpathDataValue> responses, Boolean flagApplicationResponse = false)
-        {
-
-            string[] noteCodes = { "7", "07", "8", "08", "91", "92", "96" };
-            var result = new List<XmlParamsResponseTrackId>();
-
-            foreach (var response in responses)
-            {
-                bool isValid = true;
-                var documentTypeCode = flagApplicationResponse ? "96" : response.XpathsValues["DocumentTypeXpath"];
-
-                if (string.IsNullOrEmpty(documentTypeCode))
-                    documentTypeCode = response.XpathsValues["DocumentTypeId"];
-
-                if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])
-                    && !noteCodes.Contains(documentTypeCode))
-                    isValid = false;
-
-                if (string.IsNullOrEmpty(response.XpathsValues["EmissionDateXpath"]))
-                    isValid = false;
-                if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"]))
-                    isValid = false;
-                if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]))
-                    isValid = false;
-                if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResReceiverCodeXpath" : "ReceiverCodeXpath"]))
-                    isValid = false;
-                if (string.IsNullOrEmpty(documentTypeCode))
-                    isValid = false;
-                if (string.IsNullOrEmpty(response.XpathsValues["UblVersionXpath"]))
-                    isValid = false;
-                if (!response.XpathsValues["UblVersionXpath"].Equals("UBL 2.0") && !response.XpathsValues["UblVersionXpath"].Equals("UBL 2.1"))
-                    isValid = false;
-                if (string.IsNullOrEmpty(response.XpathsValues["SoftwareIdXpath"]))
-                    isValid = false;
-
-                if (isValid)
-                    result.Add(new XmlParamsResponseTrackId
+                {
+                    if (globalDocValidatorList.Count(v => !v.IsValid && v.Mandatory) == 0 && globalDocValidatorList.Count(v => v.IsNotification) == 0)
                     {
-                        Success = isValid,
-                        XmlFileName = response.XpathsValues["FileName"],
-                        DocumentKey = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"],
-                        SenderCode = response.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]
-                    });
+                        batchFileResult.StatusCode = (int)BatchFileStatus.Accepted;
+                        batchFileResult.StatusDescription = EnumHelper.GetEnumDescription(BatchFileStatus.Accepted);
+                    }
+                    if (globalDocValidatorList.Any(v => v.IsNotification))
+                    {
+                        batchFileResult.StatusCode = (int)BatchFileStatus.Notification;
+                        batchFileResult.StatusDescription = EnumHelper.GetEnumDescription(BatchFileStatus.Notification);
+                    }
+                    if (globalDocValidatorList.Count(v => !v.IsValid && v.Mandatory) > 0)
+                    {
+                        batchFileResult.StatusCode = (int)BatchFileStatus.Rejected;
+                        batchFileResult.StatusDescription = EnumHelper.GetEnumDescription(BatchFileStatus.Rejected);
+                    }
+                }
+                return batchFileResult;
             }
 
+            private static async Task UploadXmlsAsync(string testSetId, string zipKey, ResponseXpathDataValue response, BlockingCollection<ResponseUploadXml> uploadResponses)
+            {
+                try
+                {
+                    var xmlBase64 = response.XpathsValues["XmlBase64"];
+                    var fileName = response.XpathsValues["FileName"];
+                    var documentTypeId = response.XpathsValues["DocumentTypeXpath"];
+                    var trackId = response.XpathsValues["DocumentKeyXpath"];
+                    var softwareId = response.XpathsValues["SoftwareIdXpath"];
+                    var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId };
+                    var uploadXmlResponse = await ApiHelpers.ExecuteRequestAsync<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
+                    uploadResponses.Add(uploadXmlResponse);
+                }
+                catch (Exception ex)
+                {
+                    uploadResponses.Add(new ResponseUploadXml { Success = false, Message = ex.Message, DocumentKey = response.XpathsValues["DocumentTypeXpath"] });
+                }
+            }
 
-            return result;
-        }
+            private static async Task ValidateDocumentsAsync(string zipKey, string trackId, BlockingCollection<ValidationResult> validationResults, BlockingCollection<GlobalBatchFileResult> batchFileResults)
+            {
+                try
+                {
+                    var draft = false;
+                    var request = new { trackId, draft };
+                    var validations = await ApiHelpers.ExecuteRequestAsync<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), request);
+
+                    var batchFileResult = GetBatchFileResult(zipKey, trackId, validations);
+                    if (batchFileResult != null)
+                        batchFileResults.Add(batchFileResult);
+
+                    validationResults.Add(new ValidationResult { DocumentKey = trackId, Success = true, Message = "OK", Validations = validations });
+                }
+                catch (Exception ex)
+                {
+                    validationResults.Add(new ValidationResult { DocumentKey = trackId, Success = false, Message = ex.Message, });
+                }
+            }
+
+            private static async Task GetApplicationResponse(string trackId, BlockingCollection<ResponseApplicationResponse> appResponses)
+            {
+                try
+                {
+                    var applicationResponse = await ApiHelpers.ExecuteRequestAsync<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
+                    if (applicationResponse.Content != null)
+                        appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = applicationResponse.Content, Success = true });
+                    else
+                        appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                }
+                catch (Exception ex)
+                {
+                    appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false, Message = ex.Message });
+                }
+            }
+
+            private static List<XmlParamsResponseTrackId> ValidateXpathValues(List<ResponseXpathDataValue> responses, Boolean flagApplicationResponse = false)
+            {
+
+                string[] noteCodes = { "7", "07", "8", "08", "91", "92", "96" };
+                var result = new List<XmlParamsResponseTrackId>();
+
+                foreach (var response in responses)
+                {
+                    bool isValid = true;
+                    var documentTypeCode = flagApplicationResponse ? "96" : response.XpathsValues["DocumentTypeXpath"];
+
+                    if (string.IsNullOrEmpty(documentTypeCode))
+                        documentTypeCode = response.XpathsValues["DocumentTypeId"];
+
+                    if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])
+                        && !noteCodes.Contains(documentTypeCode))
+                        isValid = false;
+
+                    if (string.IsNullOrEmpty(response.XpathsValues["EmissionDateXpath"]))
+                        isValid = false;
+                    if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"]))
+                        isValid = false;
+                    if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]))
+                        isValid = false;
+                    if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResReceiverCodeXpath" : "ReceiverCodeXpath"]))
+                        isValid = false;
+                    if (string.IsNullOrEmpty(documentTypeCode))
+                        isValid = false;
+                    if (string.IsNullOrEmpty(response.XpathsValues["UblVersionXpath"]))
+                        isValid = false;
+                    if (!response.XpathsValues["UblVersionXpath"].Equals("UBL 2.0") && !response.XpathsValues["UblVersionXpath"].Equals("UBL 2.1"))
+                        isValid = false;
+                    if (string.IsNullOrEmpty(response.XpathsValues["SoftwareIdXpath"]))
+                        isValid = false;
+
+                    if (isValid)
+                        result.Add(new XmlParamsResponseTrackId
+                        {
+                            Success = isValid,
+                            XmlFileName = response.XpathsValues["FileName"],
+                            DocumentKey = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"],
+                            SenderCode = response.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]
+                        });
+                }
+
+
+                return result;
+            }
 
         public class RequestObject
         {
@@ -549,6 +616,9 @@ namespace Gosocket.Dian.Functions.Batch
 
             [JsonProperty(PropertyName = "testSetId")]
             public string TestSetId { get; set; }
+
+            [JsonProperty(PropertyName = "othersDocuments")]
+            public string othersDocument { get; set; }
 
             [JsonProperty(PropertyName = "zipKey")]
             public string ZipKey { get; set; }
