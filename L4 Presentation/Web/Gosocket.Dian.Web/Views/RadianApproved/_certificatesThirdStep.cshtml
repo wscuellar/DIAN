@@ -20,21 +20,32 @@
         <div class="row radian-subtitle-line"></div>
         @Html.Partial("_documentStates")
         <div class="row">
-            @{ int i = 0;}
+            @{ 
+                int i = 0;
+                string alertText = "";   
+             }
             <div class="col-sm-8 padding-xs-0">
                 @if (Model.Step == 2)
                 {
                     foreach (var n in Model.Files)
                     {
-                        <div class="inputs-dinamics">
+                        if(n.Status == 3)
+                        {
+                            alertText = "Se ha rechazado el documento";
+                        }
+                        if (n.Status == 4)
+                        {
+                            alertText = "El documento tiene observaciones";
+                        }
+                        <div class="inputs-dinamics thirth-step">
 
                             @if (n.Status == 3 || n.Status == 4)
                             {
                                 <div class="form-group file-input-enabled">
                                     <p class="radian-file-top-label">
-                                        @n.FileName
+                                        @n.RadianContributorFileType.Name
                                         <span class="reject-observation font-weight-bold">
-                                            Se ha rechazado el documento, debe adjuntar el archivo nuevamente,
+                                            @alertText, debe adjuntar el archivo nuevamente,
                                             <u class="underline-reject-text">
                                                 <span class="add-tooltip" data-placement="top" data-toggle="tooltip" data-original-title="@n.Comments">consulte el comentario de la DIAN</span>
                                                 <img src="~/Content/images/png/commet-doots.png">
@@ -44,11 +55,11 @@
                                     </p>
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input radian-file" data-typeId="@n.FileType" name="file-@i" accept="application/pdf" required />
-                                        <label class="custom-file-label radian-file-label" for="customFile">Seleccionar archivo (máx10mb)</label>
+                                        <label class="custom-file-label radian-file-label" for="customFile"><span class="state-file-rejected status-@n.Status"></span> <span class="label-file-name">@n.FileName</span></label>
                                     </div>
                                 </div>
                                 <div class="form-group file-input-disabled init-hide">
-                                    <p class="radian-file-top-label">@n.FileName</p>
+                                    <p class="radian-file-top-label">@n.RadianContributorFileType.Name</p>
                                     @Html.TextBox("file-" + i, @n.FileName, new { @class = "form-control input-general", @readonly = true })
                                     <span class="file-size"></span>    
                                     <div id="progress-wrp">
@@ -60,7 +71,7 @@
                             else
                             {
                             <div class="form-group file-input-disabled">
-                                <p class="radian-file-top-label">@n.FileName</p>
+                                <p class="radian-file-top-label">@n.RadianContributorFileType.Name</p>
                                 @Html.TextBox("file-" + i, n.FileName, new { @class = "form-control input-general", @readonly = true })
                                 <span class="state-file status-@n.Status"></span>
                             </div>

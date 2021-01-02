@@ -9,12 +9,12 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 {
     public class RadianApprovedOperationModeViewModel
     {
-        [Display(Name = "Configuración modo de Operación")]
+        [Display(Name = "Seleccione el modo de operación")]
         public string OperationModeSelectedId { get; set; }
 
         public SelectList OperationModes { get; set; }
 
-        [Display(Name = "Nombre de software")]
+        [Display(Name = "Nombre del software")]
         [Required(ErrorMessage = "Nombre de software es requerido")]
         public string SoftwareName { get; set; }
 
