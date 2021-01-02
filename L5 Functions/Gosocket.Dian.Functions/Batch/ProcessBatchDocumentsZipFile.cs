@@ -62,7 +62,6 @@ namespace Gosocket.Dian.Functions.Batch
 
                 var obj = JsonConvert.DeserializeObject<RequestObject>(data);
                 testSetId = obj.TestSetId;
-                habNomina = obj.othersDocument;
                 zipKey = obj.ZipKey;
                 log.Info($"Init batch process for zipKey {zipKey}.");
                 tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "START", ""));
@@ -92,8 +91,15 @@ namespace Gosocket.Dian.Functions.Batch
 
                 Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);
 
+                var setResult = tableMaganerGlobalTestSetOthersDocuments.Find<GlobalTestSetOthersDocuments>(testSetId, testSetId);
+
+                if(setResult != null)
+                {
+                    habNomina = setResult.TestSetId;
+                }
+
                 // Check big contributor
-                if (string.IsNullOrEmpty(testSetId))
+                if (setResult == null && String.IsNullOrEmpty(testSetId))
                 {
                     xpathRequest = requestObjects.FirstOrDefault();
                     xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
@@ -109,25 +115,20 @@ namespace Gosocket.Dian.Functions.Batch
                     }
                 }
                 // Check big contributor
-                if (string.IsNullOrEmpty(habNomina))
+                var xmlBytes = contentFileList.First().XmlBytes;
+                var xmlParser = new XmlParseNomina(xmlBytes);
+                if (setResult != null && string.IsNullOrEmpty(habNomina))
                 {
-                    xpathRequest = requestObjects.FirstOrDefault();
-                    xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
-
-                    var xmlBytes = contentFileList.First().XmlBytes;
-                    var xmlParser = new XmlParseNomina(xmlBytes);
-
-                    var nitBigContributor = xpathResponse.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"];
-
-                    var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(nitBigContributor, nitBigContributor);
+                    var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(Convert.ToString(xmlParser.globalDocPayrolls.NIT), Convert.ToString(xmlParser.globalDocPayrolls.NIT));
                     if (bigContributorRequestAuthorization?.StatusCode != (int)BigContributorAuthorizationStatus.Authorized)
                     {
                         batchFileStatus.StatusCode = "2";
-                        batchFileStatus.StatusDescription = $"Empresa emisora con NIT {nitBigContributor} no se encuentra autorizada para enviar documentos por los lotes.";
+                        batchFileStatus.StatusDescription = $"Empresa emisora con NIT {Convert.ToString(xmlParser.globalDocPayrolls.NIT)} no se encuentra autorizada para enviar documentos por los lotes.";
                         await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
                         return;
                     }
                 }
+                
 
                 var threads = int.Parse(ConfigurationManager.GetValue("BatchThreads"));
 
@@ -146,6 +147,16 @@ namespace Gosocket.Dian.Functions.Batch
 
                 // check if unique nits
                 var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
+                var nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT);
+
+                if(setResult != null && nitNomina.Length > 1)
+                {
+                    batchFileStatus.StatusCode = "2";
+                    batchFileStatus.StatusDescription = "Lote de documentos contenidos en el archivo zip deben pertenecer todos a un mismo emisor.";
+                    await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
+                    return;
+                }
+                
                 if (nits.Count() > 1)
                 {
                     batchFileStatus.StatusCode = "2";
@@ -154,20 +165,23 @@ namespace Gosocket.Dian.Functions.Batch
                     return;
                 }
 
-                // Check xpaths
-                var xpathValuesValidationResult = ValidateXpathValues(multipleResponsesXpathDataValue, flagApplicationResponse);
-
-                multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(c => xpathValuesValidationResult.Where(v => v.Success).Select(v => v.DocumentKey).Contains(c.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])).ToList();
-                foreach (var responseXpathValues in multipleResponsesXpathDataValue)
+                if(setResult == null)
                 {
-                    if (!string.IsNullOrEmpty(responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"]) && responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"].Length > responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"].Length)
-                        responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"] = responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"].Substring(responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"].Length, responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"].Length - responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"].Length);
+                    // Check xpaths
+                    var xpathValuesValidationResult = ValidateXpathValues(multipleResponsesXpathDataValue, flagApplicationResponse);
 
-                    responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"]}-{responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"]}";
+                    multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(c => xpathValuesValidationResult.Where(v => v.Success).Select(v => v.DocumentKey).Contains(c.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])).ToList();
+                    foreach (var responseXpathValues in multipleResponsesXpathDataValue)
+                    {
+                        if (!string.IsNullOrEmpty(responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"]) && responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"].Length > responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"].Length)
+                            responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"] = responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"].Substring(responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"].Length, responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"].Length - responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"].Length);
+
+                        responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"]}-{responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"]}";
+                    }
                 }
-
+                
                 // Check permissions
-                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, habNomina, flagApplicationResponse);
+                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, habNomina, nitNomina, flagApplicationResponse);
                 if (result.Count > 0)
                 {
                     batchFileStatus.StatusCode = "2";
@@ -318,7 +332,7 @@ namespace Gosocket.Dian.Functions.Batch
             return requestObj;
         }
 
-        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, string habNomina = null, Boolean flagApplicationResponse = false)
+        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, string habNomina = null, string nitNomina = null, Boolean flagApplicationResponse = false)
         {
             var result = new List<XmlParamsResponseTrackId>();
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResProviderIdXpath" : "SenderCodeXpath"]).Distinct();
@@ -384,20 +398,20 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else if (!string.IsNullOrEmpty(habNomina))
                         {
-                            List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(code);
+                            List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
                             GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(habNomina.Trim(), StringComparison.OrdinalIgnoreCase));
                             var idSoftware = softwareIds.Last();
 
                             if (objGlobalTestSetOthersDocumentResult == null)
                             {
-                                authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
+                                authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, nitNomina);
                                 if (authEntity == null)
-                                    authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(newAuthCode, code);
+                                    authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(newAuthCode, nitNomina);
                                 if (authEntity == null)
-                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {trimAuthCode} no autorizado a enviar documentos para emisor con NIT {code}." });
+                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"NIT {trimAuthCode} no autorizado a enviar documentos para emisor con NIT {nitNomina}." });
 
                                 GlobalTestSetOthersDocuments testSetOthersDocumentsResultEntity = null;
-                                var testResult = tableMaganerGlobalTestSetOthersDocuments.FindByPartition<GlobalTestSetOthersDocuments>(code);
+                                var testResult = tableMaganerGlobalTestSetOthersDocuments.FindByPartition<GlobalTestSetOthersDocuments>(nitNomina);
 
                                 if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
                                     testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
@@ -419,13 +433,13 @@ namespace Gosocket.Dian.Functions.Batch
 
 
                                 if (testSetOthersDocumentsResultEntity == null)
-                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} no tiene habilitado set de prueba para software con id {softwareId}" });
+                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"NIT {nitNomina} no tiene habilitado set de prueba para software con id {softwareId}" });
                                 else if (testSetOthersDocumentsResultEntity.Id != testSetId)
-                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} es incorrecto." });
+                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} es incorrecto." });
                                 else if (testSetOthersDocumentsResultEntity.Status == (int)TestSetStatus.Accepted)
-                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Accepted)}." });
+                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Accepted)}." });
                                 else if (testSetOthersDocumentsResultEntity.Status == (int)TestSetStatus.Rejected)
-                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
+                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
 
                             }
                         }
@@ -621,9 +635,6 @@ namespace Gosocket.Dian.Functions.Batch
 
             [JsonProperty(PropertyName = "testSetId")]
             public string TestSetId { get; set; }
-
-            [JsonProperty(PropertyName = "othersDocuments")]
-            public string othersDocument { get; set; }
 
             [JsonProperty(PropertyName = "zipKey")]
             public string ZipKey { get; set; }
