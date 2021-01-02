@@ -348,7 +348,7 @@ namespace Gosocket.Dian.Functions.Batch
                     result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT de la empresa no encontrado en el certificado." });
                 else
                 {
-                    if (!string.IsNullOrEmpty(testSetId))
+                    if (!string.IsNullOrEmpty(testSetId) && nitNomina.Length == 0)
                     {
                         List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
 
@@ -396,7 +396,7 @@ namespace Gosocket.Dian.Functions.Batch
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
 
                         }
-                        else if (!string.IsNullOrEmpty(habNomina))
+                        else if (!string.IsNullOrEmpty(habNomina) && nitNomina.Length > 0)
                         {
                             List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
                             GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(habNomina.Trim(), StringComparison.OrdinalIgnoreCase));
@@ -410,8 +410,8 @@ namespace Gosocket.Dian.Functions.Batch
                                 if (authEntity == null)
                                     result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"NIT {trimAuthCode} no autorizado a enviar documentos para emisor con NIT {nitNomina}." });
 
-                                GlobalTestSetOthersDocuments testSetOthersDocumentsResultEntity = null;
-                                var testResult = tableMaganerGlobalTestSetOthersDocuments.FindByPartition<GlobalTestSetOthersDocuments>(nitNomina);
+                                GlobalTestSetOthersDocumentsResult testSetOthersDocumentsResultEntity = null;
+                                var testResult = tableMaganerGlobalTestSetOthersDocuments.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
 
                                 if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
                                     testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
