@@ -85,7 +85,7 @@ namespace Gosocket.Dian.Web.Controllers
                 Id = t.Id,
                 ContributorId = t.ContributorId,
                 OperationMode = t.OperationMode,
-                ContibutorType = t.ContibutorType,
+                ContributorType = t.ContributorType,
                 ElectronicDoc = t.ElectronicDoc,
                 Software = t.Software,
                 SoftwareId = t.SoftwareId,
@@ -187,8 +187,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(registrationData.UserCode.ToString(),
                                                 OtherDocElecState.Registrado,
-                                                registrationData.ContributorIdType,
-                                                registrationData.OperationModeId,
+                                                (int)registrationData.ContributorIdType,
+                                                (int)registrationData.OperationModeId,
                                                 registrationData.ElectronicDocumentId,
                                                 User.UserName());
 
@@ -232,8 +232,8 @@ namespace Gosocket.Dian.Web.Controllers
                         OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(
                                                             ValidacionOtherDocs.UserCode.ToString(),
                                                             OtherDocElecState.Registrado,
-                                                            ValidacionOtherDocs.ContributorIdType,
-                                                            ValidacionOtherDocs.OperationModeId,
+                                                            (int)ValidacionOtherDocs.ContributorIdType,
+                                                            (int)ValidacionOtherDocs.OperationModeId,
                                                             ValidacionOtherDocs.ElectronicDocumentId,
                                                             User.UserName());
 

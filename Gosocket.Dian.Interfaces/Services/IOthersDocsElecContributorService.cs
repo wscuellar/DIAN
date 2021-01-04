@@ -16,7 +16,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         List<OtherDocElecOperationMode> GetOperationModes();
 
-        OtherDocElecContributor CreateContributor(string userCode, Domain.Common.OtherDocElecState State, Domain.Common.OtherDocElecContributorType ContributorType, Domain.Common.OtherDocElecOperationMode OperationMode, int ElectronicDocumentId, string createdBy);
+        OtherDocElecContributor CreateContributor(string userCode, Domain.Common.OtherDocElecState State, int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy);
 
         List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int OperationModeId, string state);
 

@@ -38,13 +38,13 @@ namespace Gosocket.Dian.DataContext.Repositories
         {
             using (var context = new SqlDBContext())
             {
-                var radianContributorOperationInstance = context.RadianContributorOperations
+                var ContributorOperationInstance = context. OtherDocElecContributorOperations
                     .FirstOrDefault(c => c.Id == ContributorOperationId);
 
-                if (radianContributorOperationInstance != null)
+                if (ContributorOperationInstance != null)
                 {
-                    radianContributorOperationInstance.Deleted = true;
-                    context.Entry(radianContributorOperationInstance).State = System.Data.Entity.EntityState.Modified;
+                    ContributorOperationInstance.Deleted = true;
+                    context.Entry(ContributorOperationInstance).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();
 
                     responseMessage = new ResponseMessage("Datos actualizados correctamente", "Actualizado");

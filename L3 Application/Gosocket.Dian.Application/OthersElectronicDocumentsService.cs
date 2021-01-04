@@ -17,7 +17,7 @@ namespace Gosocket.Dian.Application
     {
         private SqlDBContext sqlDBContext;
         private readonly IContributorService _contributorService;
-        private readonly IOthersDocsElecContributorService _othersDocsElecContributorService; 
+        private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
         private readonly IGlobalOtherDocElecOperationService _globalOtherDocElecOperationService;
         private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
@@ -70,7 +70,7 @@ namespace Gosocket.Dian.Application
                     return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
             }
 
-           
+
             OtherDocElecContributorOperations existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted);
             if (existingOperation != null)
                 return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
@@ -129,6 +129,19 @@ namespace Gosocket.Dian.Application
             return customers;
         }
 
+        public ResponseMessage OperationDelete(int ODEContributorId)
+        {
+            OtherDocElecContributorOperations operationToDelete = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ODEContributorId);
+
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operationToDelete.SoftwareId);
+            if (software != null && software.OtherDocElecSoftwareStatusId == (int)OtherDocElecSoftwaresStatus.Accepted)
+                return new ResponseMessage() { Message = "El software encuentra en estado aceptado." };
+             
+            _othersDocsElecSoftwareService.DeleteSoftware(software.Id); 
+            OtherDocElecContributor participant = _othersDocsElecContributorRepository.Get(t => t.Id == ODEContributorId);
+            _globalOtherDocElecOperationService.Delete(participant.Contributor.Code, operationToDelete.SoftwareId.ToString()); 
+            return _othersDocsElecContributorOperationRepository.Delete(operationToDelete.Id);
+        }
 
         #region Private methods Cancel Participant
 

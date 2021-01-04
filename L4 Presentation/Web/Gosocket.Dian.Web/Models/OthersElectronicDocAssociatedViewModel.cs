@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Common;
 using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace Gosocket.Dian.Web.Models
 {
@@ -16,7 +17,7 @@ namespace Gosocket.Dian.Web.Models
             LegalRepresentativeList = new List<UserViewModel>();
         }
 
-        public int Id { get; set; } 
+        public int Id { get; set; }
         public int Step { get; set; }
 
         public int ContributorId { get; set; }
@@ -35,21 +36,21 @@ namespace Gosocket.Dian.Web.Models
 
         [Display(Name = "Correo electrónico")]
         public string Email { get; set; }
-         
+
         [Display(Name = "Estado de aprobación")]
         public string State { get; set; }
-         
+
         public string OperationMode { get; set; }
         public int OperationModeId { get; set; }
         public string ElectronicDoc { get; set; }
         public int ElectronicDocId { get; set; }
         [Display(Name = "Tipo de participante")]
         public string ContributorType { get; set; }
-        public int ContibutorTypeId { get; set; }
         public string SoftwareId { get; set; }
-
+        public Guid SoftwareIdBase { get; set; }
+        public int ProviderId { get; set; }
         public OtherDocElecSoftwareViewModel Software { get; set; }
-        public GlobalTestSetOthersDocumentsResult GTestSetOthersDocumentsResult  { get; set; }
+        public GlobalTestSetOthersDocumentsResult GTestSetOthersDocumentsResult { get; set; }
 
         public bool EsElectronicDocNomina { get; set; }
         public string TitleDoc1 { get; set; }
