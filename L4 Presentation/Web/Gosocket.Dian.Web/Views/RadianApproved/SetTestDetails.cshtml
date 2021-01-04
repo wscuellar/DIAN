@@ -1,8 +1,23 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
 @using Gosocket.Dian.Domain.Entity
+@using Gosocket.Dian.Domain.Common;
 @using Newtonsoft.Json
 @{
     ViewBag.title = "Detalle de Set de Pruebas - Propios Medios";
+    var status = "";
+    switch (Model.RadianTestSetResult.Status)
+    {
+        case (int)TestSetStatus.InProcess:
+            status = "En Proceso";
+            break;
+        case (int)TestSetStatus.Accepted:
+            status = "Aceptado";
+            break;
+        case (int)TestSetStatus.Rejected:
+            status = "Rechazado";
+            break;
+
+    }
 }
 
 <div class="page-content radian-view margin-15">
@@ -23,7 +38,7 @@
                     <div class="col-sm-11">
                         <span class="warning-title">¡Importante!</span>
                         <p>
-                            Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta en proceso.<br>
+                            Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta <b>@status</b>.<br>
                             Usted debe proporcinar el identificador del st de pruebas (TestSetld) <b>@Model.RadianTestSetResult.Id</b> en el web service  para el envío de su set de pruebas.
                         </p>
                     </div>
@@ -61,7 +76,7 @@
                             }
                         });
 
-                        function showChart(data) {debugger
+                        function showChart(data) {
                             var dataChart = data.data;
                             Highcharts.chart('setTestDetails', {
                                 chart: {
@@ -88,7 +103,8 @@
                                         'Notificación pago parcial o total',
                                         'Terminación de la limitación de circulación',
                                         'Endoso en garantia',
-                                        'Endoso en procuración'
+                                        'Endoso en procuración',
+                                        'Limitación de circulación'
                                     ]
                                 },
                                 yAxis: {
@@ -129,7 +145,8 @@
                                             dataChart.PaymentNotificationTotalRequired,
                                             dataChart.EndCirculationLimitationTotalRequired,
                                             dataChart.EndorsementGuaranteeTotalRequired,
-                                            dataChart.EndorsementProcurementTotalRequired
+                                            dataChart.EndorsementProcurementTotalRequired,
+                                            dataChart.CirculationLimitationTotalRequired
                                         ]
                                     },
                                     {
@@ -151,7 +168,8 @@
                                             dataChart.PaymentNotificationTotalAcceptedRequired,
                                             dataChart.EndCirculationLimitationTotalAcceptedRequired,
                                             dataChart.EndorsementGuaranteeTotalAcceptedRequired,
-                                            dataChart.EndorsementProcurementTotalAcceptedRequired
+                                            dataChart.EndorsementProcurementTotalAcceptedRequired,
+                                            dataChart.CirculationLimitationTotalAcceptedRequired
                                         ]
                                     },
                                     {
@@ -173,7 +191,8 @@
                                             dataChart.TotalPaymentNotificationSent,
                                             dataChart.TotalEndCirculationLimitationSent,
                                             dataChart.TotalEndorsementGuaranteeSent,
-                                            dataChart.TotalEndorsementProcurementSent
+                                            dataChart.TotalEndorsementProcurementSent,
+                                            dataChart.TotalCirculationLimitationSent
                                         ]
                                     },
                                     {
@@ -195,7 +214,8 @@
                                             dataChart.PaymentNotificationAccepted,
                                             dataChart.EndCirculationLimitationAccepted,
                                             dataChart.EndorsementGuaranteeAccepted,
-                                            dataChart.EndorsementProcurementAccepted
+                                            dataChart.EndorsementProcurementAccepted,
+                                            dataChart.CirculationLimitationAccepted
                                         ]
                                     },
                                     {
@@ -217,7 +237,8 @@
                                             dataChart.PaymentNotificationRejected,
                                             dataChart.EndCirculationLimitationRejected,
                                             dataChart.EndorsementGuaranteeRejected,
-                                            dataChart.EndorsementProcurementRejected
+                                            dataChart.EndorsementProcurementRejected,
+                                            dataChart.CirculationLimitationRejected
                                         ]
                                     }
                                 ]

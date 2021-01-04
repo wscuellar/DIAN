@@ -159,6 +159,66 @@ namespace Gosocket.Dian.Web.Services
         }
 
         /// <summary>
+        /// Get events of single document
+        /// </summary>
+        /// <param name="trackId"></param>
+        /// <returns></returns>
+        public DianResponse GetStatusEvent(string trackId)
+        {
+            try
+            {
+                var authCode = GetAuthCode();
+                var email = GetAuthEmail();
+
+                var check = CheckTrackIdFormat(trackId, authCode, email);
+                if (check.Any()) return check.FirstOrDefault();
+
+                DianPAServices customerDianPa = new DianPAServices();
+                {
+                    var start = DateTime.UtcNow;
+
+                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
+                    if (exist)
+                    {
+                        var previusResult = fileManager.GetText(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
+
+                        if (!string.IsNullOrEmpty(previusResult))
+                        {
+                            DianResponse response = JsonConvert.DeserializeObject<DianResponse>(previusResult);
+                            if (!response.IsValid || response.XmlBase64Bytes == null)
+                                response = customerDianPa.GetStatusEvent(trackId.ToLower());
+                            Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetStatus(p) " + DateTime.UtcNow.Subtract(start).TotalSeconds);
+                            customerDianPa = null;
+                            return response;
+                        }
+                    }
+
+                    var result = customerDianPa.GetStatusEvent(trackId.ToLower());
+                    customerDianPa = null;
+
+                    if (result.StatusCode == "66")
+                    {
+                        Log($"{authCode} {email} {DateTime.UtcNow.Subtract(start).TotalSeconds}", (int)InsightsLogType.Info, "GetStatus(ne) " + trackId);
+                    }
+                    else
+                    {
+                        Log($"{authCode} {email} {DateTime.UtcNow.Subtract(start).TotalSeconds}", (int)InsightsLogType.Info, "GetStatus(n) " + trackId);
+                    }
+
+                    return result;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log(trackId, (int)InsightsLogType.Error, "GetStatus");
+                var exception = new GlobalLogger($"GetStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetStatus, trackId: {trackId}", Message = ex.Message, StackTrace = ex.StackTrace };
+                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
+            }
+        }
+
+        /// <summary>
         /// Process multiple docuements
         /// </summary>
         /// <param name="fileName"></param>

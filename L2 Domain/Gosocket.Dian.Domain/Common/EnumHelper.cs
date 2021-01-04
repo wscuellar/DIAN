@@ -422,6 +422,25 @@ namespace Gosocket.Dian.Domain.Common
         Cancelado = 5
     }
 
+
+    public enum OtherDocumentStatus
+    {
+        none = 0,
+        [Display(Name = "Registrado")]
+        [Description("Registrado")]
+        Registrado = 1,
+        [Display(Name = "En pruebas")]
+        [Description("En pruebas")]
+        Test = 3,
+        [Display(Name = "Habilitado")]
+        [Description("Habilitado")]
+        Habilitado = 4,
+        [Display(Name = "Cancelado")]
+        [Description("Cancelado")]
+        Cancelado = 5
+    }
+
+
     public enum RadianContributorType
     {
         [Description("Cero")]

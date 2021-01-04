@@ -61,15 +61,15 @@ namespace Gosocket.Dian.Application
         }
 
         public OtherDocElecContributor CreateContributor(string userCode, OtherDocElecState State,
-            Domain.Common.OtherDocElecContributorType ContributorType,
-            Domain.Common.OtherDocElecOperationMode OperationMode, int ElectronicDocumentId, string createdBy)
+           int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy)
         {
 
             int contributorId = _contributorService.GetByCode(userCode).Id;
             OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId
-                                                                                     && t.OtherDocElecContributorTypeId == (int)ContributorType
-                                                                                     && t.OtherDocElecOperationModeId == (int)OperationMode
-                                                                                     && t.ElectronicDocumentId == ElectronicDocumentId);
+                                                                                     && t.OtherDocElecContributorTypeId == ContributorType
+                                                                                     && t.OtherDocElecOperationModeId == OperationMode
+                                                                                     && t.ElectronicDocumentId == ElectronicDocumentId
+                                                                                     && t.State!="Aceptado");
 
             OtherDocElecContributor newContributor = new OtherDocElecContributor()
             {
@@ -159,7 +159,7 @@ namespace Gosocket.Dian.Application
                                                         Id = oc.Id,
                                                         ContributorId = oc.ContributorId,
                                                         OperationMode = ope.Name,
-                                                        ContibutorType = oty.Name,
+                                                        ContributorType = oty.Name,
                                                         Software = s.Name,
                                                         PinSW = s.Pin,
                                                         SoftwareId = s.Id.ToString(),
@@ -174,33 +174,34 @@ namespace Gosocket.Dian.Application
         }
 
         public OtherDocsElectData GetCOntrinutorODE(int Id)
-        { 
-            var entity=  (from oc in sqlDBContext.OtherDocElecContributors
-                    join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
-                    join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
-                    join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
-                    join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
-                    where oc.Id == Id
-                     && oc.State != "Cancelado"
-                     && s.Deleted == false
+        {
+            var entity = (from oc in sqlDBContext.OtherDocElecContributors
+                          join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
+                          join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
+                          join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
+                          join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
+                          where oc.Id == Id
+                           && oc.State != "Cancelado"
+                           && s.Deleted == false
 
-                    select new OtherDocsElectData()
-                    {
-                        Id = oc.Id,
-                        ContributorId = oc.ContributorId,
-                        OperationMode = ope.Name,
-                        ContibutorType = oty.Name,
-                        StateContributor = oc.State,
-                        CreatedDate = oc.CreatedDate,
-                        ElectronicDoc = eld.Name,
-                        OperationModeId = oc.OtherDocElecOperationModeId,
-                        ContibutorTypeId = oc.OtherDocElecContributorTypeId,
-                        ElectronicDocId = oc.ElectronicDocumentId,
-                        Step = oc.Step,
-                        State = oc.State,
-                        SoftwareId = s.Id.ToString(),
-                        
-                      }).Distinct().FirstOrDefault();
+                          select new OtherDocsElectData()
+                          {
+                              Id = oc.Id,
+                              ContributorId = oc.ContributorId,
+                              OperationMode = ope.Name,
+                              ContributorType = oty.Name,
+                              StateContributor = oc.State,
+                              CreatedDate = oc.CreatedDate,
+                              ElectronicDoc = eld.Name,
+                              OperationModeId = oc.OtherDocElecOperationModeId,
+                              ContributorTypeId = oc.OtherDocElecContributorTypeId,
+                              ElectronicDocId = oc.ElectronicDocumentId,
+                              ProviderId = s.ProviderId,
+                              Step = oc.Step,
+                              State = oc.State,
+                              SoftwareId = s.Id.ToString(),
+                              SoftwareIdBase=s.SoftwareId
+                          }).Distinct().FirstOrDefault();
 
             List<string> userIds = _contributorService.GetUserContributors(entity.ContributorId).Select(u => u.UserId).ToList();
             entity.LegalRepresentativeIds = userIds;
@@ -284,7 +285,7 @@ namespace Gosocket.Dian.Application
 
         public GlobalTestSetOthersDocuments GetTestResult(int OperatonModeId, int ElectronicDocumentId)
         {
-            var _OperationMode= sqlDBContext.OtherDocElecOperationModes.FirstOrDefault(c => c.Id == OperatonModeId);
+            var _OperationMode = sqlDBContext.OtherDocElecOperationModes.FirstOrDefault(c => c.Id == OperatonModeId);
             var res = testSetManager.GetOthersDocuments<GlobalTestSetOthersDocuments>(ElectronicDocumentId.ToString(), _OperationMode.OperationModeId.ToString());
             if (res != null && res.Count > 0)
                 return res.FirstOrDefault();

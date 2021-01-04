@@ -18,7 +18,7 @@ $("#EndorsementWarrantyTotalRequired").change(function () {
     }
 });
 
-$("#EndorsementProcurationTotalRequired").change(function () {debugger
+$("#EndorsementProcurationTotalRequired").change(function () {
     var noticeTotal = parseInt($("#EndorsementProcurationTotalRequired").val());
     if (noticeTotal < 0) {
         showErrorMessage(0);

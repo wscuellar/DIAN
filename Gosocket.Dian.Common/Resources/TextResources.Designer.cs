@@ -259,6 +259,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Mode de operación adicionado correctamente.
+        /// </summary>
+        public static string OtherDocEleSuccesModeOperation {
+            get {
+                return ResourceManager.GetString("OtherDocEleSuccesModeOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a ¿Desea iniciar el proceso de habilitación para @docume?.
         /// </summary>
         public static string OthersElectronicDocumentsSelect_Confirm {

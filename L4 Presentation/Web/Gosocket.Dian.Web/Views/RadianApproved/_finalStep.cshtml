@@ -34,17 +34,21 @@
             @{ int i = 0;}
             @foreach (var n in Model.Files)
             {
-                <div class="form-group file-input-disabled">
-                    @Html.TextBox("file-" + i, n.FileName, new { @class = "form-control input-general", @readonly = true })
-                    <span class="state-file status-@n.Status"></span>
-                </div>
+            <div class="form-group file-input-disabled">
+                <p class="radian-file-top-label">@n.RadianContributorFileType.Name</p>
+                @Html.TextBox("file-" + i, n.FileName, new { @class = "form-control input-general", @readonly = true })
+                <span class="state-file status-@n.Status"></span>
+            </div>
                 i++;
             }
         </div>
     </div>
     <div class="panel-footer text-right">
         <div class="form-group">
-            <button type="button" class="btn btn-default btn-radian-default" id="view-costumers">Ver mis clientes asociados</button>
+            @if (@Model.RadianContributorTypeId != 1)
+            {
+                <button type="button" class="btn btn-default btn-radian-default" id="view-costumers">Ver mis clientes asociados</button>
+            }
             <button name="Submit" class="btn btn-radian-success" id="view-operation-mode">Configurar modos de operación</button>
         </div>
     </div>
