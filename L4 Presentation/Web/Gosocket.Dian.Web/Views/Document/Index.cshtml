@@ -198,6 +198,7 @@
         var endDate;
 
         $(document).ready(function () {
+
             $('input.check').on('change', function () {
                 $('input.check').not(this).prop('checked', false).parent().removeClass('active');
             });
@@ -212,6 +213,11 @@
                 else
                     $(this).removeClass('not-redirect')
             });
+
+            $(".download-document").click(function(){
+                var cufe = this.id;
+                window.location.href = "/Document/DownloadZipFiles?trackId=" + cufe;
+            })
 
             $('.download-files').click('onClick', function () {
                 downloadFiles(this);
@@ -359,11 +365,6 @@
         $(document).on('mouseenter', ".iffyTip", function () {
             var $this = $(this);
             if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
-                //$this.tooltip({
-                //    title: $this.text(),
-                //    placement: "left"
-                //});
-                //$this.tooltip('show');
             }
         });
         $('.hideText').css('width', $('.hideText').parent().width());
