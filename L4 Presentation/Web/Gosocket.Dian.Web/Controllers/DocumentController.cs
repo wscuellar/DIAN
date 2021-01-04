@@ -41,15 +41,18 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
-        private readonly RadianSupportDocument _radianSupportDocument;
+        private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
 
         #region Constructor
 
         public DocumentController(IRadianPdfCreationService radianPdfCreationService,
                                   IRadianGraphicRepresentationService radianGraphicRepresentationService,
-                                  IQueryAssociatedEventsService queryAssociatedEventsService)
+                                  IQueryAssociatedEventsService queryAssociatedEventsService,
+                                  IRadianSupportDocument radianSupportDocument)
         {
+            _radianSupportDocument = radianSupportDocument;
+            _radianPdfCreationService = radianPdfCreationService;
             _radianPdfCreationService = radianPdfCreationService;
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
             _queryAssociatedEventsService = queryAssociatedEventsService;
@@ -272,15 +275,24 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintDocument(string cufe)
         {
-            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
+            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);            
             byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
             String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
-
+        
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
+            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
+            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public async Task<JsonResult> PrintSupportDocument(string id)
+        {
+            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
+            byte[] pdfDocument = await _radianSupportDocument.GetGraphicRepresentation(id, webPath);
             String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }

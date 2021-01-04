@@ -198,7 +198,6 @@
         var endDate;
 
         $(document).ready(function () {
-
             $('input.check').on('change', function () {
                 $('input.check').not(this).prop('checked', false).parent().removeClass('active');
             });
@@ -213,11 +212,6 @@
                 else
                     $(this).removeClass('not-redirect')
             });
-
-            $(".download-document").click(function(){
-                var cufe = this.id;
-                window.location.href = "/Document/DownloadZipFiles?trackId=" + cufe;
-            })
 
             $('.download-files').click('onClick', function () {
                 downloadFiles(this);

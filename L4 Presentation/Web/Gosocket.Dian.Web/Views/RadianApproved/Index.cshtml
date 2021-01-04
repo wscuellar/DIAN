@@ -31,28 +31,28 @@
             <div class="panel-body padding-top-20">
                 @if (operationMode == "2")
                 {
-                <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
-                    @using (Html.BeginForm("GetFactorOperationMode", "RadianApproved", FormMethod.Post))
-                    {
-                        @Html.HiddenFor(m => m.Nit);
-                        @Html.HiddenFor(m => m.Name);
-                        @Html.HiddenFor(m => m.BusinessName);
-                        @Html.HiddenFor(m => m.Email);
-                        @Html.HiddenFor(m => m.Step);
-                        @Html.HiddenFor(m => m.Nit);
-                        @Html.HiddenFor(m => m.FilesRequires);
-                        @Html.HiddenFor(m => m.Customers);
-                        @Html.HiddenFor(m => m.RadianContributorTypeId);
-                        @Html.HiddenFor(m => m.ContributorId);
-                        <div class="panel-body padding-20 padding-bottom-10">
-                            <div class="radian-personal-info">
-                                @Html.Partial("_personalInfo")
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                        @using (Html.BeginForm("GetFactorOperationMode", "RadianApproved", FormMethod.Post))
+                        {
+                            @Html.HiddenFor(m => m.Nit);
+                            @Html.HiddenFor(m => m.Name);
+                            @Html.HiddenFor(m => m.BusinessName);
+                            @Html.HiddenFor(m => m.Email);
+                            @Html.HiddenFor(m => m.Step);
+                            @Html.HiddenFor(m => m.Nit);
+                            @Html.HiddenFor(m => m.FilesRequires);
+                            @Html.HiddenFor(m => m.Customers);
+                            @Html.HiddenFor(m => m.RadianContributorTypeId);
+                            @Html.HiddenFor(m => m.ContributorId);
+                            <div class="panel-body padding-20 padding-bottom-10">
+                                <div class="radian-personal-info">
+                                    @Html.Partial("_personalInfo")
+                                </div>
                             </div>
-                        </div>
-                        <div class="panel-footer text-right">
-                            <button type="submit" class="btn btn-success btn-radian-success button-change-state">Configurar modo de operación</button>
-                        </div>
-                    }
+                            <div class="panel-footer text-right">
+                                <button type="submit" class="btn btn-success btn-radian-success button-change-state">Configurar modo de operación</button>
+                            </div>
+                        }
                     </div>
                 }
                 else
@@ -104,8 +104,9 @@
 
     <script>
         $(document).ready(function () {
-        var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
-        RenderSteps(index);
+            var validator;
+            var index = '@Model.RadianState' == "En pruebas" ? 3 : @Model.Step;
+            RenderSteps(index);
 
 
         $(".show-history").click(function () {
@@ -154,7 +155,8 @@
                 })
             });
 
-        $('.submit-button').click(function (e) {
+        $('.submit-button').click(function (e) {           
+            validator && validator.destroy();
             showLoading('#panel-form', 'Cargando', 'Cargando archivos, por favor espere.');
             var form = $(this).parents("form");
             var files = $(form)[0];
@@ -176,9 +178,10 @@
                     files[i].files.length > 0 &&
                     filteredFiles.push(files[i]);
             }
-            form.validate({
+            validator = form.validate({
                 messages: messages
             });
+            $(form).valid();
             e.preventDefault();
             if (filteredFiles.length > 0 && form.valid()) {
                     var formdata = new FormData();

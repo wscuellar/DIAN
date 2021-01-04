@@ -3,6 +3,7 @@ using Gosocket.Dian.DataContext.Repositories;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Functions.Others;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
@@ -24,6 +25,7 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly ContributorService contributorService = new ContributorService();
         private static readonly ContributorOperationsService contributorOperationService = new ContributorOperationsService();
         private static readonly SoftwareService softwareService = new SoftwareService();
+        private static readonly GlobalOtherDocElecOperationService globalOtherDocElecOperation = new GlobalOtherDocElecOperationService();
         private static readonly IRadianSoftwareRepository _radianSoftwareRepository = new RadianSoftwareRepository();
         private static readonly IRadianCallSoftwareService radianSoftwareService = new RadianCallSoftwareService(_radianSoftwareRepository);
         private static readonly TableManager globalTestSetTableManager = new TableManager("GlobalTestSet");
@@ -38,10 +40,15 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager globalRadianOperations = new TableManager("GlobalRadianOperations");
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+        private static readonly TableManager tableGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
 
 
         // Set queue name 
         private const string queueName = "global-test-set-tracking-input%Slot%";
+
+        //Table
+        private static readonly TableManager tableMaganerGlobalTestSetOthersDocuments = new TableManager("GlobalTestSetOthersDocuments");
+        private static readonly TableManager tableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
 
         [FunctionName("UpdateTestSetResult")]
         public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
@@ -56,11 +63,13 @@ namespace Gosocket.Dian.Functions.Activation
                 await globalTestSetTrackingTableManager.InsertOrUpdateAsync(globalTestSetTracking);
                 var allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
 
+                var setResultOther = tableMaganerGlobalTestSetOthersDocuments.Find<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId, globalTestSetTracking.TestSetId);
+
                 var radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
                 SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
                 
                 //Valida RADIAN
-                if (radianTesSetResult != null)
+                if (radianTesSetResult != null && setResultOther == null)
                 {
 
                     
@@ -278,9 +287,6 @@ namespace Gosocket.Dian.Functions.Activation
                                 var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
 
                                 //Habilitamos el participante en GlobalRadianOperations
-                                SetLogger(null, "Step 19.3", radianTesSetResult.PartitionKey, "1111111113");
-                                SetLogger(null, "Step 19.4", globalTestSetTracking.SoftwareId, "1111111114");
-
                                 GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(radianTesSetResult.PartitionKey, globalTestSetTracking.SoftwareId);
 
 
@@ -353,6 +359,171 @@ namespace Gosocket.Dian.Functions.Activation
                             }
                         }
                     }
+                }
+                else if (setResultOther != null) //Other Document
+                {
+
+                    // traigo los datos de RadianTestSetResult
+                    SetLogger(radianTesSetResult, "Step 1 - Nomina", "Ingreso a proceso Other Document Nomina");
+
+                    var docOperationEnable = tableGlobalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(setResultOther.PartitionKey, setResultOther.SoftwareId);
+                    var status = docOperationEnable.State.Equals(OtherDocumentStatus.Habilitado) ? true : false;
+
+                    if (status) return;
+
+                    SetLogger(null, "Step 2 - Nomina", "No esta Activo en Nomina");
+
+                    foreach (var item in allGlobalTestSetTracking)
+                    {
+                        //Consigue informacion del CUDE
+                        GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(item.TrackId, item.TrackId);
+                        item.DocumentTypeId = validatorDocumentMeta.EventCode;
+                    }
+
+                    //Nomina Individual
+                    setResultOther.TotalDocumentSent = allGlobalTestSetTracking.Count();
+                    setResultOther.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
+                    setResultOther.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
+                    //Nomina Ajuste
+                    setResultOther.TotalElectronicPayrollAjustmentSent = allGlobalTestSetTracking.Count();
+                    setResultOther.ElectronicPayrollAjustmentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
+                    setResultOther.ElectronicPayrollAjustmentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
+                    //OtherDocument
+                    setResultOther.TotalOthersDocumentsSent = allGlobalTestSetTracking.Count();
+                    setResultOther.OthersDocumentsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
+                    setResultOther.OthersDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
+
+                    //Validacion Nomina
+                    if(setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired 
+                        && setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentAcceptedRequired) 
+                    {
+                        setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
+                        setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
+                    }
+
+                    SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina");
+
+                    if (setResultOther.OthersDocumentsAccepted >= setResultOther.OthersDocumentsAcceptedRequired) 
+                    {
+                        setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
+                        setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
+                    }
+
+                    SetLogger(null, "Step 4 - Validacion Other Document", "Paso Validacion de Other Document");
+
+                    if(setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
+                        && setResultOther.ElectronicPayrollAjustmentRejected >= (setResultOther.ElectronicPayrollAjustmentRequired - setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
+                        && setResultOther.Status == (int)OtherDocElecSoftwaresStatus.InProcess)
+                    {
+                        setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Rejected;
+                        setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Rejected.GetDescription();
+                    }
+
+                    SetLogger(null, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject");
+                    
+                    if(setResultOther.OthersDocumentsAccepted >= (setResultOther.OthersDocumentsRequired - setResultOther.OthersDocumentsAcceptedRequired)
+                        && setResultOther.Status == (int)OtherDocElecSoftwaresStatus.InProcess)
+                    {
+                        setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Rejected;
+                        setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Rejected.GetDescription();
+                    }
+
+                    SetLogger(null, "Step 6 - Validacion Other Document Reject", "Paso Validacion de Other Document");
+
+                    //Registro en la table Azure
+                    await tableManagerGlobalTestSetOthersDocumentsResult.InsertOrUpdateAsync(setResultOther);
+
+                    // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
+                    if (setResultOther.Status == (int)TestSetStatus.Accepted)
+                    {
+                        SetLogger(null, "Step 6.1", "Fui aceptado", "11111111112");
+
+                        // Send to activate contributor in production
+                        if (ConfigurationManager.GetValue("Environment") == "Hab")
+                        {
+
+                            try
+                            {
+                                SetLogger(null, "Step 6.2", "Estoy en habilitacion", "11111111121");
+
+                                #region Proceso Radian Habilitacion
+                                //Traemos el contribuyente
+                                var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
+
+                                //Habilitamos el participante en GlobalRadianOperations
+                                GlobalOtherDocElecOperation isPartipantActiveOtherDoc = globalOtherDocElecOperation.EnableParticipant(radianTesSetResult.PartitionKey, globalTestSetTracking.SoftwareId);
+
+
+                                SetLogger(isPartipantActiveOtherDoc, "Step 7", " isPartipantActive.RadianState " + isPartipantActiveOtherDoc.State);
+
+                                //Verificamos si quedo habilitado sino termina
+                                if (isPartipantActiveOtherDoc.State != Domain.Common.RadianState.Habilitado.GetDescription()) return;
+
+                                SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " isPartipantActive.RadianState " + isPartipantActiveOtherDoc.State);
+
+
+                                //--GlobalSoftware 
+                                var softwareId = isPartipantActiveOtherDoc.RowKey;
+                                var software = softwareService.GetByRadian(Guid.Parse(softwareId));
+
+                                #endregion
+
+                                #region Pendiente migracion SQL
+
+                                var requestObject = new
+                                {
+                                    code = isPartipantActiveOtherDoc.PartitionKey,
+                                    contributorId = contributor.Id,
+                                    contributorTypeId = isPartipantActiveOtherDoc.ContributorTypeId,
+                                    softwareId = isPartipantActiveOtherDoc.RowKey,
+                                    softwareType = isPartipantActiveOtherDoc.SoftwareId,
+                                    softwareUser = software.SoftwareUser,
+                                    softwarePassword = software.SoftwarePassword,
+                                    pin = software.Pin,
+                                    url = software.Url,
+                                    softwareName = software.Name
+                                };
+
+                                string functionPath = ConfigurationManager.GetValue("OtherDocumentSendToActivateContributorUrl");
+                                SetLogger(null, "Funciton Path", functionPath, "63333334");
+                                SetLogger(requestObject, "Funciton Path", functionPath, "73333334");
+
+
+                                var activation = await ApiHelpers.ExecuteRequestAsync<OthersDocumentSendToActivateContributor>(functionPath, requestObject);
+
+
+                                SetLogger(activation, "Step 8", activation == null ? "Estoy vacio" : " functionPath " + functionPath, "21212121");
+                                //SetLogger(activation, "Step 21", " functionPath " + functionPath, "21212121");
+
+                                var guid = Guid.NewGuid().ToString();
+                                var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
+                                {
+                                    Success = true,
+                                    ContributorCode = isPartipantActiveOtherDoc.PartitionKey,
+                                    ContributorTypeId = isPartipantActiveOtherDoc.ContributorTypeId,
+                                    OperationModeId = Convert.ToInt32(isPartipantActiveOtherDoc.SoftwareId),
+                                    OperationModeName = "OTHERDOCUMENTS",
+                                    SentToActivateBy = "Function",
+                                    SoftwareId = isPartipantActiveOtherDoc.RowKey,
+                                    SendDate = DateTime.UtcNow,
+                                    TestSetId = radianTesSetResult.Id,
+                                    Request = JsonConvert.SerializeObject(requestObject)
+                                };
+                                await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
+
+                                SetLogger(contributorActivation, "Step 9", " contributorActivationTableManager.InsertOrUpdateAsync ");
+
+                                #endregion
+                            }
+                            catch (Exception ex)
+                            {
+                                SetLogger(null, "Error", ex.Message, "Error123456");
+                                log.Error($"Error al enviar a activar Nomina/OtherDocument contribuyente con id {globalTestSetTracking.SenderCode} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                                throw;
+                            }
+                        }
+                    }
+
                 }
                 else // Factura Electronica
                 {

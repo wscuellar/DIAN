@@ -747,6 +747,14 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
+                if (string.IsNullOrEmpty(providerCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}B19a-(R): NIT del Prestador de Servicio no fue informado");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
                 if (!UBLVersionID.Equals("UBL 2.1"))
                 {
                     stringBuilder.AppendLine($"{codeMessage}D01-(R): El elemento no contiene el literal 'UBL 2.1'");
@@ -771,25 +779,22 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
-                //if (string.IsNullOrEmpty(eventCode))
-                //{
-                //    stringBuilder.AppendLine($"{codeMessage}H03-(R): Código tipo de evento no puede estar vacío.");
-                //    errors.Add(stringBuilder.ToString());
-                //    stringBuilder.Clear();
-                //    isValid = false;
-                //    flagEvento = false;
-                //}
-                //else if (!(eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034"
-                //    || eventCode == "035" || eventCode == "036" || eventCode == "037" || eventCode == "038" || eventCode == "039"
-                //    || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
-                //    || eventCode == "045"))
-                //{
-                //    stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
-                //    errors.Add(stringBuilder.ToString());
-                //    stringBuilder.Clear();
-                //    isValid = false;
-                //    flagEvento = false;
-                //}
+                if (string.IsNullOrEmpty(eventCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Código tipo de evento no puede estar vacío.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                    flagEvento = false;
+                }
+                else if ((Convert.ToInt32(eventCode) < 30 || Convert.ToInt32(eventCode) > 46) )
+                {
+                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                    flagEvento = false;
+                }
 
                 if (flagEvento)
                 {
@@ -802,7 +807,7 @@ namespace Gosocket.Dian.Services.Utils
                             stringBuilder.Clear();
                             isValid = false;
                         }
-                        if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 45)
+                        if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 46)
                         {
                             stringBuilder.AppendLine($"{codeMessage}D05a-(R): No fue informado un número para el evento.");
                             errors.Add(stringBuilder.ToString());
@@ -825,7 +830,7 @@ namespace Gosocket.Dian.Services.Utils
                         stringBuilder.Clear();
                         isValid = false;
                     }
-                    else if (Convert.ToInt32(eventCode) == 45 && string.IsNullOrEmpty(receiverCode) && flagEvento)
+                    else if ( (Convert.ToInt32(eventCode) == 45 || Convert.ToInt32(eventCode) == 46) && string.IsNullOrEmpty(receiverCode) && flagEvento)
                     {
                         stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el número de identificación.");
                         errors.Add(stringBuilder.ToString());
@@ -870,7 +875,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentCude))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D06-(R): el valor UUID no está correctamente calculado");
+                    stringBuilder.AppendLine($"{codeMessage}D06-(R): CUDE del UBL no puede estar vacío.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;

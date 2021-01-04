@@ -1,5 +1,4 @@
-﻿using ExpressiveAnnotations.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -29,41 +28,27 @@ namespace Gosocket.Dian.Web.Models
         public string Description { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Documentos")] 
-        [RegularExpression("([0-9]+)", ErrorMessage = "El valor debe ser numérico")]
+        [Display(Name = "Documentos")]
         public int TotalDocumentRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Range(0, int.MaxValue, ErrorMessage = "El valor debe ser numérico")]
-        [RegularExpression("([0-9]+)", ErrorMessage = "El valor debe ser numérico")]
         //[Display(Name = "Otros Documentos")]
         public int OthersDocumentsRequired { get; set; }
 
         //[Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Nomina electrónica de Ajuste")]
-        [Range(0, int.MaxValue, ErrorMessage = "El valor debe ser numérico")]
-        [RegularExpression("([0-9]+)", ErrorMessage = "El valor debe ser numérico")]
-        //[RequiredIf("ElectronicDocumentId == 1", ErrorMessage = "El campo es requerido")]
         public int? ElectronicPayrollAjustmentRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Documentos")]
-        [Range(0, int.MaxValue, ErrorMessage = "El valor debe ser numérico")]
-        [RegularExpression("([0-9]+)", ErrorMessage = "El valor debe ser numérico")]
         public int TotalDocumentAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Otros Documentos")]
-        [Range(0, int.MaxValue, ErrorMessage = "El valor debe ser numérico")]
-        [RegularExpression("([0-9]+)", ErrorMessage = "El valor debe ser numérico")]
         public int OthersDocumentsAcceptedRequired { get; set; }
 
         //[Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Nomina electrónica de Ajuste")]
-
-        [Range(0, int.MaxValue, ErrorMessage = "El valor debe ser numérico")]
-        [RegularExpression("([0-9]+)", ErrorMessage = "El valor debe ser numérico")]
-        //[RequiredIf("ElectronicDocumentId == 1", ErrorMessage = "El campo es requerido")]
         public int? ElectronicPayrollAjustmentAcceptedRequired { get; set; }
 
         public DateTime Date { get; set; }

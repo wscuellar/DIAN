@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -606,6 +607,9 @@ namespace Gosocket.Dian.Application.Cosmos
                             $"0{(int)EventStatus.NegotiatedInvoice}", $"0{(int)EventStatus.AnulacionLimitacionCirculacion}"
                         };
                         break;
+                    case 6:
+                        radianStatusFilter = new List<string>() { $"0{(int)EventStatus.Received}" };
+                        break;
                     case 7:
                         if (documentTypeId == "00")
                         {
@@ -624,39 +628,54 @@ namespace Gosocket.Dian.Application.Cosmos
                     .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();
             result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
             List<GlobalDataDocument> globalDocuments = result.ToList();
+            List<GlobalDataDocument> globalDocRadianStateFiltered = new List<GlobalDataDocument>();
 
             switch (radianStatus)
             {
-                case 7:
                 case 0:
                     break;
-                case 6:
-                    if (documentTypeId == "01")
-                    {
-                        radianStatusFilter = new List<string>() {
-                            $"0{(int)EventStatus.Received}", $"0{(int)EventStatus.Receipt}", $"0{(int)EventStatus.Accepted}"
-                        };
-
-                        globalDocuments = globalDocuments.Where(g => g.Events.Any(e => !radianStatusFilter.Contains(e.Code))).Take(10).ToList();
-                    }
+                case 7:
+                    globalDocuments = globalDocuments.Take(10).ToList();
                     break;
-                default:
-                    List<GlobalDataDocument> globalDocRadianStateFiltered = new List<GlobalDataDocument>();
-                    globalDocuments = globalDocuments.Where(g => g.Events.Count >= radianStatusFilter.Count).ToList();
-
+                case 1:
+                case 6:
                     foreach (GlobalDataDocument globalDocu in globalDocuments)
                     {
-                        bool correctStatus = true;
-                        for (int i = 0; i < radianStatusFilter.Count; i++)
-                        {
-                            if (!radianStatusFilter.Contains(globalDocu.Events.OrderByDescending(e => e.Date).ElementAt(i).Code))
-                            {
-                                correctStatus = false;
-                                break;
-                            }
-                        }
+                        if ((globalDocu.Events?.Count() ?? 0) == 0 || globalDocu.Events.Count() < 3)
+                            continue;
 
-                        if (correctStatus)
+                        List<Event> events = globalDocu.Events.ToList();
+
+                        globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Accepted}"));
+                        globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Receipt}"));
+                        globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Received}"));
+
+                        if ((globalDocu.Events?.Count() ?? 0) >= 1)
+                            continue;
+
+                        globalDocu.Events = events;
+                        globalDocRadianStateFiltered.Add(globalDocu);
+                    }
+
+                    if (radianStatus == 1)
+                    {
+                        globalDocuments = globalDocRadianStateFiltered.Take(10).ToList();
+                        break;
+                    }
+
+                    if (documentTypeId == "01")
+                    {
+                        globalDocuments.RemoveAll(g => globalDocRadianStateFiltered.Any(f => f == g));
+                        globalDocuments = globalDocuments.Take(10).ToList();
+                    }
+
+                    break;
+                default:
+                    foreach (GlobalDataDocument globalDocu in globalDocuments)
+                    {
+                        Event lastEvent = globalDocu.Events.OrderByDescending(e => e.Date).FirstOrDefault();
+
+                        if (lastEvent != null && radianStatusFilter.Contains(lastEvent.Code))
                             globalDocRadianStateFiltered.Add(globalDocu);
                     }
 

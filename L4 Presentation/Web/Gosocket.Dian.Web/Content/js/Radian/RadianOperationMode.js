@@ -1,6 +1,6 @@
 ﻿
 function DeleteOperationMode(url) {
-    $(".delete-software").click(function () {
+    $("#delete-software").click(function () {
         showLoading('#table-modes', 'Cargando', 'Buscando datos, por favor espere.');
         var metod = 'POST';
         var data = {
@@ -44,7 +44,9 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
         var actionError = (error) => {
             console.log(error);
         };
-        var actionSuccess = (response) => {
+    var actionSuccess = (response) => {
+                $("#SoftwareNameList").html("");
+                $("#bussiness-name").html("");
                 response.length == 0 && hideLoading('#panel-form');
                 if (response.length) {
                     LoadSoftwareList(response[0].value);
@@ -76,6 +78,7 @@ function LoadSoftwareList(radianId) {
     var actionError = () => { };
     var actionSuccess = (response) => {
         hideLoading('#panel-form');
+        $("#SoftwareNameList").html("");
         for (var i = 0; i < response.length; i++) {
             $("#SoftwareNameList").append($("<option>", { value: response[i].value, text: response[i].text }));
         }

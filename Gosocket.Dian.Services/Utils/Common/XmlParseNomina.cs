@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Caching;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace Gosocket.Dian.Services.Utils.Common
 {

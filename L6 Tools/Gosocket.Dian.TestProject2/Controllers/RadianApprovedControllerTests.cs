@@ -10,6 +10,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
@@ -321,6 +322,119 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             string message = (string)result.ViewData.Model.GetType().GetProperty("message").GetValue(result.ViewData.Model, null);
 
             Assert.AreEqual("Datos actualizados", message);
+        }
+
+        [TestMethod()]
+        public void RadianTestResultByNit_Result_Test()
+        {
+            _radianApprovedService.Setup(ras => ras.RadianTestSetResultByNit(It.IsAny<string>())).Returns(new RadianTestSetResult());
+            JsonResult result = _radianApprovedController.RadianTestResultByNit(string.Empty);
+            Assert.IsInstanceOfType(result.Data, typeof(RadianTestSetResult));
+        }
+
+        [TestMethod()]
+        public void DeleteOperationMode_Result_Test()
+        {
+            _radianApprovedService.Setup(ras => ras.OperationDelete(It.IsAny<int>())).Returns(new ResponseMessage());
+            JsonResult result = _radianApprovedController.RadianTestResultByNit(string.Empty);
+
+            Type typeOfDynamic = result.GetType();
+            Assert.IsTrue(typeOfDynamic.GetProperties().Where(p => p.Name.Equals("message")).Any()
+                          && typeOfDynamic.GetProperties().Where(p => p.Name.Equals("success")).Any());
+        }
+
+        [TestMethod()]
+        public void AutoCompleteProvider_Result_Test()
+        {
+            _radianApprovedService.Setup(ras => ras.AutoCompleteProvider(It.IsAny<int>(),
+                                                                         It.IsAny<int>(),
+                                                                         It.IsAny<RadianOperationModeTestSet>(),
+                                                                         It.IsAny<string>()))
+                .Returns(new List<RadianContributor>()
+                {
+                    new RadianContributor()
+                    {
+                        Id = 1,
+                        Contributor = new Contributor() { BusinessName = string.Empty}
+                    }
+                });
+
+
+            ViewResult result = _radianApprovedController.AutoCompleteProvider(1, 1, RadianOperationModeTestSet.OwnSoftware, string.Empty) as ViewResult;
+            Assert.IsInstanceOfType(result.ViewData.Model, typeof(List<AutoListModel>));
+        }
+
+        [TestMethod()]
+        public void SoftwareList_Result_Test()
+        {
+            _radianApprovedService.Setup(ras => ras.SoftwareList(It.IsAny<int>(), It.IsAny<RadianSoftwareStatus>()))
+                .Returns(new List<RadianSoftware>()
+                {
+                    new RadianSoftware()
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = string.Empty
+                    }
+                });
+
+            ViewResult result = _radianApprovedController.SoftwareList(1) as ViewResult;
+            Assert.IsInstanceOfType(result.ViewData.Model, typeof(List<AutoListModel>));
+        }
+
+        [TestMethod()]
+        public void CustomersList_Result_Test()
+        {
+            _radianApprovedService.Setup(ras => ras.CustormerList(It.IsAny<int>(),
+                                                                  It.IsAny<string>(),
+                                                                  It.IsAny<RadianState>(),
+                                                                  It.IsAny<int>(),
+                                                                  It.IsAny<int>()))
+                .Returns(new PagedResult<RadianCustomerList>()
+                {
+                    Results = new List<RadianCustomerList>()
+                    {
+                        new RadianCustomerList()
+                        {
+                            BussinessName = string.Empty,
+                            Nit = string.Empty,
+                            RadianState = string.Empty,
+                            Page = 1,
+                            Length = 1
+                        }
+                    }
+                });
+
+            ViewResult result = _radianApprovedController.CustomersList(1, string.Empty, RadianState.Habilitado, 1, 1) as ViewResult;
+            Assert.IsInstanceOfType(result.ViewData.Model, typeof(RadianApprovedViewModel));
+        }
+
+        [TestMethod()]
+        public void FileHistoyList_Result_Test()
+        {
+            _radianApprovedService.Setup(ras => ras.FileHistoryFilter(It.IsAny<int>(),
+                                                                      It.IsAny<string>(),
+                                                                      It.IsAny<string>(),
+                                                                      It.IsAny<string>(),
+                                                                      It.IsAny<int>(),
+                                                                      It.IsAny<int>()))
+                .Returns(new PagedResult<RadianContributorFileHistory>()
+                {
+                    RowCount = 1,
+                    Results = new List<RadianContributorFileHistory>()
+                    {
+                        new RadianContributorFileHistory()
+                        {
+                            FileName = string.Empty,
+                            Comments = string.Empty,
+                            CreatedBy = string.Empty,
+                            RadianContributorFileStatus = new RadianContributorFileStatus() { Name = string.Empty },
+                            Timestamp = DateTime.Now
+                        }
+                    }
+                });
+
+            ViewResult result = _radianApprovedController.FileHistoyList(new FileHistoryFilterViewModel() { Page = 1 }) as ViewResult;
+            Assert.IsInstanceOfType(result.ViewData.Model, typeof(FileHistoryListViewModel));
         }
     }
 }

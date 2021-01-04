@@ -26,10 +26,10 @@ namespace Gosocket.Dian.Services.Utils
         private static readonly FileManager fileManager = new FileManager();
         private static readonly FirmaElectronica signer = new FirmaElectronica();
 
-        public static byte[] GenerateApplicationResponseBytes(string trackId, 
-            GlobalDocValidatorDocumentMeta documentMeta, 
-            List<GlobalDocValidatorTracking> validations, 
-            List<GlobalDocValidatorDocumentMeta> events, 
+        public static byte[] GenerateApplicationResponseBytes(string trackId,
+            GlobalDocValidatorDocumentMeta documentMeta,
+            List<GlobalDocValidatorTracking> validations,
+            List<GlobalDocValidatorDocumentMeta> events,
             List<GlobalDocValidatorDocumentMeta> originalEvents,
             List<GlobalDocValidatorTracking> originalValidations)
         {
@@ -189,7 +189,7 @@ namespace Gosocket.Dian.Services.Utils
                         new XElement(cbc + "Name", "IVA"))));
         }
 
-        private static List<XElement> BuildDocumentResponseNodeList(List<GlobalDocValidatorDocumentMeta> events, 
+        private static List<XElement> BuildDocumentResponseNodeList(List<GlobalDocValidatorDocumentMeta> events,
             List<GlobalDocValidatorDocumentMeta> originalEvents,
             List<GlobalDocValidatorTracking> originalValidations)
         {
@@ -220,7 +220,7 @@ namespace Gosocket.Dian.Services.Utils
                 BuildIssuerPartyEventNode(originalEvent),
                 BuildRecipientPartyEventNode(originalEvent));
 
-            if(notifications != null && notifications.Count > 0)
+            if (notifications != null && notifications.Count > 0)
             {
                 documentResponse.Add(BuildLineResponseEventNodeList(_event, notifications));
             }

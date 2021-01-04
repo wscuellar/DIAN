@@ -43,7 +43,7 @@
 <div class="page-content margin-15">
     <div id="divPageContent" class="row margin-horizontal-0">
 
-        <div class="tab-base">
+        <div class="tab-base" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
             <!-- Navs Tabs -->
 
             @{
@@ -102,11 +102,12 @@
     <script>
 
         function showModal(cude) {
-            showPdfModal("#show-graphic-document",cude,'@Url.Action("PrintGraphicRepresentation", "Document")');
+            showPdfModal("#show-graphic-document", cude, '@Url.Action("PrintGraphicRepresentation", "Document")', '#panel-form_1');
         }
 
         $(document).ready(function () {
-            showPdfModal("#show-document", "@Model.Document.DocumentKey", '@Url.Action("PrintDocument", "Document")');
+            showPdfModal("#show-document", "@Model.Document.DocumentKey", '@Url.Action("PrintDocument", "Document")', '#panel-form');
+            showPdfModal("#show-supportdocument", "@Model.Document.DocumentKey", '@Url.Action("PrintSupportDocument", "Document")', '#panel-form');
             $('#container1-title').hide();
             $('.document-row').click('onClick', function () {
                 if (!$(this).hasClass('not-redirect')) {

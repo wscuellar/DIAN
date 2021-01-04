@@ -19,7 +19,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                                  join mrol in context.MenuRoles on m.Id equals mrol.MenuId
                                  join rol in context.Roles on mrol.RoleId equals rol.Id
                                  where rol.Name == rolname && mrol.SubMenuId == null
-                                 select new 
+                                 select new
                                  {
                                      m.Id,
                                      m.Name,
@@ -74,10 +74,10 @@ namespace Gosocket.Dian.DataContext.Repositories
                                  .Select(x => new SubMenu()
                                  {
                                      Id = x.Id,
-                                     MenuId=x.MenuId,
+                                     MenuId = x.MenuId,
                                      Name = x.Name,
                                      Description = x.Description,
-                                     Title = x.Title, 
+                                     Title = x.Title,
                                      Order = x.Order
                                  }).OrderBy(x => x.Order).ToList(); ;
 

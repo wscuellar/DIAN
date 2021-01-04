@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain.Domain;
+﻿using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Services.Models;

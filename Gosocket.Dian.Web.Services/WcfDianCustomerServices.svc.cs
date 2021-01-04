@@ -186,7 +186,7 @@ namespace Gosocket.Dian.Web.Services
                         {
                             DianResponse response = JsonConvert.DeserializeObject<DianResponse>(previusResult);
                             if (!response.IsValid || response.XmlBase64Bytes == null)
-                                response = customerDianPa.GetStatus(trackId.ToLower());
+                                response = customerDianPa.GetStatusEvent(trackId.ToLower());
                             Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetStatus(p) " + DateTime.UtcNow.Subtract(start).TotalSeconds);
                             customerDianPa = null;
                             return response;

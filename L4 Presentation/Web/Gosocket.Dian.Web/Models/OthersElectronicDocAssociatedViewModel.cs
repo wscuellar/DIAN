@@ -1,6 +1,9 @@
 ﻿using Gosocket.Dian.Domain;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Common;
 using System.Diagnostics.CodeAnalysis;
@@ -8,7 +11,6 @@ using System;
 
 namespace Gosocket.Dian.Web.Models
 {
-    [ExcludeFromCodeCoverage]
     public class OthersElectronicDocAssociatedViewModel
     {
         public OthersElectronicDocAssociatedViewModel()

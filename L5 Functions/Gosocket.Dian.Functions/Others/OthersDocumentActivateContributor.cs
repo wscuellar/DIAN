@@ -1,4 +1,4 @@
-using Gosocket.Dian.Application;
+﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
@@ -8,10 +8,14 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Gosocket.Dian.Functions.Radian
+namespace Gosocket.Dian.Functions.Others
 {
-    public static class RadianActivateContributor
+    class OthersDocumentActivateContributor
     {
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly ContributorService contributorService = new ContributorService();
@@ -21,9 +25,8 @@ namespace Gosocket.Dian.Functions.Radian
         private static readonly TableManager GlobalRadianOperationsTableManager = new TableManager("GlobalRadianOperations");
 
         // Set queue name
-        private const string queueName = "activate-radian-operation-input";
-
-        [FunctionName("ActivateRadianOperation")]
+        private const string queueName = "activate-otherdocument-operation-input";
+        [FunctionName("ActivateOtherDocumentOperation")]
         public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
@@ -36,12 +39,12 @@ namespace Gosocket.Dian.Functions.Radian
 
                 RadianContributor radianContributor = null;
                 GlobalContributorActivation contributorActivation = null;
-                RadianaActivateContributorRequestObject requestObject = null;
+                OtherDocumentActivateContributorRequestObject requestObject = null;
                 try
                 {
                     //    // Step 1  Validate RadianContributor
                     EventGridEvent eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
-                    requestObject = JsonConvert.DeserializeObject<RadianaActivateContributorRequestObject>(eventGridEvent.Data.ToString());
+                    requestObject = JsonConvert.DeserializeObject<OtherDocumentActivateContributorRequestObject>(eventGridEvent.Data.ToString());
                     SetLogger(requestObject, "Step RA-1", "RadianContributor ", "Paso1");
 
                     //Contributorid = RadiancontributoriD
@@ -190,7 +193,7 @@ namespace Gosocket.Dian.Functions.Radian
                         contributorActivation = new GlobalContributorActivation(requestObject.ContributorId.ToString(), Guid.NewGuid().ToString());
 
                     contributorActivation.Success = false;
-                    contributorActivation.Message = "Error al activar contribuyente en producci�n.";
+                    contributorActivation.Message = "Error al activar contribuyente en producción.";
                     contributorActivation.Detail = ex.Message;
                     contributorActivation.Trace = ex.StackTrace;
                     contributorActivationTableManager.InsertOrUpdate(contributorActivation);
@@ -205,7 +208,8 @@ namespace Gosocket.Dian.Functions.Radian
                 log.Error($"RadianActivateContributor: Wrong enviroment {ConfigurationManager.GetValue("Environment")}. {myQueueItem}");
         }
 
-        class RadianaActivateContributorRequestObject
+
+        class OtherDocumentActivateContributorRequestObject
         {
             [JsonProperty(PropertyName = "code")]
             public string Code { get; set; }

@@ -328,6 +328,7 @@
     <Compile Include="Controllers\ContributorCategoryController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ExternalUsersController.cs" />
+    <Compile Include="Controllers\OthersDocumentsController.cs" />
     <Compile Include="Controllers\OthersElectronicDocAssociatedController.cs" />
     <Compile Include="Controllers\OthersElectronicDocumentsController.cs" />
     <Compile Include="Controllers\QueryAssociatedEventsController.cs" />
@@ -2924,6 +2925,7 @@
     <Content Include="Views\OthersElectronicDocAssociated\SetupOperationMode.cshtml" />
     <Content Include="Views\OthersElectronicDocAssociated\_setupOperationModeForm.cshtml" />
     <Content Include="Views\OthersElectronicDocAssociated\_setupOperationModeList.cshtml" />
+    <Content Include="Views\Document\PrintSupportDocument.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
