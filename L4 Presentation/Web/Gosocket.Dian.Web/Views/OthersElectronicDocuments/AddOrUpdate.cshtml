@@ -141,8 +141,8 @@
                                         <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
                                             <thead>
                                                 <tr>
-                                                    <th class="text-left">Modo de operación</th>
-                                                    <th class="text-left">Documento Electrónicos</th>
+                                                    <th class="text-center">Modo de operación</th>
+                                                    <th class="text-center">Documento Electrónicos</th>
                                                     <th class="text-center">&nbsp;&nbsp;Registro&nbsp;&nbsp;</th>
                                                     <th class="text-center">Estado<br /> (Participante - Software)</th>
                                                     <th class="text-center">Nombre del Software</th>
@@ -159,7 +159,7 @@
                                                     foreach (var item in (List<Gosocket.Dian.Web.Models.OtherDocsElectListViewModel>)Model.ListTable)
                                                     {
                                                         <tr>
-                                                            <td class="text-left">@item.OperationMode - @item.ContibutorType</td>
+                                                            <td class="text-left">@item.OperationMode - @item.ContributorType</td>
                                                             <td class="text-center">@item.ElectronicDoc</td>
                                                             <td class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
                                                             <td class="text-center">@item.StateContributor - @item.StateSoftware</td>

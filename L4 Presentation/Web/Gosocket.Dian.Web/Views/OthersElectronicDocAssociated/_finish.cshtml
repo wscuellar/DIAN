@@ -1,9 +1,10 @@
 ﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
 <div class="panel-footer text-right">
     <div class="form-group">
-
-        <button type="button" class="btn btn-default btn-radian-default" id="view-costumers">Ver mis clientes asociados</button>
-
-        <button name="button" class="btn btn-default btn btn-radian-success Configurar-modo-operacion">Configurar modo de operación</button>
+        @if (Model.OperationModeId == 2)
+        {
+            <button type="button" class="btn btn-default btn-radian-default" id="view-costumers">Ver mis clientes asociados</button>
+        }
+        @Html.ActionLink("Configurar modo de operación", "SetupOperationMode", "OthersElectronicDocAssociated", new { Id = Model.Id}, new { @class = "btn btn-default btn btn-radian-success" }) 
     </div>
 </div>
