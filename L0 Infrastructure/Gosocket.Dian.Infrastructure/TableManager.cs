@@ -412,6 +412,16 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.FirstOrDefault();
         }
+
+        public T FindGlobalTestOtherDocumentId<T>(string testSetId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("TestSetId", QueryComparisons.Equal, testSetId));
+
+            var entities = CloudTable.ExecuteQuery(query);
+
+            return entities.FirstOrDefault();
+        }
+
         public List<T> FindDocumentReferenced<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
