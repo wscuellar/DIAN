@@ -155,7 +155,7 @@
 
                             <div id="IdSinPermisos" class="text-center text-danger"></div>
 
-                           
+
                             <div class="row margin-left-20 margin-right-20">
                                 <h4 class="panel-title-radian padding-0">Permisos</h4>
                                 <hr class="margin-5 margin-bottom-20" />
@@ -205,8 +205,8 @@
                             </div>
                             <div class="panel-footer footerRectangle text-right">
                                 @*@Html.ActionLink("Nuevo", "Add@*User", "ExternalUsers", null, new { @class = "btn btn-default" })
-                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
+                                    <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                                    <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
                                 <div class="footerRectangle">
                                     <a href="/ExternalUsers/AddUser" class="btn btn-default btn-radian-default cancel-register">Cancelar</a>
                                     <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-success btn-hover-gosocket btn-radian-success">
@@ -436,7 +436,7 @@
 {
     @Scripts.Render("~/bundles/jqueryval")
 
-<script>
+    <script>
         var listMenu;
         var userId = "";
         var reloadView = false;
@@ -484,7 +484,8 @@
                             onEscape: () => { }
                         });
                     }
-                    else { 
+                    else {
+                        debugger;
 
                         var model = {
                             ID: $('#Id').val(),
@@ -517,9 +518,8 @@
                                 return false;
                             }
                             });  //ajax
-              
 
-                    }
+
                     }
                 }
             });
@@ -763,5 +763,5 @@
 
 
 
-</script>
+    </script>
 }
