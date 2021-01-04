@@ -61,120 +61,122 @@
         <div class="underline-title"></div>
     </div>
 
+    <div class="tab-base" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
 
-    <div class="row margin-horizontal-0">
-        <div class="tab-base">
-            <!--Tabs Content-->
-            <div class="tab-content padding-0">
-                <div id="tab-current-country" class="tab-pane fade active in">
-                    <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
-                        <div class="panel-body padding-top-20">
-                            <div class="pad-btm padding-bottom-0">
-                                <div class="row margin-horizontal-0">
-                                    @{ string action = ViewBag.ViewType; }
-                                    @using (Html.BeginForm(action, "Document", FormMethod.Post, new { id = "documents-form" }))
-                                    {
-                                        @Html.HiddenFor(m => m.Page)
-                                        <input id="startDate" name="StartDate" type="hidden" value="@Model.StartDate" />
-                                        <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />
+        <div class="row margin-horizontal-0">
+            <div class="tab-base">
+                <!--Tabs Content-->
+                <div class="tab-content padding-0">
+                    <div id="tab-current-country" class="tab-pane fade active in">
+                        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
+                            <div class="panel-body padding-top-20">
+                                <div class="pad-btm padding-bottom-0">
+                                    <div class="row margin-horizontal-0">
+                                        @{ string action = ViewBag.ViewType; }
+                                        @using (Html.BeginForm(action, "Document", FormMethod.Post, new { id = "documents-form" }))
+                                        {
+                                            @Html.HiddenFor(m => m.Page)
+                                            <input id="startDate" name="StartDate" type="hidden" value="@Model.StartDate" />
+                                            <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />
 
-                                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
-                                            <div class="col-md-12 padding-horizontal-0">
-                                                <div id="document-list" class="panel panel-bordered-dian">
+                                            <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                                <div class="col-md-12 padding-horizontal-0">
+                                                    <div id="document-list" class="panel panel-bordered-dian">
 
-                                                    <div class="panel-body padding-20 padding-bottom-0">
-                                                        <div id="divFirstRowDocFilter" class="row">
-                                                            <div class="col-sm-@columnSize padding-xs-0">
-                                                                <div class="form-group">
-                                                                    @Html.LabelFor(m => m.DocumentKey, new { @class = "control-label" })
-                                                                    @Html.TextBoxFor(m => m.DocumentKey, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.DocumentKey) } })
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="col-sm-3 padding-xs-0">
-                                                                <div class="form-group">
-                                                                    @Html.LabelFor(m => m.SerieAndNumber, new { @class = "control-label" })
-                                                                    @Html.TextBoxFor(m => m.SerieAndNumber, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SerieAndNumber) } })
-                                                                </div>
-                                                            </div>
-
-                                                            @if (ViewBag.ViewType != "Sent")
-                                                            {
-                                                                <div class="col-sm-3 padding-xs-0">
+                                                        <div class="panel-body padding-20 padding-bottom-0">
+                                                            <div id="divFirstRowDocFilter" class="row">
+                                                                <div class="col-sm-@columnSize padding-xs-0">
                                                                     <div class="form-group">
-                                                                        @Html.LabelFor(m => m.SenderCode, new { @class = "control-label" })
-                                                                        @Html.TextBoxFor(m => m.SenderCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SenderCode) } })
+                                                                        @Html.LabelFor(m => m.DocumentKey, new { @class = "control-label" })
+                                                                        @Html.TextBoxFor(m => m.DocumentKey, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.DocumentKey) } })
                                                                     </div>
                                                                 </div>
-                                                            }
 
-                                                            @if (ViewBag.ViewType != "Received")
-                                                            {
                                                                 <div class="col-sm-3 padding-xs-0">
                                                                     <div class="form-group">
-                                                                        @Html.LabelFor(m => m.ReceiverCode, new { @class = "control-label" })
-                                                                        @Html.TextBoxFor(m => m.ReceiverCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.ReceiverCode) } })
+                                                                        @Html.LabelFor(m => m.SerieAndNumber, new { @class = "control-label" })
+                                                                        @Html.TextBoxFor(m => m.SerieAndNumber, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SerieAndNumber) } })
                                                                     </div>
                                                                 </div>
-                                                            }
 
-                                                            <div class="col-sm-3 padding-xs-0">
-                                                                <div class="form-group">
-                                                                    <label class="control-label">Rango de fechas</label>
+                                                                @if (ViewBag.ViewType != "Sent")
+                                                                {
+                                                                    <div class="col-sm-3 padding-xs-0">
+                                                                        <div class="form-group">
+                                                                            @Html.LabelFor(m => m.SenderCode, new { @class = "control-label" })
+                                                                            @Html.TextBoxFor(m => m.SenderCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SenderCode) } })
+                                                                        </div>
+                                                                    </div>
+                                                                }
+
+                                                                @if (ViewBag.ViewType != "Received")
+                                                                {
+                                                                    <div class="col-sm-3 padding-xs-0">
+                                                                        <div class="form-group">
+                                                                            @Html.LabelFor(m => m.ReceiverCode, new { @class = "control-label" })
+                                                                            @Html.TextBoxFor(m => m.ReceiverCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.ReceiverCode) } })
+                                                                        </div>
+                                                                    </div>
+                                                                }
+
+                                                                <div class="col-sm-3 padding-xs-0">
                                                                     <div class="form-group">
-                                                                        <div class="btn btn-default col-sm-12" id="dashboard-report-range">
-                                                                            <i class="icon-calendar"></i>&nbsp;
-                                                                            <span class="thin uppercase hidden-xs"></span>&nbsp;
-                                                                            <i class="fa fa-angle-down"></i>
+                                                                        <label class="control-label">Rango de fechas</label>
+                                                                        <div class="form-group">
+                                                                            <div class="btn btn-default col-sm-12" id="dashboard-report-range">
+                                                                                <i class="icon-calendar"></i>&nbsp;
+                                                                                <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                                                                <i class="fa fa-angle-down"></i>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
+
                                                             </div>
 
+                                                            <div class="row">
+                                                                <div class="col-sm-3 padding-xs-0">
+                                                                    <div class="form-group">
+                                                                        @Html.LabelFor(m => m.DocumentTypeId, new { @class = "control-label" })
+                                                                        @Html.DropDownListFor(m => m.DocumentTypeId, new SelectList(Model.DocumentTypes, "Code", "Name", Model.DocumentTypeId), new { @class = "form-control selectpicker" })
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-3 padding-xs-0">
+                                                                    <div class="form-group">
+                                                                        @Html.LabelFor(m => m.Statuses, new { @class = "control-label" })
+                                                                        @Html.DropDownListFor(m => m.Status, new SelectList(Model.Statuses, "Code", "Name", Model.Status), new { @class = "form-control selectpicker" })
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-3 padding-xs-0">
+                                                                    <div class="form-group">
+                                                                        @Html.LabelFor(m => m.RadianStatusList, new { @class = "control-label" })
+                                                                        @Html.DropDownListFor(m => m.RadianStatus, new SelectList(Model.RadianStatusList, "Code", "Name", Model.RadianStatus), new { @class = "form-control selectpicker" })
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-3 padding-xs-0">
+                                                                    <div class="form-group">
+                                                                        @Html.LabelFor(m => m.ReferencesType, new { @class = "control-label" })
+                                                                        @Html.DropDownListFor(m => m.ReferencesType, new SelectList(Model.DocumentTypes.Where(d => new List<string> { "00", "07", "08" }.Contains(d.Code)), "Code", "Name", Model.ReferencesType), new { @class = "form-control selectpicker" })
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
 
-                                                        <div class="row">
-                                                            <div class="col-sm-3 padding-xs-0">
-                                                                <div class="form-group">
-                                                                    @Html.LabelFor(m => m.DocumentTypeId, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.DocumentTypeId, new SelectList(Model.DocumentTypes, "Code", "Name", Model.DocumentTypeId), new { @class = "form-control selectpicker" })
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-3 padding-xs-0">
-                                                                <div class="form-group">
-                                                                    @Html.LabelFor(m => m.Statuses, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.Status, new SelectList(Model.Statuses, "Code", "Name", Model.Status), new { @class = "form-control selectpicker" })
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-3 padding-xs-0">
-                                                                <div class="form-group">
-                                                                    @Html.LabelFor(m => m.RadianStatusList, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.RadianStatus, new SelectList(Model.RadianStatusList, "Code", "Name", Model.RadianStatus), new { @class = "form-control selectpicker" })
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-3 padding-xs-0">
-                                                                <div class="form-group">
-                                                                    @Html.LabelFor(m => m.ReferencesType, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.ReferencesType, new SelectList(Model.DocumentTypes.Where(d => new List<string> { "00", "07", "08" }.Contains(d.Code)), "Code", "Name", Model.ReferencesType), new { @class = "form-control selectpicker" })
-                                                                </div>
-                                                            </div>
+                                                        <div class="panel-footer-grey text-right submit-container">
+                                                            <button type="submit" class="btn btn-success btn-radian-success">Buscar</button>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="panel-footer-grey text-right submit-container">
-                                                        <button type="submit" class="btn btn-success btn-radian-success">Buscar</button>
                                                     </div>
-
                                                 </div>
                                             </div>
-                                        </div>
-                                    }
+                                        }
 
+                                    </div>
                                 </div>
+
+                                @Html.Partial("_documents");
+
                             </div>
-
-                            @Html.Partial("_documents");
-
                         </div>
                     </div>
                 </div>
@@ -189,13 +191,18 @@
 
     <!--Bootstrap Select [ OPTIONAL ]-->
     <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
-
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
+    <script src="~/Content/js/Radian/RadianPrintDocumentPdf.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
     <script>
         var startDate;
         var endDate;
+
+        function showModal(cude) {
+            showPdfModal("#show-supportdocument", cude, '@Url.Action("PrintSupportDocument", "Document")', '#panel-form');
+        }
 
         $(document).ready(function () {
 

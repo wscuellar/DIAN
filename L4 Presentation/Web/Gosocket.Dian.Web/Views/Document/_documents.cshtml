@@ -63,14 +63,22 @@
                 }
                 <tr>
                     <td>
-                        @if (document.Status != 2)
+                        @if (document.DocumentTypeId == "05")
                         {
-                            <span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                            <span class="fa fa fa-download add-tooltip" data-original-title="Documento soporte" data-id="@document.Id" id="@document.Id" onclick="showPdfModal(@document.Id)"></span>
                         }
                         else
                         {
-                            <span class="fa fa fa-close add-tooltip" data-original-title="Descarga desahabilitada"></span>
+                            if (document.Status != 2)
+                            {
+                                <span class="fa fa fa-download add-tooltip" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                            }
+                            else
+                            {
+                                <span class="fa fa fa-close add-tooltip" data-original-title="Descarga desahabilitada"></span>
+                            }
                         }
+
                     </td>
                     <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
                         <a>@document.ReceptionDate.AddHours(-5).ToString("dd-MM-yyyy")</a>
