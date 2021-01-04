@@ -248,11 +248,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
-                    string msg = "No se encontró evento referenciado CUDE para evaluar fecha Limitación de circulación";           
+                    string msg = "No se puede generar este evento si previamente no existe el evento limitación de circulación.";           
                     ValidateListResponse response = new ValidateListResponse();
                     response.ErrorMessage = msg;
                     response.IsValid = false;
-                    response.ErrorCode = "89";
+                    response.ErrorCode = "LGC34";
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     validateResponses.Add(response);
                     return validateResponses;

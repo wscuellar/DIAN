@@ -787,7 +787,7 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                     flagEvento = false;
                 }
-                else if ((Convert.ToInt32(eventCode) <= 30 || Convert.ToInt32(eventCode) >= 46) )
+                else if ((Convert.ToInt32(eventCode) < 30 || Convert.ToInt32(eventCode) > 46) )
                 {
                     stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
                     errors.Add(stringBuilder.ToString());
