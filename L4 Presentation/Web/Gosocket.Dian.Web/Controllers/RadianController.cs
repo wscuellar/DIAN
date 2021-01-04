@@ -48,6 +48,8 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.TradingSystem_RadianOperationModeId = result["TradingSystem_RadianOperationModeId"];
             ViewBag.Factor_RadianContributorTypeId = result["Factor_RadianContributorTypeId"];
             ViewBag.Factor_RadianOperationModeId = result["Factor_RadianOperationModeId"];
+            ViewBag.CurrentPage = Navigation.NavigationEnum.RADIAN;
+
             return View();
         }
 
@@ -109,6 +111,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SearchFinished = true
             };
 
+            ViewBag.CurrentPage = Navigation.NavigationEnum.AdminRadian;
 
             return View(model);
         }

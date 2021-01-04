@@ -470,8 +470,8 @@ namespace Gosocket.Dian.Application
             foreach (XmlNode element in advanceNodes)
             {
                 advances.Append("<tr>");
-                advances.Append($"<td>{counter}</td>");
-                advances.Append($"<td>{element["cbc:PaidAmount"].InnerText:C}</td>");
+                advances.Append($"<td class='text-centered'>{counter}</td>");
+                advances.Append($"<td class='text-currency'>$ {element["cbc:PaidAmount"].InnerText}</td>");
                 advances.Append("</tr>");
 
                 counter++;
@@ -501,8 +501,8 @@ namespace Gosocket.Dian.Application
             foreach (XmlNode element in retentionsNodes)
             {
                 retentions.Append("<tr>");
-                retentions.Append($"<td>{counter}</td>");
-                retentions.Append($"<td>{element["cbc:TaxAmount"].InnerText:C}</td>");
+                retentions.Append($"<td class='text-centered'>{counter}</td>");
+                retentions.Append($"<td class='text-currency'>$ {element["cbc:TaxAmount"].InnerText}</td>");
                 retentions.Append("</tr>");
                 counter++;
             }

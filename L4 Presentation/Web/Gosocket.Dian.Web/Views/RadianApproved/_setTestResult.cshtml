@@ -190,10 +190,16 @@
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, defaultHtmlAttr)
                                 </div>
                             </div>
-                            <div class="col-sm-4 padding-xs-0">
+                            <div class="col-sm-3 padding-xs-0">
                                 <div class="form-group">
                                     @Html.Label("Terminación de la limitación de circulación", new { @class = "control-label" })
-                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
+                                </div>
+                            </div>
+                            <div class="col-sm-2 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.Label("Solicitud de disponibilización", new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired, defaultHtmlAttr)
                                 </div>
                             </div>
                         </div>
@@ -299,10 +305,16 @@
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, defaultHtmlAttr)
                                 </div>
                             </div>
-                            <div class="col-sm-4 padding-xs-0">
+                            <div class="col-sm-3 padding-xs-0">
                                 <div class="form-group">
                                     @Html.Label("Terminación de la limitación de circulación", new { @class = "control-label" })
                                     @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
+                                </div>
+                            </div>
+                            <div class="col-sm-2 padding-xs-0">
+                                <div class="form-group">
+                                    @Html.Label("Solicitud de disponibilización", new { @class = "control-label" })
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired, defaultHtmlAttr)
                                 </div>
                             </div>
                         </div>
