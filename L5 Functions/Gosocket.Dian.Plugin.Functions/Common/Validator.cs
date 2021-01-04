@@ -3154,9 +3154,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: 89-(R): ",
+                        ErrorCode = "Regla: LGC13-(R): ",
                         ErrorMessage = "Solo se pueda transmitir el evento (" + eventPrev.EventCode + ")," +
-                                        " después de haber transmitido el evento (030) de acuse de recibo.",
+                                        " después de haber transmitido el evento (030) de acuse de recibo de la factura electrónica de venta.",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
