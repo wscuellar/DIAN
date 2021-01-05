@@ -307,7 +307,7 @@
                 'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
             },
             "locale": {
-                "format": "DD-MM-YY",
+                "format": "YYYY/MM/DD",
                 "separator": " - ",
                 "applyLabel": "Aceptar",
                 "cancelLabel": "Cancelar",
@@ -341,13 +341,13 @@
             },
             opens: ('left'),
         }, function (start, end, label) {
-            $('#dashboard-report-range span').html(capitalizeMonth(start.format('DD-MMMM-YYYY')) + ' al ' + capitalizeMonth(end.format('DD-MMMM-YYYY')));
+                $('#dashboard-report-range span').html(capitalizeMonth(start.format('YYYY/MM/DD')) + ' al ' + capitalizeMonth(end.format('YYYY/MM/DD')));
             startDate = start;
             endDate = end;
-            $('#startDate').val(startDate.format('MM/DD/YYYY'));
-            $('#endDate').val(endDate.format('MM/DD/YYYY'));
+                $('#startDate').val(startDate.format('YYYY/MM/DD'));
+                $('#endDate').val(endDate.format('YYYY/MM/DD'));
         });
-        $('#dashboard-report-range span').html(capitalizeMonth(startDate.format('DD-MMMM-YYYY')) + ' al ' + capitalizeMonth(endDate.format('DD-MMMM-YYYY')));
+        $('#dashboard-report-range span').html(capitalizeMonth(startDate.format('YYYY/MM/DD')) + ' al ' + capitalizeMonth(endDate.format('YYYY/MM/DD')));
         $('#dashboard-report-range').show();
 
         function capitalizeMonth(date) {

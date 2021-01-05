@@ -582,22 +582,30 @@ namespace Gosocket.Dian.Application.Cosmos
 
             if (radianStatus > 0)
             {
-                options.MaxItemCount = 40;
+                options.MaxItemCount = 10;
                 switch (radianStatus)
                 {
                     case 1:
-                        radianStatusFilter = new List<string>() {
-                            $"0{(int)EventStatus.Received}", $"0{(int)EventStatus.Receipt}", $"0{(int)EventStatus.Accepted}"
-                        };
+                        predicate = predicate.And(g => g.Events.Any()
+                            && !g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.SolicitudDisponibilizacion}"))
+                            && !g.Events.Any(n => n.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}"))
+                            && g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.Accepted}")));
                         break;
                     case 2:
-                        radianStatusFilter = new List<string>() { $"0{(int)EventStatus.SolicitudDisponibilizacion}" };
+                        predicate = predicate.And(g => !g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}") 
+                                || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
+                                || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")
+                                || a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}")
+                                || a.Code.Equals($"0{(int)EventStatus.ValInfoPago}"))
+                            && g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.SolicitudDisponibilizacion}")));
                         break;
                     case 3:
-                        radianStatusFilter = new List<string>() {
-                            $"0{(int)EventStatus.EndosoPropiedad}", $"0{(int)EventStatus.EndosoGarantia}",
-                            $"0{(int)EventStatus.EndosoProcuracion}", $"0{(int)EventStatus.InvoiceOfferedForNegotiation}"
-                        };
+                        predicate = predicate.And(g => !g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.NotificacionPagoTotalParcial}")
+                               || a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}"))
+                           && g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
+                            || t.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
+                            || t.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")
+                           ));
                         break;
                     case 4:
                         radianStatusFilter = new List<string>() { $"0{(int)EventStatus.NotificacionPagoTotalParcial}" };
@@ -608,7 +616,10 @@ namespace Gosocket.Dian.Application.Cosmos
                         };
                         break;
                     case 6:
-                        radianStatusFilter = new List<string>() { $"0{(int)EventStatus.Received}" };
+                        if (documentTypeId == "01")
+                        {
+                            predicate = predicate.And(g => g.Events.Any() && !g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.Accepted}")));
+                        }
                         break;
                     case 7:
                         if (documentTypeId == "00")
@@ -630,58 +641,68 @@ namespace Gosocket.Dian.Application.Cosmos
             List<GlobalDataDocument> globalDocuments = result.ToList();
             List<GlobalDataDocument> globalDocRadianStateFiltered = new List<GlobalDataDocument>();
 
-            switch (radianStatus)
-            {
-                case 0:
-                    break;
-                case 7:
-                    globalDocuments = globalDocuments.Take(10).ToList();
-                    break;
-                case 1:
-                case 6:
-                    foreach (GlobalDataDocument globalDocu in globalDocuments)
-                    {
-                        if ((globalDocu.Events?.Count() ?? 0) == 0 || globalDocu.Events.Count() < 3)
-                            continue;
+            //foreach (GlobalDataDocument globalDocu in globalDocuments)
+            //{
+            //    Event lastEvent = globalDocu.Events.OrderByDescending(e => e.Date).FirstOrDefault();
 
-                        List<Event> events = globalDocu.Events.ToList();
+            //    if (lastEvent != null && radianStatusFilter != null && radianStatusFilter.Contains(lastEvent.Code))
+            //        globalDocRadianStateFiltered.Add(globalDocu);
+            //}
 
-                        globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Accepted}"));
-                        globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Receipt}"));
-                        globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Received}"));
+            //switch (radianStatus)
+            //{
+            //    case 0:
+            //        break;
+            //    case 7:
+            //        globalDocuments = globalDocuments.Take(10).ToList();
+            //        break;
+            //    case 1:
+            //    case 6:
 
-                        if ((globalDocu.Events?.Count() ?? 0) >= 1)
-                            continue;
+            //        globalDocuments = globalDocuments.Where(d => !d.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.Accepted}"))).ToList();
+            //        //globalDocuments = globalDocuments.Take(10).ToList();
+            //        //foreach (GlobalDataDocument globalDocu in globalDocuments)
+            //        //{
 
-                        globalDocu.Events = events;
-                        globalDocRadianStateFiltered.Add(globalDocu);
-                    }
+            //        //    List<Event> events = globalDocu.Events.ToList();
 
-                    if (radianStatus == 1)
-                    {
-                        globalDocuments = globalDocRadianStateFiltered.Take(10).ToList();
-                        break;
-                    }
+            //        //    globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.TerminacionMandato}"));
+            //        //    globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Receipt}"));
+            //        //    globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Received}"));
+            //        //    globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Mandato}"));
 
-                    if (documentTypeId == "01")
-                    {
-                        globalDocuments.RemoveAll(g => globalDocRadianStateFiltered.Any(f => f == g));
-                        globalDocuments = globalDocuments.Take(10).ToList();
-                    }
+            //        //    if ((globalDocu.Events?.Count() ?? 0) >= 1)
+            //        //        continue;
 
-                    break;
-                default:
-                    foreach (GlobalDataDocument globalDocu in globalDocuments)
-                    {
-                        Event lastEvent = globalDocu.Events.OrderByDescending(e => e.Date).FirstOrDefault();
+            //        //    globalDocu.Events = events;
+            //        //    globalDocRadianStateFiltered.Add(globalDocu);
+            //        //}
 
-                        if (lastEvent != null && radianStatusFilter.Contains(lastEvent.Code))
-                            globalDocRadianStateFiltered.Add(globalDocu);
-                    }
+            //        //if (radianStatus == 1)
+            //        //{
+            //        //    globalDocuments = globalDocRadianStateFiltered.Take(10).ToList();
+            //        //    break;
+            //        //}
 
-                    globalDocuments = globalDocRadianStateFiltered.Take(10).ToList();
-                    break;
-            }
+            //        //if (documentTypeId == "01")
+            //        //{
+            //        //    globalDocuments.RemoveAll(g => !globalDocRadianStateFiltered.Any(f => f == g));
+            //        //    globalDocuments = globalDocuments.Take(10).ToList();
+            //        //}
+
+            //        break;
+            //    default:
+            //        foreach (GlobalDataDocument globalDocu in globalDocuments)
+            //        {
+            //            Event lastEvent = globalDocu.Events.OrderByDescending(e => e.Date).FirstOrDefault();
+
+            //            if (lastEvent != null && radianStatusFilter.Contains(lastEvent.Code))
+            //                globalDocRadianStateFiltered.Add(globalDocu);
+            //        }
+
+            //        globalDocuments = globalDocRadianStateFiltered.Take(10).ToList();
+            //        break;
+            //}
 
             return (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults,
                     result.ResponseContinuation,
