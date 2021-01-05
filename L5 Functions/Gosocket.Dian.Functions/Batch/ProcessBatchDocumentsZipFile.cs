@@ -213,7 +213,8 @@ namespace Gosocket.Dian.Functions.Batch
                     var documentTypeId = "";
                     var trackId = "";
                     var softwareId = "";
-                    if(setResult != null)
+
+                    if (setResult != null)
                     {
                         xmlBase64 = response.XpathsValues["XmlBase64"];
                         fileName = response.XpathsValues["FileName"];
@@ -239,13 +240,13 @@ namespace Gosocket.Dian.Functions.Batch
                     {
                         var eventCode = response.XpathsValues["AppResEventCodeXpath"];
                         var customizationID = response.XpathsValues["AppResCustomizationIDXpath"];
-                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, isEvent, eventCode, customizationID };
+                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, isEvent, eventCode, customizationID, eventNomina };
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
                     else
                     {
-                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId };
+                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, eventNomina };
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
