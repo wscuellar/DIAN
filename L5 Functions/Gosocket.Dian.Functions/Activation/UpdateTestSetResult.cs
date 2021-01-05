@@ -67,7 +67,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                 var radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
                 SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
-                SetLogger(setResultOther, "Step 0", "Paso setResultOther");
+                SetLogger(setResultOther, "Step 0", "Paso setResultOther" + setResultOther + "****" + globalTestSetTracking.TestSetId);
 
                 //Valida RADIAN
                 if (radianTesSetResult != null && setResultOther == null)
