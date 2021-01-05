@@ -93,7 +93,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 var setResult = tableMaganerGlobalTestSetOthersDocuments.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocuments>(testSetId);
 
-                SetLogger(null, "Step prueba nomina", " validando consulta ");
+                SetLogger(null, "Step prueba nomina", " validando consulta " + flagApplicationResponse);
 
                 if (setResult != null)
                 {
@@ -207,12 +207,33 @@ namespace Gosocket.Dian.Functions.Batch
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
                 {
                     Boolean isEvent = flagApplicationResponse;
-                    var xmlBase64 = response.XpathsValues["XmlBase64"];
-                    var fileName = response.XpathsValues["FileName"];
-                    var documentTypeId = flagApplicationResponse ? "96" : response.XpathsValues["DocumentTypeXpath"];
-                    var trackId = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"];
-                    trackId = trackId?.ToLower();
-                    var softwareId = response.XpathsValues["SoftwareIdXpath"];
+                    Boolean eventNomina = false;
+                    var xmlBase64 = "";
+                    var fileName = "";
+                    var documentTypeId = "";
+                    var trackId = "";
+                    var softwareId = "";
+                    if(setResult != null)
+                    {
+                        xmlBase64 = response.XpathsValues["XmlBase64"];
+                        fileName = response.XpathsValues["FileName"];
+                        documentTypeId = "11";
+                        trackId = trackId?.ToLower();
+                        eventNomina = true;
+                    }
+                    else
+                    {
+                        isEvent = flagApplicationResponse;
+                        xmlBase64 = response.XpathsValues["XmlBase64"];
+                        fileName = response.XpathsValues["FileName"];
+                        documentTypeId = flagApplicationResponse ? "96" : response.XpathsValues["DocumentTypeXpath"];
+                        trackId = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"];
+                        trackId = trackId?.ToLower();
+                        softwareId = response.XpathsValues["SoftwareIdXpath"];
+                        eventNomina = false;
+                    }
+
+                    SetLogger(null, "Step prueba nomina", " Paso el setResult diferente null ");
 
                     if (isEvent)
                     {
@@ -291,7 +312,7 @@ namespace Gosocket.Dian.Functions.Batch
                     log.Info($"Upload applition responses zip OK.");
                 }
                 tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "END", xpathResponse.XpathsValues["FileName"]));
-                SetLogger(null, "Step prueba nomina", " proceso terminado ");
+                SetLogger(null, "Step prueba nomina", " proceso terminado " + flagApplicationResponse);
                 log.Info($"End.");
             }
             catch (Exception ex)
