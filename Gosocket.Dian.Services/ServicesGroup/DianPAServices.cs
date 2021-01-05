@@ -1247,8 +1247,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.StatusCode = Properties.Settings.Default.Code_99;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Error_FieldMandatori;
                     dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios.";
-                    dianResponse.XmlBase64Bytes = errors.Any() || notifications.Any() ? dianResponse.XmlBase64Bytes : null;                   
-
+                    dianResponse.XmlBase64Bytes = null;
                 }
                 var application = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_7AplicattionSendEvent) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 // ZONE APPLICATION
