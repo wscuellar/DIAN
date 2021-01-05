@@ -350,8 +350,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public async Task<List<ValidateListResponse>> StartValidateParty(RequestObjectParty party)
         {
-            DateTime startDate = DateTime.UtcNow;
-            string issueAttorney = String.Empty;
+            DateTime startDate = DateTime.UtcNow;    
             var validateResponses = new List<ValidateListResponse>();
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
@@ -408,15 +407,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ErrorMessage = "Mandatario no encontrado para el Nit del Endosatario" + endosatario,
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
-                        }
-                        else
-                        {
-                            issueAttorney = documentAttorney.IssuerAttorney;
-                        }
+                        }                       
                     }
                     if(valid)
                     {
-                        nitModel.SenderCode = issueAttorney;
+                        nitModel.SenderCode = party.SenderParty;
                     }
                 }
             }
