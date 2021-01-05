@@ -365,11 +365,8 @@ namespace Gosocket.Dian.Functions.Activation
 
                     // traigo los datos de RadianTestSetResult
                     SetLogger(radianTesSetResult, "Step 1 - Nomina", "Ingreso a proceso Other Document Nomina");
-                    var splitResult = setResultOther.SoftwareId.Split('|');
 
-                    SetLogger(setResultOther, "Step 0", "Paso split" + splitResult);
-
-                    var docOperationEnable = tableGlobalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(setResultOther.PartitionKey, splitResult[1]);
+                    var docOperationEnable = tableGlobalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(setResultOther.PartitionKey, setResultOther.SoftwareId);
                     var status = docOperationEnable.State.Equals(OtherDocumentStatus.Habilitado) ? true : false;
 
                     if (status) return;
