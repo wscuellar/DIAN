@@ -158,7 +158,7 @@ namespace Gosocket.Dian.Functions.Batch
                 var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
                 var nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT);
 
-                SetLogger(null, "Step prueba nomina", " Paso NitNomina " + nitNomina);
+                SetLogger(null, "Step prueba nomina", " Paso NitNomina " + nitNomina.Count() + setResult);
                 if (setResult != null && nitNomina.Count() > 1)
                 {
                     batchFileStatus.StatusCode = "2";
