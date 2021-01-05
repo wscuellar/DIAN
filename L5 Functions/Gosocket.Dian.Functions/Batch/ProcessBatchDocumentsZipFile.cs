@@ -93,7 +93,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 var setResult = tableMaganerGlobalTestSetOthersDocuments.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocuments>(testSetId);
 
-                SetLogger(null, "Step prueba nomina", " validando consulta ");
+                SetLogger(null, "Step prueba nomina", " validando consulta " + flagApplicationResponse);
 
                 if (setResult != null)
                 {
@@ -204,34 +204,58 @@ namespace Gosocket.Dian.Functions.Batch
                 // Upload all xml's
                 log.Info($"Init upload xml´s.");
                 BlockingCollection<ResponseUploadXml> uploadResponses = new BlockingCollection<ResponseUploadXml>();
+                SetLogger(null, "Step prueba nomina", " Paso multipleResponsesXpathDataValue " + multipleResponsesXpathDataValue.Count);
+                
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
                 {
                     Boolean isEvent = flagApplicationResponse;
-                    var xmlBase64 = response.XpathsValues["XmlBase64"];
-                    var fileName = response.XpathsValues["FileName"];
-                    var documentTypeId = flagApplicationResponse ? "96" : response.XpathsValues["DocumentTypeXpath"];
-                    var trackId = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"];
-                    trackId = trackId?.ToLower();
-                    var softwareId = response.XpathsValues["SoftwareIdXpath"];
+                    Boolean eventNomina = false;
+                    var xmlBase64 = "";
+                    var fileName = "";
+                    var documentTypeId = "";
+                    var trackId = "";
+                    var softwareId = "";
+
+                    if (setResult != null)
+                    {
+                        xmlBase64 = response.XpathsValues["XmlBase64"];
+                        fileName = response.XpathsValues["FileName"];
+                        documentTypeId = "11";
+                        trackId = xmlParser.globalDocPayrolls.CUNE;
+                        eventNomina = true;
+                    }
+                    else
+                    {
+                        isEvent = flagApplicationResponse;
+                        xmlBase64 = response.XpathsValues["XmlBase64"];
+                        fileName = response.XpathsValues["FileName"];
+                        documentTypeId = flagApplicationResponse ? "96" : response.XpathsValues["DocumentTypeXpath"];
+                        trackId = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"];
+                        trackId = trackId?.ToLower();
+                        softwareId = response.XpathsValues["SoftwareIdXpath"];
+                        eventNomina = false;
+                    }
+
+                    SetLogger(null, "Step prueba nomina", " Paso el setResult diferente null ");
 
                     if (isEvent)
                     {
                         var eventCode = response.XpathsValues["AppResEventCodeXpath"];
                         var customizationID = response.XpathsValues["AppResCustomizationIDXpath"];
-                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, isEvent, eventCode, customizationID };
+                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, isEvent, eventCode, customizationID, eventNomina };
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
                     else
                     {
-                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId };
+                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, eventNomina };
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
+                    SetLogger(null, "Step prueba nomina", " Paso upload " +  trackId + "**" +zipKey + "**" + testSetId + "**" + eventNomina);
 
                 });
 
-                SetLogger(null, "Step prueba nomina", " Paso upload ");
                 var uploadFailed = uploadResponses.Where(m => !m.Success && multipleResponsesXpathDataValue.Select(d => d.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"]).Contains(m.DocumentKey));
 
                 var failed = uploadFailed.Count();
@@ -247,10 +271,17 @@ namespace Gosocket.Dian.Functions.Batch
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
                 {
                     var draft = false;
+                    var eventNomina = false;
                     var trackId = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"].ToLower();
                     try
                     {
-                        var request = new { trackId, draft, testSetId };
+                        if(setResult != null)
+                        {
+                            eventNomina = true;
+                            trackId = xmlParser.globalDocPayrolls.CUNE;
+                        }
+
+                        var request = new { trackId, draft, testSetId, eventNomina };
                         var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), request);
 
                         var batchFileResult = GetBatchFileResult(zipKey, trackId, validations);
@@ -291,7 +322,7 @@ namespace Gosocket.Dian.Functions.Batch
                     log.Info($"Upload applition responses zip OK.");
                 }
                 tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "END", xpathResponse.XpathsValues["FileName"]));
-                SetLogger(null, "Step prueba nomina", " proceso terminado ");
+                SetLogger(null, "Step prueba nomina", " proceso terminado " + flagApplicationResponse);
                 log.Info($"End.");
             }
             catch (Exception ex)
