@@ -271,10 +271,17 @@ namespace Gosocket.Dian.Functions.Batch
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
                 {
                     var draft = false;
+                    var eventNomina = false;
                     var trackId = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"].ToLower();
                     try
                     {
-                        var request = new { trackId, draft, testSetId };
+                        if(setResult != null)
+                        {
+                            eventNomina = true;
+                            trackId = xmlParser.globalDocPayrolls.CUNE;
+                        }
+
+                        var request = new { trackId, draft, testSetId, eventNomina };
                         var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), request);
 
                         var batchFileResult = GetBatchFileResult(zipKey, trackId, validations);
