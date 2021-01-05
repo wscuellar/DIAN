@@ -156,18 +156,9 @@ namespace Gosocket.Dian.Functions.Batch
 
                 // check if unique nits
                 var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
-                var nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT).ToList();
+                var nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT);
 
-                SetLogger(null, "Step prueba nomina", " Paso NitNomina " + nitNomina.Count() + setResult);
-                if (setResult != null && nitNomina.Count() > 1)
-                {
-                    batchFileStatus.StatusCode = "2";
-                    batchFileStatus.StatusDescription = "Lote de documentos contenidos en el archivo zip deben pertenecer todos a un mismo emisor.";
-                    await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
-                    return;
-                }
-                
-                SetLogger(null, "Step prueba nomina", " Paso Validacion check if ");
+                SetLogger(null, "Step prueba nomina", " Paso nitNomina ");
                 if (nits.Count() > 1)
                 {
                     batchFileStatus.StatusCode = "2";
