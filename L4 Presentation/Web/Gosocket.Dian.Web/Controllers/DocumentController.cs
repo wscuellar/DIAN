@@ -765,34 +765,41 @@ namespace Gosocket.Dian.Web.Controllers
 
         private string DeterminateRadianStatus(List<EventViewModel> events, string documentTypeId)
         {
-            if (events.Count() == 0)
+            if (!events.Any())
                 return RadianDocumentStatus.DontApply.GetDescription();
 
-            int lastEventCode = int.Parse(events.OrderBy(t => t.Date).Last().Code);
+            var eventEnd = events.Where(ev => int.Parse(ev.Code) != (int)EventStatus.Avales 
+                && int.Parse(ev.Code) != (int)EventStatus.Mandato
+                && int.Parse(ev.Code) != (int)EventStatus.TerminacionMandato
+                && int.Parse(ev.Code) != (int)EventStatus.AnulacionLimitacionCirculacion
+                && int.Parse(ev.Code) != (int)EventStatus.InvoiceOfferedForNegotiation);
 
-            if (lastEventCode == ((int)EventStatus.NegotiatedInvoice)
-                || lastEventCode == ((int)EventStatus.AnulacionLimitacionCirculacion))
-                return RadianDocumentStatus.Limited.GetDescription();
+            if (eventEnd.Any())
+            {
+                int lastEventCode = int.Parse(eventEnd.OrderBy(t => t.Date).Last().Code);
 
-            if (lastEventCode == ((int)EventStatus.NotificacionPagoTotalParcial))
-                return RadianDocumentStatus.Paid.GetDescription();
+                if (lastEventCode == ((int)EventStatus.NegotiatedInvoice))
+                    return RadianDocumentStatus.Limited.GetDescription();
 
-            if (lastEventCode == ((int)EventStatus.EndosoPropiedad)
-                || lastEventCode == ((int)EventStatus.EndosoGarantia)
-                || lastEventCode == ((int)EventStatus.EndosoProcuracion)
-                || lastEventCode == ((int)EventStatus.InvoiceOfferedForNegotiation))
-                return RadianDocumentStatus.Endorsed.GetDescription();
+                if (lastEventCode == ((int)EventStatus.NotificacionPagoTotalParcial))
+                    return RadianDocumentStatus.Paid.GetDescription();
 
-            if (lastEventCode == ((int)EventStatus.SolicitudDisponibilizacion))
-                return RadianDocumentStatus.Readiness.GetDescription();
+                if (lastEventCode == ((int)EventStatus.EndosoPropiedad)
+                    || lastEventCode == ((int)EventStatus.EndosoGarantia)
+                    || lastEventCode == ((int)EventStatus.EndosoProcuracion))
+                    return RadianDocumentStatus.Endorsed.GetDescription();
 
-            if (events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Received))
-                && events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Receipt))
-                && events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Accepted)))
-                return RadianDocumentStatus.SecurityTitle.GetDescription();
+                if (lastEventCode == ((int)EventStatus.SolicitudDisponibilizacion))
+                    return RadianDocumentStatus.Readiness.GetDescription();
 
-            if (documentTypeId == "01")
-                return RadianDocumentStatus.ElectronicInvoice.GetDescription();
+                if (eventEnd.Any(e => int.Parse(e.Code) == ((int)EventStatus.Received))
+                    && eventEnd.Any(e => int.Parse(e.Code) == ((int)EventStatus.Receipt))
+                    && eventEnd.Any(e => int.Parse(e.Code) == ((int)EventStatus.Accepted)))
+                    return RadianDocumentStatus.SecurityTitle.GetDescription();
+
+                if (documentTypeId == "01")
+                    return RadianDocumentStatus.ElectronicInvoice.GetDescription();
+            }
 
             return RadianDocumentStatus.DontApply.GetDescription();
         }
