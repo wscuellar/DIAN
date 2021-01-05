@@ -291,7 +291,7 @@ namespace Gosocket.Dian.Functions.Batch
                     log.Info($"Upload applition responses zip OK.");
                 }
                 tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "END", xpathResponse.XpathsValues["FileName"]));
-                SetLogger(null, "Step prueba nomina", " Hpta por fin termino ");
+                SetLogger(null, "Step prueba nomina", " proceso terminado ");
                 log.Info($"End.");
             }
             catch (Exception ex)
