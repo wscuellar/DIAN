@@ -204,6 +204,8 @@ namespace Gosocket.Dian.Functions.Batch
                 // Upload all xml's
                 log.Info($"Init upload xml´s.");
                 BlockingCollection<ResponseUploadXml> uploadResponses = new BlockingCollection<ResponseUploadXml>();
+                SetLogger(null, "Step prueba nomina", " Paso multipleResponsesXpathDataValue " + multipleResponsesXpathDataValue);
+                return;
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
                 {
                     Boolean isEvent = flagApplicationResponse;
@@ -250,10 +252,11 @@ namespace Gosocket.Dian.Functions.Batch
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
+                    SetLogger(null, "Step prueba nomina", " Paso upload " + xmlBase64 + fileName + documentTypeId + softwareId + trackId + zipKey + testSetId + eventNomina);
+                    return;
 
                 });
 
-                SetLogger(null, "Step prueba nomina", " Paso upload ");
                 var uploadFailed = uploadResponses.Where(m => !m.Success && multipleResponsesXpathDataValue.Select(d => d.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"]).Contains(m.DocumentKey));
 
                 var failed = uploadFailed.Count();
