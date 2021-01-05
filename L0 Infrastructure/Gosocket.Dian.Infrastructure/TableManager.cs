@@ -395,6 +395,15 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
+        public T FindByGlobalOtherDocumentId<T>(string Id) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("Id", QueryComparisons.Equal, Id));
+
+            var entities = CloudTable.ExecuteQuery(query);
+
+            return entities.FirstOrDefault();
+        }
+
         public T Find<T>(string partitionKey, string rowKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
