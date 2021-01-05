@@ -299,7 +299,7 @@ namespace Gosocket.Dian.Web.Controllers
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.Received.GetDescription(), Counter1 = testSet.ReceiptNoticeTotalAcceptedRequired, Counter2 = testSet.ReceiptNoticeTotalRequired, Counter3 = 0 });
 
                 //Recibo del bien
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.Receipt.GetDescription(), Counter1 = testSet.ReceiptNoticeTotalAcceptedRequired, Counter2 = testSet.ReceiptServiceTotalRequired, Counter3 = 0 });
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Receipt.GetDescription(), Counter1 = testSet.ReceiptServiceTotalAcceptedRequired, Counter2 = testSet.ReceiptServiceTotalRequired, Counter3 = 0 });
 
                 // Aceptación expresa
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.Accepted.GetDescription(), Counter1 = testSet.ExpressAcceptanceTotalAcceptedRequired, Counter2 = testSet.ExpressAcceptanceTotalRequired, Counter3 = 0 });
