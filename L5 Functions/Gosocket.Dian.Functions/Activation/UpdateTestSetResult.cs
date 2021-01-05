@@ -47,7 +47,6 @@ namespace Gosocket.Dian.Functions.Activation
         private const string queueName = "global-test-set-tracking-input%Slot%";
 
         //Table
-        private static readonly TableManager tableMaganerGlobalTestSetOthersDocuments = new TableManager("GlobalTestSetOthersDocuments");
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
 
         [FunctionName("UpdateTestSetResult")]
@@ -63,7 +62,7 @@ namespace Gosocket.Dian.Functions.Activation
                 await globalTestSetTrackingTableManager.InsertOrUpdateAsync(globalTestSetTracking);
                 var allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
 
-                var setResultOther = tableMaganerGlobalTestSetOthersDocuments.FindByGlobalOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
+                var setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindByGlobalOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
 
                 var radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
                 SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
@@ -367,7 +366,7 @@ namespace Gosocket.Dian.Functions.Activation
                     // traigo los datos de RadianTestSetResult
                     SetLogger(radianTesSetResult, "Step 1 - Nomina", "Ingreso a proceso Other Document Nomina");
 
-                    var docOperationEnable = tableGlobalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(setResultOther.PartitionKey, setResultOther.SoftwareId);
+                    var docOperationEnable = tableGlobalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(setResultOther.PartitionKey, setResultOther.SoftwareId.Split('|')[1]);
                     var status = docOperationEnable.State.Equals(OtherDocumentStatus.Habilitado) ? true : false;
 
                     if (status) return;
