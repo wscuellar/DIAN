@@ -252,7 +252,7 @@ namespace Gosocket.Dian.Functions.Batch
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
-                    SetLogger(null, "Step prueba nomina", " Paso upload " + xmlBase64 + fileName + documentTypeId + softwareId + trackId + zipKey + testSetId + eventNomina);
+                    SetLogger(null, "Step prueba nomina", " Paso upload " +  trackId + "**" +zipKey + "**" + testSetId + "**" + eventNomina);
 
                 });
                 return;
