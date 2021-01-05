@@ -154,7 +154,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.Emp_DepartamentoEstado = Convert.ToByte(xEmpleador[j].Attributes["DepartamentoEstado"]?.InnerText);
                         globalDocPayrolls.Emp_MunicipioCiudad = Convert.ToUInt16(xEmpleador[j].Attributes["MunicipioCiudad"]?.InnerText);
                         globalDocPayrolls.Emp_Direccion = xEmpleador[j].Attributes["Direccion"]?.InnerText;
-                        globalDocPayrolls.Emp_Celular = Convert.ToUInt32(xEmpleador[j].Attributes["Celular"]?.InnerText);
+                        globalDocPayrolls.Emp_Celular = xEmpleador[j].Attributes["Celular"]?.InnerText;
                         globalDocPayrolls.Emp_Correo = xEmpleador[j].Attributes["Correo"]?.InnerText;
                     }
                     XmlNodeList xTrabajador = XmlDocument.GetElementsByTagName("Trabajador");

@@ -3056,7 +3056,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "Regla: LGC35-(R): ",
+                                        ErrorCode = "Regla: LGC34-(R): ",
                                         ErrorMessage = "No se puede generar este evento si previamente no existe el evento limitación de circulación",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
