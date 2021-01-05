@@ -255,7 +255,6 @@ namespace Gosocket.Dian.Functions.Batch
                     SetLogger(null, "Step prueba nomina", " Paso upload " +  trackId + "**" +zipKey + "**" + testSetId + "**" + eventNomina);
 
                 });
-                return;
 
                 var uploadFailed = uploadResponses.Where(m => !m.Success && multipleResponsesXpathDataValue.Select(d => d.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"]).Contains(m.DocumentKey));
 
