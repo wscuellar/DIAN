@@ -44,7 +44,7 @@ namespace Gosocket.Dian.Functions.Others
 
                 try
                 {
-                    var data = await req.Content.ReadAsAsync<RadianActivationRequest>();
+                    var data = await req.Content.ReadAsAsync<OtherDocumentActivationRequest>();
                     if (data == null)
                         throw new Exception("Request body is empty.");
 
@@ -109,7 +109,7 @@ namespace Gosocket.Dian.Functions.Others
 
 
                     // Step 5 Contributor Operations
-                    RadianaActivateContributorRequestObject activateRadianContributorRequestObject = new RadianaActivateContributorRequestObject()
+                    OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
                     {
                         Code = data.Code,
                         ContributorId = radianContributor.ContributorId,
@@ -125,9 +125,9 @@ namespace Gosocket.Dian.Functions.Others
                         Url = data.Url
                     };
 
-                    await SendToActivateOtherDocumentContributorToProduction(activateRadianContributorRequestObject);
+                    await SendToActivateOtherDocumentContributorToProduction(activateOtherDocumentContributorRequestObject);
 
-                    SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
+                    SetLogger(activateOtherDocumentContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
 
                 }
                 catch (Exception ex)
@@ -145,7 +145,7 @@ namespace Gosocket.Dian.Functions.Others
             return req.CreateResponse(HttpStatusCode.BadRequest, fail);
         }
 
-        class RadianActivationRequest
+        class OtherDocumentActivationRequest
         {
 
             [JsonProperty(PropertyName = "code")]
@@ -180,7 +180,7 @@ namespace Gosocket.Dian.Functions.Others
 
         }
 
-        class RadianaActivateContributorRequestObject
+        class OtherDocumentActivateContributorRequestObject
         {
             [JsonProperty(PropertyName = "code")]
             public string Code { get; set; }
@@ -218,7 +218,7 @@ namespace Gosocket.Dian.Functions.Others
             public string SoftwarePassword { get; set; }
         }
 
-        private static async Task SendToActivateOtherDocumentContributorToProduction(RadianaActivateContributorRequestObject activateContributorRequestObject)
+        private static async Task SendToActivateOtherDocumentContributorToProduction(OtherDocumentActivateContributorRequestObject activateContributorRequestObject)
         {
             List<EventGridEvent> eventsList = new List<EventGridEvent>
             {

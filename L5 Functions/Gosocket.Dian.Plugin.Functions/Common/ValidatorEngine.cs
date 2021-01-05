@@ -248,11 +248,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
-                    string msg = "No se encontró evento referenciado CUDE para evaluar fecha Limitación de circulación";           
+                    string msg = "No se puede generar este evento si previamente no existe el evento limitación de circulación.";           
                     ValidateListResponse response = new ValidateListResponse();
                     response.ErrorMessage = msg;
                     response.IsValid = false;
-                    response.ErrorCode = "89";
+                    response.ErrorCode = "LGC34";
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     validateResponses.Add(response);
                     return validateResponses;
@@ -350,7 +350,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public async Task<List<ValidateListResponse>> StartValidateParty(RequestObjectParty party)
         {
-            DateTime startDate = DateTime.UtcNow;
+            DateTime startDate = DateTime.UtcNow;    
             var validateResponses = new List<ValidateListResponse>();
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
@@ -381,31 +381,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
             bool valid = true;
-            if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion 
-                || Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad)
+            //Valida existe cambio legitimo tenedor
+            GlobalDocHolderExchange documentHolderExchange = documentMetaTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
+            if (documentHolderExchange != null)
             {
-                GlobalDocHolderExchange documentHolderExchange = documentMetaTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
-                if (documentHolderExchange != null)
+                //Existe mas de un legitimo tenedor requiere un mandatario
+                string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
+                if(endosatarios.Length == 1)
                 {
-                    string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
-                    if(endosatarios.Length == 1)
+                    nitModel.SenderCode = documentHolderExchange.PartyLegalEntity;
+                }
+                else
+                {
+                    foreach(string endosatario in endosatarios)
                     {
-                        nitModel.SenderCode = documentHolderExchange.PartyLegalEntity;
-                    }
-                    else
-                    {
-                        foreach(string endosatario in endosatarios)
+                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), endosatario, party.SenderParty);
+                        if(documentAttorney == null)
                         {
-                            GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), party.SenderParty, endosatario);
-                            if(documentAttorney == null)
+                            valid = false;
+                            validateResponses.Add(new ValidateListResponse
                             {
-                                valid = false;
-                            }
-                        }
-                        if(valid)
-                        {
-                            nitModel.SenderCode = party.SenderParty;
-                        }
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "089",
+                                ErrorMessage = "Mandatario no encontrado para el Nit del Endosatario" + endosatario,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }                       
+                    }
+                    if(valid)
+                    {
+                        nitModel.SenderCode = party.SenderParty;
                     }
                 }
             }
@@ -413,18 +419,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 var validator = new Validator();
                 validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude));
-            }
-            else
-            {
-                validateResponses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "089",
-                    ErrorMessage = "Mandatario no encontrado",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-
             }
             return validateResponses;
         }

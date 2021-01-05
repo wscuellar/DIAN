@@ -2938,8 +2938,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = "Regla: 89-(R): ",
-                                                    ErrorMessage = "No se pueda transmitir el evento 039-Endoso en Procuración ya existen asociados los eventos 038 Endoso en Garantía o 041 Limitación de circulación.",
+                                                    ErrorCode = "LGC29",
+                                                    ErrorMessage = "No se puede registrar este evento si  previamente se ha registrado el evento Pago de la factura electrónica de venta como título valor.",
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
                                             }
@@ -3154,9 +3154,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: 89-(R): ",
+                        ErrorCode = "Regla: LGC13-(R): ",
                         ErrorMessage = "Solo se pueda transmitir el evento (" + eventPrev.EventCode + ")," +
-                                        " después de haber transmitido el evento (030) de acuse de recibo.",
+                                        " después de haber transmitido el evento (030) de acuse de recibo de la factura electrónica de venta.",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
