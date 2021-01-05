@@ -351,6 +351,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateParty(RequestObjectParty party)
         {
             DateTime startDate = DateTime.UtcNow;
+            string issueAttorney = String.Empty;
             var validateResponses = new List<ValidateListResponse>();
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
@@ -406,10 +407,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
+                        else
+                        {
+                            issueAttorney = documentAttorney.IssuerAttorney;
+                        }
                     }
                     if(valid)
                     {
-                        nitModel.SenderCode = party.SenderParty;
+                        nitModel.SenderCode = issueAttorney;
                     }
                 }
             }
