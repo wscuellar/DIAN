@@ -351,6 +351,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateParty(RequestObjectParty party)
         {
             DateTime startDate = DateTime.UtcNow;
+            string issueAttorney = String.Empty;
             var validateResponses = new List<ValidateListResponse>();
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
@@ -381,9 +382,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
             bool valid = true;
+            //Valida existe cambio legitimo tenedor
             GlobalDocHolderExchange documentHolderExchange = documentMetaTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
             if (documentHolderExchange != null)
             {
+                //Existe mas de un legitimo tenedor requiere un mandatario
                 string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
                 if(endosatarios.Length == 1)
                 {
@@ -393,7 +396,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     foreach(string endosatario in endosatarios)
                     {
-                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), party.SenderParty, endosatario);
+                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), endosatario, party.SenderParty);
                         if(documentAttorney == null)
                         {
                             valid = false;
@@ -406,10 +409,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
+                        else
+                        {
+                            issueAttorney = documentAttorney.IssuerAttorney;
+                        }
                     }
                     if(valid)
                     {
-                        nitModel.SenderCode = party.SenderParty;
+                        nitModel.SenderCode = issueAttorney;
                     }
                 }
             }
