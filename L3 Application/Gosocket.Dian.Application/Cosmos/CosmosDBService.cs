@@ -608,12 +608,10 @@ namespace Gosocket.Dian.Application.Cosmos
                            ));
                         break;
                     case 4:
-                        radianStatusFilter = new List<string>() { $"0{(int)EventStatus.NotificacionPagoTotalParcial}" };
+                        predicate = predicate.And(g => g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.NotificacionPagoTotalParcial}")));
                         break;
                     case 5:
-                        radianStatusFilter = new List<string>() {
-                            $"0{(int)EventStatus.NegotiatedInvoice}", $"0{(int)EventStatus.AnulacionLimitacionCirculacion}"
-                        };
+                        predicate = predicate.And(g => g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}")));
                         break;
                     case 6:
                         if (documentTypeId == "01")
