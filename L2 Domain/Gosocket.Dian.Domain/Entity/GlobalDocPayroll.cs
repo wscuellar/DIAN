@@ -104,7 +104,7 @@ namespace Gosocket.Dian.Domain.Entity
         public byte Emp_DepartamentoEstado { get; set; }
         public ushort Emp_MunicipioCiudad { get; set; }
         public string Emp_Direccion { get; set; }
-        public uint Emp_Celular { get; set; }
+        public string Emp_Celular { get; set; }
         public string Emp_Correo { get; set; }
 
         //Trabajador

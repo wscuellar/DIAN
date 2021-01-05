@@ -158,7 +158,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     code = EventStatus.SolicitudDisponibilizacion;
                     break;
                 case (int)EventStatus.Avales:
-                case (int)EventStatus.ValInfoPago:
                     code = EventStatus.SolicitudDisponibilizacion;
                     break;
                 default:
@@ -172,8 +171,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.ValInfoPago
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                 )
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
@@ -350,7 +348,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public async Task<List<ValidateListResponse>> StartValidateParty(RequestObjectParty party)
         {
-            DateTime startDate = DateTime.UtcNow;
+            DateTime startDate = DateTime.UtcNow;    
             var validateResponses = new List<ValidateListResponse>();
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
@@ -381,9 +379,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
             bool valid = true;
+            //Valida existe cambio legitimo tenedor
             GlobalDocHolderExchange documentHolderExchange = documentMetaTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
             if (documentHolderExchange != null)
             {
+                //Existe mas de un legitimo tenedor requiere un mandatario
                 string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
                 if(endosatarios.Length == 1)
                 {
@@ -393,7 +393,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     foreach(string endosatario in endosatarios)
                     {
-                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), party.SenderParty, endosatario);
+                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), endosatario, party.SenderParty);
                         if(documentAttorney == null)
                         {
                             valid = false;
@@ -405,7 +405,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ErrorMessage = "Mandatario no encontrado para el Nit del Endosatario" + endosatario,
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
-                        }
+                        }                       
                     }
                     if(valid)
                     {
