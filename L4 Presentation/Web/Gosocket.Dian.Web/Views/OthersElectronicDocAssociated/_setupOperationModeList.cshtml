@@ -1,0 +1,50 @@
+﻿@model Gosocket.Dian.Web.Models.OtherDocElecSetupOperationModeViewModel
+
+<div id="table-modes" data-target="#table-modes" data-toggle="panel-overlay" class="panel">
+    <div class="panel-heading">
+        <h4 class="panel-title-radian padding-0"><strong>Listado de modos de operación asociados</strong></h4>
+        <hr class="margin-5" />
+    </div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                <thead>
+                    <tr>
+                        <th class="text-center">Modo de operación</th>
+                        <th class="text-center">Documento Electrónicos</th>
+                        <th class="text-center">&nbsp;&nbsp;Registro&nbsp;&nbsp;</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-center">Software</th>
+                        <th class="text-center">ID</th>
+                        <th class="text-center">PIN</th>
+                        <th class="text-center">URL</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.ListTable != null)
+                    {
+                        //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                        foreach (var item in (List<Gosocket.Dian.Web.Models.OtherDocsElectListViewModel>)Model.ListTable)
+                        {
+                            <tr>
+                                <td class="text-left">@item.OperationMode - @item.ContributorType</td>
+                                <td class="text-left">@item.ElectronicDoc</td>
+                                <td class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                                <td class="text-center">@item.StateContributor - @item.StateSoftware</td>
+                                <td class="text-left">@item.Software</td>
+                                <td class="text-left">@item.SoftwareId</td>
+                                <td class="text-left">@item.PinSW</td>
+                                <td class="text-left">  @item.Url  </td>
+                                <td class="text-center">
+                                    <a onclick="ODEDeleteOperationMode(@item.Id)" style="font-size: 14px; color: #348441; margin-right:10px;"><i class="fa fa-trash fa-lg"></i> </a>
+                                    <a style="font-size: 14px; color: #348441;" href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })"><i class="fa fa-eye  fa-lg"></i> </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

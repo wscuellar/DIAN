@@ -1,0 +1,161 @@
+﻿@model Gosocket.Dian.Web.Models.OtherDocElecSetupOperationModeViewModel
+@{
+    ViewBag.title = "Configurar modo de operación - " + @Model.ContributorType;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-content radian-view margin-20">
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+
+        <div class="back-button"><a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id = Model.Id })"><i class="fa fa-chevron-left"></i> Volver</a></div>
+    </div>
+    <div class="margin-top-50">
+        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
+            <div class="panel-body padding-top-20">
+                <div class="pad-btm padding-bottom-0">
+                    <div class="row margin-horizontal-0">
+                        @using (Html.BeginForm("UploadFactorOperationMode", "RadianApproved", FormMethod.Post, new { id = "formst" }))
+                        {
+                            @Html.HiddenFor(m => m.ContributorId)
+                            @Html.HiddenFor(m => m.ProviderId)
+                            @Html.HiddenFor(m => m.ContributorTypeId)
+                            @Html.HiddenFor(m => m.SoftwareIdBase)
+                            @Html.HiddenFor(m => m.ElectronicDocId)
+
+                            @Html.Partial("_setupOperationModeForm")
+                        }
+
+                        @Html.Partial("_setupOperationModeList") 
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Content/js/Radian/RadianIndex.js"></script>
+<script src="~/Content/js/Radian/RadianOperationMode.js"></script>
+<script src="~/Content/js/Radian/constants.js"></script>
+<script src="~/Content/js/Radian/RadianSteps.js"></script>
+@section Scripts{
+
+    <script>
+    $(document).ready(function () {
+
+        fnShowHidecampos();
+
+        $("#OperationModeId").change(function () {
+            fnShowHidecampos();
+        });
+
+        $("#SoftwareName").blur(function () {
+            fnvalidSoftwareName();
+        });
+        $("#SoftwarePin").blur(function () {
+            fnvalidSoftwarePin();
+        });
+
+        $("#save-operation-mode").click(function (e) { 
+            var form = $('#formst');
+            if (form.valid()) {
+                var valid1 = fnvalidSoftwarePin();
+                var valid2 = fnvalidSoftwareName();
+                if (valid1 || valid2)
+                    return;
+
+                e.preventDefault();
+                showLoading('#panel-form', 'Cargando', 'Guardando datos, por favor espere.')
+                var model = {
+                    Id: $("#OperationModeSelectedId").val(),
+                    ContributorId: @Model.ContributorId,
+                    OperationModeId: $("#OperationModeId").val(),
+                    ElectronicDocId: $("#ElectronicDocId").val(),
+                    ContributorTypeId: $("#ContributorTypeId").val(),
+                    SoftwareName: $("#SoftwareName").val(),
+                    SoftwarePin: $("#SoftwarePin").val(),
+                    SoftwareUrl: $("#SoftwareUrl").val(),
+                    SoftwareIdBase: $("#SoftwareIdBase").val(),
+                    Provider: $("#ProviderId").val(),
+                    SoftwareId: $("#SoftwareId").val(),
+                };
+                AddOperationModeODE("@Url.Action("SetupOperationModePost", "OthersElectronicDocAssociated")", model);
+            }
+        });
+        function AddOperationModeODE(url, ViewModel) { 
+            var metod = 'POST';
+            var data = ViewModel;
+            var actionError = (error) => {
+                var message = error.Message;
+                var button = AlertExec();
+                showConfirmation(message, button);
+            }
+            var actionSuccess = (response) => {
+                var message = response.Message;
+                var operation = () => { location.reload() };
+                var button = AlertExec(operation);
+                showConfirmation(message, button);
+            }
+            ajaxFunction(url, metod, data, actionError, actionSuccess);
+        }
+
+
+        ODEDeleteOperationMode = function (Id) { 
+            var url ="@Url.Action("DeleteOperationMode", "OthersElectronicDocAssociated")";
+            showLoading('#table-modes', 'Cargando', 'Buscando datos, por favor espere.');
+            var metod = 'POST';
+            var data = {
+                Id: Id
+            }
+            var actionError = () => { }
+            var actionSuccess = (response) => {
+                showConfirmation(response.message, AlertExec(() => location.reload()))
+            }
+            ajaxFunction(url, metod, data, actionError, actionSuccess)
+
+        };
+
+        function fnvalidSoftwareName() {
+            $("#validSoftwareName").text('');
+            if ($("#OperationModeId").val() == "1") {
+                if ($("#SoftwareName").val() == '' || $("#SoftwareName").val() == undefined) {
+                    $("#validSoftwareName").text("El campo es requerido");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function fnvalidSoftwarePin() {
+            $("#validSoftwarePin").text('');
+            if ($("#OperationModeId").val() == "1") {
+                if ($("#SoftwarePin").val() == '' || $("#SoftwarePin").val() == undefined) {
+                    $("#validSoftwarePin").text("El campo es requerido");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function fnShowHidecampos() {
+
+            $("#SoftwareName").val('');
+            $("#SoftwarePin").val('');
+            $("#validSoftwareName").text('');
+            $("#validSoftwarePin").text('');
+
+            if ($("#OperationModeId").val() == "2") {
+                $("#divSoftwareName").hide();
+                $("#divSoftwarePin").hide();
+            }
+            else {
+                $("#divSoftwareName").show();
+                $("#divSoftwarePin").show();
+            }
+        }
+    });
+    </script>
+}

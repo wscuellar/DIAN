@@ -240,4 +240,8 @@
   <data name="ModeElectroniDocWithoutTestSet" xml:space="preserve">
     <value>Este modo de operación y documento electrónico carece de Set de Pruebas!!!</value>
   </data>
+  <data name="OtherDocEleSuccesModeOperation" xml:space="preserve">
+    <value>Mode de operación adicionado correctamente</value>
+    <comment>\</comment>
+  </data>
 </root>

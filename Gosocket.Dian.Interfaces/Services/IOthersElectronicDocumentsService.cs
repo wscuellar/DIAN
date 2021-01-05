@@ -15,5 +15,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         bool ChangeContributorStep(int ContributorId, int step);
         PagedResult<OtherDocElecCustomerList> CustormerList(int ContributorId, string code, OtherDocElecState nState, int page, int pagesize);
+
+        ResponseMessage OperationDelete(int ODEContributorId);
     }
 }

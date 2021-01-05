@@ -1,0 +1,71 @@
+﻿@model Gosocket.Dian.Web.Models.OtherDocElecSetupOperationModeViewModel
+
+<div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+    <div class="col-md-12 padding-horizontal-0">
+        <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
+            <div class="panel-body padding-20 padding-bottom-0">
+
+                <div class="row">
+                    <div class="col-sm-6 col-md-3 padding-xs-0">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.OperationModeId, new { @class = "control-label" })
+                            @Html.DropDownListFor(m => m.OperationModeId, Model.OperationModeList, new { @class = "form-control selectpicker" })
+                        </div>
+                    </div>
+                    <div class="col-sm-5 padding-xs-0">
+                        <div class="form-group">
+                            @Html.Label("Url de recepción de eventos", new { @class = "control-label" })
+                            @Html.TextBoxFor(m => m.SoftwareUrl, new { @class = "form-control input-general", disabled = "disabled" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <h4 class="panel-title-radian padding-0"><strong>Datos de la Empresa y Software</strong></h4>
+                    <hr class="margin-5" />
+
+                    <div class="col-sm-3 padding-xs-0">
+                        <div class="form-group">
+                            @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
+                            @Html.TextBoxFor(m => m.Provider, new { @class = "form-control input-general", disabled = "disabled" })
+                        </div>
+                    </div>
+
+
+                    @if (Model.OperationModeId == 1)
+                    {
+                        <div class="col-sm-3 padding-xs-0" id="divSoftwareName">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
+                                @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
+                                <div id="validSoftwareName" class="text-danger"></div> 
+                            </div>
+                        </div>
+                        <div class="col-sm-3 padding-xs-0" id="divSoftwarePin">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.SoftwarePin, new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.SoftwarePin, new { @id = "SoftwarePin", @name = "SoftwarePin", @class = "form-control input-general", @style = "background: #ffffff;" })
+                                @Html.ValidationMessageFor(m => m.SoftwarePin, null, new { @class = "text-danger" })
+                                <div id="validSoftwarePin" class="text-danger"></div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="col-sm-3 padding-xs-0">
+                        <div class="form-group">
+                            @Html.Label("ID del Software", new { @class = "control-label" })
+                            @Html.TextBoxFor(m => m.SoftwareId, new { @class = "form-control input-general", @readonly = "readonly" })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="panel-footer-grey text-right">
+                <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar</button>
+                <button type="button"  name="Submit" id="save-operation-mode" class="btn btn-radian-success"  >Adicionar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
