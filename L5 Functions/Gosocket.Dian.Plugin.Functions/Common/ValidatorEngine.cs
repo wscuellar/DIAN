@@ -381,31 +381,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
             bool valid = true;
-            if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion 
-                || Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad)
+            GlobalDocHolderExchange documentHolderExchange = documentMetaTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
+            if (documentHolderExchange != null)
             {
-                GlobalDocHolderExchange documentHolderExchange = documentMetaTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
-                if (documentHolderExchange != null)
+                string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
+                if(endosatarios.Length == 1)
                 {
-                    string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
-                    if(endosatarios.Length == 1)
+                    nitModel.SenderCode = documentHolderExchange.PartyLegalEntity;
+                }
+                else
+                {
+                    foreach(string endosatario in endosatarios)
                     {
-                        nitModel.SenderCode = documentHolderExchange.PartyLegalEntity;
-                    }
-                    else
-                    {
-                        foreach(string endosatario in endosatarios)
+                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), party.SenderParty, endosatario);
+                        if(documentAttorney == null)
                         {
-                            GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), party.SenderParty, endosatario);
-                            if(documentAttorney == null)
+                            valid = false;
+                            validateResponses.Add(new ValidateListResponse
                             {
-                                valid = false;
-                            }
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "089",
+                                ErrorMessage = "Mandatario no encontrado para el Nit del Endosatario" + endosatario,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
                         }
-                        if(valid)
-                        {
-                            nitModel.SenderCode = party.SenderParty;
-                        }
+                    }
+                    if(valid)
+                    {
+                        nitModel.SenderCode = party.SenderParty;
                     }
                 }
             }
@@ -413,18 +417,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 var validator = new Validator();
                 validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude));
-            }
-            else
-            {
-                validateResponses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "089",
-                    ErrorMessage = "Mandatario no encontrado",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-
             }
             return validateResponses;
         }

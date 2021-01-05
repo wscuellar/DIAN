@@ -63,11 +63,12 @@ namespace Gosocket.Dian.Functions.Activation
                 await globalTestSetTrackingTableManager.InsertOrUpdateAsync(globalTestSetTracking);
                 var allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
 
-                var setResultOther = tableMaganerGlobalTestSetOthersDocuments.Find<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId, globalTestSetTracking.TestSetId);
+                var setResultOther = tableMaganerGlobalTestSetOthersDocuments.FindByGlobalOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
 
                 var radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
                 SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
-                
+                SetLogger(setResultOther, "Step 0", "Paso setResultOther");
+
                 //Valida RADIAN
                 if (radianTesSetResult != null && setResultOther == null)
                 {
