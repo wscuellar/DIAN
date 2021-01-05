@@ -156,7 +156,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 // check if unique nits
                 var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
-                var nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT);
+                var nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT).ToList();
 
                 SetLogger(null, "Step prueba nomina", " Paso NitNomina " + nitNomina.Count() + setResult);
                 if (setResult != null && nitNomina.Count() > 1)
