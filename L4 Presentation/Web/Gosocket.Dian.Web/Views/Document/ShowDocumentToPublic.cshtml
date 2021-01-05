@@ -88,7 +88,7 @@
     <script>
 
         function showModal(cude) {
-            showPdfModal("#show-graphic-document",cude,'@Url.Action("PrintGraphicRepresentation", "Document")');
+            showPdfModalDirect(cude, '@Url.Action("PrintGraphicRepresentation", "Document")', "#panel-form_1");
         }
 
         $(document).ready(function () {

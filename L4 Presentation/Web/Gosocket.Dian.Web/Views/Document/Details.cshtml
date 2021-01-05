@@ -99,7 +99,7 @@
     <script>
 
         function showModal(cude) {
-            showPdfModal("#"+cude, cude, '@Url.Action("PrintGraphicRepresentation", "Document")', '#panel-form');
+            showPdfModalDirect(cude, '@Url.Action("PrintGraphicRepresentation", "Document")', '#panel-form_1');
         }
 
         $(document).ready(function () {
