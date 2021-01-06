@@ -47,7 +47,6 @@ namespace Gosocket.Dian.Functions.Activation
         private const string queueName = "global-test-set-tracking-input%Slot%";
 
         //Table
-        private static readonly TableManager tableMaganerGlobalTestSetOthersDocuments = new TableManager("GlobalTestSetOthersDocuments");
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
 
         [FunctionName("UpdateTestSetResult")]
@@ -63,11 +62,11 @@ namespace Gosocket.Dian.Functions.Activation
                 await globalTestSetTrackingTableManager.InsertOrUpdateAsync(globalTestSetTracking);
                 var allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
 
-                var setResultOther = tableMaganerGlobalTestSetOthersDocuments.FindByGlobalOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
+                var setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindByGlobalOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
 
                 var radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
                 SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
-                SetLogger(setResultOther, "Step 0", "Paso setResultOther");
+                SetLogger(setResultOther, "Step 0", "Paso setResultOther" + setResultOther + "****" + globalTestSetTracking.TestSetId);
 
                 //Valida RADIAN
                 if (radianTesSetResult != null && setResultOther == null)
