@@ -584,9 +584,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string sender2DvErrorCode = "Regla: 89-(R): ";
 
             //valida si existe los permisos del mandatario
-            if (party.SenderParty != nitModel.ProviderCode)
+            if (party.SenderParty != xmlParserCude.ProviderCode)
             {
-                var responseVal = ValidateFacultityAttorney(party.TrackId, nitModel.ProviderCode, senderCode,
+                var responseVal = ValidateFacultityAttorney(party.TrackId, xmlParserCude.ProviderCode, senderCode,
                 party.ResponseCode, xmlParserCude.NoteMandato);
                 if (responseVal != null)
                 {

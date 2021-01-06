@@ -91,29 +91,26 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";                 
                     var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
                     var valueNote = "//*[local-name()='Note']";
+                    var providerID = "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='DianExtensions']/*[local-name()='SoftwareProvider']/*[local-name()='ProviderID']";
 
                     var documentReferenceId = XmlDocument.SelectSingleNode(documentReferenceIdValueXpath)?.InnerText;          
                     var nodePaymentMeans = XmlDocument.SelectSingleNode(nodePaymentMeansValuesXpath)?.InnerText;
                     var nodePaymentDueDate = XmlDocument.SelectSingleNode(nodePaymentDueDateValuesXpath)?.InnerText;
                     var nodeTotalInvoice = XmlDocument.SelectSingleNode(valueTotalInvoice)?.InnerText;
                     var valueNoteMandato = XmlDocument.SelectSingleNode(valueNote)?.InnerText;
-
+                    var valueProviderID = XmlDocument.SelectSingleNode(providerID)?.InnerText;
 
                     SigningTime = node?.InnerText;
                     PaymentMeansID = nodePaymentMeans;
                     DocumentReferenceId = documentReferenceId;
-                    PaymentDueDate = nodePaymentDueDate;    
-                    
+                    PaymentDueDate = nodePaymentDueDate;
+
                     //Valor total factura
-                    if(nodeTotalInvoice != null)
-                    {
-                        TotalInvoice = nodeTotalInvoice;
-                    }
+                    TotalInvoice = nodeTotalInvoice != null ? nodeTotalInvoice : "";
                     //Nota del mandato
-                    if (valueNoteMandato != null)
-                    {
-                        NoteMandato = valueNoteMandato;
-                    }
+                    NoteMandato = valueNoteMandato != null ? valueNoteMandato : "" ;                 
+                    //Provder
+                    ProviderCode = valueProviderID != null ? valueProviderID: "";
 
                     //SigningTime
                     SigningTime = SigningTime == null ? "0" : SigningTime;
