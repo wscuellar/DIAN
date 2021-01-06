@@ -2943,7 +2943,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
-
                                 break;
                             //Validación de la existencia de limitación de circulación (041)
                             case (int)EventStatus.AnulacionLimitacionCirculacion:
@@ -3073,7 +3072,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             return responses;
         }
-
 
         private ValidateListResponse ValidateAval(XmlParser xmlParserCufe, XmlParser xmlParserCude)
         {
