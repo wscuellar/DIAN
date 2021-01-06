@@ -6,6 +6,8 @@
 @{
     ViewBag.Title = "Ver Documento";
     var status = "success";
+    const string NOTES = "91, 92";
+
     if (Model.Document.Status == 10)
     {
         status = "primary";
@@ -250,12 +252,15 @@
     </div>
     <div class="row">
         <div class="ContainerDownload">
-            <p>
-                <i class="fa fa-download"></i>
-                <um id="show-document">
-                    <ins>Certificado de existencia</ins>
-                </um>
-            </p>
+            @if (!NOTES.Contains(Model.Document.DocumentTypeId))
+            {
+                <p>
+                    <i class="fa fa-download"></i>
+                    <um id="show-document">
+                        <ins>Certificado de existencia</ins>
+                    </um>
+                </p>
+            }
         </div>
     </div>
 </div>

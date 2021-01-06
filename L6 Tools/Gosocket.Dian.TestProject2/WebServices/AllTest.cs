@@ -78,7 +78,7 @@ namespace Gosocket.Dian.TestProject.WebServices
         [TestMethod]
         public void SendEventUpdateStatus_Acuse_Success_Test()
         {
-            StreamReader file = new StreamReader(@"C:\Users\oabetancourt\Desktop\Files\1.Acuse-030.zip");
+            StreamReader file = new StreamReader(@".\WebServices\Files\1.Acuse-030.zip");
             byte[] bytes;
             using (var memstream = new MemoryStream())
             {
@@ -97,7 +97,7 @@ namespace Gosocket.Dian.TestProject.WebServices
         [TestMethod]
         public void SendEventUpdateStatus_Acuse_Fail_Test()
         {
-            StreamReader file = new StreamReader(@"C:\Users\oabetancourt\Desktop\Files\1.Acuse-030.zip");
+            StreamReader file = new StreamReader(@".\WebServices\Files\1.Acuse-030.zip");
             byte[] bytes;
             using (var memstream = new MemoryStream())
             {
@@ -136,7 +136,7 @@ namespace Gosocket.Dian.TestProject.WebServices
         public void SendBillSync_Fail_Test()
         {
             var fileName = "";
-            StreamReader file = new StreamReader(@"C:\Users\oabetancourt\Desktop\Files\1.DocImportacion.zip");
+            StreamReader file = new StreamReader(@".\WebServices\Files\1.DocImportacion.zip");
             byte[] bytes;
             using (var memstream = new MemoryStream())
             {
