@@ -111,7 +111,6 @@ namespace Gosocket.Dian.Services.Utils.Common
                     NoteMandato = valueNoteMandato != null ? valueNoteMandato : "" ;                 
                     //Provder
                     ProviderCode = valueProviderID != null ? valueProviderID: "";
-
                     //SigningTime
                     SigningTime = SigningTime == null ? "0" : SigningTime;
                 }
