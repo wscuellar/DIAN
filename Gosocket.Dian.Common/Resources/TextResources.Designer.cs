@@ -106,7 +106,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Endoso Electronico.
+        ///   Busca una cadena traducida similar a Endoso Electrónico.
         /// </summary>
         public static string Endoso {
             get {
@@ -255,6 +255,15 @@ namespace Gosocket.Dian.Common.Resources {
         public static string OperationFailOtherInProcess {
             get {
                 return ResourceManager.GetString("OperationFailOtherInProcess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mode de operación adicionado correctamente.
+        /// </summary>
+        public static string OtherDocEleSuccesModeOperation {
+            get {
+                return ResourceManager.GetString("OtherDocEleSuccesModeOperation", resourceCulture);
             }
         }
         

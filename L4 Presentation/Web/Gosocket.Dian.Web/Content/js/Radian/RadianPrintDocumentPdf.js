@@ -4,13 +4,28 @@
         var data = { cufe }
         var actionSuccess = (docBase) => {
             hideLoading(panel);
-            bootbox.dialog({
-                message: '<object data="data:application/pdf;base64,' + docBase + '" width="860" height="768" type="application/pdf"></object>',
-                size: 'large',
-                backdrop: false
-            });
+            downloadPDF(docBase, cufe);
         }
         ajaxFunction(url, "POST", data, () => { }, actionSuccess);
     })
 
+}
+
+function showPdfModalDirect(cufe, url, panel) {
+        showLoading(panel, 'Cargando', 'Procesando datos, por favor espere.');
+        var data = { cufe }
+        var actionSuccess = (docBase) => {
+            hideLoading(panel);
+            downloadPDF(docBase, cufe);
+        }
+        ajaxFunction(url, "POST", data, () => { }, actionSuccess);
+}
+
+function downloadPDF(pdf, name) {
+    const linkSource = `data:application/pdf;base64,${pdf}`;
+    const downloadLink = document.createElement("a");
+    const fileName = name + ".pdf";
+    downloadLink.href = linkSource;
+    downloadLink.download = fileName;
+    downloadLink.click();
 }

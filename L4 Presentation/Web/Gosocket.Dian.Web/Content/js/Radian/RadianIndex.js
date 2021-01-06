@@ -254,6 +254,8 @@ function customDialog(htmlPartial, data, url) {
 function DeleteOptions(operationMode, radianState) {
     if (operationMode == 1 || radianState == 'Habilitado') {
         $("#RadianApprovalState option[value='0']").remove();
-
+    }
+    if (radianState == 'En pruebas') {
+        $("#RadianApprovalState option[value='1']").remove();
     }
 }

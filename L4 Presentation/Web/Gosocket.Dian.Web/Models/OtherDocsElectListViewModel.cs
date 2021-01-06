@@ -10,7 +10,7 @@ namespace Gosocket.Dian.Web.Models
         public int Id { get; set; }
         public int ContributorId { get; set; }
         public string OperationMode { get; set; }
-        public string ContibutorType { get; set; }
+        public string ContributorType { get; set; }
         public string ElectronicDoc { get; set; }
         public string Software { get; set; }
 

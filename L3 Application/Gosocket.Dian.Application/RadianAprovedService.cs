@@ -250,7 +250,7 @@ namespace Gosocket.Dian.Application
                     StatusDescription = TestSetStatus.InProcess.GetDescription(),
                     ContributorTypeId = radianContributor.RadianContributorTypeId.ToString(),
                     // Totales Generales
-                    TotalDocumentRequired = testSet.TotalDocumentAcceptedRequired,
+                    TotalDocumentRequired = testSet.TotalDocumentRequired,
                     TotalDocumentAcceptedRequired = testSet.TotalDocumentAcceptedRequired,
                     // Acuse de recibo
                     ReceiptNoticeTotalRequired = testSet.ReceiptNoticeTotalRequired,
