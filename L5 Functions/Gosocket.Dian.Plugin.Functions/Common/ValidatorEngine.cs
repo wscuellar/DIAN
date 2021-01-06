@@ -158,7 +158,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     code = EventStatus.SolicitudDisponibilizacion;
                     break;
                 case (int)EventStatus.Avales:
-                case (int)EventStatus.ValInfoPago:
                     code = EventStatus.SolicitudDisponibilizacion;
                     break;
                 default:
@@ -172,8 +171,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.ValInfoPago
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                 )
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,

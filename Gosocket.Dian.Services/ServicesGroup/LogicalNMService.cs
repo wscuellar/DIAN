@@ -896,6 +896,29 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var customizationID = documentParsed.CustomizationId;
             var listId = documentParsed.listID == "" ? "1" : documentParsed.listID;
             trackId = trackIdCude;
+
+
+            // ZONE 3
+            start = DateTime.UtcNow;
+
+            var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = "11", trackId, eventNomina = true };
+            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
+            if (!uploadXmlResponse.Success)
+            {
+                //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
+                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
+                dianResponse.StatusDescription = uploadXmlResponse.Message;
+                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
+                if (globalEnd >= 10)
+                {
+                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
+                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                }
+                return dianResponse;
+            }
+
+
+            // send to validate document sync
             var requestObjTrackId = new { trackId, draft = Properties.Settings.Default.Param_False };
             var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId);
             var validate = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Validate6) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
@@ -1162,27 +1185,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 TipoTrabajador = xmlParser.globalDocPayrolls.TipoTrabajador,
                 Trab_CodigoTrabajador = xmlParser.globalDocPayrolls.Trab_CodigoTrabajador,
                 Timestamp = new DateTime()
-            };
-
-           
-            // ZONE 3
-            start = DateTime.UtcNow;
-
-            var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = "11", trackId, eventNomina = true };
-            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
-            if (!uploadXmlResponse.Success)
-            {
-                //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
-                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
-                dianResponse.StatusDescription = uploadXmlResponse.Message;
-                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-                if (globalEnd >= 10)
-                {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
-                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
-                }
-                return dianResponse;
-            }
+            };           
 
             var validatorCuneRequest = validatorCune(trackId);
             if (!validatorCuneRequest.IsValid)
