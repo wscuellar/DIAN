@@ -70,7 +70,7 @@
 
             <!--Navs Content -->
             <div class="tab-content">
-                <div id="divViewerPartial" class="panel-body padding-top-20">
+                <div id="divViewerPartial" class="panel-body padding-top-20 padding-bottom-0">
                     @Html.Partial("_ViewerPartial")
                 </div>
             </div>
@@ -120,10 +120,10 @@
                 var documentKey = $(this).parent().find("#DocumentKey").val()
                 $('#container1').fadeOut(200);
                 GetEventsPartialView(documentKey);
-                setTimeout(function () {
-                    $('#divViewerPartial').css("height", "635px");
-                    $('#divPageContent').css('max-height', '623px');
-                }, 200)
+                //setTimeout(function () {
+                //    $('#divViewerPartial').css("height", "635px");
+                //    $('#divPageContent').css('max-height', '623px');
+                //}, 200)
             })
 
             $('#divViewMoreQueryList').hide();
@@ -143,7 +143,7 @@
                         $('#modifyWrapper').html(data);
                         $('#modifyWrapper').fadeIn(300);
                         $('#container1-title').fadeIn(300);
-                        $('#divChildrenModifyWrapper').css("padding-top", "100px");
+                        //$('#divChildrenModifyWrapper').css("padding-top", "100px");
                         $('[data-toggle="popover"]').popover();
                     }
                     else {

@@ -301,10 +301,9 @@ else
     </div>
 }
 
-<br />
+
 @Html.Partial("QueryEventsList", Model)
-<br />
-<br />
+
 @if (Model.Document.References.Where(x => x.ShowAsReference).Count() > 0)
 {
     <div class="row mar-no line-bottom">
