@@ -620,12 +620,12 @@ namespace Gosocket.Dian.Application.Cosmos
                         }
                         break;
                     case 7:
-                        if (documentTypeId == "00")
-                        {
+                       // if (documentTypeId == "00")
+                        //{
                             predicate = predicate.And(g => g.DocumentTypeId == ((int)DocumentType.CreditNote).ToString()
                                                      || g.DocumentTypeId == ((int)DocumentType.DebitNote).ToString()
                                                      || g.DocumentTypeId == ((int)DocumentType.ApplicationResponse).ToString());
-                        }
+                        //}
                         break;
                 }
 
