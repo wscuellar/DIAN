@@ -2358,8 +2358,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //if (document != null)
                 if (documentMeta.Count >= 2)
                 {
-                    //Valida Evento registrado previamente para Fase I
-                    if(Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34)
+                    //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
+                    if( (Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34)
+                        || (eventPrev.CustomizationID == "361" || eventPrev.CustomizationID == "362") )
                     {
                         if (documentMeta.Where(t => t.EventCode == eventPrev.EventCode
                         && document != null
