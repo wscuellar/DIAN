@@ -78,7 +78,15 @@ namespace Gosocket.Dian.Functions.Activation
 
                     // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
                     string code = radianTesSetResult.PartitionKey;
+                    
+
+                    SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN");
+
+                    SetLogger(null, "Step 2.1", code, "UPT_Code");
+                    SetLogger(null, "Step 2.2", globalTestSetTracking.SoftwareId, "UPT_SofwareID");
                     bool isActive = globalRadianOperationService.IsActive(code, new Guid(globalTestSetTracking.SoftwareId));
+                    SetLogger(null, "Step 2.3", isActive.ToString(), "UPT_IsActive");
+
                     if (isActive)
                         return;
 
