@@ -601,7 +601,8 @@ namespace Gosocket.Dian.Application.Cosmos
                         break;
                     case 3:
                         predicate = predicate.And(g => !g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.NotificacionPagoTotalParcial}")
-                               || a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}"))
+                               || a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}")
+                               || a.Code.Equals($"0{(int)EventStatus.ValInfoPago}"))
                            && g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
                             || t.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
                             || t.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")
