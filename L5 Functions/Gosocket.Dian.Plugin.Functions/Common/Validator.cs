@@ -1282,31 +1282,46 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     if (docReferenceAttorney.IssuerAttorney == issueAtorney)
                     {
-                        var filter = $"{docReferenceAttorney.FacultityCode}-{docReferenceAttorney.Actor}";
-                        //Valida permisos firma para el evento emitido
-                        var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
-                        if (attorneyFacultity != null)
+                        if(String.IsNullOrEmpty(docReferenceAttorney.EndDate) || (DateTime.Now >= DateTime.ParseExact(docReferenceAttorney.EndDate,"yyyy-MM-dd",CultureInfo.InvariantCulture)))
                         {
-                            if (attorneyFacultity.RowKey == eventCode)
+                            var filter = $"{docReferenceAttorney.FacultityCode}-{docReferenceAttorney.Actor}";
+                            //Valida permisos firma para el evento emitido
+                            var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
+                            if (attorneyFacultity != null)
                             {
-                                //Valida exista note mandatario
-                                if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                if (attorneyFacultity.RowKey == eventCode)
                                 {
-                                    return new ValidateListResponse
+                                    //Valida exista note mandatario
+                                    if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                                     {
-                                        IsValid = false,
-                                        Mandatory = true,
-                                        ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                        ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    };
+                                        return new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                            ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        };
+                                    }
+                                    else
+                                        valid = true;
                                 }
-                                else
-                                    valid = true;
                             }
+                            validError = false;
+                            continue;
                         }
-                        validError = false;
-                        continue;
+                        else
+                        {
+                            return new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "Regla 89-(R)",
+                                ErrorMessage = "Fecha de terminacion de mandato no valida",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            };
+
+                        }
                     }
                     else
                     {
@@ -1491,7 +1506,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 startDateAttorney = string.Empty;
                 endDate = string.Empty;
             }
-            else if (customizationID == "433" || customizationID == "431")
+            else if (customizationID == "431" || customizationID == "433")
             {
                 startDateAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='StartDate']").Item(0)?.InnerText.ToString();
                 endDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='EndDate']").Item(0)?.InnerText.ToString();
