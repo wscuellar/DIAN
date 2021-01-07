@@ -1286,7 +1286,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
                         if (attorneyFacultity != null)
                         {
-                            if (attorneyFacultity.RowKey == eventCode)
+                        
+                            if ( (attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0"))
                             {
                                 //Valida exista note mandatario
                                 if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
@@ -2357,10 +2358,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //if (document != null)
                 if (documentMeta.Count >= 2)
                 {
-                    //No valida Evento registrado previamente para solictud de disponibilizacion posterior, Aval, Endoso en Propiedad
-                    // y Terminacion de Mandato
-                    if ((eventPrev.CustomizationID != "363" && eventPrev.CustomizationID != "364"
-                        && eventPrev.EventCode != "035" && eventPrev.EventCode != "037"))
+                    //Valida Evento registrado previamente para Fase I
+                    if(Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34)
                     {
                         if (documentMeta.Where(t => t.EventCode == eventPrev.EventCode
                         && document != null
@@ -2589,7 +2588,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     (t.CustomizationID == "361" || t.CustomizationID == "362")).ToList().Count > decimal.Zero)
                                     {
                                         if (documentMeta
-                                          .Where(t => t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041" && t.Identifier == document.PartitionKey).ToList()
+                                          .Where(t => (t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041") && t.CancelElectronicEvent == null).ToList()
                                           .Count > decimal.Zero)
                                         {
                                             validFor = true;
@@ -2647,7 +2646,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     //Valida Pago Total FETV
                                     if (documentMeta
-                                             .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                             .Where(t => t.EventCode == "045" && t.CustomizationID == "452").ToList()
                                              .Count > decimal.Zero)
                                     {
                                         validFor = true;
@@ -2655,8 +2654,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "Regla: 89-(R): ",
-                                            ErrorMessage = "No se pueda transmitir el evento Informe Pago porque ya existe un pago total FETV",
+                                            ErrorCode = "Regla: LGC50-(R): ",
+                                            ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento de Pago con código de operacion (452)",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }

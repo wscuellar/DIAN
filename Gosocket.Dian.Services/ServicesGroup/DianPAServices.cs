@@ -889,9 +889,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var endDate = documentParsed.ValidityPeriodEndDate;
             var providerCode = documentParsed.ProviderCode;
 
-            //Si el endoso esta en blanco o el senderCode es diferente a providerCode
-            senderCode = (listId == "2" || (senderCode != providerCode)) ? providerCode : senderCode;
-
             var documentReferenceId = xmlParser.DocumentReferenceId;
             var zone3 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone3) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 3
