@@ -1281,32 +1281,36 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     if (docReferenceAttorney.IssuerAttorney == issueAtorney)
                     {
-                        var filter = $"{docReferenceAttorney.FacultityCode}-{docReferenceAttorney.Actor}";
-                        //Valida permisos firma para el evento emitido
-                        var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
-                        if (attorneyFacultity != null)
+                        string[] tempFacultityCode = docReferenceAttorney.FacultityCode.Split(';');
+                        foreach(string codeFacultity in tempFacultityCode)
                         {
-                        
-                            if ( (attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0"))
+                            var filter = $"{codeFacultity}-{docReferenceAttorney.Actor}";
+                            //Valida permisos firma para el evento emitido
+                            var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
+                            if (attorneyFacultity != null)
                             {
-                                //Valida exista note mandatario
-                                if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                if ( (attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0") && codeFacultity != "MR91")
                                 {
-                                    return new ValidateListResponse
+                                    //Valida exista note mandatario
+                                    if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                                     {
-                                        IsValid = false,
-                                        Mandatory = true,
-                                        ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                        ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    };
+                                        return new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                            ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        };
+                                    }
+                                    else
+                                        valid = true;
                                 }
-                                else
-                                    valid = true;
                             }
-                        }
-                        validError = false;
-                        continue;
+                            validError = false;
+                            continue;
+
+                        }                       
                     }
                     else
                     {
