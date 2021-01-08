@@ -93,6 +93,24 @@ namespace Gosocket.Dian.DataContext.Repositories
         }
 
 
+        /// <summary>
+        /// Consulta los contribuyentes de radian.
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="length"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public PagedResult<RadianContributor> ListByDateDesc(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0)
+        {
+            IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression)
+                .Include("Contributor")
+                .Include("RadianContributorType")
+                .Include("RadianOperationMode")
+                .Include("RadianContributorFile")
+                .Include("RadianContributorOperations");
+            return query.Paginate(page, length, t => t.CreatedDate,true);
+        }
+
 
         public List<RadianContributor> ActiveParticipantsWithSoftware(int radianContributorTypeId)
         {

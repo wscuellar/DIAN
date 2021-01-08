@@ -109,7 +109,7 @@ function ConfirmExec(operation, param, operationCancel) {
             label: "Aceptar",
             className: "btn-radian-default",
             callback: function () {
-                operation(param);
+                param ? operation(param) : operation();
                 operationClick = false;
             }
         },
