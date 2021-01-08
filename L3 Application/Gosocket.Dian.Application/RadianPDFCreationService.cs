@@ -143,7 +143,7 @@ namespace Gosocket.Dian.Application
             templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
             templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
 
-            byte[] report = GetPdfBytes(templateFirstPage.Append(templateLastPage.ToString()).ToString());
+            byte[] report = GetPdfBytes(templateFirstPage.Append(templateLastPage.ToString()).ToString(), "Factura electronica");
 
             return report;
         }
@@ -152,7 +152,7 @@ namespace Gosocket.Dian.Application
 
         #region GetPdfBytes
 
-        public static byte[] GetPdfBytes(string htmlContent)
+        public static byte[] GetPdfBytes(string htmlContent, string documentName = null)
         {
             byte[] pdf = null;
 
@@ -160,7 +160,7 @@ namespace Gosocket.Dian.Application
             pdf = Pdf
                 .From(htmlContent)
                 .OfSize(PaperSize.A4)
-                .WithTitle("Factura Electrónica")
+                .WithTitle(documentName)
                 .WithMargins(0.0.Centimeters())
                 .Content();
 

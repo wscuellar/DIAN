@@ -21,6 +21,7 @@
     {
         #region Properties
 
+        private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly FileManager _fileManager;
         private readonly CosmosDBService _cosmosDBService;
@@ -65,7 +66,7 @@
 
             // Mapping Events
 
-            byte[] report = RadianPdfCreationService.GetPdfBytes(template.ToString());
+            byte[] report = RadianPdfCreationService.GetPdfBytes(template.ToString(), "Representacion grafica");
 
             return report;
         }
@@ -97,8 +98,6 @@
             model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
             model.ReceiverType = string.Empty;
 
-            GlobalDocValidatorDocumentMeta invoice = _queryAssociatedEventsService.DocumentValidation(eventItem.PartitionKey);
-
             // Set Mandate
 
             if (model.EventStatus == EventStatus.Mandato)
@@ -107,8 +106,8 @@
                 {
                     ReceiverCode = eventItem.ReceiverCode,
                     ReceiverName = eventItem.ReceiverName,
-                    SenderCode = invoice.SenderCode,
-                    SenderName = invoice.SenderName,
+                    SenderCode = eventItem.SenderCode,
+                    SenderName = eventItem.SenderName,
                     MandateType = TextResources.Event_MandateType
                 };
 
@@ -123,14 +122,14 @@
 
             // Set Endoso
 
-            if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia || model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
+            if (model.EventStatus == EventStatus.EndosoGarantia || model.EventStatus == EventStatus.EndosoProcuracion)
             {
                 model.Endoso = new Domain.Entity.EndosoModel()
                 {
                     ReceiverCode = eventItem.ReceiverCode,
                     ReceiverName = eventItem.ReceiverName,
-                    SenderCode = invoice.SenderCode,
-                    SenderName = invoice.SenderName,
+                    SenderCode = eventItem.SenderCode,
+                    SenderName = eventItem.SenderName,
                     EndosoType = EnumHelper.GetEnumDescription((Enum.Parse(typeof(EventStatus), eventItem.EventCode)))
                 };
                 model.ReceiverName = model.Endoso.ReceiverName;
@@ -139,26 +138,11 @@
 
             model.RequestType = TextResources.Event_RequestType;
 
-            Domain.Entity.GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem.Identifier);
-
-            // Set Validations
-
-            if (eventVerification.ValidationStatus == 1)
-            {
-                model.ValidationMessage = TextResources.Event_ValidationMessage;
-            }
-            else if (eventVerification.ValidationStatus == 10)
-            {
-                List<Domain.Entity.GlobalDocValidatorTracking> res = _queryAssociatedEventsService.ListTracking(eventItem.DocumentKey);
-
-                model.Validations = res.Select(t => new Domain.Entity.AssociatedValidationsModel(t)).ToList();
-            }
-
             // SetReferences
             GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
             if (referenceMeta != null)
             {
-                string documentType = string.IsNullOrEmpty(referenceMeta.EventCode) ? TextResources.Event_DocumentType : Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(EventStatus), referenceMeta.EventCode)));
+                string documentType = string.IsNullOrEmpty(referenceMeta.EventCode) ? TextResources.Event_DocumentType : EnumHelper.GetEnumDescription((Enum.Parse(typeof(EventStatus), referenceMeta.EventCode)));
                 documentType = string.IsNullOrEmpty(documentType) ? TextResources.Event_DocumentType : documentType;
                 model.References.Add(new Domain.Entity.AssociatedReferenceModel()
                 {
@@ -175,34 +159,12 @@
                 });
             }
 
-            // SetEventAssociated 
-            EventStatus allowEvent = _queryAssociatedEventsService.IdentifyEvent(eventItem);
-
-            if (allowEvent != EventStatus.None)
-            {
-                model.EventTitle = "Eventos de " + EnumHelper.GetEnumDescription(model.EventStatus);
-                List<GlobalDocValidatorDocumentMeta> otherEvents = _queryAssociatedEventsService.OtherEvents(eventItem.DocumentKey, allowEvent);
-                if (otherEvents.Any())
-                {
-                    foreach (GlobalDocValidatorDocumentMeta otherEvent in otherEvents)
-                    {
-                        if (_queryAssociatedEventsService.IsVerificated(otherEvent))
-                            model.AssociatedEvents.Add(new Domain.Entity.AssociatedEventsModel()
-                            {
-                                EventCode = otherEvent.EventCode,
-                                Document = EnumHelper.GetEnumDescription(Enum.Parse(typeof(EventStatus), otherEvent.EventCode)),
-                                EventDate = otherEvent.SigningTimeStamp,
-                                SenderCode = otherEvent.ReceiverCode,
-                                Sender = otherEvent.SenderName,
-                                ReceiverCode = otherEvent.ReceiverCode,
-                                Receiver = otherEvent.ReceiverName
-                            });
-                    }
-                }
-            }
-
             model.EntityName = referenceMeta.Serie;
             model.CertificateNumber = referenceMeta.SerieAndNumber;
+
+            //Domain.Entity.GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem.Identifier);
+            Domain.Entity.GlobalDocValidatorDocument eventVerification =
+                    globalDocValidatorDocumentTableManager.Find<Domain.Entity.GlobalDocValidatorDocument>(referenceMeta?.Identifier, referenceMeta?.Identifier);
 
             // Set title value data Particular Data
             // valida la regla de negocio para mostrar la sección de titulos valor
@@ -223,12 +185,7 @@
                 if (!string.IsNullOrEmpty(eventItem.DocumentKey))
                 {
                     List<string> pks = null;
-                    List<string> radianStatusFilter = new List<string>() {
-                            $"0{(int)EventStatus.Received}", $"0{(int)EventStatus.Receipt}", $"0{(int)EventStatus.Accepted}"
-                        };
                     pks = new List<string> { $"co|{eventVerification.EmissionDateNumber.Substring(6, 2)}|{eventItem.DocumentReferencedKey.Substring(0, 2)}" };
-
-
                     (bool hasMoreResults, string continuation, List<GlobalDataDocument> globalDataDocuments) cosmosResponse =
                     (false, null, new List<GlobalDataDocument>());
 
@@ -251,28 +208,19 @@
 
                     foreach (GlobalDataDocument globalDocu in cosmosResponse.globalDataDocuments)
                     {
-                        if (!globalDocu.Events.Any())
+                        if (globalDocu.Events.Any() && globalDocu.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.Accepted}")))
                         {
-                            break;
-                        }
-                        bool correctStatus = true;
-                        for (int i = 0; i < radianStatusFilter.Count; i++)
-                        {
-                            if (!radianStatusFilter.Contains(globalDocu.Events.OrderByDescending(e => e.Date).ElementAt(i).Code))
-                            {
-                                correctStatus = false;
-                                break;
-                            }
-                        }
+                            List<Event> eventosTituloValor = new List<Event>();
+                            eventosTituloValor.Add(globalDocu.Events.FirstOrDefault(a => a.Code.Equals($"0{(int)EventStatus.Received}")));
+                            eventosTituloValor.Add(globalDocu.Events.FirstOrDefault(a => a.Code.Equals($"0{(int)EventStatus.Receipt}")));
+                            eventosTituloValor.Add(globalDocu.Events.FirstOrDefault(a => a.Code.Equals($"0{(int)EventStatus.Accepted}")));
 
-                        if (correctStatus)
+                            globalDocu.Events = eventosTituloValor;
+
                             globalDocsValueTitle.Add(globalDocu);
-                    }
-
-                    if (globalDocsValueTitle.Any())
-                    {
-                        model.ShowTitleValueSection = true;
-                        model.ValueTitleDocuments = globalDocsValueTitle;
+                            model.ShowTitleValueSection = true;
+                            model.ValueTitleEvents = globalDocsValueTitle;
+                        } 
                     }
                 }
             }
@@ -378,9 +326,9 @@
             {
                 StringBuilder templateTitleValue = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGraficaFacturaTituloValor.html"));
 
-                for (int i = 0; i < model.ValueTitleDocuments[0].Events.Count; i++)
+                for (int i = 0; i < model.ValueTitleEvents[0].Events.Count; i++)
                 {
-                    Event eventDoc = model.ValueTitleDocuments[0].Events[i];
+                    Event eventDoc = model.ValueTitleEvents[0].Events[i];
                     templateTitleValue = DocumentTemplateMapping(templateTitleValue, eventDoc, (i + 1).ToString());
                 }
                 template = template.Replace("{TitleValue}", templateTitleValue.ToString());
