@@ -129,6 +129,8 @@ namespace Gosocket.Dian.Application
         {
             Dictionary<int, string> statusValue = new Dictionary<int, string>();
             int securityTitleCounter = 0;
+            int index = 3;
+
             statusValue.Add(1, $"{RadianDocumentStatus.ElectronicInvoice.GetDescription()}");
 
             if (documentKey != "")
@@ -137,34 +139,51 @@ namespace Gosocket.Dian.Application
                 allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null).ToList();
             }
 
-            foreach (GlobalDocValidatorDocumentMeta documentMeta in allReferencedDocuments)
+            allReferencedDocuments = allReferencedDocuments.OrderBy(t => t.Timestamp).ToList();
+            var events = eventListByTimestamp(allReferencedDocuments).OrderBy(t => t.Timestamp).ThenBy(t => t.EventCode);
+
+            foreach (GlobalDocValidatorDocumentMeta documentMeta in events)
             {
-                if (documentMeta.EventCode != null)
+                if (TITULOVALORCODES.Contains(documentMeta.EventCode.Trim()))
+                    securityTitleCounter++;
+
+                if (securityTitleCounter >= 3)
+                    statusValue.Add(2, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");//5
+
+                if (DISPONIBILIZACIONCODES.Contains(documentMeta.EventCode.Trim()))
                 {
-                    if (TITULOVALORCODES.Contains(documentMeta.EventCode.Trim()))
-                        securityTitleCounter++;
+                    statusValue.Add(index, $"{RadianDocumentStatus.Readiness.GetDescription()}");
+                    index++;
+                }
 
-                    if (!statusValue.ContainsKey(2) && securityTitleCounter >= 3)
-                        statusValue.Add(2, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");//5
+                if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim()))
+                {
+                    statusValue.Add(index++, $"{RadianDocumentStatus.Endorsed.GetDescription()}");
+                    index++;
+                }
 
-                    if (!statusValue.ContainsKey(3) && DISPONIBILIZACIONCODES.Contains(documentMeta.EventCode.Trim()))
-                        statusValue.Add(3, $"{RadianDocumentStatus.Readiness.GetDescription()}");//4 //INSCRITA
+                if (PAGADACODES.Contains(documentMeta.EventCode.Trim()))
+                {
+                    statusValue.Add(index++, $"{RadianDocumentStatus.Paid.GetDescription()}");
+                    index++;
+                }
 
-                    if (!statusValue.ContainsKey(4) && ENDOSOCODES.Contains(documentMeta.EventCode.Trim()))
-                        statusValue.Add(4, $"{RadianDocumentStatus.Endorsed.GetDescription()}");//3       
-
-                    if (!statusValue.ContainsKey(5) && PAGADACODES.Contains(documentMeta.EventCode.Trim()))
-                        statusValue.Add(5, $"{RadianDocumentStatus.Paid.GetDescription()}");//2
-
-                    if (!statusValue.ContainsKey(6) && LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()))
-                        statusValue.Add(6, $"{RadianDocumentStatus.Limited.GetDescription()}");//1 
+                if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()))
+                {
+                    statusValue.Add(index++, $"{RadianDocumentStatus.Limited.GetDescription()}");
+                    index++;
                 }
             }
 
-            if (statusValue.ContainsKey(3) || statusValue.ContainsKey(6))
-                statusValue.Remove(1);
 
-            return statusValue;
+            Dictionary<int, string> cleanDictionary = statusValue.GroupBy(pair => pair.Value)
+                         .Select(group => group.Last())
+                         .ToDictionary(pair => pair.Key, pair => pair.Value);
+
+            if (cleanDictionary.ContainsValue(RadianDocumentStatus.Readiness.GetDescription()) || cleanDictionary.ContainsValue(RadianDocumentStatus.Limited.GetDescription()))
+                cleanDictionary.Remove(1);
+
+            return cleanDictionary;
         }
 
         //Pass Information to DocumentController for Debit And Credit Notes
@@ -217,6 +236,21 @@ namespace Gosocket.Dian.Application
                 return true;
 
             return false;
+        }
+
+        private List<GlobalDocValidatorDocumentMeta> eventListByTimestamp(List<GlobalDocValidatorDocumentMeta> originalList)
+        {
+            List<GlobalDocValidatorDocumentMeta> resultList = new List<GlobalDocValidatorDocumentMeta>();
+
+            foreach (var item in originalList)
+            {
+                if (!string.IsNullOrEmpty(item.EventCode))
+                {
+                    resultList.Add(item);
+                }
+            }
+
+            return resultList.Where(e => TITULOVALORCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || PAGADACODES.Contains(e.EventCode.Trim()) || ENDOSOCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || MANDATOCODES.Contains(e.EventCode.Trim())).ToList();
         }
     }
 }
