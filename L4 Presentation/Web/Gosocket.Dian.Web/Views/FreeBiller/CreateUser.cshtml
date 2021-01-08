@@ -1,6 +1,6 @@
-﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFiltersFreeBillerModel
+﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFreeBillerModel
 @{
-    ViewBag.Title = "Usuarios Facturadoir Gratuito";
+    ViewBag.Title = "Creación de Usuarios";
     //Layout = "~/Views/Shared/_Layout.cshtml";
 
     var columnSize = 3;
@@ -49,69 +49,6 @@
     .bootstrap-select button {
         padding-left: 10px !important;
     }
-
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
-    }
-
-        /* Hide default HTML checkbox */
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-    /* The slider */
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        -webkit-transition: .4s;
-        transition: .4s;
-    }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-        }
-
-    input:checked + .slider {
-        background-color: #2196F3;
-    }
-
-    input:focus + .slider {
-        box-shadow: 0 0 1px #2196F3;
-    }
-
-    input:checked + .slider:before {
-        -webkit-transform: translateX(26px);
-        -ms-transform: translateX(26px);
-        transform: translateX(26px);
-    }
-
-    /* Rounded sliders */
-    .slider.round {
-        border-radius: 34px;
-    }
-
-        .slider.round:before {
-            border-radius: 50%;
-            background: #348441;
-        }
 </style>
 
 <div class="page-content margin-15">
@@ -132,7 +69,7 @@
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
-                                    @using (Html.BeginForm("FreeBillerUser", "FreeBiller", FormMethod.Post))
+                                    @using (Html.BeginForm("CreateUser", "FreeBiller", FormMethod.Post))
                                     {
                                         <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                             <div class="col-md-12 padding-horizontal-0">
@@ -142,15 +79,15 @@
                                                         <div class="row">
                                                             <div class="col-sm-@columnSize padding-xs-0">
                                                                 <div class="form-group">
-                                                                    @Html.LabelFor(m => m.DocTypeId, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.DocTypeId, Model.DocTypes, new { @class = "form-control selectpicker" })
+                                                                    @Html.LabelFor(m => m.TypeDocId, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, new { @class = "form-control selectpicker" })
                                                                 </div>
                                                             </div>
 
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
-                                                                    @Html.LabelFor(m => m.DocNumber, new { @class = "control-label" })
-                                                                    @Html.TextBoxFor(m => m.DocNumber, new { @class = "form-control" })
+                                                                    @Html.LabelFor(m => m.NumberDoc, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.NumberDoc, new { @class = "form-control" })
                                                                 </div>
                                                             </div>
 
@@ -159,6 +96,16 @@
                                                                     @Html.LabelFor(m => m.FullName, new { @class = "control-label" })
                                                                     @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
                                                                 </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                                                                </div>
                                                             </div>
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
@@ -166,12 +113,15 @@
                                                                     @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker" })
                                                                 </div>
                                                             </div>
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <br />
+                                                            </div>
                                                         </div>
-
                                                     </div>
 
                                                     <div class="panel-footer-grey text-right submit-container">
-                                                        <button type="submit" class="btn btn-success btn-radian-success">Buscar</button>
+                                                        <button id="btnCancel" type="button" class="btn btn-success btn-radian-default">Cancelar</button>
+                                                        <button type="submit" class="btn btn-success btn-radian-success">Crear Usuario</button>
                                                     </div>
 
                                                 </div>
@@ -182,13 +132,9 @@
                                 </div>
                             </div>
 
-                            @Html.Partial("_usersFreeBiller")
+                            @*permisos*@
+                            @*@Html.Partial("_usersFreeBiller")*@
 
-                        </div>
-
-                        <div class="row margin-horizontal-0 text-right">
-                            <input id="btnProfile" type="button" value="Crear Perfil" class="btn btn-success btn-radian-success" />
-                            <input id="btnUser" type="button" value="Crear Usuario" class="btn btn-success btn-radian-success" />
                         </div>
 
                     </div>
@@ -211,19 +157,16 @@
 
     <script>
         $(document).ready(function () {
-            $("input:checkbox:checked").attr("checked", true);
+            var urlNewUser = "@Url.Action("FreeBillerUser")";
 
-            var urlNewUser = "@Url.Action("CreateUser")";
-            var urlNewProfile = "@Url.Action("CreateProfile", "ProfileFreeBiller")";
-
-            $("#btnUser").click(function () {
+            $("#btnCancel").click(function () {
                 window.location.href = urlNewUser;
             });
-
-            $("#btnProfile").click(function () {
-                window.location.href = urlNewProfile;
-            });
+            
         });
     </script>
 
 }
+
+
+
