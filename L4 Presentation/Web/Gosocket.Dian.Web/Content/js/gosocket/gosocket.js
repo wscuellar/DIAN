@@ -1,6 +1,6 @@
 var mListCb = $('.demo-cb-mail');
 
-$("input:checkbox:checked").attr("checked", false);
+//$("input:checkbox:checked").attr("checked", true);
 
 var updateDashboardCharts = function () {
     setTimeout(function () {

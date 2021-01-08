@@ -322,7 +322,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Constancia de Recibo de mercancía.
+        ///   Busca una cadena traducida similar a Constancia de recibo de mercancía.
         /// </summary>
         public static string Receipt {
             get {
