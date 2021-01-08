@@ -597,20 +597,80 @@ namespace Gosocket.Dian.Application.Cosmos
                                                      a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
-                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp) 
-                                                 && (a.Code.Equals($"0{(int)EventStatus.Accepted}") ||  a.Code.Equals($"0{(int)EventStatus.AceptacionTacita}")))
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                 && (a.Code.Equals($"0{(int)EventStatus.Accepted}") || a.Code.Equals($"0{(int)EventStatus.AceptacionTacita}")))
                                                  );
                         break;
-                    case 2:
-                        predicate = predicate.And(g => g.Events.Any(a =>
+                    case 2: //Solicitud de disponilibilizacion
+
+                        predicate = predicate.And(g => (
+                                                    g.Events.Any(a =>
+                                                                        a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                                    && a.Code.Equals($"0{(int)EventStatus.AnulacionLimitacionCirculacion}")
+                                                        )
+                                                &&
+                                                     g.Events.Any(a =>
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.AnulacionLimitacionCirculacion}")
+                                                                                       ).Max(b => b.TimeStamp)
+                                                 && a.Code.Equals($"0{(int)EventStatus.SolicitudDisponibilizacion}"))
+                                                     )
+                                                     ||
+                                                     (
+                                                        g.Events.Any(a =>
+                                                                        a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                                    && a.Code.Equals($"0{(int)EventStatus.InvoiceOfferedForNegotiation}")
+                                                        )
+                                                &&
+                                                     g.Events.Any(a =>
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.EndosoGarantia}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.InvoiceOfferedForNegotiation}")
+                                                                                       ).Max(b => b.TimeStamp)
+                                                 && a.Code.Equals($"0{(int)EventStatus.SolicitudDisponibilizacion}"))
+                                                     )
+
+                                                     ||
+                                                     (
+                                                     g.Events.Any(a =>
                                                      a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
                                                  && a.Code.Equals($"0{(int)EventStatus.SolicitudDisponibilizacion}"))
+
+                                                     )
                                                  );
+
+
+
+
+
+
+                        //predicate = predicate.And(g => g.Events.Any(a =>
+                        //                             a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                        //                                                               !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                        //                                                               !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                        //                                                               !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                        //                         && a.Code.Equals($"0{(int)EventStatus.SolicitudDisponibilizacion}"))
+                        //                         );
                         break;
-                    case 3:
+                    case 3: //endosado
                         predicate = predicate.And(g => g.Events.Any(a =>
                                                      a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
@@ -621,7 +681,7 @@ namespace Gosocket.Dian.Application.Cosmos
                                                     || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
                                                  );
                         break;
-                    case 4:
+                    case 4: //pagado
                         predicate = predicate.And(g => g.Events.Any(a =>
                                                      a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
@@ -630,7 +690,7 @@ namespace Gosocket.Dian.Application.Cosmos
                                                  && a.Code.Equals($"0{(int)EventStatus.NotificacionPagoTotalParcial}"))
                                                  );
                         break;
-                    case 5:
+                    case 5: //limitacion
                         predicate = predicate.And(g => g.Events.Any(a =>
                                                      a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
@@ -639,7 +699,7 @@ namespace Gosocket.Dian.Application.Cosmos
                                                  && a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}"))
                                                  );
                         break;
-                    case 6:
+                    case 6: //factura electronica
                         if (documentTypeId == "01")
                         {
                             predicate = predicate.And(g => g.Events.Any() && !g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.Accepted}")));
@@ -660,70 +720,6 @@ namespace Gosocket.Dian.Application.Cosmos
                     .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();
             result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
             List<GlobalDataDocument> globalDocuments = result.ToList();
-            List<GlobalDataDocument> globalDocRadianStateFiltered = new List<GlobalDataDocument>();
-
-            //foreach (GlobalDataDocument globalDocu in globalDocuments)
-            //{
-            //    Event lastEvent = globalDocu.Events.OrderByDescending(e => e.Date).FirstOrDefault();
-
-            //    if (lastEvent != null && radianStatusFilter != null && radianStatusFilter.Contains(lastEvent.Code))
-            //        globalDocRadianStateFiltered.Add(globalDocu);
-            //}
-
-            //switch (radianStatus)
-            //{
-            //    case 0:
-            //        break;
-            //    case 7:
-            //        globalDocuments = globalDocuments.Take(10).ToList();
-            //        break;
-            //    case 1:
-            //    case 6:
-
-            //        globalDocuments = globalDocuments.Where(d => !d.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.Accepted}"))).ToList();
-            //        //globalDocuments = globalDocuments.Take(10).ToList();
-            //        //foreach (GlobalDataDocument globalDocu in globalDocuments)
-            //        //{
-
-            //        //    List<Event> events = globalDocu.Events.ToList();
-
-            //        //    globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.TerminacionMandato}"));
-            //        //    globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Receipt}"));
-            //        //    globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Received}"));
-            //        //    globalDocu.Events.RemoveAll(e => e.Code.Equals($"0{(int)EventStatus.Mandato}"));
-
-            //        //    if ((globalDocu.Events?.Count() ?? 0) >= 1)
-            //        //        continue;
-
-            //        //    globalDocu.Events = events;
-            //        //    globalDocRadianStateFiltered.Add(globalDocu);
-            //        //}
-
-            //        //if (radianStatus == 1)
-            //        //{
-            //        //    globalDocuments = globalDocRadianStateFiltered.Take(10).ToList();
-            //        //    break;
-            //        //}
-
-            //        //if (documentTypeId == "01")
-            //        //{
-            //        //    globalDocuments.RemoveAll(g => !globalDocRadianStateFiltered.Any(f => f == g));
-            //        //    globalDocuments = globalDocuments.Take(10).ToList();
-            //        //}
-
-            //        break;
-            //    default:
-            //        foreach (GlobalDataDocument globalDocu in globalDocuments)
-            //        {
-            //            Event lastEvent = globalDocu.Events.OrderByDescending(e => e.Date).FirstOrDefault();
-
-            //            if (lastEvent != null && radianStatusFilter.Contains(lastEvent.Code))
-            //                globalDocRadianStateFiltered.Add(globalDocu);
-            //        }
-
-            //        globalDocuments = globalDocRadianStateFiltered.Take(10).ToList();
-            //        break;
-            //}
 
             return (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults,
                     result.ResponseContinuation,
