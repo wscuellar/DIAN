@@ -122,9 +122,11 @@ namespace Gosocket.Dian.Functions.Batch
                 SetLogger(null, "Step prueba nomina", " Paso el primero If ");
                 // Check big contributor
                 var xmlBytes = contentFileList.First().XmlBytes;
-                var xmlParser = new XmlParseNomina(xmlBytes);
+                XmlParseNomina xmlParser = new XmlParseNomina();
+                         
                 if (setResult != null && string.IsNullOrEmpty(habNomina))
                 {
+                    xmlParser = new XmlParseNomina(xmlBytes);
                     var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(Convert.ToString(xmlParser.globalDocPayrolls.NIT), Convert.ToString(xmlParser.globalDocPayrolls.NIT));
                     if (bigContributorRequestAuthorization?.StatusCode != (int)BigContributorAuthorizationStatus.Authorized)
                     {
