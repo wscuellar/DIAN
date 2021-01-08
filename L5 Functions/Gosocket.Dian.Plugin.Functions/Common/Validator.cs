@@ -1273,8 +1273,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 bool valid = false;
                 if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
                 {
-                    //No existe Mandato para el CUFE referenciado.
-                    return null;
+                    //No existe Mandato para el CUFE referenciado se valida si es Mandato Ilimitado
+                    docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(issueAtorney, senderCode);
+                    if(docsReferenceAttorney == null)
+                        return null;
                 }
                 bool validError = false;
                 //Valida existan permisos para firmar evento mandatario
@@ -1291,6 +1293,63 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 if (attorneyFacultity.RowKey == eventCode)
                                 {
+                                    var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(docReferenceAttorney.IssuerAttorney, false, "Habilitado");
+                                    if (globalRadianOperation == null)
+                                    {
+                                        return new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: AAH11-(R): ",
+                                            ErrorMessage = "No corresponde a un Mandatario habilitado en RADIAN.",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        };
+                                    }
+                                    else
+                                    {
+                                        switch (docReferenceAttorney.Actor)
+                                        {
+                                            case "PT":
+                                            if(!globalRadianOperation.TecnologicalSupplier)
+                                                {
+                                                    return new ValidateListResponse
+                                                    {
+                                                        IsValid = false,
+                                                        Mandatory = true,
+                                                        ErrorCode = "Regla: 89-(R): ",
+                                                        ErrorMessage = "Mandatario de tipo incorrecto.",
+                                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                    };
+                                                }
+                                                break;
+                                            case "F":
+                                                if (!globalRadianOperation.Factor)
+                                                {
+                                                    return new ValidateListResponse
+                                                    {
+                                                        IsValid = false,
+                                                        Mandatory = true,
+                                                        ErrorCode = "Regla: 89-(R): ",
+                                                        ErrorMessage = "Mandatario de tipo incorrecto.",
+                                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                    };
+                                                }
+                                                break;
+                                            case "SNE":
+                                                if (!globalRadianOperation.NegotiationSystem)
+                                                {
+                                                    return new ValidateListResponse
+                                                    {
+                                                        IsValid = false,
+                                                        Mandatory = true,
+                                                        ErrorCode = "Regla: 89-(R): ",
+                                                        ErrorMessage = "Mandatario de tipo incorrecto.",
+                                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                    };
+                                                }
+                                                break;
+                                        }
+                                    }
                                     //Valida exista note mandatario
                                     if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                                     {
@@ -1455,17 +1514,54 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             data.CustomizationID = customizationID;
             data.EndDate = "";
             string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
+            string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
             string factor = string.Empty;
             switch (factorTemp)
             {
                 case "M-SN-e":
                     factor = "SNE";
+                    if(description!= "Mandatario Sistema de Negociación Electrónica")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "Descripcion de mandatario invalida",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                     break;
                 case "M-Factor":
                     factor = "F";
+                    if (description != "Mandatario Factor")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "Descripcion de mandatario invalida",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                     break;
                 case "M-PT":
                     factor = "PT";
+                    if (description != "Mandatario Proveedor Tecnológico")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "Descripcion de mandatario invalida",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                     break;
             }
             string actor = factor;
@@ -1524,17 +1620,51 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
 
             }
+            if(cufeList.Count > attorneyLimit + 1)
+            {
+                validate = false;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "89",
+                    ErrorMessage = "Cantidad de cufes La lista de documentos referenciados supera el limite",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            var facultitys = TableManagerGlobalAttorneyFacultity.FindAll<GlobalAttorneyFacultity>();
             //Grupo de información alcances para el mandato sobre los CUFE.
             for (int i = 1; i < cufeList.Count && i < attorneyLimit + 1 && validate; i++)
             {
                 AttorneyModel attorneyModel = new AttorneyModel();
                 string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
                 string[] tempCode = code.Split(';');
+                bool codeExist = false;
                 foreach (string codeAttorney in tempCode)
                 {
+                    if(facultitys.SingleOrDefault(t=> t.PartitionKey == codeAttorney)==null)
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: 89-(R): ",
+                            ErrorMessage = "Error en el codigo del mandato.",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                     string[] tempCodeAttorney = codeAttorney.Split('-');
                     if (factor == tempCodeAttorney[1])
                     {
+                        if((customizationID == "431" || customizationID == "432") && tempCodeAttorney[0]=="ALL17")
+                        {
+                            codeExist = true;
+                        }
+                        else if((customizationID == "433" || customizationID == "434") && tempCodeAttorney[0] == "MR91")
+                        {
+                            codeExist = true;
+                        }
                         if (attorneyModel.facultityCode == null)
                         {
                             attorneyModel.facultityCode += tempCodeAttorney[0];
@@ -1557,6 +1687,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
+                }
+                if(!codeExist)
+                {
+                    validate = false;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: 89-(R): ",
+                        ErrorMessage = "Error en el codigo del Mandato.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
                 }
                 if (listID != "3")
                 {
@@ -1601,6 +1743,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+                }
+                else
+                {
+                    attorney.Add(attorneyModel);
                 }
             }
             if (validate)
