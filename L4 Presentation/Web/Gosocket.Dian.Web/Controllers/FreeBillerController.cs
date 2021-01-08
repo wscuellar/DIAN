@@ -434,7 +434,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             //validar si ya existe un Usuario con el tipo documento y documento suministrados
-            var vUserDB = userService.FindUserByIdentificationAndTypeId(Convert.ToInt32(model.TypeDocId), model.NumberDoc);
+            var vUserDB = userService.FindUserByIdentificationAndTypeId(string.Empty, Convert.ToInt32(model.TypeDocId), model.NumberDoc);
 
             if (vUserDB != null)
             {
