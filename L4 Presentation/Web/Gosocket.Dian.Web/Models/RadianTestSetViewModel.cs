@@ -19,25 +19,25 @@ namespace Gosocket.Dian.Web.Models
         public string OperationModeName { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Documentos")]
+        [Display(Name = "Documentos (Total)")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int TotalDocumentRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Documentos aceptados      ")]
+        [Display(Name = "Documentos (Total)      ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int TotalDocumentAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Acuse de recibo            ")]
+        [Display(Name = "Acuse de recibo de la FEV       ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ReceiptNoticeTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Acuse de recibo aceptados  ")]
+        [Display(Name = "Acuse de recibo de la FEV  ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ReceiptNoticeTotalAcceptedRequired { get; set; }
@@ -67,25 +67,25 @@ namespace Gosocket.Dian.Web.Models
         public int ExpressAcceptanceTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Manifestación de aceptación ")]
+        [Display(Name = "Aceptación tácita ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int AutomaticAcceptanceTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Manifestación de aceptación ")]
+        [Display(Name = "Aceptación tácita ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int AutomaticAcceptanceTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Rechazo factura electrónica ")]
+        [Display(Name = "Rechazo de la FEV ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int RejectInvoiceTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Rechazo factura electrónica ")]
+        [Display(Name = "Rechazo de la FEV ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int RejectInvoiceTotalAcceptedRequired { get; set; }
@@ -103,49 +103,49 @@ namespace Gosocket.Dian.Web.Models
         public int ApplicationAvailableTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Endoso en Propiedad          ")]
+        [Display(Name = "Endoso en propiedad ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Endoso en Propiedad         ")]
+        [Display(Name = "Endoso en propiedad ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Endoso en Garantía          ")]
+        [Display(Name = "Endoso en garantía          ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementWarrantyTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Endoso en Garantía         ")]
+        [Display(Name = "Endoso en garantía         ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementWarrantyTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Endoso en Procuración         ")]
+        [Display(Name = "Endoso en procuración         ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementProcurationTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Endoso en Procuración        ")]
+        [Display(Name = "Endoso en procuración        ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementProcurationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Cancelación de endoso       ")]
+        [Display(Name = "Anulación del endoso       ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementCancellationTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Cancelación de endoso       ")]
+        [Display(Name = "Anulación del endoso       ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementCancellationTotalAcceptedRequired { get; set; }
@@ -163,25 +163,25 @@ namespace Gosocket.Dian.Web.Models
         public int GuaranteeTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Mandato electrónico         ")]
+        [Display(Name = "Mandato         ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ElectronicMandateTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Mandato electrónico        ")]
+        [Display(Name = "Mandato        ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ElectronicMandateTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación mandato         ")]
+        [Display(Name = "Terminación del mandato         ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndMandateTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación mandato        ")]
+        [Display(Name = "Terminación del mandato        ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndMandateTotalAcceptedRequired { get; set; }
@@ -211,13 +211,13 @@ namespace Gosocket.Dian.Web.Models
         public int CirculationLimitationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación limitación      ")]
+        [Display(Name = "Terminación de la limitación de circulación     ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndCirculationLimitationTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación limitación      ")]
+        [Display(Name = "Terminación de la limitación de circulación     ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndCirculationLimitationTotalAcceptedRequired { get; set; }

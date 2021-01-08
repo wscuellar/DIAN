@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Application
 
         #endregion
 
-        #region GetPdfReport
+        #region GetGraphicRepresentation
 
         public async Task<byte[]> GetGraphicRepresentation(string cude, string webPath)
         {
@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Application
 
             try
             {
-                ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
+                ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
 
                 // Build QRCode
                 Bitmap qrCode = RadianPdfCreationService.GenerateQR($"{webPath}?documentkey={cude}");
@@ -81,7 +81,7 @@ namespace Gosocket.Dian.Application
                 Console.WriteLine(ex.Message);
             }
 
-            byte[] report = RadianPdfCreationService.GetPdfBytes(template.ToString());
+            byte[] report = RadianPdfCreationService.GetPdfBytes(template.ToString(),"Representacion grafica");
 
             return report;
         }

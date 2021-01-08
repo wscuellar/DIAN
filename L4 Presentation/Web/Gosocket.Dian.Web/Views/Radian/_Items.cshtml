@@ -26,7 +26,7 @@
                     @foreach (var RadianContributor in Model.RadianContributors)
                     {
                         var textClass = DataUtils.GetProviderStatusStyle(RadianContributor.AcceptanceStatusId);
-                        var isClickableRow = User.IsInAnyRole("Administrador", "Super") ? "clickable-row" : "";
+                        var isClickableRow = RadianContributor.RadianState == "Cancelado" ? "disabled" : User.IsInAnyRole("Administrador", "Super") ? "clickable-row" : "";
                         var urlView = User.IsInAnyRole("Administrador", "Super") ? Url.Action("ViewDetails", "Radian", new { id = RadianContributor.Id }) : "";
                     <tr>
                         <td class="smallText iffyTip"><a>@RadianContributor.Code</a></td>

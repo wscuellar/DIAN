@@ -133,7 +133,7 @@
     <value>¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?</value>
   </data>
   <data name="Endoso" xml:space="preserve">
-    <value>Endoso Electronico</value>
+    <value>Endoso Electrónico</value>
   </data>
   <data name="Event_DocumentType" xml:space="preserve">
     <value>Factura Electrónica</value>
@@ -184,7 +184,7 @@
     <value>https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey={CUFE}</value>
   </data>
   <data name="Receipt" xml:space="preserve">
-    <value>Constancia de Recibo de mercancía</value>
+    <value>Constancia de recibo de mercancía</value>
   </data>
   <data name="Received" xml:space="preserve">
     <value>Acuse de Recibo de Factura Electrónica</value>

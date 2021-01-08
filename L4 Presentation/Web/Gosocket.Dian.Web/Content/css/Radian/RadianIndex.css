@@ -1669,10 +1669,6 @@ a.badge {
     padding: 0 5px;
 }
 
-.state-file-rejected{
-
-}
-
 .thirth-step .label-file-name {
     color: #2458C5;
     font-weight: bold;
@@ -1680,4 +1676,12 @@ a.badge {
 
 .thirth-step .label-file-name {
     padding-left: 25px;
+}
+
+.show-details.disabled a:hover{
+    text-decoration: none;
+}
+
+.show-details.disabled a{
+    cursor: not-allowed;
 }

@@ -39,9 +39,13 @@ namespace Gosocket.Dian.Web.Controllers
                     //TestSetId = null,
                     //StartDate = DateTime.UtcNow,
                     //EndDate = DateTime.UtcNow.AddMonths(3),
-                    TotalDocumentRequired = 4,
+                    TotalDocumentRequired = 0,
                     TotalDocumentAcceptedRequired = 0,
-                    Date = System.DateTime.UtcNow
+                    Date = System.DateTime.UtcNow,
+                    OthersDocumentsRequired = 0,
+                    OthersDocumentsAcceptedRequired = 0,
+                    ElectronicPayrollAjustmentAcceptedRequired = 0,
+                    ElectronicPayrollAjustmentRequired = 0,
                     //TotalCreditNotesRequired = 1,
                     //InvoicesTotalRequired = 2,
                     //TotalDebitNotesRequired = 1
