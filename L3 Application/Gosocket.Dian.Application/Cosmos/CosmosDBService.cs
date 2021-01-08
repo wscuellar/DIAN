@@ -593,35 +593,51 @@ namespace Gosocket.Dian.Application.Cosmos
                 switch (radianStatus)
                 {
                     case 1: //Titulo Valor
-                        predicate = predicate.And(g => g.Events.Any(a =>  
-                                                     a.TimeStamp == g.Events.Where(t=> !a.Code.Equals($"0{(int)EventStatus.Avales}") && 
-                                                                                       !a.Code.Equals($"0{(int)EventStatus.Mandato}") &&
-                                                                                       !a.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp) 
+                        predicate = predicate.And(g => g.Events.Any(a =>
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp) 
                                                  && (a.Code.Equals($"0{(int)EventStatus.Accepted}") ||  a.Code.Equals($"0{(int)EventStatus.AceptacionTacita}")))
                                                  );
                         break;
                     case 2:
-                        predicate = predicate.And(g => !g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
-                                || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
-                                || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")
-                                || a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}")
-                                || a.Code.Equals($"0{(int)EventStatus.ValInfoPago}"))
-                            && g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.SolicitudDisponibilizacion}")));
+                        predicate = predicate.And(g => g.Events.Any(a =>
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                 && a.Code.Equals($"0{(int)EventStatus.SolicitudDisponibilizacion}"))
+                                                 );
                         break;
                     case 3:
-                        predicate = predicate.And(g => !g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.NotificacionPagoTotalParcial}")
-                               || a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}")
-                               || a.Code.Equals($"0{(int)EventStatus.ValInfoPago}"))
-                           && g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
-                            || t.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
-                            || t.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")
-                           ));
+                        predicate = predicate.And(g => g.Events.Any(a =>
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                 && (a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
+                                                    || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
+                                                    || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
+                                                 );
                         break;
                     case 4:
-                        predicate = predicate.And(g => g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.NotificacionPagoTotalParcial}")));
+                        predicate = predicate.And(g => g.Events.Any(a =>
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                 && a.Code.Equals($"0{(int)EventStatus.NotificacionPagoTotalParcial}"))
+                                                 );
                         break;
                     case 5:
-                        predicate = predicate.And(g => g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}")));
+                        predicate = predicate.And(g => g.Events.Any(a =>
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                 && a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}"))
+                                                 );
                         break;
                     case 6:
                         if (documentTypeId == "01")
@@ -630,12 +646,9 @@ namespace Gosocket.Dian.Application.Cosmos
                         }
                         break;
                     case 7:
-                        // if (documentTypeId == "00")
-                        //{
                         predicate = predicate.And(g => g.DocumentTypeId == ((int)DocumentType.CreditNote).ToString()
                                                  || g.DocumentTypeId == ((int)DocumentType.DebitNote).ToString()
                                                  || g.DocumentTypeId == ((int)DocumentType.ApplicationResponse).ToString());
-                        //}
                         break;
                 }
 
