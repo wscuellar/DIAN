@@ -453,7 +453,7 @@ namespace Gosocket.Dian.Web.Controllers
                                     ReceiverCode = eventItem.ReceiverCode,
                                     Receiver = eventItem.ReceiverName
                                 });
-                                model.Events = model.Events.OrderBy(t => t.EventCode).ToList();
+                                model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
                             }
 
                         }
