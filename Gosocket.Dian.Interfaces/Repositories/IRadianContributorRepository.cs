@@ -13,7 +13,7 @@ namespace Gosocket.Dian.Interfaces.Repositories
         bool GetParticipantWithActiveProcess(int contributorId, int contributorTypeId);
         RadianContributor Get(Expression<Func<RadianContributor, bool>> expression);
         PagedResult<RadianContributor> List(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0);
-
+        PagedResult<RadianContributor> ListByDateDesc(Expression<Func<RadianContributor, bool>> expression, int page = 0, int length = 0);
         int AddOrUpdate(RadianContributor radianContributor);
         
         void RemoveRadianContributor(RadianContributor radianContributor);
