@@ -24,6 +24,8 @@ namespace Gosocket.Dian.Application
         const string PAGADACODES = "045";
         const string ENDOSOCODES = "037,038,039";
         const string LIMITACIONCODES = "041";
+        const string ANULACIONENDOSOCODES = "040";
+        const string ANULACIONLIMITACIONCODES = "042";
         const string MANDATOCODES = "043";
 
         const string CREDITNOTE = "91";
@@ -142,6 +144,9 @@ namespace Gosocket.Dian.Application
             allReferencedDocuments = allReferencedDocuments.OrderBy(t => t.Timestamp).ToList();
             var events = eventListByTimestamp(allReferencedDocuments).OrderBy(t => t.Timestamp).ThenBy(t => t.EventCode);
 
+            bool limitAnulation = events.Any(e => ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim()));
+            bool endosoAnulation = events.Any(e => ANULACIONENDOSOCODES.Contains(e.EventCode.Trim()));
+
             foreach (GlobalDocValidatorDocumentMeta documentMeta in events)
             {
                 if (TITULOVALORCODES.Contains(documentMeta.EventCode.Trim()))
@@ -156,7 +161,7 @@ namespace Gosocket.Dian.Application
                     index++;
                 }
 
-                if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim()))
+                if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim()) && !endosoAnulation)
                 {
                     statusValue.Add(index++, $"{RadianDocumentStatus.Endorsed.GetDescription()}");
                     index++;
@@ -168,13 +173,12 @@ namespace Gosocket.Dian.Application
                     index++;
                 }
 
-                if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()))
+                if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()) && !limitAnulation)
                 {
                     statusValue.Add(index++, $"{RadianDocumentStatus.Limited.GetDescription()}");
                     index++;
                 }
             }
-
 
             Dictionary<int, string> cleanDictionary = statusValue.GroupBy(pair => pair.Value)
                          .Select(group => group.Last())
@@ -216,7 +220,7 @@ namespace Gosocket.Dian.Application
 
             List<GlobalDocValidatorDocumentMeta> validateNotes = new List<GlobalDocValidatorDocumentMeta>();
 
-            foreach(var note in notes)
+            foreach (var note in notes)
             {
                 if (IsVerifiedNote(note.DocumentKey))
                     validateNotes.Add(note);
@@ -250,7 +254,7 @@ namespace Gosocket.Dian.Application
                 }
             }
 
-            return resultList.Where(e => TITULOVALORCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || PAGADACODES.Contains(e.EventCode.Trim()) || ENDOSOCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || MANDATOCODES.Contains(e.EventCode.Trim())).ToList();
+            return resultList.Where(e => TITULOVALORCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || PAGADACODES.Contains(e.EventCode.Trim()) || ENDOSOCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONENDOSOCODES.Contains(e.EventCode.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim())).ToList();
         }
     }
 }
