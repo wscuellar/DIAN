@@ -11,7 +11,7 @@ function DeleteOperationMode(url) {
             showConfirmation(response.message, AlertExec(()=>location.reload()))
         }
         var operation = () => ajaxFunction(url, metod, data, actionError, actionSuccess);
-        var message = "¿Está seguro de eliminar este ususario?"
+        var message = "¿Está seguro que eliminar el modo de operación configurado previamente?"
         var cancelOperation = () => hideLoading('#table-modes');
         showConfirmation(message, ConfirmExec(operation, null, cancelOperation), null, cancelOperation);
     })

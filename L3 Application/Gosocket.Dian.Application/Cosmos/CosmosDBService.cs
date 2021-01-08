@@ -380,6 +380,13 @@ namespace Gosocket.Dian.Application.Cosmos
 
         }
 
+        private bool Operations(List<Event> events, List<string> codes)
+        {
+            //1. Fecha del evento
+            var eventC = events.FirstOrDefault(t => codes.Contains(t.Code));
+            return events.Where(t => eventC.TimeStamp > t.TimeStamp && !codes.Contains(t.Code)).Any();
+        }
+
         public async Task<Tuple<bool, string, List<GlobalDataDocument>>> ReadDocumentsAsync(string continuationToken,
                                                                                             DateTime? from,
                                                                                             DateTime? to,
@@ -585,14 +592,16 @@ namespace Gosocket.Dian.Application.Cosmos
                 options.MaxItemCount = 10;
                 switch (radianStatus)
                 {
-                    case 1:
-                        predicate = predicate.And(g => g.Events.Any()
-                            && !g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.SolicitudDisponibilizacion}"))
-                            && !g.Events.Any(n => n.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}"))
-                            && g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.Accepted}")));
+                    case 1: //Titulo Valor
+                        predicate = predicate.And(g => g.Events.Any(a =>  
+                                                     a.TimeStamp == g.Events.Where(t=> !a.Code.Equals($"0{(int)EventStatus.Avales}") && 
+                                                                                       !a.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !a.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp) 
+                                                 && (a.Code.Equals($"0{(int)EventStatus.Accepted}") ||  a.Code.Equals($"0{(int)EventStatus.AceptacionTacita}")))
+                                                 );
                         break;
                     case 2:
-                        predicate = predicate.And(g => !g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}") 
+                        predicate = predicate.And(g => !g.Events.Any(a => a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
                                 || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
                                 || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")
                                 || a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}")
@@ -621,11 +630,11 @@ namespace Gosocket.Dian.Application.Cosmos
                         }
                         break;
                     case 7:
-                       // if (documentTypeId == "00")
+                        // if (documentTypeId == "00")
                         //{
-                            predicate = predicate.And(g => g.DocumentTypeId == ((int)DocumentType.CreditNote).ToString()
-                                                     || g.DocumentTypeId == ((int)DocumentType.DebitNote).ToString()
-                                                     || g.DocumentTypeId == ((int)DocumentType.ApplicationResponse).ToString());
+                        predicate = predicate.And(g => g.DocumentTypeId == ((int)DocumentType.CreditNote).ToString()
+                                                 || g.DocumentTypeId == ((int)DocumentType.DebitNote).ToString()
+                                                 || g.DocumentTypeId == ((int)DocumentType.ApplicationResponse).ToString());
                         //}
                         break;
                 }
