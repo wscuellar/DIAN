@@ -133,7 +133,7 @@
     <value>¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?</value>
   </data>
   <data name="Endoso" xml:space="preserve">
-    <value>Endoso Electrónico</value>
+    <value>Endoso electrónico</value>
   </data>
   <data name="Event_DocumentType" xml:space="preserve">
     <value>Factura Electrónica</value>
