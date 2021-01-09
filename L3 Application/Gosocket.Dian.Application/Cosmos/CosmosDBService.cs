@@ -629,7 +629,7 @@ namespace Gosocket.Dian.Application.Cosmos
                                                                                             !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
                                                                                             !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
                                                                                             !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
-                                                                    && a.Code.Equals($"0{(int)EventStatus.InvoiceOfferedForNegotiation}") 
+                                                                    && a.Code.Equals($"0{(int)EventStatus.InvoiceOfferedForNegotiation}")
                                                         )
                                                 &&
                                                      g.Events.Any(a =>  //si tengo la anulacion de endoso, quito los endosos en procuracion y garantia
@@ -655,7 +655,65 @@ namespace Gosocket.Dian.Application.Cosmos
 
                                                      )
                                                  );
+                        break;
+                    case 3: //endosado
+                        predicate = predicate.And(g => ( //Si tengo anulacion en mi ultima posicion de fecha, 
+                                                    g.Events.Any(a =>
+                                                                        a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                                    && a.Code.Equals($"0{(int)EventStatus.AnulacionLimitacionCirculacion}")
+                                                        )
+                                                &&
+                                                     g.Events.Any(a => //si la tengo, quito la limitacion y la anulacion de limitacion
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}") &&  //limitacion
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.AnulacionLimitacionCirculacion}") //anulacion
+                                                                                       ).Max(b => b.TimeStamp)
+                                                 && (a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
+                                                     )
+                                                     ||
+                                                     ( //si en mi ultimpa osicion de fecah tengo una anulacion de endoso
+                                                        g.Events.Any(a =>
+                                                                        a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                                    && a.Code.Equals($"0{(int)EventStatus.InvoiceOfferedForNegotiation}")
+                                                        )
+                                                &&
+                                                     g.Events.Any(a =>  //si tengo la anulacion de endoso, quito los endosos en procuracion y garantia
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.EndosoGarantia}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.InvoiceOfferedForNegotiation}")
+                                                                                       ).Max(b => b.TimeStamp)
+                                                 && (a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
+                                                     )
 
+                                                     ||
+                                                     ( //si no tenemos anulacion o limitacion dejamos el flujo normal
+                                                     g.Events.Any(a =>
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                 && (a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
+                                                     )
+                                                 );
 
 
                         //predicate = predicate.And(g => g.Events.Any(a =>
@@ -663,19 +721,10 @@ namespace Gosocket.Dian.Application.Cosmos
                         //                                                               !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
                         //                                                               !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
                         //                                                               !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
-                        //                         && a.Code.Equals($"0{(int)EventStatus.SolicitudDisponibilizacion}"))
+                        //                         && (a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
+                        //                            || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
+                        //                            || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
                         //                         );
-                        break;
-                    case 3: //endosado
-                        predicate = predicate.And(g => g.Events.Any(a =>
-                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
-                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
-                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
-                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
-                                                 && (a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
-                                                    || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
-                                                    || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
-                                                 );
                         break;
                     case 4: //pagado
                         predicate = predicate.And(g => g.Events.Any(a =>
@@ -687,12 +736,58 @@ namespace Gosocket.Dian.Application.Cosmos
                                                  );
                         break;
                     case 5: //limitacion
-                        predicate = predicate.And(g => g.Events.Any(a =>
+
+                        predicate = predicate.And(g => ( //Si tengo anulacion en mi ultima posicion de fecha, 
+                                                    g.Events.Any(a =>
+                                                                        a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                                    && a.Code.Equals($"0{(int)EventStatus.AnulacionLimitacionCirculacion}")
+                                                        )
+                                                &&
+                                                     g.Events.Any(a => //si la tengo, quito la limitacion y la anulacion de limitacion
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}") &&  //limitacion
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.AnulacionLimitacionCirculacion}") //anulacion
+                                                                                       ).Max(b => b.TimeStamp)
+                                                 && a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}"))
+                                                     )
+                                                     ||
+                                                     ( //si en mi ultimpa osicion de fecah tengo una anulacion de endoso
+                                                        g.Events.Any(a =>
+                                                                        a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                            !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                                    && a.Code.Equals($"0{(int)EventStatus.InvoiceOfferedForNegotiation}")
+                                                        )
+                                                &&
+                                                     g.Events.Any(a =>  //si tengo la anulacion de endoso, quito los endosos en procuracion y garantia
+                                                     a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.EndosoGarantia}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}") &&
+                                                                                       !t.Code.Equals($"0{(int)EventStatus.InvoiceOfferedForNegotiation}")
+                                                                                       ).Max(b => b.TimeStamp)
+                                                 && a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}"))
+                                                     )
+
+                                                     ||
+                                                     ( //si no tenemos anulacion o limitacion dejamos el flujo normal
+                                                     g.Events.Any(a =>
                                                      a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
                                                  && a.Code.Equals($"0{(int)EventStatus.NegotiatedInvoice}"))
+
+                                                     )
                                                  );
                         break;
                     case 6: //factura electronica

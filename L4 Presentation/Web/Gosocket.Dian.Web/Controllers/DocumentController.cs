@@ -771,7 +771,8 @@ namespace Gosocket.Dian.Web.Controllers
             var eventEnd = events.Where(ev => int.Parse(ev.Code) != (int)EventStatus.Avales
                 && int.Parse(ev.Code) != (int)EventStatus.Mandato
                 && int.Parse(ev.Code) != (int)EventStatus.TerminacionMandato
-                && int.Parse(ev.Code) != (int)EventStatus.ValInfoPago);
+                && int.Parse(ev.Code) != (int)EventStatus.ValInfoPago
+                && int.Parse(ev.Code) != (int)EventStatus.Rejected);
 
             if (Convert.ToInt32(eventEnd.OrderByDescending(t => t.Date).FirstOrDefault().Code) == (int)EventStatus.AnulacionLimitacionCirculacion)
                 eventEnd = eventEnd.Where(t => int.Parse(t.Code) != (int)EventStatus.AnulacionLimitacionCirculacion && int.Parse(t.Code) != (int)EventStatus.NegotiatedInvoice).ToList();
@@ -797,9 +798,7 @@ namespace Gosocket.Dian.Web.Controllers
                 if (lastEventCode == ((int)EventStatus.SolicitudDisponibilizacion))
                     return RadianDocumentStatus.Readiness.GetDescription();
 
-                if (eventEnd.Any(e => int.Parse(e.Code) == ((int)EventStatus.Received))
-                    && eventEnd.Any(e => int.Parse(e.Code) == ((int)EventStatus.Receipt))
-                    && eventEnd.Any(e => int.Parse(e.Code) == ((int)EventStatus.Accepted)))
+                if (lastEventCode == ((int)EventStatus.Accepted) || lastEventCode == ((int)EventStatus.AceptacionTacita))
                     return RadianDocumentStatus.SecurityTitle.GetDescription();
 
             }
