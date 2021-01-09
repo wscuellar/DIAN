@@ -152,7 +152,7 @@ namespace Gosocket.Dian.Application
                 if (TITULOVALORCODES.Contains(documentMeta.EventCode.Trim()))
                     securityTitleCounter++;
 
-                if (securityTitleCounter >= 3)
+                if (!statusValue.Values.Contains(RadianDocumentStatus.SecurityTitle.GetDescription()) && securityTitleCounter >= 3)
                     statusValue.Add(2, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");//5
 
                 if (DISPONIBILIZACIONCODES.Contains(documentMeta.EventCode.Trim()))
@@ -163,19 +163,19 @@ namespace Gosocket.Dian.Application
 
                 if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim()) && !endosoAnulation)
                 {
-                    statusValue.Add(index++, $"{RadianDocumentStatus.Endorsed.GetDescription()}");
+                    statusValue.Add(index, $"{RadianDocumentStatus.Endorsed.GetDescription()}");
                     index++;
                 }
 
                 if (PAGADACODES.Contains(documentMeta.EventCode.Trim()))
                 {
-                    statusValue.Add(index++, $"{RadianDocumentStatus.Paid.GetDescription()}");
+                    statusValue.Add(index, $"{RadianDocumentStatus.Paid.GetDescription()}");
                     index++;
                 }
 
                 if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()) && !limitAnulation)
                 {
-                    statusValue.Add(index++, $"{RadianDocumentStatus.Limited.GetDescription()}");
+                    statusValue.Add(index, $"{RadianDocumentStatus.Limited.GetDescription()}");
                     index++;
                 }
             }
