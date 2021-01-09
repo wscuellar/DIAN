@@ -768,11 +768,15 @@ namespace Gosocket.Dian.Web.Controllers
             if (!events.Any())
                 return RadianDocumentStatus.DontApply.GetDescription();
 
-            var eventEnd = events.Where(ev => int.Parse(ev.Code) != (int)EventStatus.Avales 
+            var eventEnd = events.Where(ev => int.Parse(ev.Code) != (int)EventStatus.Avales
                 && int.Parse(ev.Code) != (int)EventStatus.Mandato
-                && int.Parse(ev.Code) != (int)EventStatus.TerminacionMandato
-                && int.Parse(ev.Code) != (int)EventStatus.AnulacionLimitacionCirculacion
-                && int.Parse(ev.Code) != (int)EventStatus.InvoiceOfferedForNegotiation);
+                && int.Parse(ev.Code) != (int)EventStatus.TerminacionMandato);
+
+            if(eventEnd.Any(t=> int.Parse(t.Code) != (int)EventStatus.AnulacionLimitacionCirculacion))
+                    eventEnd = eventEnd.Where(t=>int.Parse(t.Code) != (int)EventStatus.AnulacionLimitacionCirculacion && int.Parse(t.Code) != (int)EventStatus.NegotiatedInvoice);
+
+            if (eventEnd.Any(t => int.Parse(t.Code) != (int)EventStatus.InvoiceOfferedForNegotiation))
+                eventEnd = eventEnd.Where(t => int.Parse(t.Code) != (int)EventStatus.InvoiceOfferedForNegotiation && int.Parse(t.Code) != (int)EventStatus.EndosoGarantia && int.Parse(t.Code) != (int)EventStatus.EndosoProcuracion);
 
             if (eventEnd.Any())
             {
