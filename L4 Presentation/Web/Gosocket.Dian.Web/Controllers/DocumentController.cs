@@ -86,7 +86,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [CustomRoleAuthorization(CustomRoles = "Proveedor")]
         public async Task<ActionResult> Provider(SearchDocumentViewModel model) => await GetDocuments(model, 4);
-                
+
         public async Task<ActionResult> Details(string trackId)
         {
             DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
@@ -95,7 +95,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
             return View(model);
         }
-                
+
 
         public ActionResult Viewer(Navigation.NavigationEnum nav)
         {
@@ -275,12 +275,12 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintDocument(string cufe)
         {
-            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);            
+            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
             byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
             String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
-        
+
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
@@ -431,34 +431,34 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.Events = new List<EventsViewModel>();
             List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
-                if (eventsByInvoice.Any())
+            if (eventsByInvoice.Any())
+            {
+
+                foreach (var eventItem in eventsByInvoice)
                 {
-
-                    foreach (var eventItem in eventsByInvoice)
+                    if (!string.IsNullOrEmpty(eventItem.EventCode))
                     {
-                        if (!string.IsNullOrEmpty(eventItem.EventCode))
+                        GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
+                        if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
                         {
-                            GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
-                            if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
+                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                            model.Events.Add(new EventsViewModel()
                             {
-                                string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
-                                model.Events.Add(new EventsViewModel()
-                                {
-                                    DocumentKey = eventItem.DocumentKey,
-                                    EventCode = eventItem.EventCode,
-                                    Description = eventcodetext,
-                                    EventDate = eventItem.SigningTimeStamp,
-                                    SenderCode = eventItem.SenderCode,
-                                    Sender = eventItem.SenderName,
-                                    ReceiverCode = eventItem.ReceiverCode,
-                                    Receiver = eventItem.ReceiverName
-                                });
-                                model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
-                            }
-
+                                DocumentKey = eventItem.DocumentKey,
+                                EventCode = eventItem.EventCode,
+                                Description = eventcodetext,
+                                EventDate = eventItem.SigningTimeStamp,
+                                SenderCode = eventItem.SenderCode,
+                                Sender = eventItem.SenderName,
+                                ReceiverCode = eventItem.ReceiverCode,
+                                Receiver = eventItem.ReceiverName
+                            });
+                            model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
                         }
+
                     }
-                
+                }
+
             }
 
             return model;
@@ -772,10 +772,10 @@ namespace Gosocket.Dian.Web.Controllers
                 && int.Parse(ev.Code) != (int)EventStatus.Mandato
                 && int.Parse(ev.Code) != (int)EventStatus.TerminacionMandato);
 
-            if(eventEnd.Any(t=> int.Parse(t.Code) != (int)EventStatus.AnulacionLimitacionCirculacion))
-                    eventEnd = eventEnd.Where(t=>int.Parse(t.Code) != (int)EventStatus.AnulacionLimitacionCirculacion && int.Parse(t.Code) != (int)EventStatus.NegotiatedInvoice).ToList();
+            if (Convert.ToInt32(eventEnd.OrderByDescending(t => t.Date).FirstOrDefault().Code) == (int)EventStatus.AnulacionLimitacionCirculacion)
+                eventEnd = eventEnd.Where(t => int.Parse(t.Code) != (int)EventStatus.AnulacionLimitacionCirculacion && int.Parse(t.Code) != (int)EventStatus.NegotiatedInvoice).ToList();
 
-            if (eventEnd.Any(t => int.Parse(t.Code) != (int)EventStatus.InvoiceOfferedForNegotiation))
+            if (Convert.ToInt32(eventEnd.OrderByDescending(t => t.Date).FirstOrDefault().Code) == (int)EventStatus.InvoiceOfferedForNegotiation)
                 eventEnd = eventEnd.Where(t => int.Parse(t.Code) != (int)EventStatus.InvoiceOfferedForNegotiation && int.Parse(t.Code) != (int)EventStatus.EndosoGarantia && int.Parse(t.Code) != (int)EventStatus.EndosoProcuracion).ToList();
 
             if (eventEnd.Any())
