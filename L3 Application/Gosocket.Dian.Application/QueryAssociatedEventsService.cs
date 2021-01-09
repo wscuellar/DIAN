@@ -144,8 +144,9 @@ namespace Gosocket.Dian.Application
             allReferencedDocuments = allReferencedDocuments.OrderBy(t => t.Timestamp).ToList();
             var events = eventListByTimestamp(allReferencedDocuments).OrderBy(t => t.Timestamp).ThenBy(t => t.EventCode);
 
-            bool limitAnulation = events.Any(e => ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim()));
-            bool endosoAnulation = events.Any(e => ANULACIONENDOSOCODES.Contains(e.EventCode.Trim()));
+            bool limitacionAnulation = IsAnulation(events.Count(e => ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim())), events.Count(e => LIMITACIONCODES.Contains(e.EventCode.Trim())));
+
+            bool endosoAnulation = IsAnulation(events.Count(e => ANULACIONENDOSOCODES.Contains(e.EventCode.Trim())), events.Count(e => ENDOSOCODES.Contains(e.EventCode.Trim())));
 
             foreach (GlobalDocValidatorDocumentMeta documentMeta in events)
             {
@@ -173,7 +174,7 @@ namespace Gosocket.Dian.Application
                     index++;
                 }
 
-                if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()) && !limitAnulation )
+                if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()) && !limitacionAnulation )
                 {
                     statusValue.Add(index, $"{RadianDocumentStatus.Limited.GetDescription()}");
                     index++;
@@ -255,6 +256,14 @@ namespace Gosocket.Dian.Application
             }
 
             return resultList.Where(e => TITULOVALORCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || PAGADACODES.Contains(e.EventCode.Trim()) || ENDOSOCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONENDOSOCODES.Contains(e.EventCode.Trim()) || LIMITACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim())).ToList();
+        }
+
+        private bool IsAnulation(int counterAnulations, int counterInformation)
+        {
+            if (counterInformation > counterAnulations)
+                return false;
+
+            return true;
         }
     }
 }
