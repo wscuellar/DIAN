@@ -773,10 +773,10 @@ namespace Gosocket.Dian.Web.Controllers
                 && int.Parse(ev.Code) != (int)EventStatus.TerminacionMandato);
 
             if(eventEnd.Any(t=> int.Parse(t.Code) != (int)EventStatus.AnulacionLimitacionCirculacion))
-                    eventEnd = eventEnd.Where(t=>int.Parse(t.Code) != (int)EventStatus.AnulacionLimitacionCirculacion && int.Parse(t.Code) != (int)EventStatus.NegotiatedInvoice);
+                    eventEnd = eventEnd.Where(t=>int.Parse(t.Code) != (int)EventStatus.AnulacionLimitacionCirculacion && int.Parse(t.Code) != (int)EventStatus.NegotiatedInvoice).ToList();
 
             if (eventEnd.Any(t => int.Parse(t.Code) != (int)EventStatus.InvoiceOfferedForNegotiation))
-                eventEnd = eventEnd.Where(t => int.Parse(t.Code) != (int)EventStatus.InvoiceOfferedForNegotiation && int.Parse(t.Code) != (int)EventStatus.EndosoGarantia && int.Parse(t.Code) != (int)EventStatus.EndosoProcuracion);
+                eventEnd = eventEnd.Where(t => int.Parse(t.Code) != (int)EventStatus.InvoiceOfferedForNegotiation && int.Parse(t.Code) != (int)EventStatus.EndosoGarantia && int.Parse(t.Code) != (int)EventStatus.EndosoProcuracion).ToList();
 
             if (eventEnd.Any())
             {
@@ -801,9 +801,10 @@ namespace Gosocket.Dian.Web.Controllers
                     && eventEnd.Any(e => int.Parse(e.Code) == ((int)EventStatus.Accepted)))
                     return RadianDocumentStatus.SecurityTitle.GetDescription();
 
-                if (documentTypeId == "01")
-                    return RadianDocumentStatus.ElectronicInvoice.GetDescription();
             }
+
+            if (documentTypeId == "01")
+                return RadianDocumentStatus.ElectronicInvoice.GetDescription();
 
             return RadianDocumentStatus.DontApply.GetDescription();
         }
