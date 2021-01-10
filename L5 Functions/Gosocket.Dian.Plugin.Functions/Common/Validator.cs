@@ -1100,8 +1100,67 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+
+        #region ValidatePayment
+        private List<ValidateListResponse> ValidatePayment(XmlParser xmlParserCude, NitModel nitModel)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            //valor actual total factura TV
+            string valueActualInvoice = nitModel.ValorActualTituloValor;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validPayment = false;
+
+            //Valor pago
+            XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+            int totalValueSender = 0;
+            for (int i = 0; i < valueListSender.Count; i++)
+            {
+                string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+            }
+
+            if(nitModel.CustomizationId == "452")
+            {
+                //Valida Total valor pagado igual al valor actual del titulo valor
+                if (totalValueSender != Int32.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+                {
+                    validPayment = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAF19c-(R): ",
+                        ErrorMessage = $"{(string)null} El valor debe ser igual al valor actual del titulo valor.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+            else
+            {
+                //Valida Total valor pagado no supera el valor actual del titulo valor
+                if (totalValueSender > Int32.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+                {
+                    validPayment = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAF19b-(R): ",
+                        ErrorMessage = $"{(string)null} El valor informado no puede ser mayor al Valor actual del titulo valor.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
+            if (validPayment)
+                return responses;
+
+            return null;
+        }
+        #endregion
+
         #region ValidateEndoso
-        private List<ValidateListResponse> ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode)
+        private List<ValidateListResponse> ValidateEndoso(XmlParser xmlParserCude, NitModel nitModel, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
@@ -1143,9 +1202,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
-
+                // Si no es endoso en Blanco
                 if (xmlParserCude.Fields["listID"].ToString() != "2")
                 {
+                    //La sumatoria del valor de los endosantes
                     XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
                     int totalValueSender = 0;
                     for (int i = 0; i < valueListSender.Count; i++)
@@ -1153,7 +1213,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
                         totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
                     }
-
+                    //La sumatoria del valor de los endosatarios
                     XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
                     int totalValueReceiver = 0;
                     for (int i = 0; i < valueListReceiver.Count; i++)
@@ -1161,7 +1221,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
                         totalValueReceiver += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
                     }
-
+                    //sumatoria valor endosatarios diferente a sumatoria valor endosantes 
                     if (totalValueReceiver != totalValueSender)
                     {
                         validEndoso = true;
@@ -2947,7 +3007,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 //Solicitud de Disponibilización
                                 else if (documentMeta.Where(t => t.EventCode == "036" && t.SenderCode == nitModel.SenderCode).ToList().Count > decimal.Zero)
                                 {
-                                    var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode);
+                                    var responseListEndoso = ValidateEndoso(xmlParserCude, nitModel, eventCode);
                                     if (responseListEndoso != null)
                                     {
                                         validFor = true;
@@ -3151,6 +3211,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 });
                                 break;
                             case (int)EventStatus.NotificacionPagoTotalParcial:
+
+                                //Valida monto pago parcial o total
+                                var responseListPayment = ValidatePayment(xmlParserCude, nitModel);
+                                if (responseListPayment != null)
+                                {
+                                    validFor = true;
+                                    foreach (var item in responseListPayment)
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = item.IsValid,
+                                            Mandatory = item.Mandatory,
+                                            ErrorCode = item.ErrorCode,
+                                            ErrorMessage = item.ErrorMessage,
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+
+                                }
+
                                 //Si el titulo valor tiene una limitación previa (041)
                                 if (documentMeta
                                     .Where(t => t.EventCode == "041" && t.CancelElectronicEvent == null && t.Identifier == document.PartitionKey).ToList()
