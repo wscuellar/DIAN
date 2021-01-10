@@ -1283,137 +1283,115 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     if (docReferenceAttorney.IssuerAttorney == issueAtorney)
                     {
-                        if(String.IsNullOrEmpty(docReferenceAttorney.EndDate) || (DateTime.Now >= DateTime.ParseExact(docReferenceAttorney.EndDate,"yyyy-MM-dd",CultureInfo.InvariantCulture)))
-                        {
-                            var filter = $"{docReferenceAttorney.FacultityCode}-{docReferenceAttorney.Actor}";
-                            //Valida permisos firma para el evento emitido
-                            var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
-                            if (attorneyFacultity != null)
-                            {
-                                if (attorneyFacultity.RowKey == eventCode)
-                                {
-                                    var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(docReferenceAttorney.IssuerAttorney, false, "Habilitado");
-                                    if (globalRadianOperation == null)
-                                    {
-                                        return new ValidateListResponse
-                                        {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = "Regla: AAH11-(R): ",
-                                            ErrorMessage = "No corresponde a un Mandatario habilitado en RADIAN.",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        };
-                                    }
-                                    else
-                                    {
-                                        switch (docReferenceAttorney.Actor)
-                                        {
-                                            case "PT":
-                                            if(!globalRadianOperation.TecnologicalSupplier)
-                                                {
-                                                    return new ValidateListResponse
-                                                    {
-                                                        IsValid = false,
-                                                        Mandatory = true,
-                                                        ErrorCode = "Regla: 89-(R): ",
-                                                        ErrorMessage = "Mandatario de tipo incorrecto.",
-                                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                    };
-                                                }
-                                                break;
-                                            case "F":
-                                                if (!globalRadianOperation.Factor)
-                                                {
-                                                    return new ValidateListResponse
-                                                    {
-                                                        IsValid = false,
-                                                        Mandatory = true,
-                                                        ErrorCode = "Regla: 89-(R): ",
-                                                        ErrorMessage = "Mandatario de tipo incorrecto.",
-                                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                    };
-                                                }
-                                                break;
-                                            case "SNE":
-                                                if (!globalRadianOperation.NegotiationSystem)
-                                                {
-                                                    return new ValidateListResponse
-                                                    {
-                                                        IsValid = false,
-                                                        Mandatory = true,
-                                                        ErrorCode = "Regla: 89-(R): ",
-                                                        ErrorMessage = "Mandatario de tipo incorrecto.",
-                                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                    };
-                                                }
-                                                break;
-                                        }
-                                    }
-                                    //Valida exista note mandatario
-                                    if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
-                                    {
-                                        return new ValidateListResponse
-                                        {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                            ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        };
-                                    }
-                                    else
-                                        valid = true;
-                                }
-                            }
-                            validError = false;
-                            continue;
-                        }
-                        else
-                        {
-                            return new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "Regla 89-(R)",
-                                ErrorMessage = "Fecha de terminacion de mandato no valida",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            };
-
-                        }
-                    }
-                    else
-                    {
                         string[] tempFacultityCode = docReferenceAttorney.FacultityCode.Split(';');
-                        foreach(string codeFacultity in tempFacultityCode)
+                        foreach (string codeFacultity in tempFacultityCode)
                         {
                             var filter = $"{codeFacultity}-{docReferenceAttorney.Actor}";
+                            
                             //Valida permisos firma para el evento emitido
                             var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
                             if (attorneyFacultity != null)
                             {
-                                if ( (attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0") && codeFacultity != "MR91")
+                                //valida fecha vencimiento mandato
+                                if (String.IsNullOrEmpty(docReferenceAttorney.EndDate) || (DateTime.Now <= DateTime.ParseExact(docReferenceAttorney.EndDate,"yyyy-MM-dd",CultureInfo.InvariantCulture)))
                                 {
-                                    //Valida exista note mandatario
-                                    if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                    //Valida las facultades limitadas o ilimitadas para el evento
+                                    if ((attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0") && codeFacultity != "MR91")
                                     {
-                                        return new ValidateListResponse
+                                        //Valida exista note mandatario
+                                        if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                                         {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                            ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        };
+                                            return new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                                ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            };
+                                        }
+                                        else
+                                            valid = true;
+
+                                        //Valida permisos firma modos de operacion para el evento emitido
+                                        var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(docReferenceAttorney.IssuerAttorney, false, "Habilitado");
+                                        if (globalRadianOperation == null)
+                                        {
+                                            return new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = "Regla: AAH11-(R): ",
+                                                ErrorMessage = "No corresponde a un Mandatario habilitado en RADIAN.",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            };
+                                        }
+                                        else
+                                        {
+                                            switch (docReferenceAttorney.Actor)
+                                            {
+                                                case "PT":
+                                                    if (!globalRadianOperation.TecnologicalSupplier)
+                                                    {
+                                                        return new ValidateListResponse
+                                                        {
+                                                            IsValid = false,
+                                                            Mandatory = true,
+                                                            ErrorCode = "Regla: 89-(R): ",
+                                                            ErrorMessage = "Mandatario Proveedor Tecnológico no esta Habilitado en RADIAN",
+                                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                        };
+                                                    }
+                                                    break;
+                                                case "F":
+                                                    if (!globalRadianOperation.Factor)
+                                                    {
+                                                        return new ValidateListResponse
+                                                        {
+                                                            IsValid = false,
+                                                            Mandatory = true,
+                                                            ErrorCode = "Regla: 89-(R): ",
+                                                            ErrorMessage = "Mandatario Factor no esta Habilitado en RADIAN.",
+                                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                        };
+                                                    }
+                                                    break;
+                                                case "SNE":
+                                                    if (!globalRadianOperation.NegotiationSystem)
+                                                    {
+                                                        return new ValidateListResponse
+                                                        {
+                                                            IsValid = false,
+                                                            Mandatory = true,
+                                                            ErrorCode = "Regla: 89-(R): ",
+                                                            ErrorMessage = "Mandatario Sistema de Negociación no esta Habilitado en RADIAN.",
+                                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                        };
+                                                    }
+                                                    break;
+                                            }
+                                        }
+
                                     }
-                                    else
-                                        valid = true;
                                 }
+                                else
+                                {
+                                    return new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "Regla 89-(R)",
+                                        ErrorMessage = "Fecha Actual es mayor a la fecha de vencimiento del mandato ",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    };
+
+                                }
+
                             }
                             validError = false;
                             continue;
-
                         }                       
-                    }
+                    }                    
                     else
                     {
                         validError = true;
@@ -1547,11 +1525,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             data.EndDate = "";
             string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
-            string factor = string.Empty;
+            string modoOperacion = string.Empty;
             switch (factorTemp)
             {
                 case "M-SN-e":
-                    factor = "SNE";
+                    modoOperacion = "SNE";
                     if(description!= "Mandatario Sistema de Negociación Electrónica")
                     {
                         validate = false;
@@ -1566,7 +1544,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
                 case "M-Factor":
-                    factor = "F";
+                    modoOperacion = "F";
                     if (description != "Mandatario Factor")
                     {
                         validate = false;
@@ -1581,7 +1559,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
                 case "M-PT":
-                    factor = "PT";
+                    modoOperacion = "PT";
                     if (description != "Mandatario Proveedor Tecnológico")
                     {
                         validate = false;
@@ -1596,7 +1574,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
             }
-            string actor = factor;
+            string actor = modoOperacion;
             //Valida que exista en Radian
             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByRadianStatus(issuerPartyCode, false, "Habilitado");
             if (globalRadianOperation == null)
@@ -1687,7 +1665,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     string[] tempCodeAttorney = codeAttorney.Split('-');
-                    if (factor == tempCodeAttorney[1])
+                    if (modoOperacion == tempCodeAttorney[1])
                     {
                         if((customizationID == "431" || customizationID == "432") && tempCodeAttorney[0]=="ALL17")
                         {
