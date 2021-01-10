@@ -581,10 +581,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida cambio legitimo tenedor
             string senderCode = nitModel.SenderCode;
             var receiverCode = nitModel.ReceiverCode;            
-            string sender2DvErrorCode = "Regla: 89-(R): ";
+            string sender2DvErrorCode = "Regla: 89-(R): ";        
 
-            //valida si existe los permisos del mandatario
-            if (party.SenderParty != xmlParserCude.ProviderCode)
+            //Endoso en Blanco
+            if ( (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia ||
+               Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion) && party.ListId == "2")
+            {
+                party.SenderParty = nitModel.SenderCode;
+            }
+                
+                //valida si existe los permisos del mandatario
+                if (party.SenderParty != xmlParserCude.ProviderCode)
             {
                 var responseVal = ValidateFacultityAttorney(party.TrackId, xmlParserCude.ProviderCode, senderCode,
                 party.ResponseCode, xmlParserCude.NoteMandato);
@@ -1463,8 +1470,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeB,
-                        ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageB,
+                        ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeMandato,
+                        ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageMandato,
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     };
                 }
@@ -3834,6 +3841,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             public string errorMessageigningTimeRecibo { get; set; }
             public string errorCodeEndoso { get; set; }
             public string errorMessageEndoso { get; set; }
+            public string errorCodeMandato { get; set; }
+            public string errorMessageMandato { get; set; }
 
         }
 
@@ -3858,9 +3867,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCodeSigningTimeRecibo = string.Empty,
                 errorMessageigningTimeRecibo = string.Empty,
                 errorCodeEndoso = string.Empty,
-                errorMessageEndoso = string.Empty
-
-
+                errorMessageEndoso = string.Empty,
+                errorCodeMandato = string.Empty,
+                errorMessageMandato = string.Empty
             };
 
             response.errorCodeNote = "Regla: AAD11-(R): ";
@@ -3868,6 +3877,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             response.errorMessageFETV = "Nombre o Razón social no esta autorizado para generar esté evento";
             response.errorMessageReceiverFETV = "El adquiriente no esta autorizado para recibir esté evento";
             response.errorMessageEndoso = "No se puede registrar este evento si previamente se ha registrado el evento Pago de la factura electrónica de venta como título valor";
+            response.errorCodeMandato = "Regla: LGC36-(R): ";
+            response.errorMessageMandato = "El mandatario no puede enviar este evento al documento/evento referenciado ya que no cuenta con un mandato vigente para el esté.";
 
             //SenderPArty
             if (eventCode == "030") response.errorCodeFETV = "Regla: AAF01a-(R): ";
@@ -3924,7 +3935,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (eventCode == "043")
             {
                 response.errorCode = "Regla: AAF01-(R): ";
-                response.errorMessage = "No es informado el grupo del Mandante";
+                response.errorMessage = "No es informado el grupo del Mandante";               
             }
             else if (eventCode == "044")
             {
