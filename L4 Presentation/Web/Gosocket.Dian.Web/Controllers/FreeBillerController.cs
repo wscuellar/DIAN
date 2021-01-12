@@ -134,7 +134,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             return View(model);
           
-            return View();
+            //return View();
         }
        
         [HttpPost]
@@ -365,8 +365,9 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult CreateUser()
         {
             UserFreeBillerModel model = new UserFreeBillerModel();
-            model.TypesDoc = this.staticTypeDoc;
-            model.Profiles = this.staticProfiles;
+            model.TypesDoc = this.GetTypesDoc();
+            model.Profiles = this.GetProfiles();
+
             model.IsActive = true;
 
             if (model.IsActive)
@@ -458,7 +459,6 @@ namespace Gosocket.Dian.Web.Controllers
                     Email = model.Email,
                     CreatorNit = user.CreatorNit
                 }), "Creación");
-
 
                 // Revisar calse estatica para colocar el valor del nuevo rol.
                 var resultRole = userManager.AddToRole(user.Id, ROLEFREEBILLER);
