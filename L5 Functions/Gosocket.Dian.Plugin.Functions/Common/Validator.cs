@@ -1350,8 +1350,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     if (docReferenceAttorney.IssuerAttorney == issueAtorney)
                     {
-                        string[] tempFacultityCode = docReferenceAttorney.FacultityCode.Split(';');
-                        foreach (string codeFacultity in tempFacultityCode)
                         if (String.IsNullOrEmpty(docReferenceAttorney.EndDate) || (DateTime.Now >= DateTime.ParseExact(docReferenceAttorney.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture)))
                         {
                             string[] tempFacultityCode = docReferenceAttorney.FacultityCode.Split(';');
