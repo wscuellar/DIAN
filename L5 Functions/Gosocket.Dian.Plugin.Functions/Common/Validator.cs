@@ -591,24 +591,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
                 
                 //valida si existe los permisos del mandatario
-                if (party.SenderParty != xmlParserCude.ProviderCode)
+            if (party.SenderParty != xmlParserCude.ProviderCode)
             {
                 var responseVal = ValidateFacultityAttorney(party.TrackId, xmlParserCude.ProviderCode, senderCode,
                 party.ResponseCode, xmlParserCude.NoteMandato);
                 if (responseVal != null)
                 {
-                    responses.Add(responseVal);
-                }
-                else
-                {
-                    responses.Add(new ValidateListResponse
+                    foreach (var item in responseVal)
                     {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = "Evento senderParty referenciado correctamente",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = item.IsValid,
+                            Mandatory = item.Mandatory,
+                            ErrorCode = item.ErrorCode,
+                            ErrorMessage = item.ErrorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                 }
             }
 
@@ -1142,23 +1141,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
             }
-            else
+          
+            //Valida Total valor pagado no supera el valor actual del titulo valor
+            if (totalValueSender > Int32.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
             {
-                //Valida Total valor pagado no supera el valor actual del titulo valor
-                if (totalValueSender > Int32.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+                validPayment = true;
+                responses.Add(new ValidateListResponse
                 {
-                    validPayment = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAF19b-(R): ",
-                        ErrorMessage = $"{(string)null} El valor informado no puede ser mayor al Valor actual del titulo valor.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAF19b-(R): ",
+                    ErrorMessage = $"{(string)null} El valor informado no puede ser mayor al Valor actual del titulo valor.",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
-
+            
             if (validPayment)
                 return responses;
 
@@ -1266,11 +1263,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateFacultityAttorney
-        private ValidateListResponse ValidateFacultityAttorney(string cufe, string issueAtorney, string senderCode, string eventCode, string noteMandato)
+        private List<ValidateListResponse> ValidateFacultityAttorney(string cufe, string issueAtorney, string senderCode, string eventCode, string noteMandato)
         {
             DateTime startDate = DateTime.UtcNow;
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
             var sender = GetContributorInstanceCache(issueAtorney);
+            bool validError = false;
             //Valida exista contributor en ambiente Habilitacion y Test
             if (ConfigurationManager.GetValue("Environment") == "Hab" ||
                 ConfigurationManager.GetValue("Environment") == "Test")
@@ -1279,26 +1278,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     if (sender.StatusId != 3 && sender.StatusId != 4)
                     {
-                        return new ValidateListResponse
+                        validError = true;
+                        responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "89",
                             ErrorMessage = $"{(string)null} Emisor de servicios no autorizado.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        };
+                        });
                     }
                 }
                 else
                 {
-                    return new ValidateListResponse
+                    validError = true;
+                    responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "89",
                         ErrorMessage = $"{(string)null} Emisor de servicios no autorizado.",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
+                    });
                 }
 
             }
@@ -1309,31 +1310,33 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     if (sender.StatusId != 4)
                     {
-                        return new ValidateListResponse
+                        validError = true;
+                        responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "89",
                             ErrorMessage = $"{(string)null} Emisor de servicios no autorizado.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        };
+                        });
                     }
                 }
                 else
                 {
-                    return new ValidateListResponse
+                    validError = true;
+                    responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "89",
                         ErrorMessage = $"{(string)null} Emisor de servicios no autorizado.",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
+                    });
                 }
 
             }
             //Valida exista informacion mandato - Mandatario - CUFE para eventos disitintos a Mandato 043
-            if (eventCode != "043")
+            if (eventCode != "043" && !validError)
             {
                 var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cufe, senderCode);
                 bool valid = false;
@@ -1344,13 +1347,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if(docsReferenceAttorney == null)
                         return null;
                 }
-                bool validError = false;
+               
                 //Valida existan permisos para firmar evento mandatario
                 foreach (var docReferenceAttorney in docsReferenceAttorney)
                 {
                     if (docReferenceAttorney.IssuerAttorney == issueAtorney)
                     {
-                        if (String.IsNullOrEmpty(docReferenceAttorney.EndDate) || (DateTime.Now >= DateTime.ParseExact(docReferenceAttorney.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture)))
+                        if ( (String.IsNullOrEmpty(docReferenceAttorney.EndDate) 
+                            || (DateTime.Now >= DateTime.ParseExact(docReferenceAttorney.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture) ) 
+                            ) && docReferenceAttorney.Active)
                         {
                             string[] tempFacultityCode = docReferenceAttorney.FacultityCode.Split(';');
                             foreach (string codeFacultity in tempFacultityCode)
@@ -1365,14 +1370,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(docReferenceAttorney.IssuerAttorney, false, "Habilitado");
                                         if (globalRadianOperation == null)
                                         {
-                                            return new ValidateListResponse
+                                            validError = true;
+                                            responses.Add(new ValidateListResponse
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
                                                 ErrorCode = "Regla: AAH11-(R): ",
                                                 ErrorMessage = "No corresponde a un Mandatario habilitado en RADIAN.",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            };
+                                            });
                                         }
                                         else
                                         {
@@ -1381,40 +1387,43 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 case "PT":
                                                     if (!globalRadianOperation.TecnologicalSupplier)
                                                     {
-                                                        return new ValidateListResponse
+                                                        validError = true;
+                                                        responses.Add(new ValidateListResponse
                                                         {
                                                             IsValid = false,
                                                             Mandatory = true,
                                                             ErrorCode = "Regla: 89-(R): ",
                                                             ErrorMessage = "Mandatario de tipo incorrecto.",
                                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                        };
+                                                        });
                                                     }
                                                     break;
                                                 case "F":
                                                     if (!globalRadianOperation.Factor)
                                                     {
-                                                        return new ValidateListResponse
+                                                        validError = true;
+                                                        responses.Add(new ValidateListResponse
                                                         {
                                                             IsValid = false,
                                                             Mandatory = true,
                                                             ErrorCode = "Regla: 89-(R): ",
                                                             ErrorMessage = "Mandatario de tipo incorrecto.",
                                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                        };
+                                                        });
                                                     }
                                                     break;
                                                 case "SNE":
                                                     if (!globalRadianOperation.NegotiationSystem)
                                                     {
-                                                        return new ValidateListResponse
+                                                        validError = true;
+                                                        responses.Add(new ValidateListResponse
                                                         {
                                                             IsValid = false,
                                                             Mandatory = true,
                                                             ErrorCode = "Regla: 89-(R): ",
                                                             ErrorMessage = "Mandatario de tipo incorrecto.",
                                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                        };
+                                                        });
                                                     }
                                                     break;
                                             }
@@ -1422,64 +1431,61 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         //Valida exista note mandatario
                                         if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                                         {
-                                            return new ValidateListResponse
+                                            validError = true;
+                                            responses.Add(new ValidateListResponse
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
                                                 ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
                                                 ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            };
-                                        }
-                                        else
-                                            valid = true;
+                                            });
+                                        }                                      
                                     }
-                                }
-                                validError = false;
-                                continue;
-
+                                    else if(codeFacultity != "MR91")
+                                    {
+                                        validError = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeMandato,
+                                            ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageMandato,
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }                              
                             }
                         }
                         else
+                        {
+                            validError = true;
+                            responses.Add(new ValidateListResponse
                             {
-                                return new ValidateListResponse
-                                {
-                                    IsValid = false,
-                                    Mandatory = true,
-                                    ErrorCode = "Regla 89-(R)",
-                                    ErrorMessage = "Fecha de terminacion de mandato no valida",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                };
-
-                            }
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "Regla 89-(R)",
+                                ErrorMessage = "Fecha Actual es mayor a la fecha de terminacion de mandato",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
                         }
+                    }
                     else
                     {
                         validError = true;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla 89-(R)",
+                            ErrorMessage = "Fecha Actual es mayor a la fecha de terminacion de mandato",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
                     }
                 }
-                if (validError)
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeMandato,
-                        ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageMandato,
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
-                if (!valid)
-                {
-                    return new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                        ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    };
-                }
+
+                if (validError)              
+                    return responses;                     
             }
             return null;
         }
@@ -1589,54 +1595,54 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string messageMandatoG = "Error no existe código mandato General";
             string messageMandatoL = "Error no existe código mandato Limitado";
             //Valida descripcion Mnadatario 
-            switch (factorTemp)
-            {
-                case "M-SN-e":
-                    modoOperacion = "SNE";
-                    if(description!= "Mandatario Sistema de Negociación Electrónica")
-                    {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "Descripcion de Mandatario Sistema de Negociación Electrónica invalida",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    break;
-                case "M-Factor":
-                    modoOperacion = "F";
-                    if (description != "Mandatario Factor")
-                    {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "Descripcion de Mandatario Factor invalida",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    break;
-                case "M-PT":
-                    modoOperacion = "PT";
-                    if (description != "Mandatario Proveedor Tecnológico")
-                    {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "Descripcion de Mandatario Proveedor Tecnológico invalida",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    break;
-            }
+            //switch (factorTemp)
+            //{
+            //    case "M-SN-e":
+            //        modoOperacion = "SNE";
+            //        if(description!= "Mandatario Sistema de Negociación Electrónica")
+            //        {
+            //            validate = false;
+            //            responses.Add(new ValidateListResponse
+            //            {
+            //                IsValid = false,
+            //                Mandatory = true,
+            //                ErrorCode = "Regla: AAH65-(R):",
+            //                ErrorMessage = "Descripcion de Mandatario Sistema de Negociación Electrónica invalida",
+            //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            //            });
+            //        }
+            //        break;
+            //    case "M-Factor":
+            //        modoOperacion = "F";
+            //        if (description != "Mandatario Factor")
+            //        {
+            //            validate = false;
+            //            responses.Add(new ValidateListResponse
+            //            {
+            //                IsValid = false,
+            //                Mandatory = true,
+            //                ErrorCode = "Regla: AAH65-(R):",
+            //                ErrorMessage = "Descripcion de Mandatario Factor invalida",
+            //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            //            });
+            //        }
+            //        break;
+            //    case "M-PT":
+            //        modoOperacion = "PT";
+            //        if (description != "Mandatario Proveedor Tecnológico")
+            //        {
+            //            validate = false;
+            //            responses.Add(new ValidateListResponse
+            //            {
+            //                IsValid = false,
+            //                Mandatory = true,
+            //                ErrorCode = "Regla: AAH65-(R):",
+            //                ErrorMessage = "Descripcion de Mandatario Proveedor Tecnológico invalida",
+            //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            //            });
+            //        }
+            //        break;
+            //}
             string actor = modoOperacion;
             //Valida que exista en Radian
             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByRadianStatus(issuerPartyCode, false, "Habilitado");
@@ -3539,7 +3545,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = "Ok",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
-
                     break;
                 case (int)EventStatus.AceptacionTacita:
                     businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
@@ -3785,7 +3790,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     break;
-
             }
 
             return responses;
