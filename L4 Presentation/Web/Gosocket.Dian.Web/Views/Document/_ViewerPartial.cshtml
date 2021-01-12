@@ -163,81 +163,84 @@
     <div class="row">
         <div class="col-md-6">
             <div style="display:inline-flex">
-                @if (Model.IconsData != null)
+                @if (Model.Document.DocumentTypeId == "01")
                 {
-                    var iconList = Model.IconsData.OrderBy(s => s.Key).ToList();
-                    int minIndex = iconList[0].Key;
-                    int maxIndex = iconList[iconList.Count - 1].Key;
-
-                    foreach (var statusIcons in iconList)
+                    if (Model.IconsData != null)
                     {
-                        if (minIndex == statusIcons.Key)
+                        var iconList = Model.IconsData.OrderBy(s => s.Key).ToList();
+                        int minIndex = iconList[0].Key;
+                        int maxIndex = iconList[iconList.Count - 1].Key;
+
+                        foreach (var statusIcons in iconList)
                         {
-                            if (maxIndex != statusIcons.Key)
+                            if (minIndex == statusIcons.Key)
                             {
-                                <div class="icon-card">
-                                    <div class="text-center">
-                                        @if (minIndex == 1)
-                                        {
-                                            <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
-                                        }
-                                        else
-                                        {
+                                if (maxIndex != statusIcons.Key)
+                                {
+                                    <div class="icon-card">
+                                        <div class="text-center">
+                                            @if (minIndex == 1)
+                                            {
+                                                <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                                            }
+                                            else
+                                            {
+                                                <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
+                                            }
+                                        </div>
+                                        <p>@statusIcons.Value</p>
+                                    </div>
+                                    <div class="radian-state-ef-line"></div>
+                                }
+                                else
+                                {
+                                    <div class="icon-card">
+                                        <div class="text-center padding-top-5">
+                                            @if (minIndex == 1)
+                                            {
+                                                <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                                            }
+                                            else
+                                            {
+                                                <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />}
+                                        </div>
+                                        <p>@statusIcons.Value</p>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                if (maxIndex != statusIcons.Key)
+                                {
+                                    <div class="icon-card">
+                                        <div class="text-center">
                                             <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
-                                        }
+                                        </div>
+                                        <p>@statusIcons.Value</p>
                                     </div>
-                                    <p>@statusIcons.Value</p>
-                                </div>
-                                <div class="radian-state-ef-line"></div>
-                            }
-                            else
-                            {
-                                <div class="icon-card">
-                                    <div class="text-center padding-top-5">
-                                        @if (minIndex == 1)
-                                        {
-                                            <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
-                                        }
-                                        else
-                                        {
-                                            <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />}
+                                    <div class="radian-state-ef-line"></div>
+                                }
+                                else
+                                {
+                                    <div class="icon-card">
+                                        <div class="text-center padding-top-5">
+                                            <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
+                                        </div>
+                                        <p>@statusIcons.Value</p>
                                     </div>
-                                    <p>@statusIcons.Value</p>
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            if (maxIndex != statusIcons.Key)
-                            {
-                                <div class="icon-card">
-                                    <div class="text-center">
-                                        <img src="~/Content/images/Svg/EstadoFacturaRadian1.svg" />
-                                    </div>
-                                    <p>@statusIcons.Value</p>
-                                </div>
-                                <div class="radian-state-ef-line"></div>
-                            }
-                            else
-                            {
-                                <div class="icon-card">
-                                    <div class="text-center padding-top-5">
-                                        <img src="~/Content/images/Svg/EstadoFacturaRadian2.svg" />
-                                    </div>
-                                    <p>@statusIcons.Value</p>
-                                </div>
+                                }
                             }
                         }
                     }
-                }
-                else
-                {
-                    <div class="icon-card">
-                        <div class="text-center">
-                            <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                    else
+                    {
+                        <div class="icon-card">
+                            <div class="text-center">
+                                <img src="~/Content/images/Svg/EstadoFacturaElectronica.svg" />
+                            </div>
+                            <p>Factura Electrónica</p>
                         </div>
-                        <p>Factura Electrónica</p>
-                    </div>
+                    }
                 }
             </div>
         </div>
@@ -252,7 +255,7 @@
     </div>
     <div class="row">
         <div class="ContainerDownload">
-            @if (!NOTES.Contains(Model.Document.DocumentTypeId))
+            @if (Model.Document.DocumentTypeId == "01")
             {
                 <p>
                     <i class="fa fa-download"></i>

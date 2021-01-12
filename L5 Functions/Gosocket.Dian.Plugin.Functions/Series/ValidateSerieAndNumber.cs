@@ -28,14 +28,13 @@ namespace Gosocket.Dian.Plugin.Functions.Series
             if (data == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Request body is empty");
 
-            if (string.IsNullOrEmpty(data.TrackId))
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
             if (string.IsNullOrEmpty(data.Number))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a Number in the request body");
             if (string.IsNullOrEmpty(data.DocumentTypeId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId in the request body");
+            if (string.IsNullOrEmpty(data.ProviderCode))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a ProviderCode in the request body");
 
-         
             try
             {
                 var validateResponses = ValidatorEngine.Instance.StartValidateSerieAndNumberAsync(data);
@@ -44,7 +43,7 @@ namespace Gosocket.Dian.Plugin.Functions.Series
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALIDATESERIEPLGNS-{DateTime.UtcNow:yyyyMMdd}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATESERIEPLGNS-{DateTime.UtcNow:yyyyMMdd}", data.Number) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -62,15 +61,11 @@ namespace Gosocket.Dian.Plugin.Functions.Series
         }
 
         public class RequestObject
-        {
-            [JsonProperty(PropertyName = "trackId")]
-            public string TrackId { get; set; }
+        {            
             [JsonProperty(PropertyName = "number")]
             public string Number { get; set; }
             [JsonProperty(PropertyName = "documentTypeId")]
-            public string DocumentTypeId { get; set; }
-            [JsonProperty(PropertyName = "senderCode")]
-            public string SenderCode { get; set; }
+            public string DocumentTypeId { get; set; }     
             [JsonProperty(PropertyName = "providerCode")]
             public string ProviderCode { get; set; }
         }

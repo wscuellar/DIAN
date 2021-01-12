@@ -637,6 +637,32 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
+        public List<T> FindDocumentSenderCodeIssueAttorney<T>(string issuerAttorney, string senderCode) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("IssuerAttorney",
+                    QueryComparisons.Equal,
+                    issuerAttorney),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("SenderCode",
+                    QueryComparisons.Equal,
+                    senderCode));
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, 
+                TableOperators.And, 
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    null));
+
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+
         public List<T> FindByPartition<T>(string partitionKey, DateTime timeStampFrom, DateTime timeStampTo)
             where T : ITableEntity, new()
         {
@@ -924,7 +950,44 @@ namespace Gosocket.Dian.Infrastructure
                 TableQuery.GenerateFilterCondition("RadianState",
                     QueryComparisons.Equal,
                     radianStatus));
+            prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
+                TableOperators.Or,
+                TableQuery.GenerateFilterCondition("RadianState",
+                    QueryComparisons.Equal,
+                    "En pruebas"));
 
+
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
+        public T FindhByPartitionKeyRadianStatus<T>(string partitionKey, bool deleted, string radianStatus) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterConditionForBool("Deleted",
+                    QueryComparisons.Equal,
+                    deleted));
+            prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RadianState",
+                    QueryComparisons.Equal,
+                    radianStatus));
+            prefixCondition = TableQuery.CombineFilters(
+               prefixCondition,
+               TableOperators.Or,
+               TableQuery.GenerateFilterCondition("RadianState",
+                   QueryComparisons.Equal,
+                   "En pruebas"));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 

@@ -23,5 +23,6 @@ public class GlobalDocReferenceAttorney : TableEntity
     public string IssuerAttorneyName { get; set; }
     public string SenderName { get; set; }
     public string SerieAndNumber { get; set; }
+    public string ResponseCodeListID { get; set; }
 }
 
