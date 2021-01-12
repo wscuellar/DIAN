@@ -1102,7 +1102,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndoso
-        private List<ValidateListResponse> ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode)
+        private List<ValidateListResponse> ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode, double newAmountTV)
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR
@@ -1112,85 +1112,117 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validEndoso = false;
 
-            //Valida informacion Endoso                           
-            if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
+            ////Valida informacion Endoso                           
+            //if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
+            //{
+            if (String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
             {
-                if (String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
+                validEndoso = true;
+                responses.Add(new ValidateListResponse
                 {
-                    validEndoso = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAI07b-(R): ",
-                        ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-                //Valida precio a pagar endoso
-                int resultValuePriceToPay = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
-                resultValuePriceToPay = resultValuePriceToPay / 100;
-
-                if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultValuePriceToPay)
-                {
-                    validEndoso = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAI07b-(R): ",
-                        ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-                if (xmlParserCude.Fields["listID"].ToString() != "2")
-                {
-                    XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-                    int totalValueSender = 0;
-                    for (int i = 0; i < valueListSender.Count; i++)
-                    {
-                        string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                        totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-                    }
-
-                    XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
-                    int totalValueReceiver = 0;
-                    for (int i = 0; i < valueListReceiver.Count; i++)
-                    {
-                        string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                        totalValueReceiver += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-                    }
-
-                    if (totalValueReceiver != totalValueSender)
-                    {
-                        validEndoso = true;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: AAF19-(R): ",
-                            ErrorMessage = $"{(string)null} El valor no coincide con la sumatoria del evento //cac:ReceiverParty/cac:PartyLegalEntity/cbc:CorporateStockAmount.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-
-                    if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
-                    {
-                        validEndoso = true;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: AAI07c-(R): ",
-                            ErrorMessage = $"{(string)null} El valor informado es diferente a la sumatoria de los elementos cbd:CorporateStockAmount del titular del evento.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                }
-
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAI07b-(R): ",
+                    ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
+
+            //Valida precio a pagar endoso
+            int resultValuePriceToPay = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
+            resultValuePriceToPay = resultValuePriceToPay / 100;
+
+            if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultValuePriceToPay)
+            {
+                validEndoso = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAI07b-(R): ",
+                    ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            if (xmlParserCude.Fields["listID"].ToString() != "2")
+            {
+                XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+                int totalValueSender = 0;
+                for (int i = 0; i < valueListSender.Count; i++)
+                {
+                    string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                    totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                }
+
+                XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
+                int totalValueReceiver = 0;
+                for (int i = 0; i < valueListReceiver.Count; i++)
+                {
+                    string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                    totalValueReceiver += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                }
+
+                if (totalValueReceiver != totalValueSender)
+                {
+                    validEndoso = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAF19-(R): ",
+                        ErrorMessage = $"{(string)null} El valor no coincide con la sumatoria del evento //cac:ReceiverParty/cac:PartyLegalEntity/cbc:CorporateStockAmount.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+
+                if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
+                {
+                    validEndoso = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAI07c-(R): ",
+                        ErrorMessage = $"{(string)null} El valor informado es diferente a la sumatoria de los elementos cbd:CorporateStockAmount del titular del evento.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
+            //}
+
+            //Calculo valor de la negociación
+            int resultNegotiationValue = ((Int32)newAmountTV * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
+            resultNegotiationValue = resultNegotiationValue / 100;
+
+            //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
+            if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
+            {
+                validEndoso = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: 89-(R):",
+                    ErrorMessage = $"El valor informado es diferente a la operación de Nuevo Valor en disponibilización * la tasa de descuento.",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //// Se debe comparar el valor de negociación contra el saldo (Nuevo Valor en disponibilización)
+            //if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != (Int32)newAmountTV)
+            //{
+            //    validEndoso = true;
+            //    responses.Add(new ValidateListResponse
+            //    {
+            //        IsValid = false,
+            //        Mandatory = true,
+            //        ErrorCode = "Regla: 89-(R):",
+            //        ErrorMessage = $"Valor de la negociación es diferente al nuevo valor en disponibilización.",
+            //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            //    });
+            //}
 
             if (validEndoso)
                 return responses;
@@ -2641,6 +2673,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
 
+                                // Comparar ValorFEV-TV contra el valor total de la FE
+                                if (xmlParserCude.ValorOriginalTV == xmlParserCufe.TotalInvoice)
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
+                                {
+                                    validFor = true;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "Regla: 89-(R):",
+                                        ErrorMessage = "Valor original del Titulo Valor es diferente al valor total de la factura referenciada",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+
                                 break;
                             //Validacion de la existensia eventos previos informe de pago
                             case (int)EventStatus.ValInfoPago:
@@ -2777,7 +2834,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 //Solicitud de Disponibilización
                                 else if (documentMeta.Where(t => t.EventCode == "036" && t.SenderCode == nitModel.SenderCode).ToList().Count > decimal.Zero)
                                 {
-                                    var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode);
+                                    var newAmountTV = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => t.EventCode == "036").NewAmountTV;
+                                    var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode, newAmountTV);
                                     if (responseListEndoso != null)
                                     {
                                         validFor = true;
@@ -3195,7 +3253,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateSigningTime
-        public List<ValidateListResponse> ValidateSigningTime(ValidateSigningTime.RequestObject data, XmlParser dataModel, NitModel nitModel)
+        public List<ValidateListResponse> ValidateSigningTime(ValidateSigningTime.RequestObject data, XmlParser dataModel, NitModel nitModel, string paymentDueDateFE = null)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -3336,6 +3394,59 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
                 case (int)EventStatus.SolicitudDisponibilizacion:
+                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                        ? new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Ok",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        }
+                        : new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: 89-(R): ",
+                            ErrorMessage =
+                                "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE/CUDE",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+
+                    // El evento debe incluir la fecha de Vencimiento de la Factura electrónica de Venta 
+                    // (Debe validar el campo EndDate contra el campo  PaymentDueDate de la factura referenciada.)
+                    if(!string.IsNullOrWhiteSpace(paymentDueDateFE))
+                    {
+                        responses.Add(Convert.ToDateTime(data.EndDate) == Convert.ToDateTime(paymentDueDateFE)
+                        ? new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Ok",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        }
+                        : new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: 89-(R): ",
+                            ErrorMessage = "EndDate del evento no coincide con el PaymentDueDate de la factura referenciada",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: 89-(R): ",
+                            ErrorMessage = "PaymentDueDate llega NULL",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
                 case (int)EventStatus.NegotiatedInvoice:
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
                     if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362" ||

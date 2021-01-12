@@ -42,6 +42,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string DocumentTypeIdRef { get; set; }
         public string ValidityPeriodEndDate { get; set; }
         public string ProviderCode { get; set; }
+        public string ValorOriginalTV { get; set; }
 
         public XmlParser()
         {
@@ -92,6 +93,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
                     var valueNote = "//*[local-name()='Note']";
                     var providerID = "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='DianExtensions']/*[local-name()='SoftwareProvider']/*[local-name()='ProviderID']";
+                    var originalAmountTV = "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='ConstanciadePagos']/*[local-name()='Value'][1]";
 
                     var documentReferenceId = XmlDocument.SelectSingleNode(documentReferenceIdValueXpath)?.InnerText;          
                     var nodePaymentMeans = XmlDocument.SelectSingleNode(nodePaymentMeansValuesXpath)?.InnerText;
@@ -99,6 +101,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var nodeTotalInvoice = XmlDocument.SelectSingleNode(valueTotalInvoice)?.InnerText;
                     var valueNoteMandato = XmlDocument.SelectSingleNode(valueNote)?.InnerText;
                     var valueProviderID = XmlDocument.SelectSingleNode(providerID)?.InnerText;
+                    ValorOriginalTV = XmlDocument.SelectSingleNode(originalAmountTV)?.InnerText;
 
                     SigningTime = node?.InnerText;
                     PaymentMeansID = nodePaymentMeans;

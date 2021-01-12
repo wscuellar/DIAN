@@ -1744,7 +1744,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID, DianResponse response)
         {
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
-            
+
             if (validations.Count > 0)
             {
                 if(response.ErrorMessage.Count == 0)
@@ -1778,7 +1778,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidationSigningTime(string trackId, string eventCode, string signingTime, string documentTypeId, string customizationID, string endDate,  DianResponse response)
         {
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId, customizationID, endDate });            
-            
+
             if (validations.Count > 0)
             {
                 if (response.ErrorMessage.Count == 0)

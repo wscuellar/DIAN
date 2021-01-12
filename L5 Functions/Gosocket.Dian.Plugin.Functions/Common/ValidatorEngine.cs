@@ -145,6 +145,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
             EventStatus code;
+            string originalTrackIdSolicitudDisponibilizacion = null;
             switch (int.Parse(data.EventCode))
             {
                 case (int)EventStatus.Receipt:
@@ -152,6 +153,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;              
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     code = EventStatus.Accepted;
+                    originalTrackIdSolicitudDisponibilizacion = data.TrackId;
                     break;              
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                 case (int)EventStatus.NegotiatedInvoice:
@@ -261,9 +263,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            // Por el momento solo para el evento 036 se conserva el trackId original, con el fin de traer el PaymentDueDate del CUFE
+            // y enviarlo al validator para una posterior validación contra la fecha de vencimiento del evento (036).
+            string parameterPaymentDueDateFE = null;
+            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
+            {
+                var originalXmlBytes = await GetXmlFromStorageAsync(originalTrackIdSolicitudDisponibilizacion);
+                var originalXmlParser = new XmlParser(originalXmlBytes);
+                if (!originalXmlParser.Parser())
+                    throw new Exception(originalXmlParser.ParserError);
+
+                parameterPaymentDueDateFE = originalXmlParser.PaymentDueDate;
+            }
+
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel));
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE));
 
             return validateResponses;
         }
