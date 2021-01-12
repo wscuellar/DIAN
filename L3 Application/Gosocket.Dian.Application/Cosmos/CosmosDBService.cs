@@ -714,17 +714,6 @@ namespace Gosocket.Dian.Application.Cosmos
                                                         || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
                                                      )
                                                  );
-
-
-                        //predicate = predicate.And(g => g.Events.Any(a =>
-                        //                             a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
-                        //                                                               !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
-                        //                                                               !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
-                        //                                                               !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
-                        //                         && (a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
-                        //                            || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
-                        //                            || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
-                        //                         );
                         break;
                     case 4: //pagado
                         predicate = predicate.And(g => g.Events.Any(a =>
@@ -797,9 +786,7 @@ namespace Gosocket.Dian.Application.Cosmos
                         }
                         break;
                     case 7:
-                        predicate = predicate.And(g => g.DocumentTypeId == ((int)DocumentType.CreditNote).ToString()
-                                                 || g.DocumentTypeId == ((int)DocumentType.DebitNote).ToString()
-                                                 || g.DocumentTypeId == ((int)DocumentType.ApplicationResponse).ToString());
+                        predicate = predicate.And(g => !g.DocumentTypeId.Equals($"0{(int)DocumentType.Invoice}"));
                         break;
                 }
 
