@@ -419,7 +419,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if(valid)
             {
                 //Enodsatario Anulacion endoso
-                nitModel.ReceiverCode = ReceiverCancelacion != null ? ReceiverCancelacion : nitModel.ReceiverCode;
+                nitModel.ReceiverCode = ReceiverCancelacion != "" ? ReceiverCancelacion : nitModel.ReceiverCode;
                 var validator = new Validator();
                 validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude));
             }

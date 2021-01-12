@@ -736,8 +736,10 @@ namespace Gosocket.Dian.Services.Utils
 
             //string[] noteCodes = { "7", "8" };
 
-            Boolean flagEvento = true;
-            if(docTypeCode == "96")
+            bool flagEvento = true;
+            bool validaUUID = (Convert.ToInt32(eventCode) == 43 && Convert.ToInt32(listID) == 3) ? false : true;
+
+            if (docTypeCode == "96")
             {
                 if (providerCode.Equals("800197268"))
                 {
@@ -771,7 +773,7 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
-                if (string.IsNullOrEmpty(documentKey))
+                if (string.IsNullOrEmpty(documentKey) && validaUUID)
                 {
                     stringBuilder.AppendLine($"{codeMessage}H07-(R): esta UUID no existe en la base de datos de la DIAN.");
                     errors.Add(stringBuilder.ToString());

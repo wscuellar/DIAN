@@ -1593,6 +1593,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
             string modoOperacion = string.Empty;
+            string messageMandatoG = "Error no existe código mandato General";
+            string messageMandatoL = "Error no existe código mandato Limitado";
+            //Valida descripcion Mnadatario 
             switch (factorTemp)
             {
                 case "M-SN-e":
@@ -1605,7 +1608,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "89",
-                            ErrorMessage = "Descripcion de mandatario invalida",
+                            ErrorMessage = "Descripcion de Mandatario Sistema de Negociación Electrónica invalida",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1620,7 +1623,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "89",
-                            ErrorMessage = "Descripcion de mandatario invalida",
+                            ErrorMessage = "Descripcion de Mandatario Factor invalida",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1635,7 +1638,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "89",
-                            ErrorMessage = "Descripcion de mandatario invalida",
+                            ErrorMessage = "Descripcion de Mandatario Proveedor Tecnológico invalida",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1713,12 +1716,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Grupo de información alcances para el mandato sobre los CUFE.
             for (int i = 1; i < cufeList.Count && i < attorneyLimit + 1 && validate; i++)
             {
+                //Valida facultades madato 
                 AttorneyModel attorneyModel = new AttorneyModel();
                 string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
                 string[] tempCode = code.Split(';');
                 bool codeExist = false;
                 foreach (string codeAttorney in tempCode)
                 {
+                    //Valida exitan codigos de facultades asignadas mandato
                     if(facultitys.SingleOrDefault(t=> t.PartitionKey == codeAttorney)==null)
                     {
                         validate = false;
@@ -1727,10 +1732,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "Regla: 89-(R): ",
-                            ErrorMessage = "Error en el codigo del mandato.",
+                            ErrorMessage = "Error en el codigo facultad mandato no existe.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+                    //Valida codigos facultades mandato General - Limitado
                     string[] tempCodeAttorney = codeAttorney.Split('-');
                     if (modoOperacion == tempCodeAttorney[1])
                     {
@@ -1759,7 +1765,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "Regla: 89-(R): ",
-                            ErrorMessage = "Error en el tipo de mandatario",
+                            ErrorMessage = "Error en tipo de modo de operación " + modoOperacion  + " no corresponde a la facultad/permiso asignado ResponseCode",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1773,10 +1779,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "Regla: 89-(R): ",
-                        ErrorMessage = "Error en el codigo del Mandato.",
+                        ErrorMessage = (customizationID == "431" || customizationID == "432") ? messageMandatoG : messageMandatoL,
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
+                //Solo si existe información referenciada del CUFE
                 if (listID != "3")
                 {
                     attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
@@ -1791,10 +1798,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         validate = false;
                         responses.Add(new ValidateListResponse
                         {
-                            IsValid = false,
+                            IsValid = resultValidateCufe[0].IsValid,
                             Mandatory = true,
-                            ErrorCode = "Regla: AAL07-(R): ",
-                            ErrorMessage = "Error en la validación del CUFE referenciado, No existe en sistema DIAN",
+                            ErrorCode = resultValidateCufe[0].ErrorCode,
+                            ErrorMessage = resultValidateCufe[0].ErrorMessage,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1823,9 +1830,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
+                    attorneyModel.cufe = "1";
                     attorney.Add(attorneyModel);
                 }
             }
+            //Si no hay errores inserta registro
             if (validate)
             {
                 foreach (var attorneyDocument in attorney)
@@ -1843,7 +1852,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         AttorneyType = customizationID,
                         SerieAndNumber = serieAndNumber,
                         SenderName = senderName,
-                        IssuerAttorneyName = name
+                        IssuerAttorneyName = name,
+                        ResponseCodeListID = listID
                     };
                     TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
                     var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), new { TrackId = attorneyDocument.cufe, ResponseCode = data.EventCode, TrackIdCude = trackId });
@@ -2361,6 +2371,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
                 ? "No corresponde a un tipo de documento valido"
                 : "El tipo de identificador no coincide con el informado en el documento electrónico.";
+            string errorCodeReglaUUID = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
+                ? "Regla: AAL07-(R): "
+                : "Regla: AAH07-(R): ";
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
@@ -2427,7 +2440,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: AAH07-(R): ",
+                        ErrorCode = errorCodeReglaUUID,
                         ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
