@@ -3539,7 +3539,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = "Ok",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
-
                     break;
                 case (int)EventStatus.AceptacionTacita:
                     businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
@@ -3785,7 +3784,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     break;
-
             }
 
             return responses;
