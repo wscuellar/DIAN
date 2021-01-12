@@ -106,7 +106,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Endoso Electrónico.
+        ///   Busca una cadena traducida similar a Endoso electrónico.
         /// </summary>
         public static string Endoso {
             get {

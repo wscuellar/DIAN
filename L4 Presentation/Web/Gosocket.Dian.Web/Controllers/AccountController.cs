@@ -174,6 +174,10 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     return RedirectToAction("Admin", "Dashboard");
                 }
+                else if (User.IsInAnyRole("UsuarioFacturadorGratuito"))
+                {
+                    return RedirectToAction("RedirectToBiller", "User");
+                }
                 else
                 {
                     
