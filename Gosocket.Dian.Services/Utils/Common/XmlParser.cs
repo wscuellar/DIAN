@@ -42,6 +42,8 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string DocumentTypeIdRef { get; set; }
         public string ValidityPeriodEndDate { get; set; }
         public string ProviderCode { get; set; }
+        public string ValorActualTituloValor { get; set; }
+        public string ValorPendienteTituloValor { get; set; }
 
         public XmlParser()
         {
