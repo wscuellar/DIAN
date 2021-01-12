@@ -1830,7 +1830,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
-                    attorneyModel.cufe = "1";
+                    attorneyModel.cufe = "01";
                     attorney.Add(attorneyModel);
                 }
             }

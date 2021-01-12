@@ -1108,10 +1108,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     //return dianResponse;
                 }
             }
-            else
-            {
-                documentParsed.DocumentKey = "1";
-            }
+          
 
             var validateParty = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_ValidateParty) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             var validateEventCode = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_ValidateEventCode) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };          
@@ -1156,7 +1153,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
                 });
 
-                var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
+                var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();               
                 var notifications = validations.Where(r => r.IsNotification).ToList();              
 
                 if (!errors.Any() && !notifications.Any() && !flagMeta)
@@ -1878,13 +1875,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
         {
             //valida InTransaction eventos Endoso en propeidad, Garantia y procuración
             var arrayTasks = new List<Task>();
-            GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            
-            if(validatorDocumentMeta != null)
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad
+            || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia
+            || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
             {
-                if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad
-             || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia
-             || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
+                GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+                if (validatorDocumentMeta != null)
                 {
                     validatorDocumentMeta.InTransaction = false;
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
@@ -1896,14 +1892,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
         {
             //Actualiza factura electronica TV eventos fase 1 registrados
             var arrayTasks = new List<Task>();
-            GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (validatorDocumentMeta != null)
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.Accepted
+            || Convert.ToInt32(eventCode) == (int)EventStatus.AceptacionTacita)
             {
-                if (Convert.ToInt32(eventCode) == (int)EventStatus.Accepted
-             || Convert.ToInt32(eventCode) == (int)EventStatus.AceptacionTacita)
+                GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+                if (validatorDocumentMeta != null)
                 {
                     validatorDocumentMeta.IsInvoiceTV = true;
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
+
                 }
             }
         }
