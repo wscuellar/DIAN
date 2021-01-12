@@ -33,8 +33,6 @@ using iTextSharp.text;
 using iTextSharp.tool.xml;
 using System.Web;
 using System.Drawing;
-using QRCoder;
-using IronPdf;
 using Image = iTextSharp.text.Image;
 using iTextSharp.tool.xml.pipeline.html;
 using iTextSharp.tool.xml.html;
@@ -429,19 +427,6 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        #region GenerateQR
-
-        public static Bitmap GenerateQR(string invoiceUrl)
-        {
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(invoiceUrl, QRCodeGenerator.ECCLevel.Q);
-            QRCode qrCode = new QRCode(qrCodeData);
-            Bitmap qrCodeImage = qrCode.GetGraphic(20);
-            return qrCodeImage;
-        }
-
-        #endregion
-
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult Search()
         {
@@ -504,10 +489,10 @@ namespace Gosocket.Dian.Web.Controllers
 
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
-            byte[] suportDoc = await _radianSupportDocument.GetGraphicRepresentation(cufe);
-             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
+            //byte[] suportDoc = await _radianSupportDocument.GetGraphicRepresentation(cufe);
+            byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
             // String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
-            String base64EncodedPdf = Convert.ToBase64String(suportDoc);
+            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
 
