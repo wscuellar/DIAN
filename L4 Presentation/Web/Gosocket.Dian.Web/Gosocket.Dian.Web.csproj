@@ -2940,6 +2940,7 @@
     <Content Include="Views\FreeBiller\CreateUser.cshtml" />
     <Content Include="Views\FreeBiller\_usersFreeBiller.cshtml" />
     <Content Include="Views\ProfileFreeBiller\CreateProfile.cshtml" />
+    <Content Include="Views\Document\ExportPDF.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
