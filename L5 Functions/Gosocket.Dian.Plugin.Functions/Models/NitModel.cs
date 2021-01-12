@@ -33,6 +33,8 @@
         public string DocumentTypeId { get; set; }
         public string SerieAndNumber { get; set; }
         public string ValidityPeriodEndDate { get; set; }
+        public string ValorActualTituloValor { get; set; }
+        public string ValorPendienteTituloValor { get; set; }
 
     }
 }

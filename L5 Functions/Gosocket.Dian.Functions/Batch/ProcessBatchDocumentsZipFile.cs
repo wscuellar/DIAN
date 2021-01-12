@@ -1,4 +1,4 @@
-using Gosocket.Dian.Application;
+ï»¿using Gosocket.Dian.Application;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
@@ -122,9 +122,11 @@ namespace Gosocket.Dian.Functions.Batch
                 SetLogger(null, "Step prueba nomina", " Paso el primero If ");
                 // Check big contributor
                 var xmlBytes = contentFileList.First().XmlBytes;
-                var xmlParser = new XmlParseNomina(xmlBytes);
+                XmlParseNomina xmlParser = new XmlParseNomina();
+                         
                 if (setResult != null && string.IsNullOrEmpty(habNomina))
                 {
+                    xmlParser = new XmlParseNomina(xmlBytes);
                     var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(Convert.ToString(xmlParser.globalDocPayrolls.NIT), Convert.ToString(xmlParser.globalDocPayrolls.NIT));
                     if (bigContributorRequestAuthorization?.StatusCode != (int)BigContributorAuthorizationStatus.Authorized)
                     {
@@ -202,7 +204,7 @@ namespace Gosocket.Dian.Functions.Batch
                 //await Task.WhenAll(arrayTasks);
 
                 // Upload all xml's
-                log.Info($"Init upload xml´s.");
+                log.Info($"Init upload xmlï¿½s.");
                 BlockingCollection<ResponseUploadXml> uploadResponses = new BlockingCollection<ResponseUploadXml>();
                 SetLogger(null, "Step prueba nomina", " Paso multipleResponsesXpathDataValue " + multipleResponsesXpathDataValue.Count);
                 
@@ -265,7 +267,7 @@ namespace Gosocket.Dian.Functions.Batch
                 // Get success upload
                 multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(x => !uploadFailed.Select(e => e.DocumentKey).Contains(x.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])).ToList();
 
-                log.Info($"Init validation xml´s.");
+                log.Info($"Init validation xmlï¿½s.");
                 BlockingCollection<GlobalBatchFileResult> batchFileResults = new BlockingCollection<GlobalBatchFileResult>();
                 BlockingCollection<ResponseApplicationResponse> appResponses = new BlockingCollection<ResponseApplicationResponse>();
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
@@ -307,7 +309,7 @@ namespace Gosocket.Dian.Functions.Batch
                         log.Error($"Error al validar documento del batch, trackId: {trackId} Message: {ex.Message}, StackTrace: {ex.StackTrace}");
                     }
                 });
-                log.Info($"End validation xml´s.");
+                log.Info($"End validation xmlï¿½s.");
 
                 // Update document status on batch
                 await ProcessBatchFileResults(batchFileResults);

@@ -167,7 +167,7 @@
 <div class="event-section page-content radian-view margin-15">
 
     <div id="divChildrenModifyWrapper" class="row margin-horizontal-0">
-        <div class="panel panel-event" id="panel-form_1" data-target="#panel-form_1" data-toggle="panel-form_1">
+        <div class="panel panel-event margin-top-0" id="panel-form_1" data-target="#panel-form_1" data-toggle="panel-form_1">
             <div class="panel-heading padding-15">
                 <div class="row">
                     <div class="col-sm-8 left-section">
@@ -204,12 +204,12 @@
 
                 <div class="row aditional-data-section padding-panel">
                     <div class="col-sm-4">
-                        <h5><strong>Datos del Emisor del Evento </strong></h5>
+                        <h5><strong>DATOS DEL EMISOR DEL EVENTO </strong></h5>
                         <p class="p-event-issuer">NIT: @Model.SenderCode</p>
                         <p class="p-event-issuer">Nombre: @Model.SenderName</p>
                     </div>
                     <div class="col-sm-4">
-                        <h5><strong>Datos del Receptor del Evento </strong></h5>
+                        <h5><strong>DATOS DEL RECEPTOR DEL EVENTO </strong></h5>
                         <p class="p-event-issuer">NIT: @Model.ReceiverCode</p>
                         <p class="p-event-issuer">Nombre: @Model.ReceiverName</p>
                     </div>
@@ -239,7 +239,7 @@
                         @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia ||
                              Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
                         {
-                            <h5>Datos del Endoso </h5>
+                            <h5><strong>DATOS DEL ENDOSO</strong></h5>
                             <span>NIT: @Model.Endoso.ReceiverCode</span>
                             <span>ENDOSATARIO: @Model.Endoso.ReceiverName</span>
                             <span>NIT: @Model.Endoso.SenderCode</span>
@@ -247,7 +247,7 @@
 
                             <div class="row">
                                 <div class="second-section-align">
-                                    <h5>Tipo de Endoso</h5>
+                                    <h5><strong>TIPO DE ENDOSO </strong></h5>
                                     <span>@Model.Endoso.EndosoType</span>
                                 </div>
                             </div>
@@ -269,7 +269,7 @@
                     <div>
                         @if (Model.Validations.Count == 0)
                         {
-                            <h5 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i> @Model.ValidationMessage </h5>
+                            <h6 class="margin-top-10"><i class="fa fa-check-circle fa-fw"></i> @Model.ValidationMessage </h6>
                         }
                         else
                         {

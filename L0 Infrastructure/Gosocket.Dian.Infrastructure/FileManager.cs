@@ -51,8 +51,9 @@ namespace Gosocket.Dian.Infrastructure
                 }
                 return bytes;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _ = ex.Message;
                 return null;
             }
         }
@@ -209,6 +210,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
+                _ = ex.Message;
                 return false;
             }
 
@@ -228,6 +230,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
+                _ = ex.Message;
                 return false;
             }
         }
@@ -268,6 +271,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
+                _ = ex.Message;
                 return false;
             }
         }

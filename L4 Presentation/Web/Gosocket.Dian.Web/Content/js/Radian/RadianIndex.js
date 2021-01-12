@@ -109,7 +109,7 @@ function ConfirmExec(operation, param, operationCancel) {
             label: "Aceptar",
             className: "btn-radian-default",
             callback: function () {
-                operation(param);
+                param ? operation(param) : operation();
                 operationClick = false;
             }
         },
@@ -254,6 +254,8 @@ function customDialog(htmlPartial, data, url) {
 function DeleteOptions(operationMode, radianState) {
     if (operationMode == 1 || radianState == 'Habilitado') {
         $("#RadianApprovalState option[value='0']").remove();
-
+    }
+    if (radianState == 'En pruebas') {
+        $("#RadianApprovalState option[value='1']").remove();
     }
 }

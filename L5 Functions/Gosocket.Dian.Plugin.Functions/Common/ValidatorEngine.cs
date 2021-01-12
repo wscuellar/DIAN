@@ -97,7 +97,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
             if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.SolicitudDisponibilizacion || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoGarantia 
                 || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoProcuracion
-                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales)
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
             {
                 //Obtiene XML Factura electronica CUFE
                 var xmlBytes = await GetXmlFromStorageAsync(eventPrev.TrackId);
@@ -367,6 +367,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
+            string ReceiverCancelacion = String.Empty;
 
             //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
             if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
@@ -377,6 +378,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     //Obtiene el CUFE
                     party.TrackId = documentMeta.DocumentReferencedKey;
+                    ReceiverCancelacion = documentMeta.ReceiverCode;
                 }
             }
 
@@ -394,6 +396,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
             bool valid = true;
+
             //Valida existe cambio legitimo tenedor
             GlobalDocHolderExchange documentHolderExchange = documentMetaTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
             if (documentHolderExchange != null)
@@ -408,7 +411,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     foreach(string endosatario in endosatarios)
                     {
-                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), endosatario, party.SenderParty);
+                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), endosatario, xmlParserCude.ProviderCode);
                         if(documentAttorney == null)
                         {
                             valid = false;
@@ -430,6 +433,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             if(valid)
             {
+                //Enodsatario Anulacion endoso
+                nitModel.ReceiverCode = ReceiverCancelacion != "" ? ReceiverCancelacion : nitModel.ReceiverCode;
                 var validator = new Validator();
                 validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude));
             }

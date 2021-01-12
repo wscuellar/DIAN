@@ -74,7 +74,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "VALIDATEPARTYPLGNS",
-                        ErrorMessage = $"No se pudo validar referencia."
+                        ErrorMessage = $"No se pudo validar referencia SenderParty / ReceiverParty."
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);

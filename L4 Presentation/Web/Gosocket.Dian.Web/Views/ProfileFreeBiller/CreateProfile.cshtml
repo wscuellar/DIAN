@@ -1,0 +1,211 @@
+﻿@model Gosocket.Dian.Web.Models.FreeBiller.ProfileFreeBillerModel
+@{
+    ViewBag.Title = "Creación de Perfiles";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var columnSize = 3;
+    //if (view == "Index" || view == "Provider")
+    //{
+    //    columnSize = 3;
+    //}
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+}
+
+<style>
+    .form-control {
+        border-radius: 4px;
+        height: 43px !important;
+        border: 1px solid #CCCCCC;
+    }
+
+    .btn-default {
+        border-radius: 4px;
+        height: 43px !important;
+        padding-top: 12px;
+        padding-left: 0px !important;
+    }
+
+    .title-container {
+        margin-bottom: 50px !important;
+        margin-top: 30px !important;
+    }
+
+    .select-container {
+        padding-left: 10px !important;
+    }
+
+    .submit-container {
+        margin-top: 8px;
+        padding-top: 24px;
+        padding-bottom: 20px;
+    }
+
+    .bootstrap-select button {
+        padding-left: 10px !important;
+    }
+
+    .textPermisos {
+        font-family: Arial;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 23px;
+        color: #2C323C;
+    }
+
+    .linePermisos {
+        background: #E9E8E8;
+        border-radius: 2px;
+    }
+
+    .titleMenu {
+        font-size: 16px;
+        line-height: 18px;
+        color: #2C323C;
+    }
+
+    .subTitleMenu {
+        font-size: 16px;
+        line-height: 16px;
+        color: #2C323C;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("input:checkbox:checked").attr("checked", true);
+        if (@ViewBag.activo = true) {
+            document.getElementById("activo").checked = true;
+            console.log("Ok¡¡");
+        }
+        else {
+            console.log("No Ok¡¡");
+        }
+    });
+</script>
+<div class="page-content margin-15">
+
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+
+
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div id="divMain" class="panel">
+                        <div class="panel-body padding-top-20">
+                            <div class="pad-btm padding-bottom-0">
+                                <div class="row margin-horizontal-0">
+                                    @using (Html.BeginForm("CreateProfile", "ProfileFreeBiller", FormMethod.Post))
+                                    {
+                                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                            <div class="col-md-12 padding-horizontal-0">
+                                                <div id="document-list" class="panel panel-bordered-dian">
+
+                                                    <div class="panel-body padding-20 padding-bottom-0">
+                                                        <div class="row">
+                                                            <div class="col-sm-@columnSize padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.Name, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <span class="textPermisos">Permisos</span>
+                                                            <hr class="linePermisos" />
+                                                        </div>
+                                                        <div class="row">
+                                                            @foreach (var menuMain in Model.MenuOptionsByProfile.Where(m => m.Level == 1))
+                                                            {
+                                                                <div class="col-sm-1">
+                                                                    <div class="row">
+                                                                        <spam class="titleMenu">@menuMain.Name</spam>
+                                                                    </div>
+                                                                    @foreach (var subMenuItems in Model.MenuOptionsByProfile.Where(m => m.FatherId == (Nullable<int>)menuMain.MenuId))
+                                                                    {
+                                                                        if (subMenuItems.Level == 2)
+                                                                        {
+                                                                            <div class="row">
+                                                                                <span class="subTitleMenu">@subMenuItems.Name</span>
+                                                                            </div>
+                                                                            foreach (var subSubMenuItems in Model.MenuOptionsByProfile.Where(m => m.FatherId == (Nullable<int>
+                                                                                )subMenuItems.MenuId))
+                                                                            {
+                                                                                <div class="row-cols-1">
+                                                                                    <label>
+                                                                                        <input type="checkbox" name="ValuesSelected" value="@menuMain.MenuId,@subMenuItems.MenuId,@subSubMenuItems.MenuId" />
+                                                                                        @subSubMenuItems.Name
+                                                                                    </label>
+                                                                                </div>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <div class="row">
+                                                                                <input type="checkbox" name="ValuesSelected" value="@menuMain.MenuId,@subMenuItems.MenuId" />
+                                                                                <label for="@subMenuItems.Name">@subMenuItems.Name</label>
+                                                                            </div>
+                                                                        }
+                                                                    }
+
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="panel-footer-grey text-right submit-container">
+                                                        <button id="btnCancel" type="button" class="btn btn-success btn-radian-default">Cancelar</button>
+                                                        <button type="submit" class="btn btn-success btn-radian-success">Crear Perfil</button>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var urlUsers = "@Url.Action("FreeBillerUser", "FreeBiller")";
+
+            $("#btnCancel").click(function () {
+                window.location.href = urlUsers;
+            });
+
+        });
+    </script>
+
+}
