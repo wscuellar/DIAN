@@ -1,0 +1,269 @@
+﻿@using Gosocket.Dian.Web.Common;
+@model Gosocket.Dian.Web.Models.ExportDocumentTableViewModel
+
+@{
+    ViewBag.Title = "Configurar Tarea de Exportación de Nomina PDF";
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+}
+
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <!--Tabs Content-->
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">@ViewBag.Title</h3>
+                        </div>
+
+                        <div class="panel-body padding-top-20">
+                            <div class="pad-btm padding-bottom-0">
+                                <div class="row margin-horizontal-0">
+                                    @using (Html.BeginForm("ExportPDF", "Document", FormMethod.Post, new { id = "export-form" }))
+                                    {
+                                       @* @Html.AntiForgeryToken()*@
+                                        @Html.HiddenFor(m => m.Type)
+                                        @Html.HiddenFor(m => m.StartDate)
+                                        @Html.HiddenFor(m => m.EndDate)
+
+                                        @*<input id="startDate" name="StartDate" type="hidden" value="@Model.StartDate" />
+                                            <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />*@
+
+                                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                            <div class="col-md-12 padding-horizontal-0">
+                                                <div id="document-list" class="panel panel-bordered-dian">
+
+                                                    <div class="panel-body padding-20 padding-bottom-0">
+                                                        <div class="row">
+
+                                                            @if (User.IsInAnyRole("Administrador", "Super"))
+                                                            {
+                                                                <div class="col-sm-3 padding-xs-0">
+                                                                    <div class="form-group">
+                                                                        @Html.LabelFor(m => m.SenderCode, new { @class = "control-label" })
+                                                                        @Html.TextBoxFor(m => m.SenderCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SenderCode) } })
+                                                                    </div>
+                                                                </div>
+                                                            }
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.ReceiverCode, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.ReceiverCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.ReceiverCode) } })
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    <label class="control-label">Rango de fechas</label>
+                                                                    <div class="form-group">
+                                                                        <div class="btn btn-default col-sm-12" id="export-range">
+                                                                            <i class="icon-calendar"></i>&nbsp;
+                                                                            <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                                                            <i class="fa fa-angle-down"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            @if (!User.IsInAnyRole("Administrador", "Super"))
+                                                            {
+                                                                <div class="col-sm-3 padding-xs-0">
+                                                                    <div class="form-group margin-bottom-0">
+                                                                        <label class="control-label">Grupos</label>
+                                                                        <select id="filter-groups" class="form-control selectpicker" name="GroupCode">
+                                                                            <option selected="selected" value="0">Todos</option>
+                                                                            <option value="1">Emitidos</option>
+                                                                            <option value="2">Recibidos</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            }
+
+                                                        </div>
+                                                        <br />
+                                                        <p class="text-normal">* Se exportarán un máximo de 10 000 documentos.</p>
+                                                    </div>
+
+                                                    <div class="panel-footer-grey text-right">
+                                                        <button class="btn btn-default btn-hover-gosocket btn-export-excel"><i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Exportar Pdf</button>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+
+                            @Html.Partial("_tasks")
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/file-validator.js"></script>
+
+    <script>
+        var startDate;
+        var endDate;
+
+        $(document).ready(function () {
+            //$('input.check').on('change', function () {
+            //    $('input.check').not(this).prop('checked', false).parent().removeClass('active');
+            //});
+
+            //$('.document-row').click('onClick', function () {
+            //    if (!$(this).hasClass('not-redirect')) {
+            //        var id = $(this).context.getAttribute('data-id');
+            //        var partitionKey = $(this).context.getAttribute('data-partitionKey');
+            //        window.location.href = "/Document/Details?trackId=" + id + "&partitionKey=" + partitionKey;
+            //    }
+            //    else
+            //        $(this).removeClass('not-redirect')
+            //});
+
+            //$('.download-files').click('onClick', function () {
+            //    downloadFiles(this);
+            //});
+
+            $('.btn-export-excel').click(function () {
+                //$(this).attr('disabled', 'disabled');
+                $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Exportando...');
+                $('.table-pagination').css('display', 'none');
+                $('.table-responsive').css('display', 'none');
+                $('#Type').val(0);
+                var file = "/Document/ExportPDF";
+                window.location = file;
+               // $('#export-form').submit();
+            });
+
+            // Pagination
+            @*$('.next-page').click(function () {
+                $('#Page').val(@Model.Page + 1);
+                $('#export-form').submit();
+            });
+
+            $('.prev-page').click(function () {
+                $('#Page').val(@Model.Page - 1);
+                $('#export-form').submit();
+            });*@
+            // Pagination
+
+        });
+
+        startDate = moment("@Model.StartDate.ToString("yyyy-MM-dd")");
+        endDate = moment("@Model.EndDate.ToString("yyyy-MM-dd")");
+
+        startDate.locale('es');
+        endDate.locale('es');
+
+        $('#export-range').daterangepicker({
+            "buttonClasses": "btn btn-block btn-default",
+            "startDate": startDate,
+            "endDate": endDate,
+            "applyClass": "btn-hover-gosocket",
+            "cancelClass": "btn-hover-gosocket",
+            "ranges": {
+                'Últimos 7 Días': [moment().subtract('days', 6), moment()],
+                'Mes actual': [moment().startOf('month'), moment().endOf('month')],
+                'Mes Anterior': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+                'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
+            },
+            "locale": {
+                "format": "DD-MM-YY",
+                "separator": " - ",
+                "applyLabel": "Aceptar",
+                "cancelLabel": "Cancelar",
+                "fromLabel": "Desde",
+                "toLabel": "Hasta",
+                "customRangeLabel": "Rango de Fechas",
+                "daysOfWeek": [
+                    "Do",
+                    "Lu",
+                    "Ma",
+                    "Mi",
+                    "Ju",
+                    "Vi",
+                    "Sa"
+                ],
+                "monthNames": [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre"
+                ],
+                "firstDay": 1
+            },
+            opens: ('left'),
+        }, function (start, end, label) {
+            $('#export-range span').html(capitalizeMonth(start.format('DD-MMMM-YYYY')) + ' al ' + capitalizeMonth(end.format('DD-MMMM-YYYY')));
+            startDate = start;
+            endDate = end;
+            $('#StartDate').val(startDate.format('MM/DD/YYYY'));
+            $('#EndDate').val(endDate.format('MM/DD/YYYY'));
+        });
+
+
+        function capitalizeMonth(date) {
+            return date.substring(0,3) + date.charAt(3).toUpperCase() + date.slice(4);
+        }
+
+        //function downloadFiles(span) {
+        //    $(span).parent().parent().addClass('not-redirect');
+        //    var id = span.id;
+        //    if ($(span).hasClass("fa-download")) {
+        //        $(span).removeClass("fa-download");
+        //        $(span).addClass("fa-spinner");
+        //        setTimeout(function () {
+        //            $("#" + id).removeClass("fa-spinner");
+        //            $("#" + id).addClass("fa-download");
+        //        }, 5000);
+        //        window.location.href = "/Document/DownloadZipFiles?trackId=" + id;
+
+        //    }
+        //}
+
+        //$(document).on('mouseenter', ".iffyTip", function () {
+        //    var $this = $(this);
+        //    if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+        //        $this.tooltip({
+        //            title: $this.text(),
+        //            placement: "top"
+        //        });
+        //        $this.tooltip('show');
+        //    }
+        //});
+        //$('.hideText').css('width', $('.hideText').parent().width());
+
+    </script>
+
+}
