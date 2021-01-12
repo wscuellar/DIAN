@@ -3529,7 +3529,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.Accepted:
                     businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
-                    responses.Add(businessDays >= 3
+                    responses.Add(businessDays > 3
                         ? new ValidateListResponse
                         {
                             IsValid = false,
