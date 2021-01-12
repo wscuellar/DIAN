@@ -8,7 +8,7 @@ namespace Gosocket.Dian.DataContext.Middle
 {
     public static class PagedQuery
     {
-        public static PagedResult<T> Paginate<T>(this IQueryable<T> query, int page, int pageSize, Expression<Func<T, string>> orderby) where T : class
+        public static PagedResult<T> Paginate<T,K>(this IQueryable<T> query, int page, int pageSize, Expression<Func<T, K>> orderby, bool descending = false) where T : class
         {
             var result = new PagedResult<T>
             {
@@ -22,7 +22,8 @@ namespace Gosocket.Dian.DataContext.Middle
                 result.Results = query.ToList();
                 return result;
             }
-            query = query.OrderBy(orderby);
+
+            query = descending ? query.OrderByDescending(orderby) : query.OrderBy(orderby);
 
             double pageCount = (double)result.RowCount / pageSize;
             result.PageCount = (int)Math.Ceiling(pageCount);

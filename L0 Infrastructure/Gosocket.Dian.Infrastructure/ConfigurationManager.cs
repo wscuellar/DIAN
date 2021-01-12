@@ -16,6 +16,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch(Exception ex)
             {
+                _ = ex.Message;
                 value = System.Configuration.ConfigurationManager.AppSettings[key];
             }
 

@@ -87,6 +87,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
+                _ = ex.Message;
                 return false;
             }
         }
@@ -101,6 +102,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
+                _ = ex.Message;
                 return false;
             }
         }
@@ -167,6 +169,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
+                _ = ex.Message;
                 return false;
             }
         }
@@ -979,7 +982,12 @@ namespace Gosocket.Dian.Infrastructure
                 TableQuery.GenerateFilterCondition("RadianState",
                     QueryComparisons.Equal,
                     radianStatus));
-
+            prefixCondition = TableQuery.CombineFilters(
+               prefixCondition,
+               TableOperators.Or,
+               TableQuery.GenerateFilterCondition("RadianState",
+                   QueryComparisons.Equal,
+                   "En pruebas"));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 

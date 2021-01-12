@@ -118,7 +118,7 @@ namespace Gosocket.Dian.Application
         public RadianAdmin ListParticipants(int page, int size)
         {
             string cancelState = RadianState.Cancelado.GetDescription();
-            PagedResult<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.RadianState != cancelState, page, size);
+            PagedResult<RadianContributor> radianContributors = _radianContributorRepository.ListByDateDesc(t => t.RadianState != cancelState, page, size);
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
             {
@@ -131,7 +131,9 @@ namespace Gosocket.Dian.Application
                    BusinessName = c.Contributor.BusinessName,
                    AcceptanceStatusName = c.Contributor.AcceptanceStatus.Name,
                    RadianState = c.RadianState,
-                   RadianContributorId = c.Id
+                   RadianContributorId = c.Id,
+                   CreatedDate = c.CreatedDate,
+                   Update = c.Update
                }).ToList(),
                 Types = radianContributorType,
                 RowCount = radianContributors.RowCount,
@@ -149,7 +151,7 @@ namespace Gosocket.Dian.Application
             DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
             DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
 
-            var radianContributors = _radianContributorRepository.List(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
+            var radianContributors = _radianContributorRepository.ListByDateDesc(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
                                                                              (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
                                                                              ((filter.RadianState == null && t.RadianState != cancelState) || t.RadianState == stateDescriptionFilter) &&
                                                                              (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) &&

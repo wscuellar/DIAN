@@ -1,0 +1,183 @@
+﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFiltersFreeBillerModel
+@using System
+<style>
+    .fa-download {
+        color: #348441;
+        font-size: 125%;
+    }
+
+    .radian-subtitle-line {
+        margin-bottom: 10px;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("input:checkbox:checked").attr("checked", true);
+        if (@ViewBag.activo = true) {
+            document.getElementById("activo").checked = true;
+            console.log("Ok¡¡");
+        }
+        else {
+            console.log("No Ok¡¡");
+        }
+    });
+    function activo(checkboxElem,Id) {
+        //var Id = "041c9dc6-ed8d-4f67-bbe3-bd6fab3ef8cd";
+        if (checkboxElem.checked) {
+          
+            console.log(Id);
+            alert("El usuario ahora esta activo");
+            var activo = "true";
+            //var objectexample = {};
+            //console.log(objectexample);
+            //objectexample.Active = true;
+            //objectexample.Id = Id;
+            $.ajax({
+                url: '@Url.Action("EditUserActive", "FreeBiller")',
+                //data: JSON.stringify(objectexample),
+                //dataType: "json",
+                data: "Id=" + Id + "&activo=" + activo,
+                dataType: "json",
+                type: "POST",
+                //contentType:"application/json",
+                cache: false,
+                success: function (data) {
+                    console.log(data)
+                    if (data != undefined && data.length > 0) {
+                        var e = data;
+                        alert("ACTIVO",e);
+                    } else {
+                        alert("Algo no salio bien", data);
+                    }
+                },
+                error: function (xhr) {
+
+                }
+            });
+        } else {
+           
+            alert("El usuario ahora esta inactivo");
+            console.log(Id);
+
+            //var objectexample = {};
+            //objectexample.Active = true;
+            //objectexample.Id = Id;
+            var activo = "false";
+            $.ajax({
+               url: '@Url.Action("EditUserActive", "FreeBiller")',
+                //data: JSON.stringify(objectexample),
+                //dataType: "json",
+                data: "Id=" + Id + "&activo=" + activo,
+                dataType: "json",
+                type: "POST",
+                //contentType:"application/json; charset=utf-8",
+                success: function (data) {
+                    console.log(data)
+                    if (data != undefined && data.length > 0) {
+                        var e = data;
+                        alert("INACTIVO",e);
+                    } else {
+                        alert("Algo no salio bien", data);
+                    }
+                },
+                error: function (xhr) {
+
+                }
+            });
+        }
+    }
+</script>
+<div class="row radian-subtitle-container">
+    <p class="subtitle-view">
+        Resultados de búsqueda
+    </p>
+    <div class="radian-subtitle-line"></div>
+</div>
+
+<div class="table-responsive padding-bottom-15">
+
+    <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Tipo de doocumento</th>
+                <th>N&uacute;mero de documento</th>
+                <th>Nombre y apellido</th>
+                <th>Perfil</th>
+                <th>&Uacute;ltima Modificaci&oacute;n</th>
+                <th colspan="3">Acciones</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @if (Model.Users.Count == 0)
+            {
+                <tr style="background-color: transparent !important;">
+                    <td class="text-nowrap text-center" colspan="13" style="padding-left: 0 !important; padding-right: 0 !important;">
+                        <div class="alert panel-footer-grey">
+                            Ningún usuario disponible para mostrar.
+                        </div>
+                    </td>
+                </tr>
+            }
+            @foreach (var user in Model.Users)
+            {
+               
+                <tr class="document-row">
+                    <td class="text-nowrap">
+                        <a>@user.DescriptionTypeDoc</a>
+                    </td>
+                    <td class="text-nowrap text-center">
+                        <a>@user.NumberDoc</a>
+                    </td>
+                    <td class="text-center text-nowrap">
+                        @user.FullName
+                    </td>
+                    <td class="text-nowrap text-center">
+                        @user.DescriptionProfile
+                    </td>
+                    <td class="text-center">
+                        @user.LastUpdate
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.ActionLink("Ver detalles", "Details")
+                    </td>
+                    <td>
+                        <a href="@Url.Action("EditFreeBillerUser","FreeBiller", new { user.Id })" id="@user.Id">
+                            <img src="@Url.Content("~/Content/images/Svg/edti.svg")" />
+                        </a>
+                        @*<img src="~/Content/images/Svg/edti.svg"></img>*@
+                        @*@Html.ActionLink("E", "EditFreeBillerUser", new { user.Id }, new { @class = "bi bi-pencil-fill" })*@
+                    </td>
+                    <td class="text-nowrap">
+                        <input type="checkbox" name="activo" id="activo" value="1" runat="server" onchange="activo(this, '@user.Id' )"/>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="row margin-horizontal-0 padding-top-0">
+    <div class="col-md-9 table-toolbar-left padding-left-0">
+    </div>
+    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+        @if (Model.Users.Any())
+        {
+            <span class="text-muted">
+                <strong>@(Model.Page * Model.MaxItemCount + 1)-@(Model.MaxItemCount > Model.Users.Count ? (Model.Page) * Model.MaxItemCount + Model.Users.Count : (Model.Page + 1) * Model.MaxItemCount)</strong>
+            </span>
+            <div class="btn-group btn-group margin-left-5">
+                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                    <span class="fa fa-chevron-left"></span>
+                </a>
+                <a class="btn btn-default paginate-btn next-page" @(Model.Users.Count < Model.MaxItemCount ? "disabled=\"disabled\"" : "")>
+                    <span class="fa fa-chevron-right"></span>
+                </a>
+            </div>
+        }
+    </div>
+</div>

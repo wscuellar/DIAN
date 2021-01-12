@@ -95,7 +95,16 @@
             model.CUDE = cude;
 
             // Set Titles
-            model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
+            
+            if ((int)model.EventStatus < 40 && (int)model.EventStatus > 36)
+            {
+                model.Title = model.EventStatus.GetDescription();
+            }
+            else
+            {
+                model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
+            }
+
             model.ReceiverType = string.Empty;
 
             // Set Mandate
