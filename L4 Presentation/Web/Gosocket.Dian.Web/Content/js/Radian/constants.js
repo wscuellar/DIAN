@@ -3,6 +3,7 @@
     CHANGE_STATE: "¿Está seguro que desea cambiar el estado del archivo?",
     CANCEL_DESCRIPTION: "Describa el motivo de la cancelación del registro.",
     LABEL_PROMPT: "Describa el motivo de la cancelación del registro.",
+    LABEL_STATUS: "Describa el motivo del cambio de estado.",
     CANCEL_REGISTER: "Cancelar registro",
     ACEPTAR: "Aceptar",
     CANCEL_RESPONSE_CORRECT: "Se canceló el registro exitosamente"
