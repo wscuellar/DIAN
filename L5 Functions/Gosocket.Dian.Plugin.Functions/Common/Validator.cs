@@ -1351,6 +1351,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Valida existan permisos para firmar evento por mandatario
                 foreach (var docReferenceAttorney in docsReferenceAttorney)
                 {
+                    validError = false;
                     if (docReferenceAttorney.IssuerAttorney == issueAtorney)
                     {
                         if ( (String.IsNullOrEmpty(docReferenceAttorney.EndDate) 
@@ -1384,7 +1385,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 IsValid = false,
                                                 Mandatory = true,
                                                 ErrorCode = "Regla: 89-(R): ",
-                                                ErrorMessage = "Mandatario Proveedor Tecnológico no se encuentra HAbilitado.",
+                                                ErrorMessage = "Mandatario Proveedor Tecnológico no se encuentra Habilitado.",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
