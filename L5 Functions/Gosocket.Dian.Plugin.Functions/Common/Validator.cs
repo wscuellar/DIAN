@@ -1595,54 +1595,54 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string messageMandatoG = "Error no existe código mandato General";
             string messageMandatoL = "Error no existe código mandato Limitado";
             //Valida descripcion Mnadatario 
-            //switch (factorTemp)
-            //{
-            //    case "M-SN-e":
-            //        modoOperacion = "SNE";
-            //        if(description!= "Mandatario Sistema de Negociación Electrónica")
-            //        {
-            //            validate = false;
-            //            responses.Add(new ValidateListResponse
-            //            {
-            //                IsValid = false,
-            //                Mandatory = true,
-            //                ErrorCode = "Regla: AAH65-(R):",
-            //                ErrorMessage = "Descripcion de Mandatario Sistema de Negociación Electrónica invalida",
-            //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-            //            });
-            //        }
-            //        break;
-            //    case "M-Factor":
-            //        modoOperacion = "F";
-            //        if (description != "Mandatario Factor")
-            //        {
-            //            validate = false;
-            //            responses.Add(new ValidateListResponse
-            //            {
-            //                IsValid = false,
-            //                Mandatory = true,
-            //                ErrorCode = "Regla: AAH65-(R):",
-            //                ErrorMessage = "Descripcion de Mandatario Factor invalida",
-            //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-            //            });
-            //        }
-            //        break;
-            //    case "M-PT":
-            //        modoOperacion = "PT";
-            //        if (description != "Mandatario Proveedor Tecnológico")
-            //        {
-            //            validate = false;
-            //            responses.Add(new ValidateListResponse
-            //            {
-            //                IsValid = false,
-            //                Mandatory = true,
-            //                ErrorCode = "Regla: AAH65-(R):",
-            //                ErrorMessage = "Descripcion de Mandatario Proveedor Tecnológico invalida",
-            //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-            //            });
-            //        }
-            //        break;
-            //}
+            switch (factorTemp)
+            {
+                case "M-SN-e":
+                    modoOperacion = "SNE";
+                    if (description != "Mandatario Sistema de Negociación Electrónica")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: AAH65-(R):",
+                            ErrorMessage = "Descripcion de Mandatario Sistema de Negociación Electrónica invalida",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
+                case "M-Factor":
+                    modoOperacion = "F";
+                    if (description != "Mandatario Factor")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: AAH65-(R):",
+                            ErrorMessage = "Descripcion de Mandatario Factor invalida",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
+                case "M-PT":
+                    modoOperacion = "PT";
+                    if (description != "Mandatario Proveedor Tecnológico")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: AAH65-(R):",
+                            ErrorMessage = "Descripcion de Mandatario Proveedor Tecnológico invalida",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
+            }
             string actor = modoOperacion;
             //Valida que exista en Radian
             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByRadianStatus(issuerPartyCode, false, "Habilitado");
@@ -3252,7 +3252,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                                 //Si el titulo valor tiene una limitación previa (041)
                                 if (documentMeta
-                                    .Where(t => t.EventCode == "041" && t.CancelElectronicEvent == null && t.Identifier == document.PartitionKey).ToList()
+                                    .Where(t => t.EventCode == "041" && t.CancelElectronicEvent == null
+                                    && document != null                        
+                                    && t.Identifier == document.PartitionKey).ToList()
                                     .Count > decimal.Zero)
                                 {
                                     if (eventPrev.ListId == "2")
@@ -3281,7 +3283,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 //Valdia si existe un pago total
                                 else if (documentMeta
-                                  .Where(t => t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                  .Where(t => t.CustomizationID == "452" 
+                                    && document != null
+                                    && t.Identifier == document.PartitionKey).ToList()
                                   .Count > decimal.Zero)
                                 {
                                     validFor = true;
