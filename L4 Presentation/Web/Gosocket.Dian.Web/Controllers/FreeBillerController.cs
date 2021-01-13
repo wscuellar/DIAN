@@ -48,13 +48,13 @@ namespace Gosocket.Dian.Web.Controllers
         /// Listas parametrica "estaticas" para no tener que consultar muchas veces la DB.
         /// Tipos de Documento.
         /// </summary>
-        private List<SelectListItem> staticTypeDoc { get; set; }
+        private static List<SelectListItem> staticTypeDoc { get; set; }
 
         /// <summary>
         /// Listas parametrica "estaticas" para no tener que consultar muchas veces la DB.
         /// Perfiles.
         /// </summary>
-        private List<SelectListItem> staticProfiles { get; set; }
+        private static List<SelectListItem> staticProfiles { get; set; }
 
         /// <summary>
         /// Identificador para poder guardar Claims con el Perfil del usuario.
@@ -121,29 +121,43 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.activo = false;
             UserFiltersFreeBillerModel model = new UserFiltersFreeBillerModel();
-            this.staticTypeDoc = this.GetTypesDoc();
-            this.staticProfiles = this.GetProfiles();
+            staticTypeDoc = this.GetTypesDoc();
+            staticProfiles = this.GetProfiles();
             
-            model.DocTypes = this.staticTypeDoc;
-            model.Profiles = this.staticProfiles;
+            model.DocTypes = staticTypeDoc;
+            model.Profiles = staticProfiles;
             model.Users = this.GetUsers();
-            foreach (var item in model.Users.ToList())
+            foreach (var item in model.Users.ToList()) 
             {
                 var activo = item.IsActive;
                 ViewBag.activo = activo;
             }
             return View(model);
           
-            //return View();
         }
        
         [HttpPost]
         public ActionResult FreeBillerUser(UserFiltersFreeBillerModel model)
         {
-            model.Profiles = this.staticProfiles;
+            model.DocTypes = staticTypeDoc;
+            model.Profiles = staticProfiles;
+
             if (model.DocTypeId > default(int) && !string.IsNullOrWhiteSpace(model.DocNumber))
             {
-               model.Users = this.GetUsersByDocument(model.DocTypeId, model.DocNumber);
+                model.Users = this.GetUsersByDocument(model.DocTypeId, model.DocNumber);
+                return View(model);
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.FullName))
+            {
+                model.Users = this.GetUsersByName(model.FullName);
+                return View(model);
+            }
+
+            if (model.ProfileId > 0)
+            {
+                model.Users = this.GetUsersByProfile(model.ProfileId);
+                return View(model);
             }
 
             return View(model);
@@ -669,8 +683,8 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         Id = item.Id,
                         FullName = item.Name,
-                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
+                        DescriptionTypeDoc = staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
+                        DescriptionProfile = staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
                         NumberDoc = item.IdentificationId,
                         LastUpdate = item.LastUpdated,
                         IsActive = Convert.ToBoolean(item.Active)
@@ -702,8 +716,8 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         Id = item.Id,
                         FullName = item.Name,
-                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
+                        DescriptionTypeDoc = staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
+                        DescriptionProfile = staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
                         NumberDoc = item.IdentificationId,
                         LastUpdate = item.LastUpdated,
                         IsActive = Convert.ToBoolean(item.Active)
@@ -735,8 +749,8 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         Id = item.Id,
                         FullName = item.Name,
-                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
+                        DescriptionTypeDoc = staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
+                        DescriptionProfile = staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
                         NumberDoc = item.IdentificationId,
                         LastUpdate = item.LastUpdated,
                         IsActive = Convert.ToBoolean(item.Active)
@@ -768,8 +782,8 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         Id = item.Id,
                         FullName = item.Name,
-                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
+                        DescriptionTypeDoc = staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
+                        DescriptionProfile = staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
                         NumberDoc = item.IdentificationId,
                         LastUpdate = item.LastUpdated,
                         IsActive = Convert.ToBoolean(item.Active)
