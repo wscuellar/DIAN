@@ -986,18 +986,18 @@ namespace Gosocket.Dian.Infrastructure
                 TableQuery.GenerateFilterConditionForBool("Deleted",
                     QueryComparisons.Equal,
                     deleted));
-            prefixCondition = TableQuery.CombineFilters(
-                prefixCondition,
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("RadianState",
-                    QueryComparisons.Equal,
-                    radianStatus));
-            prefixCondition = TableQuery.CombineFilters(
-               prefixCondition,
-               TableOperators.Or,
-               TableQuery.GenerateFilterCondition("RadianState",
-                   QueryComparisons.Equal,
-                   "En pruebas"));
+
+            var RadianStateHabilitado = TableQuery.GenerateFilterCondition("RadianState",
+               QueryComparisons.Equal,
+               radianStatus);
+
+            var RadianStatePruebas= TableQuery.GenerateFilterCondition("RadianState",
+                QueryComparisons.Equal,
+                "En pruebas");
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.CombineFilters(RadianStateHabilitado,
+             TableOperators.Or,
+             RadianStatePruebas));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
