@@ -2728,7 +2728,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
                     if( (Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34)
-                        || (eventPrev.CustomizationID == "361" || eventPrev.CustomizationID == "362") )
+                        || (eventPrev.CustomizationID == "361" || eventPrev.CustomizationID == "362") 
+                        || (Convert.ToInt32(eventPrev.EventCode) == 42))
                     {
                         if (documentMeta.Where(t => t.EventCode == eventPrev.EventCode
                         && document != null
@@ -3603,10 +3604,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 break;
                         }
                     }
-                    if (validFor)
-                    {
-                        return responses;
-                    }
+                    if (validFor) return responses;
+                    
                 }
                 // Valida que el primer evento transmitido sea un acuse
                 else if (eventPrev.EventCode != "030")

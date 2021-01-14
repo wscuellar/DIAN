@@ -775,7 +775,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(eventCode))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Código tipo de evento no puede estar vacío.");
+                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -892,7 +892,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(customizationId))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D02-(R): CustomizationID no corresponde un código valido.");
+                    stringBuilder.AppendLine($"{codeMessage}D02-(R): No corresponde a un código valido.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
