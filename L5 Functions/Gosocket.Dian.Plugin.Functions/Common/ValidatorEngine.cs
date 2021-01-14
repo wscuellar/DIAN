@@ -243,18 +243,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (documentMeta != null)
                 {
                     data.TrackId = documentMeta.PartitionKey;
-                }
-                else
-                {
-                    string msg = "No se puede generar este evento si previamente no existe el evento limitación de circulación.";           
-                    ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = msg;
-                    response.IsValid = false;
-                    response.ErrorCode = "LGC34";
-                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                    validateResponses.Add(response);
-                    return validateResponses;
-                }
+                }               
             }
             var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);

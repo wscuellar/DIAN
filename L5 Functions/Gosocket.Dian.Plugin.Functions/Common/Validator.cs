@@ -1471,8 +1471,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = "Regla 89-(R)",
-                                ErrorMessage = "Fecha Actual es mayor a la fecha de terminacion de mandato",
+                                ErrorCode = "Regla LGC35-(R)",
+                                ErrorMessage = "No se cuenta con un mandato vigente a la fecha entre el Mandante y el Mandatario para la transmisión de este evento.",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2525,20 +2525,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string errorRegla = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? "Regla: LGC01-(R): " : "Regla: LGC20-(R): ";
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
-            //Evento 041 no tiene validación de eventos previos.
-            if (eventPrev.EventCode == "041")
-            {
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = true,
-                    Mandatory = true,
-                    ErrorCode = "100",
-                    ErrorMessage = "Evento referenciado correctamente",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-                return responses;
-            }
-
+           
             var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
             //Valida eventos previos terminacion de mandato
             if (eventPrev.EventCode == "044")
@@ -2553,8 +2540,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: 89-(R): ",
-                        ErrorMessage = "No es posible realizar la Terminación de Mandato, no existe un Mandato registrado con este CUDE referenciado",
+                        ErrorCode = "Regla: LGC41-(R): ",
+                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento mandato",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
@@ -2570,15 +2557,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = "Regla: 89-(R): ",
-                                ErrorMessage = "No es posible realizar la Terminación de Mandato, no existe una Mandato vigente a la fecha",
+                                ErrorCode = "Regla: LGC42-(R): ",
+                                ErrorMessage = "Evento registrado previamente, Ya existe un evento Terminación de mandato " +
+                                "para el documento referenciado y el mismo destinatario",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-                        if (validFor)
-                        {
-                            return responses;
-                        }
+
+                        if (validFor) return responses;
+                        
                     }
                 }
 
@@ -2617,8 +2604,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = errorRegla,
-                                ErrorMessage = "Evento registrado previamente",
+                                ErrorCode = (eventPrev.CustomizationID == "361" || eventPrev.CustomizationID == "362") ? "Regla: LGC23-(R): " : errorRegla,
+                                ErrorMessage = (eventPrev.CustomizationID == "361" || eventPrev.CustomizationID == "362") 
+                                ? "No puede registrar si previamente se registro primera inscripcion de la factura electrónica de venta" 
+                                : "Evento registrado previamente",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2829,6 +2818,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
                                 if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                                 {
+                                    //Valida exista previamnete un registro de endoso en propiedad
+                                    if (documentMeta.Where(t => t.EventCode == "037").ToList().Count == decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: LGC37-(R): ",
+                                            ErrorMessage = "No se puede generar un Registro para inscripción posterior si previamente " +
+                                            "no se ha registrado un evento de endoso en propiedad (037).",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+
                                     //Valida que exista una Primera Disponibilizacion
                                     if (documentMeta.Where(t => t.EventCode == "036" &&
                                     (t.CustomizationID == "361" || t.CustomizationID == "362")).ToList().Count > decimal.Zero)
@@ -2842,8 +2857,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "Regla: 89-(R): ",
-                                                ErrorMessage = "Ya existe un tipo de instrumento de limitación registrado en el sistema",
+                                                ErrorCode = "Regla: LGC22-(R): ",
+                                                ErrorMessage = "No se puede registrar esté evento si previamente se registro uno de los siguientes eventos: " +
+                                                "Endoso en garantía, Endoso en procuración, Limitación de circulación.",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -2886,51 +2902,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
 
                                 break;
-                            //Validacion de la existensia eventos previos informe de pago
-                            case (int)EventStatus.ValInfoPago:
-                                if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
-                                {
-                                    //Valida Pago Total FETV
-                                    if (documentMeta
-                                             .Where(t => t.EventCode == "045" && t.CustomizationID == "452").ToList()
-                                             .Count > decimal.Zero)
-                                    {
-                                        validFor = true;
-                                        responses.Add(new ValidateListResponse
-                                        {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = "Regla: LGC50-(R): ",
-                                            ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento de Pago con código de operacion (452)",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
-                                    else
-                                    {
-                                        responses.Add(new ValidateListResponse
-                                        {
-                                            IsValid = true,
-                                            Mandatory = true,
-                                            ErrorCode = "100",
-                                            ErrorMessage = "Evento referenciado correctamente",
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
-                                }
-                                else
-                                {
-                                    validFor = true;
-                                    responses.Add(new ValidateListResponse
-                                    {
-                                        IsValid = false,
-                                        Mandatory = true,
-                                        ErrorCode = "Regla: LGC24-(R): ",
-                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Solicitud de disponibilización",
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
-                                }
-
-                                break;
+                           
                             //Validacion de la existensia eventos previos Avales
                             case (int)EventStatus.Avales:
                                 if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
@@ -2953,8 +2925,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "Regla: 89-(R): ",
-                                                ErrorMessage = "No es posible transmitir el evento Aval, ya existe un evento 041 Limitación de circulación",
+                                                ErrorCode = "Regla: LGC39-(R): ",
+                                                ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento Limitación de circulación",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -2968,8 +2940,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "Regla: 89-(R): ",
-                                                ErrorMessage = "No se pueda transmitir el evento Aval porque ya existe un pago total FETV",
+                                                ErrorCode = "Regla: LGC40-(R): ",
+                                                ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento de Pago con código de operacion (452)",
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
@@ -2993,8 +2965,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "Regla: LGC24-(R): ",
-                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Solicitud de disponibilización",
+                                        ErrorCode = "Regla: LGC38-(R): ",
+                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento " +
+                                        "inscripción de la factura electrónica de venta como título valor",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -3003,7 +2976,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             case (int)EventStatus.EndosoPropiedad:
                             case (int)EventStatus.EndosoGarantia:
                             case (int)EventStatus.EndosoProcuracion:
-                                //Valida Pago Total FETV                          
+                                //Valida Pago Total FETV                                
                                 if (documentMeta
                                  .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
                                  .Count > decimal.Zero)
@@ -3052,8 +3025,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = "Regla: 89-(R): ",
-                                                    ErrorMessage = "No se pueda transmitir el evento 038-Endoso en Garantía ya existen asociados los eventos 039 Endoso en Procuración o 041 Limitación de circulación.",
+                                                    ErrorCode = "Regla: LGC28-(R): ",
+                                                    ErrorMessage = "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: " +
+                                                    "Endoso en procuración o Limitación de circulación",
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
                                             }
@@ -3081,8 +3055,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = "LGC29",
-                                                    ErrorMessage = "No se puede registrar este evento si  previamente se ha registrado el evento Pago de la factura electrónica de venta como título valor.",
+                                                    ErrorCode = "Regla: LGC31-(R): ",
+                                                    ErrorMessage = "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: " +
+                                                    "Endoso en garantía o Limitación de circulación",
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
                                             }
@@ -3115,21 +3090,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                     "Endoso en garantía, Endoso en procuración o Limitación de circulación",
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
-                                            }
-                                            else if (documentMeta
-                                                 .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
-                                                 .Count > decimal.Zero)
-                                            {
-                                                validFor = true;
-                                                responses.Add(new ValidateListResponse
-                                                {
-                                                    IsValid = false,
-                                                    Mandatory = true,
-                                                    ErrorCode = "Regla: LGC26-(R): ",
-                                                    ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento Notificación de Pago total",
-                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                });
-                                            }
+                                            }                                           
                                             else
                                             {
                                                 responses.Add(new ValidateListResponse
@@ -3146,37 +3107,125 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 else
                                 {
+                                    string errorCode = eventPrev.EventCode == "037" ? "Regla: LGC24-(R): " : "Regla: LGC27-(R):";
                                     validFor = true;
                                     responses.Add(new ValidateListResponse
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "Regla: LGC24-(R): ",
-                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Inscripción de la factura electrónica de venta como título valor",
+                                        ErrorCode = eventPrev.EventCode == "039" ? "Regla: LGC30-(R): " : errorCode,
+                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento " +
+                                        "Inscripción de la factura electrónica de venta como título valor",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
                                 break;
                             //Validación de la existencia de Endosos y Limitaciones TASK  730
                             case (int)EventStatus.InvoiceOfferedForNegotiation:
-                                if (documentMeta
-                                    .Where(t => (t.EventCode == "037" || t.EventCode == "041") && t.CancelElectronicEvent == null).ToList()
-                                    .Count > decimal.Zero)
+                                
+                                if(eventPrev.CustomizationID == "401")
+                                {
+                                    //Valida exista un endoso en garantia
+                                    if (documentMeta.Where(t => (t.EventCode == "038") && t.CancelElectronicEvent == null).ToList().Count > decimal.Zero)
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else 
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: LGC46-(R): ",
+                                            ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Endoso en garantía (038)",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }                                
+
+                                //Valida exista un endoso en procuracion
+                                if(eventPrev.CustomizationID == "402")
+                                {
+                                    if (documentMeta.Where(t => (t.EventCode == "039") && t.CancelElectronicEvent == null).ToList().Count > decimal.Zero)
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else 
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: LGC47-(R): ",
+                                            ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Endoso en procuración(039)",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }                               
+
+
+                                if(eventPrev.CustomizationID == "401" || eventPrev.CustomizationID == "402")
+                                {                                   
+                                    if (documentMeta.Where(t => (t.EventCode == "041") && t.CancelElectronicEvent == null).ToList().Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: LGC48-(R): ",
+                                            ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento Limitación de circulación (041)",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+
+                                    if (documentMeta.Where(t => (t.EventCode == "037") && t.CancelElectronicEvent == null).ToList().Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: LGC49-(R): ",
+                                            ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento de endoso en propiedad (037)",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+
+                                }
+                               
+                                break;
+                            case (int)EventStatus.NegotiatedInvoice:
+                                if (documentMeta.Where(t => t.EventCode == "036" 
+                                && (t.CustomizationID == "361" || t.CustomizationID == "362" )).ToList().Count == decimal.Zero)
                                 {
                                     validFor = true;
                                     responses.Add(new ValidateListResponse
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "Regla: LGC48-(R): ",
-                                        ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento Limitación de circulación (041)",
+                                        ErrorCode = "Regla: LGC33-(R): ",
+                                        ErrorMessage = "No se puede generar este evento si previamente no existe el evento Autorización para circulación (361 – 362)",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
-                                //Anulacion de Endoso solo aplica para Endoso en Garantia o Endoso en Procuracion
-                                else if (documentMeta
-                                .Where(t => (t.EventCode == "038" || t.EventCode == "039") && t.CancelElectronicEvent == null).ToList()
-                                .Count > decimal.Zero)
+                                else
                                 {
                                     responses.Add(new ValidateListResponse
                                     {
@@ -3187,9 +3236,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+
                                 break;
-                            //Validación de la existencia de limitación de circulación (041)
                             case (int)EventStatus.AnulacionLimitacionCirculacion:
+                                //Validación de la existencia de limitación de circulación (041)
                                 if (documentMeta.Where(t => t.EventCode == "041").ToList().Count == decimal.Zero)
                                 {
                                     validFor = true;
@@ -3225,7 +3275,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 });
                                 break;
                             case (int)EventStatus.NotificacionPagoTotalParcial:
-
                                 //Valida monto pago parcial o total
                                 var responseListPayment = ValidatePayment(xmlParserCude, nitModel);
                                 if (responseListPayment != null)
@@ -3243,6 +3292,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         });
                                     }
 
+                                }
+                                //Valida exista evento Registro para la circulación
+                                if (documentMeta.Where(t => t.EventCode == "036").ToList().Count == decimal.Zero)
+                                {
+                                    validFor = true;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "Regla: LGC43-(R): ",
+                                        ErrorMessage = "No se puede generar este evento si previamente no existe el evento Autorización para circulación (361 – 362)",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
                                 }
 
                                 //Si el titulo valor tiene una limitación previa (041)
@@ -3270,15 +3343,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "Regla: 89-(R): ",
-                                            ErrorMessage = "El evento 045 - Notificación de pago parcial o total tiene una limitación previa (041), no es posible realziar el pago",
+                                            ErrorCode = "Regla: LGC45-(R): ",
+                                            ErrorMessage = "Si el titulo valor tiene una limitación previa (041), " +
+                                            "el evento 045- Notificación de pago parcial o total se podrá transmitir si en el campo ResponseCode, " +
+                                            "el atributo ListID sea igual a 2",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
                                 }
                                 //Valdia si existe un pago total
-                                else if (documentMeta
-                                  .Where(t => t.CustomizationID == "452" 
+                                else if (documentMeta.Where(t => t.CustomizationID == "452" 
                                     && document != null
                                     && t.Identifier == document.PartitionKey).ToList()
                                   .Count > decimal.Zero)
@@ -3288,8 +3362,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = "Regla: 89-(R): ",
-                                        ErrorMessage = "Ya existe un Pago Total de la Factura",
+                                        ErrorCode = "Regla: LGC44-(R): ",
+                                        ErrorMessage = "No se puede registrar el evento de pago con código de operación " +
+                                        "451 si ya se registro un esvento de pago con código de operación 452.",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -3304,6 +3379,49 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+                                break;
+                            //Validacion de la existensia eventos previos informe de pago
+                            case (int)EventStatus.ValInfoPago:
+                                if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
+                                {
+                                    //Valida Pago Total FETV
+                                    if (documentMeta.Where(t => t.EventCode == "045" && t.CustomizationID == "452").ToList().Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: LGC50-(R): ",
+                                            ErrorMessage = "No se puede registrar este evento si previamente se ha registrado el evento de Pago con código de operacion (452)",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }
+                                else
+                                {
+                                    validFor = true;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "Regla: LGC51-(R): ",
+                                        ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el evento Solicitud de disponibilización",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+
                                 break;
                         }
                     }
@@ -3450,8 +3568,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "89",
-                    ErrorMessage = "Factura no cuenta con características para considerarse título valor",
+                    ErrorCode = "Regla: LGC21-(R): ",
+                    ErrorMessage = "La Factura Electrónica no cumple con los requisitos legales para ser considerada título valor y no podrá ser registrada.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -3887,7 +4005,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             response.errorMessageReceiverFETV = "El adquiriente no esta autorizado para recibir esté evento";
             response.errorMessageEndoso = "No se puede registrar este evento si previamente se ha registrado el evento Pago de la factura electrónica de venta como título valor";
             response.errorCodeMandato = "Regla: LGC36-(R): ";
-            response.errorMessageMandato = "El mandatario no puede enviar este evento al documento/evento referenciado ya que no cuenta con un mandato vigente para el esté.";
+            response.errorMessageMandato = "El mandatario no puede enviareste evento ya que no cuenta con un mandato vigente.";
 
             //SenderPArty
             if (eventCode == "030") response.errorCodeFETV = "Regla: AAF01a-(R): ";
@@ -3908,9 +4026,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (eventCode == "032") response.errorMessageigningTimeAcuse = "No se puede generar el evento recibo de bien prestación de servicio antes de la fecha de generación " +
                     "del evento acuse de recibo de la factura electrónica de venta.. ";
             //Endoso
-            if (eventCode == "037") response.errorCodeEndoso = "Regla: LGC27-(R): ";
-            if (eventCode == "038") response.errorCodeEndoso = "Regla: LGC30-(R): ";
-            if (eventCode == "039") response.errorCodeEndoso = "Regla: LGC33-(R): ";
+            if (eventCode == "037") response.errorCodeEndoso = "Regla: LGC26-(R): ";
+            if (eventCode == "038") response.errorCodeEndoso = "Regla: LGC29-(R): ";
+            if (eventCode == "039") response.errorCodeEndoso = "Regla: LGC32-(R): ";
 
             else if (eventCode == "036")
             {
