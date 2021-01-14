@@ -1781,7 +1781,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidationSigningTime(string trackId, string eventCode, string signingTime, string documentTypeId, string customizationID, string endDate,  DianResponse response)
         {
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId, customizationID, endDate });            
-            
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateSigningTime", new { trackId, eventCode, signingTime, documentTypeId, customizationID, endDate });
             if (validations.Count > 0)
             {
                 if (response.ErrorMessage.Count == 0)
@@ -1814,7 +1814,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef, string issuerPartyCode, string issuerPartyName)
         {
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName });            
-            
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateDocumentReference", new { trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName });
             DianResponse response = new DianResponse();
             if (validations.Count > 0)
             {

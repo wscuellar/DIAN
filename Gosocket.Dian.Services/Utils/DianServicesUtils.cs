@@ -737,7 +737,7 @@ namespace Gosocket.Dian.Services.Utils
             //string[] noteCodes = { "7", "8" };
 
             bool flagEvento = true;
-            bool validaUUID = (Convert.ToInt32(eventCode) == 43 && Convert.ToInt32(listID) == 3) ? false : true;
+            
 
             if (docTypeCode == "96")
             {
@@ -771,15 +771,7 @@ namespace Gosocket.Dian.Services.Utils
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
-                }
-
-                if (string.IsNullOrEmpty(documentKey) && validaUUID)
-                {
-                    stringBuilder.AppendLine($"{codeMessage}H07-(R): esta UUID no existe en la base de datos de la DIAN.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                }
+                }               
 
                 if (string.IsNullOrEmpty(eventCode))
                 {
@@ -789,7 +781,10 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                     flagEvento = false;
                 }
-                else if ((Convert.ToInt32(eventCode) < 30 || Convert.ToInt32(eventCode) > 46) )
+                else if (!(eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034"
+                   || eventCode == "035" || eventCode == "036" || eventCode == "037" || eventCode == "038" || eventCode == "039"
+                   || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
+                   || eventCode == "045" || eventCode == "046"))
                 {
                     stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
                     errors.Add(stringBuilder.ToString());
@@ -798,8 +793,20 @@ namespace Gosocket.Dian.Services.Utils
                     flagEvento = false;
                 }
 
+
+
                 if (flagEvento)
                 {
+
+                    bool validaUUID = (Convert.ToInt32(eventCode) == 43 && Convert.ToInt32(listID) == 3) ? false : true;
+                    if (string.IsNullOrEmpty(documentKey) && validaUUID)
+                    {
+                        stringBuilder.AppendLine($"{codeMessage}H07-(R): esta UUID no existe en la base de datos de la DIAN.");
+                        errors.Add(stringBuilder.ToString());
+                        stringBuilder.Clear();
+                        isValid = false;
+                    }
+
                     if (string.IsNullOrEmpty(serieAndNumber))
                     {
                         if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34 && flagEvento)
