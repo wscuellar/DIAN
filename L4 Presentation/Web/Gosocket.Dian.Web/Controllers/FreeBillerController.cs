@@ -531,7 +531,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             List<SelectListItem> selectTypesId = new List<SelectListItem>();
             var types = identificationTypeService.List().ToList();
-            types.Insert(0, new Domain.IdentificationType() { Code = "0, Description = "Seleccione..." });
+            types.Insert(0, new Domain.IdentificationType() { Code = "0", Description = "Seleccione..." });
 
             if (types.Count > 0)
             {
