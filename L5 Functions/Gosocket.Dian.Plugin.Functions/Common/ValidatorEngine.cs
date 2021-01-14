@@ -92,6 +92,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     //Obtiene el CUFE
                     eventPrev.TrackId = documentMeta.DocumentReferencedKey;
+                    //Obtiene XML ApplicationResponse CUDE
+                    var xmlBytesCude = await GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                    xmlParserCude = new XmlParser(xmlBytesCude);
+                    if (!xmlParserCude.Parser())
+                        throw new Exception(xmlParserCude.ParserError);
                 }
             }
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE

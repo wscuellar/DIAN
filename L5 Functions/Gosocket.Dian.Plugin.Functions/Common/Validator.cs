@@ -1278,8 +1278,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "",
-                            ErrorMessage = $"Se registro un evento de Endoso en Procuración",
+                            ErrorCode = "Regla: 89-(R): ",
+                            ErrorMessage = $"No existe referencia del CUDE en la Document.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                         return responses;
@@ -1292,8 +1292,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: AAI07b-(R): ",
-                            ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
+                            ErrorCode = "Regla: 89-(R): ",
+                            ErrorMessage = $"No se encuentra informada la Nota para Cancelación de Endoso en Procuración.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -2945,6 +2945,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+
+                                // Comparar ValorFEV-TV contra el valor total de la FE
+                                if (xmlParserCude.ValorOriginalTV == xmlParserCufe.TotalInvoice)
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = "Evento referenciado correctamente",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
+                                {
+                                    validFor = true;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "Regla: 89-(R):",
+                                        ErrorMessage = "Valor original del Titulo Valor es diferente al valor total de la factura referenciada",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
                                 break;
                            
                             //Validacion de la existensia eventos previos Avales
@@ -3167,8 +3192,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 break;
                             //Validación de la existencia de Endosos y Limitaciones TASK  730
                             case (int)EventStatus.InvoiceOfferedForNegotiation:
-                                
-                                if(eventPrev.CustomizationID == "401")
+                                if (eventPrev.CustomizationID == "401")
                                 {
                                     //Valida exista un endoso en garantia
                                     if (documentMeta.Where(t => (t.EventCode == "038") && t.CancelElectronicEvent == null).ToList().Count > decimal.Zero)
@@ -3199,6 +3223,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 //Valida exista un endoso en procuracion
                                 if(eventPrev.CustomizationID == "402")
                                 {
+                                    //El evento debe informar una nota donde manifieste los motivos de la revocatoria contenida del endoso.
+                                    var responseListEndosoNota = this.ValidateEndosoNota(documentMeta, xmlParserCude, eventPrev.EventCode);
+                                    if (responseListEndosoNota != null)
+                                    {
+                                        validFor = true;
+                                        foreach (var item in responseListEndosoNota)
+                                        {
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = item.IsValid,
+                                                Mandatory = item.Mandatory,
+                                                ErrorCode = item.ErrorCode,
+                                                ErrorMessage = item.ErrorMessage,
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                    }
+
                                     if (documentMeta.Where(t => (t.EventCode == "039") && t.CancelElectronicEvent == null).ToList().Count > decimal.Zero)
                                     {
                                         responses.Add(new ValidateListResponse
