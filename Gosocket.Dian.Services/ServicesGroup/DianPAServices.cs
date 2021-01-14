@@ -1716,8 +1716,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var ResponseCode = eventCode;
             var ListID = listID;
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, trackIdCude, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateParty", new { trackId, trackIdCude, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
-
+            
             if (validations.Count > 0)
             {
                 if (response.ErrorMessage.Count == 0)
@@ -1748,8 +1747,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID, DianResponse response)
         {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
+            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
             if (validations.Count > 0)
             {
                 if(response.ErrorMessage.Count == 0)

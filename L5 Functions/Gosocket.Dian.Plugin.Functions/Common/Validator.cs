@@ -1177,12 +1177,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validEndoso = false;        
 
-            ////Valida informacion Endoso                           
-            //if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
-            //{
+            //Valida informacion Endoso                           
             if (String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
             {
-                validEndoso = true;
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
@@ -1191,23 +1188,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
-            }
-
-            //Valida precio a pagar endoso
-            int resultValuePriceToPay = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
-            resultValuePriceToPay = resultValuePriceToPay / 100;
-
-            if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultValuePriceToPay)
-            {
-                validEndoso = true;
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAI07b-(R): ",
-                    ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
+                return responses;
             }
 
             if (xmlParserCude.Fields["listID"].ToString() != "2")
@@ -1255,8 +1236,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            //}
-
             //Calculo valor de la negociación
             int resultNegotiationValue = ((Int32)newAmountTV * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
             resultNegotiationValue = resultNegotiationValue / 100;
@@ -1269,25 +1248,60 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "Regla: 89-(R):",
-                    ErrorMessage = $"El valor informado es diferente a la operación de Nuevo Valor en disponibilización * la tasa de descuento.",
+                    ErrorCode = "Regla: AAI07b-(R): ",
+                    ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
 
-            //// Se debe comparar el valor de negociación contra el saldo (Nuevo Valor en disponibilización)
-            //if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != (Int32)newAmountTV)
-            //{
-            //    validEndoso = true;
-            //    responses.Add(new ValidateListResponse
-            //    {
-            //        IsValid = false,
-            //        Mandatory = true,
-            //        ErrorCode = "Regla: 89-(R):",
-            //        ErrorMessage = $"Valor de la negociación es diferente al nuevo valor en disponibilización.",
-            //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-            //    });
-            //}
+            if (validEndoso)
+                return responses;
+
+            return null;
+        }
+        #endregion
+
+        #region ValidateEndosoNota
+        private List<ValidateListResponse> ValidateEndosoNota(List<GlobalDocValidatorDocumentMeta> documentMetaList, XmlParser xmlParserCude, string eventCode)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validEndoso = false;
+
+            if (eventCode == "040")
+            {
+                // busca un Endoso en Procuración...
+                var documentMeta = documentMetaList.Where(x => x.EventCode == "039").OrderByDescending(x => x.SigningTimeStamp).FirstOrDefault();
+                if (documentMeta != null)
+                {
+                    var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
+                    if (document == null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "",
+                            ErrorMessage = $"Se registro un evento de Endoso en Procuración",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        return responses;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(xmlParserCude.NoteMandato))
+                    {
+                        validEndoso = true;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: AAI07b-(R): ",
+                            ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                }
+            }
 
             if (validEndoso)
                 return responses;
@@ -3215,6 +3229,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 break;
                             //Validación de la existencia de Endosos y Limitaciones TASK  730
                             case (int)EventStatus.InvoiceOfferedForNegotiation:
+                                //El evento debe informar una nota donde manifieste los motivos de la revocatoria contenida del endoso.
+                                var responseListEndosoNota = this.ValidateEndosoNota(documentMeta, xmlParserCude, eventPrev.EventCode);
+                                if(responseListEndosoNota != null)
+                                {
+                                    validFor = true;
+                                    foreach (var item in responseListEndosoNota)
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = item.IsValid,
+                                            Mandatory = item.Mandatory,
+                                            ErrorCode = item.ErrorCode,
+                                            ErrorMessage = item.ErrorMessage,
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }
+
                                 if (documentMeta
                                     .Where(t => (t.EventCode == "037" || t.EventCode == "041") && t.CancelElectronicEvent == null).ToList()
                                     .Count > decimal.Zero)
