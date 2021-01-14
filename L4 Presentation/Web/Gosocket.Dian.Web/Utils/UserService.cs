@@ -1,9 +1,11 @@
 ﻿using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Gosocket.Dian.Web.Utils
 {
@@ -17,6 +19,38 @@ namespace Gosocket.Dian.Web.Utils
                 _sqlDBContext = new ApplicationDbContext();
             }
         }
+
+        #region RELACION DE USUARIO CON PERFIL PARA FACTURADOR GRATUITO.
+
+        public List<ApplicationUser> UserFreeBillerProfile(Expression<Func<ApplicationUser, bool>> expression, int profileId = 1)
+        {
+            var query = from pr in _sqlDBContext.UserFreeBillerProfile.Where(t=> profileId == 1 || t.ProfileFreeBillerId ==  profileId)
+                        join u in _sqlDBContext.Users.Where(expression) on pr.UserId equals u.Id
+                        select u;
+
+            return query.ToList();
+        }
+
+
+        public int UserFreeBillerUpdate(UsersFreeBillerProfile usersFreeBiller)
+        {
+            UsersFreeBillerProfile usersInstance = _sqlDBContext.UserFreeBillerProfile.FirstOrDefault(c => c.Id == usersFreeBiller.Id);
+
+            if (usersInstance != null)
+            {
+                usersInstance.UserId = usersFreeBiller.UserId;
+                usersInstance.ProfileFreeBillerId = usersFreeBiller.ProfileFreeBillerId;
+                _sqlDBContext.Entry(usersInstance).State = System.Data.Entity.EntityState.Modified;
+            }
+            else
+                _sqlDBContext.Entry(usersFreeBiller).State = System.Data.Entity.EntityState.Added;
+
+            _sqlDBContext.SaveChanges();
+
+            return usersInstance ==  null ? usersFreeBiller.Id : usersInstance.Id;
+        }
+
+        #endregion
 
         public IEnumerable<ApplicationUser> GetUsers(List<string> ids)
         {

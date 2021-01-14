@@ -263,6 +263,7 @@
     <Compile Include="Sql\SubMenu.cs" />
     <Compile Include="Sql\UserContributors.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sql\UserFreeBillerProfile.cs" />
     <Compile Include="Utils\ClaimsDb.cs" />
     <Compile Include="Utils\DeliveryStatus.cs" />
     <Compile Include="Utils\EmailData.cs" />
