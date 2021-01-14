@@ -503,9 +503,9 @@ namespace Gosocket.Dian.Web.Controllers
         {
             List<SelectListItem> selectTypesId = new List<SelectListItem>();
             var profiles = profileService.GetAll();
-
             if (profiles?.Count > 0)
             {
+                profiles.Insert(0, new Domain.Sql.FreeBiller.Profile() { Id = 0, Name = "Seleccione..." });
                 foreach (var item in profiles)
                 {
                     selectTypesId.Add(
