@@ -72,6 +72,8 @@
     "CosmosDbAuthorizationKey": "Kz5FGFLwRVrWYuwDJtYOoQsuSRF3qgPvIz7hPa5Bp2XgSBwhpt42UuKGtT12GMbvaHVl4UtK7ud344Mco1pomQ==",
     "CosmosDbDataBaseId": "DocumentsData",
     "CosmosDbCollectionID": "Documents"
+
+
     // Test UAT INDRA
     //"Environment": "Test",
     //"AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
