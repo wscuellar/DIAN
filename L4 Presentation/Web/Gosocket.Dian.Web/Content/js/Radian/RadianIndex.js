@@ -203,7 +203,7 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
     });
 
     bootboxPrompt.init(function () {
-        $(".bootbox-form").prepend($("<label>", { text: bootboxMessage.LABEL_PROMPT }));
+        $(".bootbox-form").prepend($("<label>", { text: title == "Cancelar registro" ? bootboxMessage.LABEL_PROMPT : bootboxMessage.LABEL_STATUS }));
     });
 
 }

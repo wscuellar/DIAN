@@ -504,6 +504,16 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+        public List<T> FindDocumentReferenceAttorneyList<T>(string partitionKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+
+
+            var entities = CloudTable.ExecuteQuery(query);
+
+            return entities.ToList();
+        }
+
 
         public List<T> FindDocumentByReference<T>(string documentReferencedKey) where T : ITableEntity, new()
         {
@@ -976,18 +986,18 @@ namespace Gosocket.Dian.Infrastructure
                 TableQuery.GenerateFilterConditionForBool("Deleted",
                     QueryComparisons.Equal,
                     deleted));
-            prefixCondition = TableQuery.CombineFilters(
-                prefixCondition,
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("RadianState",
-                    QueryComparisons.Equal,
-                    radianStatus));
-            prefixCondition = TableQuery.CombineFilters(
-               prefixCondition,
-               TableOperators.Or,
-               TableQuery.GenerateFilterCondition("RadianState",
-                   QueryComparisons.Equal,
-                   "En pruebas"));
+
+            var RadianStateHabilitado = TableQuery.GenerateFilterCondition("RadianState",
+               QueryComparisons.Equal,
+               radianStatus);
+
+            var RadianStatePruebas= TableQuery.GenerateFilterCondition("RadianState",
+                QueryComparisons.Equal,
+                "En pruebas");
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.CombineFilters(RadianStateHabilitado,
+             TableOperators.Or,
+             RadianStatePruebas));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 

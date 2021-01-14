@@ -27,6 +27,18 @@ using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.Mvc;
 using EnumHelper = Gosocket.Dian.Web.Models.EnumHelper;
+using Gosocket.Dian.Services.Utils.Common;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
+using iTextSharp.tool.xml;
+using System.Web;
+using System.Drawing;
+using Image = iTextSharp.text.Image;
+using iTextSharp.tool.xml.pipeline.html;
+using iTextSharp.tool.xml.html;
+using iTextSharp.tool.xml.pipeline.css;
+using iTextSharp.tool.xml.pipeline.end;
+using iTextSharp.tool.xml.parser;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -43,19 +55,27 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
         private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
+        #region Properties
 
+
+        private readonly FileManager _fileManager;
+      
+        #endregion
+       
+       
         #region Constructor
 
         public DocumentController(IRadianPdfCreationService radianPdfCreationService,
                                   IRadianGraphicRepresentationService radianGraphicRepresentationService,
                                   IQueryAssociatedEventsService queryAssociatedEventsService,
-                                  IRadianSupportDocument radianSupportDocument)
+                                  IRadianSupportDocument radianSupportDocument, FileManager fileManager)
         {
             _radianSupportDocument = radianSupportDocument;
             _radianPdfCreationService = radianPdfCreationService;
             _radianPdfCreationService = radianPdfCreationService;
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
             _queryAssociatedEventsService = queryAssociatedEventsService;
+            _fileManager = fileManager;
         }
 
         #endregion
@@ -87,6 +107,7 @@ namespace Gosocket.Dian.Web.Controllers
         [CustomRoleAuthorization(CustomRoles = "Proveedor")]
         public async Task<ActionResult> Provider(SearchDocumentViewModel model) => await GetDocuments(model, 4);
 
+        [ExcludeFilter(typeof(Authorization))]
         public async Task<ActionResult> Details(string trackId)
         {
             DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
@@ -95,7 +116,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
             return View(model);
         }
-
+                
 
         public ActionResult Viewer(Navigation.NavigationEnum nav)
         {
@@ -167,7 +188,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-                //IsValidCaptcha(recaptchaToken);
+                IsValidCaptcha(recaptchaToken);
                 string url = ConfigurationManager.GetValue("GetPdfUrl");
 
                 var requestObj = new { trackId };
@@ -218,6 +239,191 @@ namespace Gosocket.Dian.Web.Controllers
 
             DocValidatorModel model = ReturnDocValidationModel(documentKey, globalDataDocument);
 
+            return View(model);
+        }
+       
+    
+     
+
+        #region GetXmlFromStorageAsync
+
+        /// <summary>
+        /// Método de extracción del xml de la representación grafica
+        /// TODO: pendiente de incorporar, hasta q se haga consulta por cufe
+        /// </summary>
+        /// <param name="trackId"></param>
+        /// <returns></returns>
+        private async Task<byte[]> GetXmlFromStorageAsync(string trackId)
+        {
+            var TableManager = new TableManager("GlobalDocValidatorRuntime");
+            var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
+            if (documentStatusValidation == null)
+                return null;
+
+            var fileManager = new FileManager();
+            var container = $"global";
+            var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
+            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+
+            return xmlBytes;
+        }
+
+        #endregion
+
+        #region TemplateGlobalMapping
+
+        private StringBuilder TemplateGlobalMappingNomina(StringBuilder template, XmlParseNomina dataValues)
+        {
+            //Set Variables
+            DateTime expeditionDate = DateTime.Now;
+
+
+
+            template = template.Replace("{SupportDocumentNumber}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
+            template = template.Replace("{Cune}", dataValues.globalDocPayrolls.CUNE);
+            template = template.Replace("{EmissionDate}", dataValues.globalDocPayrolls.FechaGen.ToString());
+            template = template.Replace("{PaisType}", dataValues.globalDocPayrolls.Pais.ToString());
+            template = template.Replace("{CityType}", dataValues.globalDocPayrolls.MunicipioCiudad.ToString());
+            template = template.Replace("{DepartamentoType}", dataValues.globalDocPayrolls.DepartamentoEstado.ToString());
+
+            // Seller Data
+            template = template.Replace("{Nit}", dataValues.globalDocPayrolls.NIT.ToString());
+            template = template.Replace("{DirType}", dataValues.globalDocPayrolls.LugarTrabajoDireccion.ToString());
+            template = template.Replace("{PaisType}", dataValues.globalDocPayrolls.Pais.ToString());
+            template = template.Replace("{DepType}", dataValues.globalDocPayrolls.DepartamentoEstado.ToString());
+            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());
+            template = template.Replace("{CelType}", dataValues.globalDocPayrolls.Celular.ToString());
+
+            // Employer Data
+            template = template.Replace("{NitEmp}", dataValues.globalDocPayrolls.Emp_NIT.ToString());
+            template = template.Replace("{SocialType}", dataValues.globalDocPayrolls.Emp_RazonSocial.ToString());
+            template = template.Replace("{DirTypeEmp}", dataValues.globalDocPayrolls.Emp_Direccion.ToString());
+            template = template.Replace("{PaisTypeEmp}", dataValues.globalDocPayrolls.Emp_Pais.ToString());
+            template = template.Replace("{DepTypeEmp}", dataValues.globalDocPayrolls.Emp_DepartamentoEstado.ToString());
+            template = template.Replace("{MunTypeEmp}", dataValues.globalDocPayrolls.Emp_MunicipioCiudad.ToString());
+            template = template.Replace("{CelTypeEmp}", dataValues.globalDocPayrolls.Emp_Celular.ToString());
+            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());
+            template = template.Replace("{AreaTypeEmp}", dataValues.globalDocPayrolls.NombreArea.ToString());
+            template = template.Replace("{CodAreaTypeEmp}", dataValues.globalDocPayrolls.CodigoArea.ToString());
+            template = template.Replace("{CargoType}", dataValues.globalDocPayrolls.NombreCargo.ToString());
+            template = template.Replace("{CodCargo}", dataValues.globalDocPayrolls.CodigoCargo.ToString());
+            template = template.Replace("{FrecuencyNomina}", dataValues.globalDocPayrolls.PeriodoNomina.ToString());
+            template = template.Replace("{DateEmpIngType}", dataValues.globalDocPayrolls.FechaIngreso.ToString());
+            template = template.Replace("{AntType}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
+            template = template.Replace("{TConType}", dataValues.globalDocPayrolls.TipoContrato.ToString());
+            template = template.Replace("{TimeWorkTypeEmp}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
+            template = template.Replace("{DatePayType}", dataValues.globalDocPayrolls.FechaPagoFin.ToString());
+            template = template.Replace("{SalaryType}", dataValues.globalDocPayrolls.Salario.ToString());
+            template = template.Replace(" {SalaryIntegralType}", dataValues.globalDocPayrolls.SalarioIntegral.ToString());
+
+            // Acquirer Data
+            template = template.Replace("{QRCode}", dataValues.globalDocPayrolls.Pago.ToString());
+            template = template.Replace("{PayType}", dataValues.globalDocPayrolls.Pago.ToString());
+            template = template.Replace("{CoinType}", dataValues.globalDocPayrolls.TipoMoneda.ToString());
+            template = template.Replace("{BankType}", dataValues.globalDocPayrolls.Banco.ToString());
+            template = template.Replace("{LibraryType}", dataValues.globalDocPayrolls.TipoCuenta.ToString());
+            template = template.Replace("{NumberLibraryType}", dataValues.globalDocPayrolls.NumeroCuenta.ToString());
+            template = template.Replace("{TotalDevType}", dataValues.globalDocPayrolls.devengadosTotal.ToString());
+            template = template.Replace("{TotalDedType}", dataValues.globalDocPayrolls.deduccionesTotal.ToString());
+           
+            // ToTal Advances
+            template = template.Replace("{NumNomType}", dataValues.globalDocPayrolls.Numero.ToString());
+            template = template.Replace("{DateGenType}", dataValues.globalDocPayrolls.FechaGen.ToString());
+            template = template.Replace("{ComTotalType}", dataValues.globalDocPayrolls.comprobanteTotal.ToString());
+
+            // ToTal Retentions
+            template = template.Replace("{RetentionNumber}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
+            template = template.Replace("{RetentionAmount}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
+
+            return template;
+        }
+
+        #endregion
+
+        #region SplitAndSum
+
+        private double SplitAndSum(string concateField)
+        {
+            // TotalDiscountsDetail
+            var aux = concateField.Split('|');
+            double fieldValue = 0;
+
+            foreach (var dataField in aux)
+            {
+                if (!string.IsNullOrEmpty(dataField))
+                {
+                    fieldValue += double.Parse(dataField, CultureInfo.InvariantCulture);
+                }
+            }
+            return fieldValue;
+        }
+
+        #endregion
+
+        public ActionResult ExportPDF()
+        {
+            var model = new ExportDocumentTableViewModel();
+
+            GetExportDocumentTasks(ref model);
+
+            return View(model);
+        }
+        [HttpPost]
+        //[ValidateAntiForgeryToken]
+        public async Task<ActionResult> ExportPDF(ExportDocumentTableViewModel model)
+        {
+            var xmlBytes = await GetXmlFromStorageAsync("660ebb7fdd77b6d67a00448e7afde2959992c53ad1bf14b9a394272c56ee8cc64b75dc08940625e39390a0af3d8d7cb9");
+            var xmlParser = new XmlParseNomina(xmlBytes);
+             //parseo xml
+            Console.WriteLine(xmlParser.globalDocPayrolls);
+           
+            // Load Templates            
+            StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNomina.html"));
+            // Load xpaths
+           
+            string temp = string.Empty;
+            try
+            {
+            
+                // Mapping Fields
+                template = TemplateGlobalMappingNomina(template, xmlParser);
+                temp = template.ToString();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+          
+            try
+            {
+                StringReader sr = new StringReader(temp);
+                Document pdfDoc = new Document(PageSize.A4);
+                BarcodeQRCode qrCode = new BarcodeQRCode("https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey=abf83aa055de79de4d4df482e91b2fe452065d4698020ad4d5f5039b12227149bfc7f4fdeb88da5e9f6b0b3f5905fd94", 125, 125, null);
+               
+                Image codeQRImage = qrCode.GetImage();
+                codeQRImage.ScaleAbsolute(125, 125);
+                PdfWriter writer = PdfWriter.GetInstance(pdfDoc, Response.OutputStream);
+                pdfDoc.Open();
+
+                XMLWorkerHelper.GetInstance().ParseXHtml(writer, pdfDoc, sr);
+                pdfDoc.Add(codeQRImage);
+                pdfDoc.Close();
+                Response.ContentType = "application/pdf";
+                Response.AddHeader("content-disposition", "attachment;filename=NominaPDF.pdf");
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.Write(pdfDoc);
+                Response.BufferOutput = true;
+                Response.End();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+         
+
+            GetExportDocumentTasks(ref model);
             return View(model);
         }
 
@@ -288,14 +494,20 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
 
-        [ExcludeFilter(typeof(Authorization))]
-        public async Task<JsonResult> PrintSupportDocument(string id)
+        #region SendMail
+
+        [HttpGet]
+        public ActionResult SendMail(string correo)
         {
-            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
-            byte[] pdfDocument = await _radianSupportDocument.GetGraphicRepresentation(id, webPath);
-            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
-            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
+            ExternalUserViewModel model = new ExternalUserViewModel();
+            model.Names = "Rodolfo Mendieta";
+            model.Email = correo;
+            model.Password = "123456**";
+            bool result = SendMailCreate(model);
+            return Json(result);
         }
+
+        #endregion
 
         [ExcludeFilter(typeof(Authorization))]
         public async Task<ActionResult> ShowDocumentToPublic(string Id)
@@ -431,34 +643,34 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.Events = new List<EventsViewModel>();
             List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
-            if (eventsByInvoice.Any())
-            {
-
-                foreach (var eventItem in eventsByInvoice)
+                if (eventsByInvoice.Any())
                 {
-                    if (!string.IsNullOrEmpty(eventItem.EventCode))
+
+                    foreach (var eventItem in eventsByInvoice)
                     {
-                        GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
-                        if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
+                        if (!string.IsNullOrEmpty(eventItem.EventCode))
                         {
-                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
-                            model.Events.Add(new EventsViewModel()
+                            GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
+                            if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
                             {
-                                DocumentKey = eventItem.DocumentKey,
-                                EventCode = eventItem.EventCode,
-                                Description = eventcodetext,
-                                EventDate = eventItem.SigningTimeStamp,
-                                SenderCode = eventItem.SenderCode,
-                                Sender = eventItem.SenderName,
-                                ReceiverCode = eventItem.ReceiverCode,
-                                Receiver = eventItem.ReceiverName
-                            });
-                            model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
+                                string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                                model.Events.Add(new EventsViewModel()
+                                {
+                                    DocumentKey = eventItem.DocumentKey,
+                                    EventCode = eventItem.EventCode,
+                                    Description = eventcodetext,
+                                    EventDate = eventItem.SigningTimeStamp,
+                                    SenderCode = eventItem.SenderCode,
+                                    Sender = eventItem.SenderName,
+                                    ReceiverCode = eventItem.ReceiverCode,
+                                    Receiver = eventItem.ReceiverName
+                                });
+                                model.Events = model.Events.OrderBy(t => t.EventCode).ToList();
+                            }
+
                         }
-
                     }
-                }
-
+                
             }
 
             return model;
@@ -765,43 +977,31 @@ namespace Gosocket.Dian.Web.Controllers
 
         private string DeterminateRadianStatus(List<EventViewModel> events, string documentTypeId)
         {
-            if (!events.Any())
+            if (events.Count() == 0)
                 return RadianDocumentStatus.DontApply.GetDescription();
 
-            var eventEnd = events.Where(ev => int.Parse(ev.Code) != (int)EventStatus.Avales
-                && int.Parse(ev.Code) != (int)EventStatus.Mandato
-                && int.Parse(ev.Code) != (int)EventStatus.TerminacionMandato
-                && int.Parse(ev.Code) != (int)EventStatus.ValInfoPago
-                && int.Parse(ev.Code) != (int)EventStatus.Rejected);
+            int lastEventCode = int.Parse(events.OrderBy(t => t.Date).Last().Code);
 
-            if (Convert.ToInt32(eventEnd.OrderByDescending(t => t.Date).FirstOrDefault().Code) == (int)EventStatus.AnulacionLimitacionCirculacion)
-                eventEnd = eventEnd.Where(t => int.Parse(t.Code) != (int)EventStatus.AnulacionLimitacionCirculacion && int.Parse(t.Code) != (int)EventStatus.NegotiatedInvoice).ToList();
+            if (lastEventCode == ((int)EventStatus.NegotiatedInvoice)
+                || lastEventCode == ((int)EventStatus.AnulacionLimitacionCirculacion))
+                return RadianDocumentStatus.Limited.GetDescription();
 
-            if (Convert.ToInt32(eventEnd.OrderByDescending(t => t.Date).FirstOrDefault().Code) == (int)EventStatus.InvoiceOfferedForNegotiation)
-                eventEnd = eventEnd.Where(t => int.Parse(t.Code) != (int)EventStatus.InvoiceOfferedForNegotiation && int.Parse(t.Code) != (int)EventStatus.EndosoGarantia && int.Parse(t.Code) != (int)EventStatus.EndosoProcuracion).ToList();
+            if (lastEventCode == ((int)EventStatus.NotificacionPagoTotalParcial))
+                return RadianDocumentStatus.Paid.GetDescription();
 
-            if (eventEnd.Any())
-            {
-                int lastEventCode = int.Parse(eventEnd.OrderBy(t => t.Date).Last().Code);
+            if (lastEventCode == ((int)EventStatus.EndosoPropiedad)
+                || lastEventCode == ((int)EventStatus.EndosoGarantia)
+                || lastEventCode == ((int)EventStatus.EndosoProcuracion)
+                || lastEventCode == ((int)EventStatus.InvoiceOfferedForNegotiation))
+                return RadianDocumentStatus.Endorsed.GetDescription();
 
-                if (lastEventCode == ((int)EventStatus.NegotiatedInvoice))
-                    return RadianDocumentStatus.Limited.GetDescription();
+            if (lastEventCode == ((int)EventStatus.SolicitudDisponibilizacion))
+                return RadianDocumentStatus.Readiness.GetDescription();
 
-                if (lastEventCode == ((int)EventStatus.NotificacionPagoTotalParcial))
-                    return RadianDocumentStatus.Paid.GetDescription();
-
-                if (lastEventCode == ((int)EventStatus.EndosoPropiedad)
-                    || lastEventCode == ((int)EventStatus.EndosoGarantia)
-                    || lastEventCode == ((int)EventStatus.EndosoProcuracion))
-                    return RadianDocumentStatus.Endorsed.GetDescription();
-
-                if (lastEventCode == ((int)EventStatus.SolicitudDisponibilizacion))
-                    return RadianDocumentStatus.Readiness.GetDescription();
-
-                if (lastEventCode == ((int)EventStatus.Accepted) || lastEventCode == ((int)EventStatus.AceptacionTacita))
-                    return RadianDocumentStatus.SecurityTitle.GetDescription();
-
-            }
+            if (events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Received))
+                && events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Receipt))
+                && events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Accepted)))
+                return RadianDocumentStatus.SecurityTitle.GetDescription();
 
             if (documentTypeId == "01")
                 return RadianDocumentStatus.ElectronicInvoice.GetDescription();
@@ -917,6 +1117,41 @@ namespace Gosocket.Dian.Web.Controllers
             };
             await EventGridManager.Instance("EventGridKey", "EventGridTopicEndpoint").SendMessagesToEventGridAsync(eventsList);
         }
+
+
+
         #endregion
+
+        #region Mailing
+
+        /// <summary>
+        /// Enviar notificacion email para creacion de usuario externo
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool SendMailCreate(ExternalUserViewModel model)
+        {
+            var emailService = new Application.EmailService();
+            StringBuilder message = new StringBuilder();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("</br> <span style='font-size:18px;'><b>Se ha generado una clave de acceso al Catalogo de DIAN</b></span></br>");
+            message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.Names);
+            message.Append("</br> A continuación, se entrega la clave para realizar tramites y gestión de solicitudes recepción documentos electrónicos.");
+            message.AppendFormat("</br> Clave de acceso: {0}", model.Password);
+
+            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+
+            //Nombre del documento, estado, observaciones
+            dic.Add("##CONTENT##", message.ToString());
+
+            emailService.SendEmail(model.Email, "DIAN - Creacion de Usuario Registrado", dic);
+
+            return true;
+        }
+
+        #endregion
+
     }
 }
