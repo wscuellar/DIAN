@@ -2900,7 +2900,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
-
                                 break;
                            
                             //Validacion de la existensia eventos previos Avales
