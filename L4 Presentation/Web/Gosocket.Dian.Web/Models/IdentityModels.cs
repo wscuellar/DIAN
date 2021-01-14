@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Sql;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
@@ -118,5 +119,7 @@ namespace Gosocket.Dian.Web.Models
         }
         public DbSet<Contributor> Contributor { set; get; }
         public DbSet<ContributorOperations> ContributorOperation { set; get; }
+
+        public DbSet<UsersFreeBillerProfile> UserFreeBillerProfile { set; get; }
     }
 }
