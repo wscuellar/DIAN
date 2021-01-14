@@ -101,10 +101,10 @@
     <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         <thead>
             <tr>
-                <th>Tipo de doocumento</th>
+                <th class="text-left">Tipo de doocumento</th>
                 <th>N&uacute;mero de documento</th>
-                <th>Nombre y apellido</th>
-                <th>Perfil</th>
+                <th class="text-left">Nombre y apellido</th>
+                <th class="text-left">Perfil</th>
                 <th>&Uacute;ltima Modificaci&oacute;n</th>
                 <th colspan="3">Acciones</th>
             </tr>
@@ -127,33 +127,36 @@
             {
                
                 <tr class="document-row">
-                    <td class="text-nowrap">
+                    <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
                         <a>@user.DescriptionTypeDoc</a>
                     </td>
-                    <td class="text-nowrap text-center">
+                    <td class="text-nowrap text-center padding-top-0 padding-bottom-0">
                         <a>@user.NumberDoc</a>
                     </td>
-                    <td class="text-center text-nowrap">
+                    <td class="text-left text-nowrap padding-top-0 padding-bottom-0">
                         @user.FullName
                     </td>
-                    <td class="text-nowrap text-center">
+                    <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
                         @user.DescriptionProfile
                     </td>
-                    <td class="text-center">
+                    <td class="text-center padding-top-0 padding-bottom-0">
                         @user.LastUpdate
                     </td>
-                    <td class="text-nowrap">
-                        @Html.ActionLink("Ver detalles", "Details")
+                    <td class="text-nowrap padding-top-0 padding-bottom-0">
+                        @Html.ActionLink("Ver detalles", "EditOrViewFreeBillerUser",
+                            new { controller = "FreeBiller", id = user.Id, isEdit = false },
+                            new { @class = "btn-link" })
                     </td>
-                    <td>
-                        <a href="@Url.Action("EditFreeBillerUser","FreeBiller", new { user.Id })" id="@user.Id">
+                    <td class="padding-top-0 padding-bottom-0">
+                        <a href="@Url.Action("EditOrViewFreeBillerUser","FreeBiller", new { user.Id })" id="@user.Id">
                             <img src="@Url.Content("~/Content/images/Svg/edti.svg")" />
                         </a>
-                        @*<img src="~/Content/images/Svg/edti.svg"></img>*@
-                        @*@Html.ActionLink("E", "EditFreeBillerUser", new { user.Id }, new { @class = "bi bi-pencil-fill" })*@
                     </td>
-                    <td class="text-nowrap">
-                        <input type="checkbox" name="activo" id="activo" value="1" runat="server" onchange="activo(this, '@user.Id' )"/>
+                    <td class="text-nowrap padding-top-0 padding-bottom-0">
+                        <label class="switch">
+                            <input type="checkbox" name="activo" id="activo" value="1" runat="server" onchange="activo(this, '@user.Id' )">
+                            <span class="slider"></span>
+                        </label> 
                     </td>
                 </tr>
             }
@@ -163,6 +166,7 @@
 
 <div class="row margin-horizontal-0 padding-top-0">
     <div class="col-md-9 table-toolbar-left padding-left-0">
+        <span>Mostrando @(Model.Users.Count < Model.MaxItemCount ?  Model.Users.Count : 10) de @Model.Users.Count resultados</span>
     </div>
     <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
         @if (Model.Users.Any())

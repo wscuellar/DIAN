@@ -1,0 +1,520 @@
+﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFreeBillerModel
+@{
+
+    ViewBag.Title = "Modificar Registro";
+
+}
+
+<style>
+    .form-control {
+        border-radius: 4px;
+        height: 43px !important;
+        border: 1px solid #CCCCCC;
+    }
+
+    .btn-default {
+        border-radius: 4px;
+        height: 43px !important;
+        padding-top: 12px;
+        padding-left: 0px !important;
+    }
+
+    .select-container {
+        padding-left: 10px !important;
+    }
+
+    .submit-container {
+        margin-top: 8px;
+        padding-top: 24px;
+        padding-bottom: 20px;
+    }
+
+    .bootstrap-select button {
+        padding-left: 10px !important;
+    }
+</style>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="page-content margin-15">
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+        @*@if (string.IsNullOrEmpty(operationMode) && Model.Contributor.RadianState == "Habilitado" || operationMode == "1")
+        {
+            <div class="back-button"><a href="@Url.Action("Index","RadianApproved", new { ContributorId = contributorId, RadianContributorType = radianContributorType, RadianOperationMode = "1"})"><i class="fa fa-chevron-left"></i> Volver</a></div>
+        }
+        @if (operationMode == "2")
+        {
+            <div class="back-button"><a href="/"><i class="fa fa-chevron-left"></i> Volver</a></div>
+        }*@
+        <div class="back-button"><a href="/"><i class="fa fa-chevron-left"></i> Volver</a></div>
+    </div>
+    <div class="panel">
+        <div class="panel-body padding-top-20">
+            <div class="pad-btm padding-bottom-0">
+                <div class="row margin-horizontal-0">
+                    <div class="form-group">
+                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                            <div class="col-md-12 padding-horizontal-0">
+                                <div id="document-list" class="panel panel-bordered-dian">
+
+                                    <div class="panel-body padding-20 padding-bottom-0">
+                                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                        @Html.HiddenFor(model => model.Id)
+                                        <div class="row">
+                                            <div class="col-md-3 padding-xs-0">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(model => model.TypeDocId, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                    @Html.DropDownListFor(model => model.TypeDocId, (List<SelectListItem>
+                                                    )ViewBag.tdocs, new { @class = "form-control selectpicker" })
+                                                    @Html.ValidationMessageFor(model => model.TypeDocId, "", new { @class = "text-danger" })
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 padding-xs-0">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(model => model.NumberDoc, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                    @Html.EditorFor(model => model.NumberDoc, new { htmlAttributes = new { @class = "form-control" } })
+                                                    @Html.ValidationMessageFor(model => model.NumberDoc, "", new { @class = "text-danger" })
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 padding-xs-0">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(model => model.FullName, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                    @Html.EditorFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control" } })
+                                                    @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3 padding-xs-0">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                    @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                                                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 padding-xs-0">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                    @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", placeholder = "Password", @type = "password" } })
+                                                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                       
+
+
+                                       
+                                       
+                                        <div class="col-md-3 padding-xs-0">
+                                            <div class="form-group">
+
+                                                @Html.LabelFor(model => model.ProfileId, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                @Html.DropDownListFor(model => model.ProfileId, Model.Profiles, new { @class = "form-control selectpicker" })
+                                                @Html.ValidationMessageFor(model => model.ProfileId, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer-grey text-right submit-container">
+                                        <input type="submit" value="Eliminar Usuario" class="btn btn-radian-default" />
+                                        <input type="submit" value="Guardar" class="btn btn-success btn-radian-success" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-heading">
+            <h4 class="panel-title-radian padding-0"><strong>Listado de modos de operación asociados</strong></h4>
+            <hr class="margin-5" />
+        </div>
+        <div class="panel-body padding-top-20">
+            <div class="pad-btm padding-bottom-0">
+                <form class="margin-vertical-0">
+                    <div class="margin-vertical-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                        <div class="col-md-2">
+                            <h3 class="panel-title">Facturación</h3>
+                            <div class="form-check">
+                                <input class="text-nowrap"
+                                       type="checkbox"
+                                       name="FacturaVenta"
+                                       value="1"
+                                       id="FacturaVenta"
+                                       runat="server"
+                                       disabled />
+                                <label class="form-check-label" for="FacturaVenta">
+                                    Factura de Venta
+                                </label>
+                            </div>
+
+                            <!-- Checked checkbox -->
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       value=""
+                                       id="FacturaContingencia"
+                                       disabled />
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Factura de Contingencia
+                                </label>
+                            </div>
+
+                            <!-- Default checkbox -->
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       value=""
+                                       id="NotaCredito" disabled />
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    Nota Credito
+                                </label>
+                            </div>
+
+                            <!-- Checked checkbox -->
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       value=""
+                                       id="NotaDebito"
+                                       disabled />
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Nota Debito
+                                </label>
+                            </div>
+                            <!-- Checked checkbox -->
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       value=""
+                                       id="FacturaMandato"
+                                       disabled />
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Factura de Mandato
+                                </label>
+                            </div>
+                            <!-- Checked checkbox -->
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       value=""
+                                       id="FacturaAIU"
+                                       disabled />
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Factura AIU
+                                </label>
+                            </div>
+                            <!-- Checked checkbox -->
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       value=""
+                                       id="FacturaExportacion"
+                                       disabled />
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Factura de Exportación
+                                </label>
+                            </div>
+                            <!-- Checked checkbox -->
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       value=""
+                                       id="DocumentoSoporte"
+                                       disabled />
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Documento de Soporte
+                                </label>
+                            </div>
+
+                        </div>
+                        <div class="col-md-2">
+                            <h3 class="panel-title">Configuración</h3>
+                            <div class="d-flex align-items-center bg-light mb-3" style="height: 100px;">
+                                <!-- Default checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="Seguridad" disabled />
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Seguridad
+                                    </label>
+                                </div>
+
+                                <!-- Checked checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           checked="checked"
+                                           value=""
+                                           id="CertificadosDigitales" disabled />
+                                    <label class="form-check-label" for="CertificadosDigitales">
+                                        Certificados Digitales
+                                    </label>
+                                </div>
+                                <!-- Default checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="Administrar" disabled />
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Administrar
+                                    </label>
+                                </div>
+                                <!-- Default checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="clientes" disabled />
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Clientes - Adquirientes
+                                    </label>
+                                </div>
+                                <!-- Default checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="RangosNum" disabled />
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Rangos de numeración
+                                    </label>
+                                </div>
+                                <!-- Default checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="Productos" disabled />
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Productos
+                                    </label>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-md-2">
+                            <h3 class="panel-title">Plantillas</h3>
+                            <div class="d-flex align-items-end bg-light mb-3" style="height: 100px;">
+                                <!-- Default checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="NuevaPlantilla" disabled />
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Nueva Plantilla
+                                    </label>
+                                </div>
+
+                                <!-- Checked checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="FacturaVenta"
+                                           disabled />
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        Factura de Venta
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="d-flex align-items-end bg-light mb-3" style="height: 100px;">
+                                <h3 class="panel-title">Documentos</h3>
+                                <!-- Default checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="FacturaExportacion" disabled />
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Factura de Exportación
+                                    </label>
+                                </div>
+
+                                <!-- Checked checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="FacturaContingencia"
+                                           disabled />
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        Factura de Contingencia
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="d-flex align-items-end bg-light mb-3" style="height: 100px;">
+                                <h3 class="panel-title">Operaciones</h3>
+                                <!-- Default checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="AdminPlantillas" disabled />
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Administrar Plantillas
+                                    </label>
+                                </div>
+
+                                <!-- Checked checkbox -->
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="EmitirPlantillas"
+                                           disabled />
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        Usar/Emitir Plantillas
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+        $("input:checkbox:checked").attr("checked", true);
+        if (@ViewBag.valor= true) {
+            if (@ViewBag.valor= 1) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+            if (@ViewBag.valor= 2) {
+                document.getElementById("FacturaContingencia").checked = true;
+            }
+             if (@ViewBag.valor= 3) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 4) {
+                 document.getElementById("NotaCredito").checked = true;
+            }
+             if (@ViewBag.valor= 5) {
+                 document.getElementById("NotaDebito").checked = true;
+            }
+             if (@ViewBag.valor= 6) {
+                 document.getElementById("FacturaMandato").checked = true;
+            }
+             if (@ViewBag.valor= 7) {
+                 document.getElementById("FacturaAIU").checked = true;
+            }
+             if (@ViewBag.valor= 8) {
+                 document.getElementById("FacturaExportacion").checked = true;
+            }
+             if (@ViewBag.valor= 9) {
+                 document.getElementById("DocumentoSoporte").checked = true;
+            }
+             if (@ViewBag.valor= 10) {
+                 document.getElementById("Seguridad").checked = true;
+            }
+             if (@ViewBag.valor= 11) {
+                 document.getElementById("CertificadosDigitales").checked = true;
+            }
+             if (@ViewBag.valor= 12) {
+                 document.getElementById("Administrar").checked = true;
+            }
+             if (@ViewBag.valor= 13) {
+                 document.getElementById("clientes").checked = true;
+            }
+             if (@ViewBag.valor= 14) {
+                 document.getElementById("RangosNum").checked = true;
+            }
+             if (@ViewBag.valor= 15) {
+                 document.getElementById("Productos").checked = true;
+            }
+             if (@ViewBag.valor= 16) {
+                 document.getElementById("NuevaPlantilla").checked = true;
+            }
+             if (@ViewBag.valor= 17) {
+                 document.getElementById("FacturaExportacion").checked = true;
+            }
+             if (@ViewBag.valor= 18) {
+                 document.getElementById("AdminPlantillas").checked = true;
+            }
+             if (@ViewBag.valor= 19) {
+                 document.getElementById("EmitirPlantillas").checked = true;
+            }
+             if (@ViewBag.valor= 20) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 21) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 22) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 23) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 24) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 25) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 26) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 27) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 28) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 29) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 30) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 31) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+             if (@ViewBag.valor= 32) {
+                document.getElementById("FacturaVenta").checked = true;
+            }
+            console.log("Ok¡¡");
+        }
+        else {
+            console.log("No Ok¡¡");
+        }
+    });
+    </script>
+
+
+}

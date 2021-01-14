@@ -169,7 +169,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult EditFreeBillerUser(string id)
+        public ActionResult EditOrViewFreeBillerUser(string id, bool isEdit = true)
         {
             var tdocs = GetTypesDoc();
             var MenuProfiles = GetMenuProfile(id);
@@ -325,6 +325,7 @@ namespace Gosocket.Dian.Web.Controllers
             UserService user = new UserService();
             var data = user.Get(id);
             UserFreeBillerModel model = new UserFreeBillerModel();
+            model.IsEdit = isEdit == false ? false : true;
             model.Id = data.Id;
             model.Name = data.UserName;
             model.Email = data.Email;

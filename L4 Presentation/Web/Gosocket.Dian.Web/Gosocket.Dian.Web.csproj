@@ -2941,7 +2941,7 @@
     <Content Include="Views\OthersElectronicDocAssociated\_setupOperationModeForm.cshtml" />
     <Content Include="Views\OthersElectronicDocAssociated\_setupOperationModeList.cshtml" />
     <Content Include="Views\Document\PrintSupportDocument.cshtml" />
-    <Content Include="Views\FreeBiller\EditFreeBillerUser.cshtml" />
+    <Content Include="Views\FreeBiller\EditOrViewFreeBillerUser.cshtml" />
     <Content Include="Views\FreeBiller\FreeBillerUser.cshtml" />
     <Content Include="Views\FreeBiller\CreateUser.cshtml" />
     <Content Include="Views\FreeBiller\_usersFreeBiller.cshtml" />

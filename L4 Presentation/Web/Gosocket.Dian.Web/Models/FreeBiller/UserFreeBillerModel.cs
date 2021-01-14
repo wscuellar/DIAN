@@ -46,5 +46,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public DateTime? LastUpdate { get; set; }
 
         public bool IsActive { get; set; }
+
+        public bool IsEdit { get; set; }
     }
 }

@@ -1685,3 +1685,88 @@ a.badge {
 .show-details.disabled a{
     cursor: not-allowed;
 }
+
+
+/* ############# bootstrap toogle ################# */
+
+/* Basic Rules */
+.switch input {
+    display: none;
+}
+
+.switch {
+    display: inline-block;
+    width: 23px;
+    height: 15px;
+    margin: 8px;
+    transform: translateY(50%);
+    position: relative;
+    background-color: #348441;
+    border-radius: 10px;
+}
+/* Style Wired */
+.slider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 30px;
+    box-shadow: 0 0 0 2px #777, 0 0 4px #777;
+    cursor: pointer;
+    border: 2px solid transparent;
+    overflow: hidden;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    width: 13px;
+    height: 13px;
+    background: white;
+    border-radius: 30px;
+    transform: translateX(-90%);
+    transition: .4s;
+    top: -1px;
+}
+
+input:checked + .slider:before {
+    transform: translateX(-1px);
+    background: white;
+}
+
+input:checked + .slider {
+    box-shadow: 0 0 0 1px #348441,0 0 1px #348441;
+}
+
+/* Style Flat */
+.switch.flat .slider {
+    box-shadow: none;
+}
+
+    .switch.flat .slider:before {
+        background: #FFF;
+    }
+
+.switch.flat input:checked + .slider:before {
+    background: white;
+}
+
+.switch.flat input:checked + .slider {
+    background: limeGreen;
+}
+
+/* ############# bootstrap toogle ################# */
+
+.documents-table tr td{
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.documents-freebiller {
+    padding: 20px;
+}
+.buttons-freebiller {
+    padding: 20px;
+}
