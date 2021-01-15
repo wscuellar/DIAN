@@ -386,6 +386,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 ViewBag.activo = true;
             }
+            model.MenuOptionsByProfile = profileService.GetOptionsByProfile(0);
             return View(model);
         }
 

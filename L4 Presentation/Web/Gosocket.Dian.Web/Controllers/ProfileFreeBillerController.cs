@@ -7,7 +7,7 @@ using System.Web.Mvc;
 using Gosocket.Dian.Application.FreeBiller;
 using Gosocket.Dian.Domain.Sql.FreeBiller;
 using Gosocket.Dian.Web.Models.FreeBiller;
-using Gosocket.Dian.Web.Utils;
+using Newtonsoft.Json;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -19,7 +19,6 @@ namespace Gosocket.Dian.Web.Controllers
         /// Tabla: ProfilesFreeBiller.
         /// </summary>
         private readonly ProfileService profileService = new ProfileService();
-        private readonly UserService userService = new UserService();
 
         private List<MenuOptionsModel> staticMenuOptions { get; set; }
 
@@ -33,8 +32,8 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult CreateProfile()
         {
             ProfileFreeBillerModel model = new ProfileFreeBillerModel();
-            //this.GetMenuOption();
-            model.MenuOptionsByProfile = userService.GetOptionsByProfile(0);
+            model.MenuOptionsByProfile = profileService.GetOptionsByProfile(0);
+            string output = JsonConvert.SerializeObject(model.MenuOptionsByProfile);
             return View(model);
         }
 
@@ -83,26 +82,26 @@ namespace Gosocket.Dian.Web.Controllers
             return menuOptions;
         }
 
-        private void GetMenuOption()
-        {
-            var options = profileService.GetMenuOptions();
+        //private void GetMenuOption()
+        //{
+        //    var options = profileService.GetMenuOptions();
 
-            this.staticMenuOptions = this.staticMenuOptions ?? new List<MenuOptionsModel>();
-            if (options != null)
-            {
-                foreach (var item in options)
-                {
-                    this.staticMenuOptions.Add(
-                        new MenuOptionsModel
-                        {
-                            MenuId = item.Id,
-                            Name = item.Name,
-                            FatherId = item.ParentId,
-                            Level = item.MenuLevel
-                        });
-                }
-            }
-        }
+        //    this.staticMenuOptions = this.staticMenuOptions ?? new List<MenuOptionsModel>();
+        //    if (options != null)
+        //    {
+        //        foreach (var item in options)
+        //        {
+        //            this.staticMenuOptions.Add(
+        //                new MenuOptionsModel
+        //                {
+        //                    MenuId = item.Id,
+        //                    Name = item.Name,
+        //                    FatherId = item.ParentId,
+        //                    Level = item.MenuLevel
+        //                });
+        //        }
+        //    }
+        //}
 
         private List<string> VerificationFatherIds(string[] valuesSelected)
         {

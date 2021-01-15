@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gosocket.Dian.Domain.Sql.FreeBiller;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -48,5 +49,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public bool IsActive { get; set; }
 
         public bool IsEdit { get; set; }
+
+        public List<MenuOptions> MenuOptionsByProfile { get; set; }
     }
 }

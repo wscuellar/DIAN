@@ -132,8 +132,47 @@
                                 </div>
                             </div>
 
-                            @*permisos*@
-                            @*@Html.Partial("_usersFreeBiller")*@
+                            <div class="row">
+                                <span class="textPermisos">Permisos</span>
+                                <hr class="linePermisos" />
+                            </div>
+                            <div class="row">
+                                @foreach (var menuMain in Model.MenuOptionsByProfile)
+                                {
+                                    if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0)
+                                    {
+                                        <div class="col-sm-3">
+                                            <spam class="titleMenu">@menuMain.Name</spam>
+                                            @foreach (var subMenuItems in menuMain.Children)
+                                            {
+                                                if (subMenuItems.MenuLevel == 2)
+                                                {
+                                                    <span class="subTitleMenu">@subMenuItems.Name</span>
+                                                    foreach (var subSubMenuItems in subMenuItems.Children)
+                                                    {
+                                                        <div class="row-cols-1">
+                                                            <div class="form-group d-inline-flex">
+                                                                <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" />
+                                                                <label>@subSubMenuItems.Name</label>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <div class="row-cols-1">
+                                                        <div class="form-group d-inline-flex">
+                                                            <input type="checkbox" id="@subMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id" />
+                                                            <label>@subMenuItems.Name</label>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+
+                                        </div>
+                                    }
+                                }
+                            </div>
 
                         </div>
 
@@ -159,6 +198,20 @@
         $(document).ready(function () {
             var urlNewUser = "@Url.Action("FreeBillerUser")";
 
+            $("#ProfileId").click(function () {debugger
+                var idProfile = $(this).val();
+                var url = @Url.Action("GetIdsByProfile","FreeBillerController");
+                var dataAjax = {
+                    profileId: idProfile
+                }
+                var errorAction = (error) => {
+                    console.log(error);
+                }
+                var successAction = (result) => {debugger
+                    console.log(result);
+                }
+                ajaxFunction(url, "POST", dataAjax, errorAction, successAction);
+            });
             $("#btnCancel").click(function () {
                 window.location.href = urlNewUser;
             });
