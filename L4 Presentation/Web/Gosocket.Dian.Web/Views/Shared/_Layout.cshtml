@@ -270,12 +270,12 @@
                                         <!--Rol Administrador-->
                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                         {
-                                    <ul class="collapse">
-                                        <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Consultar</a></li>
-                                        <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
-                                        <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Exportar</a></li>
-                                        <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("ExportPDF", "Document")">Consultar Nomina</a></li>
-                                    </ul>
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Consultar</a></li>
+                                                <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Exportar</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("ExportPDF", "Document")">Consultar Nomina</a></li>
+                                            </ul>
                                         }
                                         <!--Rol Administrador-->
                                         <!--Rol Facturador and Proveedor-->
@@ -386,15 +386,15 @@
 
                                     <!--Rol Administrador-->
                                     @*@if (User.IsInAnyRole("Administrador", "Super"))
-                                    {*@
-                                        <li id="@Navigation.NavigationEnum.ExternalUsersCreate">
-                                            <a href="@Url.Action("AddUser", "ExternalUsers")">
-                                                <i class="fa fa-user-circle-o"></i>
-                                                <span class="menu-title">
-                                                    Crear Usuario
-                                                </span>
-                                            </a>
-                                        </li>
+        {*@
+                                    <li id="@Navigation.NavigationEnum.ExternalUsersCreate">
+                                        <a href="@Url.Action("AddUser", "ExternalUsers")">
+                                            <i class="fa fa-user-circle-o"></i>
+                                            <span class="menu-title">
+                                                Crear Usuario
+                                            </span>
+                                        </a>
+                                    </li>
                                     @*}*@
 
                                     <!--Rol Administrador-->
@@ -454,40 +454,8 @@
                                     <!--Rol Facturador-->
                                     @if (User.GoToInvoicer())
                                     {
-                                        <li id="@Navigation.NavigationEnum.Invoice">
-                                            <a href="@Url.Action("RedirectToBiller", "User")" target="_blank">
-                                                <i class="fa fa-dollar"></i>
-                                                <span class="menu-title">
-                                                    Facturador Gratuito
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @*if (ConfigurationManager.GetValue("Environment") == "Test")
-                                            {
-                                                <li id="@Navigation.NavigationEnum.Invoice">
-                                                    <a href="@Url.Action("RedirectToBiller2", "User")" target="_blank">
-                                                        <i class="fa fa-dollar"></i>
-                                                        <span class="menu-title">
-                                                            Facturador Gratuito 2
-                                                        </span>
-                                                    </a>
-                                                </li>
-                                            }*@
-                                    }
-
-                                    @if (!User.IsInAnyRole("Administrador", "Super"))
-                                    {
-                                        @*<li id="@Navigation.NavigationEnum.Invoice">
-                                                <a href="@Url.Action("RedirectToBiller", "User")" target="_blank">
-                                                    <i class="fa fa-dollar"></i>
-                                                    <span class="menu-title">
-                                                        Facturador Gratuito
-                                                    </span>
-                                                </a>
-                                            </li> *@
                                         <li>
                                             <a id="@Navigation.NavigationEnum.Invoice" class="parent-link" href="#">
-
                                                 <i class="fa fa-cog"></i>
                                                 <span class="menu-title">
                                                     Facturador Gratuito
@@ -496,10 +464,30 @@
                                             </a>
                                             <!--Submenu-->
                                             <ul class="collapse">
-                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Configuraci&oacute;n Permisos</a></li>
-                                                <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")">Inicio Facturador Gratuito</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser")">Crear Usuarios</a></li>
                                             </ul>
                                         </li>
+                                    }
+                                    else
+                                    {
+                                        @if (!User.IsInAnyRole("Administrador", "Super"))
+                                        {
+                                            <li>
+                                                <a id="@Navigation.NavigationEnum.Invoice" class="parent-link" href="#">
+
+                                                    <i class="fa fa-cog"></i>
+                                                    <span class="menu-title">
+                                                        Facturador Gratuito
+                                                    </span>
+                                                    <i class="arrow"></i>
+                                                </a>
+                                                <!--Submenu-->
+                                                <ul class="collapse">
+                                                    <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Configuraci&oacute;n Permisos</a></li>
+                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")">Inicio Facturador Gratuito</a></li>
+                                                </ul>
+                                            </li>
+                                        }
                                     }
 
                                     <!--Rol Facturador-->

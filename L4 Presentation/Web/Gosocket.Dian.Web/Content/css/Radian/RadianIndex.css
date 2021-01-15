@@ -1770,3 +1770,17 @@ input:checked + .slider {
 .buttons-freebiller {
     padding: 20px;
 }
+
+.result-users {
+    width: 95%;
+    margin: auto;
+}
+
+#btnUser {
+    margin-left: 40px;
+}
+
+.view-details-user a{
+    color: #348441;
+    text-decoration: underline;
+}
