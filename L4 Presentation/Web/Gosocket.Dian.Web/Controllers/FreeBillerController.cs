@@ -654,28 +654,10 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult GetMenuOptionsByProfile(int profileId)
         {
-            List<MenuOptions> menuOptions = profileService.GetMenuOptions().ToList();
-            List<MenuOptionsByProfiles> optionsByProfile = profileId > 0 ? profileService.GetMenuOptionsByProfile(profileId) : new List<MenuOptionsByProfiles>();
-            List<MenuOptions> hierarchy = GetChildren(menuOptions, null, optionsByProfile);
+            List<MenuOptions> hierarchy = profileService.GetOptionsByProfile(profileId);
             return Json(hierarchy, JsonRequestBehavior.AllowGet);
         }
 
-        static List<MenuOptions> GetChildren(List<MenuOptions> menuOptions, int? parentId, List<MenuOptionsByProfiles> optionsByProfile)
-        {
-            return menuOptions
-                    .Where(c => c.ParentId == parentId)
-                    .Select(c => new MenuOptions
-                    {
-                        Id = c.Id,
-                        Name = c.Name,
-                        ParentId = c.ParentId,
-                        IsActive = c.IsActive,
-                        MenuLevel = c.MenuLevel,
-                        Children = GetChildren(menuOptions, c.Id, optionsByProfile),
-                        Checked = optionsByProfile.Any(t => t.MenuOptionId == c.Id)
-                    })
-                    .ToList();
-        }
 
     }
 
