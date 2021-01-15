@@ -347,40 +347,30 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             //validar si existe un Usuario con el id
-            var user = await userManager.FindByIdAsync(model.Id);
-
-            IdentityResult identityResult = null;
-
+            ApplicationUser user = await userManager.FindByIdAsync(model.Id);
             if (user == null)
-            {
                 return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
-            }
-            else
+
+            // Actualiza los datos del usuario ingresados en el modelo
+            user.Name = model.FullName;
+            user.IdentificationTypeId = Convert.ToInt32(model.TypeDocId);
+            user.IdentificationId = model.NumberDoc;
+            user.Email = model.Email;
+            user.PasswordHash = model.Password;
+            IdentityResult identityResult = await userManager.UpdateAsync(user);
+            if (identityResult.Succeeded)
             {
-                // Actualiza los datos del usuario ingresados en el modelo
-                user.Name = model.FullName;
-                user.IdentificationTypeId = Convert.ToInt32(model.TypeDocId);
-                user.IdentificationId = model.NumberDoc;
-                user.Email = model.Email;
-                user.PasswordHash = model.Password;
-                identityResult = await userManager.UpdateAsync(user);
-                if (identityResult.Succeeded)
-                {
-                    //Envio de notificacion por correo
-                    SendMailCreate(model);
-                    //Aquí va el modal de ok.
-                    ResponseMessage resultx = new ResponseMessage(TextResources.UserUpdatedSuccess, TextResources.alertType);
-                    resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");
-                    return Json(resultx, JsonRequestBehavior.AllowGet);
-                }
+                SendMailCreate(model);
+                ResponseMessage resultx = new ResponseMessage(TextResources.UserUpdatedSuccess, TextResources.alertType);
+                resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");
+                return Json(resultx, JsonRequestBehavior.AllowGet);
             }
-            if (identityResult != null)
-            {
-                foreach (var item in identityResult.Errors)
-                    errors.Append(item);
-            }
+
+            foreach (var item in identityResult.Errors)
+                errors.Append(item);
             return Json(new ResponseMessage(errors.ToString(), TextResources.alertType), JsonRequestBehavior.AllowGet);
-        } 
+
+        }
 
         #endregion
 
@@ -659,7 +649,7 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult GetMenuOptionsByProfile(int profileId)
         {
             List<MenuOptions> menuOptions = profileService.GetMenuOptions().ToList();
-            List<MenuOptionsByProfiles> optionsByProfile = profileId > 0  ? profileService.GetMenuOptionsByProfile(profileId) : new List<MenuOptionsByProfiles>();
+            List<MenuOptionsByProfiles> optionsByProfile = profileId > 0 ? profileService.GetMenuOptionsByProfile(profileId) : new List<MenuOptionsByProfiles>();
             List<MenuOptions> hierarchy = GetChildren(menuOptions, null, optionsByProfile);
             return Json(hierarchy, JsonRequestBehavior.AllowGet);
         }
@@ -676,7 +666,7 @@ namespace Gosocket.Dian.Web.Controllers
                         IsActive = c.IsActive,
                         MenuLevel = c.MenuLevel,
                         Children = GetChildren(menuOptions, c.Id, optionsByProfile),
-                        Checked = optionsByProfile.Any(t=> t.MenuOptionId == c.Id)
+                        Checked = optionsByProfile.Any(t => t.MenuOptionId == c.Id)
                     })
                     .ToList();
         }
