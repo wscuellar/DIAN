@@ -1784,3 +1784,7 @@ input:checked + .slider {
     color: #348441;
     text-decoration: underline;
 }
+
+#btnCancel {
+    color: #707782;
+}
