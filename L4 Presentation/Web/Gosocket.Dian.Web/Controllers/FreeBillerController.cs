@@ -324,6 +324,8 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
+        #region EditFreeBillerUser
+
         /// <summary>
         /// Metodo asincrono para editar la información..
         /// </summary>
@@ -333,34 +335,53 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> EditFreeBillerUser(UserFreeBillerModel model)
         {
 
+            //Valida si el modelo trae errores
+            StringBuilder errors = new StringBuilder();
+            if (!ModelState.IsValid)
+            {
+                IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var item in allErrors)
+                    errors.AppendLine(item.ErrorMessage);
+                return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            //validar si existe un Usuario con el id
             var user = await userManager.FindByIdAsync(model.Id);
+
+            IdentityResult identityResult = null;
 
             if (user == null)
             {
-                ViewBag.message = "No se encontro el ID";
-                return View("Not found");
+                return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
             else
             {
+                // Actualiza los datos del usuario ingresados en el modelo
                 user.Name = model.FullName;
                 user.IdentificationTypeId = Convert.ToInt32(model.TypeDocId);
                 user.IdentificationId = model.NumberDoc;
                 user.Email = model.Email;
                 user.PasswordHash = model.Password;
-                var result = await userManager.UpdateAsync(user);
-                if (result.Succeeded)
+                identityResult = await userManager.UpdateAsync(user);
+                if (identityResult.Succeeded)
                 {
                     //Envio de notificacion por correo
                     SendMailCreate(model);
-                    return RedirectToAction("FreeBillerUser");
+                    //Aquí va el modal de ok.
+                    ResponseMessage resultx = new ResponseMessage(TextResources.UserUpdatedSuccess, TextResources.alertType);
+                    resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");
+                    return Json(resultx, JsonRequestBehavior.AllowGet);
                 }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.ToString());
-                }
-                return View(model);
             }
-        }
+            if (identityResult != null)
+            {
+                foreach (var item in identityResult.Errors)
+                    errors.Append(item);
+            }
+            return Json(new ResponseMessage(errors.ToString(), TextResources.alertType), JsonRequestBehavior.AllowGet);
+        } 
+
+        #endregion
 
         public ActionResult CreateUser()
         {

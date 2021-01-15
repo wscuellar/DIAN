@@ -256,4 +256,10 @@
   <data name="UserWithOutCompany" xml:space="preserve">
     <value>El Usuario no tiene una Empresa Asociada!</value>
   </data>
+  <data name="UserDoesntExist" xml:space="preserve">
+    <value>El usuario no existe o no está registrado</value>
+  </data>
+  <data name="UserUpdatedSuccess" xml:space="preserve">
+    <value>El usuario fue actualizado exitosamente</value>
+  </data>
 </root>
