@@ -244,4 +244,16 @@
     <value>Mode de operación adicionado correctamente</value>
     <comment>\</comment>
   </data>
+  <data name="UserCreatedSuccess" xml:space="preserve">
+    <value>El usuario fue creado exitosamente</value>
+  </data>
+  <data name="UserExistingDoc" xml:space="preserve">
+    <value>Ya existe un Usuario con el Tipo de Documento y Documento suministrados</value>
+  </data>
+  <data name="UserRoleFail" xml:space="preserve">
+    <value>El Usuario no puedo ser asignado al role 'Usuario Facturador Gratuito'</value>
+  </data>
+  <data name="UserWithOutCompany" xml:space="preserve">
+    <value>El Usuario no tiene una Empresa Asociada!</value>
+  </data>
 </root>

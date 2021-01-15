@@ -22,9 +22,9 @@ namespace Gosocket.Dian.Web.Utils
 
         #region RELACION DE USUARIO CON PERFIL PARA FACTURADOR GRATUITO.
 
-        public List<ApplicationUser> UserFreeBillerProfile(Expression<Func<ApplicationUser, bool>> expression, int profileId = 1)
+        public List<ApplicationUser> UserFreeBillerProfile(Expression<Func<ApplicationUser, bool>> expression, int profileId = 0)
         {
-            var query = from pr in _sqlDBContext.UserFreeBillerProfile.Where(t=> profileId == 1 || t.ProfileFreeBillerId ==  profileId)
+            var query = from pr in _sqlDBContext.UserFreeBillerProfile.Where(t=> profileId == 0 || t.ProfileFreeBillerId ==  profileId)
                         join u in _sqlDBContext.Users.Where(expression) on pr.UserId equals u.Id
                         select u;
 

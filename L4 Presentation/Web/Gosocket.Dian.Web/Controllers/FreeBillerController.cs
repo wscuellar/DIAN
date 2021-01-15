@@ -17,6 +17,8 @@ using Gosocket.Dian.Application.FreeBiller;
 using Gosocket.Dian.Domain.Utils;
 using System.Threading.Tasks;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Common.Resources;
+using System.Net;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -126,7 +128,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.DocTypes = staticTypeDoc;
             model.Profiles = staticProfiles;
-            model.Users = this.GetUsers(new UserFiltersFreeBillerModel() { ProfileId = 1, DocNumber = null, FullName= null, DocTypeId = 0 });  
+            model.Users = this.GetUsers(new UserFiltersFreeBillerModel() { ProfileId = 0, DocNumber = null, FullName= null, DocTypeId = 0 });  
             foreach (var item in model.Users.ToList())
             {
                 var activo = item.IsActive;
@@ -386,13 +388,13 @@ namespace Gosocket.Dian.Web.Controllers
                 IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
                 foreach (var item in allErrors)
                     errors.AppendLine(item.ErrorMessage);
-                return Json(new ResponseMessage(errors.ToString(), "alerttype"), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             //identifica el usuario que esta crean los nuevos registros
             var uCompany = userService.Get(User.Identity.GetUserId());
             if (uCompany == null)
-                return Json(new ResponseMessage("El Usuario no tiene una Empresa Asociada!", "alerttype"), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage(TextResources.UserWithOutCompany, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
             //Crea nuevo registro para AspNetUser
             model.FullName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(model.FullName);
@@ -417,7 +419,7 @@ namespace Gosocket.Dian.Web.Controllers
             //validar si ya existe un Usuario con el tipo documento y documento suministrados en AspNetUser
             var vUserDB = userService.FindUserByIdentificationAndTypeId(string.Empty, user.IdentificationTypeId, model.NumberDoc);
             if (vUserDB != null)
-                return Json(new ResponseMessage("Ya existe un Usuario con el Tipo de Documento y Documento suministrados", "alerttype"), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage(TextResources.UserExistingDoc, TextResources.alertType,(int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
             //Crea el registro del nuevo usuario
             IdentityResult identification = userManager.Create(user, model.Password);
@@ -442,7 +444,7 @@ namespace Gosocket.Dian.Web.Controllers
                 if (!resultRole.Succeeded)
                 {
                     userManager.Delete(user);
-                    return Json(new ResponseMessage("El Usario no puedo ser asignado al role 'Usuario Facturador Gratuito'", "alerttype"), JsonRequestBehavior.AllowGet);
+                    return Json(new ResponseMessage(TextResources.UserRoleFail, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
                 }
 
                 // Claim para reconocer el perfi del nuevo usuario para el Facturador Gratuito.
@@ -455,14 +457,14 @@ namespace Gosocket.Dian.Web.Controllers
                 _ = SendMailCreate(model);
 
                 //Aquí va el modal de ok.
-                ResponseMessage resultx = new ResponseMessage("El usuario fue creado exitosamente", "alerttype", 200);
+                ResponseMessage resultx = new ResponseMessage(TextResources.UserCreatedSuccess, TextResources.alertType);
                 resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");
                 return Json(resultx, JsonRequestBehavior.AllowGet);
             }
 
             foreach (var item in identification.Errors)
                 errors.Append(item);
-            return Json(new ResponseMessage(errors.ToString(), "alerttype"), JsonRequestBehavior.AllowGet);
+            return Json(new ResponseMessage(errors.ToString(), TextResources.alertType), JsonRequestBehavior.AllowGet);
         }
 
 
@@ -493,6 +495,7 @@ namespace Gosocket.Dian.Web.Controllers
             return true;
         }
 
+        #region Carga de combos
 
         /// <summary>
         /// Método encargado de obtener los perfiles del Facturador Gratuito y asignarlos a 
@@ -503,9 +506,9 @@ namespace Gosocket.Dian.Web.Controllers
         {
             List<SelectListItem> selectTypesId = new List<SelectListItem>();
             var profiles = profileService.GetAll();
-
             if (profiles?.Count > 0)
             {
+                profiles.Insert(0, new Domain.Sql.FreeBiller.Profile() { Id = 0, Name = "Seleccione..." });
                 foreach (var item in profiles)
                 {
                     selectTypesId.Add(
@@ -549,7 +552,8 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             return selectTypesId;
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// Método encargado de obtener todos los perfiles para los usuarios del Facturador Gratuito.
