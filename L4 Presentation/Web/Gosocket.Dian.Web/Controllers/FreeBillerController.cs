@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Common.Resources;
 using System.Net;
+using Gosocket.Dian.Domain.Sql.FreeBiller;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -128,7 +129,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.DocTypes = staticTypeDoc;
             model.Profiles = staticProfiles;
-            model.Users = this.GetUsers(new UserFiltersFreeBillerModel() { ProfileId = 0, DocNumber = null, FullName= null, DocTypeId = 0 });  
+            model.Users = this.GetUsers(new UserFiltersFreeBillerModel() { ProfileId = 0, DocNumber = null, FullName = null, DocTypeId = 0 });
             foreach (var item in model.Users.ToList())
             {
                 var activo = item.IsActive;
@@ -440,7 +441,7 @@ namespace Gosocket.Dian.Web.Controllers
             //validar si ya existe un Usuario con el tipo documento y documento suministrados en AspNetUser
             var vUserDB = userService.FindUserByIdentificationAndTypeId(string.Empty, user.IdentificationTypeId, model.NumberDoc);
             if (vUserDB != null)
-                return Json(new ResponseMessage(TextResources.UserExistingDoc, TextResources.alertType,(int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage(TextResources.UserExistingDoc, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
             //Crea el registro del nuevo usuario
             IdentityResult identification = userManager.Create(user, model.Password);
@@ -573,7 +574,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             return selectTypesId;
-        } 
+        }
         #endregion
 
         /// <summary>
@@ -653,6 +654,32 @@ namespace Gosocket.Dian.Web.Controllers
                     }).ToList();
         }
 
+
+        [HttpPost]
+        public JsonResult GetMenuOptionsByProfile(int profileId)
+        {
+            List<MenuOptions> menuOptions = profileService.GetMenuOptions().ToList();
+            List<MenuOptionsByProfiles> optionsByProfile = profileId > 0  ? profileService.GetMenuOptionsByProfile(profileId) : new List<MenuOptionsByProfiles>();
+            List<MenuOptions> hierarchy = GetChildren(menuOptions, null, optionsByProfile);
+            return Json(hierarchy, JsonRequestBehavior.AllowGet);
+        }
+
+        static List<MenuOptions> GetChildren(List<MenuOptions> menuOptions, int? parentId, List<MenuOptionsByProfiles> optionsByProfile)
+        {
+            return menuOptions
+                    .Where(c => c.ParentId == parentId)
+                    .Select(c => new MenuOptions
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        ParentId = c.ParentId,
+                        IsActive = c.IsActive,
+                        MenuLevel = c.MenuLevel,
+                        Children = GetChildren(menuOptions, c.Id, optionsByProfile),
+                        Checked = optionsByProfile.Any(t=> t.MenuOptionId == c.Id)
+                    })
+                    .ToList();
+        }
 
     }
 
