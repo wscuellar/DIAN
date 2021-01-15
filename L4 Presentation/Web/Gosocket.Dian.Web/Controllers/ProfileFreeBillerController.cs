@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using Gosocket.Dian.Application.FreeBiller;
 using Gosocket.Dian.Domain.Sql.FreeBiller;
 using Gosocket.Dian.Web.Models.FreeBiller;
+using Gosocket.Dian.Web.Utils;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -18,6 +19,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// Tabla: ProfilesFreeBiller.
         /// </summary>
         private readonly ProfileService profileService = new ProfileService();
+        private readonly UserService userService = new UserService();
 
         private List<MenuOptionsModel> staticMenuOptions { get; set; }
 
@@ -31,8 +33,8 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult CreateProfile()
         {
             ProfileFreeBillerModel model = new ProfileFreeBillerModel();
-            this.GetMenuOption();
-            model.MenuOptionsByProfile = this.staticMenuOptions;
+            //this.GetMenuOption();
+            model.MenuOptionsByProfile = userService.GetOptionsByProfile(0);
             return View(model);
         }
 
