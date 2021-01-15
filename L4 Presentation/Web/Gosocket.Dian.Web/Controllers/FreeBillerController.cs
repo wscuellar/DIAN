@@ -659,6 +659,15 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
+        [HttpPost]
+        public JsonResult GetIdsByProfile(int profileId)
+        {
+            List<MenuOptionsByProfiles> hierarchy = profileService.GetMenuOptionsByProfile(profileId);
+            var ids =  hierarchy.Select(t => t.MenuOptionId);
+            return Json(ids, JsonRequestBehavior.AllowGet);
+        }
+
+
     }
 
 }
