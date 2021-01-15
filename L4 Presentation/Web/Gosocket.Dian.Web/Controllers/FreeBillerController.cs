@@ -360,6 +360,12 @@ namespace Gosocket.Dian.Web.Controllers
             IdentityResult identityResult = await userManager.UpdateAsync(user);
             if (identityResult.Succeeded)
             {
+                // Actualiza el claim
+                _ = userService.UpdateUserClaim(new ClaimsDb() { ClaimValue = model.ProfileId.ToString(), UserId = user.Id });
+                
+                // Actualiza perfil
+                _ = userService.UserFreeBillerUpdate(new Domain.Sql.UsersFreeBillerProfile() { ProfileFreeBillerId = model.ProfileId, UserId = user.Id });
+
                 SendMailCreate(model);
                 ResponseMessage resultx = new ResponseMessage(TextResources.UserUpdatedSuccess, TextResources.alertType);
                 resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");

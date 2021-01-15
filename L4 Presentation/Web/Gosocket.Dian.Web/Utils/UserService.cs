@@ -1,5 +1,7 @@
-﻿using Gosocket.Dian.Domain.Entity;
+﻿using Gosocket.Dian.DataContext;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Domain.Utils;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Web.Models;
 using System;
@@ -12,11 +14,16 @@ namespace Gosocket.Dian.Web.Utils
     public class UserService
     {
         ApplicationDbContext _sqlDBContext;
+        SqlDBContext _sqlAspDBContext;
         public UserService()
         {
             if (_sqlDBContext == null)
             {
                 _sqlDBContext = new ApplicationDbContext();
+            }
+            if (_sqlAspDBContext == null)
+            {
+                _sqlAspDBContext = new SqlDBContext();
             }
         }
 
@@ -34,7 +41,7 @@ namespace Gosocket.Dian.Web.Utils
 
         public int UserFreeBillerUpdate(UsersFreeBillerProfile usersFreeBiller)
         {
-            UsersFreeBillerProfile usersInstance = _sqlDBContext.UserFreeBillerProfile.FirstOrDefault(c => c.Id == usersFreeBiller.Id);
+            UsersFreeBillerProfile usersInstance = _sqlDBContext.UserFreeBillerProfile.FirstOrDefault(c => c.UserId == usersFreeBiller.UserId);
 
             if (usersInstance != null)
             {
@@ -49,6 +56,26 @@ namespace Gosocket.Dian.Web.Utils
 
             return usersInstance ==  null ? usersFreeBiller.Id : usersInstance.Id;
         }
+
+        #region Actualizar Claims para usuarios de facturador gratuito
+
+        public int UpdateUserClaim(ClaimsDb usersFreeBiller)
+        {
+            ClaimsDb usersInstance = _sqlAspDBContext.ClaimsDbs.FirstOrDefault(c => c.UserId.Equals(usersFreeBiller.UserId));
+
+            if (usersInstance != null)
+            {
+                usersInstance.UserId = usersFreeBiller.UserId;
+                usersInstance.ClaimValue = usersFreeBiller.ClaimValue.ToString();
+                _sqlAspDBContext.Entry(usersInstance).State = System.Data.Entity.EntityState.Modified;
+            }
+
+            _sqlAspDBContext.SaveChanges();
+
+            return usersInstance == null ? usersFreeBiller.Id : usersInstance.Id;
+        }
+
+        #endregion
 
         #endregion
 
