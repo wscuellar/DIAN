@@ -439,6 +439,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a El usuario no existe o no está registrado.
+        /// </summary>
+        public static string UserDoesntExist {
+            get {
+                return ResourceManager.GetString("UserDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Ya existe un Usuario con el Tipo de Documento y Documento suministrados.
         /// </summary>
         public static string UserExistingDoc {
@@ -453,6 +462,15 @@ namespace Gosocket.Dian.Common.Resources {
         public static string UserRoleFail {
             get {
                 return ResourceManager.GetString("UserRoleFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El usuario fue actualizado exitosamente.
+        /// </summary>
+        public static string UserUpdatedSuccess {
+            get {
+                return ResourceManager.GetString("UserUpdatedSuccess", resourceCulture);
             }
         }
         
