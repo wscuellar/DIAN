@@ -127,13 +127,17 @@
                                                             <hr class="linePermisos" />
                                                         </div>
                                                         <div class="row">
-                                                            @foreach (var menuMain in Model.MenuOptionsByProfile.Where(m => m.Level == 1))
+                                                            @foreach (var menuMain in Model.MenuOptionsByProfile)
                                                             {
+                                                                @*if (menuMain.Children.Count)
+                                                                {
+
+                                                                }
                                                                 <div class="col-sm-1">
                                                                     <div class="row">
                                                                         <spam class="titleMenu">@menuMain.Name</spam>
                                                                     </div>
-                                                                    @foreach (var subMenuItems in Model.MenuOptionsByProfile.Where(m => m.FatherId == (Nullable<int>)menuMain.MenuId))
+                                                                    @foreach (var subMenuItems in )
                                                                     {
                                                                         if (subMenuItems.Level == 2)
                                                                         {
@@ -160,7 +164,7 @@
                                                                         }
                                                                     }
 
-                                                                </div>
+                                                                </div>*@
                                                             }
                                                         </div>
                                                     </div>
