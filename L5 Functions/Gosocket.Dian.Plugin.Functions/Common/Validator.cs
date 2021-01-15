@@ -2886,9 +2886,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "Regla:  89-(R): ",
-                                            ErrorMessage = "Solo se pueda transmitir el evento (033) Aceptacion Expresa de la factura," +
-                                            " después de haber transmitido el evento (032) recibo del bien o aceptacion de la prestacion del servicio ",
+                                            ErrorCode = "Regla: LGC12-(R): ",
+                                            ErrorMessage = "Solo se pueda transmitir el evento (033) Aceptación Expresa de la factura, " +
+                                            "después de haber transmitido el evento (032) Recibo del bien o prestación del servicio",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
