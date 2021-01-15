@@ -630,7 +630,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["DocumentKeyXpath"]) && !noteCodes.Contains(docTypeCode))
             {
-                stringBuilder.AppendLine($"{codeMessage}D06-(R) CUFE del UBL no puede estar vacío.");
+                stringBuilder.AppendLine($"{codeMessage}D06-(R) el valor UUID no está correctamente calculado.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -884,7 +884,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentCude))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D06-(R): CUDE del UBL no puede estar vacío.");
+                    stringBuilder.AppendLine($"{codeMessage}D06-(R): el valor UUID no está correctamente calculado.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -903,7 +903,7 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (string.IsNullOrEmpty(documentKey))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D06-(R): CUFE del UBL no puede estar vacío.");
+                    stringBuilder.AppendLine($"{codeMessage}D06-(R): el valor UUID no está correctamente calculado.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
