@@ -470,7 +470,14 @@ namespace Gosocket.Dian.Web.Controllers
                 userManager.AddClaim(user.Id, new System.Security.Claims.Claim(CLAIMPROFILE, model.ProfileId.ToString()));
 
                 //incluir el asociacion del registro. UserFreeBillerProfile
-                _ = userService.UserFreeBillerUpdate(new Domain.Sql.UsersFreeBillerProfile() { ProfileFreeBillerId = model.ProfileId, UserId = user.Id });
+                _ = userService.UserFreeBillerUpdate(
+                    new Domain.Sql.UsersFreeBillerProfile() 
+                    { 
+                        ProfileFreeBillerId = model.ProfileId, 
+                        UserId = user.Id, 
+                        CompanyCode = user.CreatorNit,
+                        CompanyIdentificationType = uCompany.IdentificationTypeId
+                    });
 
                 //Envio de notificacion por correo
                 _ = SendMailCreate(model);

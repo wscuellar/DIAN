@@ -117,6 +117,12 @@ namespace Gosocket.Dian.Web.Utils
             return _sqlDBContext.Users.FirstOrDefault(u => u.Code == code && u.IdentificationTypeId == identificatioTypeId);
         }
 
+
+        public ApplicationUser GetByCodePasswordAndIdentificationTyte(string code, int identificatioTypeId, string password)
+        {
+            return _sqlDBContext.Users.FirstOrDefault(u => u.Code == code && u.IdentificationTypeId == identificatioTypeId && u.PasswordHash == password);
+        }
+
         public ApplicationUser GetByEmail(string email)
         {
             return _sqlDBContext.Users.FirstOrDefault(u => u.Email == email);
