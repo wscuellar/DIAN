@@ -207,9 +207,6 @@
 
     <script>
         $(document).ready(function () {
-            var urlNewUser = "@Url.Action("FreeBillerUser")";
-
-
             $("#btnSend").click(function (e) {
                 e.preventDefault();
                 var form = $("#create-user-form")
@@ -256,7 +253,7 @@
                 ajaxFunction(url, "POST", dataAjax, errorAction, successAction);
             });
             $("#btnCancel").click(function () {
-                window.location.href = urlNewUser;
+                window.location.href = '@Url.Action("FreeBillerUser", "FreeBiller")';
             });
 
         });
