@@ -72,6 +72,9 @@ namespace Gosocket.Dian.Functions.Pdf
                 // Objeto que se Conecta al Storage 
                 var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
 
+                var storageBiller = "DefaultEndpointsProtocol=https;AccountName=gtpabillerstoragetest;AccountKey=JAuJKjEWIsOU0e4VhpuY2VH5gk5CEfZyFp3xm3NffTZug7HzUNdJdX4DT+4/UIdE0qfrwG9asG730Zv6QBVFcA==";
+                var fileManagerBiller = new FileManager(storageBiller);
+
 
                 // Transformar **XML** to **HTML**
                 var htmlGDoc = new HtmlGDoc(xmlBytes, xmlBytesApplication);
@@ -80,7 +83,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 //-------------------------------------------------------------------------------------------------------------------------
 
                 // Obtener en el Storage el Byte Array del **LOGO** a poner en el Documento - Convertir a Base 64 Image
-                MemoryStream logoStream = new MemoryStream(fileManager.GetBytes("dian", "images/logoTest.png"));
+                MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytes("logo", $"{documentMetaEntity.ReceiverCode}.jpg") ?? fileManager.GetBytes("dian", "images/logoTest.png"));
                 string logoStrBase64 = Convert.ToBase64String(logoStream.ToArray());
                 var logoBase64 = $@"data:image/png;base64,{logoStrBase64}";
 
