@@ -2949,6 +2949,7 @@
     <Content Include="Views\FreeBiller\_usersFreeBiller.cshtml" />
     <Content Include="Views\ProfileFreeBiller\CreateProfile.cshtml" />
     <Content Include="Views\Document\ExportPDF.cshtml" />
+    <Content Include="Views\User\_userexLogin.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
