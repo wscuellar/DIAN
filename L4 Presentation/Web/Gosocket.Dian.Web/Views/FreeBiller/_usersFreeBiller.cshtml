@@ -10,21 +10,15 @@
         margin-bottom: 10px;
     }
 </style>
-<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
-<script type="text/javascript">
+<script>
 
-    $(document).ready(function () {
+    @*$(document).ready(function () {
         $("input:checkbox:checked").attr("checked", true);
         if (@ViewBag.activo = true) {
             document.getElementById("activo").checked = true;
-            console.log("Ok¡¡");
         }
-        else {
-            console.log("No Ok¡¡");
-        }
-    });
+    });*@
     function activo(checkboxElem,Id) {
-        //var Id = "041c9dc6-ed8d-4f67-bbe3-bd6fab3ef8cd";
         if (checkboxElem.checked) {
           
             console.log(Id);
@@ -94,97 +88,97 @@
         <p class="subtitle-view">
             Resultados de búsqueda
         </p>
-    <div class="radian-subtitle-line"></div>
-</div>
-
-<div class="table-responsive padding-bottom-15">
-
-    <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
-        <thead>
-            <tr>
-                <th class="text-left">Tipo de doocumento</th>
-                <th>N&uacute;mero de documento</th>
-                <th class="text-left">Nombre y apellido</th>
-                <th class="text-left">Perfil</th>
-                <th>&Uacute;ltima Modificaci&oacute;n</th>
-                <th colspan="3">Acciones</th>
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            @if (Model.Users.Count == 0)
-            {
-                <tr style="background-color: transparent !important;">
-                    <td class="text-nowrap text-center" colspan="13" style="padding-left: 0 !important; padding-right: 0 !important;">
-                        <div class="alert panel-footer-grey">
-                            Ningún usuario disponible para mostrar.
-                        </div>
-                    </td>
-                </tr>
-            }
-            @foreach (var user in Model.Users)
-            {
-               
-                <tr class="document-row">
-                    <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
-                        <a>@user.DescriptionTypeDoc</a>
-                    </td>
-                    <td class="text-nowrap text-center padding-top-0 padding-bottom-0">
-                        <a>@user.NumberDoc</a>
-                    </td>
-                    <td class="text-left text-nowrap padding-top-0 padding-bottom-0">
-                        @user.FullName
-                    </td>
-                    <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
-                        @user.DescriptionProfile
-                    </td>
-                    <td class="text-center padding-top-0 padding-bottom-0">
-                        @user.LastUpdate
-                    </td>
-                    <td class="text-nowrap padding-top-0 padding-bottom-0 view-details-user">
-                        @Html.ActionLink("Ver detalles", "EditOrViewFreeBillerUser",
-                            new { controller = "FreeBiller", id = user.Id, isEdit = false },
-                            new { @class = "btn-link" })
-                    </td>
-                    <td class="padding-top-0 padding-bottom-0">
-                        <a href="@Url.Action("EditOrViewFreeBillerUser","FreeBiller", new { user.Id })" id="@user.Id">
-                            <img src="@Url.Content("~/Content/images/Svg/edti.svg")" />
-                        </a>
-                    </td>
-                    <td class="text-nowrap padding-top-0 padding-bottom-0">
-                        <label class="switch">
-                            <input type="checkbox" name="activo" id="activo" value="1" runat="server" onchange="activo(this, '@user.Id' )">
-                            <span class="slider"></span>
-                        </label> 
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-<div class="row margin-horizontal-0 padding-top-0">
-    <div class="col-md-9 table-toolbar-left padding-left-0">
-        <span>Mostrando @(Model.Users.Count < Model.PageSize ?  Model.Users.Count : 10) de @Model.Users.Count resultados</span>
+        <div class="radian-subtitle-line"></div>
     </div>
-    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
-        @if (Model.Users.Any())
-        {
-            <span class="text-muted">
-                <strong>@(Model.Page * Model.PageSize + 1)-@(Model.PageSize > Model.Users.Count ? (Model.Page) * Model.PageSize + Model.Users.Count : (Model.Page + 1) * Model.PageSize)</strong>
-            </span>
-            <div class="btn-group btn-group margin-left-5">
-                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
-                    <span class="fa fa-chevron-left"></span>
-                </a>
-                <a class="btn btn-default paginate-btn next-page" @(Model.Users.Count < Model.PageSize ? "disabled=\"disabled\"" : "")>
-                    <span class="fa fa-chevron-right"></span>
-                </a>
-            </div>
-        }
+
+    <div class="table-responsive padding-bottom-15">
+
+        <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+            <thead>
+                <tr>
+                    <th class="text-left">Tipo de doocumento</th>
+                    <th>N&uacute;mero de documento</th>
+                    <th class="text-left">Nombre y apellido</th>
+                    <th class="text-left">Perfil</th>
+                    <th>&Uacute;ltima Modificaci&oacute;n</th>
+                    <th colspan="3">Acciones</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @if (Model.Users.Count == 0)
+                {
+                    <tr style="background-color: transparent !important;">
+                        <td class="text-nowrap text-center" colspan="13" style="padding-left: 0 !important; padding-right: 0 !important;">
+                            <div class="alert panel-footer-grey">
+                                Ningún usuario disponible para mostrar.
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @foreach (var user in Model.Users)
+                {
+
+                    <tr class="document-row">
+                        <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
+                            <a>@user.DescriptionTypeDoc</a>
+                        </td>
+                        <td class="text-nowrap text-center padding-top-0 padding-bottom-0">
+                            <a>@user.NumberDoc</a>
+                        </td>
+                        <td class="text-left text-nowrap padding-top-0 padding-bottom-0">
+                            @user.FullName
+                        </td>
+                        <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
+                            @user.DescriptionProfile
+                        </td>
+                        <td class="text-center padding-top-0 padding-bottom-0">
+                            @user.LastUpdate
+                        </td>
+                        <td class="text-nowrap padding-top-0 padding-bottom-0 view-details-user">
+                            @Html.ActionLink("Ver detalles", "EditOrViewFreeBillerUser",
+                                new { controller = "FreeBiller", id = user.Id, isEdit = false },
+                                new { @class = "btn-link" })
+                        </td>
+                        <td class="padding-top-0 padding-bottom-0">
+                            <a href="@Url.Action("EditOrViewFreeBillerUser","FreeBiller", new { user.Id })" id="@user.Id">
+                                <img src="@Url.Content("~/Content/images/Svg/edti.svg")" />
+                            </a>
+                        </td>
+                        <td class="text-nowrap padding-top-0 padding-bottom-0">
+                            <label class="switch">
+                                <input type="checkbox" name="activo" id="activo" value="1" runat="server" onchange="activo(this, '@user.Id' )">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
-</div>
+
+    <div class="row margin-horizontal-0">
+        <div class="col-md-9 table-toolbar-left padding-left-0">
+            <span>Mostrando @(Model.TotalCount < Model.PageSize ?  Model.TotalCount : 10) de @Model.TotalCount resultados</span>
+        </div>
+        <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+            @if (Model.Users.Count > 0)
+            {
+                <span class="text-muted">
+                    <strong>@((Model.Page - 1) * Model.PageSize + 1)-@(Model.PageSize > Model.Users.Count ? (Model.Page - 1) * Model.PageSize + Model.Users.Count : (Model.Page) * Model.PageSize)</strong>
+                </span>
+                <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
+                    <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 1 ? "disabled=\"disabled\"" : "")>
+                        <span class="fa fa-chevron-left"></span>
+                    </a>
+                    <a class="btn btn-default paginate-btn next-page" @(Model.Users.Count < Model.PageSize ? "disabled=\"disabled\"" : "")>
+                        <span class="fa fa-chevron-right"></span>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
 
 </div>
