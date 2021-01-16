@@ -36,7 +36,7 @@
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
-                                    @using (Html.BeginForm("FreeBillerUser", "FreeBiller", FormMethod.Post))
+                                    @using (Html.BeginForm("FreeBillerUser", "FreeBiller", FormMethod.Post, , new { id = "freebiller-users-form" }))
                                     {
                                         <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                             <div class="col-md-12 padding-horizontal-0">
@@ -112,6 +112,7 @@
 
     <script>
         $(document).ready(function () {
+            var form = $('#freebiller-users-form');
             $("input:checkbox:checked").attr("checked", true);
 
             var urlNewUser = "@Url.Action("CreateUser")";
@@ -124,6 +125,16 @@
             $("#btnProfile").click(function () {
                 window.location.href = urlNewProfile;
             });
+
+             $(".next-page").click(function () {
+                $("#Page").val(@Model.Page + 1);
+                form.submit();
+            })
+
+            $(".prev-page").click(function () {
+                $("#Page").val(@Model.Page - 1);
+                form.submit();
+            })
         });
     </script>
 
