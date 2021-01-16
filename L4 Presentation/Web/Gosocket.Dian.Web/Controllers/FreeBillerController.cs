@@ -477,7 +477,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 //Aquí va el modal de ok.
                 ResponseMessage resultx = new ResponseMessage(TextResources.UserCreatedSuccess, TextResources.alertType);
-                resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");
+                resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBiller");
                 return Json(resultx, JsonRequestBehavior.AllowGet);
             }
 
