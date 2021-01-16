@@ -1788,3 +1788,38 @@ input:checked + .slider {
 #btnCancel {
     color: #707782;
 }
+
+.label-check {
+    margin: auto 5px;
+    padding-top: 4px;
+}
+
+.level-2{
+    padding-left: 10px;
+}
+
+.level-3 {
+    padding-left: 15px;
+}
+
+.d-flex{
+    display: flex;
+}
+
+.subTitleMenu {
+    margin-top: 10px;
+    display: block;
+}
+
+#divMain .level-3 input[type=checkbox] {
+    margin: 0px;
+}
+
+.checks-group {
+    width: 95%;
+    margin: auto;
+}
+
+#divMain .titleMenu, #divMain .subTitleMenu {
+    font-size: 16px;
+}
