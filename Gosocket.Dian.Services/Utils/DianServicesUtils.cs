@@ -798,7 +798,7 @@ namespace Gosocket.Dian.Services.Utils
                 if (flagEvento)
                 {
 
-                    bool validaUUID = (Convert.ToInt32(eventCode) == 43 && Convert.ToInt32(listID) == 3) ? false : true;
+                    bool validaUUID = (Convert.ToInt32(eventCode) == 43 && listID == "3") ? false : true;
                     if (string.IsNullOrEmpty(documentKey) && validaUUID)
                     {
                         stringBuilder.AppendLine($"{codeMessage}H07-(R): esta UUID no existe en la base de datos de la DIAN.");

@@ -3152,8 +3152,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+
                                 //Solicitud de Disponibilización
-                                else if (documentMeta.Where(t => t.EventCode == "036" && t.SenderCode == nitModel.SenderCode).ToList().Count > decimal.Zero)
+                                if (documentMeta.Where(t => t.EventCode == "036" && t.SenderCode == nitModel.SenderCode).ToList().Count > decimal.Zero)
                                 {
                                     var newAmountTV = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => t.EventCode == "036").NewAmountTV;
                                     var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode, newAmountTV);
@@ -3173,99 +3174,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         }
 
                                     }
-                                    else
-                                    {
-                                        //Endoso Garantia
-                                        if (eventPrev.EventCode == "038")
-                                        {
-                                            if (documentMeta
-                                               .Where(t => (t.EventCode == "039" || t.EventCode == "041") && t.CancelElectronicEvent == null).ToList()
-                                               .Count > decimal.Zero)
-                                            {
-                                                validFor = true;
-                                                responses.Add(new ValidateListResponse
-                                                {
-                                                    IsValid = false,
-                                                    Mandatory = true,
-                                                    ErrorCode = "Regla: LGC28-(R): ",
-                                                    ErrorMessage = "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: " +
-                                                    "Endoso en procuración o Limitación de circulación",
-                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                });
-                                            }
-                                            else
-                                            {
-                                                responses.Add(new ValidateListResponse
-                                                {
-                                                    IsValid = true,
-                                                    Mandatory = true,
-                                                    ErrorCode = "100",
-                                                    ErrorMessage = "Evento referenciado correctamente",
-                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                });
-                                            }
-                                        }
-                                        //Endoso de Procuracion 
-                                        else if (eventPrev.EventCode == "039")
-                                        {
-                                            if (documentMeta
-                                                  .Where(t => (t.EventCode == "038" || t.EventCode == "041") && t.CancelElectronicEvent == null ).ToList()
-                                                  .Count > decimal.Zero)
-                                            {
-                                                validFor = true;
-                                                responses.Add(new ValidateListResponse
-                                                {
-                                                    IsValid = false,
-                                                    Mandatory = true,
-                                                    ErrorCode = "Regla: LGC31-(R): ",
-                                                    ErrorMessage = "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: " +
-                                                    "Endoso en garantía o Limitación de circulación",
-                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                });
-                                            }
-                                            else
-                                            {
-                                                responses.Add(new ValidateListResponse
-                                                {
-                                                    IsValid = true,
-                                                    Mandatory = true,
-                                                    ErrorCode = "100",
-                                                    ErrorMessage = "Evento referenciado correctamente",
-                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                });
-                                            }
-                                        }
-                                        //Endoso propiedad
-                                        else if (eventPrev.EventCode == "037")
-                                        {
-                                            if (documentMeta
-                                                 .Where(t => (t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041") && t.CancelElectronicEvent == null).ToList()
-                                                 .Count > decimal.Zero)
-                                            {
-                                                validFor = true;
-                                                responses.Add(new ValidateListResponse
-                                                {
-                                                    IsValid = false,
-                                                    Mandatory = true,
-                                                    ErrorCode = "Regla: LGC25-(R): ",
-                                                    ErrorMessage = "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: " +
-                                                    "Endoso en garantía, Endoso en procuración o Limitación de circulación",
-                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                });
-                                            }                                           
-                                            else
-                                            {
-                                                responses.Add(new ValidateListResponse
-                                                {
-                                                    IsValid = true,
-                                                    Mandatory = true,
-                                                    ErrorCode = "100",
-                                                    ErrorMessage = "Evento referenciado correctamente",
-                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                });
-                                            }
-                                        }
-                                    }
                                 }
                                 else
                                 {
@@ -3281,6 +3189,98 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+
+                                //Endoso Garantia
+                                if (eventPrev.EventCode == "038")
+                                    {
+                                        if (documentMeta
+                                            .Where(t => (t.EventCode == "039" || t.EventCode == "041") && t.CancelElectronicEvent == null).ToList()
+                                            .Count > decimal.Zero)
+                                        {
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = "Regla: LGC28-(R): ",
+                                                ErrorMessage = "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: " +
+                                                "Endoso en procuración o Limitación de circulación",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                        else
+                                        {
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = true,
+                                                Mandatory = true,
+                                                ErrorCode = "100",
+                                                ErrorMessage = "Evento referenciado correctamente",
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                }
+                                //Endoso de Procuracion 
+                                else if (eventPrev.EventCode == "039")
+                                {
+                                    if (documentMeta
+                                            .Where(t => (t.EventCode == "038" || t.EventCode == "041") && t.CancelElectronicEvent == null ).ToList()
+                                            .Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: LGC31-(R): ",
+                                            ErrorMessage = "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: " +
+                                            "Endoso en garantía o Limitación de circulación",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }
+                                //Endoso propiedad
+                                else if (eventPrev.EventCode == "037")
+                                {
+                                    if (documentMeta
+                                            .Where(t => (t.EventCode == "038" || t.EventCode == "039" || t.EventCode == "041") && t.CancelElectronicEvent == null).ToList()
+                                            .Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "Regla: LGC25-(R): ",
+                                            ErrorMessage = "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: " +
+                                            "Endoso en garantía, Endoso en procuración o Limitación de circulación",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }                                           
+                                    else
+                                    {
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = "Evento referenciado correctamente",
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }
+                                                                                              
                                 break;
                             //Validación de la existencia de Endosos y Limitaciones TASK  730
                             case (int)EventStatus.InvoiceOfferedForNegotiation:
@@ -3827,8 +3827,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: LGC02-(R): ",
-                            ErrorMessage = "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente.",
+                            ErrorCode = "Regla: DC24c-(R): ",
+                            ErrorMessage = "No se puede generar el evento pasado los 3 días hábiles de la fecha de generación " +
+                            "del evento Recibo del bien y prestación del servicio.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
                         : new ValidateListResponse
@@ -3856,7 +3857,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "Regla: DC24e-(R): ",
-                            ErrorMessage = "No se puede generar el evento antes de los 3 días hábiles de la fecha de generación del evento Recibo del bien y prestación del servicio.",
+                            ErrorMessage = "No se puede generar el evento antes de los 3 días hábiles de la fecha de generación" +
+                            " del evento Recibo del bien y prestación del servicio.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
@@ -3908,9 +3910,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: 89-(R): ",
+                            ErrorCode = "Regla: DC24h-(R): ",
                             ErrorMessage =
-                                "la fecha debe ser mayor o igual al evento de la factura electrónica referenciada con el CUFE/CUDE",
+                                "No se puede generar el evento inscripción en el RADIAN de la factura electrónica de venta " +
+                                "como título valor que circula en el territorio nacional antes de la fecha de generación del documento referenciado.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
 
@@ -4195,7 +4198,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             public string errorCodeSigningTimeAcuse { get; set; }
             public string errorMessageigningTimeAcuse { get; set; }
             public string errorCodeSigningTimeRecibo { get; set; }
-            public string errorMessageigningTimeRecibo { get; set; }
+            public string errorMessageigningTimeRecibo { get; set; }           
             public string errorCodeEndoso { get; set; }
             public string errorMessageEndoso { get; set; }
             public string errorCodeMandato { get; set; }
@@ -4248,13 +4251,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (eventCode == "031") response.errorCodeReceiverFETV = "Regla: AAG01b-(R): ";
             if (eventCode == "032") response.errorCodeReceiverFETV = "Regla: AAG01c-(R): ";
             if (eventCode == "033") response.errorCodeReceiverFETV = "Regla: AAG01d-(R): ";
+            
             //SigningTime
             if (eventCode == "030") response.errorCodeSigningTimeAcuse = "Regla: DC24a-(R): ";
             if (eventCode == "030") response.errorMessageigningTimeAcuse = "No se puede generar el evento acuse de recibo de la factura electrónica de venta " +
                     "antes de la fecha de generación del documento referenciado. ";
-            if (eventCode == "032") response.errorCodeSigningTimeAcuse = "Regla: DC24b-(R): ";
-            if (eventCode == "032") response.errorMessageigningTimeAcuse = "No se puede generar el evento recibo de bien prestación de servicio antes de la fecha de generación " +
-                    "del evento acuse de recibo de la factura electrónica de venta.. ";
+
+            if (eventCode == "032") response.errorCodeSigningTimeRecibo = "Regla: DC24b-(R): ";
+            if (eventCode == "032") response.errorMessageigningTimeRecibo = "No se puede generar el evento recibo de bien prestación de servicio antes de la fecha de generación " +
+                    "del evento acuse de recibo de la factura electrónica de venta. ";
+
             //Endoso
             if (eventCode == "037") response.errorCodeEndoso = "Regla: LGC26-(R): ";
             if (eventCode == "038") response.errorCodeEndoso = "Regla: LGC29-(R): ";
