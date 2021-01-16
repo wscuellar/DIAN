@@ -130,11 +130,6 @@ namespace Gosocket.Dian.Web.Controllers
             model.DocTypes = staticTypeDoc;
             model.Profiles = staticProfiles;
             model.Users = this.GetUsers(new UserFiltersFreeBillerModel() { ProfileId = 0, DocNumber = null, FullName = null, DocTypeId = 0, Page = 1, PageSize = 10 });
-            foreach (var item in model.Users.ToList())
-            {
-                var activo = item.IsActive;
-                ViewBag.activo = activo;
-            }
             return View(model);
 
         }
@@ -630,7 +625,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// Obtiene todos los usuarios creados para el facturador gratuito.
         /// </summary>
         /// <returns>List<UserFreeBillerModel></returns>
-        private List<UserFreeBillerModel> GetUsers(UserFiltersFreeBillerModel model)
+        private UserFreeBillerContainerModel GetUsers(UserFiltersFreeBillerModel model)
         {
             List<ApplicationUser> users = userService.UserFreeBillerProfile(t => (model.DocTypeId == 0 || t.IdentificationTypeId == model.DocTypeId)
                                               && (model.DocNumber == null || t.IdentificationId == model.DocNumber)
@@ -650,13 +645,14 @@ namespace Gosocket.Dian.Web.Controllers
                             LastUpdate = item.LastUpdated,
                             IsActive = Convert.ToBoolean(item.Active)
                         };
-
-            if (model.Page == 0)
-                return query.ToList();
-
+            int totalCount = query.Count();
             int skip = (model.Page - 1) * model.PageSize;
             IQueryable<UserFreeBillerModel> sql = query.Skip(skip).Take(model.PageSize).AsQueryable();
-            return sql.ToList();
+            return new UserFreeBillerContainerModel()
+            {
+                TotalCount = totalCount,
+                Users = sql.ToList()
+            };
         }
 
 
