@@ -86,6 +86,10 @@ th {
     box-shadow: 4px 5px 7px rgba(0, 0, 0, 0.1);
 }
 
+.RadianCardContainerLogin {
+    width: 80% !important;
+}
+
 .close {
     font-size: 19px !important;
     font-weight: 700 !important;
@@ -287,6 +291,9 @@ th {
     fill: #348441 !important;
 }
 
+.RadianCardContainerLogin:hover .RadianimgSvg path {
+    fill: #348441 !important;
+}
 
 .input-general {
     height: 41px !important;

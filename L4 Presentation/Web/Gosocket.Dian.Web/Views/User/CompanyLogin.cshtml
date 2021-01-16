@@ -6,7 +6,7 @@
     ViewBag.Title = "Acceder";
     Layout = "~/Views/Shared/_LayoutNewLogin.cshtml";
 }
-
+<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 <div class="row">
     <div class="col-lg-6 col-md-6 col-sm-8 col-xs-9 bhoechie-tab-container">
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
@@ -17,7 +17,7 @@
                 </a>
 
                 <!-- company -->
-                <a href="#" class="list-group-item text-center active">
+                <a href="#" class="list-group-item text-center active cCompany">
                     <h4 class="glyphicon glyphicon-briefcase"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Company)
                 </a>
 
@@ -42,8 +42,40 @@
             </div>
         </div>
         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
-            <!-- company section -->
-            @Html.Partial("_companyLogin")
+
+            <div class="container-fluid" id="panel-form-login">
+
+                <div class="row-fluid">
+                    <div class="card RadianCardContainer RadianCardContainerLogin" id="legalRepresentative">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/RepresentanteLegal.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Representante legal</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="card RadianCardContainer RadianCardContainerLogin" id="authorizedUser">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/UsuarioAutorizado.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Usuario Autorizado</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="companyLogin pxLogin">
+                <!-- company section -->
+                @Html.Partial("_companyLogin")
+            </div>
+
+            <div class="userExLogin pxLogin">
+                <!-- company section -->
+                @Html.Partial("_companyLogin")
+            </div>
 
         </div>
     </div>
@@ -57,6 +89,24 @@
     <script>
 
         $(document).ready(function () {
+
+            $(".pxLogin").hide();
+
+            
+            $('.cCompany').click(function () {
+                $("#panel-form-login").show();
+                $(".pxLogin").hide();
+            });
+
+            $('#legalRepresentative').click(function () {
+                $("#panel-form-login").hide();
+                $(".companyLogin").show();
+            });
+
+            $('#authorizedUser').click(function () {
+                $("#panel-form-login").hide();
+                $(".userExLogin").show();
+            });
 
             $('.certificate-login-link').click(function () {
                 window.location = '@ConfigurationManager.GetValue("CertificateLoginUrl")';
