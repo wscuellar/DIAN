@@ -192,30 +192,34 @@
     <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
 
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
 
     <script>
         $(document).ready(function () {
             var urlNewUser = "@Url.Action("FreeBillerUser")";
 
-            $("#ProfileId").click(function () {debugger
+            $("#ProfileId").change(function () {
+                $("input:checkbox:checked").prop("checked",false)
                 var idProfile = $(this).val();
-                var url = @Url.Action("GetIdsByProfile","FreeBillerController");
+                var url = '@Url.Action("GetIdsByProfile", "FreeBiller")';
                 var dataAjax = {
                     profileId: idProfile
                 }
                 var errorAction = (error) => {
                     console.log(error);
                 }
-                var successAction = (result) => {debugger
-                    console.log(result);
+                var successAction = (result) => {
+                    result.forEach(function (id) {
+                        $("input#" + id).prop("checked", "checked");
+                    });
                 }
                 ajaxFunction(url, "POST", dataAjax, errorAction, successAction);
             });
             $("#btnCancel").click(function () {
                 window.location.href = urlNewUser;
             });
-            
+
         });
     </script>
 
