@@ -129,7 +129,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.DocTypes = staticTypeDoc;
             model.Profiles = staticProfiles;
-            model.Users = this.GetUsers(new UserFiltersFreeBillerModel() { ProfileId = 0, DocNumber = null, FullName = null, DocTypeId = 0 });
+            model.Users = this.GetUsers(new UserFiltersFreeBillerModel() { ProfileId = 0, DocNumber = null, FullName = null, DocTypeId = 0, Page = 1, PageSize = 10 });
             foreach (var item in model.Users.ToList())
             {
                 var activo = item.IsActive;
