@@ -65,5 +65,36 @@ namespace Gosocket.Dian.Application.FreeBiller
             return sqlDBContext.MenuOptionsByProfiles.ToList();
         }
 
+
+        public List<MenuOptionsByProfiles> GetMenuOptionsByProfile(int profileId)
+        {
+            return sqlDBContext.MenuOptionsByProfiles.Where(t=> t.ProfileId == profileId).ToList();
+        }
+
+
+        public List<MenuOptions> GetOptionsByProfile(int profileId)
+        {
+            List<MenuOptions> menuOptions = GetMenuOptions().ToList();
+            List<MenuOptionsByProfiles> optionsByProfile = profileId > 0 ? GetMenuOptionsByProfile(profileId) : new List<MenuOptionsByProfiles>();
+            return GetChildren(menuOptions, null, optionsByProfile);
+        }
+
+        static List<MenuOptions> GetChildren(List<MenuOptions> menuOptions, int? parentId, List<MenuOptionsByProfiles> optionsByProfile)
+        {
+            return menuOptions
+                    .Where(c => c.ParentId == parentId)
+                    .Select(c => new MenuOptions
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        ParentId = c.ParentId,
+                        IsActive = c.IsActive,
+                        MenuLevel = c.MenuLevel,
+                        Children = GetChildren(menuOptions, c.Id, optionsByProfile),
+                        Checked = optionsByProfile.Any(t => t.MenuOptionId == c.Id)
+                    })
+                    .ToList();
+        }
+
     }
 }

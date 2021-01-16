@@ -76,9 +76,8 @@
         color: #2C323C;
     }
 </style>
-<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
-<script type="text/javascript">
 
+<script>
     $(document).ready(function () {
         $("input:checkbox:checked").attr("checked", true);
         if (@ViewBag.activo = true) {
@@ -123,45 +122,45 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="row">
-                                                            <span class="textPermisos">Permisos</span>
-                                                            <hr class="linePermisos" />
+                                                        <div>
+                                                            <h3 class="panel-title-radian padding-0">Permisos</h3>
+                                                            <hr class="margin-0 margin-bottom-10" />
                                                         </div>
                                                         <div class="row">
-                                                            @foreach (var menuMain in Model.MenuOptionsByProfile.Where(m => m.Level == 1))
+                                                            @foreach (var menuMain in Model.MenuOptionsByProfile)
                                                             {
-                                                                <div class="col-sm-1">
-                                                                    <div class="row">
+                                                                if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0)
+                                                                {
+                                                                    <div class="col-sm-3">
                                                                         <spam class="titleMenu">@menuMain.Name</spam>
-                                                                    </div>
-                                                                    @foreach (var subMenuItems in Model.MenuOptionsByProfile.Where(m => m.FatherId == (Nullable<int>)menuMain.MenuId))
-                                                                    {
-                                                                        if (subMenuItems.Level == 2)
+                                                                        @foreach (var subMenuItems in menuMain.Children)
                                                                         {
-                                                                            <div class="row">
+                                                                            if (subMenuItems.MenuLevel == 2)
+                                                                            {
                                                                                 <span class="subTitleMenu">@subMenuItems.Name</span>
-                                                                            </div>
-                                                                            foreach (var subSubMenuItems in Model.MenuOptionsByProfile.Where(m => m.FatherId == (Nullable<int>
-                                                                                )subMenuItems.MenuId))
+                                                                                foreach (var subSubMenuItems in subMenuItems.Children)
+                                                                                {
+                                                                                    <div class="row-cols-1">
+                                                                                        <div class="form-group d-inline-flex">
+                                                                                            <input type="checkbox" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" />
+                                                                                            <label>@subSubMenuItems.Name</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                }
+                                                                            }
+                                                                            else
                                                                             {
                                                                                 <div class="row-cols-1">
-                                                                                    <label>
-                                                                                        <input type="checkbox" name="ValuesSelected" value="@menuMain.MenuId,@subMenuItems.MenuId,@subSubMenuItems.MenuId" />
-                                                                                        @subSubMenuItems.Name
-                                                                                    </label>
+                                                                                    <div class="form-group d-inline-flex">
+                                                                                        <input type="checkbox" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id" />
+                                                                                        <label>@subMenuItems.Name</label>
+                                                                                    </div>
                                                                                 </div>
                                                                             }
                                                                         }
-                                                                        else
-                                                                        {
-                                                                            <div class="row">
-                                                                                <input type="checkbox" name="ValuesSelected" value="@menuMain.MenuId,@subMenuItems.MenuId" />
-                                                                                <label for="@subMenuItems.Name">@subMenuItems.Name</label>
-                                                                            </div>
-                                                                        }
-                                                                    }
 
-                                                                </div>
+                                                                    </div>
+                                                                }
                                                             }
                                                         </div>
                                                     </div>

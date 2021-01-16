@@ -430,6 +430,60 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a El usuario fue creado exitosamente.
+        /// </summary>
+        public static string UserCreatedSuccess {
+            get {
+                return ResourceManager.GetString("UserCreatedSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El usuario no existe o no está registrado.
+        /// </summary>
+        public static string UserDoesntExist {
+            get {
+                return ResourceManager.GetString("UserDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Ya existe un Usuario con el Tipo de Documento y Documento suministrados.
+        /// </summary>
+        public static string UserExistingDoc {
+            get {
+                return ResourceManager.GetString("UserExistingDoc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El Usuario no puedo ser asignado al role &apos;Usuario Facturador Gratuito&apos;.
+        /// </summary>
+        public static string UserRoleFail {
+            get {
+                return ResourceManager.GetString("UserRoleFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El usuario fue actualizado exitosamente.
+        /// </summary>
+        public static string UserUpdatedSuccess {
+            get {
+                return ResourceManager.GetString("UserUpdatedSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El Usuario no tiene una Empresa Asociada!.
+        /// </summary>
+        public static string UserWithOutCompany {
+            get {
+                return ResourceManager.GetString("UserWithOutCompany", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El software de la operación tiene {0} clientes asociados..
         /// </summary>
         public static string WithCustomerList {

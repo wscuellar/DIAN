@@ -1,6 +1,7 @@
 ﻿
 namespace Gosocket.Dian.Domain.Sql.FreeBiller
 {
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,5 +20,11 @@ namespace Gosocket.Dian.Domain.Sql.FreeBiller
 
         public int MenuLevel { get; set; }
 
+        [NotMapped]
+        public List<MenuOptions> Children { get; set; }
+
+
+        [NotMapped]
+        public bool Checked { get; set; }
     }
 }

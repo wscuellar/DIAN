@@ -16,7 +16,10 @@ using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.FreeBiller;
 using Gosocket.Dian.Domain.Utils;
 using System.Threading.Tasks;
-
+using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Common.Resources;
+using System.Net;
+using Gosocket.Dian.Domain.Sql.FreeBiller;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -24,7 +27,7 @@ namespace Gosocket.Dian.Web.Controllers
     {
 
         #region variables privadas
-        
+
         /// <summary>
         /// Servicio que contiene las operaciones de los usuarios de Entrega Factura.
         /// </summary>
@@ -48,13 +51,13 @@ namespace Gosocket.Dian.Web.Controllers
         /// Listas parametrica "estaticas" para no tener que consultar muchas veces la DB.
         /// Tipos de Documento.
         /// </summary>
-        private List<SelectListItem> staticTypeDoc { get; set; }
+        private static List<SelectListItem> staticTypeDoc { get; set; }
 
         /// <summary>
         /// Listas parametrica "estaticas" para no tener que consultar muchas veces la DB.
         /// Perfiles.
         /// </summary>
-        private List<SelectListItem> staticProfiles { get; set; }
+        private static List<SelectListItem> staticProfiles { get; set; }
 
         /// <summary>
         /// Identificador para poder guardar Claims con el Perfil del usuario.
@@ -86,7 +89,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult> EditUserActive(string id, string activo)
-        {          
+        {
             var user = await userManager.FindByIdAsync(id);
             int dt = 0;
             if (activo == "true")
@@ -101,7 +104,7 @@ namespace Gosocket.Dian.Web.Controllers
             else
             {
                 user.Active = Convert.ToByte(dt);
-               
+
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
@@ -113,7 +116,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
                 return RedirectToAction("FreeBillerUser");
             }
-          
+
         }
 
         // GET: FreeBiller
@@ -121,31 +124,27 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.activo = false;
             UserFiltersFreeBillerModel model = new UserFiltersFreeBillerModel();
-            this.staticTypeDoc = this.GetTypesDoc();
-            this.staticProfiles = this.GetProfiles();
-            
-            model.DocTypes = this.staticTypeDoc;
-            model.Profiles = this.staticProfiles;
-            model.Users = this.GetUsers();
+            staticTypeDoc = this.GetTypesDoc();
+            staticProfiles = this.GetProfiles();
+
+            model.DocTypes = staticTypeDoc;
+            model.Profiles = staticProfiles;
+            model.Users = this.GetUsers(new UserFiltersFreeBillerModel() { ProfileId = 0, DocNumber = null, FullName = null, DocTypeId = 0 });
             foreach (var item in model.Users.ToList())
             {
                 var activo = item.IsActive;
                 ViewBag.activo = activo;
             }
             return View(model);
-          
-            //return View();
+
         }
-       
+
         [HttpPost]
         public ActionResult FreeBillerUser(UserFiltersFreeBillerModel model)
         {
-            model.Profiles = this.staticProfiles;
-            if (model.DocTypeId > default(int) && !string.IsNullOrWhiteSpace(model.DocNumber))
-            {
-               model.Users = this.GetUsersByDocument(model.DocTypeId, model.DocNumber);
-            }
-
+            model.DocTypes = staticTypeDoc;
+            model.Profiles = staticProfiles;
+            model.Users = GetUsers(model);
             return View(model);
         }
 
@@ -155,7 +154,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult EditFreeBillerUser(string id)
+        public ActionResult EditOrViewFreeBillerUser(string id, bool isEdit = true)
         {
             var tdocs = GetTypesDoc();
             var MenuProfiles = GetMenuProfile(id);
@@ -165,11 +164,11 @@ namespace Gosocket.Dian.Web.Controllers
                 ViewBag.valor = true;
                 foreach (var item in MenuProfiles)
                 {
-                    for (int i = 0; i<= MenuProfiles.Count; i++)
+                    for (int i = 0; i <= MenuProfiles.Count; i++)
                     {
                         if (item.Text == i.ToString())
                         {
-                            if(i == 1)
+                            if (i == 1)
                             {
                                 ViewBag.menu1 = item.Text;
                             }
@@ -299,18 +298,19 @@ namespace Gosocket.Dian.Web.Controllers
                             }
                         }
                     }
-                   
-                    
+
+
                 }
 
             }
-          
-            
+
+
             //dropdown
             ViewBag.tdocs = tdocs.Select(p => new SelectListItem() { Value = p.Value.ToString(), Text = p.Text }).ToList<SelectListItem>();
             UserService user = new UserService();
             var data = user.Get(id);
             UserFreeBillerModel model = new UserFreeBillerModel();
+            model.IsEdit = isEdit == false ? false : true;
             model.Id = data.Id;
             model.Name = data.UserName;
             model.Email = data.Email;
@@ -325,6 +325,8 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
+        #region EditFreeBillerUser
+
         /// <summary>
         /// Metodo asincrono para editar la información..
         /// </summary>
@@ -334,33 +336,49 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> EditFreeBillerUser(UserFreeBillerModel model)
         {
 
-            var user = await userManager.FindByIdAsync(model.Id);
-
-            if (user == null)
+            //Valida si el modelo trae errores
+            StringBuilder errors = new StringBuilder();
+            if (!ModelState.IsValid)
             {
-                ViewBag.message = "No se encontro el ID";
-                return View("Not found");
-            }else
-            {
-                user.Name = model.FullName;
-                user.IdentificationTypeId = Convert.ToInt32(model.TypeDocId);
-                user.IdentificationId = model.NumberDoc;
-                user.Email = model.Email;
-                user.PasswordHash = model.Password;
-                var result = await userManager.UpdateAsync(user);
-                if (result.Succeeded)
-                {
-                    //Envio de notificacion por correo
-                    SendMailCreate(model);
-                    return RedirectToAction("FreeBillerUser");
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.ToString());
-                }
-                return View(model);
+                IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var item in allErrors)
+                    errors.AppendLine(item.ErrorMessage);
+                return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
+
+            //validar si existe un Usuario con el id
+            ApplicationUser user = await userManager.FindByIdAsync(model.Id);
+            if (user == null)
+                return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+
+            // Actualiza los datos del usuario ingresados en el modelo
+            user.Name = model.FullName;
+            user.IdentificationTypeId = Convert.ToInt32(model.TypeDocId);
+            user.IdentificationId = model.NumberDoc;
+            user.Email = model.Email;
+            user.PasswordHash = model.Password;
+            IdentityResult identityResult = await userManager.UpdateAsync(user);
+            if (identityResult.Succeeded)
+            {
+                // Actualiza el claim
+                _ = userService.UpdateUserClaim(new ClaimsDb() { ClaimValue = model.ProfileId.ToString(), UserId = user.Id });
+                
+                // Actualiza perfil
+                _ = userService.UserFreeBillerUpdate(new Domain.Sql.UsersFreeBillerProfile() { ProfileFreeBillerId = model.ProfileId, UserId = user.Id });
+
+                SendMailCreate(model);
+                ResponseMessage resultx = new ResponseMessage(TextResources.UserUpdatedSuccess, TextResources.alertType);
+                resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");
+                return Json(resultx, JsonRequestBehavior.AllowGet);
+            }
+
+            foreach (var item in identityResult.Errors)
+                errors.Append(item);
+            return Json(new ResponseMessage(errors.ToString(), TextResources.alertType), JsonRequestBehavior.AllowGet);
+
         }
+
+        #endregion
 
         public ActionResult CreateUser()
         {
@@ -374,38 +392,34 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 ViewBag.activo = true;
             }
+            model.MenuOptionsByProfile = profileService.GetOptionsByProfile(0);
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult CreateUser(UserFreeBillerModel model)
+        public JsonResult CreateUser(UserFreeBillerModel model)
         {
-            var uCompany = userService.Get(User.Identity.GetUserId());
+
+            //Valida si el modelo trae errores
+            StringBuilder errors = new StringBuilder();
             if (!ModelState.IsValid)
             {
                 IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
                 foreach (var item in allErrors)
-                    ModelState.AddModelError("", item.ErrorMessage);
-
-                return View(model);
+                    errors.AppendLine(item.ErrorMessage);
+                return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            //if (uCompany == null)
-            //{
-            //    ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
-            //    return View(model);
-            //}
+            //identifica el usuario que esta crean los nuevos registros
+            var uCompany = userService.Get(User.Identity.GetUserId());
+            if (uCompany == null)
+                return Json(new ResponseMessage(TextResources.UserWithOutCompany, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
-            //if (string.IsNullOrEmpty(uCompany.Code))
-            //{
-            //    ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
-            //    return View(model);
-            //}
-
+            //Crea nuevo registro para AspNetUser
             model.FullName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(model.FullName);
             var user = new ApplicationUser
             {
-                CreatorNit = uCompany?.Code ?? "999999999",
+                CreatorNit = uCompany.Code,
                 IdentificationTypeId = Convert.ToInt32(model.TypeDocId),
                 IdentificationId = model.NumberDoc,
                 Code = model.NumberDoc,
@@ -417,39 +431,23 @@ namespace Gosocket.Dian.Web.Controllers
                 UpdatedBy = User.Identity.Name,
                 LastUpdated = DateTime.Now,
                 Active = 1
-                //PasswordHash = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0])
             };
             model.Password = userManager.PasswordHasher.HashPassword(model.Email.Split('@')[0]);
 
-            if (!ModelState.IsValid)
-            {
-                foreach (var item in ModelState.Values.SelectMany(v => v.Errors))
-                    ModelState.AddModelError("", item.ErrorMessage);
-            }
 
-            if (Convert.ToInt32(model.TypeDocId) <= 0)
-            {
-                ModelState.AddModelError("", "Por favor seleccione el Tipo de Documento");
-
-                return View(model);
-            }
-
-            //validar si ya existe un Usuario con el tipo documento y documento suministrados
-            var vUserDB = userService.FindUserByIdentificationAndTypeId(string.Empty, Convert.ToInt32(model.TypeDocId), model.NumberDoc);
-
+            //validar si ya existe un Usuario con el tipo documento y documento suministrados en AspNetUser
+            var vUserDB = userService.FindUserByIdentificationAndTypeId(string.Empty, user.IdentificationTypeId, model.NumberDoc);
             if (vUserDB != null)
-            {
-                ModelState.AddModelError("", "Ya existe un Usuario con el Tipo de Documento y Documento suministrados");
-                return View(model);
-            }
+                return Json(new ResponseMessage(TextResources.UserExistingDoc, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
-            IdentityResult result = userManager.Create(user, model.Password);
+            //Crea el registro del nuevo usuario
+            IdentityResult identification = userManager.Create(user, model.Password);
 
-            if (result.Succeeded)
+            //Si la creacion fue exitosa  
+            if (identification.Succeeded)
             {
                 model.Id = user.Id;
-                ViewBag.messageAction = "Usuario Registrado exitosamente!";
-
+                //En el log de azure tabla globalogger hace los registros de acceso.
                 userService.RegisterExternalUserTrazability(JsonConvert.SerializeObject(new ExternalUserViewModel()
                 {
                     Id = user.Id,
@@ -462,55 +460,30 @@ namespace Gosocket.Dian.Web.Controllers
 
                 // Revisar calse estatica para colocar el valor del nuevo rol.
                 var resultRole = userManager.AddToRole(user.Id, ROLEFREEBILLER);
+                if (!resultRole.Succeeded)
+                {
+                    userManager.Delete(user);
+                    return Json(new ResponseMessage(TextResources.UserRoleFail, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                }
 
                 // Claim para reconocer el perfi del nuevo usuario para el Facturador Gratuito.
                 userManager.AddClaim(user.Id, new System.Security.Claims.Claim(CLAIMPROFILE, model.ProfileId.ToString()));
-                
+
+                //incluir el asociacion del registro. UserFreeBillerProfile
+                _ = userService.UserFreeBillerUpdate(new Domain.Sql.UsersFreeBillerProfile() { ProfileFreeBillerId = model.ProfileId, UserId = user.Id });
 
                 //Envio de notificacion por correo
-                var envio = SendMailCreate(model);
-
-                if (!resultRole.Succeeded)
-                {
-                    ModelState.AddModelError("", "El Usario no puedo ser asignado al role 'Usuario Facturador Gratuito'");
-
-                    userManager.Delete(user);
-
-                    return View(model);
-                }
-
-                //var affected = _permisionService.AddOrUpdate(permissions);
-
-                //userService.RegisterExternalUserTrazability(JsonConvert.SerializeObject(new ExternalUserViewModel()
-                //{
-                //    IdentificationTypeId = model.IdentificationTypeId,
-                //    IdentificationId = model.IdentificationId,
-                //    Names = model.Names,
-                //    Email = model.Email
-                //}) + ", permisos: " + JsonConvert.SerializeObject(permissions), "Creación de Permisos");
+                _ = SendMailCreate(model);
 
                 //Aquí va el modal de ok.
-                return RedirectToAction("FreeBillerUser");
-            }
-            else
-            {
-                ViewBag.messageAction = "No se pudo Registrar el Usuario!";
-
-                if (!result.Succeeded)
-                {
-                    foreach (var item in result.Errors)
-                        ModelState.AddModelError(string.Empty, item);
-
-                    foreach (var item in ModelState)
-                        if (item.Key.Contains("Code"))
-                            item.Value.Errors.Clear();
-
-                    return View(model);
-                }
-
+                ResponseMessage resultx = new ResponseMessage(TextResources.UserCreatedSuccess, TextResources.alertType);
+                resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");
+                return Json(resultx, JsonRequestBehavior.AllowGet);
             }
 
-            return View(model);
+            foreach (var item in identification.Errors)
+                errors.Append(item);
+            return Json(new ResponseMessage(errors.ToString(), TextResources.alertType), JsonRequestBehavior.AllowGet);
         }
 
 
@@ -541,6 +514,7 @@ namespace Gosocket.Dian.Web.Controllers
             return true;
         }
 
+        #region Carga de combos
 
         /// <summary>
         /// Método encargado de obtener los perfiles del Facturador Gratuito y asignarlos a 
@@ -551,9 +525,9 @@ namespace Gosocket.Dian.Web.Controllers
         {
             List<SelectListItem> selectTypesId = new List<SelectListItem>();
             var profiles = profileService.GetAll();
-
             if (profiles?.Count > 0)
             {
+                profiles.Insert(0, new Domain.Sql.FreeBiller.Profile() { Id = 0, Name = "Seleccione..." });
                 foreach (var item in profiles)
                 {
                     selectTypesId.Add(
@@ -568,7 +542,7 @@ namespace Gosocket.Dian.Web.Controllers
             return selectTypesId;
         }
 
-    
+
         /// <summary>
         /// Método encargado de obtener los tipos de documentos y asignarlos a una lista para 
         /// usarlos en las vistas.
@@ -579,9 +553,10 @@ namespace Gosocket.Dian.Web.Controllers
         private List<SelectListItem> GetTypesDoc()
         {
             List<SelectListItem> selectTypesId = new List<SelectListItem>();
-            var types = identificationTypeService.List()?.ToList();
+            var types = identificationTypeService.List().ToList();
+            types.Insert(0, new Domain.IdentificationType() { Code = "0", Description = "Seleccione..." });
 
-            if (types?.Count > 0)
+            if (types.Count > 0)
             {
                 foreach (var item in types)
                 {
@@ -597,6 +572,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             return selectTypesId;
         }
+        #endregion
 
         /// <summary>
         /// Método encargado de obtener todos los perfiles para los usuarios del Facturador Gratuito.
@@ -611,25 +587,25 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (users != null)
             {
-                foreach (var item in users.Where(x => x.Id == id).ToList() )
+                foreach (var item in users.Where(x => x.Id == id).ToList())
                 {
-                    foreach(var item2 in userIdsFreeBiller.Where(x => x.UserId == item.Id).ToList())
+                    foreach (var item2 in userIdsFreeBiller.Where(x => x.UserId == item.Id).ToList())
                     {
                         listUsers.Add(new UserFreeBillerModel
                         {
                             Id = item2.ClaimValue
                         });
                     }
-                    
+
                 }
             }
-            List <SelectListItem> selectProfiles = new List<SelectListItem>();
+            List<SelectListItem> selectProfiles = new List<SelectListItem>();
             var types = profileService.GetMenuOptions().ToList();
-           
+
 
             if (types?.Count > 0)
             {
-                foreach(var item in listUsers.ToList())
+                foreach (var item in listUsers.ToList())
                 {
                     var OptProf = profileService.GetMenuOptionsByProfile().Where(x => x.ProfileId == Convert.ToInt32(item.Id)).ToList();
                     foreach (var item1 in OptProf.ToList())
@@ -642,7 +618,7 @@ namespace Gosocket.Dian.Web.Controllers
                             });
                     }
                 }
-              
+
 
             }
 
@@ -653,133 +629,46 @@ namespace Gosocket.Dian.Web.Controllers
         /// Obtiene todos los usuarios creados para el facturador gratuito.
         /// </summary>
         /// <returns>List<UserFreeBillerModel></returns>
-        private List<UserFreeBillerModel> GetUsers()
+        private List<UserFreeBillerModel> GetUsers(UserFiltersFreeBillerModel model)
         {
-            List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
+            List<ApplicationUser> users = userService.UserFreeBillerProfile(t => (model.DocTypeId == 0 || t.IdentificationTypeId == model.DocTypeId)
+                                              && (model.DocNumber == null || t.IdentificationId == model.DocNumber)
+                                              && (model.FullName == null || t.Name.ToLower().Contains(model.FullName.ToLower()))
+                                               , model.ProfileId);
+
             List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
-
-            var users = userService.GetUsers(userIdsFreeBiller.Select(u=> u.UserId).ToList());
-
-            if (users != null)
-            {
-                foreach (var item in users)
-                {
-                    string perfilId = userIdsFreeBiller.FirstOrDefault(u => u.UserId == item.Id).ClaimValue;
-                    listUsers.Add(new UserFreeBillerModel
+            return (from item in users
+                    join cl in userIdsFreeBiller on item.Id equals cl.UserId
+                    select new UserFreeBillerModel()
                     {
                         Id = item.Id,
                         FullName = item.Name,
-                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
+                        DescriptionTypeDoc = staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
+                        DescriptionProfile = staticProfiles.FirstOrDefault(td => td.Value == cl.ClaimValue).Text,
                         NumberDoc = item.IdentificationId,
                         LastUpdate = item.LastUpdated,
                         IsActive = Convert.ToBoolean(item.Active)
-                    });
-                }
-
-            }
-
-            return listUsers;
+                    }).ToList();
         }
 
-        /// <summary>
-        /// Obtiene todos los usuarios creados para el facturador gratuito.
-        /// </summary>
-        /// <returns>List<UserFreeBillerModel></returns>
-        private List<UserFreeBillerModel> GetUsersByDocument(int typeDocId, string numberDoc)
+
+        [HttpPost]
+        public JsonResult GetMenuOptionsByProfile(int profileId)
         {
-            List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
-            List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
-
-            var users = userService.GetUsers(userIdsFreeBiller.Select(u => u.UserId).ToList());
-
-            if (users != null)
-            {
-                foreach (var item in users.Where(u=> u.IdentificationTypeId == typeDocId && u.IdentificationId == numberDoc))
-                {
-                    string perfilId = userIdsFreeBiller.FirstOrDefault(u => u.UserId == item.Id).ClaimValue;
-                    listUsers.Add(new UserFreeBillerModel
-                    {
-                        Id = item.Id,
-                        FullName = item.Name,
-                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
-                        NumberDoc = item.IdentificationId,
-                        LastUpdate = item.LastUpdated,
-                        IsActive = Convert.ToBoolean(item.Active)
-                    });
-                }
-
-            }
-
-            return listUsers;
+            List<MenuOptions> hierarchy = profileService.GetOptionsByProfile(profileId);
+            return Json(hierarchy, JsonRequestBehavior.AllowGet);
         }
 
-        /// <summary>
-        /// Obtiene todos los usuarios creados para el facturador gratuito dependiendo del nombre.
-        /// </summary>
-        /// <returns>List<UserFreeBillerModel></returns>
-        private List<UserFreeBillerModel> GetUsersByName(string name)
+
+        [HttpPost]
+        public JsonResult GetIdsByProfile(int profileId)
         {
-            List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
-            List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
-
-            var users = userService.GetUsers(userIdsFreeBiller.Select(u => u.UserId).ToList());
-
-            if (users != null)
-            {
-                foreach (var item in users.Where(u => u.Name.ToLower().Contains(name.ToLower())))
-                {
-                    string perfilId = userIdsFreeBiller.FirstOrDefault(u => u.UserId == item.Id).ClaimValue;
-                    listUsers.Add(new UserFreeBillerModel
-                    {
-                        Id = item.Id,
-                        FullName = item.Name,
-                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
-                        NumberDoc = item.IdentificationId,
-                        LastUpdate = item.LastUpdated,
-                        IsActive = Convert.ToBoolean(item.Active)
-                    });
-                }
-
-            }
-
-            return listUsers;
+            List<MenuOptionsByProfiles> hierarchy = profileService.GetMenuOptionsByProfile(profileId);
+            var ids =  hierarchy.Select(t => t.MenuOptionId);
+            return Json(ids, JsonRequestBehavior.AllowGet);
         }
 
-        /// <summary>
-        /// Obtiene todos los usuarios creados para el facturador gratuito dependiendo del nombre.
-        /// </summary>
-        /// <returns>List<UserFreeBillerModel></returns>
-        private List<UserFreeBillerModel> GetUsersByProfile(int profileId)
-        {
-            List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
-            List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
 
-            var users = userService.GetUsers(userIdsFreeBiller.Where(u=> u.ClaimValue == profileId.ToString()).Select(u => u.UserId).ToList());
-
-            if (users != null)
-            {
-                foreach (var item in users)
-                {
-                    string perfilId = userIdsFreeBiller.FirstOrDefault(u => u.UserId == item.Id).ClaimValue;
-                    listUsers.Add(new UserFreeBillerModel
-                    {
-                        Id = item.Id,
-                        FullName = item.Name,
-                        DescriptionTypeDoc = this.staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                        DescriptionProfile = this.staticProfiles.FirstOrDefault(td => td.Value == perfilId).Text,
-                        NumberDoc = item.IdentificationId,
-                        LastUpdate = item.LastUpdated,
-                        IsActive = Convert.ToBoolean(item.Active)
-                    });
-                }
-
-            }
-
-            return listUsers;
-        }
     }
-    
+
 }
