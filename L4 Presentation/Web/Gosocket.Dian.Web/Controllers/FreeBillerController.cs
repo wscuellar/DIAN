@@ -362,7 +362,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 // Actualiza el claim
                 _ = userService.UpdateUserClaim(new ClaimsDb() { ClaimValue = model.ProfileId.ToString(), UserId = user.Id });
-                
+
                 // Actualiza perfil
                 _ = userService.UserFreeBillerUpdate(new Domain.Sql.UsersFreeBillerProfile() { ProfileFreeBillerId = model.ProfileId, UserId = user.Id });
 
@@ -477,7 +477,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 //Aquí va el modal de ok.
                 ResponseMessage resultx = new ResponseMessage(TextResources.UserCreatedSuccess, TextResources.alertType);
-                resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");
+                resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBiller");
                 return Json(resultx, JsonRequestBehavior.AllowGet);
             }
 
@@ -638,18 +638,25 @@ namespace Gosocket.Dian.Web.Controllers
                                                , model.ProfileId);
 
             List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
-            return (from item in users
-                    join cl in userIdsFreeBiller on item.Id equals cl.UserId
-                    select new UserFreeBillerModel()
-                    {
-                        Id = item.Id,
-                        FullName = item.Name,
-                        DescriptionTypeDoc = staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                        DescriptionProfile = staticProfiles.FirstOrDefault(td => td.Value == cl.ClaimValue).Text,
-                        NumberDoc = item.IdentificationId,
-                        LastUpdate = item.LastUpdated,
-                        IsActive = Convert.ToBoolean(item.Active)
-                    }).ToList();
+            var query = from item in users
+                        join cl in userIdsFreeBiller on item.Id equals cl.UserId
+                        select new UserFreeBillerModel()
+                        {
+                            Id = item.Id,
+                            FullName = item.Name,
+                            DescriptionTypeDoc = staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
+                            DescriptionProfile = staticProfiles.FirstOrDefault(td => td.Value == cl.ClaimValue).Text,
+                            NumberDoc = item.IdentificationId,
+                            LastUpdate = item.LastUpdated,
+                            IsActive = Convert.ToBoolean(item.Active)
+                        };
+
+            if (model.Page == 0)
+                return query.ToList();
+
+            int skip = (model.Page - 1) * model.PageSize;
+            IQueryable<UserFreeBillerModel> sql = query.Skip(skip).Take(model.PageSize).AsQueryable();
+            return sql.ToList();
         }
 
 
@@ -665,7 +672,7 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult GetIdsByProfile(int profileId)
         {
             List<MenuOptionsByProfiles> hierarchy = profileService.GetMenuOptionsByProfile(profileId);
-            var ids =  hierarchy.Select(t => t.MenuOptionId);
+            var ids = hierarchy.Select(t => t.MenuOptionId);
             return Json(ids, JsonRequestBehavior.AllowGet);
         }
 

@@ -10,7 +10,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public UserFiltersFreeBillerModel()
         {
             this.Page = (int)default;
-            this.MaxItemCount = 10;
+            this.PageSize = 10;
         }
 
         [DisplayName("Tipo Documento")]
@@ -34,6 +34,6 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
 
         public int Page { get; set; }
 
-        public int MaxItemCount { get; set; }
+        public int PageSize { get; set; }
     }
 }
