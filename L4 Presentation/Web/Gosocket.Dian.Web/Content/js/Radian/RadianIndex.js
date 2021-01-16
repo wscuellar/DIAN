@@ -169,7 +169,7 @@ function SetIconsList(fileId) {
 function CancelRegister(url, dataAjax, confirmMessage, successAction, label, errorAction) {
         var metod = 'POST';
         var operation = (description) => ajaxFunction(url, metod, { ...dataAjax, description }, errorAction, successAction);
-    ShowPromptCancel(confirmMessage, operation, label, errorAction, bootboxMessage.CANCEL_REGISTER);
+        ShowPromptCancel(confirmMessage, operation, label, errorAction, bootboxMessage.CANCEL_REGISTER);
 }
 
 function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText) {

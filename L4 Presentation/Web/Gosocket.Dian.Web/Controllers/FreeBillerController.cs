@@ -483,6 +483,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             foreach (var item in identification.Errors)
                 errors.Append(item);
+
             return Json(new ResponseMessage(errors.ToString(), TextResources.alertType), JsonRequestBehavior.AllowGet);
         }
 

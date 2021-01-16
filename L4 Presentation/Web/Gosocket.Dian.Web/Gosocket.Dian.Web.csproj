@@ -744,6 +744,7 @@
     <Content Include="Content\js\demo\ui-panels.js" />
     <Content Include="Content\js\demo\widgets.js" />
     <Content Include="Content\js\file-validator.js" />
+    <Content Include="Content\js\FreeBiller\FreeBiller.js" />
     <Content Include="Content\js\gosocket\gosocket-search.js" />
     <Content Include="Content\js\gosocket\gosocket.js" />
     <Content Include="Content\js\gosocket\typeahead.js" />
