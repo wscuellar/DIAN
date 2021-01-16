@@ -1,13 +1,11 @@
 ﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFreeBillerModel
+@using Newtonsoft.Json;
 @{
     ViewBag.Title = "Creación de Usuarios";
     //Layout = "~/Views/Shared/_Layout.cshtml";
 
     var columnSize = 3;
-    //if (view == "Index" || view == "Provider")
-    //{
-    //    columnSize = 3;
-    //}
+
 }
 
 @section css
@@ -69,7 +67,7 @@
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
-                                    @using (Html.BeginForm("CreateUser", "FreeBiller", FormMethod.Post))
+                                    @using (Html.BeginForm("CreateUser", "FreeBiller", FormMethod.Post, new { id = "create-user-form" }))
                                     {
                                         <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                             <div class="col-md-12 padding-horizontal-0">
@@ -120,8 +118,8 @@
                                                     </div>
 
                                                     <div class="panel-footer-grey text-right submit-container">
-                                                        <button id="btnCancel" type="button" class="btn btn-success btn-radian-default">Cancelar</button>
-                                                        <button type="submit" class="btn btn-success btn-radian-success">Crear Usuario</button>
+                                                        <button id="btnCancel" class="btn btn-success btn-radian-default">Cancelar</button>
+                                                        <button id="btnSend" class="btn btn-success btn-radian-success">Crear Usuario</button>
                                                     </div>
 
                                                 </div>
@@ -159,7 +157,7 @@
                                                                 <div class="level-3">
                                                                     <div class="row-cols-1">
                                                                         <div class="form-group d-flex margin-0">
-                                                                            <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled/>
+                                                                            <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
                                                                             <label class="label-check">@subSubMenuItems.Name</label>
                                                                         </div>
                                                                     </div>
@@ -172,7 +170,7 @@
                                                         <div class="level-3">
                                                             <div class="row-cols-1">
                                                                 <div class="form-group d-flex margin-0">
-                                                                    <input type="checkbox" id="@subMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id" disabled/>
+                                                                    <input type="checkbox" id="@subMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id" disabled />
                                                                     <label class="label-check">@subMenuItems.Name</label>
                                                                 </div>
                                                             </div>
@@ -203,13 +201,43 @@
     <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
 
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
-    <script src="~/Content/js/Radian/RadianIndex.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/FreeBiller/FreeBiller.js"></script>
 
     <script>
         $(document).ready(function () {
             var urlNewUser = "@Url.Action("FreeBillerUser")";
 
+
+            $("#btnSend").click(function (e) {
+                e.preventDefault();
+                var form = $("#create-user-form")
+                var data = {
+                    FullName: $('[name=FullName]').val(),
+                    TypeDocId: $('[name=TypeDocId]').val(),
+                    NumberDoc: $('[name=NumberDoc]').val(),
+                    Email: $('[name=Email]').val(),
+                    ProfileId: $('[name=ProfileId]').val(),
+                }
+                var url = '@Url.Action("CreateUser", "FreeBiller")';
+                var actionError = (error) => {
+                    console.log(error);
+                }
+                var actionSuccess = (success) => {
+                    var confirmMessage = success.Message;
+                    var operationCancel = () => {
+                        if (success.RedirectTo) {
+                            window.location.href = success.RedirectTo;
+                        }
+                    }
+                    var buttons = AlertExec(operationCancel);
+                    var clName = (success.Code == 200) ? "cancel-confirmation" : null;
+                    showConfirmation(confirmMessage, buttons, clName, operationCancel)
+                }
+                createUser(url, 'POST', data, actionError, actionSuccess)
+
+            })
             $("#ProfileId").change(function () {
                 $("input:checkbox:checked").prop("checked",false)
                 var idProfile = $(this).val();
