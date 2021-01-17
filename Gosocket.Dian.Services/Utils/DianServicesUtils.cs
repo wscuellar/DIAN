@@ -678,6 +678,72 @@ namespace Gosocket.Dian.Services.Utils
             return isValid;
         }
 
+        public static bool ValidateParserNomina(DocumentParsedNomina documentParsed, ref DianResponse dianResponse)
+        {
+            string codeMessage = string.Empty;
+            bool isValid = true;
+            StringBuilder stringBuilder = new StringBuilder();
+
+            List<string> errors = new List<string>();
+
+            var docTypeCode = documentParsed.DocumentTypeId;
+            var cune = documentParsed.CUNE;
+            var cunePred = documentParsed.CUNEPred;
+            var codigoTrabajador = documentParsed.CodigoTrabajador;
+
+            switch (docTypeCode)
+            {
+                case "11":               
+                    {
+                        codeMessage = "NIE";
+                        break;
+                    }
+                case "12":          
+                    {
+                        codeMessage = "NIAE";
+                        break;
+                    }                       
+                default:
+                    {
+                        codeMessage = "GEN";
+                        break;
+                    }
+            }
+
+            if (string.IsNullOrEmpty(cune))
+            {
+                stringBuilder.AppendLine($"{codeMessage}024-(R): Se debe indicar el CUNE según la definición establecida.");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
+
+            if (string.IsNullOrEmpty(cunePred) && docTypeCode == "12")
+            {
+                stringBuilder.AppendLine($"{codeMessage}191-(R): Debe ir el CUNE del documento a Reemplazar");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
+
+            if (string.IsNullOrEmpty(codigoTrabajador))
+            {
+                stringBuilder.AppendLine($"{codeMessage}009-(R): Se debe indicar el Codigo del Trabajador.");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
+
+            if (!isValid)
+            {
+                dianResponse.StatusCode = "66";
+                dianResponse.ErrorMessage = errors;
+            }
+
+            return isValid;
+        }
+
+
         public static bool ValidateParserValuesSync(DocumentParsed documentParsed, ref DianResponse dianResponse)
         {
             string codeMessage = string.Empty;

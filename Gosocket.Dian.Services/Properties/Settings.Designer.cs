@@ -12,7 +12,7 @@ namespace Gosocket.Dian.Services.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -382,6 +382,15 @@ namespace Gosocket.Dian.Services.Properties {
         public string Param_ValidatePredecesor {
             get {
                 return ((string)(this["Param_ValidatePredecesor"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("El método síncrono SendNominaSync solo puede recibir un documento.")]
+        public string Msg_Error_NominaOnlyDocument {
+            get {
+                return ((string)(this["Msg_Error_NominaOnlyDocument"]));
             }
         }
     }
