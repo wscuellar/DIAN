@@ -57,7 +57,7 @@
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
-                                    @using (Html.BeginForm("CreateUser", "FreeBiller", FormMethod.Post, new { id = "edit-user-form" }))
+                                    @using (Html.BeginForm("GetIdsByProfile", "FreeBiller", FormMethod.Post, new { id = "edit-user-form" }))
                                     {
                                         @Html.HiddenFor(m => m.Id)
                                         <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
