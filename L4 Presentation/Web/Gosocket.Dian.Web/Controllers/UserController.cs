@@ -1212,7 +1212,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         [ExcludeFilter(typeof(Authorization))]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ContributorUserLogin(UserLoginViewModel model, string returnUrl)
+        public async Task<ActionResult> ContributorUserLogin(UserLoginViewModel model)
         {
             ClearUnnecessariesModelStateErrorsForAuthentication(false);
 
@@ -1282,42 +1282,7 @@ namespace Gosocket.Dian.Web.Controllers
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
-
-            var accessUrl = ConfigurationManager.GetValue("UserAuthTokenUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
-            if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Prod")
-            {
-                try
-                {
-                    auth.Email = user.Email;
-                    var emailSenderResponse = await EmailUtil.SendEmailAsync(auth, accessUrl);
-                    if (emailSenderResponse.ErrorType != ErrorTypes.NoError)
-                    {
-                        ModelState.AddModelError($"CompanyLoginFailed", "Autenticación correcta, su solicitud está siendo procesada.");
-                        return View("CompanyLogin", model);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var requestId = Guid.NewGuid();
-                    var logger = new GlobalLogger(requestId.ToString(), requestId.ToString())
-                    {
-                        Action = "SendEmailAsync",
-                        Controller = "User",
-                        Message = ex.Message,
-                        RouteData = "",
-                        StackTrace = ex.StackTrace
-                    };
-                    var tableManager = new TableManager("GlobalLogger");
-                    tableManager.InsertOrUpdate(logger);
-                    ModelState.AddModelError($"CompanyLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
-                    return View("CompanyLogin", model);
-                }
-            }
-
-            ViewBag.UserEmail = HideUserEmailParts(auth.Email);
-            ViewBag.Url = accessUrl;
-            ViewBag.currentTab = "confirmed";
-            return View("LoginConfirmed", model);
+            return RedirectToBiller();
         }
 
         #endregion

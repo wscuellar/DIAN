@@ -1,6 +1,6 @@
 ﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFreeBillerModel
+@using Newtonsoft.Json;
 @{
-
     ViewBag.Title = "Modificar Registro";
 
 }
@@ -57,8 +57,9 @@
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
-                                    @using (Html.BeginForm("CreateUser", "FreeBiller", FormMethod.Post, new { id = "create-user-form" }))
+                                    @using (Html.BeginForm("CreateUser", "FreeBiller", FormMethod.Post, new { id = "edit-user-form" }))
                                     {
+                                        @Html.HiddenFor(m => m.Id)
                                         <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                             <div class="col-md-12 padding-horizontal-0">
                                                 <div id="document-list" class="panel panel-bordered-dian">
@@ -109,7 +110,7 @@
 
                                                     <div class="panel-footer-grey text-right submit-container">
                                                         <button id="btnCancel" class="btn btn-success btn-radian-default">Cancelar</button>
-                                                        <button id="btnSend" class="btn btn-success btn-radian-success">Crear Usuario</button>
+                                                        <button id="btnSend" class="btn btn-success btn-radian-success">Guardar Cambios</button>
                                                     </div>
 
                                                 </div>
@@ -185,113 +186,59 @@
 
 
 @section scripts{
+    <script src="~/Content/js/FreeBiller/FreeBiller.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
     <script>
         $(document).ready(function () {
-        $("input:checkbox:checked").attr("checked", true);
-        if (@ViewBag.valor= true) {
-            if (@ViewBag.valor= 1) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-            if (@ViewBag.valor= 2) {
-                document.getElementById("FacturaContingencia").checked = true;
-            }
-             if (@ViewBag.valor= 3) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 4) {
-                 document.getElementById("NotaCredito").checked = true;
-            }
-             if (@ViewBag.valor= 5) {
-                 document.getElementById("NotaDebito").checked = true;
-            }
-             if (@ViewBag.valor= 6) {
-                 document.getElementById("FacturaMandato").checked = true;
-            }
-             if (@ViewBag.valor= 7) {
-                 document.getElementById("FacturaAIU").checked = true;
-            }
-             if (@ViewBag.valor= 8) {
-                 document.getElementById("FacturaExportacion").checked = true;
-            }
-             if (@ViewBag.valor= 9) {
-                 document.getElementById("DocumentoSoporte").checked = true;
-            }
-             if (@ViewBag.valor= 10) {
-                 document.getElementById("Seguridad").checked = true;
-            }
-             if (@ViewBag.valor= 11) {
-                 document.getElementById("CertificadosDigitales").checked = true;
-            }
-             if (@ViewBag.valor= 12) {
-                 document.getElementById("Administrar").checked = true;
-            }
-             if (@ViewBag.valor= 13) {
-                 document.getElementById("clientes").checked = true;
-            }
-             if (@ViewBag.valor= 14) {
-                 document.getElementById("RangosNum").checked = true;
-            }
-             if (@ViewBag.valor= 15) {
-                 document.getElementById("Productos").checked = true;
-            }
-             if (@ViewBag.valor= 16) {
-                 document.getElementById("NuevaPlantilla").checked = true;
-            }
-             if (@ViewBag.valor= 17) {
-                 document.getElementById("FacturaExportacion").checked = true;
-            }
-             if (@ViewBag.valor= 18) {
-                 document.getElementById("AdminPlantillas").checked = true;
-            }
-             if (@ViewBag.valor= 19) {
-                 document.getElementById("EmitirPlantillas").checked = true;
-            }
-             if (@ViewBag.valor= 20) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 21) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 22) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 23) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 24) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 25) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 26) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 27) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 28) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 29) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 30) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 31) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-             if (@ViewBag.valor= 32) {
-                document.getElementById("FacturaVenta").checked = true;
-            }
-            console.log("Ok¡¡");
-        }
-        else {
-            console.log("No Ok¡¡");
-        }
-    });
+            initialValuesCheck(@Model.ProfileId, '@Url.Action("GetIdsByProfile", "FreeBiller")');
+            $("#ProfileId").change(function () {
+                $("input:checkbox:checked").prop("checked",false)
+                var idProfile = $(this).val();
+                var url = '@Url.Action("GetIdsByProfile", "FreeBiller")';
+                var dataAjax = {
+                    profileId: idProfile
+                }
+                var errorAction = (error) => {
+                    console.log(error);
+                }
+                var successAction = (result) => {
+                    result.forEach(function (id) {
+                        $("input#" + id).prop("checked", "checked");
+                    });
+                }
+                ajaxFunction(url, "POST", dataAjax, errorAction, successAction);
+            });
+
+            $("#btnSend").click(function (e) {
+                e.preventDefault();
+                var form = $("#edit-user-form")
+                var data = {
+                    FullName: $('[name=FullName]').val(),
+                    TypeDocId: $('[name=TypeDocId]').val(),
+                    NumberDoc: $('[name=NumberDoc]').val(),
+                    Email: $('[name=Email]').val(),
+                    ProfileId: $('[name=ProfileId]').val(),
+                }
+                var url = '@Url.Action("EditFreeBillerUser", "FreeBiller")';
+                var actionError = (error) => {
+                    console.log(error);
+                }
+                var actionSuccess = (success) => {
+                    var confirmMessage = success.Message;
+                    var operationCancel = () => {
+                        if (success.RedirectTo) {
+                            window.location.href = success.RedirectTo;
+                        }
+                    }
+                    var buttons = AlertExec(operationCancel);
+                    var clName = (success.Code == 200) ? "cancel-confirmation" : null;
+                    showConfirmation(confirmMessage, buttons, clName, operationCancel)
+                }
+                createUser(url, 'POST', data, actionError, actionSuccess)
+
+            })
+        });
     </script>
 
 
