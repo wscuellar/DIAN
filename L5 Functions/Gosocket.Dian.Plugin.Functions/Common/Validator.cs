@@ -1633,9 +1633,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             data.EndDate = "";
             string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
+            string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
+            string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']").Item(0)?.InnerText.ToString();
             string modoOperacion = string.Empty;
             string messageMandatoG = "Error no existe código mandato General";
             string messageMandatoL = "Error no existe código mandato Limitado";
+            //Validacion descripcion Mandante
+            if(descriptionSender!= "Mandante Facturador Electrónico" && descriptionSender != "Mandante Legitimo Tenedor" && descriptionSender != "Mandante Aval" && descriptionSender != "Mandante Adquirente/Deudor")
+            {
+                validate = false;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAF35-(R):",
+                    ErrorMessage = "No fue informado el literal de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
             //Valida descripcion Mnadatario 
             switch (factorTemp)
             {
@@ -1833,7 +1848,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida CUFE referenciado existe en sistema DIAN                
                     var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference, issuerPartyCode, issuerPartyName);
                     if (resultValidateCufe[0].IsValid)
-                        attorney.Add(attorneyModel);
+                    {
+                        TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+                        var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyModel.cufe, attorneyModel.cufe);
+                        if(companyId == documentMetaCUFE.SenderCode)
+                        {
+                            attorney.Add(attorneyModel);
+                        }
+                        else
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "Regla: 89-(R): ",
+                                ErrorMessage = "CUFE no se encuentra referenciado no corresponde al emisor",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
                     else
                     {
                         validate = false;
