@@ -83,7 +83,11 @@ namespace Gosocket.Dian.Functions.Pdf
                 //-------------------------------------------------------------------------------------------------------------------------
 
                 // Obtener en el Storage el Byte Array del **LOGO** a poner en el Documento - Convertir a Base 64 Image
-                MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytes("logo", $"{documentMetaEntity.ReceiverCode}.jpg") ?? fileManager.GetBytes("dian", "images/logoTest.png"));
+                MemoryStream logoDianStream = new MemoryStream(fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
+                string logoDianaStrBase64 = Convert.ToBase64String(logoDianStream.ToArray());
+                var logoDianBase64 = $@"data:image/png;base64,{logoDianaStrBase64}";
+
+                MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytes("logo", $"{documentMetaEntity.ReceiverCode}.jpg") ?? fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
                 string logoStrBase64 = Convert.ToBase64String(logoStream.ToArray());
                 var logoBase64 = $@"data:image/png;base64,{logoStrBase64}";
 
@@ -99,6 +103,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 //-------------------------------------------------------------------------------------------------------------------------
 
                 // Sustuir en el HTML la ruta de LOGO y CÓDIGO QR para colocar imágenes
+                Html_Content = Html_Content.Replace("#123logoDian", logoDianBase64);
                 Html_Content = Html_Content.Replace("#123logo", logoBase64);
                 Html_Content = Html_Content.Replace("#1qrcode", qrBase64);
 
