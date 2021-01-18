@@ -83,12 +83,12 @@ namespace Gosocket.Dian.Services.Utils.Common
                     // Load xml document.
                     XmlNodeList xPersonas = XmlDocument.GetElementsByTagName("Periodo");
                     for (int i = 0; i < xPersonas.Count; i++) {
-                        globalDocPayrolls.FechaIngreso = Convert.ToDateTime(xPersonas[i].Attributes["FechaIngreso"]?.InnerText);
-                        globalDocPayrolls.FechaPagoInicio = Convert.ToDateTime(xPersonas[i].Attributes["FechaPagoInicio"]?.InnerText);
-                        globalDocPayrolls.FechaPagoFin = Convert.ToDateTime(xPersonas[i].Attributes["FechaPagoFin"]?.InnerText);
+                        globalDocPayrolls.FechaIngreso = xPersonas[i].Attributes["FechaIngreso"]?.InnerText;
+                        globalDocPayrolls.FechaPagoInicio = xPersonas[i].Attributes["FechaPagoInicio"]?.InnerText;
+                        globalDocPayrolls.FechaPagoFin = xPersonas[i].Attributes["FechaPagoFin"]?.InnerText;
                         globalDocPayrolls.TiempoLaborado = xPersonas[i].Attributes["TiempoLaborado"]?.InnerText;
-                        globalDocPayrolls.FechaLiquidacion = Convert.ToDateTime(xPersonas[i].Attributes["FechaLiquidacion"]?.InnerText);
-                        globalDocPayrolls.FechaGen = Convert.ToDateTime(xPersonas[i].Attributes["FechaGen"]?.InnerText);
+                        globalDocPayrolls.FechaLiquidacion = xPersonas[i].Attributes["FechaLiquidacion"]?.InnerText;
+                        globalDocPayrolls.FechaGen = xPersonas[i].Attributes["FechaGen"]?.InnerText;
                     }
                     XmlNodeList xNumeroSecuenciaXML = XmlDocument.GetElementsByTagName("NumeroSecuenciaXML");
                     for (int j = 0; j < xNumeroSecuenciaXML.Count; j++)
