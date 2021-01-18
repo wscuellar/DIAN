@@ -1228,10 +1228,20 @@ namespace Gosocket.Dian.Web.Controllers
             var pk = $"{model.IdentificationType}|{model.UserCode}";
             var rk = $"{model.CompanyCode}";
 
-            var user = userService.GetByCodePasswordAndIdentificationTyte(model.UserCode, model.IdentificationType, UserManager.PasswordHasher.HashPassword(model.Password));
+            var user = userService.GetByCodeAndIdentificationTyte(model.UserCode, model.IdentificationType);
+            
             if (user == null)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Error de ingreso, verifique sus datos");
+                return View("CompanyLogin", model);
+            }
+
+            var result = await SignInManager.PasswordSignInAsync(user.Email, model.Password, true, shouldLockout: true);
+
+            //var pass = UserManager.PasswordHasher.VerifyHashedPassword(model.Password, user.PasswordHash);
+            if (result != SignInStatus.Success)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Contraseña incorrecta");
                 return View("CompanyLogin", model);
             }
 
