@@ -419,7 +419,7 @@ namespace Gosocket.Dian.Web.Controllers
                     selectTypesId.Add(
                         new SelectListItem
                         {
-                            Value = item.Code,
+                            Value = item.Id.ToString(),
                             Text = item.Description
                         });
                 }
