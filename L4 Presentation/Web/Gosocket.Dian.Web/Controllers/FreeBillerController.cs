@@ -20,6 +20,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Common.Resources;
 using System.Net;
 using Gosocket.Dian.Domain.Sql.FreeBiller;
+using Gosocket.Dian.Web.Common;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -487,10 +488,11 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns>List<UserFreeBillerModel></returns>
         private UserFreeBillerContainerModel GetUsers(UserFiltersFreeBillerModel model)
         {
+            string companyCode = User.ContributorCode();
             List<ApplicationUser> users = userService.UserFreeBillerProfile(t => (model.DocTypeId == 0 || t.IdentificationTypeId == model.DocTypeId)
                                               && (model.DocNumber == null || t.IdentificationId == model.DocNumber)
                                               && (model.FullName == null || t.Name.ToLower().Contains(model.FullName.ToLower()))
-                                               , model.ProfileId);
+                                               , companyCode, model.ProfileId);
 
             List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
             var query = from item in users
