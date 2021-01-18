@@ -373,6 +373,32 @@ namespace Gosocket.Dian.Web.Controllers
             return true;
         }
 
+
+        /// <summary>
+        /// Enviar notificacion email para creacion de usuario externo.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private bool SendMailEdit(UserFreeBillerModel model)
+        {
+            var emailService = new Gosocket.Dian.Application.EmailService();
+            StringBuilder message = new StringBuilder();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("</br> <span style='font-size:18px;'><b>Se ha realizado una actualizacion a sus datos de usuario</b></span></br>");
+            message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.FullName);
+            
+            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+
+            //Nombre del documento, estado, observaciones
+            dic.Add("##CONTENT##", message.ToString());
+
+            emailService.SendEmail(model.Email, "DIAN - Edición de Usuario Registrado", dic);
+
+            return true;
+        }
+
         #region Carga de combos
 
         /// <summary>
