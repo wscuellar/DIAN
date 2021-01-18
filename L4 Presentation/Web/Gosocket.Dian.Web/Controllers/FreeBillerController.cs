@@ -266,6 +266,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             //Crea nuevo registro para AspNetUser
             model.FullName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(model.FullName);
+            model.Password = userManager.PasswordHasher.HashPassword(model.Email.Split('@')[0]);
             var user = new ApplicationUser
             {
                 CreatorNit = uCompany.Code,
@@ -279,9 +280,10 @@ namespace Gosocket.Dian.Web.Controllers
                 CreationDate = DateTime.Now,
                 UpdatedBy = User.Identity.Name,
                 LastUpdated = DateTime.Now,
-                Active = 1
+                Active = 1,
+                PasswordHash = model.Password
             };
-            model.Password = userManager.PasswordHasher.HashPassword(model.Email.Split('@')[0]);
+            
 
 
             //validar si ya existe un Usuario con el tipo documento y documento suministrados en AspNetUser
@@ -324,8 +326,8 @@ namespace Gosocket.Dian.Web.Controllers
                     { 
                         ProfileFreeBillerId = model.ProfileId, 
                         UserId = user.Id, 
-                        CompanyCode = user.CreatorNit,
-                        CompanyIdentificationType = uCompany.IdentificationTypeId
+                        CompanyCode = User.ContributorCode(),
+                        CompanyIdentificationType = User.IdentificationTypeId()
                     });
 
                 //Envio de notificacion por correo
@@ -431,56 +433,6 @@ namespace Gosocket.Dian.Web.Controllers
         }
         #endregion
 
-        /// <summary>
-        /// Método encargado de obtener todos los perfiles para los usuarios del Facturador Gratuito.
-        /// </summary>
-        /// <returns>List<SelectListItem></returns>
-        private List<SelectListItem> GetMenuProfile(string id)
-        {
-            List<UserFreeBillerModel> listUsers = new List<UserFreeBillerModel>();
-            List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
-
-            var users = userService.GetUsers(userIdsFreeBiller.Select(u => u.UserId).ToList());
-
-            if (users != null)
-            {
-                foreach (var item in users.Where(x => x.Id == id).ToList())
-                {
-                    foreach (var item2 in userIdsFreeBiller.Where(x => x.UserId == item.Id).ToList())
-                    {
-                        listUsers.Add(new UserFreeBillerModel
-                        {
-                            Id = item2.ClaimValue
-                        });
-                    }
-
-                }
-            }
-            List<SelectListItem> selectProfiles = new List<SelectListItem>();
-            var types = profileService.GetMenuOptions().ToList();
-
-
-            if (types?.Count > 0)
-            {
-                foreach (var item in listUsers.ToList())
-                {
-                    var OptProf = profileService.GetMenuOptionsByProfile().Where(x => x.ProfileId == Convert.ToInt32(item.Id)).ToList();
-                    foreach (var item1 in OptProf.ToList())
-                    {
-                        selectProfiles.Add(
-                            new SelectListItem
-                            {
-                                Value = item1.ProfileId.ToString(),
-                                Text = item1.MenuOptionId.ToString()
-                            });
-                    }
-                }
-
-
-            }
-
-            return selectProfiles;
-        }
 
         /// <summary>
         /// Obtiene todos los usuarios creados para el facturador gratuito.
@@ -489,7 +441,6 @@ namespace Gosocket.Dian.Web.Controllers
         private UserFreeBillerContainerModel GetUsers(UserFiltersFreeBillerModel model)
         {
             string companyCode = User.ContributorCode();
-            int i = User.IdentificationTypeId();
             List<ApplicationUser> users = userService.UserFreeBillerProfile(t => (model.DocTypeId == 0 || t.IdentificationTypeId == model.DocTypeId)
                                               && (model.DocNumber == null || t.IdentificationId == model.DocNumber)
                                               && (model.FullName == null || t.Name.ToLower().Contains(model.FullName.ToLower()))
