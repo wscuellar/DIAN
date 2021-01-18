@@ -12,6 +12,9 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string ProveedorSoftwareID { get; set; }
         public string ProveedorSoftwareSC { get; set; }
         public string SerieAndNumber { get; set; }
+        public string EmpleadorDV { get; set; }
+        public string EmpleadorNIT { get; set; }
+
 
         public static void SetValues (ref DocumentParsedNomina documentParsedNomina)
         {
