@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Domain.Utils;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Web.Common;
@@ -1240,8 +1241,10 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("CompanyLogin", model);
             }
 
+            UsersFreeBillerProfile freeBiller = userService.GetUserFreeBillerProfile(u => u.CompanyCode == model.CompanyCode && u.CompanyIdentificationType == model.CompanyIdentificationType);
+
             var contributor = user.Contributors.FirstOrDefault(c => c.Code == model.CompanyCode);
-            if (user.FreeBillerProfile.CompanyCode != model.CompanyCode && user.FreeBillerProfile.CompanyIdentificationType != model.CompanyIdentificationType)
+            if (freeBiller == null)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Empresa no asociada a representante legal.");
                 return View("CompanyLogin", model);

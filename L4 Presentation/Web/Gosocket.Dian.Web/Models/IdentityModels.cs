@@ -41,7 +41,7 @@ namespace Gosocket.Dian.Web.Models
         public string ContributorCode { get; set; }
 
         public virtual ICollection<Contributor> Contributors { get; set; }
-        public virtual UsersFreeBillerProfile FreeBillerProfile { get; set; }
+        //public virtual UsersFreeBillerProfile FreeBillerProfile { get; set; }
 
         /// <summary>
         /// Activar o descativar el Usuario. Por ahora solo aplica para Usuarios externos

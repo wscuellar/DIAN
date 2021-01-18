@@ -57,6 +57,13 @@ namespace Gosocket.Dian.Web.Utils
             return usersInstance ==  null ? usersFreeBiller.Id : usersInstance.Id;
         }
 
+        public UsersFreeBillerProfile GetUserFreeBillerProfile(Expression<Func<UsersFreeBillerProfile, bool>> expression)
+        {
+            var entity = _sqlDBContext.UserFreeBillerProfile.FirstOrDefault(expression);
+
+            return entity;
+        }
+
         #region Actualizar Claims para usuarios de facturador gratuito
 
         public int UpdateUserClaim(ClaimsDb usersFreeBiller)
