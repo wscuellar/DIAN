@@ -8,6 +8,10 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
 {
     public class UserFreeBillerModel
     {
+        public UserFreeBillerModel()
+        {
+            IsEdit = true;
+        }
         public string Id { get; set; }
 
         [DisplayName("Nombre")]
