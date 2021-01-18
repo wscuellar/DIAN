@@ -526,14 +526,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
 
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
-            var xmlParser = new XmlParser(xmlBytes);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
 
-            var softwareModel = xmlParser.Fields.ToObject<SoftwareModel>();
+            SoftwareModel softwareModel = null;
+            NominaModel nominaModel = null;
+            XmlParser xmlParser = null;
+            XmlParseNomina xmlParserNomina = null;
+            var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+            {
+                xmlParserNomina = new XmlParseNomina(xmlBytes);
+                if (!xmlParserNomina.Parser())
+                    throw new Exception(xmlParserNomina.ParserError);
+
+                nominaModel = xmlParserNomina.Fields.ToObject<NominaModel>();
+            }
+            else
+            {
+                xmlParser = new XmlParser(xmlBytes);
+                if (!xmlParser.Parser())
+                    throw new Exception(xmlParser.ParserError);
+
+                softwareModel = xmlParser.Fields.ToObject<SoftwareModel>();
+            }
 
             var validator = new Validator();
-            validateResponses.Add(validator.ValidateSoftware(softwareModel, trackId));
+            validateResponses.Add(validator.ValidateSoftware(softwareModel, trackId, nominaModel: nominaModel));
 
             return validateResponses;
         }

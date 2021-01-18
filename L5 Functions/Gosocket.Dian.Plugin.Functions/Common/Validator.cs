@@ -2206,7 +2206,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Software validation
-        public ValidateListResponse ValidateSoftware(SoftwareModel softwareModel, string trackId)
+        public ValidateListResponse ValidateSoftware(SoftwareModel softwareModel, string trackId, NominaModel nominaModel = null)
         {
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
@@ -2219,10 +2219,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 response.ErrorCode = "DAB27b";
             if (documentMeta.DocumentTypeId == "96")
                 response.ErrorCode = "AAB27b";
+            if (documentMeta.DocumentTypeId == "11")
+                response.ErrorCode = "NIE020";
+            if (documentMeta.DocumentTypeId == "12")
+                response.ErrorCode = "NIAE020";
 
-            var number = softwareModel.SerieAndNumber;
-            var softwareId = softwareModel.SoftwareId;
-            var SoftwareSecurityCode = softwareModel.SoftwareSecurityCode;
+            if (documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+            {
+                response.ErrorMessage = "Se debe indicar el Software Security Code según la definición establecida.";
+            }
+
+            var number = (softwareModel != null) ? softwareModel.SerieAndNumber : nominaModel.SerieAndNumber;
+            var softwareId = (softwareModel != null) ? softwareModel.SoftwareId : nominaModel.ProveedorSoftwareID;
+            var SoftwareSecurityCode = (softwareModel != null) ? softwareModel.SoftwareSecurityCode : nominaModel.ProveedorSoftwareSC;
 
             var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
@@ -2236,26 +2245,45 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (software == null)
                 {
                     response.ErrorCode = "FAB24b";
+                    response.ErrorMessage = "El identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este OFE.";
                     if (documentMeta.DocumentTypeId == "91")
                         response.ErrorCode = "CAB24b";
                     if (documentMeta.DocumentTypeId == "92")
                         response.ErrorCode = "DAB24b";
                     if (documentMeta.DocumentTypeId == "96")
                         response.ErrorCode = "AAB24b";
-                    response.ErrorMessage = "El identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este OFE.";
+                    if (documentMeta.DocumentTypeId == "11")
+                        response.ErrorCode = "NIE019";
+                    if (documentMeta.DocumentTypeId == "12")
+                        response.ErrorCode = "NIAE019";
+
+                    if (documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+                    {
+                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Documento Soporte de Pago de Nómina Electrónica, debe corresponder a un software autorizado para este Emisor";
+                    }
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
                 }
                 else if (software.StatusId == (int)SoftwareStatus.Inactive)
                 {
                     response.ErrorCode = "FAB24c";
+                    response.ErrorMessage = "Identificador del software informado se encuentra inactivo.";
                     if (documentMeta.DocumentTypeId == "91")
                         response.ErrorCode = "CAB24c";
                     if (documentMeta.DocumentTypeId == "92")
                         response.ErrorCode = "DAB24c";
                     if (documentMeta.DocumentTypeId == "96")
                         response.ErrorCode = "AAB24c";
-                    response.ErrorMessage = "Identificador del software informado se encuentra inactivo.";
+                    if (documentMeta.DocumentTypeId == "11")
+                        response.ErrorCode = "NIE019";
+                    if (documentMeta.DocumentTypeId == "12")
+                        response.ErrorCode = "NIAE019";
+
+                    if (documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+                    {
+                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Documento Soporte de Pago de Nómina Electrónica, debe corresponder a un software autorizado para este Emisor";
+                    }
+
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
                 }
