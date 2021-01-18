@@ -204,7 +204,7 @@ namespace Gosocket.Dian.Web.Controllers
             user.IdentificationTypeId = Convert.ToInt32(model.TypeDocId);
             user.IdentificationId = model.NumberDoc;
             user.Email = model.Email;
-            user.PasswordHash = model.Password;
+            user.PasswordHash = userManager.PasswordHasher.HashPassword(model.Password);
             IdentityResult identityResult = await userManager.UpdateAsync(user);
             if (identityResult.Succeeded)
             {
