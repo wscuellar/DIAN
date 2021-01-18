@@ -215,7 +215,7 @@ namespace Gosocket.Dian.Web.Controllers
                 // Actualiza perfil
                 _ = userService.UserFreeBillerUpdate(new Domain.Sql.UsersFreeBillerProfile() { ProfileFreeBillerId = model.ProfileId, UserId = user.Id });
 
-                SendMailCreate(model);
+                SendMailEdit(model);
                 ResponseMessage resultx = new ResponseMessage(TextResources.UserUpdatedSuccess, TextResources.alertType);
                 resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");
                 return Json(resultx, JsonRequestBehavior.AllowGet);
