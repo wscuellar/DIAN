@@ -103,24 +103,24 @@ namespace Gosocket.Dian.Services.Utils.Common
                     XmlNodeList xNumeroSecuenciaXML = XmlDocument.GetElementsByTagName("NumeroSecuenciaXML");
                     for (int j = 0; j < xNumeroSecuenciaXML.Count; j++)
                     {
-                        globalDocPayrolls.CodigoTrabajador = Convert.ToUInt64(xNumeroSecuenciaXML[j].Attributes["CodigoTrabajador"]?.InnerText);
+                        globalDocPayrolls.CodigoTrabajador = xNumeroSecuenciaXML[j].Attributes["CodigoTrabajador"]?.InnerText;
                         globalDocPayrolls.Prefijo = xNumeroSecuenciaXML[j].Attributes["Prefijo"]?.InnerText;
-                        globalDocPayrolls.Consecutivo = Convert.ToByte(xNumeroSecuenciaXML[j].Attributes["Consecutivo"]?.InnerText);
+                        globalDocPayrolls.Consecutivo = xNumeroSecuenciaXML[j].Attributes["Consecutivo"]?.InnerText;
                         globalDocPayrolls.Numero = xNumeroSecuenciaXML[j].Attributes["Numero"]?.InnerText;
                     }
                     XmlNodeList xLugarGeneracionXML = XmlDocument.GetElementsByTagName("LugarGeneracionXML");
                     for (int j = 0; j < xLugarGeneracionXML.Count; j++)
                     {
                         globalDocPayrolls.Pais = xLugarGeneracionXML[j].Attributes["Pais"]?.InnerText;
-                        globalDocPayrolls.DepartamentoEstado = Convert.ToByte(xLugarGeneracionXML[j].Attributes["DepartamentoEstado"]?.InnerText);
-                        globalDocPayrolls.MunicipioCiudad = Convert.ToUInt16(xLugarGeneracionXML[j].Attributes["MunicipioCiudad"]?.InnerText);
+                        globalDocPayrolls.DepartamentoEstado = xLugarGeneracionXML[j].Attributes["DepartamentoEstado"]?.InnerText;
+                        globalDocPayrolls.MunicipioCiudad = xLugarGeneracionXML[j].Attributes["MunicipioCiudad"]?.InnerText;
                         globalDocPayrolls.Idioma = xLugarGeneracionXML[j].Attributes["Idioma"]?.InnerText;
                     }
                     XmlNodeList xProveedorXML = XmlDocument.GetElementsByTagName("ProveedorXML");
                     for (int j = 0; j < xProveedorXML.Count; j++)
                     {
-                        globalDocPayrolls.NIT = Convert.ToUInt32(xProveedorXML[j].Attributes["NIT"]?.InnerText);
-                        globalDocPayrolls.DV = Convert.ToByte(xProveedorXML[j].Attributes["DV"]?.InnerText);
+                        globalDocPayrolls.NIT = xProveedorXML[j].Attributes["NIT"]?.InnerText;
+                        globalDocPayrolls.DV = xProveedorXML[j].Attributes["DV"]?.InnerText;
                         globalDocPayrolls.SoftwareID = xProveedorXML[j].Attributes["SoftwareID"]?.InnerText;
                         globalDocPayrolls.SoftwareSC = xProveedorXML[j].Attributes["SoftwareSC"]?.InnerText;
                     }
@@ -182,7 +182,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.NombreCargo = xTrabajador[j].Attributes["NombreCargo"]?.InnerText;
                         globalDocPayrolls.TipoContrato = Convert.ToByte(xTrabajador[j].Attributes["TipoContrato"]?.InnerText);
                         globalDocPayrolls.Salario = Convert.ToDecimal(xTrabajador[j].Attributes["Salario"]?.InnerText);
-                        globalDocPayrolls.CodigoTrabajador = Convert.ToUInt64(xTrabajador[j].Attributes["CodigoTrabajador"]?.InnerText);
+                        globalDocPayrolls.CodigoTrabajador = xTrabajador[j].Attributes["CodigoTrabajador"]?.InnerText;
                     }
                     XmlNodeList xPago = XmlDocument.GetElementsByTagName("Pago");
                     for (int j = 0; j < xPago.Count; j++)

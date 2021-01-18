@@ -34,27 +34,27 @@ namespace Gosocket.Dian.Domain.Entity
         public System.DateTime FechaGen { get; set; }
 
         //NumeroSecuenciaXML
-        public ulong CodigoTrabajador { get; set; }
+        public string CodigoTrabajador { get; set; }
 
         public string Prefijo { get; set; }
 
-        public byte Consecutivo { get; set; }
+        public string Consecutivo { get; set; }
 
         public string Numero { get; set; }
 
         //LugarGeneracionXML
         public string Pais { get; set; }
 
-        public byte DepartamentoEstado { get; set; }
+        public string DepartamentoEstado { get; set; }
 
-        public ushort MunicipioCiudad { get; set; }
+        public string MunicipioCiudad { get; set; }
 
         public string Idioma { get; set; }
 
         //ProveedorXml
-        public uint NIT { get; set; }
+        public string NIT { get; set; }
 
-        public byte DV { get; set; }
+        public string DV { get; set; }
 
         public string SoftwareID { get; set; }
 
