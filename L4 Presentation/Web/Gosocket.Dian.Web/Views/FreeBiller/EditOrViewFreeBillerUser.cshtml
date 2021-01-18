@@ -3,6 +3,15 @@
 @{
     ViewBag.Title = "Modificar Registro";
     string classMarginTop = Model.IsEdit == true ? "margin-top-50" : "";
+    var defaultHtmlAttrInput = Model.IsEdit == false ?
+        new Dictionary<string, object> { { "class", "form-control input-general" }, { "disabled", "disabled" } } :
+        new Dictionary<string, object> { { "class", "form-control input-general" } };
+
+    var defaultHtmlAttrSelect = Model.IsEdit == false ?
+        new Dictionary<string, object> { { "class", "form-control selectpicker" }, { "disabled", "disabled" } } :
+        new Dictionary<string, object> { { "class", "form-control selectpicker" } };
+
+
 }
 
 <style>
@@ -72,21 +81,21 @@
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.TypeDocId, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, new { @class = "form-control selectpicker", @disabled = !Model.IsEdit })
+                                                                    @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, defaultHtmlAttrSelect)
                                                                 </div>
                                                             </div>
 
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.NumberDoc, new { @class = "control-label" })
-                                                                    @Html.TextBoxFor(m => m.NumberDoc, new { @class = "form-control", @readonly = !Model.IsEdit })
+                                                                    @Html.TextBoxFor(m => m.NumberDoc, defaultHtmlAttrInput)
                                                                 </div>
                                                             </div>
 
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.FullName, new { @class = "control-label" })
-                                                                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", @readonly = !Model.IsEdit })
+                                                                    @Html.TextBoxFor(m => m.FullName, defaultHtmlAttrInput)
                                                                 </div>
 
                                                             </div>
@@ -96,13 +105,13 @@
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-                                                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @readonly = !Model.IsEdit })
+                                                                    @Html.TextBoxFor(m => m.Email, defaultHtmlAttrInput)
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker", @disabled = !Model.IsEdit })
+                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, defaultHtmlAttrSelect)
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-3 padding-xs-0">
