@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Models.FreeBiller
@@ -52,4 +50,19 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
 
         public List<MenuOptions> MenuOptionsByProfile { get; set; }
     }
+
+
+    public class UserFreeBillerContainerModel
+    {
+        public int TotalCount
+        {
+            get; set;
+        }
+
+        public List<UserFreeBillerModel> Users
+        {
+            get; set;
+        }
+    }
+
 }

@@ -152,160 +152,11 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult EditOrViewFreeBillerUser(string id, bool isEdit = true)
         {
             var tdocs = GetTypesDoc();
-            var MenuProfiles = GetMenuProfile(id);
-            //perfiles y permisos
-            if (MenuProfiles != null)
-            {
-                ViewBag.valor = true;
-                foreach (var item in MenuProfiles)
-                {
-                    for (int i = 0; i <= MenuProfiles.Count; i++)
-                    {
-                        if (item.Text == i.ToString())
-                        {
-                            if (i == 1)
-                            {
-                                ViewBag.menu1 = item.Text;
-                            }
-                            if (i == 2)
-                            {
-                                ViewBag.menu2 = item.Text;
-                            }
-                            if (i == 3)
-                            {
-                                ViewBag.menu3 = item.Text;
-                            }
-                            if (i == 4)
-                            {
-                                ViewBag.menu4 = item.Text;
-                            }
-                            if (i == 5)
-                            {
-                                ViewBag.menu5 = item.Text;
-                            }
-                            if (i == 6)
-                            {
-                                ViewBag.menu6 = item.Text;
-                            }
-                            if (i == 7)
-                            {
-                                ViewBag.menu7 = item.Text;
-                            }
-                            if (i == 8)
-                            {
-                                ViewBag.menu8 = item.Text;
-                            }
-                            if (i == 9)
-                            {
-                                ViewBag.menu9 = item.Text;
-                            }
-                            if (i == 10)
-                            {
-                                ViewBag.menu10 = item.Text;
-                            }
-                            if (i == 11)
-                            {
-                                ViewBag.menu11 = item.Text;
-                            }
-                            if (i == 12)
-                            {
-                                ViewBag.menu12 = item.Text;
-                            }
-                            if (i == 13)
-                            {
-                                ViewBag.menu13 = item.Text;
-                            }
-                            if (i == 14)
-                            {
-                                ViewBag.menu14 = item.Text;
-                            }
-                            if (i == 15)
-                            {
-                                ViewBag.menu15 = item.Text;
-                            }
-                            if (i == 16)
-                            {
-                                ViewBag.menu16 = item.Text;
-                            }
-                            if (i == 17)
-                            {
-                                ViewBag.menu17 = item.Text;
-                            }
-                            if (i == 18)
-                            {
-                                ViewBag.menu18 = item.Text;
-                            }
-                            if (i == 19)
-                            {
-                                ViewBag.menu19 = item.Text;
-                            }
-                            if (i == 20)
-                            {
-                                ViewBag.menu20 = item.Text;
-                            }
-                            if (i == 21)
-                            {
-                                ViewBag.menu21 = item.Text;
-                            }
-                            if (i == 22)
-                            {
-                                ViewBag.menu22 = item.Text;
-                            }
-                            if (i == 23)
-                            {
-                                ViewBag.menu23 = item.Text;
-                            }
-                            if (i == 24)
-                            {
-                                ViewBag.menu24 = item.Text;
-                            }
-                            if (i == 25)
-                            {
-                                ViewBag.menu25 = item.Text;
-                            }
-                            if (i == 26)
-                            {
-                                ViewBag.menu26 = item.Text;
-                            }
-                            if (i == 27)
-                            {
-                                ViewBag.menu27 = item.Text;
-                            }
-                            if (i == 28)
-                            {
-                                ViewBag.menu28 = item.Text;
-                            }
-                            if (i == 29)
-                            {
-                                ViewBag.menu29 = item.Text;
-                            }
-                            if (i == 30)
-                            {
-                                ViewBag.menu30 = item.Text;
-                            }
-                            if (i == 31)
-                            {
-                                ViewBag.menu31 = item.Text;
-                            }
-                            if (i == 32)
-                            {
-                                ViewBag.menu31 = item.Text;
-                            }
-                        }
-                    }
-
-
-                }
-
-            }
-
-
-            //dropdown
             ViewBag.tdocs = tdocs.Select(p => new SelectListItem() { Value = p.Value.ToString(), Text = p.Text }).ToList<SelectListItem>();
             UserService user = new UserService();
             var data = user.Get(id);
             UserFreeBillerModel model = new UserFreeBillerModel();
-            model.IsEdit = isEdit == false ? false : true;
+            model.IsEdit = isEdit;
             model.Id = data.Id;
             model.Name = data.UserName;
             model.Email = data.Email;
@@ -634,7 +485,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// Obtiene todos los usuarios creados para el facturador gratuito.
         /// </summary>
         /// <returns>List<UserFreeBillerModel></returns>
-        private List<UserFreeBillerModel> GetUsers(UserFiltersFreeBillerModel model)
+        private UserFreeBillerContainerModel GetUsers(UserFiltersFreeBillerModel model)
         {
             List<ApplicationUser> users = userService.UserFreeBillerProfile(t => (model.DocTypeId == 0 || t.IdentificationTypeId == model.DocTypeId)
                                               && (model.DocNumber == null || t.IdentificationId == model.DocNumber)
@@ -654,13 +505,14 @@ namespace Gosocket.Dian.Web.Controllers
                             LastUpdate = item.LastUpdated,
                             IsActive = Convert.ToBoolean(item.Active)
                         };
-
-            if (model.Page == 0)
-                return query.ToList();
-
+            int totalCount = query.Count();
             int skip = (model.Page - 1) * model.PageSize;
             IQueryable<UserFreeBillerModel> sql = query.Skip(skip).Take(model.PageSize).AsQueryable();
-            return sql.ToList();
+            return new UserFreeBillerContainerModel()
+            {
+                TotalCount = totalCount,
+                Users = sql.ToList()
+            };
         }
 
 
