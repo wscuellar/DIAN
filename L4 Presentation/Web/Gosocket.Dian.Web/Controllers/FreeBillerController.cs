@@ -206,6 +206,7 @@ namespace Gosocket.Dian.Web.Controllers
             user.IdentificationTypeId = Convert.ToInt32(model.TypeDocId);
             user.IdentificationId = model.NumberDoc;
             user.Email = model.Email;
+            user.UserName = model.Email;
             //user.PasswordHash = userManager.PasswordHasher.HashPassword(model.Password);
             IdentityResult identityResult = await userManager.UpdateAsync(user);
             if (identityResult.Succeeded)
@@ -218,7 +219,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 SendMailEdit(model);
                 ResponseMessage resultx = new ResponseMessage(TextResources.UserUpdatedSuccess, TextResources.alertType);
-                resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBillerController");
+                resultx.RedirectTo = Url.Action("FreeBillerUser", "FreeBiller");
                 return Json(resultx, JsonRequestBehavior.AllowGet);
             }
 
