@@ -1660,25 +1660,74 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             data.EndDate = "";
             string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
+            string senderId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
             string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']").Item(0)?.InnerText.ToString();
             string modoOperacion = string.Empty;
             string messageMandatoG = "Error no existe código mandato General";
             string messageMandatoL = "Error no existe código mandato Limitado";
             //Validacion descripcion Mandante
-            if(descriptionSender!= "Mandante Facturador Electrónico" && descriptionSender != "Mandante Legitimo Tenedor" && descriptionSender != "Mandante Aval" && descriptionSender != "Mandante Adquirente/Deudor")
+            switch (senderId)
             {
-                validate = false;
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAF35-(R):",
-                    ErrorMessage = "No fue informado el literal de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
+                case "Mandante-FE":
+                    if (descriptionSender != "Mandante Facturador Electrónico")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: AAF35-(R):",
+                            ErrorMessage = "No fue informado el literal de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
+                case "Mandante-LT":
+                    if (descriptionSender != "Mandante Legitimo Tenedor")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: AAF35-(R):",
+                            ErrorMessage = "No fue informado el literal de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
+                case "Mandante-AV":
+                    if (descriptionSender != "Mandante Aval")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: AAF35-(R):",
+                            ErrorMessage = "No fue informado el literal de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
+                case "Mandante-AD":
+                    if (descriptionSender != "Mandante Adquirente/Deudor")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: AAF35-(R):",
+                            ErrorMessage = "No fue informado el literal de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
             }
-            //Valida descripcion Mnadatario 
+
+            //Valida descripcion Mandatario 
             switch (factorTemp)
             {
                 case "M-SN-e":
