@@ -280,7 +280,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var ValDev = objCune.ValDev?.Trim();
             var ValDesc = objCune.ValDesc?.Trim();
             var ValTol = objCune.ValTol?.Trim();
-            var errorCode = "NIE024";
+            var errorCode = "Regla: NIE024-(R):";
             var prop = "CUNE";
 
             string key = string.Empty;

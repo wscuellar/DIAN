@@ -19,19 +19,19 @@ namespace Gosocket.Dian.Domain.Entity
 
         //Periodo
 
-        public System.DateTime FechaIngreso { get; set; }
+        public string FechaIngreso { get; set; }
 
-        public System.DateTime FechaPagoInicio { get; set; }
+        public string FechaPagoInicio { get; set; }
 
-        public System.DateTime FechaPagoFin { get; set; }
+        public string FechaPagoFin { get; set; }
 
         public string TiempoLaborado { get; set; }
 
 
-        public System.DateTime FechaLiquidacion { get; set; }
+        public string FechaLiquidacion { get; set; }
 
 
-        public System.DateTime FechaGen { get; set; }
+        public string FechaGen { get; set; }
 
         //NumeroSecuenciaXML
         public string CodigoTrabajador { get; set; }
