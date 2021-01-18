@@ -21,6 +21,7 @@ using Gosocket.Dian.Common.Resources;
 using System.Net;
 using Gosocket.Dian.Domain.Sql.FreeBiller;
 using Gosocket.Dian.Web.Common;
+using System.Text.RegularExpressions;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -205,7 +206,7 @@ namespace Gosocket.Dian.Web.Controllers
             user.IdentificationTypeId = Convert.ToInt32(model.TypeDocId);
             user.IdentificationId = model.NumberDoc;
             user.Email = model.Email;
-            user.PasswordHash = userManager.PasswordHasher.HashPassword(model.Password);
+            //user.PasswordHash = userManager.PasswordHasher.HashPassword(model.Password);
             IdentityResult identityResult = await userManager.UpdateAsync(user);
             if (identityResult.Succeeded)
             {
@@ -266,7 +267,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             //Crea nuevo registro para AspNetUser
             model.FullName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(model.FullName);
-            model.Password = userManager.PasswordHasher.HashPassword(model.Email.Split('@')[0]);
+            model.Password = CreateStringPassword(model);
             var user = new ApplicationUser
             {
                 CreatorNit = uCompany.Code,
@@ -280,8 +281,7 @@ namespace Gosocket.Dian.Web.Controllers
                 CreationDate = DateTime.Now,
                 UpdatedBy = User.Identity.Name,
                 LastUpdated = DateTime.Now,
-                Active = 1,
-                PasswordHash = model.Password
+                Active = 1
             };
             
 
@@ -488,6 +488,16 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(ids, JsonRequestBehavior.AllowGet);
         }
 
+        #region CreateStringPassword
+
+        private string CreateStringPassword(UserFreeBillerModel model)
+        {
+            string result = model.FullName.Substring(1, 1).ToUpper();
+            result =  $"{result}{model.Email.Split('@')[0]}{Guid.NewGuid().ToString("d").Substring(1, 4)}**";
+            return result;
+        }
+
+        #endregion
 
     }
 
