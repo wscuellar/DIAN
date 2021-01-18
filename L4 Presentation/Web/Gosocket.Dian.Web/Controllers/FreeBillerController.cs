@@ -162,10 +162,10 @@ namespace Gosocket.Dian.Web.Controllers
             model.Email = data.Email;
             model.LastUpdate = data.LastUpdated;
             model.Profiles = this.GetProfiles();
-            model.LastName = "Perez";
+            model.LastName =string.Empty;
             model.FullName = data.Name;
             model.NumberDoc = data.IdentificationId;
-            model.ProfileId = 1;
+            model.ProfileId = data.FreeBillerProfile.ProfileFreeBillerId;
             model.TypeDocId = Convert.ToString(data.IdentificationTypeId);
             model.IsActive = false;
             model.TypesDoc = this.GetTypesDoc();
