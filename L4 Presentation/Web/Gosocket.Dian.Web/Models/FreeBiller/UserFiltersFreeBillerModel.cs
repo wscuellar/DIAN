@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
 
         public List<SelectListItem> Profiles { get; set; }
 
-        public UserFreeBillerContainerModel Users { get; set; }
+        public UserFreeBillerContainerModel UserContainer { get; set; }
 
         public int Page { get; set; }
 

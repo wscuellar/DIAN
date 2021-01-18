@@ -108,7 +108,7 @@
 
             <tbody>
 
-                @if (Model.Users.Count == 0)
+                @if (Model.UserContainer.Users.Count == 0)
                 {
                     <tr style="background-color: transparent !important;">
                         <td class="text-nowrap text-center" colspan="13" style="padding-left: 0 !important; padding-right: 0 !important;">
@@ -118,7 +118,7 @@
                         </td>
                     </tr>
                 }
-                @foreach (var user in Model.Users)
+                @foreach (var user in Model.UserContainer.Users)
                 {
 
                     <tr class="document-row">
@@ -161,19 +161,19 @@
 
     <div class="row margin-horizontal-0">
         <div class="col-md-9 table-toolbar-left padding-left-0">
-            <span>Mostrando @(Model.TotalCount < Model.PageSize ?  Model.TotalCount : 10) de @Model.TotalCount resultados</span>
+            <span>Mostrando @(Model.UserContainer.TotalCount < Model.PageSize ?  Model.UserContainer.TotalCount : 10) de @Model.UserContainer.TotalCount resultados</span>
         </div>
         <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
-            @if (Model.Users.Count > 0)
+            @if (Model.UserContainer.Users.Count > 0)
             {
                 <span class="text-muted">
-                    <strong>@((Model.Page - 1) * Model.PageSize + 1)-@(Model.PageSize > Model.Users.Count ? (Model.Page - 1) * Model.PageSize + Model.Users.Count : (Model.Page) * Model.PageSize)</strong>
+                    <strong>@((Model.Page - 1) * Model.PageSize + 1)-@(Model.PageSize > Model.UserContainer.Users.Count ? (Model.Page - 1) * Model.PageSize + Model.UserContainer.Users.Count : (Model.Page) * Model.PageSize)</strong>
                 </span>
                 <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
                     <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 1 ? "disabled=\"disabled\"" : "")>
                         <span class="fa fa-chevron-left"></span>
                     </a>
-                    <a class="btn btn-default paginate-btn next-page" @(Model.Users.Count < Model.PageSize ? "disabled=\"disabled\"" : "")>
+                    <a class="btn btn-default paginate-btn next-page" @(Model.UserContainer.Users.Count < Model.PageSize ? "disabled=\"disabled\"" : "")>
                         <span class="fa fa-chevron-right"></span>
                     </a>
                 </div>

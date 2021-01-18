@@ -1781,7 +1781,7 @@ input:checked + .slider {
 
 .result-users {
     width: 95%;
-    margin: auto;
+    margin: auto !important;
 }
 
 #btnUser {

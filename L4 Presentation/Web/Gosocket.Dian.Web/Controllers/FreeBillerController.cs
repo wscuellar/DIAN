@@ -129,7 +129,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.DocTypes = staticTypeDoc;
             model.Profiles = staticProfiles;
-            model.Users = this.GetUsers(new UserFiltersFreeBillerModel() { ProfileId = 0, DocNumber = null, FullName = null, DocTypeId = 0, Page = 1, PageSize = 10 });
+            model.UserContainer = this.GetUsers(new UserFiltersFreeBillerModel() { ProfileId = 0, DocNumber = null, FullName = null, DocTypeId = 0, Page = 1, PageSize = 10 });
             return View(model);
 
         }
@@ -139,7 +139,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             model.DocTypes = staticTypeDoc;
             model.Profiles = staticProfiles;
-            model.Users = GetUsers(model);
+            model.UserContainer = GetUsers(model);
             return View(model);
         }
 
@@ -317,6 +317,8 @@ namespace Gosocket.Dian.Web.Controllers
             model.ProfileId = 1;
             model.TypeDocId = Convert.ToString(data.IdentificationTypeId);
             model.IsActive = false;
+            model.TypesDoc = this.GetTypesDoc();
+            model.MenuOptionsByProfile = profileService.GetOptionsByProfile(model.ProfileId);
             return View(model);
         }
 
