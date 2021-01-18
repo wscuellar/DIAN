@@ -489,6 +489,7 @@ namespace Gosocket.Dian.Web.Controllers
         private UserFreeBillerContainerModel GetUsers(UserFiltersFreeBillerModel model)
         {
             string companyCode = User.ContributorCode();
+            int i = User.IdentificationTypeId();
             List<ApplicationUser> users = userService.UserFreeBillerProfile(t => (model.DocTypeId == 0 || t.IdentificationTypeId == model.DocTypeId)
                                               && (model.DocNumber == null || t.IdentificationId == model.DocNumber)
                                               && (model.FullName == null || t.Name.ToLower().Contains(model.FullName.ToLower()))
