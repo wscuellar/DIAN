@@ -885,14 +885,56 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var parser = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Parser) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // Parser
 
+            //Carga propieadaes GlobalDocPayroll
+            GlobalDocPayroll docGlobalPayroll = SetGlobalDocPayroll(xmlParser);
+           
             // ZONE 3
             start = DateTime.UtcNow;
             //Validar campos mandatorios basicos para el trabajo del WS
             if (!DianServicesUtils.ValidateParserNomina(documentParsed, ref dianResponse)) return dianResponse;
+            var documentTypeId = documentParsed.DocumentTypeId;
             var trackId = documentParsed.CUNE;
             var trackIdPred = documentParsed.CUNEPred;
-            var codigoTrabajador = documentParsed.CodigoTrabajador;
+            var SerieAndNumber = documentParsed.SerieAndNumber;
             // ZONE 3
+
+            //Valdiar codigo trabajador
+            var response = ValdiateWorkedCode(xmlParser.globalDocPayrolls);
+            if (!response)
+            {
+                //string errorCode = documentTypeId == "11" ? "Regla:  NIE009-(R): " : "Regla: NIAE009-(R): ";
+                string errorCode = "Regla:  89-(R): ";
+                string errorMessage = "Código trabaajador no corresponde a un valor entero calculado con la " +
+                    "Identificación del trabajador + código del área de trabajo + código del cargo del trabajador";              
+                dianResponse.IsValid = false;
+                dianResponse.StatusCode = "99";
+                dianResponse.StatusMessage = "Documento con errores en campos mandatorios.";
+                dianResponse.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                dianResponse.ErrorMessage.Add($"{errorCode} - {errorMessage}");
+
+            }
+            var valdiateWorkedCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+
+            //Valida CUNE
+            var validatorCuneRequest = validatorCune(trackId, dianResponse);
+            if (!validatorCuneRequest.IsValid)
+            {
+                dianResponse = validatorCuneRequest;
+                dianResponse.XmlDocumentKey = trackId;
+                dianResponse.XmlFileName = filename;
+                dianResponse.IsValid = false;               
+            }
+            var validatorCuneResponse = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+
+            //Validate CUNE Predesesor
+            var validatePredecesor = ValidateReplacePredecedor(trackId, dianResponse);
+            if (!validatePredecesor.IsValid)
+            {
+                dianResponse = validatePredecesor;
+                dianResponse.XmlDocumentKey = trackId;
+                dianResponse.XmlFileName = filename;
+                dianResponse.IsValid = false;
+            }
 
             // upload xml
             start = DateTime.UtcNow;
@@ -912,7 +954,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 return dianResponse;
             }
             // upload xml
-
 
             // send to validate document sync
             var requestObjTrackId = new { trackId, draft = Properties.Settings.Default.Param_False };
@@ -944,13 +985,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 Task secondLocalRun = Task.Run(() =>
                 {
                     documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);                   
-                    message = $"La {documentMeta.DocumentTypeName} {codigoTrabajador}, ha sido autorizada."; 
+                    message = $"La {documentMeta.DocumentTypeName} {SerieAndNumber}, ha sido autorizada."; 
                     existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
                 });
 
                 var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
                 var notifications = validations.Where(r => r.IsNotification).ToList();
-
 
                 if (!errors.Any() && !notifications.Any())
                 {
@@ -1024,38 +1064,28 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validate),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(application),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone1),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(zone2)
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(zone2),
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(valdiateWorkedCode),
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(validatorCuneResponse)
                 };
 
                 if (dianResponse.IsValid && !existDocument)
+                {
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
+                    arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
+                }
 
                 Task.WhenAll(arrayTasks);
 
                 var lastZone = new GlobalLogger(trackId, Properties.Settings.Default.Param_LastZone) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 TableManagerGlobalLogger.InsertOrUpdate(lastZone);
 
-                if(errors.Count > 0)
-                {
-                    return dianResponse;
-                }
-            }
+                return dianResponse;                
+            }            
+        }
 
-            var response = ValdiateWorkedCode(xmlParser.globalDocPayrolls);
-            if (!response) {
-
-                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
-                dianResponse.StatusDescription = "Metodo del Trabajador Mal Calculado.";
-                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-                if (globalEnd >= 10)
-                {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
-                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
-                }
-                return dianResponse;
-            }
-
-
+        private GlobalDocPayroll SetGlobalDocPayroll(XmlParseNomina xmlParser)
+        {
             GlobalDocPayroll docGlobalPayroll = new GlobalDocPayroll(xmlParser.globalDocPayrolls.CUNE, xmlParser.globalDocPayrolls.CUNE)
             {
                 FechaIngreso = xmlParser.globalDocPayrolls.FechaIngreso,
@@ -1147,96 +1177,75 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 TipoTrabajador = xmlParser.globalDocPayrolls.TipoTrabajador,
                 Trab_CodigoTrabajador = xmlParser.globalDocPayrolls.Trab_CodigoTrabajador,
                 Timestamp = new DateTime()
-            };           
+            };
 
-            var validatorCuneRequest = validatorCune(trackId);
-            if (!validatorCuneRequest.IsValid)
-            {
-                dianResponse.XmlFileName = filename;
-                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
-                dianResponse.StatusDescription = validatorCuneRequest.ErrorMessage[0];
-                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-                if (globalEnd >= 10)
-                {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
-                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
-                }
-                return dianResponse;
-            }
-
-            //Reemplazador Predecesor
-            var validatePredecesor = ValidateReplacePredecedor(trackId);
-            if (!validatePredecesor.IsValid)
-            {
-                dianResponse.XmlFileName = filename;
-                dianResponse.StatusCode = Properties.Settings.Default.Code_89;
-                dianResponse.StatusDescription = validatePredecesor.StatusMessage;
-                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-                if (globalEnd >= 10)
-                {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
-                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
-                }
-                return dianResponse;
-            }
-
-            arrayTasks = new List<Task>
-                {
-                    TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll)
-                };
-
-            Task.WhenAll(arrayTasks);
-            return dianResponse;
-
+            return docGlobalPayroll;
         }
 
-        public DianResponse ValidateReplacePredecedor(string trackId)
+        public DianResponse ValidateReplacePredecedor(string trackId, DianResponse response)
         {
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidatePredecesor), new { trackId });
-            DianResponse response = new DianResponse();
+ 
             if (validations.Count > 0)
             {
-                response = new DianResponse()
+                if (response.ErrorMessage.Count == 0)
                 {
-                    StatusMessage = validations[0].ErrorMessage,
-                    StatusCode = Properties.Settings.Default.Code_89,
-                    IsValid = validations[0].IsValid
-                };
-                response.ErrorMessage = new List<string>();
-                if (!response.IsValid)
-                {
-                    foreach (var item in validations)
+                    response = new DianResponse()
                     {
-                        response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
-                    }
-                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                        StatusMessage = "Documento con errores en campos mandatorios.",
+                        StatusCode = Properties.Settings.Default.Code_89,
+                        IsValid = validations[0].IsValid,
+                        ErrorMessage = new List<string>()
+                    };
                 }
+
+                var failedList = new List<string>();
+                foreach (var item in validations)
+                {
+                    if (!item.IsValid)
+                    {
+                        failedList.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                        response.IsValid = false;
+                    }
+
+                }
+
+                response.ErrorMessage.AddRange(failedList);
+                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
             }
             return response;
         }
 
-        public DianResponse validatorCune(string trackId)
+        public DianResponse validatorCune(string trackId, DianResponse response)
         {
-            var data = new { trackId };
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateCune), new { trackId });
-            DianResponse response = new DianResponse();
+            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateCune", new { trackId });
             if (validations.Count > 0)
             {
-                response = new DianResponse()
+                if (response.ErrorMessage.Count == 0)
                 {
-                    StatusMessage = validations[0].ErrorMessage,
-                    StatusCode = Properties.Settings.Default.Code_89,
-                    IsValid = validations[0].IsValid
-                };
-                response.ErrorMessage = new List<string>();
-                if (!response.IsValid)
-                {
-                    foreach (var item in validations)
+                    response = new DianResponse()
                     {
-                        response.ErrorMessage.Add($"{item.ErrorCode} - {item.ErrorMessage}");
-                    }
-                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                        StatusMessage = "Documento con errores en campos mandatorios.",
+                        StatusCode = Properties.Settings.Default.Code_89,
+                        IsValid = validations[0].IsValid,
+                        ErrorMessage = new List<string>()
+                    };
                 }
+
+                var failedList = new List<string>();
+                foreach (var item in validations)
+                {
+                    if (!item.IsValid)
+                    {
+                        failedList.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                        response.IsValid = false;
+                    }
+
+                }
+
+                response.ErrorMessage.AddRange(failedList);
+                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
             }
             return response;
         }

@@ -280,7 +280,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var ValDev = objCune.ValDev?.Trim();
             var ValDesc = objCune.ValDesc?.Trim();
             var ValTol = objCune.ValTol?.Trim();
-            var errorCode = "FAD06";
+            var errorCode = "NIE024";
             var prop = "CUNE";
 
             string key = string.Empty;
@@ -291,14 +291,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var softwareId = objCune.SoftwareId;
             if (softwareId == billerSoftwareId)
             {
-
                 key = billerSoftwarePin;
             }
             else
             {
                 var software = GetSoftwareInstanceCache(softwareId);
                 key = software?.Pin;
-            }
+            }         
 
             string errorMessarge = string.Empty;
             errorMessarge = $"Valor del { prop} no está calculado correctamente.";
@@ -313,7 +312,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var HorNIE = objCune.HorNIE;
             var NitNIE = objCune.NitNIE;
             var DocEmp = objCune.DocEmp;
-            var SoftwarePin = objCune.SoftwareId;
+            var SoftwarePin = key;
             var TipAmb = objCune.TipAmb;
 
             var numberSha384 = $"{NumNIE}{FechNIE}{HorNIE}{ValDev}{ValDesc}{ValTol}{NitNIE}{DocEmp}{SoftwarePin}{TipAmb}";
@@ -328,7 +327,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else
             {
                 response.IsValid = false;
-                response.ErrorMessage = $"Valor del {prop} no esta calculado correctamente.";
+                response.ErrorMessage = $"Se debe indicar el {prop} según la definición establecida.";
             }
 
             response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;

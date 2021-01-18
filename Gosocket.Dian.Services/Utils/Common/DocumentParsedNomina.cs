@@ -11,6 +11,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string ProveedorDV { get; set; }
         public string ProveedorSoftwareID { get; set; }
         public string ProveedorSoftwareSC { get; set; }
+        public string SerieAndNumber { get; set; }
 
         public static void SetValues (ref DocumentParsedNomina documentParsedNomina)
         {
@@ -22,6 +23,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             documentParsedNomina.ProveedorDV = documentParsedNomina?.ProveedorDV;
             documentParsedNomina.ProveedorSoftwareID = documentParsedNomina?.ProveedorSoftwareID;
             documentParsedNomina.ProveedorSoftwareSC = documentParsedNomina?.ProveedorSoftwareSC.ToString()?.ToLower();
+            documentParsedNomina.SerieAndNumber = documentParsedNomina?.SerieAndNumber.ToString()?.ToUpper();
         }
     }
 }
