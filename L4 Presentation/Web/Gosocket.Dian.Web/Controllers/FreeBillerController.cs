@@ -165,7 +165,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.LastName =string.Empty;
             model.FullName = data.Name;
             model.NumberDoc = data.IdentificationId;
-            //model.ProfileId = data.FreeBillerProfile.ProfileFreeBillerId;
+            model.ProfileId = Convert.ToInt32(data.Claims.First().ClaimValue);
             model.TypeDocId = Convert.ToString(data.IdentificationTypeId);
             model.IsActive = false;
             model.TypesDoc = this.GetTypesDoc();
