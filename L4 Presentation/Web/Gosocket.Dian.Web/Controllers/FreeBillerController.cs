@@ -495,12 +495,14 @@ namespace Gosocket.Dian.Web.Controllers
             List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
             var query = from item in users
                         join cl in userIdsFreeBiller on item.Id equals cl.UserId
+                        join td in staticTypeDoc on item.IdentificationTypeId.ToString() equals td.Value
+                        join pr in staticProfiles on cl.ClaimValue equals pr.Value
                         select new UserFreeBillerModel()
                         {
                             Id = item.Id,
                             FullName = item.Name,
-                            DescriptionTypeDoc = staticTypeDoc.FirstOrDefault(td => td.Value == item.IdentificationTypeId.ToString()).Text,
-                            DescriptionProfile = staticProfiles.FirstOrDefault(td => td.Value == cl.ClaimValue).Text,
+                            DescriptionTypeDoc = td.Text,
+                            DescriptionProfile = pr.Text,
                             NumberDoc = item.IdentificationId,
                             LastUpdate = item.LastUpdated,
                             IsActive = Convert.ToBoolean(item.Active)
