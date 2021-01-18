@@ -2,7 +2,7 @@
 @using Newtonsoft.Json;
 @{
     ViewBag.Title = "Modificar Registro";
-
+    string classMarginTop = Model.IsEdit == true ? "margin-top-50" : "";
 }
 
 <style>
@@ -20,7 +20,6 @@
     }
 
     .title-container {
-        margin-bottom: 50px !important;
         margin-top: 30px !important;
     }
 
@@ -48,8 +47,12 @@
         <div class="underline-title"></div>
     </div>
 
+    @if (!Model.IsEdit)
+    {
+        <div class="back-button"><a href="javascript:history.back();"><i class="fa fa-chevron-left"></i> Volver</a></div>
+    }
 
-    <div class="row margin-horizontal-0">
+    <div class="row margin-horizontal-0 @classMarginTop">
         <div class="tab-base">
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
@@ -69,21 +72,21 @@
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.TypeDocId, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, new { @class = "form-control selectpicker" })
+                                                                    @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, new { @class = "form-control selectpicker", @disabled = !Model.IsEdit })
                                                                 </div>
                                                             </div>
 
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.NumberDoc, new { @class = "control-label" })
-                                                                    @Html.TextBoxFor(m => m.NumberDoc, new { @class = "form-control" })
+                                                                    @Html.TextBoxFor(m => m.NumberDoc, new { @class = "form-control", @readonly = !Model.IsEdit })
                                                                 </div>
                                                             </div>
 
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.FullName, new { @class = "control-label" })
-                                                                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+                                                                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", @readonly = !Model.IsEdit })
                                                                 </div>
 
                                                             </div>
@@ -93,13 +96,13 @@
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-                                                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                                                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @readonly = !Model.IsEdit })
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker" })
+                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker", @disabled = !Model.IsEdit })
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-3 padding-xs-0">
@@ -107,12 +110,13 @@
                                                             </div>
                                                         </div>
                                                     </div>
-
                                                     <div class="panel-footer-grey text-right submit-container">
-                                                        <button id="btnCancel" class="btn btn-success btn-radian-default">Cancelar</button>
-                                                        <button id="btnSend" class="btn btn-success btn-radian-success">Guardar Cambios</button>
+                                                        @if (Model.IsEdit)
+                                                        {
+                                                            <button id="btnCancel" class="btn btn-success btn-radian-default">Cancelar</button>
+                                                            <button id="btnSend" class="btn btn-success btn-radian-success">Guardar Cambios</button>
+                                                        }
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
@@ -191,6 +195,7 @@
 
     <script>
         $(document).ready(function () {
+            var urlNewUser = "@Url.Action("FreeBillerUser")";
             initialValuesCheck(@Model.ProfileId, '@Url.Action("GetIdsByProfile", "FreeBiller")');
             $("#ProfileId").change(function () {
                 $("input:checkbox:checked").prop("checked",false)
@@ -209,11 +214,11 @@
                 }
                 ajaxFunction(url, "POST", dataAjax, errorAction, successAction);
             });
-
             $("#btnSend").click(function (e) {
                 e.preventDefault();
                 var form = $("#edit-user-form")
                 var data = {
+                    Id: $('[name=Id]').val(),
                     FullName: $('[name=FullName]').val(),
                     TypeDocId: $('[name=TypeDocId]').val(),
                     NumberDoc: $('[name=NumberDoc]').val(),
@@ -222,9 +227,11 @@
                 }
                 var url = '@Url.Action("EditFreeBillerUser", "FreeBiller")';
                 var actionError = (error) => {
+                    debugger
                     console.log(error);
                 }
                 var actionSuccess = (success) => {
+                    debugger
                     var confirmMessage = success.Message;
                     var operationCancel = () => {
                         if (success.RedirectTo) {
@@ -237,7 +244,10 @@
                 }
                 createUser(url, 'POST', data, actionError, actionSuccess)
 
-            })
+            });
+            $("#btnCancel").click(function () {
+                window.location.href = urlNewUser;
+            });
         });
     </script>
 
