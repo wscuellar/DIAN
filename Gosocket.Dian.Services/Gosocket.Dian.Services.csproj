@@ -79,6 +79,7 @@
     <Compile Include="Utils\BatchInsertionUtils.cs" />
     <Compile Include="Utils\Common\DianResponse.cs" />
     <Compile Include="Utils\Common\DocumentParsed.cs" />
+    <Compile Include="Utils\Common\DocumentParsedNomina.cs" />
     <Compile Include="Utils\Common\ExceptionExtensions.cs" />
     <Compile Include="Utils\Common\Formatter.cs" />
     <Compile Include="Utils\Common\Schemas.cs" />

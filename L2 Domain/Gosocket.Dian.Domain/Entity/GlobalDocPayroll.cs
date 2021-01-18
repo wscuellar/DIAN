@@ -34,27 +34,27 @@ namespace Gosocket.Dian.Domain.Entity
         public System.DateTime FechaGen { get; set; }
 
         //NumeroSecuenciaXML
-        public ulong CodigoTrabajador { get; set; }
+        public string CodigoTrabajador { get; set; }
 
         public string Prefijo { get; set; }
 
-        public byte Consecutivo { get; set; }
+        public string Consecutivo { get; set; }
 
         public string Numero { get; set; }
 
         //LugarGeneracionXML
         public string Pais { get; set; }
 
-        public byte DepartamentoEstado { get; set; }
+        public string DepartamentoEstado { get; set; }
 
-        public ushort MunicipioCiudad { get; set; }
+        public string MunicipioCiudad { get; set; }
 
         public string Idioma { get; set; }
 
         //ProveedorXml
-        public uint NIT { get; set; }
+        public string NIT { get; set; }
 
-        public byte DV { get; set; }
+        public string DV { get; set; }
 
         public string SoftwareID { get; set; }
 
@@ -62,25 +62,25 @@ namespace Gosocket.Dian.Domain.Entity
 
         //CodigoQR
 
-        public byte CodigoQR { get; set; }
+        public string CodigoQR { get; set; }
 
 
         //InformacionGeneral
         public string Version { get; set; }
 
-        public byte Ambiente { get; set; }
+        public string Ambiente { get; set; }
 
         public string CUNE { get; set; }
 
         public string EncripCUNE { get; set; }
 
-        public System.DateTime Info_FechaGen { get; set; }
+        public string Info_FechaGen { get; set; }
 
         public string HoraGen { get; set; }
 
-        public byte TipoNomina { get; set; }
+        public string TipoNomina { get; set; }
 
-        public byte PeriodoNomina { get; set; }
+        public string PeriodoNomina { get; set; }
 
 
         public string TipoMoneda { get; set; }
@@ -98,27 +98,27 @@ namespace Gosocket.Dian.Domain.Entity
 
         //Empleador
         public string Emp_RazonSocial { get; set; }
-        public uint Emp_NIT { get; set; }
-        public byte Emp_DV { get; set; }
+        public string Emp_NIT { get; set; }
+        public string Emp_DV { get; set; }
         public string Emp_Pais { get; set; }
-        public byte Emp_DepartamentoEstado { get; set; }
-        public ushort Emp_MunicipioCiudad { get; set; }
+        public string Emp_DepartamentoEstado { get; set; }
+        public string Emp_MunicipioCiudad { get; set; }
         public string Emp_Direccion { get; set; }
         public string Emp_Celular { get; set; }
         public string Emp_Correo { get; set; }
 
         //Trabajador
-        public byte TipoTrabajador { get; set; }
+        public string TipoTrabajador { get; set; }
 
-        public byte SubTipoTrabajador { get; set; }
+        public string SubTipoTrabajador { get; set; }
 
         public bool AltoRiesgoPension { get; set; }
 
 
-        public byte TipoDocumento { get; set; }
+        public string TipoDocumento { get; set; }
 
 
-        public uint NumeroDocumento { get; set; }
+        public string NumeroDocumento { get; set; }
 
 
         public string PrimerApellido { get; set; }
@@ -133,36 +133,36 @@ namespace Gosocket.Dian.Domain.Entity
 
         public string LugarTrabajoPais { get; set; }
 
-        public byte LugarTrabajoDepartamentoEstado { get; set; }
+        public string LugarTrabajoDepartamentoEstado { get; set; }
 
-        public ushort LugarTrabajoMunicipioCiudad { get; set; }
+        public string LugarTrabajoMunicipioCiudad { get; set; }
 
         public string LugarTrabajoDireccion { get; set; }
 
-        public uint Celular { get; set; }
+        public string Celular { get; set; }
 
         public string Correo { get; set; }
 
         public bool SalarioIntegral { get; set; }
 
-        public byte CodigoArea { get; set; }
+        public string CodigoArea { get; set; }
 
         public string NombreArea { get; set; }
 
-        public byte CodigoCargo { get; set; }
+        public string CodigoCargo { get; set; }
 
         public string NombreCargo { get; set; }
 
-        public byte TipoContrato { get; set; }
+        public string TipoContrato { get; set; }
 
-        public decimal Salario { get; set; }
+        public string Salario { get; set; }
 
-        public ulong Trab_CodigoTrabajador { get; set; }
+        public string Trab_CodigoTrabajador { get; set; }
 
         //Pago
-        public byte Forma { get; set; }
+        public string Forma { get; set; }
 
-        public byte Metodo { get; set; }
+        public string Metodo { get; set; }
 
         public string Banco { get; set; }
 
@@ -172,57 +172,57 @@ namespace Gosocket.Dian.Domain.Entity
 
         //Salud
 
-        public decimal s_Porcentaje { get; set; }
+        public string s_Porcentaje { get; set; }
 
-        public decimal s_ValorBase { get; set; }
+        public string s_ValorBase { get; set; }
 
-        public decimal s_Deduccion { get; set; }
+        public string s_Deduccion { get; set; }
 
 
         //FondoPension
 
-        public decimal FP_Porcentaje { get; set; }
+        public string FP_Porcentaje { get; set; }
 
-        public decimal FP_ValorBase { get; set; }
+        public string FP_ValorBase { get; set; }
 
-        public decimal FP_Deduccion { get; set; }
+        public string FP_Deduccion { get; set; }
 
         //FondoSP
-        public decimal FSP_Porcentaje { get; set; }
+        public string FSP_Porcentaje { get; set; }
 
-        public decimal FSP_Deduccion { get; set; }
+        public string FSP_Deduccion { get; set; }
 
         //Basico
-        public byte DiasTrabajados { get; set; }
+        public string DiasTrabajados { get; set; }
 
-        public decimal SalarioTrabajado { get; set; }
+        public string SalarioTrabajado { get; set; }
 
         //VacacionesComunes
-        public System.DateTime FechaInicio { get; set; }
+        public string FechaInicio { get; set; }
 
-        public System.DateTime FechaFin { get; set; }
+        public string FechaFin { get; set; }
 
-        public byte Cantidad { get; set; }
+        public string Cantidad { get; set; }
 
-        public decimal Pago { get; set; }
+        public string Pago { get; set; }
 
         //Bonificaciones
 
-        public decimal BonificacionNS { get; set; }
+        public string BonificacionNS { get; set; }
 
         //Deducciones
 
-        public decimal RetencionFuente { get; set; }
+        public string RetencionFuente { get; set; }
 
-        public decimal AFC { get; set; }
+        public string AFC { get; set; }
 
-        public decimal Deuda { get; set; }
+        public string Deuda { get; set; }
 
-        public decimal devengadosTotal { get; set; }
+        public string devengadosTotal { get; set; }
 
-        public decimal deduccionesTotal { get; set; }
+        public string deduccionesTotal { get; set; }
 
-        public decimal comprobanteTotal { get; set; }
+        public string comprobanteTotal { get; set; }
 
     }
 }
