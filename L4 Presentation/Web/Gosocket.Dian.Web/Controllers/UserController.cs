@@ -1228,7 +1228,7 @@ namespace Gosocket.Dian.Web.Controllers
             var pk = $"{model.IdentificationType}|{model.UserCode}";
             var rk = $"{model.CompanyCode}";
 
-            var user = userService.GetByCodePasswordAndIdentificationTyte(model.UserCode, model.IdentificationType, model.Password);
+            var user = userService.GetByCodePasswordAndIdentificationTyte(model.UserCode, model.IdentificationType, UserManager.PasswordHasher.HashPassword(model.Password));
             if (user == null)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Error de ingreso, verifique sus datos");
