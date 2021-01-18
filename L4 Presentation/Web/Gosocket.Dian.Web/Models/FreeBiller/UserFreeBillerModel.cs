@@ -52,17 +52,4 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
 
         public List<MenuOptions> MenuOptionsByProfile { get; set; }
     }
-
-    public class UserFreeBillerContainerModel
-    {
-        public int TotalCount
-        {
-            get;set;
-        }
-
-        public List<UserFreeBillerModel> Users
-        {
-            get;set;
-        }
-    }
 }

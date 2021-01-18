@@ -10,15 +10,21 @@
         margin-bottom: 10px;
     }
 </style>
-<script>
+<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
 
-    @*$(document).ready(function () {
+    $(document).ready(function () {
         $("input:checkbox:checked").attr("checked", true);
         if (@ViewBag.activo = true) {
             document.getElementById("activo").checked = true;
+            console.log("Ok¡¡");
         }
-    });*@
+        else {
+            console.log("No Ok¡¡");
+        }
+    });
     function activo(checkboxElem,Id) {
+        //var Id = "041c9dc6-ed8d-4f67-bbe3-bd6fab3ef8cd";
         if (checkboxElem.checked) {
           
             console.log(Id);
@@ -88,25 +94,25 @@
         <p class="subtitle-view">
             Resultados de búsqueda
         </p>
-        <div class="radian-subtitle-line"></div>
-    </div>
+    <div class="radian-subtitle-line"></div>
+</div>
 
-    <div class="table-responsive padding-bottom-15">
+<div class="table-responsive padding-bottom-15">
 
-        <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
-            <thead>
-                <tr>
-                    <th class="text-left">Tipo de doocumento</th>
-                    <th>N&uacute;mero de documento</th>
-                    <th class="text-left">Nombre y apellido</th>
-                    <th class="text-left">Perfil</th>
-                    <th>&Uacute;ltima Modificaci&oacute;n</th>
-                    <th colspan="3">Acciones</th>
-                </tr>
+    <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th class="text-left">Tipo de doocumento</th>
+                <th>N&uacute;mero de documento</th>
+                <th class="text-left">Nombre y apellido</th>
+                <th class="text-left">Perfil</th>
+                <th>&Uacute;ltima Modificaci&oacute;n</th>
+                <th colspan="3">Acciones</th>
+            </tr>
 
-            </thead>
+        </thead>
 
-            <tbody>
+        <tbody>
 
                 @if (Model.UserContainer.Users.Count == 0)
                 {

@@ -467,7 +467,14 @@ namespace Gosocket.Dian.Web.Controllers
                 userManager.AddClaim(user.Id, new System.Security.Claims.Claim(CLAIMPROFILE, model.ProfileId.ToString()));
 
                 //incluir el asociacion del registro. UserFreeBillerProfile
-                _ = userService.UserFreeBillerUpdate(new Domain.Sql.UsersFreeBillerProfile() { ProfileFreeBillerId = model.ProfileId, UserId = user.Id });
+                _ = userService.UserFreeBillerUpdate(
+                    new Domain.Sql.UsersFreeBillerProfile() 
+                    { 
+                        ProfileFreeBillerId = model.ProfileId, 
+                        UserId = user.Id, 
+                        CompanyCode = user.CreatorNit,
+                        CompanyIdentificationType = uCompany.IdentificationTypeId
+                    });
 
                 //Envio de notificacion por correo
                 _ = SendMailCreate(model);
@@ -627,7 +634,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// Obtiene todos los usuarios creados para el facturador gratuito.
         /// </summary>
         /// <returns>List<UserFreeBillerModel></returns>
-        private UserFreeBillerContainerModel GetUsers(UserFiltersFreeBillerModel model)
+        private List<UserFreeBillerModel> GetUsers(UserFiltersFreeBillerModel model)
         {
             List<ApplicationUser> users = userService.UserFreeBillerProfile(t => (model.DocTypeId == 0 || t.IdentificationTypeId == model.DocTypeId)
                                               && (model.DocNumber == null || t.IdentificationId == model.DocNumber)
@@ -647,14 +654,13 @@ namespace Gosocket.Dian.Web.Controllers
                             LastUpdate = item.LastUpdated,
                             IsActive = Convert.ToBoolean(item.Active)
                         };
-            int totalCount = query.Count();
+
+            if (model.Page == 0)
+                return query.ToList();
+
             int skip = (model.Page - 1) * model.PageSize;
             IQueryable<UserFreeBillerModel> sql = query.Skip(skip).Take(model.PageSize).AsQueryable();
-            return new UserFreeBillerContainerModel()
-            {
-                TotalCount = totalCount,
-                Users = sql.ToList()
-            };
+            return sql.ToList();
         }
 
 

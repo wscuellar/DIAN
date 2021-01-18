@@ -1205,5 +1205,118 @@ namespace Gosocket.Dian.Web.Controllers
             }
             return result;
         }
+
+        #region ContributorUserLogin
+
+        [HttpPost]
+        [ExcludeFilter(typeof(Authorization))]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ContributorUserLogin(UserLoginViewModel model, string returnUrl)
+        {
+            ClearUnnecessariesModelStateErrorsForAuthentication(false);
+
+            var recaptchaValidation = IsValidCaptcha(model.RecaptchaToken);
+            if (!recaptchaValidation.Item1)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", recaptchaValidation.Item2);
+                return View("CompanyLogin", model);
+            }
+            if (!ModelState.IsValid)
+                return View("CompanyLogin", model);
+
+            var pk = $"{model.IdentificationType}|{model.UserCode}";
+            var rk = $"{model.CompanyCode}";
+
+            var user = userService.GetByCodePasswordAndIdentificationTyte(model.UserCode, model.IdentificationType, model.Password);
+            if (user == null)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Error de ingreso, verifique sus datos");
+                return View("CompanyLogin", model);
+            }
+
+            if (!Convert.ToBoolean(user.Active))
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Usuario no se encuentra activo");
+                return View("CompanyLogin", model);
+            }
+
+            var contributor = user.Contributors.FirstOrDefault(c => c.Code == model.CompanyCode);
+            if (user.FreeBillerProfile.CompanyCode != model.CompanyCode && user.FreeBillerProfile.CompanyIdentificationType != model.CompanyIdentificationType)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no asociada a representante legal.");
+                return View("CompanyLogin", model);
+            }
+
+            if (contributor.StatusRut == (int)StatusRut.Cancelled)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Contribuyente tiene RUT en estado cancelado.");
+                return View("CompanyLogin", model);
+            }
+
+            if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)Domain.Common.ContributorStatus.Enabled)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no se encuentra habilitada.");
+                return View("CompanyLogin", model);
+            }
+
+            var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
+            if (auth == null)
+            {
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Company.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                dianAuthTableManager.InsertOrUpdate(auth);
+            }
+            else
+            {
+                TimeSpan timeSpan = DateTime.UtcNow.Subtract(auth.Timestamp.DateTime);
+                if (timeSpan.TotalMinutes > 60 || string.IsNullOrEmpty(auth.Token))
+                {
+                    auth.UserId = user.Id;
+                    auth.Email = user.Email;
+                    auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.Company.GetDescription();
+                    auth.Token = Guid.NewGuid().ToString();
+                    auth.Status = true;
+                    dianAuthTableManager.InsertOrUpdate(auth);
+                }
+            }
+
+            var accessUrl = ConfigurationManager.GetValue("UserAuthTokenUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
+            if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Prod")
+            {
+                try
+                {
+                    auth.Email = user.Email;
+                    var emailSenderResponse = await EmailUtil.SendEmailAsync(auth, accessUrl);
+                    if (emailSenderResponse.ErrorType != ErrorTypes.NoError)
+                    {
+                        ModelState.AddModelError($"CompanyLoginFailed", "Autenticación correcta, su solicitud está siendo procesada.");
+                        return View("CompanyLogin", model);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var requestId = Guid.NewGuid();
+                    var logger = new GlobalLogger(requestId.ToString(), requestId.ToString())
+                    {
+                        Action = "SendEmailAsync",
+                        Controller = "User",
+                        Message = ex.Message,
+                        RouteData = "",
+                        StackTrace = ex.StackTrace
+                    };
+                    var tableManager = new TableManager("GlobalLogger");
+                    tableManager.InsertOrUpdate(logger);
+                    ModelState.AddModelError($"CompanyLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
+                    return View("CompanyLogin", model);
+                }
+            }
+
+            ViewBag.UserEmail = HideUserEmailParts(auth.Email);
+            ViewBag.Url = accessUrl;
+            ViewBag.currentTab = "confirmed";
+            return View("LoginConfirmed", model);
+        }
+
+        #endregion
     }
 }

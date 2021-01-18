@@ -9,7 +9,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
     {
         public UserFiltersFreeBillerModel()
         {
-            this.Page = 1;
+            this.Page = (int)default;
             this.PageSize = 10;
         }
 
@@ -34,7 +34,5 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public int Page { get; set; }
 
         public int PageSize { get; set; }
-
-        public int TotalCount { get; set; }
     }
 }
