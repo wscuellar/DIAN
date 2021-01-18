@@ -1,6 +1,6 @@
 ﻿namespace Gosocket.Dian.Plugin.Functions.Models
 {
-    class NominaModel
+    public class NominaModel
     {
         public string DocumentTypeId { get; set; }
         public string CUNE { get; set; }

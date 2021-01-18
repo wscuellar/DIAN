@@ -358,13 +358,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region NIT validations
-        public List<ValidateListResponse> ValidateNit(NitModel nitModel, string trackId)
+        public List<ValidateListResponse> ValidateNit(NitModel nitModel, string trackId, NominaModel nominaModel = null)
         {
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            // Validación de DV para documentos de Nómina
+            if(nominaModel != null)
+            {
+                if (nominaModel.DocumentTypeId == "11")
+                {
+                    // Proveedor
+                    if (ValidateDigitCode(nominaModel.ProveedorNIT, int.Parse(nominaModel.ProveedorDV)))
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "NIE018", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIE018", ErrorMessage = "Se debe colocar el DV de la empresa dueña del Software que genera el Documento, debe estar registrado en la DIAN", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    // Empleador
+                    if (ValidateDigitCode(nominaModel.EmpleadorNIT, int.Parse(nominaModel.EmpleadorDV)))
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "NIE034", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIE034", ErrorMessage = "Debe ir el DV del Empleador", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+                else
+                {
+                    // Proveedor
+                    if (ValidateDigitCode(nominaModel.ProveedorNIT, int.Parse(nominaModel.ProveedorDV)))
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "NIAE018", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIAE018", ErrorMessage = "Se debe colocar el DV de la empresa dueña del Software que genera el Documento, debe estar registrado en la DIAN", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    // Empleador
+                    if (ValidateDigitCode(nominaModel.EmpleadorNIT, int.Parse(nominaModel.EmpleadorDV)))
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "NIAE034", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIAE034", ErrorMessage = "Debe ir el DV del Empleador", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+
+                return responses;
+            }
 
             var senderCode = nitModel.SenderCode;
             var senderCodeDigit = nitModel.SenderCodeDigit;
