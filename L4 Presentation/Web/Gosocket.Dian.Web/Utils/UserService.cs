@@ -59,9 +59,7 @@ namespace Gosocket.Dian.Web.Utils
 
         public UsersFreeBillerProfile GetUserFreeBillerProfile(Expression<Func<UsersFreeBillerProfile, bool>> expression)
         {
-            var entity = _sqlDBContext.UserFreeBillerProfile.FirstOrDefault(expression);
-
-            return entity;
+             return _sqlDBContext.UserFreeBillerProfile.FirstOrDefault(expression);
         }
 
         #region Actualizar Claims para usuarios de facturador gratuito

@@ -1243,7 +1243,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             UsersFreeBillerProfile freeBiller = userService.GetUserFreeBillerProfile(u => u.CompanyCode == model.CompanyCode && u.CompanyIdentificationType == model.CompanyIdentificationType);
 
-            var contributor = user.Contributors.FirstOrDefault(c => c.Code == model.CompanyCode);
+            var contributor = contributorService.GetByCode(model.CompanyCode);
             if (freeBiller == null)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Empresa no asociada a representante legal.");
@@ -1282,7 +1282,9 @@ namespace Gosocket.Dian.Web.Controllers
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
-            return RedirectToBiller();
+
+            var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
+            return Redirect(redirectUrl);
         }
 
         #endregion
