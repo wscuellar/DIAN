@@ -211,7 +211,8 @@
         $(document).ready(function () {
             var urlUsers = "@Url.Action("FreeBillerUser", "FreeBiller")";
 
-            $("#btnCancel").click(function () {
+            $("#btnCancel").click(function (e) {
+                e.preventDefault();
                 window.location.href = urlUsers;
             });
 

@@ -156,6 +156,7 @@
                         type: "POST",
                         cache: false,
                         success: function (data) {
+                            debugger
                             if (data != undefined && data.length > 0) {
                                 var e = data;
                                 alert("ACTIVO",e);
@@ -164,6 +165,7 @@
                             }
                         },
                         error: function (xhr) {
+                            debugger
 
                         }
                     });
@@ -185,7 +187,7 @@
                         data: "Id=" + Id + "&activo=" + activo,
                         dataType: "json",
                         type: "POST",
-                        success: function (data) {
+                        success: function (data) {debugger
                             console.log(data)
                             if (data != undefined && data.length > 0) {
                                 var e = data;
@@ -195,6 +197,7 @@
                             }
                         },
                         error: function (xhr) {
+                            debugger
 
                         }
                     });
