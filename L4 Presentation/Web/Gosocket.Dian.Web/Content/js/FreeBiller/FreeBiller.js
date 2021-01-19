@@ -17,7 +17,4 @@ function initialValuesCheck(ProfileId, url) {
         });
     }
     ajaxFunction(url, "POST", dataAjax, errorAction, successAction);
-
-    //var newModel = JSON.parse(model.replace(/(&quot\;)/g, "\""));
-    //console.log(newModel);
 }
