@@ -1004,19 +1004,18 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
-        public T FindhByCufeExchange<T> (string partitionKey, bool active) where T : ITableEntity, new()
+        public T FindhByCufeExchange<T> (string partitionKey, bool Active) where T : ITableEntity, new()
         {
-            var query = new TableQuery<T>();
 
+            var query = new TableQuery<T>();
             var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("PartitionKey",
-                    QueryComparisons.Equal,
-                    partitionKey),
-                TableOperators.And,
+               TableQuery.GenerateFilterCondition("PartitionKey",
+                   QueryComparisons.Equal,
+                   partitionKey),
+               TableOperators.And,
                 TableQuery.GenerateFilterConditionForBool("Active",
                     QueryComparisons.Equal,
-                    active));
-
+                    Active));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 

@@ -26,6 +26,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
         static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
+        static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
+
         #endregion
 
         public ValidatorEngine() { }
@@ -409,7 +411,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool valid = true;
 
             //Valida existe cambio legitimo tenedor
-            GlobalDocHolderExchange documentHolderExchange = documentMetaTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
+            GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
+            //var documentHolderExchange = documentHolderExchange.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower()).ToList().FirstOrDefault(g => g.Active = true);
             if (documentHolderExchange != null)
             {
                 //Existe mas de un legitimo tenedor requiere un mandatario
