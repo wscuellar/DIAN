@@ -68,10 +68,13 @@
                         <td class="text-nowrap padding-top-0 padding-bottom-0 view-details-user">
                             @Html.ActionLink("Ver detalles", "EditOrViewFreeBillerUser",
                                 new { controller = "FreeBiller", id = user.Id, isEdit = false },
-                                new { @class = "btn-link" })
+                                new { @class = "btn-link isActive-" + user.IsActive })
                         </td>
                         <td class="padding-top-0 padding-bottom-0">
-                            <a href="@Url.Action("EditOrViewFreeBillerUser","FreeBiller", new { user.Id })" id="@user.Id">
+                            @{ 
+                                string isActive = Convert.ToString(user.IsActive);
+                            }
+                            <a href="@Url.Action("EditOrViewFreeBillerUser","FreeBiller", new { user.Id })" class="isActive-@isActive" id="@user.Id">
                                 <img src="@Url.Content("~/Content/images/Svg/edti.svg")" />
                             </a>
                         </td>

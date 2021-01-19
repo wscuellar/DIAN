@@ -30,6 +30,7 @@ function showPassword(element) {
 }
 
 function initialValuesSwitchActive(users) {
+    $("a.isActive-False").click(function (e) { e.preventDefault() });
     var listUsers = JSON.parse(users.replace(/(&quot\;)/g, "\""));
     listUsers.forEach((element) => {
         element.IsActive && $("#" + element.Id + element.NumberDoc).prop("checked", "checked");

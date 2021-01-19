@@ -1867,3 +1867,12 @@ input:checked + .slider {
 .cancel-confirmation .modal-dialog .media-body {
     padding: 25px 20% 0px 20%;
 }
+
+.isActive-False {
+    cursor: not-allowed;
+    opacity: 0.5;
+    text-decoration: none !important;
+}
+.isActive-False a {
+    text-decoration: none;
+}
