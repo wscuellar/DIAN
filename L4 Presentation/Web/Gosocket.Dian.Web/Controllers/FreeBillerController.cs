@@ -101,22 +101,38 @@ namespace Gosocket.Dian.Web.Controllers
             if (user == null)
             {
                 ViewBag.message = "No se encontro el ID";
-                return View("Not found");
+                ResponseMessage resultx = new ResponseMessage()
+                {
+                    Message = "Not Found",
+                    MessageType = "alert",
+                    Code = 200
+                };
+                return Json(resultx, JsonRequestBehavior.AllowGet);
             }
             else
             {
                 user.Active = Convert.ToByte(dt);
-
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("FreeBillerUser");
+                    ResponseMessage resultx = new ResponseMessage()
+                    {
+                        Message = "Estado actualizado correctamente",
+                        MessageType = "alert",
+                        Code = 200
+                    };
+                    return Json(resultx, JsonRequestBehavior.AllowGet);
                 }
-                foreach (var error in result.Errors)
+                else
                 {
-                    ModelState.AddModelError("", error.ToString());
+                    ResponseMessage resultx = new ResponseMessage()
+                    {
+                        Message = "¡Ocurrió un problema al cambiar de estado.!",
+                        MessageType = "alert",
+                        Code = 200
+                    };
+                    return Json(resultx, JsonRequestBehavior.AllowGet);
                 }
-                return RedirectToAction("FreeBillerUser");
             }
 
         }

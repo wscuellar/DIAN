@@ -33,7 +33,7 @@
         <div class="tab-base">
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
-                    <div id="divMain" class="panel">
+                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay" >
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
@@ -143,30 +143,29 @@
             })
         });
 
-        function activo(checkboxElem,Id) {
-
+        function activo(checkboxElem,Id,userID) {
+            showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
             if (checkboxElem.checked) {
                 var activo = "true";
                 var confirmMessage = bootboxMessage.CONFIRMATION_MESSAGE_ACTIVE;
                 var operation = () => {
                     $.ajax({
                         url: '@Url.Action("EditUserActive", "FreeBiller")',
-                        data: "Id=" + Id + "&activo=" + activo,
+                        data: "Id=" + userID + "&activo=" + activo,
                         dataType: "json",
                         type: "POST",
                         cache: false,
                         success: function (data) {
-                            debugger
-                            if (data != undefined && data.length > 0) {
-                                var e = data;
-                                alert("ACTIVO",e);
-                            } else {
-                                alert("Algo no salio bien", data);
-                            }
+                            var confirmMessage = data.Message;
+                            var buttons = null;
+                            var clName = (data.Code == 200) ? "cancel-confirmation" : null;
+                            var operationCancel = () => {
+                                hideLoading('#divMain');
+                            }; 
+                            showConfirmation(confirmMessage, buttons, clName, operationCancel)
                         },
                         error: function (xhr) {
-                            debugger
-
+                            console.log(xhr);
                         }
                     });
                 }
@@ -184,21 +183,20 @@
                 var operation = () => {
                     $.ajax({
                        url: '@Url.Action("EditUserActive", "FreeBiller")',
-                        data: "Id=" + Id + "&activo=" + activo,
+                        data: "Id=" + userID + "&activo=" + activo,
                         dataType: "json",
                         type: "POST",
-                        success: function (data) {debugger
-                            console.log(data)
-                            if (data != undefined && data.length > 0) {
-                                var e = data;
-                                alert("INACTIVO",e);
-                            } else {
-                                alert("Algo no salio bien", data);
-                            }
+                        success: function (data) {
+                            var confirmMessage = data.Message;
+                            var buttons = null;
+                            var clName = (data.Code == 200) ? "cancel-confirmation" : null;
+                            var operationCancel = () => {
+                                hideLoading('#divMain');
+                            };
+                            showConfirmation(confirmMessage, buttons, clName, operationCancel)
                         },
                         error: function (xhr) {
-                            debugger
-
+                            console.log(xhr);
                         }
                     });
                 }
