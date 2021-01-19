@@ -466,29 +466,9 @@
                                             <ul class="collapse">
                                                 <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios</a></li>
                                                 <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Configuraci&oacute;n Permisos</a></li>
+                                                <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")">Inicio Facturador Gratuito</a></li>
                                             </ul>
                                         </li>
-                                    }
-                                    else
-                                    {
-                                        if (!User.IsInAnyRole("Administrador", "Super"))
-                                        {
-                                            <li>
-                                                <a id="@Navigation.NavigationEnum.Invoice" class="parent-link" href="#">
-
-                                                    <i class="fa fa-cog"></i>
-                                                    <span class="menu-title">
-                                                        Facturador Gratuito
-                                                    </span>
-                                                    <i class="arrow"></i>
-                                                </a>
-                                                <!--Submenu-->
-                                                <ul class="collapse">
-                                                    <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Configuraci&oacute;n Permisos</a></li>
-                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")">Inicio Facturador Gratuito</a></li>
-                                                </ul>
-                                            </li>
-                                        }
                                     }
 
                                     <!--Rol Facturador-->
