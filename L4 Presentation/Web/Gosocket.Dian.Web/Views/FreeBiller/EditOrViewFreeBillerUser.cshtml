@@ -1,7 +1,7 @@
 ﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFreeBillerModel
 @using Newtonsoft.Json;
 @{
-    ViewBag.Title = "Modificar Registro";
+    ViewBag.Title = "Editar usuarios";
     string classMarginTop = Model.IsEdit == true ? "margin-top-50" : "";
     var defaultHtmlAttrInput = Model.IsEdit == false ?
         new Dictionary<string, object> { { "class", "form-control input-general" }, { "disabled", "disabled" } } :
