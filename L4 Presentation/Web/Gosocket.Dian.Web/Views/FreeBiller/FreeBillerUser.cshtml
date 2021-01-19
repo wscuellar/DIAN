@@ -1,4 +1,6 @@
 ﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFiltersFreeBillerModel
+@using Newtonsoft.Json;
+
 @{
     ViewBag.Title = "Usuarios Facturador Gratuito";
     var columnSize = 3;
@@ -26,7 +28,6 @@
         </p>
         <div class="underline-title"></div>
     </div>
-
 
     <div class="row margin-horizontal-0">
         <div class="tab-base">
@@ -110,12 +111,16 @@
 
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
+    <script src="~/Content/js/Radian/constants.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/FreeBiller/FreeBiller.js"></script>
+
 
     <script>
         $(document).ready(function () {
-            var form = $('#freebiller-users-form');
-            $("input:checkbox:checked").attr("checked", true);
+            initialValuesSwitchActive('@JsonConvert.SerializeObject(Model.UserContainer.Users)');
 
+            var form = $('#freebiller-users-form');
             var urlNewUser = "@Url.Action("CreateUser")";
             var urlNewProfile = "@Url.Action("CreateProfile", "ProfileFreeBiller")";
 
@@ -137,6 +142,67 @@
                 form.submit();
             })
         });
+
+        function activo(checkboxElem,Id) {
+
+            if (checkboxElem.checked) {
+                var activo = "true";
+                var confirmMessage = bootboxMessage.CONFIRMATION_MESSAGE_ACTIVE;
+                var operation = () => {
+                    $.ajax({
+                        url: '@Url.Action("EditUserActive", "FreeBiller")',
+                        data: "Id=" + Id + "&activo=" + activo,
+                        dataType: "json",
+                        type: "POST",
+                        cache: false,
+                        success: function (data) {
+                            if (data != undefined && data.length > 0) {
+                                var e = data;
+                                alert("ACTIVO",e);
+                            } else {
+                                alert("Algo no salio bien", data);
+                            }
+                        },
+                        error: function (xhr) {
+
+                        }
+                    });
+                }
+                var operationCancel = () => {
+                    $("#" + Id).removeProp("checked");
+                }
+                var buttons = ConfirmExec(operation, null, operationCancel)
+                showConfirmation(confirmMessage, buttons, null, operationCancel);
+            } else {
+                var activo = "false";
+                var confirmMessage = bootboxMessage.CONFIRMATION_MESSAGE_DESACTIVE;
+                var operationCancel = () => {
+                    $("#" + Id).prop("checked","checked");
+                }
+                var operation = () => {
+                    $.ajax({
+                       url: '@Url.Action("EditUserActive", "FreeBiller")',
+                        data: "Id=" + Id + "&activo=" + activo,
+                        dataType: "json",
+                        type: "POST",
+                        success: function (data) {
+                            console.log(data)
+                            if (data != undefined && data.length > 0) {
+                                var e = data;
+                                alert("INACTIVO",e);
+                            } else {
+                                alert("Algo no salio bien", data);
+                            }
+                        },
+                        error: function (xhr) {
+
+                        }
+                    });
+                }
+                var buttons = ConfirmExec(operation, null, operationCancel)
+                showConfirmation(confirmMessage, buttons, null, operationCancel);
+            }
+        }
     </script>
 
 }

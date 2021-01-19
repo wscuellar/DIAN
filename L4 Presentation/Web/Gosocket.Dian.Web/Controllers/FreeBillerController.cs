@@ -172,6 +172,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.IsActive = false;
             model.TypesDoc = this.GetTypesDoc();
             model.MenuOptionsByProfile = profileService.GetOptionsByProfile(model.ProfileId);
+            model.Password = data.PasswordHash;
             return View(model);
         }
 

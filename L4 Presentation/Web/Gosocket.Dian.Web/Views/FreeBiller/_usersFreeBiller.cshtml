@@ -10,109 +10,31 @@
         margin-bottom: 10px;
     }
 </style>
-<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
-<script type="text/javascript">
 
-    $(document).ready(function () {
-        $("input:checkbox:checked").attr("checked", true);
-        if (@ViewBag.activo = true) {
-            document.getElementById("activo").checked = true;
-            console.log("Ok¡¡");
-        }
-        else {
-            console.log("No Ok¡¡");
-        }
-    });
-    function activo(checkboxElem,Id) {
-        //var Id = "041c9dc6-ed8d-4f67-bbe3-bd6fab3ef8cd";
-        if (checkboxElem.checked) {
-          
-            console.log(Id);
-            alert("El usuario ahora esta activo");
-            var activo = "true";
-            //var objectexample = {};
-            //console.log(objectexample);
-            //objectexample.Active = true;
-            //objectexample.Id = Id;
-            $.ajax({
-                url: '@Url.Action("EditUserActive", "FreeBiller")',
-                //data: JSON.stringify(objectexample),
-                //dataType: "json",
-                data: "Id=" + Id + "&activo=" + activo,
-                dataType: "json",
-                type: "POST",
-                //contentType:"application/json",
-                cache: false,
-                success: function (data) {
-                    console.log(data)
-                    if (data != undefined && data.length > 0) {
-                        var e = data;
-                        alert("ACTIVO",e);
-                    } else {
-                        alert("Algo no salio bien", data);
-                    }
-                },
-                error: function (xhr) {
-
-                }
-            });
-        } else {
-           
-            alert("El usuario ahora esta inactivo");
-            console.log(Id);
-
-            //var objectexample = {};
-            //objectexample.Active = true;
-            //objectexample.Id = Id;
-            var activo = "false";
-            $.ajax({
-               url: '@Url.Action("EditUserActive", "FreeBiller")',
-                //data: JSON.stringify(objectexample),
-                //dataType: "json",
-                data: "Id=" + Id + "&activo=" + activo,
-                dataType: "json",
-                type: "POST",
-                //contentType:"application/json; charset=utf-8",
-                success: function (data) {
-                    console.log(data)
-                    if (data != undefined && data.length > 0) {
-                        var e = data;
-                        alert("INACTIVO",e);
-                    } else {
-                        alert("Algo no salio bien", data);
-                    }
-                },
-                error: function (xhr) {
-
-                }
-            });
-        }
-    }
-</script>
 <div class="row result-users">
     <div class="radian-subtitle-container">
         <p class="subtitle-view">
             Resultados de búsqueda
         </p>
-    <div class="radian-subtitle-line"></div>
-</div>
+        <div class="radian-subtitle-line"></div>
+    </div>
 
-<div class="table-responsive padding-bottom-15">
+    <div class="table-responsive padding-bottom-15">
 
-    <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
-        <thead>
-            <tr>
-                <th class="text-left">Tipo de doocumento</th>
-                <th>N&uacute;mero de documento</th>
-                <th class="text-left">Nombre y apellido</th>
-                <th class="text-left">Perfil</th>
-                <th>&Uacute;ltima Modificaci&oacute;n</th>
-                <th colspan="3">Acciones</th>
-            </tr>
+        <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+            <thead>
+                <tr>
+                    <th class="text-left">Tipo de doocumento</th>
+                    <th>N&uacute;mero de documento</th>
+                    <th class="text-left">Nombre y apellido</th>
+                    <th class="text-left">Perfil</th>
+                    <th>&Uacute;ltima Modificaci&oacute;n</th>
+                    <th colspan="3">Acciones</th>
+                </tr>
 
-        </thead>
+            </thead>
 
-        <tbody>
+            <tbody>
 
                 @if (Model.UserContainer.Users.Count == 0)
                 {
@@ -155,7 +77,7 @@
                         </td>
                         <td class="text-nowrap padding-top-0 padding-bottom-0">
                             <label class="switch">
-                                <input type="checkbox" name="activo" id="activo" value="1" runat="server" onchange="activo(this, '@user.Id' )">
+                                <input type="checkbox" id="@user.Id@user.NumberDoc" onclick="activo(this, '@user.Id@user.NumberDoc')">
                                 <span class="slider"></span>
                             </label>
                         </td>
@@ -188,3 +110,4 @@
     </div>
 
 </div>
+

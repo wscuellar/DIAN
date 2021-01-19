@@ -58,12 +58,11 @@
         <div class="underline-title"></div>
     </div>
 
-
     <div class="row margin-horizontal-0">
         <div class="tab-base">
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
-                    <div id="divMain" class="panel">
+                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay" >
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
@@ -105,10 +104,11 @@
                                                                     @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
                                                                 </div>
                                                             </div>
-                                                            <div class="col-sm-3 padding-xs-0">
+                                                            <div class="col-sm-3 padding-xs-0 padding-right-25">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker" })
+                                                                    <div class="add-profile"><a href='@Url.Action("CreateProfile", "ProfileFreeBiller")'>+</a></div>
+                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker add-profile-button" })
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-3 padding-xs-0">
@@ -210,6 +210,7 @@
             var urlNewUser = "@Url.Action("FreeBillerUser")";
 
             $("#btnSend").click(function (e) {
+                showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
                 e.preventDefault();
                 var form = $("#create-user-form")
                 var data = {

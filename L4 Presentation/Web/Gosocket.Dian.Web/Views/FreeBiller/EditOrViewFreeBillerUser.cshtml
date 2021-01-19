@@ -1,7 +1,7 @@
 ﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFreeBillerModel
 @using Newtonsoft.Json;
 @{
-    ViewBag.Title = "Editar usuarios";
+    ViewBag.Title = Model.IsEdit == false ? "Consultar usuario" : "Editar usuario";
     string classMarginTop = Model.IsEdit == true ? "margin-top-50" : "";
     var defaultHtmlAttrInput = Model.IsEdit == false ?
         new Dictionary<string, object> { { "class", "form-control input-general" }, { "disabled", "disabled" } } :
@@ -65,7 +65,7 @@
         <div class="tab-base">
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
-                    <div id="divMain" class="panel">
+                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay">
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
@@ -114,6 +114,16 @@
                                                                     @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, defaultHtmlAttrSelect)
                                                                 </div>
                                                             </div>
+                                                            @if (Model.IsEdit)
+                                                            {
+                                                                <div class="col-sm-3 padding-xs-0">
+                                                                    <div class="form-group">
+                                                                        @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                                                                        @Html.TextBoxFor(m => m.Password, new { @class = "form-control input-general", @type = "password" })
+                                                                        <i onclick="showPassword(this)" class="fa fa-eye show-password"></i>
+                                                                    </div>
+                                                                </div>
+                                                            }
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <br />
                                                             </div>
@@ -225,7 +235,7 @@
             });
             $("#btnSend").click(function (e) {
                 e.preventDefault();
-                var form = $("#edit-user-form")
+                showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
                 var data = {
                     Id: $('[name=Id]').val(),
                     FullName: $('[name=FullName]').val(),
@@ -236,11 +246,9 @@
                 }
                 var url = '@Url.Action("EditFreeBillerUser", "FreeBiller")';
                 var actionError = (error) => {
-                    debugger
                     console.log(error);
                 }
                 var actionSuccess = (success) => {
-                    debugger
                     var confirmMessage = success.Message;
                     var operationCancel = () => {
                         if (success.RedirectTo) {

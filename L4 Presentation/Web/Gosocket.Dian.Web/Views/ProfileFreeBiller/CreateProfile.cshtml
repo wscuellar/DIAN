@@ -103,7 +103,7 @@
         <div class="tab-base">
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
-                    <div id="divMain" class="panel">
+                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay">
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
@@ -126,39 +126,50 @@
                                                             <h3 class="panel-title-radian padding-0">Permisos</h3>
                                                             <hr class="margin-0 margin-bottom-10" />
                                                         </div>
-                                                        <div class="row">
+                                                        <div class="row checks-group">
                                                             @foreach (var menuMain in Model.MenuOptionsByProfile)
                                                             {
                                                                 if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0)
                                                                 {
                                                                     <div class="col-sm-3">
-                                                                        <spam class="titleMenu">@menuMain.Name</spam>
-                                                                        @foreach (var subMenuItems in menuMain.Children)
-                                                                        {
-                                                                            if (subMenuItems.MenuLevel == 2)
+                                                                        <div class="level-1">
+                                                                            <div>
+                                                                                <spam class="titleMenu">@menuMain.Name</spam>
+                                                                            </div>
+                                                                            @foreach (var subMenuItems in menuMain.Children)
                                                                             {
-                                                                                <span class="subTitleMenu">@subMenuItems.Name</span>
-                                                                                foreach (var subSubMenuItems in subMenuItems.Children)
+                                                                                if (subMenuItems.MenuLevel == 2)
                                                                                 {
-                                                                                    <div class="row-cols-1">
-                                                                                        <div class="form-group d-inline-flex">
-                                                                                            <input type="checkbox" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" />
-                                                                                            <label>@subSubMenuItems.Name</label>
+                                                                                    <div class="level-2">
+                                                                                        <div>
+                                                                                            <span class="subTitleMenu">@subMenuItems.Name</span>
+                                                                                        </div>
+                                                                                        @foreach (var subSubMenuItems in subMenuItems.Children)
+                                                                                        {
+                                                                                            <div class="level-3">
+                                                                                                <div class="row-cols-1">
+                                                                                                    <div class="form-group d-flex margin-0">
+                                                                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" />
+                                                                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        }
+                                                                                    </div>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <div class="level-3">
+                                                                                        <div class="row-cols-1">
+                                                                                            <div class="form-group d-flex margin-0">
+                                                                                                <input type="checkbox" id="@subMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id" />
+                                                                                                <label for="@subMenuItems.Id" class="label-check">@subMenuItems.Name</label>
+                                                                                            </div>
                                                                                         </div>
                                                                                     </div>
                                                                                 }
                                                                             }
-                                                                            else
-                                                                            {
-                                                                                <div class="row-cols-1">
-                                                                                    <div class="form-group d-inline-flex">
-                                                                                        <input type="checkbox" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id" />
-                                                                                        <label>@subMenuItems.Name</label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            }
-                                                                        }
-
+                                                                        </div>
                                                                     </div>
                                                                 }
                                                             }
@@ -167,7 +178,7 @@
 
                                                     <div class="panel-footer-grey text-right submit-container">
                                                         <button id="btnCancel" type="button" class="btn btn-success btn-radian-default">Cancelar</button>
-                                                        <button type="submit" class="btn btn-success btn-radian-success">Crear Perfil</button>
+                                                        <button id="btnSend" type="submit" class="btn btn-success btn-radian-success">Crear Perfil</button>
                                                     </div>
 
                                                 </div>
@@ -203,6 +214,10 @@
             $("#btnCancel").click(function () {
                 window.location.href = urlUsers;
             });
+
+            $("#btnSend").click(function (e) {
+                showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
+            }
 
         });
     </script>

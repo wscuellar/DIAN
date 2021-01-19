@@ -18,3 +18,21 @@ function initialValuesCheck(ProfileId, url) {
     }
     ajaxFunction(url, "POST", dataAjax, errorAction, successAction);
 }
+
+
+function showPassword(element) {
+    var attrType = $(element).parent().children("input").attr("type");
+    if (attrType == "password") {
+        $("#Password").attr("type", "text");
+    } else {
+        $("#Password").attr("type","password");
+    }
+}
+
+function initialValuesSwitchActive(users) {
+    var listUsers = JSON.parse(users.replace(/(&quot\;)/g, "\""));
+    listUsers.forEach((element) => {
+        element.IsActive && $("#" + element.Id + element.NumberDoc).prop("checked", "checked");
+    });
+}
+    
