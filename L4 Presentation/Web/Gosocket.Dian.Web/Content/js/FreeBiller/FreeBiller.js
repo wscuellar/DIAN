@@ -36,4 +36,3 @@ function initialValuesSwitchActive(users) {
         element.IsActive && $("#" + element.Id + element.NumberDoc).prop("checked", "checked");
     });
 }
-    

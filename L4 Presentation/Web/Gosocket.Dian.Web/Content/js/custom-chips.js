@@ -61,6 +61,14 @@ function getProfiles() {
     });
     return profilesIds;
 }
-window.onload = function () {
+
+function showInitialChips(profilesIds, profilesList) {
+    var objProfile; 
+    var listProfile = JSON.parse(profilesList.replace(/(&quot\;)/g, "\""));
+    profilesIds.forEach((profile) => {
+        objProfile = listProfile.find(m => m.Value == String(profile));
+        profiles.push({ option: objProfile.Text, optionId: objProfile.Value})
+    })
     render();
+    unchekedPermits(profiles);
 }
