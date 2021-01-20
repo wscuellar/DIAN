@@ -397,13 +397,6 @@ function showErrorMessage(total) {
     showNotification('warning', 'fa fa-check fa-2x', 'floating', 'Aviso.', 'El valor no puede ser inferior a ' + total);
 }
 
-//function showDetails(html, objectSet) {
-//    debugger
-//    var jsonData = JSON.parse(objectSet);
-//    var html = html;
-//    var softwareType = data.softwareType;
-//    ShowDetailsTestSet(htmlPartial, "", "", softwareType, url);
-//}
 
 function showDetails(html, softwareName, url) {
     var data = {

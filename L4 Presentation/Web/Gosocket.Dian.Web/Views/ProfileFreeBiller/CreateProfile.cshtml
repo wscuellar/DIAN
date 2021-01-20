@@ -64,31 +64,8 @@
         border-radius: 2px;
     }
 
-    .titleMenu {
-        font-size: 16px;
-        line-height: 18px;
-        color: #2C323C;
-    }
-
-    .subTitleMenu {
-        font-size: 16px;
-        line-height: 16px;
-        color: #2C323C;
-    }
 </style>
 
-@*<script>
-    $(document).ready(function () {
-        $("input:checkbox:checked").attr("checked", true);
-        if (@ViewBag.activo = true) {
-            document.getElementById("activo").checked = true;
-            console.log("Ok¡¡");
-        }
-        else {
-            console.log("No Ok¡¡");
-        }
-    });
-</script>*@
 <div class="page-content margin-15">
 
     <div class="title-container">
@@ -107,7 +84,7 @@
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
-                                    @using (Html.BeginForm("CreateProfile", "ProfileFreeBiller", FormMethod.Post))
+                                    @using (Html.BeginForm("CreateProfile", "ProfileFreeBiller", FormMethod.Post, new { id = "checked-add-form"}))
                                     {
                                         <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                             <div class="col-md-12 padding-horizontal-0">
@@ -122,58 +99,8 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div>
-                                                            <h3 class="panel-title-radian padding-0">Permisos</h3>
-                                                            <hr class="margin-0 margin-bottom-10" />
-                                                        </div>
-                                                        <div class="row checks-group">
-                                                            @foreach (var menuMain in Model.MenuOptionsByProfile)
-                                                            {
-                                                                if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0)
-                                                                {
-                                                                    <div class="col-sm-3">
-                                                                        <div class="level-1">
-                                                                            <div>
-                                                                                <spam class="titleMenu">@menuMain.Name</spam>
-                                                                            </div>
-                                                                            @foreach (var subMenuItems in menuMain.Children)
-                                                                            {
-                                                                                if (subMenuItems.MenuLevel == 2)
-                                                                                {
-                                                                                    <div class="level-2">
-                                                                                        <div>
-                                                                                            <span class="subTitleMenu">@subMenuItems.Name</span>
-                                                                                        </div>
-                                                                                        @foreach (var subSubMenuItems in subMenuItems.Children)
-                                                                                        {
-                                                                                            <div class="level-3">
-                                                                                                <div class="row-cols-1">
-                                                                                                    <div class="form-group d-flex margin-0">
-                                                                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" />
-                                                                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        }
-                                                                                    </div>
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    <div class="level-3">
-                                                                                        <div class="row-cols-1">
-                                                                                            <div class="form-group d-flex margin-0">
-                                                                                                <input type="checkbox" id="@subMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id" />
-                                                                                                <label for="@subMenuItems.Id" class="label-check">@subMenuItems.Name</label>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                }
-                                                                            }
-                                                                        </div>
-                                                                    </div>
-                                                                }
-                                                            }
-                                                        </div>
+                                                    
+                                                        @Html.Partial("~/Views/FreeBiller/_checksGrid.cshtml");
                                                     </div>
 
                                                     <div class="panel-footer-grey text-right submit-container">
@@ -206,6 +133,9 @@
 
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/FreeBiller/FreeBiller.js"></script>
+
 
     <script>
         $(document).ready(function () {
@@ -215,9 +145,31 @@
                 e.preventDefault();
                 window.location.href = urlUsers;
             });
-
             $("#btnSend").click(function (e) {
                 showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
+                e.preventDefault();
+                var valuesSelected = [];
+                $('[name=ValuesSelected]').each(function (index, element) {
+                    element.checked == true && valuesSelected.push($(element).val());
+                })
+                var data = {
+                    Name: $('[name=Name]').val(),
+                    ValuesSelected: valuesSelected
+                }
+                var url = '@Url.Action("CreateProfile", "ProfileFreeBiller")';
+                var actionError = (error) => {
+                    console.log(error);
+                }
+                var actionSuccess = (success) => {
+                    var confirmMessage = success.Message;
+                    var operationCancel = () => {
+                        window.location.href = urlUsers;
+                    }
+                    var buttons = AlertExec(operationCancel);
+                    var clName = (success.Code == 200) ? "cancel-confirmation" : null;
+                    showConfirmation(confirmMessage, buttons, clName, operationCancel)
+                }
+                createUser(url, 'POST', data, actionError, actionSuccess)
             });
 
         });
