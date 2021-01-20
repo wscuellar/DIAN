@@ -1200,25 +1200,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueTotalEndoso = nitModel.ValorTotalEndoso;
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
-            DateTime fechaVencimientoFactura = Convert.ToDateTime(xmlParserCufe.PaymentDueDate);
-            DateTime fechaEndDateEndoso = Convert.ToDateTime(nitModel.ValidityPeriodEndDate);
-            string customizationId = nitModel.CustomizationId;
+           
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool validEndoso = false;
-
-            //Compara fecha vencimiento factura / ValidityPeriod EndDate Endoso
-            if(customizationId != "372" && fechaVencimientoFactura != fechaEndDateEndoso)
-            {
-                validEndoso = true;
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAH59-(R): ",
-                    ErrorMessage = $"{(string)null} La fecha de vencimiento no correspo a la fecha de vencimiento de la factura electrónica de venta.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
+            bool validEndoso = false;          
 
             //Valida informacion Endoso                           
             if (String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
