@@ -529,7 +529,7 @@ namespace Gosocket.Dian.Web.Controllers
                 profilesKey.Add( new KeyText()
                 {
                     Key = item.Key,
-                    Text = String.Join("</br>", item.Select(t => t.Profile))
+                    Text = String.Join("</br>", item.Select(t => t.Profile).Distinct())
                 });
             }
             profilesKey = profilesKey.Distinct().ToList();
