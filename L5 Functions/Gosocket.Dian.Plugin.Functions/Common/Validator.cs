@@ -1199,8 +1199,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //valor total Endoso Electronico AR
             string valueTotalEndoso = nitModel.ValorTotalEndoso;
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
-            string valueDiscountRateEndoso = nitModel.TasaDescuento;
-           
+            string valueDiscountRateEndoso = nitModel.TasaDescuento;           
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validEndoso = false;          
 
