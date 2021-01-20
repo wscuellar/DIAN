@@ -60,7 +60,7 @@
                             @user.FullName
                         </td>
                         <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
-                            @user.DescriptionProfile
+                            @Html.Raw(HttpUtility.HtmlDecode(user.DescriptionProfile))
                         </td>
                         <td class="text-center padding-top-0 padding-bottom-0">
                             @user.LastUpdate
