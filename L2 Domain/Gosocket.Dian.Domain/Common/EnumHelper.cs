@@ -75,6 +75,8 @@ namespace Gosocket.Dian.Domain.Common
         Person = 2,
         [Description("Certificate")]
         Certificate = 3,
+        [Description("ProfileUser")]
+        ProfileUser = 4,
     }
 
     public enum BatchFileStatus
@@ -287,21 +289,21 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Registro civil")]
         RC = 10910097,
         [Description("Tarjeta de identidad")]
-        TI =10910098,
+        TI = 10910098,
         [Description("Tarjeta de extranjería")]
-        TE=10910099,
+        TE = 10910099,
         [Description("Nit")]
-        Nit=10910100,
+        Nit = 10910100,
         [Description("Pasaporte")]
-        Pasaporte=10910101	,
+        Pasaporte = 10910101,
         [Description("Documento de identificación de extranjero")]
-        DIE=10910102,
+        DIE = 10910102,
         [Description("PEP")]
-        PEP=10910103,
+        PEP = 10910103,
         [Description("Nit de otro país")]
-        NitOP=10910104,
+        NitOP = 10910104,
         [Description("NIUP")]
-        NIUP=10910105
+        NIUP = 10910105
     }
 
     public enum OperationMode
@@ -382,7 +384,7 @@ namespace Gosocket.Dian.Domain.Common
     }
 
 
-   
+
 
     public enum RadianOperationMode
     {
@@ -500,13 +502,13 @@ namespace Gosocket.Dian.Domain.Common
 
         [Description("Documento de Importación")]
         ImportDocument = 2,
-        
+
         [Description("Documento de Soporte")]
         SupportDocument = 3,
-        
+
         [Description("Documento equivalente electrónico")]
         ElectronicEquivalent = 4,
-        
+
         [Description("POS electrónico")]
         ElectronicPOS = 5
     }
@@ -525,7 +527,7 @@ namespace Gosocket.Dian.Domain.Common
     public enum OtherDocElecContributorType
     {
         [Description("Emisor")]
-        Transmitter = 1, 
+        Transmitter = 1,
         [Description("Proveedor Tecnologico")]
         TechnologyProvider = 2,
     }
