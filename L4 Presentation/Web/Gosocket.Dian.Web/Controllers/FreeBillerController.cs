@@ -266,7 +266,6 @@ namespace Gosocket.Dian.Web.Controllers
             foreach (var item in identityResult.Errors)
                 errors.Append(item);
             return Json(new ResponseMessage(errors.ToString(), TextResources.alertType), JsonRequestBehavior.AllowGet);
-
         }
 
         #endregion

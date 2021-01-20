@@ -34,6 +34,8 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public string Password { get; set; }
 
         [DisplayName("Perfil")]
+        public int ProfileId { get; set; }
+
         public List<int> ProfileIds { get; set; }
 
         public List<SelectListItem> Profiles { get; set; }

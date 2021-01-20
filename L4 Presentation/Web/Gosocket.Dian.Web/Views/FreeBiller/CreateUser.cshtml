@@ -170,7 +170,7 @@
                     TypeDocId: $('[name=TypeDocId]').val(),
                     NumberDoc: $('[name=NumberDoc]').val(),
                     Email: $('[name=Email]').val(),
-                    ProfileId: $('[name=ProfileId]').val(),
+                    ProfileIds: getProfiles(),
                 }
                 var url = '@Url.Action("CreateUser", "FreeBiller")';
                 var actionError = (error) => {

@@ -54,6 +54,13 @@ function unchekedPermits(profiles) {
     });
 }
 
+function getProfiles() {
+    var profilesIds = [];
+    profiles.forEach((profile) => {
+        profilesIds.push(Number(profile.optionId));
+    });
+    return profilesIds;
+}
 window.onload = function () {
     render();
 }
