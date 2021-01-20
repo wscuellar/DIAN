@@ -148,6 +148,10 @@
             if (checkboxElem.checked) {
                 var activo = "true";
                 var confirmMessage = bootboxMessage.CONFIRMATION_MESSAGE_ACTIVE;
+                var operationCancel = () => {
+                    $("#" + Id).prop("checked", false);
+                    hideLoading('#divMain');
+                }
                 var operation = () => {
                     $.ajax({
                         url: '@Url.Action("EditUserActive", "FreeBiller")',
@@ -159,18 +163,15 @@
                             var confirmMessage = data.Message;
                             var buttons = null;
                             var clName = (data.Code == 200) ? "cancel-confirmation" : null;
-                            var operationCancel = () => {
-                                hideLoading('#divMain');
+                            var operationCancelA = () => {
+                                window.location.reload();
                             }; 
-                            showConfirmation(confirmMessage, buttons, clName, operationCancel)
+                            showConfirmation(confirmMessage, buttons, clName, operationCancelA)
                         },
                         error: function (xhr) {
                             console.log(xhr);
                         }
                     });
-                }
-                var operationCancel = () => {
-                    $("#" + Id).removeProp("checked");
                 }
                 var buttons = ConfirmExec(operation, null, operationCancel)
                 showConfirmation(confirmMessage, buttons, null, operationCancel);
@@ -178,7 +179,8 @@
                 var activo = "false";
                 var confirmMessage = bootboxMessage.CONFIRMATION_MESSAGE_DESACTIVE;
                 var operationCancel = () => {
-                    $("#" + Id).prop("checked","checked");
+                    $("#" + Id).prop("checked", "checked");
+                    hideLoading('#divMain');
                 }
                 var operation = () => {
                     $.ajax({
@@ -190,10 +192,10 @@
                             var confirmMessage = data.Message;
                             var buttons = null;
                             var clName = (data.Code == 200) ? "cancel-confirmation" : null;
-                            var operationCancel = () => {
-                                hideLoading('#divMain');
-                            };
-                            showConfirmation(confirmMessage, buttons, clName, operationCancel)
+                            var operationCancelA = () => {
+                                window.location.reload();
+                            }; 
+                            showConfirmation(confirmMessage, buttons, clName, operationCancelA)
                         },
                         error: function (xhr) {
                             console.log(xhr);

@@ -1703,15 +1703,21 @@ a.badge {
 .switch {
     display: inline-block;
     width: 23px;
-    height: 15px;
+    height: 14px;
     margin: 8px;
     transform: translateY(50%);
     position: relative;
-    background-color: #348441;
-    border-radius: 10px;
 }
+
+input:checked + .slider {
+    background-color: #348441;
+    border: 1px solid transparent;
+}
+
 /* Style Wired */
 .slider {
+    background-color: white;
+    border-radius: 10px;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -1720,26 +1726,32 @@ a.badge {
     border-radius: 30px;
     box-shadow: 0 0 0 2px #777, 0 0 4px #777;
     cursor: pointer;
-    border: 2px solid transparent;
     overflow: hidden;
     transition: .4s;
+    border: 1px solid #348441;
 }
 
-.slider:before {
-    position: absolute;
-    content: "";
-    width: 13px;
-    height: 13px;
-    background: white;
-    border-radius: 30px;
-    transform: translateX(-90%);
-    transition: .4s;
-    top: -1px;
-}
+        .slider:before {
+            position: absolute;
+            content: "";
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 30px;
+            transform: translateX(-90%);
+            transition: .4s;
+            top: -2px;
+            border: solid 3px #348441;
+            left: 12px;
+        }
 
 input:checked + .slider:before {
-    transform: translateX(-1px);
+    border: white;
+    transform: translateX(-3px);
     background: white;
+    top: 0px;
+    width: 12px;
+    height: 12px;
 }
 
 input:checked + .slider {
