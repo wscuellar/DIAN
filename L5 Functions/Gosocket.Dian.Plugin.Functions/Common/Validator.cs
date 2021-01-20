@@ -727,7 +727,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = Convert.ToInt16(party.ResponseCode) == 34 ? "AAG01e" : sender2DvErrorCode,
+                            ErrorCode = Convert.ToInt16(party.ResponseCode) == 34 ? "Regla: AAG01e-(R)" : sender2DvErrorCode,
                             ErrorMessage = "No fue informado los datos de la DIAN",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2888,8 +2888,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if (documentMeta.Where(t => t.EventCode == eventPrev.EventCode
                         && document != null
-                        && t.Identifier == document.PartitionKey
-                        ).ToList().Count > decimal.Zero)
+                        ).ToList().Count > 1)
                         {
                             validFor = true;
                             responses.Add(new ValidateListResponse
