@@ -62,7 +62,7 @@
         <div class="tab-base">
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
-                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay" >
+                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay">
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
@@ -104,16 +104,18 @@
                                                                     @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
                                                                 </div>
                                                             </div>
-                                                            <div class="col-sm-3 padding-xs-0 padding-right-25">
+                                                            <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
-                                                                    <div class="add-profile"><a href='@Url.Action("CreateProfile", "ProfileFreeBiller")'>+</a></div>
-                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker add-profile-button" })
+                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker" })
                                                                 </div>
                                                             </div>
-                                                            <div class="col-sm-3 padding-xs-0">
-                                                                <br />
+                                                            <div class="col-sm-3 padding-xs-0 div-add-profile">
+                                                                <div class="add-profile"><i class="fa fa-plus-circle"></i>Añadir perfil</div>
                                                             </div>
+                                                        </div>
+                                                        <div>
+                                                            <ul id="list"></ul>
                                                         </div>
                                                     </div>
 
@@ -130,7 +132,7 @@
                                 </div>
                             </div>
 
-                            @Html.Partial("_checksGrid");
+                            @Html.Partial("_checksGrid")
 
                         </div>
 
@@ -153,11 +155,12 @@
     <script src="~/Content/js/file-validator.js"></script>
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
     <script src="~/Content/js/FreeBiller/FreeBiller.js"></script>
+    <script src="~/Content/js/custom-chips.js"></script>
+
 
     <script>
         $(document).ready(function () {
             var urlNewUser = "@Url.Action("FreeBillerUser")";
-
             $("#btnSend").click(function (e) {
                 showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
                 e.preventDefault();
@@ -187,28 +190,10 @@
                 createUser(url, 'POST', data, actionError, actionSuccess)
 
             })
-            $("#ProfileId").change(function () {
-                $("input:checkbox:checked").prop("checked",false)
-                var idProfile = $(this).val();
-                var url = '@Url.Action("GetIdsByProfile", "FreeBiller")';
-                var dataAjax = {
-                    profileId: idProfile
-                }
-                var errorAction = (error) => {
-                    console.log(error);
-                }
-                var successAction = (result) => {
-                    result.forEach(function (id) {
-                        $("input#" + id).prop("checked", "checked");
-                    });
-                }
-                ajaxFunction(url, "POST", dataAjax, errorAction, successAction);
-            });
             $("#btnCancel").click(function (e) {
                 e.preventDefault()
                 window.location.href = urlNewUser;
             });
-
         });
     </script>
 
