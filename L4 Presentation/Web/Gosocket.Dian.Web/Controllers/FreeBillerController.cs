@@ -180,7 +180,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.Email = data.Email;
             model.LastUpdate = data.LastUpdated;
             model.Profiles = this.GetProfiles();
-            model.LastName =string.Empty;
+            model.LastName = string.Empty;
             model.FullName = data.Name;
             model.NumberDoc = data.IdentificationId;
             model.ProfileIds = new List<int>();
@@ -194,7 +194,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.TypeDocId = Convert.ToString(data.IdentificationTypeId);
             model.IsActive = false;
             model.TypesDoc = this.GetTypesDoc();
-            
+
             model.Password = data.PasswordHash;
             return View(model);
         }
@@ -231,9 +231,9 @@ namespace Gosocket.Dian.Web.Controllers
             user.IdentificationId = model.NumberDoc;
             user.Email = model.Email;
             user.UserName = model.Email;
-            
+
             IdentityResult identityResult = await userManager.UpdateAsync(user);
-            
+
             if (identityResult.Succeeded)
             {
                 // Elimina las relaciones actuales para insertar las nuevas
@@ -323,7 +323,7 @@ namespace Gosocket.Dian.Web.Controllers
                 LastUpdated = DateTime.Now,
                 Active = 1
             };
-            
+
 
 
             //validar si ya existe un Usuario con el tipo documento y documento suministrados en AspNetUser
@@ -372,7 +372,7 @@ namespace Gosocket.Dian.Web.Controllers
                         CompanyIdentificationType = User.IdentificationTypeId()
                     });
                 }
-                
+
 
                 //Envio de notificacion por correo
                 _ = SendMailCreate(model);
@@ -432,7 +432,7 @@ namespace Gosocket.Dian.Web.Controllers
             message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
             message.Append("</br> <span style='font-size:18px;'><b>Se ha realizado una actualizacion a sus datos de usuario</b></span></br>");
             message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.FullName);
-            
+
             message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
 
             //Nombre del documento, estado, observaciones
@@ -517,16 +517,32 @@ namespace Gosocket.Dian.Web.Controllers
                                                , companyCode, model.ProfileId);
 
             List<ClaimsDb> userIdsFreeBiller = claimsDbService.GetUserIdsByClaimType(CLAIMPROFILE);
-            var query = from item in users
-                        join cl in userIdsFreeBiller on item.Id equals cl.UserId
+
+            var profilesText = (from item in users
+                                join cl in userIdsFreeBiller on item.Id equals cl.UserId
+                                join pr in staticProfiles on cl.ClaimValue equals pr.Value
+                                select new { item.Id, Profile = pr.Text }).GroupBy(t => t.Id);
+
+            List<KeyText> profilesKey = new List<KeyText>();
+            foreach (var item in profilesText)
+            {
+                profilesKey.Add( new KeyText()
+                {
+                    Key = item.Key,
+                    Text = String.Join("</br>", item.Select(t => t.Profile))
+                });
+            }
+            profilesKey = profilesKey.Distinct().ToList();
+
+            var query = from item in users.Select(t=> new { t.Id, t.Name,t.UserName,t.IdentificationId, t.IdentificationTypeId, t.LastUpdated, t.Active}).Distinct()
+                        join kv in profilesKey on item.Id equals kv.Key
                         join td in staticTypeDoc on item.IdentificationTypeId.ToString() equals td.Value
-                        join pr in staticProfiles on cl.ClaimValue equals pr.Value
                         select new UserFreeBillerModel()
                         {
                             Id = item.Id,
                             FullName = item.Name,
                             DescriptionTypeDoc = td.Text,
-                            DescriptionProfile = pr.Text,
+                            DescriptionProfile = kv.Text,
                             NumberDoc = item.IdentificationId,
                             LastUpdate = item.LastUpdated,
                             IsActive = Convert.ToBoolean(item.Active)
@@ -563,7 +579,7 @@ namespace Gosocket.Dian.Web.Controllers
         private string CreateStringPassword(UserFreeBillerModel model)
         {
             string result = model.FullName.Substring(1, 1).ToUpper();
-            result =  $"{result}{model.Email.Split('@')[0]}{Guid.NewGuid().ToString("d").Substring(1, 4)}**";
+            result = $"{result}{model.Email.Split('@')[0]}{Guid.NewGuid().ToString("d").Substring(1, 4)}**";
             return result;
         }
 

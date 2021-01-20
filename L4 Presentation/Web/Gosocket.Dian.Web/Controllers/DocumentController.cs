@@ -487,6 +487,7 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
 
+        [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
