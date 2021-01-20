@@ -995,7 +995,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = new AuthToken();
             if (!User.IsInAnyRole("Administrador", "Super"))
             {
-               auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
+                auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
             }
             else
             {
@@ -1229,7 +1229,7 @@ namespace Gosocket.Dian.Web.Controllers
             var rk = $"{model.CompanyCode}";
 
             var user = userService.GetByCodeAndIdentificationTyte(model.UserCode, model.IdentificationType);
-            
+
             if (user == null)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Error de ingreso, verifique sus datos");
@@ -1275,7 +1275,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Company.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.ProfileUser.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
                 dianAuthTableManager.InsertOrUpdate(auth);
             }
             else
@@ -1286,13 +1286,13 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.UserId = user.Id;
                     auth.Email = user.Email;
                     auth.ContributorId = contributor.Id;
-                    auth.Type = AuthType.Company.GetDescription();
+                    auth.Type = AuthType.ProfileUser.GetDescription();
                     auth.Token = Guid.NewGuid().ToString();
                     auth.Status = true;
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
-
+            UserManager.AddClaim(user.Id, new System.Security.Claims.Claim(AuthType.ProfileUser.GetDescription(), user.Id));
             var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
             return Redirect(redirectUrl);
         }

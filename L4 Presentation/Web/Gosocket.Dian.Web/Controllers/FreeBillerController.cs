@@ -183,11 +183,18 @@ namespace Gosocket.Dian.Web.Controllers
             model.LastName =string.Empty;
             model.FullName = data.Name;
             model.NumberDoc = data.IdentificationId;
-            model.ProfileId = Convert.ToInt32(data.Claims.First().ClaimValue);
+            model.ProfileIds = new List<int>();
+            model.MenuOptionsByProfile = new List<MenuOptions>();
+            foreach (var claim in data.Claims)
+            {
+                model.ProfileIds.Add(Convert.ToInt32(claim.ClaimValue));
+                model.MenuOptionsByProfile.AddRange(profileService.GetOptionsByProfile(Convert.ToInt32(claim.ClaimValue)));
+            }
+
             model.TypeDocId = Convert.ToString(data.IdentificationTypeId);
             model.IsActive = false;
             model.TypesDoc = this.GetTypesDoc();
-            model.MenuOptionsByProfile = profileService.GetOptionsByProfile(model.ProfileId);
+            
             model.Password = data.PasswordHash;
             return View(model);
         }
@@ -224,15 +231,31 @@ namespace Gosocket.Dian.Web.Controllers
             user.IdentificationId = model.NumberDoc;
             user.Email = model.Email;
             user.UserName = model.Email;
-            //user.PasswordHash = userManager.PasswordHasher.HashPassword(model.Password);
+            
             IdentityResult identityResult = await userManager.UpdateAsync(user);
+            
             if (identityResult.Succeeded)
             {
-                // Actualiza el claim
-                _ = userService.UpdateUserClaim(new ClaimsDb() { ClaimValue = model.ProfileId.ToString(), UserId = user.Id });
+                // Elimina las relaciones actuales para insertar las nuevas
+                _ = userService.UserFreeBillerDeleteAll(user.Id);
 
-                // Actualiza perfil
-                _ = userService.UserFreeBillerUpdate(new Domain.Sql.UsersFreeBillerProfile() { ProfileFreeBillerId = model.ProfileId, UserId = user.Id });
+                _ = userService.DeleteUserClaims(user.Id);
+
+                //incluir el asociacion del registro. UserFreeBillerProfile
+                foreach (var profileId in model.ProfileIds)
+                {
+                    // Claim para reconocer el perfi del nuevo usuario para el Facturador Gratuito.
+                    userManager.AddClaim(user.Id, new System.Security.Claims.Claim(CLAIMPROFILE, profileId.ToString()));
+
+                    _ = userService.UserFreeBillerUpdate(
+                    new Domain.Sql.UsersFreeBillerProfile()
+                    {
+                        ProfileFreeBillerId = profileId,
+                        UserId = user.Id,
+                        CompanyCode = User.ContributorCode(),
+                        CompanyIdentificationType = User.IdentificationTypeId()
+                    });
+                }
 
                 SendMailEdit(model);
                 ResponseMessage resultx = new ResponseMessage(TextResources.UserUpdatedSuccess, TextResources.alertType);
@@ -335,18 +358,22 @@ namespace Gosocket.Dian.Web.Controllers
                     return Json(new ResponseMessage(TextResources.UserRoleFail, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
                 }
 
-                // Claim para reconocer el perfi del nuevo usuario para el Facturador Gratuito.
-                userManager.AddClaim(user.Id, new System.Security.Claims.Claim(CLAIMPROFILE, model.ProfileId.ToString()));
-
                 //incluir el asociacion del registro. UserFreeBillerProfile
-                _ = userService.UserFreeBillerUpdate(
-                    new Domain.Sql.UsersFreeBillerProfile() 
-                    { 
-                        ProfileFreeBillerId = model.ProfileId, 
-                        UserId = user.Id, 
+                foreach (var profileId in model.ProfileIds)
+                {
+                    // Claim para reconocer el perfi del nuevo usuario para el Facturador Gratuito.
+                    userManager.AddClaim(user.Id, new System.Security.Claims.Claim(CLAIMPROFILE, profileId.ToString()));
+
+                    _ = userService.UserFreeBillerUpdate(
+                    new Domain.Sql.UsersFreeBillerProfile()
+                    {
+                        ProfileFreeBillerId = profileId,
+                        UserId = user.Id,
                         CompanyCode = User.ContributorCode(),
                         CompanyIdentificationType = User.IdentificationTypeId()
                     });
+                }
+                
 
                 //Envio de notificacion por correo
                 _ = SendMailCreate(model);

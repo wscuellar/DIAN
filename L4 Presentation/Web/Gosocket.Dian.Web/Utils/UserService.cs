@@ -41,7 +41,7 @@ namespace Gosocket.Dian.Web.Utils
 
         public int UserFreeBillerUpdate(UsersFreeBillerProfile usersFreeBiller)
         {
-            UsersFreeBillerProfile usersInstance = _sqlDBContext.UserFreeBillerProfile.FirstOrDefault(c => c.UserId == usersFreeBiller.UserId);
+            UsersFreeBillerProfile usersInstance = _sqlDBContext.UserFreeBillerProfile.FirstOrDefault(c => c.UserId == usersFreeBiller.UserId && c.ProfileFreeBillerId == usersFreeBiller.ProfileFreeBillerId);
 
             if (usersInstance != null)
             {
@@ -55,6 +55,22 @@ namespace Gosocket.Dian.Web.Utils
             _sqlDBContext.SaveChanges();
 
             return usersInstance ==  null ? usersFreeBiller.Id : usersInstance.Id;
+        }
+
+
+        public int UserFreeBillerDeleteAll(string userId)
+        {
+            List<UsersFreeBillerProfile> usersInstance = _sqlDBContext.UserFreeBillerProfile.Where(c => c.UserId == userId).ToList();
+
+            if (usersInstance != null)
+            {
+                foreach (var profileuser in usersInstance)
+                {
+                    _sqlDBContext.Entry (profileuser).State = System.Data.Entity.EntityState.Deleted;
+                }
+            }
+            
+            return _sqlDBContext.SaveChanges();
         }
 
         public UsersFreeBillerProfile GetUserFreeBillerProfile(Expression<Func<UsersFreeBillerProfile, bool>> expression)
@@ -81,6 +97,26 @@ namespace Gosocket.Dian.Web.Utils
         }
 
         #endregion
+
+        #region DeleteUserClaims
+
+        public int DeleteUserClaims(string userId)
+        {
+            List<ClaimsDb> usersInstance = _sqlAspDBContext.ClaimsDbs.Where(c => c.UserId == userId).ToList();
+
+            if (usersInstance != null)
+            {
+                foreach (var profileuser in usersInstance)
+                {
+                    _sqlDBContext.Entry(profileuser).State = System.Data.Entity.EntityState.Deleted;
+                }
+            }
+
+            return _sqlDBContext.SaveChanges();
+        }
+
+        #endregion
+
 
         #endregion
 
