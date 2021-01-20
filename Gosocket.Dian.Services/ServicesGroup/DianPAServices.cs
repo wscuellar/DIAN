@@ -1204,7 +1204,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 //Solicitud de Disponibilizacion
                 if (Convert.ToInt32(eventCode) == (int)EventStatus.SolicitudDisponibilizacion)
                 {
-                    var eventApproveCufe = EventApproveCufe(trackId, eventCode, docTypeCode, dianResponse);
+                    var eventApproveCufe = EventApproveCufe(documentParsed.DocumentKey.ToLower(), eventCode, docTypeCode, dianResponse);
                     if (!eventApproveCufe.IsValid)
                     {
                         flagMeta = true;

@@ -4088,8 +4088,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: 89-(R): ",
-                            ErrorMessage = "EndDate del evento no coincide con el PaymentDueDate de la factura referenciada",
+                            ErrorCode = "Regla: AAH59-(R): ",
+                            ErrorMessage = "La fecha de vencimiento no correspo a la fecha de vencimiento de la factura electrónica de venta",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -4207,17 +4207,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.EndosoGarantia:
                 case (int)EventStatus.EndosoProcuracion:
-                case (int)EventStatus.EndosoPropiedad:
-                    responses.Add(Convert.ToDateTime(data.SigningTime) <= Convert.ToDateTime(dataModel.PaymentDueDate)
-                        ? new ValidateListResponse
-                        {
-                            IsValid = true,
-                            Mandatory = true,
-                            ErrorCode = "100",
-                            ErrorMessage = "Ok",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        }
-                        : new ValidateListResponse
+                case (int)EventStatus.EndosoPropiedad:                   
+                    DateTime signingTimeEndoso = Convert.ToDateTime(data.SigningTime);
+                    DateTime paymentDueDate = Convert.ToDateTime(dataModel.PaymentDueDate);
+                    if(signingTimeEndoso.Date > paymentDueDate.Date)
+                    {
+                        responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
@@ -4225,6 +4220,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = "Fecha de endoso es superior a la fecha de vencimiento de la factura electrónica",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
+                    }
+                    else
+                    {
+                          responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Ok",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });                    
+                    }
+                                     
                     break;
                 case (int)EventStatus.TerminacionMandato:
                     DateTime signingTime = Convert.ToDateTime(data.SigningTime);
