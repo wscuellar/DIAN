@@ -212,16 +212,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         data.TrackId = documentMeta.PartitionKey;
                     }
-                    else
-                    {
-                        ValidateListResponse response = new ValidateListResponse();
-                        response.ErrorMessage = $"No se encuentran registros de Eventos de Aceptación Expresa - Tácita  prerrequisito para esta transmisión de Disponibilizacion";
-                        response.IsValid = false;
-                        response.ErrorCode = "89";
-                        response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                        validateResponses.Add(response);
-                        return validateResponses;
-                    }
+                    //else
+                    //{
+                    //    ValidateListResponse response = new ValidateListResponse();
+                    //    response.ErrorMessage = $"No se encuentran registros de Eventos de Aceptación Expresa - Tácita  prerrequisito para esta transmisión de Disponibilizacion";
+                    //    response.IsValid = false;
+                    //    response.ErrorCode = "89";
+                    //    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                    //    validateResponses.Add(response);
+                    //    return validateResponses;
+                    //}
                 }
                 //Solo si es eventcode AR Aceptacion Expresa - Tácita
                 else if (Convert.ToInt32(data.EventCode) != (int)EventStatus.Rejected)
@@ -470,9 +470,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if(xmlParser.PaymentMeansID != "2")
             {
                 ValidateListResponse response = new ValidateListResponse();
-                response.ErrorMessage = $"Tipo factura diferente a Crédito.";
+                response.ErrorMessage = $"Tipo factura no es Crédito.";
                 response.IsValid = false;
-                response.ErrorCode = "89";
+                response.ErrorCode = "Regla: 89-(R): ";
                 response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                 validateResponses.Add(response);
                 return validateResponses;

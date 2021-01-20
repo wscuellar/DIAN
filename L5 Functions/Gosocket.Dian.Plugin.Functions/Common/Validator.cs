@@ -1033,18 +1033,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 //NotificacionPagoTotalParcial
                 case (int)EventStatus.NotificacionPagoTotalParcial:
-                    if (party.SenderParty != receiverCode)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = errorCodeMessage.errorCode,
-                            ErrorMessage = errorCodeMessage.errorMessage,
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    else
+                    if (party.SenderParty == receiverCode || party.SenderParty == senderCode)
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -1052,6 +1041,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             Mandatory = true,
                             ErrorCode = "100",
                             ErrorMessage = "Evento senderParty referenciado correctamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCode,
+                            ErrorMessage = errorCodeMessage.errorMessage,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1200,8 +1200,25 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueTotalEndoso = nitModel.ValorTotalEndoso;
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
+            DateTime fechaVencimientoFactura = Convert.ToDateTime(xmlParserCufe.PaymentDueDate);
+            DateTime fechaEndDateEndoso = Convert.ToDateTime(nitModel.ValidityPeriodEndDate);
+            string customizationId = nitModel.CustomizationId;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool validEndoso = false;        
+            bool validEndoso = false;
+
+            //Compara fecha vencimiento factura / ValidityPeriod EndDate Endoso
+            if(customizationId != "372" && fechaVencimientoFactura != fechaEndDateEndoso)
+            {
+                validEndoso = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: AAH59-(R): ",
+                    ErrorMessage = $"{(string)null} La fecha de vencimiento no correspo a la fecha de vencimiento de la factura electrónica de venta.",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
 
             //Valida informacion Endoso                           
             if (String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
