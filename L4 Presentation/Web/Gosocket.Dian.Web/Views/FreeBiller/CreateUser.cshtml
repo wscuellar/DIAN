@@ -186,6 +186,7 @@
                             if (success.RedirectTo) {
                                 window.location.href = success.RedirectTo;
                             }
+                            hideLoading('#divMain');
                         }
                         var buttons = AlertExec(operationCancel);
                         var clName = (success.Code == 200) ? "cancel-confirmation" : null;
