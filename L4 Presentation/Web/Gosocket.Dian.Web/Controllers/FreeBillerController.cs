@@ -170,7 +170,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult EditOrViewFreeBillerUser(string id, bool isEdit = true)
         {
             var tdocs = GetTypesDoc();
-            ViewBag.tdocs = tdocs.Select(p => new SelectListItem() { Value = p.Value.ToString(), Text = p.Text }).ToList<SelectListItem>();
+            ViewBag.tdocs = tdocs.Where(p=> p.Value != null).Select(p => new SelectListItem() { Value = p.Value.ToString(), Text = p.Text }).ToList<SelectListItem>();
             UserService user = new UserService();
             var data = user.Get(id);
             UserFreeBillerModel model = new UserFreeBillerModel();

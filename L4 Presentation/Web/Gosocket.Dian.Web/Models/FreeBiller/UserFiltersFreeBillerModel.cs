@@ -22,7 +22,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         [DisplayName("Nombre Completo")]
         public string FullName { get; set; }
 
-        [DisplayName("Estado")]
+        [DisplayName("Perfil")]
         public int ProfileId { get; set; }
 
         public List<SelectListItem> DocTypes { get; set; }
