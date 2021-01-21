@@ -224,6 +224,14 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
+            if (!int.TryParse(model.TypeDocId, out _))
+                return Json(new ResponseMessage("Seleccione un tipo de documento..", TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+
+            if (model.ProfileIds == null)
+            {
+                return Json(new ResponseMessage("El usuario debe tener un perfil adicionado...", TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
             //validar si existe un Usuario con el id
             ApplicationUser user = await userManager.FindByIdAsync(model.Id);
             if (user == null)
@@ -302,6 +310,14 @@ namespace Gosocket.Dian.Web.Controllers
                 foreach (var item in allErrors)
                     errors.AppendLine(item.ErrorMessage);
                 return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            if(!int.TryParse(model.TypeDocId,out _))
+                return Json(new ResponseMessage("Seleccione un tipo de documento..", TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+
+            if (model.ProfileIds == null)
+            {
+                return Json(new ResponseMessage("El usuario debe tener un perfil adicionado...", TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             //identifica el usuario que esta crean los nuevos registros
