@@ -18,10 +18,10 @@ $(".add-profile").click(function () {
 
 function render(isEdit) {
     list.innerHTML = '';
-    profiles.map((item, index) => {
-        list.innerHTML += isEdit == "true" ?
-            `<li><a href="javascript: remove(${index},${item.optionId})">+</a><span class="margin-right-10">${item.option}</span></li>` :
-            `<li><span class="margin-right-10">${item.option}</span></li>`
+    profiles.map((item, index) => {debugger
+        list.innerHTML += isEdit == "True"
+            ? `<li><a href="javascript: remove(${index},${item.optionId})">+</a><span class="margin-right-10">${item.option}</span></li>`
+            : `<li><span class="margin-right-10">${item.option}</span></li>`
     });
 }
 
