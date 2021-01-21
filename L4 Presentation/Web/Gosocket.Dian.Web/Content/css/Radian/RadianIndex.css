@@ -1934,3 +1934,10 @@ ul#list li a {
 ul#list li a:hover {
     color: red;
 }
+
+
+#TypeDocIdHidden {
+    position: absolute;
+    left: 0;
+    z-index: -1;
+}

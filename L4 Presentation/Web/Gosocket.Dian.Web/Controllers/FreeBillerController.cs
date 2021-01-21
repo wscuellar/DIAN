@@ -490,12 +490,26 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 foreach (var item in types)
                 {
-                    selectTypesId.Add(
-                        new SelectListItem
-                        {
-                            Value = item.Id.ToString(),
-                            Text = item.Description
-                        });
+                    if (item.Id == 0)
+                    {
+                        selectTypesId.Add(
+                            new SelectListItem
+                            {
+                                Value = null,
+                                Text = "Seleccione..."
+                            }
+                         );
+                    }
+                    else
+                    {
+                        selectTypesId.Add(
+                            new SelectListItem
+                            {
+                                Value = item.Id.ToString(),
+                                Text = item.Description
+                            }
+                         );
+                    }
                 }
 
             }
