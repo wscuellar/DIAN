@@ -18,7 +18,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public string LastName { get; set; }
 
         [Required(ErrorMessage = "Nombres y apellidos requerido")]
-        [MaxLength(30, ErrorMessage = "Máximo {1} carácteres")]
+        [MaxLength(50, ErrorMessage = "Máximo {1} carácteres")]
         [DisplayName("Nombres y apellidos")]
         public string FullName { get; set; }
 
@@ -34,7 +34,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public string NumberDoc { get; set; }
 
         [Required(ErrorMessage = "El correo electrónico es requerido")]
-        [MaxLength(30, ErrorMessage = "Máximo {1} carácteres")]
+        [MaxLength(50, ErrorMessage = "Máximo {1} carácteres")]
         [EmailAddress(ErrorMessage = "Correo inválido")]
         [DisplayName("Correo electrónico")]
         public string Email { get; set; }
