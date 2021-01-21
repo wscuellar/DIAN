@@ -185,6 +185,8 @@
                         var operationCancel = () => {
                             if (success.RedirectTo) {
                                 window.location.href = success.RedirectTo;
+                            } else {
+                                hideLoading('#divMain');
                             }
                         }
                         var buttons = AlertExec(operationCancel);

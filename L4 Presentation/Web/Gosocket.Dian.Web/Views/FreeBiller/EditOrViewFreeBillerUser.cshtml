@@ -196,6 +196,7 @@
                 var actionSuccess = (success) => {
                     var confirmMessage = success.Message;
                     var operationCancel = () => {
+                        debugger
                         if (success.RedirectTo) {
                             window.location.href = success.RedirectTo;
                         } else {
