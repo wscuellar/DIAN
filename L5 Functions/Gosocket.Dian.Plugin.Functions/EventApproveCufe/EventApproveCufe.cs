@@ -48,7 +48,7 @@ namespace Gosocket.Dian.Plugin.Functions.EventApproveCufe
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALIDATEPARTYPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATEAPPROVECUFEPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -57,8 +57,8 @@ namespace Gosocket.Dian.Plugin.Functions.EventApproveCufe
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "VALIDATEPARTYPLGNS",
-                        ErrorMessage = $"No se pudo validar referencia."
+                        ErrorCode = "VALIDATEAPPROVECUFEPLGNS",
+                        ErrorMessage = $"No se pudo validar documento referenciado."
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
