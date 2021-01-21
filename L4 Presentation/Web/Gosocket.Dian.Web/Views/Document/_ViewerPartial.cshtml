@@ -111,14 +111,14 @@
                         }
                         Folio: @Model.Document.Number<br>
                         Fecha de emisión de la factura Electrónica: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br />
+                        @if (Model.Document.Status != 2)
+                        {
+                            <a href="@Url.Action("DownloadPDF", "Document", new { trackId = Model.Document.Id})" class="downloadPDFUrl" style="font-size:15px; text-decoration:underline;">
+                                <i class="fa fa-download"></i> Descargar PDF
+                            </a>
+                        }
                     </p>
                 </div>
-                @if (Model.Document.Status != 2)
-                {
-                    <a href="@Url.Action("DownloadPDF", "Document", new { trackId = Model.Document.Id})" class="downloadPDFUrl" style="font-size:15px; text-decoration:underline;">
-                        <i class="fa fa-download"></i> Descargar PDF
-                    </a>
-                }
             </div>
 
             <div class="row line-bottom row-fe-details" style="padding-bottom:24px; padding-top:14px;">

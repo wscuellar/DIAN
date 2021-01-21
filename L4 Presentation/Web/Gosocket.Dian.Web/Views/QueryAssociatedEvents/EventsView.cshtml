@@ -163,6 +163,7 @@
         padding-top: 2px;
         text-decoration: underline;
         color: #348441;
+        font-size: 18px;
     }
 </style>
 
@@ -174,7 +175,7 @@
         <div class="panel panel-event margin-top-0" id="panel-form_1" data-target="#panel-form_1" data-toggle="panel-form_1">
             <div class="panel-heading padding-15">
                 <div class="row">
-                    <div class="col-sm-4 text-right right-section">
+                    <div class="col-sm-12 text-right right-section">
                         <i class="fa fa-times-circle close-button-acuse" onclick="darClick()"></i>
                     </div>
                 </div>
@@ -187,27 +188,22 @@
                     <div class="col-sm-5 left-section">
                         <span>CUDE:</span>
                         <span class="cude-text">@Model.CUDE</span>
-                        <div class="left-section ContainerDownload">
-                            <p>
-                                <i class="fa fa-download"></i>
-                                <um>
-                                    <button id="show-graphic-document" class="btn btn-link btn-link-download" onclick="showModal('@Model.CUDE')">Descarga</button>
-                                </um>
-                            </p>
-                        </div>
                     </div>
                     <div class="col-sm-4 text-right right-section">
-                        <div class="col-sm-8 pull-right">
-                            <p class="titlecs-new">
-                                @Model.Title
-                            </p>
-                        </div>
+                        <span class="tipo-doc">@Model.Title</span>
                         <span>Prefijo: @Model.Prefix </span>
                         <span>Número: @Model.Number</span>
                         <span>Fecha de emisión del evento: @Model.DateOfIssue.ToString("yyyy-MM-dd")</span>
                     </div>
                 </div>
-
+                <div class="left-section ContainerDownload">
+                    <p>
+                        <i class="fa fa-download"></i>
+                        <um>
+                            <button id="show-graphic-document" class="btn btn-link btn-link-download" onclick="showModal('@Model.CUDE')">Descarga</button>
+                        </um>
+                    </p>
+                </div>
                 <div class="row aditional-data-section padding-panel">
                     <div class="col-sm-4">
                         <h5><strong>DATOS DEL EMISOR DEL EVENTO </strong></h5>
