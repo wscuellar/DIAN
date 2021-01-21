@@ -186,6 +186,7 @@
                     TypeDocId: $('[name=TypeDocId]').val(),
                     NumberDoc: $('[name=NumberDoc]').val(),
                     Email: $('[name=Email]').val(),
+                    Password: $('[name=Password]').val(),
                     ProfileIds: getProfiles(),
                 }
                 var url = '@Url.Action("EditFreeBillerUser", "FreeBiller")';
@@ -197,6 +198,8 @@
                     var operationCancel = () => {
                         if (success.RedirectTo) {
                             window.location.href = success.RedirectTo;
+                        } else {
+                            hideLoading('#divMain');
                         }
                     }
                     var buttons = AlertExec(operationCancel);
