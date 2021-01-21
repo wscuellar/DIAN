@@ -48,5 +48,6 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string EventCodeDescription { get; set; }
     public bool InTransaction { get; set; }
     public DateTime SigningTimeStamp { get; set; }
+    public double NewAmountTV { get; set; }
     public bool IsInvoiceTV { get; set; }
 }

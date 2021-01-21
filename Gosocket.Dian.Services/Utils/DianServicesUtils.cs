@@ -630,7 +630,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["DocumentKeyXpath"]) && !noteCodes.Contains(docTypeCode))
             {
-                stringBuilder.AppendLine($"{codeMessage}D06-(R) CUFE del UBL no puede estar vacío.");
+                stringBuilder.AppendLine($"{codeMessage}D06-(R) el valor UUID no está correctamente calculado.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -677,6 +677,72 @@ namespace Gosocket.Dian.Services.Utils
 
             return isValid;
         }
+
+        public static bool ValidateParserNomina(DocumentParsedNomina documentParsed, ref DianResponse dianResponse)
+        {
+            string codeMessage = string.Empty;
+            bool isValid = true;
+            StringBuilder stringBuilder = new StringBuilder();
+
+            List<string> errors = new List<string>();
+
+            var docTypeCode = documentParsed.DocumentTypeId;
+            var cune = documentParsed.CUNE;
+            var cunePred = documentParsed.CUNEPred;
+            var codigoTrabajador = documentParsed.CodigoTrabajador;
+
+            switch (docTypeCode)
+            {
+                case "11":               
+                    {
+                        codeMessage = "NIE";
+                        break;
+                    }
+                case "12":          
+                    {
+                        codeMessage = "NIAE";
+                        break;
+                    }                       
+                default:
+                    {
+                        codeMessage = "GEN";
+                        break;
+                    }
+            }
+
+            if (string.IsNullOrEmpty(cune))
+            {
+                stringBuilder.AppendLine($"{codeMessage}024-(R): Se debe indicar el CUNE según la definición establecida.");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
+
+            if (string.IsNullOrEmpty(cunePred) && docTypeCode == "12")
+            {
+                stringBuilder.AppendLine($"{codeMessage}191-(R): Debe ir el CUNE del documento a Reemplazar");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
+
+            if (string.IsNullOrEmpty(codigoTrabajador))
+            {
+                stringBuilder.AppendLine($"{codeMessage}009-(R): Se debe indicar el Codigo del Trabajador.");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
+
+            if (!isValid)
+            {
+                dianResponse.StatusCode = "66";
+                dianResponse.ErrorMessage = errors;
+            }
+
+            return isValid;
+        }
+
 
         public static bool ValidateParserValuesSync(DocumentParsed documentParsed, ref DianResponse dianResponse)
         {
@@ -737,7 +803,7 @@ namespace Gosocket.Dian.Services.Utils
             //string[] noteCodes = { "7", "8" };
 
             bool flagEvento = true;
-            bool validaUUID = (Convert.ToInt32(eventCode) == 43 && Convert.ToInt32(listID) == 3) ? false : true;
+            
 
             if (docTypeCode == "96")
             {
@@ -771,25 +837,20 @@ namespace Gosocket.Dian.Services.Utils
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
-                }
-
-                if (string.IsNullOrEmpty(documentKey) && validaUUID)
-                {
-                    stringBuilder.AppendLine($"{codeMessage}H07-(R): esta UUID no existe en la base de datos de la DIAN.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                }
+                }               
 
                 if (string.IsNullOrEmpty(eventCode))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Código tipo de evento no puede estar vacío.");
+                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
                     flagEvento = false;
                 }
-                else if ((Convert.ToInt32(eventCode) < 30 || Convert.ToInt32(eventCode) > 46) )
+                else if (!(eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034"
+                   || eventCode == "035" || eventCode == "036" || eventCode == "037" || eventCode == "038" || eventCode == "039"
+                   || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
+                   || eventCode == "045" || eventCode == "046"))
                 {
                     stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
                     errors.Add(stringBuilder.ToString());
@@ -798,8 +859,20 @@ namespace Gosocket.Dian.Services.Utils
                     flagEvento = false;
                 }
 
+
+
                 if (flagEvento)
                 {
+
+                    bool validaUUID = (Convert.ToInt32(eventCode) == 43 && listID == "3") ? false : true;
+                    if (string.IsNullOrEmpty(documentKey) && validaUUID)
+                    {
+                        stringBuilder.AppendLine($"{codeMessage}H07-(R): esta UUID no existe en la base de datos de la DIAN.");
+                        errors.Add(stringBuilder.ToString());
+                        stringBuilder.Clear();
+                        isValid = false;
+                    }
+
                     if (string.IsNullOrEmpty(serieAndNumber))
                     {
                         if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34 && flagEvento)
@@ -877,7 +950,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentCude))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D06-(R): CUDE del UBL no puede estar vacío.");
+                    stringBuilder.AppendLine($"{codeMessage}D06-(R): el valor UUID no está correctamente calculado.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -885,7 +958,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(customizationId))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D02-(R): CustomizationID no corresponde un código valido.");
+                    stringBuilder.AppendLine($"{codeMessage}D02-(R): No corresponde a un código valido.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -896,7 +969,7 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (string.IsNullOrEmpty(documentKey))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D06-(R): CUFE del UBL no puede estar vacío.");
+                    stringBuilder.AppendLine($"{codeMessage}D06-(R): el valor UUID no está correctamente calculado.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;

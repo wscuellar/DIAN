@@ -42,7 +42,7 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALIDATEPARTYPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", data.trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATECUNEPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", data.trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -51,8 +51,8 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "VALIDATEPARTYPLGNS",
-                        ErrorMessage = $"No se pudo validar referencia."
+                        ErrorCode = "VALIDATECUNEPLGNS",
+                        ErrorMessage = $"No se pudo validar referencia CUNE."
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);

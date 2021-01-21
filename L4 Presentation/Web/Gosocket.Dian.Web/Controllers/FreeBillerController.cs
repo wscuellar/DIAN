@@ -189,7 +189,10 @@ namespace Gosocket.Dian.Web.Controllers
 
             foreach (var claim in data.Claims)
             {
-                model.ProfileIds.Add(Convert.ToInt32(claim.ClaimValue));
+                int profileId = 0;
+                if(int.TryParse(claim.ClaimValue, out profileId))
+                    model.ProfileIds.Add(profileId);
+                
             }
 
             model.TypeDocId = Convert.ToString(data.IdentificationTypeId);
@@ -211,7 +214,7 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> EditFreeBillerUser(UserFreeBillerModel model)
         {
 
-            //Valida si el modelo trae errores
+            //Valida si el modelo trae errores¿
             StringBuilder errors = new StringBuilder();
             if (!ModelState.IsValid)
             {

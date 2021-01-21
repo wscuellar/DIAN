@@ -41,7 +41,7 @@ namespace Gosocket.Dian.Plugin.Functions.Predecesor
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALIDATEPARTYPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATEPREDECESORPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -50,8 +50,8 @@ namespace Gosocket.Dian.Plugin.Functions.Predecesor
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "VALIDATEPARTYPLGNS",
-                        ErrorMessage = $"No se pudo validar referencia."
+                        ErrorCode = "VALIDATEPREDECESORPLGNS",
+                        ErrorMessage = $"No se pudo validar referencia Predecesor."
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
