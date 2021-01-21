@@ -82,6 +82,7 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.TypeDocId, new { @class = "control-label" })
                                                                     @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, defaultHtmlAttrSelect)
+                                                                    @Html.ValidationMessageFor(m => m.TypeDocId, "", new { @class = "text-danger" })
                                                                 </div>
                                                             </div>
 
@@ -89,6 +90,7 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.NumberDoc, new { @class = "control-label" })
                                                                     @Html.TextBoxFor(m => m.NumberDoc, defaultHtmlAttrInput)
+                                                                    @Html.ValidationMessageFor(m => m.NumberDoc, "", new { @class = "text-danger" })
                                                                 </div>
                                                             </div>
 
@@ -96,6 +98,7 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.FullName, new { @class = "control-label" })
                                                                     @Html.TextBoxFor(m => m.FullName, defaultHtmlAttrInput)
+                                                                    @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
                                                                 </div>
 
                                                             </div>
@@ -106,6 +109,7 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.Email, new { @class = "control-label" })
                                                                     @Html.TextBoxFor(m => m.Email, defaultHtmlAttrInput)
+                                                                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
                                                                 </div>
                                                             </div>
                                                             @if (Model.IsEdit)
@@ -114,6 +118,7 @@
                                                                     <div class="form-group">
                                                                         @Html.LabelFor(m => m.Password, new { @class = "control-label" })
                                                                         @Html.TextBoxFor(m => m.Password, new { @class = "form-control input-general", @type = "password" })
+                                                                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                                                                         <i onclick="showPassword(this)" class="fa fa-eye show-password"></i>
                                                                     </div>
                                                                 </div>
@@ -126,6 +131,7 @@
                                                                     <div class="form-group">
                                                                         @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
                                                                         @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, defaultHtmlAttrSelect)
+                                                                        @Html.ValidationMessageFor(m => m.ProfileId, "", new { @class = "text-danger" })
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-sm-3 padding-xs-0 div-add-profile">

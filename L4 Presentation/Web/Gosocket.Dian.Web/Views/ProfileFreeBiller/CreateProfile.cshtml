@@ -96,6 +96,8 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.Name, new { @class = "control-label" })
                                                                     @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                                                                    @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+
                                                                 </div>
                                                             </div>
                                                         </div>
