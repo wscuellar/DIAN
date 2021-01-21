@@ -108,11 +108,11 @@ namespace Gosocket.Dian.Web.Utils
             {
                 foreach (var profileuser in usersInstance)
                 {
-                    _sqlDBContext.Entry(profileuser).State = System.Data.Entity.EntityState.Deleted;
+                    _sqlAspDBContext.Entry(profileuser).State = System.Data.Entity.EntityState.Deleted;
                 }
             }
 
-            return _sqlDBContext.SaveChanges();
+            return _sqlAspDBContext.SaveChanges();
         }
 
         #endregion
