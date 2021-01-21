@@ -185,10 +185,11 @@ namespace Gosocket.Dian.Web.Controllers
             model.NumberDoc = data.IdentificationId;
             model.ProfileIds = new List<int>();
             model.MenuOptionsByProfile = new List<MenuOptions>();
+            model.MenuOptionsByProfile.AddRange(profileService.GetOptionsByProfile(0));
+
             foreach (var claim in data.Claims)
             {
                 model.ProfileIds.Add(Convert.ToInt32(claim.ClaimValue));
-                model.MenuOptionsByProfile.AddRange(profileService.GetOptionsByProfile(Convert.ToInt32(claim.ClaimValue)));
             }
 
             model.TypeDocId = Convert.ToString(data.IdentificationTypeId);
