@@ -1829,7 +1829,7 @@ input:checked + .slider {
     width: 95%;
     margin: auto !important;
     margin-top: 20px !important;
-    padding-left: 7%;
+    padding-left: 3%;
 }
 
 #divMain .titleMenu, #divMain .subTitleMenu {
@@ -1902,29 +1902,33 @@ ul#list {
     display: inline-block;
 }
 
-ul#list li {
-    display: inline-block;
-    background: #555;
-    color: white;
-    padding: 3px 5px 3px 10px;
-    border-radius: 15px;
-    margin-right: 5px;
-    margin-bottom: 5px;
-}
+    ul#list li {
+        display: inline-block;
+        background: #9AB4B0;
+        color: white;
+        padding: 3px 5px 3px 10px;
+        border-radius: 15px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
 
 ul#list li a {
-    color: white;
+    color: #9AB4B0;
     text-decoration: none;
-    margin-left: 5px;
-    font-size: 10px;
-    background: #333;
-    width: 15px;
+    margin-right: 5px;
+    font-size: 19px;
+    background: white;
+    width: 16px;
     height: 15px;
     border-radius: 50%;
     display: inline-flex;
+    transform: matrix(0.71, 0.64, -0.78, 0.71, 0, 0);
     text-align: center;
     align-items: center;
     justify-content: center;
+    top: 2px;
+    left: -2px;
+    position: relative;
 }
 
 ul#list li a:hover {
