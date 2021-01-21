@@ -1925,24 +1925,65 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference, issuerPartyCode, issuerPartyName);
                     if (resultValidateCufe[0].IsValid)
                     {
+                        TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
                         TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-                        var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyModel.cufe, attorneyModel.cufe);
-                        if(companyId == documentMetaCUFE.SenderCode)
+                        var docHolderExchange = TableManagerGlobalDocHolderExchange.FindhByCufeExchange<GlobalDocHolderExchange>(attorneyModel.cufe.ToLower(), true);
+                        if(docHolderExchange != null)
                         {
-                            attorney.Add(attorneyModel);
+                            //Existe mas de un legitimo tenedor requiere un mandatario
+                            string[] endosatarios = docHolderExchange.PartyLegalEntity.Split('|');
+                            if (endosatarios.Length == 1)
+                            {
+                                if(docHolderExchange.PartyLegalEntity == companyId)
+                                {
+                                    attorney.Add(attorneyModel);
+                                }
+                                else
+                                {
+                                    validate = false;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "Regla: 89-(R): ",
+                                        ErrorMessage = "Emisor del mandato no corresponde al CUFE referenciado como el legítimo tenedor de la factura",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                validate = false;
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "Regla: 89-(R): ",
+                                    ErrorMessage = "Factura cuenta con mas de un Legitimo tenedor, no es posible crear un mandato",
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                         else
                         {
-                            validate = false;
-                            responses.Add(new ValidateListResponse
+                            var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyModel.cufe, attorneyModel.cufe);
+                            if (companyId == documentMetaCUFE.SenderCode)
                             {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "Regla: 89-(R): ",
-                                ErrorMessage = "CUFE no se encuentra referenciado no corresponde al emisor",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                                attorney.Add(attorneyModel);
+                            }
+                            else
+                            {
+                                validate = false;
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "Regla: 89-(R): ",
+                                    ErrorMessage = "Emisor del mandato no corresponde al CUFE referenciado como facturador electrónico",
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }                      
                     }
                     else
                     {
