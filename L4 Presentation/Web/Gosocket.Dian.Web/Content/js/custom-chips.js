@@ -10,7 +10,7 @@ $(".add-profile").click(function () {
         var elementFind = profiles.find(m => m.option == option);
         if (!elementFind) {
             profiles.push({ option, optionId});
-            render();
+            render("True");
             checkChecks(optionId);
         }
     } 
@@ -18,7 +18,7 @@ $(".add-profile").click(function () {
 
 function render(isEdit) {
     list.innerHTML = '';
-    profiles.map((item, index) => {debugger
+    profiles.map((item, index) => {
         list.innerHTML += isEdit == "True"
             ? `<li><a href="javascript: remove(${index},${item.optionId})">+</a><span class="margin-right-10">${item.option}</span></li>`
             : `<li><span class="margin-right-10">${item.option}</span></li>`
@@ -29,7 +29,7 @@ function render(isEdit) {
 function remove(i, optionId) {
     profiles = profiles.filter(item => profiles.indexOf(item) != i);
     unchekedPermits(profiles);
-    render();
+    render("True");
 }
 
 function checkChecks(profileId) {
