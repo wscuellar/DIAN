@@ -26,6 +26,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
         static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
+        static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
+
         #endregion
 
         public ValidatorEngine() { }
@@ -92,6 +94,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     //Obtiene el CUFE
                     eventPrev.TrackId = documentMeta.DocumentReferencedKey;
+                    //Obtiene XML ApplicationResponse CUDE
+                    var xmlBytesCude = await GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                    xmlParserCude = new XmlParser(xmlBytesCude);
+                    if (!xmlParserCude.Parser())
+                        throw new Exception(xmlParserCude.ParserError);
                 }
             }
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
@@ -145,6 +152,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
             EventStatus code;
+            string originalTrackIdSolicitudDisponibilizacion = null;
             switch (int.Parse(data.EventCode))
             {
                 case (int)EventStatus.Receipt:
@@ -152,6 +160,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;              
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     code = EventStatus.Accepted;
+                    originalTrackIdSolicitudDisponibilizacion = data.TrackId;
                     break;              
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                 case (int)EventStatus.NegotiatedInvoice:
@@ -203,16 +212,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         data.TrackId = documentMeta.PartitionKey;
                     }
-                    else
-                    {
-                        ValidateListResponse response = new ValidateListResponse();
-                        response.ErrorMessage = $"No se encuentran registros de Eventos de Aceptación Expresa - Tácita  prerrequisito para esta transmisión de Disponibilizacion";
-                        response.IsValid = false;
-                        response.ErrorCode = "89";
-                        response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                        validateResponses.Add(response);
-                        return validateResponses;
-                    }
+                    //else
+                    //{
+                    //    ValidateListResponse response = new ValidateListResponse();
+                    //    response.ErrorMessage = $"No se encuentran registros de Eventos de Aceptación Expresa - Tácita  prerrequisito para esta transmisión de Disponibilizacion";
+                    //    response.IsValid = false;
+                    //    response.ErrorCode = "89";
+                    //    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                    //    validateResponses.Add(response);
+                    //    return validateResponses;
+                    //}
                 }
                 //Solo si es eventcode AR Aceptacion Expresa - Tácita
                 else if (Convert.ToInt32(data.EventCode) != (int)EventStatus.Rejected)
@@ -243,27 +252,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (documentMeta != null)
                 {
                     data.TrackId = documentMeta.PartitionKey;
-                }
-                else
-                {
-                    string msg = "No se puede generar este evento si previamente no existe el evento limitación de circulación.";           
-                    ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = msg;
-                    response.IsValid = false;
-                    response.ErrorCode = "LGC34";
-                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                    validateResponses.Add(response);
-                    return validateResponses;
-                }
+                }               
             }
             var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            // Por el momento solo para el evento 036 se conserva el trackId original, con el fin de traer el PaymentDueDate del CUFE
+            // y enviarlo al validator para una posterior validación contra la fecha de vencimiento del evento (036).
+            string parameterPaymentDueDateFE = null;
+            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
+            {
+                var originalXmlBytes = await GetXmlFromStorageAsync(originalTrackIdSolicitudDisponibilizacion);
+                var originalXmlParser = new XmlParser(originalXmlBytes);
+                if (!originalXmlParser.Parser())
+                    throw new Exception(originalXmlParser.ParserError);
+
+                parameterPaymentDueDateFE = originalXmlParser.PaymentDueDate;
+            }
+
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel));
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE));
 
             return validateResponses;
         }
@@ -296,14 +307,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
 
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
-            var xmlParser = new XmlParser(xmlBytes);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
 
-            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+            NitModel nitModel = null;
+            NominaModel nominaModel = null;
+            XmlParser xmlParser = null;
+            XmlParseNomina xmlParserNomina = null;
+            var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if(documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+            {
+                xmlParserNomina = new XmlParseNomina(xmlBytes);
+                if (!xmlParserNomina.Parser())
+                    throw new Exception(xmlParserNomina.ParserError);
+
+                nominaModel = xmlParserNomina.Fields.ToObject<NominaModel>();
+            }
+            else
+            {
+                xmlParser = new XmlParser(xmlBytes);
+                if (!xmlParser.Parser())
+                    throw new Exception(xmlParser.ParserError);
+
+                nitModel = xmlParser.Fields.ToObject<NitModel>();
+            }
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateNit(nitModel, trackId));
+            validateResponses.AddRange(validator.ValidateNit(nitModel, trackId, nominaModel: nominaModel));
 
             return validateResponses;
         }
@@ -330,7 +358,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             cmObject.Cune = xmlParser.globalDocPayrolls.CUNE;
             cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
 
-            cmObject.FecNIE = xmlParser.globalDocPayrolls.FechaGen.ToString("yyyy-MM-dd");
+            cmObject.FecNIE = xmlParser.globalDocPayrolls.FechaGen;
             cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen;
             cmObject.SoftwareId = xmlParser.globalDocPayrolls.SoftwareID;
             cmObject.ValDesc = Convert.ToString(xmlParser.globalDocPayrolls.deduccionesTotal);
@@ -383,7 +411,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool valid = true;
 
             //Valida existe cambio legitimo tenedor
-            GlobalDocHolderExchange documentHolderExchange = documentMetaTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
+            GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);            
             if (documentHolderExchange != null)
             {
                 //Existe mas de un legitimo tenedor requiere un mandatario
@@ -441,9 +469,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if(xmlParser.PaymentMeansID != "2")
             {
                 ValidateListResponse response = new ValidateListResponse();
-                response.ErrorMessage = $"Tipo factura diferente a Crédito.";
+                response.ErrorMessage = $"Tipo factura no es Crédito.";
                 response.IsValid = false;
-                response.ErrorCode = "89";
+                response.ErrorCode = "Regla: 89-(R): ";
                 response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                 validateResponses.Add(response);
                 return validateResponses;
@@ -500,14 +528,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
 
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
-            var xmlParser = new XmlParser(xmlBytes);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
 
-            var softwareModel = xmlParser.Fields.ToObject<SoftwareModel>();
+            SoftwareModel softwareModel = null;
+            NominaModel nominaModel = null;
+            XmlParser xmlParser = null;
+            XmlParseNomina xmlParserNomina = null;
+            var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+            {
+                xmlParserNomina = new XmlParseNomina(xmlBytes);
+                if (!xmlParserNomina.Parser())
+                    throw new Exception(xmlParserNomina.ParserError);
+
+                nominaModel = xmlParserNomina.Fields.ToObject<NominaModel>();
+            }
+            else
+            {
+                xmlParser = new XmlParser(xmlBytes);
+                if (!xmlParser.Parser())
+                    throw new Exception(xmlParser.ParserError);
+
+                softwareModel = xmlParser.Fields.ToObject<SoftwareModel>();
+            }
 
             var validator = new Validator();
-            validateResponses.Add(validator.ValidateSoftware(softwareModel, trackId));
+            validateResponses.Add(validator.ValidateSoftware(softwareModel, trackId, nominaModel: nominaModel));
 
             return validateResponses;
         }

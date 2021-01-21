@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Models.FreeBiller
@@ -10,31 +11,43 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
     {
         public string Id { get; set; }
 
+        [Required(ErrorMessage = "El nombre es requerido")]
         [DisplayName("Nombre")]
         public string Name { get; set; }
 
         [DisplayName("Apellidos")]
         public string LastName { get; set; }
 
+        [Required(ErrorMessage = "Nombres y apellidos requerido")]
         [DisplayName("Nombres y apellidos")]
         public string FullName { get; set; }
 
         [DisplayName("Tipo documento")]
         public string TypeDocId { get; set; }
 
+        [Required(ErrorMessage = "El Tipo documento es requerido")]
+        public string TypeDocIdHidden { get; set; }
+
+        [Required(ErrorMessage = "El tipo de documento es requerido")]
         public List<SelectListItem> TypesDoc { get; set; }
 
+        [Required(ErrorMessage = "El número de documento es requerido")]
         [DisplayName("Número documento")]
         public string NumberDoc { get; set; }
 
+        [Required(ErrorMessage = "El correo electrónico es requerido")]
+        [EmailAddress(ErrorMessage = "Correo inválido")]
         [DisplayName("Correo electrónico")]
         public string Email { get; set; }
 
+        [Required(ErrorMessage = "La contraseña es requerida")]
         [DisplayName("Contraseña")]
         public string Password { get; set; }
 
         [DisplayName("Perfil")]
         public int ProfileId { get; set; }
+
+        public List<int> ProfileIds { get; set; }
 
         public List<SelectListItem> Profiles { get; set; }
 

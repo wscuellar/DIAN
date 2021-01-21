@@ -62,7 +62,7 @@
         <div class="tab-base">
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
-                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay" >
+                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay">
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
@@ -78,6 +78,7 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.TypeDocId, new { @class = "control-label" })
                                                                     @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, new { @class = "form-control selectpicker" })
+                                                                    @Html.ValidationMessageFor(m => m.TypeDocId, "", new { @class = "text-danger" })
                                                                 </div>
                                                             </div>
 
@@ -85,6 +86,8 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.NumberDoc, new { @class = "control-label" })
                                                                     @Html.TextBoxFor(m => m.NumberDoc, new { @class = "form-control" })
+                                                                    @Html.ValidationMessageFor(m => m.NumberDoc, "", new { @class = "text-danger" })
+
                                                                 </div>
                                                             </div>
 
@@ -92,6 +95,7 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.FullName, new { @class = "control-label" })
                                                                     @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+                                                                    @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
                                                                 </div>
 
                                                             </div>
@@ -102,24 +106,25 @@
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.Email, new { @class = "control-label" })
                                                                     @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-3 padding-xs-0 padding-right-25">
-                                                                <div class="form-group">
-                                                                    @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
-                                                                    <div class="add-profile"><a href='@Url.Action("CreateProfile", "ProfileFreeBiller")'>+</a></div>
-                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker add-profile-button" })
+                                                                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-3 padding-xs-0">
-                                                                <br />
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker" })
+                                                                    @Html.ValidationMessageFor(m => m.ProfileId, "", new { @class = "text-danger" })
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-3 padding-xs-0 div-add-profile">
+                                                                <div class="add-profile"><i class="fa fa-plus-circle"></i>Añadir perfil</div>
                                                             </div>
                                                         </div>
                                                     </div>
 
                                                     <div class="panel-footer-grey text-right submit-container">
                                                         <button id="btnCancel" class="btn btn-success btn-radian-default">Cancelar</button>
-                                                        <button id="btnSend" class="btn btn-success btn-radian-success">Crear Usuario</button>
+                                                        <button type="submit" id="btnSend" class="btn btn-success btn-radian-success">Crear Usuario</button>
                                                     </div>
 
                                                 </div>
@@ -130,7 +135,7 @@
                                 </div>
                             </div>
 
-                            @Html.Partial("_checksGrid");
+                            @Html.Partial("_checksGrid")
 
                         </div>
 
@@ -153,62 +158,46 @@
     <script src="~/Content/js/file-validator.js"></script>
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
     <script src="~/Content/js/FreeBiller/FreeBiller.js"></script>
+    <script src="~/Content/js/custom-chips.js"></script>
+
 
     <script>
         $(document).ready(function () {
             var urlNewUser = "@Url.Action("FreeBillerUser")";
-
             $("#btnSend").click(function (e) {
-                showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
-                e.preventDefault();
-                var form = $("#create-user-form")
-                var data = {
-                    FullName: $('[name=FullName]').val(),
-                    TypeDocId: $('[name=TypeDocId]').val(),
-                    NumberDoc: $('[name=NumberDoc]').val(),
-                    Email: $('[name=Email]').val(),
-                    ProfileId: $('[name=ProfileId]').val(),
-                }
-                var url = '@Url.Action("CreateUser", "FreeBiller")';
-                var actionError = (error) => {
-                    console.log(error);
-                }
-                var actionSuccess = (success) => {
-                    var confirmMessage = success.Message;
-                    var operationCancel = () => {
-                        if (success.RedirectTo) {
-                            window.location.href = success.RedirectTo;
-                        }
+                var form = $("#create-user-form");
+                if ($(form).valid()) {
+                    showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
+                    e.preventDefault();
+                        var data = {
+                        FullName: $('[name=FullName]').val(),
+                        TypeDocId: $('[name=TypeDocId]').val(),
+                        NumberDoc: $('[name=NumberDoc]').val(),
+                        Email: $('[name=Email]').val(),
+                        ProfileIds: getProfiles(),
                     }
-                    var buttons = AlertExec(operationCancel);
-                    var clName = (success.Code == 200) ? "cancel-confirmation" : null;
-                    showConfirmation(confirmMessage, buttons, clName, operationCancel)
+                    var url = '@Url.Action("CreateUser", "FreeBiller")';
+                    var actionError = (error) => {
+                        console.log(error);
+                    }
+                    var actionSuccess = (success) => {
+                        var confirmMessage = success.Message;
+                        var operationCancel = () => {
+                            if (success.RedirectTo) {
+                                window.location.href = success.RedirectTo;
+                            }
+                        }
+                        var buttons = AlertExec(operationCancel);
+                        var clName = (success.Code == 200) ? "cancel-confirmation" : null;
+                        showConfirmation(confirmMessage, buttons, clName, operationCancel)
+                    }
+                    createUser(url, 'POST', data, actionError, actionSuccess)
                 }
-                createUser(url, 'POST', data, actionError, actionSuccess)
-
             })
-            $("#ProfileId").change(function () {
-                $("input:checkbox:checked").prop("checked",false)
-                var idProfile = $(this).val();
-                var url = '@Url.Action("GetIdsByProfile", "FreeBiller")';
-                var dataAjax = {
-                    profileId: idProfile
-                }
-                var errorAction = (error) => {
-                    console.log(error);
-                }
-                var successAction = (result) => {
-                    result.forEach(function (id) {
-                        $("input#" + id).prop("checked", "checked");
-                    });
-                }
-                ajaxFunction(url, "POST", dataAjax, errorAction, successAction);
-            });
             $("#btnCancel").click(function (e) {
                 e.preventDefault()
                 window.location.href = urlNewUser;
             });
-
         });
     </script>
 

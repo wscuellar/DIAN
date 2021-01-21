@@ -724,6 +724,7 @@
     <Content Include="Content\js\bootstrap.min.js" />
     <Content Include="Content\js\common\common.js" />
     <Content Include="Content\js\contributor\contributor.js" />
+    <Content Include="Content\js\custom-chips.js" />
     <Content Include="Content\js\daterangepicker.min.js" />
     <Content Include="Content\js\demo\bg-images.js" />
     <Content Include="Content\js\demo\charts.js" />
@@ -2952,6 +2953,7 @@
     <Content Include="Views\Document\ExportPDF.cshtml" />
     <Content Include="Views\User\_userexLogin.cshtml" />
     <Content Include="Views\FreeBiller\_checksGrid.cshtml" />
+    <Content Include="Views\ProfileFreeBiller\_checksGrid.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

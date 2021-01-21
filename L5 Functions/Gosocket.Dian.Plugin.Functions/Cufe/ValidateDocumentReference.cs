@@ -37,21 +37,7 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an IdDocumentReference in the request body");
             if (string.IsNullOrEmpty(data.EventCode))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an EventCode in the request body");
-            if (string.IsNullOrEmpty(data.DocumentTypeIdRef))
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an DocumentTypeIdRef in the request body");
-
-            ////Campos obligatorios para endoso
-            //if ((Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia)
-            //    || (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
-            //    || (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad))
-            //{
-            //    if (string.IsNullOrEmpty(data.IssuerPartyCode))
-            //        return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an IssuerPartyCode in the request body");
-            //    if (string.IsNullOrEmpty(data.IssuerPartyName))
-            //        return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass an IssuerPartyName in the request body");
-            //}
-
-
+           
             try
             {
                 var validateResponses = ValidatorEngine.Instance.StartValidateDocumentReference(data);

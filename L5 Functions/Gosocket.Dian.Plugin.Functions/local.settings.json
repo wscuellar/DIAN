@@ -66,7 +66,14 @@
     "TestHabTechnicalKey": "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c",
     "TestHabSoftwarePin": "20191",
     "ApplicationResponseProcessUrl": "https://gtpa-function-commons-test.azurewebsites.net/api/ApplicationResponseProcess?code=ocMBoXmOlNNffsNts7H4M4VMJiqoiAk3QBKhkRpkzIGWpEiQQ3SiQQ==",
-    "MAX_Attorney": "20"
+    "MAX_Attorney": "20",
+    "CosmosDbEndpointUrl": "https://gtpa-cosmosdb-document-test.documents.azure.com:443/",
+    "CosmosDbAccountEndpointUrl": "AccountEndpoint=https://gtpa-cosmosdb-document-test.documents.azure.com:443/;AccountKey=Kz5FGFLwRVrWYuwDJtYOoQsuSRF3qgPvIz7hPa5Bp2XgSBwhpt42UuKGtT12GMbvaHVl4UtK7ud344Mco1pomQ==;",
+    "CosmosDbAuthorizationKey": "Kz5FGFLwRVrWYuwDJtYOoQsuSRF3qgPvIz7hPa5Bp2XgSBwhpt42UuKGtT12GMbvaHVl4UtK7ud344Mco1pomQ==",
+    "CosmosDbDataBaseId": "DocumentsData",
+    "CosmosDbCollectionID": "Documents"
+
+
     // Test UAT INDRA
     //"Environment": "Test",
     //"AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",

@@ -1829,6 +1829,7 @@ input:checked + .slider {
     width: 95%;
     margin: auto !important;
     margin-top: 20px !important;
+    padding-left: 3%;
 }
 
 #divMain .titleMenu, #divMain .subTitleMenu {
@@ -1844,15 +1845,10 @@ input:checked + .slider {
 }
 
 .add-profile {
-    position: absolute;
-    right: 6px;
-    height: 43px;
-    width: 22px;
-    background-color: #348441;
     border-radius: 0px 5px 5px 0px;
-    color: white;
-    text-align: center;
-    font-size: 20px;
+    color: #348441;
+    font-size: 14px;
+    cursor: pointer;
 }
 
 .add-profile a{
@@ -1862,12 +1858,6 @@ input:checked + .slider {
     top: 7px;
     left: 1px;
 }
-
-.add-profile-button button {
-    border-right: none !important;
-    border-radius: 4px 0px 0px 4px;
-}
-
 
 .cancel-confirmation .modal-dialog .media-body {
     padding: 25px 20% 0px 20%;
@@ -1893,4 +1883,61 @@ input:checked + .slider {
     font-weight: bold;
     line-height: 16px;
     color: #2C323C;
+}
+
+.div-add-profile{
+    margin: 31px 0px 11px 0;
+}
+.fa-plus-circle:before {
+    margin-right: 6px;
+}
+
+
+
+
+ul#list {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    display: inline-block;
+}
+
+    ul#list li {
+        display: inline-block;
+        background: #9AB4B0;
+        color: white;
+        padding: 3px 5px 3px 10px;
+        border-radius: 15px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+
+ul#list li a {
+    color: #9AB4B0;
+    text-decoration: none;
+    margin-right: 5px;
+    font-size: 19px;
+    background: white;
+    width: 16px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-flex;
+    transform: matrix(0.71, 0.64, -0.78, 0.71, 0, 0);
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    top: 2px;
+    left: -2px;
+    position: relative;
+}
+
+ul#list li a:hover {
+    color: red;
+}
+
+
+#TypeDocIdHidden {
+    position: absolute;
+    left: 0;
+    z-index: -1;
 }
