@@ -11,7 +11,6 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
     {
         public string Id { get; set; }
 
-        [Required(ErrorMessage = "El nombre es requerido")]
         [DisplayName("Nombre")]
         public string Name { get; set; }
 
@@ -19,28 +18,27 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         public string LastName { get; set; }
 
         [Required(ErrorMessage = "Nombres y apellidos requerido")]
+        [MaxLength(30, ErrorMessage = "Máximo {1} carácteres")]
         [DisplayName("Nombres y apellidos")]
         public string FullName { get; set; }
 
         [DisplayName("Tipo documento")]
+        [Required(ErrorMessage = "El tipo de documento es requerido")]
         public string TypeDocId { get; set; }
 
-        [Required(ErrorMessage = "El Tipo documento es requerido")]
-        public string TypeDocIdHidden { get; set; }
-
-        [Required(ErrorMessage = "El tipo de documento es requerido")]
         public List<SelectListItem> TypesDoc { get; set; }
 
         [Required(ErrorMessage = "El número de documento es requerido")]
+        [MaxLength(30, ErrorMessage = "Máximo {1} carácteres")]
         [DisplayName("Número documento")]
         public string NumberDoc { get; set; }
 
         [Required(ErrorMessage = "El correo electrónico es requerido")]
+        [MaxLength(30, ErrorMessage = "Máximo {1} carácteres")]
         [EmailAddress(ErrorMessage = "Correo inválido")]
         [DisplayName("Correo electrónico")]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "La contraseña es requerida")]
         [DisplayName("Contraseña")]
         public string Password { get; set; }
 
