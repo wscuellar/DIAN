@@ -9,8 +9,8 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
     {
         public UserFiltersFreeBillerModel()
         {
-            this.Page = (int)default;
-            this.MaxItemCount = 10;
+            this.Page = 1;
+            this.PageSize = 10;
         }
 
         [DisplayName("Tipo Documento")]
@@ -22,18 +22,17 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         [DisplayName("Nombre Completo")]
         public string FullName { get; set; }
 
-        [DisplayName("Estado")]
+        [DisplayName("Perfil")]
         public int ProfileId { get; set; }
 
         public List<SelectListItem> DocTypes { get; set; }
 
         public List<SelectListItem> Profiles { get; set; }
 
-        public List<UserFreeBillerModel> Users { get; set; }
-
+        public UserFreeBillerContainerModel UserContainer { get; set; }
 
         public int Page { get; set; }
 
-        public int MaxItemCount { get; set; }
+        public int PageSize { get; set; }
     }
 }

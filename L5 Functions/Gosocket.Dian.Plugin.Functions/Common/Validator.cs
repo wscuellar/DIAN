@@ -362,6 +362,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             trackId = trackId.ToLower();
+            GlobalContributor softwareProvider = null;
+            GlobalRadianOperations softwareProviderRadian = null;
+            bool habilitadoRadian = false;
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -399,6 +402,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var senderCodeProvider = nitModel.ProviderCode;
             var senderCodeProviderDigit = nitModel.ProviderCodeDigit;
+            var softwareId = nitModel.SoftwareId;
 
             var receiverCode = nitModel.ReceiverCode;
             var receiverCodeSchemeNameValue = nitModel.ReceiverCodeSchemaValue;
@@ -436,10 +440,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //IssuerParty Adquiriente/deudor de la Factura Electrónica evento Endoso Electronico
-            if (nitModel.IssuerPartySchemeAgencyCode == "195")
+            if (nitModel.ResponseCode == "043" )
             {
-                var issuerPartyCode = nitModel.IssuerPartyCode;
-                var IssuerPartyCodeDigit = nitModel.IssuerPartySchemeCode;
+                var issuerPartyCode = nitModel.IssuerPartyID;
+                var IssuerPartyCodeDigit = nitModel.IssuerPartySchemeID;
                 if (string.IsNullOrEmpty(IssuerPartyCodeDigit) || IssuerPartyCodeDigit == "undefined") IssuerPartyCodeDigit = "11";
                 if (ValidateDigitCode(issuerPartyCode, int.Parse(IssuerPartyCodeDigit)))
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAH63", ErrorMessage = "(R) DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -494,7 +498,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
             else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
-            var softwareProvider = (documentMeta.DocumentTypeId == "96") ? GetContributorInstanceCache(providerCode) : GetContributorInstanceCache(softwareProviderCode);
+                        
+            if (documentMeta.DocumentTypeId == "96")
+            {               
+                senderCodeProvider = senderCode != senderCodeProvider ? senderCodeProvider : senderCode;
+                softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                              senderCodeProvider, false, "Habilitado", softwareId);
+                if(softwareProviderRadian != null)
+                {
+                    switch (softwareProviderRadian.SoftwareType)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            if (softwareProviderRadian.TecnologicalSupplier || softwareProviderRadian.Factor || softwareProviderRadian.NegotiationSystem
+                                || softwareProviderRadian.ElectronicInvoicer || softwareProviderRadian.IndirectElectronicInvoicer)
+                                habilitadoRadian = true;
+                            break;
+                    }
+                }               
+            }
+            else
+            {
+                softwareProvider = GetContributorInstanceCache(softwareProviderCode);
+            }                    
+                               
             if (string.IsNullOrEmpty(providerCodeDigit) || providerCodeDigit == "undefined") providerCodeDigit = "11";
             if (string.IsNullOrEmpty(softwareProviderCodeDigit) || softwareProviderCodeDigit == "undefined") softwareProviderCodeDigit = "11";
             if (ValidateDigitCode(documentMeta.DocumentTypeId == "96" ? providerCode : softwareProviderCode, documentMeta.DocumentTypeId == "96" ? int.Parse(providerCodeDigit) : int.Parse(softwareProviderCodeDigit)))
@@ -516,8 +545,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId == "05") softwareProviderErrorCode = "DSAB19b";
             else if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
             else if (documentMeta.DocumentTypeId == "92") softwareProviderErrorCode = "DAB19b";
+            
             //Validar habilitacion RADIAN
             else if (documentMeta.DocumentTypeId == "96") softwareProviderErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB19b;
+
+            string softwareProviderCodeHab = habilitadoRadian ? softwareProviderRadian?.PartitionKey : softwareProvider?.Code;
 
             if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
             {
@@ -533,30 +565,43 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     else
                         responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
-                if (softwareProvider != null)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProvider.Code} Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                if (softwareProvider != null || habilitadoRadian)
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProvider?.Code} NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
             else if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
-                if (sender?.StatusId == (int)ContributorStatus.Enabled)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                else
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
-                if (!string.IsNullOrEmpty(senderCodeProvider) && senderCode != senderCodeProvider)
+                //Valida software proveedor RADIAN Habilitado
+                if (documentMeta.DocumentTypeId == "96")
                 {
-                    if (sender2?.StatusId == (int)ContributorStatus.Enabled)
-                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    if (softwareProviderRadian != null && habilitadoRadian)
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     else
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
-
-                if (softwareProvider?.StatusId == (int)ContributorStatus.Enabled)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProvider.Code} Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProvider?.Code} NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                {
+                    if (sender?.StatusId == (int)ContributorStatus.Enabled)
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                    if (!string.IsNullOrEmpty(senderCodeProvider) && senderCode != senderCodeProvider)
+                    {
+                        if (sender2?.StatusId == (int)ContributorStatus.Enabled)
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else
+                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+
+                    if (softwareProvider?.StatusId == (int)ContributorStatus.Enabled)
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProviderCodeHab} Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProviderCodeHab} NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                }
             }
 
             foreach (var r in responses)
@@ -610,7 +655,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida cambio legitimo tenedor
             string senderCode = nitModel.SenderCode;
             var receiverCode = nitModel.ReceiverCode;            
-            string sender2DvErrorCode = "Regla: 89-(R): ";        
+            string sender2DvErrorCode = "Regla: 89-(R): ";
+            string softwareId = xmlParserCude.Fields["SoftwareId"].ToString();
 
             //Endoso en Blanco
             if ( (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia ||
@@ -619,11 +665,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 party.SenderParty = nitModel.SenderCode;
             }
                 
-                //valida si existe los permisos del mandatario
+            //valida si existe los permisos del mandatario
             if (party.SenderParty != xmlParserCude.ProviderCode)
             {
-                var responseVal = ValidateFacultityAttorney(party.TrackId, xmlParserCude.ProviderCode, senderCode,
-                party.ResponseCode, xmlParserCude.NoteMandato);
+                var responseVal = ValidateFacultityAttorney(nitModel, party, xmlParserCude);              
                 if (responseVal != null)
                 {
                     foreach (var item in responseVal)
@@ -1199,39 +1244,44 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //valor total Endoso Electronico AR
             string valueTotalEndoso = nitModel.ValorTotalEndoso;
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
-            string valueDiscountRateEndoso = nitModel.TasaDescuento;
-            DateTime fechaVencimientoFactura = Convert.ToDateTime(xmlParserCufe.PaymentDueDate);
-            DateTime fechaEndDateEndoso = Convert.ToDateTime(nitModel.ValidityPeriodEndDate);
-            string customizationId = nitModel.CustomizationId;
+            string valueDiscountRateEndoso = nitModel.TasaDescuento;           
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validEndoso = false;
 
-            //Compara fecha vencimiento factura / ValidityPeriod EndDate Endoso
-            if(customizationId != "372" && fechaVencimientoFactura != fechaEndDateEndoso)
+            //Valida informacion Endoso en propiedad                       
+            if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
             {
-                validEndoso = true;
-                responses.Add(new ValidateListResponse
+                //Valida informacion Endoso                           
+                if (String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
                 {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAH59-(R): ",
-                    ErrorMessage = $"{(string)null} La fecha de vencimiento no correspo a la fecha de vencimiento de la factura electrónica de venta.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAI07b-(R): ",
+                        ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento para el evento: Endoso en Propiedad",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    return responses;
+                }
 
-            //Valida informacion Endoso                           
-            if (String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
-            {
-                responses.Add(new ValidateListResponse
+                //Calculo valor de la negociación
+                int resultNegotiationValue = ((Int32)newAmountTV * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
+                resultNegotiationValue = resultNegotiationValue / 100;
+
+                //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
+                if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
                 {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAI07b-(R): ",
-                    ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-                return responses;
+                    validEndoso = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: AAI07b-(R): ",
+                        ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento para el evento: Endoso en Propiedad .",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
             }
 
             if (xmlParserCude.Fields["listID"].ToString() != "2")
@@ -1252,19 +1302,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     totalValueReceiver += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
                 }
 
-                if (totalValueReceiver != totalValueSender)
-                {
-                    validEndoso = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAF19-(R): ",
-                        ErrorMessage = $"{(string)null} El valor no coincide con la sumatoria del evento //cac:ReceiverParty/cac:PartyLegalEntity/cbc:CorporateStockAmount.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
                 if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
                 {
                     validEndoso = true;
@@ -1272,30 +1309,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: AAI07c-(R): ",
-                        ErrorMessage = $"{(string)null} El valor informado es diferente a la sumatoria de los elementos cbd:CorporateStockAmount del titular del evento.",
+                        ErrorCode = "Regla: AAF19-(R): ",
+                        ErrorMessage = $"{(string)null} la sumatoria del elemento: cbc:CorporateStockAmount no coincide con el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value ",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
-                }
-            }
-
-            //Calculo valor de la negociación
-            int resultNegotiationValue = ((Int32)newAmountTV * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
-            resultNegotiationValue = resultNegotiationValue / 100;
-
-            //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
-            if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
-            {
-                validEndoso = true;
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "Regla: AAI07b-(R): ",
-                    ErrorMessage = $"{(string)null} El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento .",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
+                }              
+            }            
 
             if (validEndoso)
                 return responses;
@@ -1352,80 +1371,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return null;
         }
         #endregion
-
+        
         #region ValidateFacultityAttorney
-        private List<ValidateListResponse> ValidateFacultityAttorney(string cufe, string issueAtorney, string senderCode, string eventCode, string noteMandato)
+        private List<ValidateListResponse> ValidateFacultityAttorney(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude)       
         {
             DateTime startDate = DateTime.UtcNow;
+            string issueAtorney = xmlParserCude.ProviderCode;
+            string eventCode = party.ResponseCode;
+            string cufe = party.TrackId;
+            string senderCode = nitModel.SenderCode;
+            string noteMandato = xmlParserCude.NoteMandato;
+            string softwareId = xmlParserCude.Fields["SoftwareId"].ToString();
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var sender = GetContributorInstanceCache(issueAtorney);
             bool validError = false;
-            //Valida exista contributor en ambiente Habilitacion y Test
-            if (ConfigurationManager.GetValue("Environment") == "Hab" ||
-                ConfigurationManager.GetValue("Environment") == "Test")
-            {
-                if (sender != null)
-                {
-                    if (sender.StatusId != 3 && sender.StatusId != 4)
-                    {
-                        validError = true;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = $"{(string)null} Emisor de servicios no autorizado.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                }
-                else
-                {
-                    validError = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "89",
-                        ErrorMessage = $"{(string)null} Emisor de servicios no autorizado.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-            }
-            //Valida exista contributor en ambiente Productivo
-            else if (ConfigurationManager.GetValue("Environment") == "Prod")
-            {
-                if (sender != null)
-                {
-                    if (sender.StatusId != 4)
-                    {
-                        validError = true;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = $"{(string)null} Emisor de servicios no autorizado.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                }
-                else
-                {
-                    validError = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "89",
-                        ErrorMessage = $"{(string)null} Emisor de servicios no autorizado.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-            }
+          
             //Valida exista informacion mandato - Mandatario - CUFE para eventos disitintos a Mandato 043
             if (eventCode != "043" && !validError)
             {
@@ -1450,7 +1410,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ) && docReferenceAttorney.Active)
                         {
                             //Valida se encuetre habilitado Modo Operacion RadianOperation
-                            var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(docReferenceAttorney.IssuerAttorney, false, "Habilitado");
+                            var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                                docReferenceAttorney.IssuerAttorney, false, "Habilitado", softwareId);
                             if (globalRadianOperation == null)
                             {
                                 validError = true;
@@ -1512,48 +1473,52 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                             }
 
-                            string[] tempFacultityCode = docReferenceAttorney.FacultityCode.Split(';');
-                            foreach (string codeFacultity in tempFacultityCode)
+                            if (!validError)
                             {
-                                //Valida permisos/facultades firma para el evento emitido
-                                var filter = $"{codeFacultity}-{docReferenceAttorney.Actor}";                                
-                                var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
-                                if (attorneyFacultity != null)
+                                string[] tempFacultityCode = docReferenceAttorney.FacultityCode.Split(';');
+                                foreach (string codeFacultity in tempFacultityCode)
                                 {
-                                    if ((attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0") && codeFacultity != "MR91")
-                                    {                                       
-                                        //Valida exista note mandatario
-                                        if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                    //Valida permisos/facultades firma para el evento emitido
+                                    var filter = $"{codeFacultity}-{docReferenceAttorney.Actor}";
+                                    var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
+                                    if (attorneyFacultity != null)
+                                    {
+                                        if ((attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0") && codeFacultity != "MR91")
+                                        {
+                                            //Valida exista note mandatario
+                                            if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                            {
+                                                validError = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                                    ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                            }
+
+                                            //Si mandatario tiene permisos/facultades y esta habilitado para emitir documentos
+                                            if (!validError)
+                                                return null;
+
+                                        }
+                                        else if (codeFacultity != "MR91")
                                         {
                                             validError = true;
                                             responses.Add(new ValidateListResponse
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                                ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                                ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeMandato,
+                                                ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageMandato,
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
-
-                                        //Si mandatario tiene permisos/facultades y esta habilitado para emitir documentos
-                                        if(!validError)
-                                            return null;
                                     }
-                                    else if(codeFacultity != "MR91")
-                                    {
-                                        validError = true;
-                                        responses.Add(new ValidateListResponse
-                                        {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeMandato,
-                                            ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageMandato,
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
-                                }                              
-                            }
+                                }
+                            }                           
                         }
                         else
                         {
@@ -1573,6 +1538,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (validError)              
                     return responses;                     
             }
+            if (validError)
+                return responses;
             return null;
         }
         #endregion
@@ -1942,24 +1909,65 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference, issuerPartyCode, issuerPartyName);
                     if (resultValidateCufe[0].IsValid)
                     {
+                        TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
                         TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-                        var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyModel.cufe, attorneyModel.cufe);
-                        if(companyId == documentMetaCUFE.SenderCode)
+                        var docHolderExchange = TableManagerGlobalDocHolderExchange.FindhByCufeExchange<GlobalDocHolderExchange>(attorneyModel.cufe.ToLower(), true);
+                        if(docHolderExchange != null)
                         {
-                            attorney.Add(attorneyModel);
+                            //Existe mas de un legitimo tenedor requiere un mandatario
+                            string[] endosatarios = docHolderExchange.PartyLegalEntity.Split('|');
+                            if (endosatarios.Length == 1)
+                            {
+                                if(docHolderExchange.PartyLegalEntity == companyId)
+                                {
+                                    attorney.Add(attorneyModel);
+                                }
+                                else
+                                {
+                                    validate = false;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "Regla: 89-(R): ",
+                                        ErrorMessage = "Emisor del mandato no corresponde al CUFE referenciado como el legítimo tenedor de la factura",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                validate = false;
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "Regla: 89-(R): ",
+                                    ErrorMessage = "Factura cuenta con mas de un Legitimo tenedor, no es posible crear un mandato",
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                         else
                         {
-                            validate = false;
-                            responses.Add(new ValidateListResponse
+                            var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyModel.cufe, attorneyModel.cufe);
+                            if (companyId == documentMetaCUFE.SenderCode)
                             {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "Regla: 89-(R): ",
-                                ErrorMessage = "CUFE no se encuentra referenciado no corresponde al emisor",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                                attorney.Add(attorneyModel);
+                            }
+                            else
+                            {
+                                validate = false;
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "Regla: 89-(R): ",
+                                    ErrorMessage = "Emisor del mandato no corresponde al CUFE referenciado como facturador electrónico",
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }                      
                     }
                     else
                     {
@@ -3308,7 +3316,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
 
                                 //Solicitud de Disponibilización
-                                if (documentMeta.Where(t => t.EventCode == "036" && t.SenderCode == nitModel.SenderCode).ToList().Count > decimal.Zero)
+                                string senderCode = nitModel.listID == "1" ? xmlParserCude.Fields["SenderCode"].ToString() : nitModel.SenderCode;
+                                if (documentMeta.Where(t => t.EventCode == "036" 
+                                    && (t.SenderCode == senderCode)).ToList().Count > decimal.Zero)
                                 {
                                     var newAmountTV = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => t.EventCode == "036").NewAmountTV;
                                     var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode, newAmountTV);
@@ -4400,7 +4410,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             response.errorMessageReceiverFETV = "El adquiriente no esta autorizado para recibir esté evento";
             response.errorMessageEndoso = "No se puede registrar este evento si previamente se ha registrado el evento Pago de la factura electrónica de venta como título valor";
             response.errorCodeMandato = "Regla: LGC36-(R): ";
-            response.errorMessageMandato = "El mandatario no puede enviareste evento ya que no cuenta con un mandato vigente.";
+            response.errorMessageMandato = "El mandatario no puede enviar este evento ya que no cuenta con un mandato vigente.";
 
             //SenderPArty
             if (eventCode == "030") response.errorCodeFETV = "Regla: AAF01a-(R): ";

@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Domain.Utils;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Web.Common;
@@ -994,7 +995,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = new AuthToken();
             if (!User.IsInAnyRole("Administrador", "Super"))
             {
-               auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
+                auth = dianAuthTableManager.Find<AuthToken>($"{User.IdentificationTypeId()}|{User.UserCode()}", User.ContributorCode());
             }
             else
             {
@@ -1205,5 +1206,97 @@ namespace Gosocket.Dian.Web.Controllers
             }
             return result;
         }
+
+        #region ContributorUserLogin
+
+        [HttpPost]
+        [ExcludeFilter(typeof(Authorization))]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ContributorUserLogin(UserLoginViewModel model)
+        {
+            ClearUnnecessariesModelStateErrorsForAuthentication(false);
+
+            var recaptchaValidation = IsValidCaptcha(model.RecaptchaToken);
+            if (!recaptchaValidation.Item1)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", recaptchaValidation.Item2);
+                return View("CompanyLogin", model);
+            }
+            if (!ModelState.IsValid)
+                return View("CompanyLogin", model);
+
+            var pk = $"{model.IdentificationType}|{model.UserCode}";
+            var rk = $"{model.CompanyCode}";
+
+            var user = userService.GetByCodeAndIdentificationTyte(model.UserCode, model.IdentificationType);
+
+            if (user == null)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Error de ingreso, verifique sus datos");
+                return View("CompanyLogin", model);
+            }
+
+            var result = await SignInManager.PasswordSignInAsync(user.Email, model.Password, true, shouldLockout: true);
+
+            //var pass = UserManager.PasswordHasher.VerifyHashedPassword(model.Password, user.PasswordHash);
+            if (result != SignInStatus.Success)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Contraseña incorrecta");
+                return View("CompanyLogin", model);
+            }
+
+            if (!Convert.ToBoolean(user.Active))
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Usuario no se encuentra activo");
+                return View("CompanyLogin", model);
+            }
+
+            UsersFreeBillerProfile freeBiller = userService.GetUserFreeBillerProfile(u => u.CompanyCode == model.CompanyCode && u.CompanyIdentificationType == model.CompanyIdentificationType);
+
+            var contributor = contributorService.GetByCode(model.CompanyCode);
+            if (freeBiller == null)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no asociada a representante legal.");
+                return View("CompanyLogin", model);
+            }
+
+            if (contributor.StatusRut == (int)StatusRut.Cancelled)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Contribuyente tiene RUT en estado cancelado.");
+                return View("CompanyLogin", model);
+            }
+
+            if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)Domain.Common.ContributorStatus.Enabled)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no se encuentra habilitada.");
+                return View("CompanyLogin", model);
+            }
+
+            var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
+            if (auth == null)
+            {
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.ProfileUser.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                dianAuthTableManager.InsertOrUpdate(auth);
+            }
+            else
+            {
+                TimeSpan timeSpan = DateTime.UtcNow.Subtract(auth.Timestamp.DateTime);
+                if (timeSpan.TotalMinutes > 60 || string.IsNullOrEmpty(auth.Token))
+                {
+                    auth.UserId = user.Id;
+                    auth.Email = user.Email;
+                    auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.ProfileUser.GetDescription();
+                    auth.Token = Guid.NewGuid().ToString();
+                    auth.Status = true;
+                    dianAuthTableManager.InsertOrUpdate(auth);
+                }
+            }
+            UserManager.AddClaim(user.Id, new System.Security.Claims.Claim(AuthType.ProfileUser.GetDescription(), user.Id));
+            var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
+            return Redirect(redirectUrl);
+        }
+
+        #endregion
     }
 }

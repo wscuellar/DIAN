@@ -136,7 +136,7 @@ namespace Gosocket.Dian.Web.Controllers
                 // Endosos
                 EndorsementPropertyTotalRequired = model.EndorsementTotalRequired,
                 EndorsementPropertyTotalAcceptedRequired = model.EndorsementTotalAcceptedRequired,
-                EndorsementProcurementTotalRequired = model.EndorsementProcurationTotalAcceptedRequired,
+                EndorsementProcurementTotalRequired = model.EndorsementProcurationTotalRequired,
                 EndorsementProcurementTotalAcceptedRequired = model.EndorsementProcurationTotalAcceptedRequired,
                 EndorsementGuaranteeTotalRequired = model.EndorsementWarrantyTotalRequired,
                 EndorsementGuaranteeTotalAcceptedRequired = model.EndorsementWarrantyTotalAcceptedRequired,
@@ -199,9 +199,9 @@ namespace Gosocket.Dian.Web.Controllers
                 // Endosos
                 EndorsementTotalRequired = testSet.EndorsementPropertyTotalRequired,
                 EndorsementTotalAcceptedRequired = testSet.EndorsementPropertyTotalAcceptedRequired,
-                EndorsementWarrantyTotalRequired = testSet.EndorsementGuaranteeTotalAcceptedRequired,
+                EndorsementWarrantyTotalRequired = testSet.EndorsementGuaranteeTotalRequired,
                 EndorsementWarrantyTotalAcceptedRequired = testSet.EndorsementGuaranteeTotalAcceptedRequired,
-                EndorsementProcurationTotalRequired = testSet.EndorsementGuaranteeTotalRequired,
+                EndorsementProcurationTotalRequired = testSet.EndorsementProcurementTotalRequired,
                 EndorsementProcurationTotalAcceptedRequired = testSet.EndorsementProcurementTotalAcceptedRequired,
                 EndorsementCancellationTotalRequired = testSet.EndorsementCancellationTotalRequired,
                 EndorsementCancellationTotalAcceptedRequired = testSet.EndorsementCancellationTotalAcceptedRequired,
@@ -256,7 +256,7 @@ namespace Gosocket.Dian.Web.Controllers
                 // Endosos
                 EndorsementPropertyTotalRequired = model.EndorsementTotalRequired,
                 EndorsementPropertyTotalAcceptedRequired = model.EndorsementTotalAcceptedRequired,
-                EndorsementProcurementTotalRequired = model.EndorsementProcurationTotalAcceptedRequired,
+                EndorsementProcurementTotalRequired = model.EndorsementProcurationTotalRequired,
                 EndorsementProcurementTotalAcceptedRequired = model.EndorsementProcurationTotalAcceptedRequired,
                 EndorsementGuaranteeTotalRequired = model.EndorsementWarrantyTotalRequired,
                 EndorsementGuaranteeTotalAcceptedRequired = model.EndorsementWarrantyTotalAcceptedRequired,
@@ -308,7 +308,7 @@ namespace Gosocket.Dian.Web.Controllers
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.AceptacionTacita.GetDescription(), Counter1 = testSet.AutomaticAcceptanceTotalAcceptedRequired, Counter2 = testSet.AutomaticAcceptanceTotalRequired, Counter3 = 0 });
 
                 //Rechazo factura electrónica
-                events.Add(new EventCountersViewModel() { EventName = EventStatus.Rejected.GetDescription(), Counter1 = testSet.RejectInvoiceTotalAcceptedRequired, Counter2 = testSet.RejectInvoiceTotalAcceptedRequired, Counter3 = 0 });
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Rejected.GetDescription(), Counter1 = testSet.RejectInvoiceTotalAcceptedRequired, Counter2 = testSet.RejectInvoiceTotalRequired, Counter3 = 0 });
 
                 // Solicitud disponibilización
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.SolicitudDisponibilizacion.GetDescription(), Counter1 = testSet.ApplicationAvailableTotalAcceptedRequired, Counter2 = testSet.ApplicationAvailableTotalRequired, Counter3 = 0 });

@@ -612,6 +612,8 @@
     <Content Include="Content\images\Svg\EstadoFacturaRadian1.svg" />
     <Content Include="Content\images\Svg\EstadoFacturaRadian2.svg" />
     <Content Include="Content\images\Svg\Emisor.svg" />
+    <Content Include="Content\images\Svg\UsuarioAutorizado.svg" />
+    <Content Include="Content\images\Svg\RepresentanteLegal.svg" />
     <Content Include="Content\images\Svg\Loaded.svg" />
     <Content Include="Content\images\Svg\Factor.svg" />
     <Content Include="Content\images\Svg\OperacionIndirecta.svg" />
@@ -722,6 +724,7 @@
     <Content Include="Content\js\bootstrap.min.js" />
     <Content Include="Content\js\common\common.js" />
     <Content Include="Content\js\contributor\contributor.js" />
+    <Content Include="Content\js\custom-chips.js" />
     <Content Include="Content\js\daterangepicker.min.js" />
     <Content Include="Content\js\demo\bg-images.js" />
     <Content Include="Content\js\demo\charts.js" />
@@ -744,6 +747,7 @@
     <Content Include="Content\js\demo\ui-panels.js" />
     <Content Include="Content\js\demo\widgets.js" />
     <Content Include="Content\js\file-validator.js" />
+    <Content Include="Content\js\FreeBiller\FreeBiller.js" />
     <Content Include="Content\js\gosocket\gosocket-search.js" />
     <Content Include="Content\js\gosocket\gosocket.js" />
     <Content Include="Content\js\gosocket\typeahead.js" />
@@ -2941,12 +2945,15 @@
     <Content Include="Views\OthersElectronicDocAssociated\_setupOperationModeForm.cshtml" />
     <Content Include="Views\OthersElectronicDocAssociated\_setupOperationModeList.cshtml" />
     <Content Include="Views\Document\PrintSupportDocument.cshtml" />
-    <Content Include="Views\FreeBiller\EditFreeBillerUser.cshtml" />
+    <Content Include="Views\FreeBiller\EditOrViewFreeBillerUser.cshtml" />
     <Content Include="Views\FreeBiller\FreeBillerUser.cshtml" />
     <Content Include="Views\FreeBiller\CreateUser.cshtml" />
     <Content Include="Views\FreeBiller\_usersFreeBiller.cshtml" />
     <Content Include="Views\ProfileFreeBiller\CreateProfile.cshtml" />
     <Content Include="Views\Document\ExportPDF.cshtml" />
+    <Content Include="Views\User\_userexLogin.cshtml" />
+    <Content Include="Views\FreeBiller\_checksGrid.cshtml" />
+    <Content Include="Views\ProfileFreeBiller\_checksGrid.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -20,6 +20,9 @@
     .modal-dialog {
         min-width: 800px;
     }
+    .cancel-confirmation .modal-dialog {
+        min-width: 620px;
+    }
     .modal .panel-body {
         padding-left: 0;
     }

@@ -411,8 +411,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool valid = true;
 
             //Valida existe cambio legitimo tenedor
-            GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
-            //var documentHolderExchange = documentHolderExchange.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower()).ToList().FirstOrDefault(g => g.Active = true);
+            GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);            
             if (documentHolderExchange != null)
             {
                 //Existe mas de un legitimo tenedor requiere un mandatario
