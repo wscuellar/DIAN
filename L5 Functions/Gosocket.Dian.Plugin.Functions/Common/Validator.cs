@@ -3984,9 +3984,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                          {
                              IsValid = false,
                              Mandatory = true,
-                             ErrorCode = "Regla: LGC02-(R): ",
+                             ErrorCode = "Regla: DC24z-(R): ",
                              ErrorMessage =
-                                "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente.",
+                                "No se puede generar el evento de Reclamo  pasado los 3 días hábiles de la fecha de generación " +
+                                "del evento Recibo del bien y prestación del servicio..",
                              ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                          }
                         : new ValidateListResponse
@@ -4223,9 +4224,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        {
                            IsValid = false,
                            Mandatory = true,
-                           ErrorCode = "Regla: 89-(R): ",
+                           ErrorCode = "Regla: DC24x-(R): ",
                            ErrorMessage =
-                               "la fecha debe ser mayor o igual al evento referenciado con el CUFE/CUDE",
+                               "No se puede generar el evento Pago de la factura electrónica de venta " +
+                               "como título valor antes de la fecha de generación del documento referenciado.",
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
                     break;
