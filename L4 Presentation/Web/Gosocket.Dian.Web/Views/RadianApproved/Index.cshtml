@@ -3,8 +3,6 @@
 @{
     ViewBag.title = "";
     var operationMode = Request.Params["RadianOperationMode"];
-    var classMarginTop = operationMode != "2" ? "margin-top-50" : "";
-
     switch (Request.Params["RadianContributorType"])
     {
         case "1":
@@ -27,12 +25,8 @@
             @ViewBag.title
         </p>
         <div class="underline-title"></div>
-        @if (operationMode == "2" && Model.Contributor.RadianState == "Habilitado")
-        {
-            <div class="back-button"><a href="@Url.Action("Index","Radian")"><i class="fa fa-chevron-left"></i> Volver</a></div>
-        }
     </div>
-    <div class="row margin-horizontal-0 @classMarginTop">
+    <div class="row margin-horizontal-0 margin-top-50">
         <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
             <div class="panel-body padding-top-20">
                 @if (operationMode == "2")
