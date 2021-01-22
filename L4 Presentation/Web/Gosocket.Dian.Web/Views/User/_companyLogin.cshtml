@@ -6,7 +6,7 @@
         <a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
         <form method="post" action="@Url.Action("CompanyAuthentication","User")" style="margin-top: 20px;">
             @Html.AntiForgeryToken()
-            @Html.HiddenFor(x => x.RecaptchaToken, new { id = "CompanyRecaptchaToken", @class = "RecaptchaToken"})
+            @Html.HiddenFor(x => x.RecaptchaToken, new { id = "CompanyRecaptchaToken", @class = "RecaptchaToken" })
             <div class="form-group">
                 @Html.DropDownListFor(m => m.IdentificationType, new SelectList(Model.IdentificationTypes, "Id", "Description", Model.IdentificationType), new { id = "CompanyIdentificationType", @class = "form-control selectpicker" })
             </div>

@@ -1,0 +1,221 @@
+﻿@model Gosocket.Dian.Web.Models.FreeBiller.UserFreeBillerModel
+@using Newtonsoft.Json;
+@{
+    ViewBag.Title = Model.IsEdit == false ? "Consultar usuario" : "Editar usuario";
+    string classMarginTop = Model.IsEdit == true ? "margin-top-50" : "";
+    var defaultHtmlAttrInput = Model.IsEdit == false ?
+        new Dictionary<string, object> { { "class", "form-control input-general" }, { "disabled", "disabled" } } :
+        new Dictionary<string, object> { { "class", "form-control input-general" } };
+
+    var defaultHtmlAttrSelect = Model.IsEdit == false ?
+        new Dictionary<string, object> { { "class", "form-control selectpicker" }, { "disabled", "disabled" } } :
+        new Dictionary<string, object> { { "class", "form-control selectpicker" } };
+
+
+}
+
+<style>
+    .form-control {
+        border-radius: 4px;
+        height: 43px !important;
+        border: 1px solid #CCCCCC;
+    }
+
+    .btn-default {
+        border-radius: 4px;
+        height: 43px !important;
+        padding-top: 12px;
+        padding-left: 0px !important;
+    }
+
+    .title-container {
+        margin-top: 30px !important;
+    }
+
+    .select-container {
+        padding-left: 10px !important;
+    }
+
+    .submit-container {
+        margin-top: 8px;
+        padding-top: 24px;
+        padding-bottom: 20px;
+    }
+
+    .bootstrap-select button {
+        padding-left: 10px !important;
+    }
+</style>
+
+<div class="page-content margin-15">
+
+    <div class="title-container">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+    </div>
+
+    @if (!Model.IsEdit)
+    {
+        <div class="back-button"><a href="javascript:history.back();"><i class="fa fa-chevron-left"></i> Volver</a></div>
+    }
+
+    <div class="row margin-horizontal-0 @classMarginTop">
+        <div class="tab-base">
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay">
+                        <div class="panel-body padding-top-20">
+                            <div class="pad-btm padding-bottom-0">
+                                <div class="row margin-horizontal-0">
+                                    @using (Html.BeginForm("GetIdsByProfile", "FreeBiller", FormMethod.Post, new { id = "edit-user-form" }))
+                                    {
+                                        @Html.HiddenFor(m => m.Id)
+                                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                            <div class="col-md-12 padding-horizontal-0">
+                                                <div id="document-list" class="panel panel-bordered-dian">
+
+                                                    <div class="panel-body padding-20 padding-bottom-0">
+                                                        <div class="row">
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.TypeDocId, new { @class = "control-label" })
+                                                                    @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, defaultHtmlAttrSelect)
+                                                                    @Html.ValidationMessageFor(m => m.TypeDocId, "", new { @class = "text-danger" })
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.NumberDoc, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.NumberDoc, defaultHtmlAttrInput)
+                                                                    @Html.ValidationMessageFor(m => m.NumberDoc, "", new { @class = "text-danger" })
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.FullName, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.FullName, defaultHtmlAttrInput)
+                                                                    @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.Email, defaultHtmlAttrInput)
+                                                                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                                                                </div>
+                                                            </div>
+                                                            @if (Model.IsEdit)
+                                                            {
+                                                                <div class="col-sm-3 padding-xs-0">
+                                                                    <div class="form-group">
+                                                                        @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                                                                        @Html.TextBoxFor(m => m.Password, new { @class = "form-control input-general", @type = "password" })
+                                                                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                                                                        <i onclick="showPassword(this)" class="fa fa-eye show-password"></i>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                        @if (Model.IsEdit)
+                                                        {
+                                                            <div class="row">
+                                                                <div class="col-sm-3 padding-xs-0">
+                                                                    <div class="form-group">
+                                                                        @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
+                                                                        @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, defaultHtmlAttrSelect)
+                                                                        @Html.ValidationMessageFor(m => m.ProfileId, "", new { @class = "text-danger" })
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-3 padding-xs-0 div-add-profile">
+                                                                    <div class="add-profile"><i class="fa fa-plus-circle"></i>Añadir perfil</div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                    <div class="panel-footer-grey text-right submit-container">
+                                                        @if (Model.IsEdit)
+                                                        {
+                                                            <button id="btnCancel" class="btn btn-success btn-radian-default">Cancelar</button>
+                                                            <button id="btnSend" class="btn btn-success btn-radian-success">Guardar Cambios</button>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                            @Html.Partial("_checksGrid");
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script src="~/Content/js/FreeBiller/FreeBiller.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/custom-chips.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            var urlNewUser = "@Url.Action("FreeBillerUser")";
+            initialValuesCheck(@Model.ProfileId, '@Url.Action("GetIdsByProfile", "FreeBiller")');
+            showInitialChips(@JsonConvert.SerializeObject(Model.ProfileIds), '@JsonConvert.SerializeObject(Model.Profiles)', '@Model.IsEdit' );
+            $("#btnSend").click(function (e) {
+                e.preventDefault();
+                showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
+                var data = {
+                    Id: $('[name=Id]').val(),
+                    FullName: $('[name=FullName]').val(),
+                    TypeDocId: $('[name=TypeDocId]').val(),
+                    NumberDoc: $('[name=NumberDoc]').val(),
+                    Email: $('[name=Email]').val(),
+                    Password: $('[name=Password]').val(),
+                    ProfileIds: getProfiles(),
+                }
+                var url = '@Url.Action("EditFreeBillerUser", "FreeBiller")';
+                var actionError = (error) => {
+                    console.log(error);
+                }
+                var actionSuccess = (success) => {
+                    var confirmMessage = success.Message;
+                    var operationCancel = () => {
+                        debugger
+                        if (success.RedirectTo) {
+                            window.location.href = success.RedirectTo;
+                        } else {
+                            hideLoading('#divMain');
+                        }
+                    }
+                    var buttons = AlertExec(operationCancel);
+                    var clName = (success.Code == 200) ? "cancel-confirmation" : null;
+                    showConfirmation(confirmMessage, buttons, clName, operationCancel)
+                }
+                createUser(url, 'POST', data, actionError, actionSuccess)
+
+            });
+            $("#btnCancel").click(function (e) {
+                e.preventDefault();
+                window.location.href = urlNewUser;
+            });
+        });
+    </script>
+
+
+}

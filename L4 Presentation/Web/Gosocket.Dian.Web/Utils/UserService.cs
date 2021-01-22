@@ -1,22 +1,124 @@
-﻿using Gosocket.Dian.Domain.Entity;
+﻿using Gosocket.Dian.DataContext;
+using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Domain.Utils;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Gosocket.Dian.Web.Utils
 {
     public class UserService
     {
         ApplicationDbContext _sqlDBContext;
+        SqlDBContext _sqlAspDBContext;
         public UserService()
         {
             if (_sqlDBContext == null)
             {
                 _sqlDBContext = new ApplicationDbContext();
             }
+            if (_sqlAspDBContext == null)
+            {
+                _sqlAspDBContext = new SqlDBContext();
+            }
         }
+
+        #region RELACION DE USUARIO CON PERFIL PARA FACTURADOR GRATUITO.
+
+        public List<ApplicationUser> UserFreeBillerProfile(Expression<Func<ApplicationUser, bool>> expression,  string companyCode, int profileId = 0)
+        {
+            var query = from pr in _sqlDBContext.UserFreeBillerProfile.Where(t=> t.CompanyCode == companyCode && ( profileId == 0 || t.ProfileFreeBillerId ==  profileId))
+                        join u in _sqlDBContext.Users.Where(expression) on pr.UserId equals u.Id
+                        select u;
+
+            return query.ToList();
+        }
+
+
+        public int UserFreeBillerUpdate(UsersFreeBillerProfile usersFreeBiller)
+        {
+            UsersFreeBillerProfile usersInstance = _sqlDBContext.UserFreeBillerProfile.FirstOrDefault(c => c.UserId == usersFreeBiller.UserId && c.ProfileFreeBillerId == usersFreeBiller.ProfileFreeBillerId);
+
+            if (usersInstance != null)
+            {
+                usersInstance.UserId = usersFreeBiller.UserId;
+                usersInstance.ProfileFreeBillerId = usersFreeBiller.ProfileFreeBillerId;
+                _sqlDBContext.Entry(usersInstance).State = System.Data.Entity.EntityState.Modified;
+            }
+            else
+                _sqlDBContext.Entry(usersFreeBiller).State = System.Data.Entity.EntityState.Added;
+
+            _sqlDBContext.SaveChanges();
+
+            return usersInstance ==  null ? usersFreeBiller.Id : usersInstance.Id;
+        }
+
+
+        public int UserFreeBillerDeleteAll(string userId)
+        {
+            List<UsersFreeBillerProfile> usersInstance = _sqlDBContext.UserFreeBillerProfile.Where(c => c.UserId == userId).ToList();
+
+            if (usersInstance != null)
+            {
+                foreach (var profileuser in usersInstance)
+                {
+                    _sqlDBContext.Entry (profileuser).State = System.Data.Entity.EntityState.Deleted;
+                }
+            }
+            
+            return _sqlDBContext.SaveChanges();
+        }
+
+        public UsersFreeBillerProfile GetUserFreeBillerProfile(Expression<Func<UsersFreeBillerProfile, bool>> expression)
+        {
+             return _sqlDBContext.UserFreeBillerProfile.FirstOrDefault(expression);
+        }
+
+        #region Actualizar Claims para usuarios de facturador gratuito
+
+        public int UpdateUserClaim(ClaimsDb usersFreeBiller)
+        {
+            ClaimsDb usersInstance = _sqlAspDBContext.ClaimsDbs.FirstOrDefault(c => c.UserId.Equals(usersFreeBiller.UserId));
+
+            if (usersInstance != null)
+            {
+                usersInstance.UserId = usersFreeBiller.UserId;
+                usersInstance.ClaimValue = usersFreeBiller.ClaimValue.ToString();
+                _sqlAspDBContext.Entry(usersInstance).State = System.Data.Entity.EntityState.Modified;
+            }
+
+            _sqlAspDBContext.SaveChanges();
+
+            return usersInstance == null ? usersFreeBiller.Id : usersInstance.Id;
+        }
+
+        #endregion
+
+        #region DeleteUserClaims
+
+        public int DeleteUserClaims(string userId)
+        {
+            List<ClaimsDb> usersInstance = _sqlAspDBContext.ClaimsDbs.Where(c => c.UserId == userId).ToList();
+
+            if (usersInstance != null)
+            {
+                foreach (var profileuser in usersInstance)
+                {
+                    _sqlAspDBContext.Entry(profileuser).State = System.Data.Entity.EntityState.Deleted;
+                }
+            }
+
+            return _sqlAspDBContext.SaveChanges();
+        }
+
+        #endregion
+
+
+        #endregion
 
         public IEnumerable<ApplicationUser> GetUsers(List<string> ids)
         {
@@ -54,6 +156,12 @@ namespace Gosocket.Dian.Web.Utils
         public ApplicationUser GetByCodeAndIdentificationTyte(string code, int identificatioTypeId)
         {
             return _sqlDBContext.Users.FirstOrDefault(u => u.Code == code && u.IdentificationTypeId == identificatioTypeId);
+        }
+
+
+        public ApplicationUser GetByCodePasswordAndIdentificationTyte(string code, int identificatioTypeId, string password)
+        {
+            return _sqlDBContext.Users.FirstOrDefault(u => u.Code == code && u.IdentificationTypeId == identificatioTypeId && u.PasswordHash == password);
         }
 
         public ApplicationUser GetByEmail(string email)

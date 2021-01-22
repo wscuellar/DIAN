@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Sql;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
@@ -40,6 +41,7 @@ namespace Gosocket.Dian.Web.Models
         public string ContributorCode { get; set; }
 
         public virtual ICollection<Contributor> Contributors { get; set; }
+        //public virtual UsersFreeBillerProfile FreeBillerProfile { get; set; }
 
         /// <summary>
         /// Activar o descativar el Usuario. Por ahora solo aplica para Usuarios externos
@@ -118,5 +120,7 @@ namespace Gosocket.Dian.Web.Models
         }
         public DbSet<Contributor> Contributor { set; get; }
         public DbSet<ContributorOperations> ContributorOperation { set; get; }
+
+        public DbSet<UsersFreeBillerProfile> UserFreeBillerProfile { set; get; }
     }
 }
