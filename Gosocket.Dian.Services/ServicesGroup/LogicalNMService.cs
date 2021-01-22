@@ -39,6 +39,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private TableManager TableManagerGlobalDocPayroll = new TableManager("GlobalDocPayroll");
+        private TableManager TableManagerGlobalDocPayrollHistoric = new TableManager("GlobalDocPayrollHistoric");
 
         private FileManager fileManager = new FileManager();
 
@@ -887,7 +888,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             
             //Carga propieadaes GlobalDocPayroll
             GlobalDocPayroll docGlobalPayroll = SetGlobalDocPayroll(xmlParser);
-           
+            
             // ZONE 3
             start = DateTime.UtcNow;
             //Validar campos mandatorios basicos para el trabajo del WS
@@ -897,6 +898,23 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var trackIdPred = documentParsed.CUNEPred;
             var SerieAndNumber = documentParsed.SerieAndNumber;
             // ZONE 3
+
+            // ------------------------------------- OSCAR -------------------------------------
+
+            if (documentParsed.DocumentTypeId == "11")
+            {
+                var result = this.CheckIndividualPayrollDuplicity(trackId, documentParsed.EmpleadorNIT, 
+                    documentParsed.CodigoTrabajador, xmlParser.Novelty);
+                if (result != null) return result;
+            }
+
+            if (documentParsed.DocumentTypeId == "12")
+            {
+                var result = this.CkeckIndividualPayrollExists(trackIdPred);
+                if (result != null) return result;
+            }
+
+            // ------------------------------------- OSCAR -------------------------------------
 
             //Valdiar codigo trabajador
             var response = ValdiateWorkedCode(xmlParser.globalDocPayrolls);
@@ -1089,6 +1107,19 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
                     arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
+
+                    // ------------------------------------- OSCAR -------------------------------------
+
+                    if (documentParsed.DocumentTypeId == "12")
+                    {
+                        var docGlobalPayrollHistoric = new GlobalDocPayrollHistoric(trackIdPred, trackId);
+                        arrayTasks.Add(TableManagerGlobalDocPayrollHistoric.InsertOrUpdateAsync(docGlobalPayrollHistoric));
+                        // se actualiza en la Meta el DocumentReferenceKey con el ID del último ajuste...
+                        documentMeta.DocumentReferencedKey = trackId;
+                        arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(documentMeta));
+                    }
+
+                    // ------------------------------------- OSCAR -------------------------------------
                 }
 
                 Task.WhenAll(arrayTasks);
@@ -1192,7 +1223,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 TipoDocumento = xmlParser.globalDocPayrolls.TipoDocumento,
                 TipoTrabajador = xmlParser.globalDocPayrolls.TipoTrabajador,
                 Trab_CodigoTrabajador = xmlParser.globalDocPayrolls.Trab_CodigoTrabajador,
-                Timestamp = new DateTime()
+                Timestamp = new DateTime(),
+                Novelty = xmlParser.Novelty
             };
 
             return docGlobalPayroll;
@@ -1411,6 +1443,62 @@ namespace Gosocket.Dian.Services.ServicesGroup
                    daysStringFormatted = $"{totalDays.ToString().PadLeft(2, char.Parse("0"))}D";
 
             return $"{yearsStringFormatted}{monthsStringFormatted}{daysStringFormatted}";
+        }
+
+        private DianResponse CheckIndividualPayrollDuplicity(string cune, string companyId, string employeeId, bool novelty)
+        {
+            // Solo se podrá transmitir una única vez el número del documento para el trabajador.
+            var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
+            if(documentMeta != null)
+            {
+                var documentApproved = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
+                if(documentApproved != null)
+                {
+                    return new DianResponse()
+                    {
+                        IsValid = false,
+                        StatusCode = "99",
+                        StatusMessage = ".",
+                        StatusDescription = ".",
+                        ErrorMessage = { "Regla:  90: - Documento procesado anteriormente" }
+                    };
+                }
+            }
+
+            // Solo se podrá transmitir para cada trabajador 1 documento NominaIndividual mensual durante cada mes del año. Para el mismo Empleador.
+            var documentsList = TableManagerGlobalDocValidatorDocumentMeta.FindDocumentSenderCodeReceiverCode<GlobalDocValidatorDocumentMeta>(companyId, employeeId);
+            if (documentsList == null || documentsList.Count <= 0) return null; // no exiten documentos
+
+            var currentDate = DateTime.Now.Date;
+            var document = documentsList.FirstOrDefault(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month);
+            if (document == null) return null; // no existe para el mes actual
+
+            if (novelty) return null; // cuando el documento existe para el mes actual y la novedad es true, se debe permitir la transmisión
+
+            return new DianResponse()
+            {
+                IsValid = false,
+                StatusCode = "99",
+                StatusMessage = ".",
+                StatusDescription = ".",
+                ErrorMessage = { "Regla:  91: - Documento para este Trabajador ya ha sido enviado anteriormente para este mes." }
+            };
+        }
+
+        private DianResponse CkeckIndividualPayrollExists(string cune)
+        {
+            // El documento referenciado debe encontrarse en la base de datos de la DIAN.
+            var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
+            if (documentMeta != null) return null;
+
+            return new DianResponse()
+            {
+                IsValid = false,
+                StatusCode = "99",
+                StatusMessage = ".",
+                StatusDescription = ".",
+                ErrorMessage = { "Regla:  NIAE902: - El documento referenciado no se encuentra en la base de datos de la DIAN." }
+            };
         }
     }
 }

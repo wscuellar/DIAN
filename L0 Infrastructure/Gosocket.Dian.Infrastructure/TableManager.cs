@@ -1141,5 +1141,23 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.FirstOrDefault();
         }
+
+        public List<T> FindDocumentSenderCodeReceiverCode<T>(string senderCode, string receiverCode) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("SenderCode",
+                    QueryComparisons.Equal,
+                    senderCode),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("ReceiverCode",
+                    QueryComparisons.Equal,
+                    receiverCode));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
     }
 }
