@@ -35,6 +35,7 @@
         public string ValidityPeriodEndDate { get; set; }
         public string ValorActualTituloValor { get; set; }
         public string ValorPendienteTituloValor { get; set; }
+        public string SoftwareId { get; set; }
 
     }
 }
