@@ -504,17 +504,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 senderCodeProvider = senderCode != senderCodeProvider ? senderCodeProvider : senderCode;
                 softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
                               senderCodeProvider, false, "Habilitado", softwareId);
-                switch (softwareProviderRadian.SoftwareType)
+                if(softwareProviderRadian != null)
                 {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        if (softwareProviderRadian.TecnologicalSupplier || softwareProviderRadian.Factor || softwareProviderRadian.NegotiationSystem
-                            || softwareProviderRadian.ElectronicInvoicer || softwareProviderRadian.IndirectElectronicInvoicer)
-                            habilitadoRadian = true;
-                        break;                 
-                }
+                    switch (softwareProviderRadian.SoftwareType)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            if (softwareProviderRadian.TecnologicalSupplier || softwareProviderRadian.Factor || softwareProviderRadian.NegotiationSystem
+                                || softwareProviderRadian.ElectronicInvoicer || softwareProviderRadian.IndirectElectronicInvoicer)
+                                habilitadoRadian = true;
+                            break;
+                    }
+                }               
             }
             else
             {
@@ -546,7 +549,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Validar habilitacion RADIAN
             else if (documentMeta.DocumentTypeId == "96") softwareProviderErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB19b;
 
-            string softwareProviderCodeHab = habilitadoRadian ? softwareProviderRadian.PartitionKey : softwareProvider?.Code;
+            string softwareProviderCodeHab = habilitadoRadian ? softwareProviderRadian?.PartitionKey : softwareProvider?.Code;
 
             if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
             {
@@ -562,6 +565,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     else
                         responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2ErrorCode, ErrorMessage = $"{sender2?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
+
                 if (softwareProvider != null || habilitadoRadian)
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
@@ -569,21 +573,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             else if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
-                if (sender?.StatusId == (int)ContributorStatus.Enabled)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                else
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
                 //Valida software proveedor RADIAN Habilitado
-                if (softwareProviderRadian != null)
+                if (documentMeta.DocumentTypeId == "96")
                 {
-                    if (habilitadoRadian)
+                    if (softwareProviderRadian != null && habilitadoRadian)
                         responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     else
                         responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
                 else
                 {
+                    if (sender?.StatusId == (int)ContributorStatus.Enabled)
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender.Code} del emisor de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderErrorCode, ErrorMessage = $"{sender?.Code} Emisor de servicios no autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
                     if (!string.IsNullOrEmpty(senderCodeProvider) && senderCode != senderCodeProvider)
                     {
                         if (sender2?.StatusId == (int)ContributorStatus.Enabled)
@@ -596,9 +600,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProviderCodeHab} Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     else
                         responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProviderCodeHab} NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                }
 
-               
+                }
             }
 
             foreach (var r in responses)
@@ -662,7 +665,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 party.SenderParty = nitModel.SenderCode;
             }
                 
-                //valida si existe los permisos del mandatario
+            //valida si existe los permisos del mandatario
             if (party.SenderParty != xmlParserCude.ProviderCode)
             {
                 var responseVal = ValidateFacultityAttorney(nitModel, party, xmlParserCude);              
@@ -1381,73 +1384,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string softwareId = xmlParserCude.Fields["SoftwareId"].ToString();
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var sender = GetContributorInstanceCache(issueAtorney);
             bool validError = false;
-            //Valida exista contributor en ambiente Habilitacion y Test
-            if (ConfigurationManager.GetValue("Environment") == "Hab" ||
-                ConfigurationManager.GetValue("Environment") == "Test")
-            {
-                if (sender != null)
-                {
-                    if (sender.StatusId != 3 && sender.StatusId != 4)
-                    {
-                        validError = true;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: AAB19b-(R): ",
-                            ErrorMessage = $"{(string)null} NIT del Prestador de Servicios no está autorizado para prestar servicios.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                }
-                else
-                {
-                    validError = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAB19b-(R): ",
-                        ErrorMessage = $"{(string)null} NIT del Prestador de Servicios no está autorizado para prestar servicios.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-            }
-            //Valida exista contributor en ambiente Productivo
-            else if (ConfigurationManager.GetValue("Environment") == "Prod")
-            {
-                if (sender != null)
-                {
-                    if (sender.StatusId != 4)
-                    {
-                        validError = true;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: AAB19b-(R): ",
-                            ErrorMessage = $"{(string)null} NIT del Prestador de Servicios no está autorizado para prestar servicios.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                }
-                else
-                {
-                    validError = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAB19b-(R): ",
-                        ErrorMessage = $"{(string)null} NIT del Prestador de Servicios no está autorizado para prestar servicios.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-            }
+          
             //Valida exista informacion mandato - Mandatario - CUFE para eventos disitintos a Mandato 043
             if (eventCode != "043" && !validError)
             {
