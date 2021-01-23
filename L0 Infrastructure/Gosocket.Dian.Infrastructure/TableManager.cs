@@ -974,7 +974,7 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
-        public T FindhByPartitionKeyRadianStatus<T>(string partitionKey, bool deleted, string radianStatus) where T : ITableEntity, new()
+        public T FindhByPartitionKeyRadianStatus<T>(string partitionKey, bool deleted, string radianStatus, string softwareId) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
 
@@ -986,6 +986,12 @@ namespace Gosocket.Dian.Infrastructure
                 TableQuery.GenerateFilterConditionForBool("Deleted",
                     QueryComparisons.Equal,
                     deleted));
+            prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    softwareId));
 
             var RadianStateHabilitado = TableQuery.GenerateFilterCondition("RadianState",
                QueryComparisons.Equal,
