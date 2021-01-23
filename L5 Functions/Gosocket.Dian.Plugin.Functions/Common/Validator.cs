@@ -4250,35 +4250,44 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
                     break;
-                //case (int)EventStatus.EndosoGarantia:
-                //case (int)EventStatus.EndosoProcuracion:
-                //case (int)EventStatus.EndosoPropiedad:                   
-                //    DateTime signingTimeEndoso = Convert.ToDateTime(data.SigningTime);
-                //    DateTime paymentDueDate = Convert.ToDateTime(dataModel.PaymentDueDate);
-                //    if(signingTimeEndoso.Date > paymentDueDate.Date)
-                //    {
-                //        responses.Add(new ValidateListResponse
-                //        {
-                //            IsValid = false,
-                //            Mandatory = true,
-                //            ErrorCode = "Regla: 89-(R): ",
-                //            ErrorMessage = "Fecha de endoso es superior a la fecha de vencimiento de la factura electrónica",
-                //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                //        });
-                //    }
-                //    else
-                //    {
-                //          responses.Add(new ValidateListResponse
-                //        {
-                //            IsValid = true,
-                //            Mandatory = true,
-                //            ErrorCode = "100",
-                //            ErrorMessage = "Ok",
-                //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                //        });                    
-                //    }
-                                     
-                //    break;
+                case (int)EventStatus.EndosoGarantia:
+                case (int)EventStatus.EndosoProcuracion:
+                case (int)EventStatus.EndosoPropiedad:
+                    //DateTime signingTimeEndoso = Convert.ToDateTime(data.SigningTime);
+                    //DateTime paymentDueDate = Convert.ToDateTime(dataModel.PaymentDueDate);
+                    //if (signingTimeEndoso.Date > paymentDueDate.Date)
+                    //{
+                    //    responses.Add(new ValidateListResponse
+                    //    {
+                    //        IsValid = false,
+                    //        Mandatory = true,
+                    //        ErrorCode = "Regla: 89-(R): ",
+                    //        ErrorMessage = "Fecha de endoso es superior a la fecha de vencimiento de la factura electrónica",
+                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //    });
+                    //}
+                    //else
+                    //{
+                    //    responses.Add(new ValidateListResponse
+                    //    {
+                    //        IsValid = true,
+                    //        Mandatory = true,
+                    //        ErrorCode = "100",
+                    //        ErrorMessage = "Ok",
+                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //    });
+                    //}
+
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = "Ok",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                    break;
                 case (int)EventStatus.TerminacionMandato:
                     DateTime signingTime = Convert.ToDateTime(data.SigningTime);
                     //General por tiempo ilimitado_432 - limitado por tiempo ilimitado_434
