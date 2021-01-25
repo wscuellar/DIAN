@@ -899,12 +899,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var SerieAndNumber = documentParsed.SerieAndNumber;
             // ZONE 3
 
-            // ------------------------------------- OSCAR -------------------------------------
-
             if (documentParsed.DocumentTypeId == "11")
             {
-                var result = this.CheckIndividualPayrollDuplicity(trackId, documentParsed.EmpleadorNIT, 
-                    documentParsed.CodigoTrabajador, xmlParser.Novelty);
+                var result = this.CheckIndividualPayrollDuplicity(trackId, documentParsed.EmpleadorNIT,
+                    xmlParser.globalDocPayrolls.NumeroDocumento, xmlParser.Novelty);
                 if (result != null) return result;
             }
 
@@ -913,8 +911,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var result = this.CkeckIndividualPayrollExists(trackIdPred);
                 if (result != null) return result;
             }
-
-            // ------------------------------------- OSCAR -------------------------------------
 
             //Valdiar codigo trabajador
             var response = ValdiateWorkedCode(xmlParser.globalDocPayrolls);
@@ -1107,9 +1103,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
                     arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
-
-                    // ------------------------------------- OSCAR -------------------------------------
-
+                    // Nómina Individual de Ajuste...
                     if (documentParsed.DocumentTypeId == "12")
                     {
                         var docGlobalPayrollHistoric = new GlobalDocPayrollHistoric(trackIdPred, trackId);
@@ -1118,8 +1112,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         documentMeta.DocumentReferencedKey = trackId;
                         arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(documentMeta));
                     }
-
-                    // ------------------------------------- OSCAR -------------------------------------
                 }
 
                 Task.WhenAll(arrayTasks);
@@ -1460,7 +1452,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         StatusCode = "99",
                         StatusMessage = ".",
                         StatusDescription = ".",
-                        ErrorMessage = { "Regla:  90: - Documento procesado anteriormente" }
+                        ErrorMessage = new List<string>() { "Regla: 90: - Documento procesado anteriormente" }
                     };
                 }
             }
@@ -1481,7 +1473,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 StatusCode = "99",
                 StatusMessage = ".",
                 StatusDescription = ".",
-                ErrorMessage = { "Regla:  91: - Documento para este Trabajador ya ha sido enviado anteriormente para este mes." }
+                ErrorMessage = new List<string>() { "Regla: 91: - Documento para este Trabajador ya ha sido enviado anteriormente para este mes." }
             };
         }
 
@@ -1497,7 +1489,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 StatusCode = "99",
                 StatusMessage = ".",
                 StatusDescription = ".",
-                ErrorMessage = { "Regla:  NIAE902: - El documento referenciado no se encuentra en la base de datos de la DIAN." }
+                ErrorMessage = new List<string>() { "Regla: NIAE902: - El documento referenciado no se encuentra en la base de datos de la DIAN." }
             };
         }
     }
