@@ -599,6 +599,8 @@ namespace Gosocket.Dian.Application.Cosmos
                                                                                        !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
                                                  && (a.Code.Equals($"0{(int)EventStatus.Accepted}") || a.Code.Equals($"0{(int)EventStatus.AceptacionTacita}")))
+                                                && g.Events.Any(ev => ev.Code.Equals($"0{(int)EventStatus.Received}"))
+                                                && g.Events.Any(ev => ev.Code.Equals($"0{(int)EventStatus.Receipt}"))
                                                  );
                         break;
                     case 2: //Solicitud de disponilibilizacion

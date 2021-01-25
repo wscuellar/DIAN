@@ -83,11 +83,6 @@ namespace Gosocket.Dian.Application
                     if (customizationId == CONS363 || customizationId == CONS364)
                         title = TextResources.SolicitudDisponibilizacion1;
                     break;
-                case EventStatus.EndosoGarantia:
-                case EventStatus.EndosoProcuracion:
-                case EventStatus.EndosoPropiedad:
-                    title = TextResources.Endoso;
-                    break;
                 default:
                     title = EnumHelper.GetEnumDescription(Enum.Parse(typeof(EventStatus), eventCode));
                     break;

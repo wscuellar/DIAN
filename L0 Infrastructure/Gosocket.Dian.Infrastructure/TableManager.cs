@@ -987,11 +987,11 @@ namespace Gosocket.Dian.Infrastructure
                     QueryComparisons.Equal,
                     deleted));
             prefixCondition = TableQuery.CombineFilters(
-               prefixCondition,
-               TableOperators.And,
-               TableQuery.GenerateFilterCondition("RowKey",
-                   QueryComparisons.Equal,
-                   softwareId));
+                prefixCondition,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    softwareId));
 
             var RadianStateHabilitado = TableQuery.GenerateFilterCondition("RadianState",
                QueryComparisons.Equal,
