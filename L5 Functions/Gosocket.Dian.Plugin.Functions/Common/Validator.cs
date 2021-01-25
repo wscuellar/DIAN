@@ -3941,7 +3941,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCodeRef = "Regla: DC24r-(R): ";
                 errorMesaageRef = "No se puede generar el evento mandato antes de la fecha de generación del documento referenciado";
             }
-            else
+            else if(data.EventCode != "030")
             {
                 errorCodeRef = "Regla: DC24q-(R): ";
                 errorMesaageRef = "No se puede generar el evento Cancelación del endoso electrónico antes de la fecha de generación del documento referenciado.";
@@ -3994,7 +3994,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.Accepted:
-                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
+                    DateTime signingTimeAccepted = Convert.ToDateTime(data.SigningTime);
+                    DateTime signingTimeReceipt = Convert.ToDateTime(dataModel.SigningTime);
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(signingTimeReceipt, signingTimeAccepted);
                     responses.Add(businessDays > 3
                         ? new ValidateListResponse
                         {
