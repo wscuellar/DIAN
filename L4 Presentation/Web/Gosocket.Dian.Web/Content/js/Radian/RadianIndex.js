@@ -259,3 +259,15 @@ function DeleteOptions(operationMode, radianState) {
         $("#RadianApprovalState option[value='1']").remove();
     }
 }
+
+function SetCapcthatoken(configuration) {
+        //grecaptcha.ready(function () {
+        //    grecaptcha.execute(configuration, { action: 'submit' }).then(function (token) {debugger
+        //        $(".downloadPDFUrl").attr("href", $(".downloadPDFUrl").attr("href") + "&recaptchaToken=" + token);
+        //    });
+        //});
+}
+
+function RestartCounters() {
+
+}

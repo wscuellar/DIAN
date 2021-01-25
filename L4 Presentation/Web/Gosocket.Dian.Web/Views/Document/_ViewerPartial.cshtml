@@ -346,27 +346,3 @@ else
     </div>
 }
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-
-    <!--Bootstrap Select [ OPTIONAL ]-->
-    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
-    <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
-    <script src="~/Content/js/file-validator.js"></script>
-    <script src="https://www.google.com/recaptcha/api.js?render=@ConfigurationManager.GetValue("Recaptcha")"></script>
-
-
-    <script>
-        $(document).ready(function () {
-            grecaptcha.ready(function () {
-                grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
-                    $(".downloadPDFUrl").attr("href", $(".downloadPDFUrl").attr("href") + "&recaptchaToken=" + token);
-                });
-            });
-        });
-                function downloadFiles(id) {
-                window.location.href = "/Document/DownloadPDF?trackId=" + id;
-            }
-    </script>
-
-}

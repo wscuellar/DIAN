@@ -42,6 +42,10 @@
                             Usted debe proporcinar el identificador del st de pruebas (TestSetld) <b>@Model.RadianTestSetResult.Id</b> en el web service  para el envío de su set de pruebas.
                         </p>
                     </div>
+                    @if (status == "Rechazado")
+                    {
+                        <button onclick="RestartCounters('@Model.RadianTestSetResult.Id')" class="btn btn-radian-success">Reiniciar contadores</button>
+                    }
                 </div>
                 <div class="row margin-horizontal-0">
                     <p class="title-view" style="padding-top: 5px">
@@ -60,8 +64,9 @@
 
 @section Scripts{
 
+    <script src="~/Content/js/Radian/RadianIndex.js"></script >
     <script>
-                    $(document).ready(function () {
+        $(document).ready(function () {
                         var nit = '@Model.Nit';
 
                         $.ajax({
@@ -140,7 +145,7 @@
                                             dataChart.ElectronicMandateTotalRequired,
                                             dataChart.EndMandateTotalRequired,
                                             dataChart.ApplicationAvailableTotalRequired,
-                                            dataChart.EndorsementTotalRequired,
+                                            dataChart.EndorsementPropertyTotalRequired,
                                             dataChart.EndorsementCancellationTotalRequired,
                                             dataChart.PaymentNotificationTotalRequired,
                                             dataChart.EndCirculationLimitationTotalRequired,
@@ -163,7 +168,7 @@
                                             dataChart.ElectronicMandateTotalAcceptedRequired,
                                             dataChart.EndMandateTotalAcceptedRequired,
                                             dataChart.ApplicationAvailableTotalAcceptedRequired,
-                                            dataChart.EndorsementTotalAcceptedRequired,
+                                            dataChart.EndorsementPropertyTotalAcceptedRequired,
                                             dataChart.EndorsementCancellationTotalAcceptedRequired,
                                             dataChart.PaymentNotificationTotalAcceptedRequired,
                                             dataChart.EndCirculationLimitationTotalAcceptedRequired,
@@ -186,7 +191,7 @@
                                             dataChart.TotalElectronicMandateSent,
                                             dataChart.TotalEndMandateSent,
                                             dataChart.TotalApplicationAvailableSent,
-                                            dataChart.TotalEndorsementSent,
+                                            dataChart.TotalEndorsementPropertySent,
                                             dataChart.TotalEndorsementCancellationSent,
                                             dataChart.TotalPaymentNotificationSent,
                                             dataChart.TotalEndCirculationLimitationSent,
@@ -209,7 +214,7 @@
                                             dataChart.ElectronicMandateAccepted,
                                             dataChart.EndMandateAccepted,
                                             dataChart.ApplicationAvailableAccepted,
-                                            dataChart.EndorsementAccepted,
+                                            dataChart.EndorsementPropertyAccepted,
                                             dataChart.EndorsementCancellationAccepted,
                                             dataChart.PaymentNotificationAccepted,
                                             dataChart.EndCirculationLimitationAccepted,
@@ -232,7 +237,7 @@
                                             dataChart.ElectronicMandateRejected,
                                             dataChart.EndMandateRejected,
                                             dataChart.ApplicationAvailableRejected,
-                                            dataChart.EndorsementRejected,
+                                            dataChart.EndorsementPropertyRejected,
                                             dataChart.EndorsementCancellationRejected,
                                             dataChart.PaymentNotificationRejected,
                                             dataChart.EndCirculationLimitationRejected,
