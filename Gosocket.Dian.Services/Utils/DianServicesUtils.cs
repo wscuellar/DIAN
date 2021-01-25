@@ -809,7 +809,7 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (providerCode.Equals("800197268"))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}89-(R): NIT de DIAN no autorizado para emitir ApplicationResponse");
+                    stringBuilder.AppendLine($"{codeMessage}B19b-(R): NIT del Prestador de Servicios No está autorizado para prestar servicios");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
