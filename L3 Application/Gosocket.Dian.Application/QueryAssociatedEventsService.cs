@@ -100,7 +100,7 @@ namespace Gosocket.Dian.Application
             GlobalDocValidatorDocument eventVerification = EventVerification(otherEvent.Identifier);
 
             return eventVerification != null
-                && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10);
+                && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10);
         }
 
         public List<GlobalDocValidatorTracking> ListTracking(string eventDocumentKey)
