@@ -42,10 +42,6 @@
                             Usted debe proporcinar el identificador del st de pruebas (TestSetld) <b>@Model.RadianTestSetResult.Id</b> en el web service  para el envío de su set de pruebas.
                         </p>
                     </div>
-                    @if (status == "Rechazado")
-                    {
-                        <button onclick="RestartCounters('@Model.RadianTestSetResult.Id')" class="btn btn-radian-success">Reiniciar contadores</button>
-                    }
                 </div>
                 <div class="row margin-horizontal-0">
                     <p class="title-view" style="padding-top: 5px">
@@ -64,7 +60,6 @@
 
 @section Scripts{
 
-    <script src="~/Content/js/Radian/RadianIndex.js"></script >
     <script>
         $(document).ready(function () {
                         var nit = '@Model.Nit';

@@ -268,6 +268,22 @@ function SetCapcthatoken(configuration) {
         //});
 }
 
-function RestartCounters() {
-
+function RestartCounters(url, testResult, softwareId) {
+    console.log(testResult);
+    var confirmMessage = bootboxMessage.CONFIRMATION_RESTART;
+    var operation = () => {
+        var actionError = (error) => {
+            window.location.reload();
+        }
+        var actionSuccess = (result) => {
+            window.location.reload();
+        }
+        var data = {
+            result: testResult,
+            softwareId
+        }
+        ajaxFunction(url, "POST", data, actionError, actionSuccess);
+    }
+    var buttons = ConfirmExec(operation)
+    showConfirmation(confirmMessage, buttons);
 }

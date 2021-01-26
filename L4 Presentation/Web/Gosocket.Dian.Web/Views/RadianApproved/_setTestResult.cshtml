@@ -1,5 +1,6 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
 @using Gosocket.Dian.Domain.Common;
+@using Newtonsoft.Json;
 @{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" }, { "readonly", "true" } };}
 @{
     ViewBag.title = "Datos del set de pruebas";
@@ -43,6 +44,13 @@
                         </p>
                     </div>
                 </div>
+                @if (status == "Rechazado")
+                {
+                    <div>
+                        <button onclick="RestartCounters('@Url.Action("RestartSetTestResult","RadianApproved")',@JsonConvert.SerializeObject(Model.RadianTestSetResult),'@Model.Software.Id')" class="btn btn-radian-success margin-top-15">Reiniciar contadores</button>
+                    </div>
+                }
+
                 <div class="row margin-horizontal-0">
                     @using (Html.BeginForm("SetTestDetails", "RadianApproved", FormMethod.Post, new { @class = "setTestForm" }))
                     {
@@ -181,25 +189,25 @@
                             <div class="col-sm-2 padding-xs-0">
                                 <div class="form-group">
                                     @Html.Label("Endoso en garantía", new { @class = "control-label" })
-                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired, defaultHtmlAttr)
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalRequired, defaultHtmlAttr)
                                 </div>
                             </div>
                             <div class="col-sm-2 padding-xs-0">
                                 <div class="form-group">
                                     @Html.Label("Endoso en procuración", new { @class = "control-label" })
-                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, defaultHtmlAttr)
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementProcurementTotalRequired, defaultHtmlAttr)
                                 </div>
                             </div>
                             <div class="col-sm-3 padding-xs-0">
                                 <div class="form-group">
                                     @Html.Label("Terminación de la limitación de circulación", new { @class = "control-label" })
-                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
                                 </div>
                             </div>
                             <div class="col-sm-2 padding-xs-0">
                                 <div class="form-group">
                                     @Html.Label("Solicitud de disponibilización", new { @class = "control-label" })
-                                    @Html.TextBoxFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired, defaultHtmlAttr)
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired, defaultHtmlAttr)
                                 </div>
                             </div>
                         </div>
@@ -308,13 +316,13 @@
                             <div class="col-sm-3 padding-xs-0">
                                 <div class="form-group">
                                     @Html.Label("Terminación de la limitación de circulación", new { @class = "control-label" })
-                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
                                 </div>
                             </div>
                             <div class="col-sm-2 padding-xs-0">
                                 <div class="form-group">
                                     @Html.Label("Solicitud de disponibilización", new { @class = "control-label" })
-                                    @Html.TextBoxFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired, defaultHtmlAttr)
+                                    @Html.TextBoxFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired, defaultHtmlAttr)
                                 </div>
                             </div>
                         </div>

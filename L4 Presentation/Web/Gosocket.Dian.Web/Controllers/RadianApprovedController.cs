@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Common.Resources;
+﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
@@ -8,6 +9,7 @@ using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
 using Gosocket.Dian.Web.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,17 +23,20 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianTestSetService _radianTestSetService;
         private readonly IRadianApprovedService _radianAprovedService;
         private readonly IRadianTestSetResultService _radianTestSetResultService;
+        private readonly IRadianTestSetAppliedService _radianTestSetAppliedService;
         private readonly UserService userService = new UserService();
 
         public RadianApprovedController(IRadianContributorService radianContributorService,
                                         IRadianTestSetService radianTestSetService,
                                         IRadianApprovedService radianAprovedService,
-                                        IRadianTestSetResultService radianTestSetResultService)
+                                        IRadianTestSetResultService radianTestSetResultService,
+                                        IRadianTestSetAppliedService radianTestSetAppliedService)
         {
             _radianContributorService = radianContributorService;
             _radianTestSetService = radianTestSetService;
             _radianAprovedService = radianAprovedService;
             _radianTestSetResultService = radianTestSetResultService;
+            _radianTestSetAppliedService = radianTestSetAppliedService;
         }
 
         [HttpGet]
@@ -242,6 +247,89 @@ namespace Gosocket.Dian.Web.Controllers
             model.Software = software;
             return View(model);
         }
+
+        [HttpPost]
+        public JsonResult RestartSetTestResult(RadianTestSetResult result, string softwareId)
+        {
+            RadianTestSetResult testSetResult = result;
+            testSetResult.ApplicationAvailableAccepted = 0;
+            testSetResult.ApplicationAvailableRejected = 0;
+            testSetResult.ApplicationAvailableTotalAcceptedRequired = 0;
+            testSetResult.AutomaticAcceptanceAccepted = 0;
+            testSetResult.AutomaticAcceptanceRejected = 0;
+            testSetResult.AutomaticAcceptanceTotalAcceptedRequired = 0;
+            testSetResult.CirculationLimitationAccepted = 0;
+            testSetResult.CirculationLimitationRejected = 0;
+            testSetResult.CirculationLimitationTotalAcceptedRequired = 0;
+            testSetResult.ElectronicMandateAccepted = 0;
+            testSetResult.ElectronicMandateRejected = 0;
+            testSetResult.ElectronicMandateTotalAcceptedRequired = 0;
+            testSetResult.TotalElectronicMandateSent = 0;
+            testSetResult.TotalEndCirculationLimitationSent = 0;
+            testSetResult.TotalEndMandateSent = 0;
+            testSetResult.TotalEndorsementCancellationSent = 0;
+            testSetResult.TotalEndorsementGuaranteeSent = 0;
+            testSetResult.TotalEndorsementProcurementSent = 0;
+            testSetResult.TotalEndorsementPropertySent = 0;
+            testSetResult.TotalExpressAcceptanceSent = 0;
+            testSetResult.TotalGuaranteeSent = 0;
+            testSetResult.TotalPaymentNotificationSent = 0;
+            testSetResult.TotalReceiptNoticeSent = 0;
+            testSetResult.TotalReceiptServiceSent = 0;
+            testSetResult.TotalRejectInvoiceSent = 0;
+            testSetResult.EndCirculationLimitationAccepted = 0;
+            testSetResult.EndCirculationLimitationRejected = 0;
+            testSetResult.EndCirculationLimitationTotalAcceptedRequired = 0;
+            testSetResult.EndMandateAccepted = 0;
+            testSetResult.EndMandateRejected = 0;
+            testSetResult.EndMandateTotalAcceptedRequired = 0;
+            testSetResult.EndorsementCancellationAccepted = 0;
+            testSetResult.EndorsementCancellationRejected = 0;
+            testSetResult.EndorsementCancellationTotalAcceptedRequired = 0;
+            testSetResult.EndorsementGuaranteeAccepted = 0;
+            testSetResult.EndorsementGuaranteeRejected = 0;
+            testSetResult.EndorsementGuaranteeTotalAcceptedRequired = 0;
+            testSetResult.EndorsementProcurementAccepted = 0;
+            testSetResult.EndorsementProcurementRejected = 0;
+            testSetResult.EndorsementProcurementTotalAcceptedRequired = 0;
+            testSetResult.EndorsementPropertyAccepted = 0;
+            testSetResult.EndorsementPropertyRejected = 0;
+            testSetResult.EndorsementPropertyTotalAcceptedRequired = 0;
+            testSetResult.EndorsementTotalAcceptedRequired = 0;
+            testSetResult.EndorsementWarrantyTotalAcceptedRequired = 0;
+            testSetResult.ExpressAcceptanceAccepted = 0;
+            testSetResult.ExpressAcceptanceRejected = 0;
+            testSetResult.ExpressAcceptanceTotalAcceptedRequired = 0;
+            testSetResult.GuaranteeAccepted = 0;
+            testSetResult.GuaranteeRejected = 0;
+            testSetResult.GuaranteeTotalAcceptedRequired = 0;
+            testSetResult.PaymentNotificationAccepted = 0;
+            testSetResult.PaymentNotificationRejected = 0;
+            testSetResult.PaymentNotificationTotalAcceptedRequired = 0;
+            testSetResult.ReceiptNoticeAccepted = 0;
+            testSetResult.ReceiptNoticeRejected = 0;
+            testSetResult.ReceiptNoticeTotalAcceptedRequired = 0;
+            testSetResult.ReceiptServiceAccepted = 0;
+            testSetResult.ReceiptServiceRejected = 0;
+            testSetResult.ReceiptServiceTotalAcceptedRequired = 0;
+            testSetResult.RejectInvoiceAccepted = 0;
+            testSetResult.RejectInvoiceRejected = 0;
+            testSetResult.RejectInvoiceTotalAcceptedRequired = 0;
+            testSetResult.TotalApplicationAvailableSent = 0;
+            testSetResult.TotalAutomaticAcceptanceSent = 0;
+            testSetResult.TotalCirculationLimitationSent = 0;
+            testSetResult.TotalDocumentAccepted = 0;
+            testSetResult.TotalDocumentAcceptedRequired = 0;
+            testSetResult.TotalDocumentSent = 0;
+            testSetResult.TotalDocumentsRejected = 0;
+            testSetResult.SoftwareId = softwareId;
+            testSetResult.SenderCode = result.PartitionKey;
+            bool isUpdate = _radianTestSetAppliedService.InsertOrUpdateTestSet(testSetResult);
+            ResponseMessage response = new ResponseMessage();
+            response.Message = isUpdate ? "Contadores reiniciados correctamente" : "¡Error en la actualización!";
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
+        
 
         [HttpPost]
         public ActionResult GetFactorOperationMode(RadianApprovedViewModel radianApprovedViewModel)
