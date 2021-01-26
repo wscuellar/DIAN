@@ -499,7 +499,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
 
-            if (documentMeta.DocumentTypeId == "96" && !documentMeta.sendTestSet && senderCodeProvider != "800197268" )
+            if (documentMeta.DocumentTypeId == "96" && !documentMeta.SendTestSet && senderCodeProvider != "800197268" )
             {
                 senderCodeProvider = senderCode != senderCodeProvider ? senderCodeProvider : senderCode;
                 softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
