@@ -720,8 +720,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     Task.WhenAll(arrayTasks).Wait();
 
                     var applicationResponse = XmlUtilEvents.GetApplicationResponseIfExist(documentMeta);
-                    response.XmlBase64Bytes = applicationResponse ?? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations);
-                    //response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations) : null;
+                    response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations) : null;
 
                     response.XmlDocumentKey = trackId;
                     response.XmlFileName = documentMeta.FileName;
