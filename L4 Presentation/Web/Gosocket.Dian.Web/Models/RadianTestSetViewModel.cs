@@ -222,6 +222,20 @@ namespace Gosocket.Dian.Web.Models
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndCirculationLimitationTotalAcceptedRequired { get; set; }
 
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Informe para el pago")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int ReportForPaymentTotalAcceptedRequired { get; set; }
+
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Informe para el pago")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int ReportForPaymentTotalRequired { get; set; }
+
+        
+
         public DateTime Date { get; set; }
 
         public string CreatedBy { get; set; }
