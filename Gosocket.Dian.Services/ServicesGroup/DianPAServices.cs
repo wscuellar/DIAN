@@ -862,6 +862,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 throw new Exception(xmlParser.ParserError);
 
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
+            documentParsed.SigningTime = xmlParser.SigningTime;
             DocumentParsed.SetValues(ref documentParsed);
             var parser = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Parser) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // Parser
