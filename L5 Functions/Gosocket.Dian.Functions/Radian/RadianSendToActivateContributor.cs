@@ -22,6 +22,7 @@ namespace Gosocket.Dian.Functions.Radian
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly ContributorService contributorService = new ContributorService();
         private static readonly TableManager globalTestSetResultTableManager = new TableManager("RadianTestSetResult");
+        private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
 
 
 
@@ -105,6 +106,8 @@ namespace Gosocket.Dian.Functions.Radian
                         radianContributor.RadianContributorTypeId,
                         data.SoftwareId,
                         Convert.ToInt32(data.SoftwareType));
+
+                    globalRadianOperationService.EnableParticipantRadian(data.Code, data.SoftwareId, radianContributor);
 
 
                     // Step 5 Contributor Operations

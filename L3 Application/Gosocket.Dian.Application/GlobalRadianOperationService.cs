@@ -58,12 +58,23 @@ namespace Gosocket.Dian.Application
             return globalSoftware.InsertOrUpdate(item);
         }
 
-        public GlobalRadianOperations EnableParticipantRadian(string code, string softwareId)
+        public GlobalRadianOperations EnableParticipantRadian(string code, string softwareId, RadianContributor radianContributor)
         {
             GlobalRadianOperations operation = globalRadianOperations.Find<GlobalRadianOperations>(code, softwareId.ToString());
             if (operation.RadianState != Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Test))
                 return new GlobalRadianOperations();
             operation.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
+            if (radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect)
+                operation.IndirectElectronicInvoicer = radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice)
+                operation.ElectronicInvoicer = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider)
+                operation.TecnologicalSupplier = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem)
+                operation.NegotiationSystem = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem;
+            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor)
+                operation.Factor = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor;
+
             _ = Update(operation);
             return operation;
         }

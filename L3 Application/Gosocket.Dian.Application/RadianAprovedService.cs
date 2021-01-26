@@ -222,17 +222,6 @@ namespace Gosocket.Dian.Application
             if (operation == null)
                 operation = new GlobalRadianOperations(contributor.Code, existingOperation.SoftwareId.ToString());
 
-            if (radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect)
-                operation.IndirectElectronicInvoicer = radianContributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Indirect;
-            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice)
-                operation.ElectronicInvoicer = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.ElectronicInvoice;
-            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider)
-                operation.TecnologicalSupplier = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TechnologyProvider;
-            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem)
-                operation.NegotiationSystem = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.TradingSystem;
-            if (radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor)
-                operation.Factor = radianContributor.RadianContributorTypeId == (int)Domain.Common.RadianContributorType.Factor;
-
             operation.RadianState = radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test.GetDescription() : RadianState.Registrado.GetDescription();
             operation.SoftwareType = existingOperation.SoftwareType;
             operation.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
@@ -299,7 +288,10 @@ namespace Gosocket.Dian.Application
                     CirculationLimitationTotalAcceptedRequired = testSet.CirculationLimitationTotalAcceptedRequired,
                     // Terminación limitación 
                     EndCirculationLimitationTotalRequired = testSet.EndCirculationLimitationTotalRequired,
-                    EndCirculationLimitationTotalAcceptedRequired = testSet.EndCirculationLimitationTotalAcceptedRequired
+                    EndCirculationLimitationTotalAcceptedRequired = testSet.EndCirculationLimitationTotalAcceptedRequired,
+                    //Reporte para el pago
+                    ReportForPaymentTotalRequired = testSet.ReportForPaymentTotalRequired,
+                    ReportForPaymentTotalAcceptedRequired= testSet.ReportForPaymentTotalAcceptedRequired
                 };
                 _ = _radianTestSetResultService.InsertTestSetResult(setResult);
 
