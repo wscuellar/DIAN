@@ -763,6 +763,8 @@ namespace Gosocket.Dian.Services.Utils
             var UBLVersionID = documentParsed.UBLVersionID;
             var receiverCode = documentParsed.ReceiverCode;
             var providerCode = documentParsed.ProviderCode;
+            DateTime signingTimeEvent = Convert.ToDateTime(documentParsed.SigningTime).Date;
+            DateTime startDate = DateTime.UtcNow.Date;
 
             switch (docTypeCode)
             {
@@ -807,9 +809,19 @@ namespace Gosocket.Dian.Services.Utils
 
             if (docTypeCode == "96")
             {
+                if (signingTimeEvent > startDate)
+                {
+                    stringBuilder.AppendLine($"DC24-(R): Error en el valor de la fecha y hora de firma. " +
+                        $"NO corresponde al formato y/o el valor reportado es superior a la fecha del sistema.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
+
                 if (providerCode.Equals("800197268"))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}89-(R): NIT de DIAN no autorizado para emitir ApplicationResponse");
+                    stringBuilder.AppendLine($"{codeMessage}B19b-(R): NIT del Prestador de Servicios No está autorizado para prestar servicios");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;

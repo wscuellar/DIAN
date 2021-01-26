@@ -224,5 +224,8 @@ namespace Gosocket.Dian.Domain.Entity
 
         public string comprobanteTotal { get; set; }
 
+        //Novedad
+
+        public bool Novelty { get; set; }
     }
 }

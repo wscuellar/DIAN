@@ -644,6 +644,7 @@ namespace Gosocket.Dian.Functions.Activation
             }
             catch (Exception ex)
             {
+                SetLogger(null, "Error-General", ex.Message, "Error-UPT");
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 throw;
             }
