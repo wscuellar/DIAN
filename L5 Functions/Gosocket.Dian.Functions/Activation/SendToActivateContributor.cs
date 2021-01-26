@@ -56,7 +56,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                     contributorService.SetToEnabled(contributor);
 
-                    var operationModes = contributorOperationService.GetContributorOperations(data.ContributorId);
+                    List<ContributorOperations> operationModes = contributorOperationService.GetContributorOperations(data.ContributorId);
                     foreach (var operation in operationModes.Where(o => !o.Deleted))
                     {
                         if (operation.OperationModeId == (int)Domain.Common.OperationMode.Free && operation.SoftwareId == null)

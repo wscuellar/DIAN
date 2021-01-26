@@ -303,19 +303,18 @@ namespace Gosocket.Dian.Functions.Activation
                                 var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
 
                                 //Habilitamos el participante en GlobalRadianOperations
-                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(radianTesSetResult.PartitionKey, globalTestSetTracking.SoftwareId);
+                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
 
-
-                                SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
+                                //SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
 
                                 //Verificamos si quedo habilitado sino termina
-                                if (isPartipantActive.RadianState != Domain.Common.RadianState.Habilitado.GetDescription()) return;
+                                //if (isPartipantActive.RadianState != Domain.Common.RadianState.Habilitado.GetDescription()) return;
 
-                                SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
+                                //SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
 
 
                                 //--GlobalSoftware 
-                                var softwareId = isPartipantActive.RowKey;
+                                var softwareId = globalTestSetTracking.SoftwareId; //isPartipantActive.RowKey;
                                 var software = softwareService.GetByRadian(Guid.Parse(softwareId));
 
                                 #endregion
