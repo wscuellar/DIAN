@@ -20,6 +20,7 @@
         public string IssuerPartyName { get; set; }
         public string ProviderCode { get; set; }
         public string ValidityPeriodEndDate { get; set; }
+        public string SigningTime { get; set; }
 
 
         public static void SetValues(ref DocumentParsed documentParsed)
