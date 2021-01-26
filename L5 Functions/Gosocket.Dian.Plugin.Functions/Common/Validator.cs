@@ -3309,7 +3309,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             case (int)EventStatus.EndosoProcuracion:
                                 //Valida Pago Total FETV                                
                                 if (documentMeta
-                                 .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
+                                 .Where(t => t.EventCode == "045" && t.CustomizationID == "452").ToList()
                                  .Count > decimal.Zero)
                                 {
                                     validFor = true;
