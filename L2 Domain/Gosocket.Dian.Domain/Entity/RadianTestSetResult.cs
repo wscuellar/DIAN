@@ -409,9 +409,20 @@ namespace Gosocket.Dian.Domain.Entity
         public int ReportForPaymentTotalRequired { get; set; }
 
         /// <summary>
-        /// Reporte por pago - Rechazadoss (3 dias)
+        /// Reporte por pago - Aceptado (3 dias)
+        /// </summary>
+        public int ReportForPaymentAccepted { get; set; }
+
+        /// <summary>
+        /// Reporte por pago - Rechazados (3 dias)
         /// </summary>
         public int ReportForPaymentRejected { get; set; }
+
+        /// <summary>
+        /// Reporte por pago  - Total Enviados (3 dias)
+        /// </summary>
+        public int TotalReportForPaymentSent { get; set; }
+
 
         public string StatusDescription { get; set; }
         public int Status { get; set; }

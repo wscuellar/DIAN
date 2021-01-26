@@ -89,7 +89,9 @@ namespace Gosocket.Dian.Web.Controllers
                 EndMandateTotalRequired = 0,
                 PaymentNotificationTotalRequired = 0,
                 CirculationLimitationTotalRequired = 0,
-                EndCirculationLimitationTotalRequired = 0
+                EndCirculationLimitationTotalRequired = 0,
+                ReportForPaymentTotalRequired = 0,
+                ReportForPaymentTotalAcceptedRequired = 0
             };
             ViewBag.CurrentPage = Navigation.NavigationEnum.RadianSetPruebas;
             return View(model);
@@ -153,7 +155,9 @@ namespace Gosocket.Dian.Web.Controllers
                 CirculationLimitationTotalRequired = model.CirculationLimitationTotalRequired,
                 CirculationLimitationTotalAcceptedRequired = model.CirculationLimitationTotalAcceptedRequired,
                 EndCirculationLimitationTotalAcceptedRequired = model.EndCirculationLimitationTotalAcceptedRequired,
-                EndCirculationLimitationTotalRequired = model.EndCirculationLimitationTotalRequired
+                EndCirculationLimitationTotalRequired = model.EndCirculationLimitationTotalRequired,
+                ReportForPaymentTotalRequired = model.ReportForPaymentTotalRequired,
+                ReportForPaymentTotalAcceptedRequired = model.ReportForPaymentTotalAcceptedRequired
             }
             );
             if (result)
@@ -217,6 +221,8 @@ namespace Gosocket.Dian.Web.Controllers
                 CirculationLimitationTotalAcceptedRequired = testSet.CirculationLimitationTotalAcceptedRequired,
                 EndCirculationLimitationTotalAcceptedRequired = testSet.EndCirculationLimitationTotalAcceptedRequired,
                 EndCirculationLimitationTotalRequired = testSet.EndCirculationLimitationTotalRequired,
+                ReportForPaymentTotalRequired = testSet.ReportForPaymentTotalRequired,
+                ReportForPaymentTotalAcceptedRequired = testSet.ReportForPaymentTotalAcceptedRequired,
                 TestSetId = testSet.TestSetId.ToString(),
                 OperationModeId = int.Parse(testSet.PartitionKey)
             };
@@ -274,6 +280,8 @@ namespace Gosocket.Dian.Web.Controllers
                 CirculationLimitationTotalAcceptedRequired = model.CirculationLimitationTotalAcceptedRequired,
                 EndCirculationLimitationTotalAcceptedRequired = model.EndCirculationLimitationTotalAcceptedRequired,
                 EndCirculationLimitationTotalRequired = model.EndCirculationLimitationTotalRequired,
+                ReportForPaymentTotalRequired = model.ReportForPaymentTotalRequired,
+                ReportForPaymentTotalAcceptedRequired = model.ReportForPaymentTotalAcceptedRequired,
                 UpdateBy = User.Identity.Name,
                 Date = DateTime.UtcNow
             });
@@ -342,6 +350,10 @@ namespace Gosocket.Dian.Web.Controllers
 
                 // Terminación limitación 
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.AnulacionLimitacionCirculacion.GetDescription(), Counter1 = testSet.EndCirculationLimitationTotalAcceptedRequired, Counter2 = testSet.EndCirculationLimitationTotalRequired, Counter3 = 0 });
+
+                // Informe para el pago
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.ValInfoPago.GetDescription(), Counter1 = testSet.ReportForPaymentTotalAcceptedRequired, Counter2 = testSet.ReportForPaymentTotalRequired, Counter3 = 0 });
+
             }
             return Json(events, JsonRequestBehavior.AllowGet);
 

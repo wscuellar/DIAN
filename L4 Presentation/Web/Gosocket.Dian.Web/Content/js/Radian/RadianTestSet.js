@@ -335,6 +335,29 @@ $("#EndorsementProcurationTotalAcceptedRequired").change(function () {
 });
 
 
+$("#ReportForPaymentTotalRequired").change(function () {
+    var endcirculationNotificationTotal0 = parseInt($("#ReportForPaymentTotalRequired").val());
+    if (endcirculationNotificationTotal0 < 0) {
+        showErrorMessage(0);
+        $("#ReportForPaymentTotalRequired").val(0);
+    }
+    else {
+        updateTotal();
+    }
+});
+
+$("#ReportForPaymentTotalAcceptedRequired").change(function () {
+    var endcirculationNotificationTotal0 = parseInt($("#ReportForPaymentTotalAcceptedRequired").val());
+    if (endcirculationNotificationTotal0 < 0) {
+        showErrorMessage(0);
+        $("#ReportForPaymentTotalAcceptedRequired").val(0);
+    }
+    else {
+        updateTotalRequired();
+    }
+});
+
+
 $('.btn-save').click(function () {
 
     var form = $('#edit-testset-form');
