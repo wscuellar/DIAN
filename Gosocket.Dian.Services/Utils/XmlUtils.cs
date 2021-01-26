@@ -195,12 +195,7 @@ namespace Gosocket.Dian.Services.Utils
 
             var uuId = $"{processResultEntity.UblVersion}{processResultEntity.DocumentTypeId}{processResultEntity.SenderCode}{processResultEntity.ReceiverCode}{processResultEntity.Serie}{processResultEntity.Number}";
             var profileExecutionId = "1";
-            var schemeID = "1";
-            if (ConfigurationManager.GetValue("Environment") != "Prod")
-            {
-                profileExecutionId = "2";
-                schemeID = "2";
-            }
+            if (ConfigurationManager.GetValue("Environment") != "Prod") profileExecutionId = "2";
 
             var cufe = CreateCufeId(uuId);
             var issueDate = DateTime.UtcNow;
@@ -221,7 +216,6 @@ namespace Gosocket.Dian.Services.Utils
                 new XElement(cbc + "ProfileExecutionID", profileExecutionId),
                 new XElement(cbc + "ID", $"{GetRandomInt()}"),
                 new XElement(cbc + "UUID", cufe,
-                    new XAttribute("schemeID", schemeID),
                     new XAttribute("schemeName", "CUDE-SHA384")),
                 new XElement(cbc + "IssueDate", issueDate.AddHours(-5).ToString("yyyy-MM-dd")),
                 new XElement(cbc + "IssueTime", $"{issueDate.AddHours(-5).ToString("HH:mm:ss")}-05:00"));

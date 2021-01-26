@@ -510,7 +510,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     Task.WhenAll(arrayTasks).Wait();
 
                     var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
-                    response.XmlBase64Bytes = applicationResponse ?? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations);
+                    response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations) : null;
 
                     response.XmlDocumentKey = trackId;
                     response.XmlFileName = documentMeta.FileName;
