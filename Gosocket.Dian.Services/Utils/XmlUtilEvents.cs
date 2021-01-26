@@ -170,7 +170,7 @@ namespace Gosocket.Dian.Services.Utils
                         new XElement(cbc + "RegistrationName", "Unidad Especial Dirección de Impuestos y Aduanas Nacionales"),
                         new XElement(cbc + "CompanyID", $"800197268",
                             new XAttribute("schemeID", "4"),
-                            new XAttribute("schemeName", $"{processResultEntity.SenderTypeCode}")),
+                            new XAttribute("schemeName", $"{processResultEntity.SenderSchemeCode}")),
                         new XElement(cac + "TaxScheme",
                             new XElement(cbc + "ID", "01"),
                             new XElement(cbc + "Name", "IVA"))));
