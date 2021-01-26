@@ -1478,6 +1478,7 @@ button.selectpicker {
     border-bottom: 1px solid #E9E8E8;
     color: #707782;
     font-size: 14px;
+    padding-bottom: 5px;
 }
 
 .set-test-counts .modal-dialog {
@@ -1525,9 +1526,6 @@ button.selectpicker {
     padding-right: 50px !important;
 }
 
-a.badge {
-    display: table-caption;
-}
 
 .set-test-counts .panel-body {
     padding-left: 40px;
