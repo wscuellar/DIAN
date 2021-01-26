@@ -138,7 +138,7 @@ namespace Gosocket.Dian.Functions.Batch
                 }
 
                 SetLogger(null, "Step prueba nomina", " Paso el segundo If ");
-
+                SetLogger(null, "Step" , ConfigurationManager.GetValue("BatchThreads"), "PN-02");
                 var threads = int.Parse(ConfigurationManager.GetValue("BatchThreads"));
 
                 BlockingCollection<ResponseXpathDataValue> xPathDataValueResponses = new BlockingCollection<ResponseXpathDataValue>();
@@ -193,6 +193,7 @@ namespace Gosocket.Dian.Functions.Batch
                 {
                     batchFileStatus.StatusCode = "2";
                     batchFileStatus.StatusDescription = result[0].ProcessedMessage;
+                    SetLogger(null, " Reject Description", batchFileStatus.StatusDescription, "RD-Description");
                     await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
                     return;
                 }
