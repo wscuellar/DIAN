@@ -215,23 +215,23 @@ namespace Gosocket.Dian.Domain.Common
         None = 000,
         [Description("Acuse de recibo")]
         Received = 030,
-        [Description("Rechazo de la Factura Electrónica")]
+        [Description("Rechazo de la factura electrónica")]
         Rejected = 031,
         [Description("Constancia de recibo del bien o aceptación de la prestación del servicio")]
         Receipt = 032,
-        [Description("Aceptación Expresa")]
+        [Description("Aceptación expresa")]
         Accepted = 033,
-        [Description("Aceptación Tácita")]
+        [Description("Manifestación aceptación tácita")]
         AceptacionTacita = 034,
         [Description("Avales")]
         Avales = 035,
-        [Description("Solicitud de Disponibilizacion")]
+        [Description("Solicitud de disponibilizacion")]
         SolicitudDisponibilizacion = 036,
-        [Description("Endoso en Propiedad")]
+        [Description("Endoso en propiedad")]
         EndosoPropiedad = 037,
-        [Description("Endoso en Garantía")]
+        [Description("Endoso en garantía")]
         EndosoGarantia = 038,
-        [Description("Endoso en Procuración")]
+        [Description("Endoso en procuración")]
         EndosoProcuracion = 039,
         [Description("Anulacion de endoso electrónico")]
         InvoiceOfferedForNegotiation = 040,
