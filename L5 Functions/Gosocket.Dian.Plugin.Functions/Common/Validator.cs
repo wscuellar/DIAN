@@ -3322,9 +3322,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+                                string senderCode = string.Empty;
+                                //Solicitud de Disponibilización                              
+                                if (eventCode == "038" || eventCode == "039")
+                                {
+                                    senderCode = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => t.EventCode == "036").SenderCode;
+                                }
+                                else
+                                {
+                                    //Si el endoso esta en blanco o el senderCode es diferente a providerCode                
+                                    nitModel.SenderCode = (nitModel.listID == "2" || (nitModel.SenderCode != nitModel.ProviderCode)) ? nitModel.ProviderCode : nitModel.SenderCode;
+                                    senderCode = nitModel.listID == "1" ? xmlParserCude.Fields["SenderCode"].ToString() : nitModel.SenderCode;
+                                }
 
-                                //Solicitud de Disponibilización
-                                string senderCode = nitModel.listID == "1" ? xmlParserCude.Fields["SenderCode"].ToString() : nitModel.SenderCode;
                                 if (documentMeta.Where(t => t.EventCode == "036"
                                     && (t.SenderCode == senderCode)).ToList().Count > decimal.Zero)
                                 {                                   
@@ -3941,7 +3951,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCodeRef = "Regla: DC24r-(R): ";
                 errorMesaageRef = "No se puede generar el evento mandato antes de la fecha de generación del documento referenciado";
             }
-            else if(data.EventCode != "030")
+            else if(data.EventCode != "030" && data.EventCode != "032")
             {
                 errorCodeRef = "Regla: DC24q-(R): ";
                 errorMesaageRef = "No se puede generar el evento Cancelación del endoso electrónico antes de la fecha de generación del documento referenciado.";
