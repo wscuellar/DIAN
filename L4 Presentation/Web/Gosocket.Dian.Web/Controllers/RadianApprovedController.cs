@@ -322,6 +322,9 @@ namespace Gosocket.Dian.Web.Controllers
             testSetResult.TotalDocumentAcceptedRequired = 0;
             testSetResult.TotalDocumentSent = 0;
             testSetResult.TotalDocumentsRejected = 0;
+            testSetResult.ReportForPaymentTotalAcceptedRequired = 0;
+            testSetResult.ReportForPaymentTotalRequired = 0;
+            testSetResult.ReportForPaymentRejected = 0;
             testSetResult.SoftwareId = softwareId;
             testSetResult.SenderCode = result.PartitionKey;
             bool isUpdate = _radianTestSetAppliedService.InsertOrUpdateTestSet(testSetResult);
