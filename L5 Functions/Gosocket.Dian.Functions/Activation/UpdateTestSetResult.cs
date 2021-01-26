@@ -113,7 +113,10 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.ReceiptNoticeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
                     radianTesSetResult.ReceiptNoticeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
 
-                    SetLogger(null, "Step 3", "Acuse de recibo");
+                    SetLogger(null, "Step 3", "Acuse de recibo", "AR_001");
+                    SetLogger(null, "Step 3.1", radianTesSetResult.TotalReceiptNoticeSent.ToString(), "AR_002");
+                    SetLogger(null, "Step 3.2", radianTesSetResult.ReceiptNoticeAccepted.ToString(), "AR_003");
+                    SetLogger(null, "Step 3.6", radianTesSetResult.ReceiptNoticeRejected.ToString(), "AR_004");
 
                     // Recibo del Bien
                     tipo = EventStatus.Received.ToString();
