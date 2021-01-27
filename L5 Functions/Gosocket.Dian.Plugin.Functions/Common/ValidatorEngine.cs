@@ -118,10 +118,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (!xmlParserCude.Parser())
                     throw new Exception(xmlParserCude.ParserError);
 
-                nitModel = xmlParserCude.Fields.ToObject<NitModel>();
-
-                //Si el endoso esta en blanco o el senderCode es diferente a providerCode                
-                nitModel.SenderCode = (nitModel.listID == "2" || (nitModel.SenderCode != nitModel.ProviderCode)) ? nitModel.ProviderCode : nitModel.SenderCode;
+                nitModel = xmlParserCude.Fields.ToObject<NitModel>();               
             }
 
             var validator = new Validator();           
