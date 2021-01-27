@@ -8,5 +8,6 @@ namespace Gosocket.Dian.Application
         List<RadianTestSetResult> GetAllTestSetResult();
         RadianTestSetResult GetTestSetResult(string partitionKey, string rowKey);
         bool InsertOrUpdateTestSet(RadianTestSetResult radianTestSet);
+        bool ResetPreviousCounts(string testSetId);
     }
 }

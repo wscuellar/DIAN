@@ -12,6 +12,7 @@ namespace Gosocket.Dian.Application.Managers
     {
         private static readonly TableManager testSetManager = new TableManager("RadianTestSetResult");
         private static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
+        private static readonly TableManager tableManagerGlobalTestSetTracking = new TableManager("GlobalTestSetTracking");
 
         public bool InsertOrUpdateTestSetResult(RadianTestSetResult testSetResult)
         {
@@ -57,6 +58,16 @@ namespace Gosocket.Dian.Application.Managers
         {
             return tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(code);
         }
+
+        public bool ResetPreviousCounts(string testSetId)
+        {
+            List<GlobalTestSetTracking> tracking = tableManagerGlobalTestSetTracking.FindByPartition<GlobalTestSetTracking>(testSetId);
+            foreach(GlobalTestSetTracking item in tracking)
+            {
+                tableManagerGlobalTestSetTracking.Delete(item);
+            }
+            return true;
+        } 
 
     }
 }

@@ -310,7 +310,8 @@ namespace Gosocket.Dian.Web.Controllers
             testSetResult.StatusDescription = "En proceso";
             testSetResult.SoftwareId = softwareId;
             testSetResult.SenderCode = result.PartitionKey;
-            bool isUpdate = _radianTestSetAppliedService.InsertOrUpdateTestSet(testSetResult);
+            bool isUpdate = _radianTestSetAppliedService.InsertOrUpdateTestSet(testSetResult) &&  _radianTestSetAppliedService.ResetPreviousCounts(testSetResult.Id);
+
             ResponseMessage response = new ResponseMessage();
             response.Message = isUpdate ? "Contadores reiniciados correctamente" : "¡Error en la actualización!";
             return Json(response, JsonRequestBehavior.AllowGet);
