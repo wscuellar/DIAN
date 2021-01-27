@@ -383,6 +383,8 @@ namespace Gosocket.Dian.Web.Controllers
             // Terminación limitación  
             events.Add(new EventCountersViewModel() { EventName = EventStatus.AnulacionLimitacionCirculacion.GetDescription(), Counter1 = result.EndCirculationLimitationTotalAcceptedRequired, Counter2 = result.EndCirculationLimitationAccepted, Counter3 = result.EndCirculationLimitationRejected });
 
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.ValInfoPago.GetDescription(), Counter1 = result.ReportForPaymentTotalAcceptedRequired, Counter2 = result.ReportForPaymentAccepted, Counter3 = result.ReportForPaymentRejected });
+
             return Json(events, JsonRequestBehavior.AllowGet);
         }
 
