@@ -1214,6 +1214,7 @@ namespace Gosocket.Dian.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ContributorUserLogin(UserLoginViewModel model)
         {
+            model.IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList();
             ClearUnnecessariesModelStateErrorsForAuthentication(false);
 
             var recaptchaValidation = IsValidCaptcha(model.RecaptchaToken);
