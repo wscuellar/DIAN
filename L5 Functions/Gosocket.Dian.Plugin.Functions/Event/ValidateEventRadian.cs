@@ -12,13 +12,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Gosocket.Dian.Plugin.Functions.Series
+namespace Gosocket.Dian.Plugin.Functions.Event
 {
-    public static class ValidateSerieAndNumber
+    public static class ValidateEventRadian
     {
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
 
-        [FunctionName("ValidateSerieAndNumber")]
+        [FunctionName("ValidateEventRadian")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");
@@ -40,13 +40,13 @@ namespace Gosocket.Dian.Plugin.Functions.Series
             try
             {
 
-                var validateResponses = await ValidatorEngine.Instance.StartValidateSerieAndNumberAsync(data.TrackId);
+                var validateResponses = await ValidatorEngine.Instance.StartValidationEventRadianAsync(trackId);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALIDATESERIEPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATE_EVENTRADIANPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -55,8 +55,8 @@ namespace Gosocket.Dian.Plugin.Functions.Series
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "VALIDATESERIEPLGNS",
-                         ErrorMessage = $"No se pudo validar serie del ApplicationResponse con el Nit del emisor."
+                        ErrorCode = "VALIDATE_EVENTRADIANPLGNS",
+                        ErrorMessage = $"No se pudo validar registro eventos RADIAN."
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);

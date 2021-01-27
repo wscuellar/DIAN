@@ -761,10 +761,7 @@ namespace Gosocket.Dian.Services.Utils
             var serieAndNumber = documentParsed.SerieAndNumber;
             var listID = documentParsed.listID;
             var UBLVersionID = documentParsed.UBLVersionID;
-            var receiverCode = documentParsed.ReceiverCode;
-            var providerCode = documentParsed.ProviderCode;
-            DateTime signingTimeEvent = Convert.ToDateTime(documentParsed.SigningTime).Date;
-            DateTime startDate = DateTime.UtcNow.Date;
+            var receiverCode = documentParsed.ReceiverCode;                     
 
             switch (docTypeCode)
             {
@@ -808,33 +805,7 @@ namespace Gosocket.Dian.Services.Utils
             
 
             if (docTypeCode == "96")
-            {
-                if (signingTimeEvent > startDate)
-                {
-                    stringBuilder.AppendLine($"DC24-(R): Error en el valor de la fecha y hora de firma. " +
-                        $"NO corresponde al formato y/o el valor reportado es superior a la fecha del sistema.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                }
-
-
-                if (providerCode.Equals("800197268"))
-                {
-                    stringBuilder.AppendLine($"{codeMessage}B19b-(R): NIT del Prestador de Servicios No está autorizado para prestar servicios");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                }
-
-                if (string.IsNullOrEmpty(providerCode))
-                {
-                    stringBuilder.AppendLine($"{codeMessage}B19a-(R): NIT del Prestador de Servicio no fue informado");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                }
-
+            {              
                 if (!UBLVersionID.Equals("UBL 2.1"))
                 {
                     stringBuilder.AppendLine($"{codeMessage}D01-(R): El elemento no contiene el literal 'UBL 2.1'");
