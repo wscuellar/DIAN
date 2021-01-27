@@ -248,7 +248,7 @@
             // Mapping Event Data Section
             template = template.Replace("{EventName}", model.Title);
             template = template.Replace("{EventNumber}", $"{model.Prefix} - {model.Number}");
-            template = template.Replace("{EventType}", model.RequestType);
+            template = template.Replace("{EventType}", model.Title);
             template = template.Replace("{OperationType}", model.RequestType);
             template = template.Replace("{OperationDetails}", string.Empty);
             template = template.Replace("{DiscountRate}", string.Empty);

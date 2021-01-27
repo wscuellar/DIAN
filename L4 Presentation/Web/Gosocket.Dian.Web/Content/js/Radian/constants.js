@@ -1,5 +1,5 @@
 ﻿const bootboxMessage = {
-    CONFIRMATION_MESSAGE: "Está seguro que quiere cancelar este usuario",
+    CONFIRMATION_MESSAGE: "¿Está seguro que quiere cancelar este usuario?",
     CHANGE_STATE: "¿Está seguro que desea cambiar el estado del archivo?",
     CANCEL_DESCRIPTION: "Describa el motivo de la cancelación del registro.",
     LABEL_PROMPT: "Describa el motivo de la cancelación del registro.",
@@ -10,4 +10,6 @@
     CONFIRMATION_MESSAGE_DESACTIVE: "¿Desea inactivar el usuario seleccionado?",
     CONFIRMATION_MESSAGE_ACTIVE: "¿Desea activar el usuario seleccionado?",
     CONFIRMATION_CORRECT_ENABLED: "Estado actualizado correctamente",
+    CONFIRMATION_RESTART: "¿Está seguro que quiere reiniciar los contadores?",
+
 };

@@ -61,7 +61,7 @@
 @section Scripts{
 
     <script>
-                    $(document).ready(function () {
+        $(document).ready(function () {
                         var nit = '@Model.Nit';
 
                         $.ajax({
@@ -78,6 +78,7 @@
 
                         function showChart(data) {
                             var dataChart = data.data;
+                            console.log(dataChart);
                             Highcharts.chart('setTestDetails', {
                                 chart: {
                                     type: 'bar'
@@ -104,7 +105,8 @@
                                         'Terminación de la limitación de circulación',
                                         'Endoso en garantia',
                                         'Endoso en procuración',
-                                        'Limitación de circulación'
+                                        'Limitación de circulación',
+                                        'Informe para el pago'
                                     ]
                                 },
                                 yAxis: {
@@ -140,13 +142,14 @@
                                             dataChart.ElectronicMandateTotalRequired,
                                             dataChart.EndMandateTotalRequired,
                                             dataChart.ApplicationAvailableTotalRequired,
-                                            dataChart.EndorsementTotalRequired,
+                                            dataChart.EndorsementPropertyTotalRequired,
                                             dataChart.EndorsementCancellationTotalRequired,
                                             dataChart.PaymentNotificationTotalRequired,
                                             dataChart.EndCirculationLimitationTotalRequired,
                                             dataChart.EndorsementGuaranteeTotalRequired,
                                             dataChart.EndorsementProcurementTotalRequired,
-                                            dataChart.CirculationLimitationTotalRequired
+                                            dataChart.CirculationLimitationTotalRequired,
+                                            dataChart.ReportForPaymentTotalRequired
                                         ]
                                     },
                                     {
@@ -163,13 +166,14 @@
                                             dataChart.ElectronicMandateTotalAcceptedRequired,
                                             dataChart.EndMandateTotalAcceptedRequired,
                                             dataChart.ApplicationAvailableTotalAcceptedRequired,
-                                            dataChart.EndorsementTotalAcceptedRequired,
+                                            dataChart.EndorsementPropertyTotalAcceptedRequired,
                                             dataChart.EndorsementCancellationTotalAcceptedRequired,
                                             dataChart.PaymentNotificationTotalAcceptedRequired,
                                             dataChart.EndCirculationLimitationTotalAcceptedRequired,
                                             dataChart.EndorsementGuaranteeTotalAcceptedRequired,
                                             dataChart.EndorsementProcurementTotalAcceptedRequired,
-                                            dataChart.CirculationLimitationTotalAcceptedRequired
+                                            dataChart.CirculationLimitationTotalAcceptedRequired,
+                                            dataChart.ReportForPaymentTotalAcceptedRequired
                                         ]
                                     },
                                     {
@@ -186,13 +190,15 @@
                                             dataChart.TotalElectronicMandateSent,
                                             dataChart.TotalEndMandateSent,
                                             dataChart.TotalApplicationAvailableSent,
-                                            dataChart.TotalEndorsementSent,
+                                            dataChart.TotalEndorsementPropertySent,
                                             dataChart.TotalEndorsementCancellationSent,
                                             dataChart.TotalPaymentNotificationSent,
                                             dataChart.TotalEndCirculationLimitationSent,
                                             dataChart.TotalEndorsementGuaranteeSent,
                                             dataChart.TotalEndorsementProcurementSent,
-                                            dataChart.TotalCirculationLimitationSent
+                                            dataChart.TotalCirculationLimitationSent,
+                                            dataChart.TotalReportForPaymentSent
+
                                         ]
                                     },
                                     {
@@ -209,13 +215,14 @@
                                             dataChart.ElectronicMandateAccepted,
                                             dataChart.EndMandateAccepted,
                                             dataChart.ApplicationAvailableAccepted,
-                                            dataChart.EndorsementAccepted,
+                                            dataChart.EndorsementPropertyAccepted,
                                             dataChart.EndorsementCancellationAccepted,
                                             dataChart.PaymentNotificationAccepted,
                                             dataChart.EndCirculationLimitationAccepted,
                                             dataChart.EndorsementGuaranteeAccepted,
                                             dataChart.EndorsementProcurementAccepted,
-                                            dataChart.CirculationLimitationAccepted
+                                            dataChart.CirculationLimitationAccepted,
+                                            dataChart.ReportForPaymentAccepted
                                         ]
                                     },
                                     {
@@ -232,13 +239,14 @@
                                             dataChart.ElectronicMandateRejected,
                                             dataChart.EndMandateRejected,
                                             dataChart.ApplicationAvailableRejected,
-                                            dataChart.EndorsementRejected,
+                                            dataChart.EndorsementPropertyRejected,
                                             dataChart.EndorsementCancellationRejected,
                                             dataChart.PaymentNotificationRejected,
                                             dataChart.EndCirculationLimitationRejected,
                                             dataChart.EndorsementGuaranteeRejected,
                                             dataChart.EndorsementProcurementRejected,
-                                            dataChart.CirculationLimitationRejected
+                                            dataChart.CirculationLimitationRejected,
+                                            dataChart.ReportForPaymentRejected
                                         ]
                                     }
                                 ]

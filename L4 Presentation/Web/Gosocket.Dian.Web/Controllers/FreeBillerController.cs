@@ -568,9 +568,10 @@ namespace Gosocket.Dian.Web.Controllers
             }
             profilesKey = profilesKey.Distinct().ToList();
 
-            var query = from item in users.Select(t=> new { t.Id, t.Name,t.UserName,t.IdentificationId, t.IdentificationTypeId, t.LastUpdated, t.Active}).Distinct()
+            var query = from item in users.Select(t=> new { t.Id, t.Name,t.UserName,t.IdentificationId, t.IdentificationTypeId, t.LastUpdated, t.Active, t.CreationDate }).Distinct()
                         join kv in profilesKey on item.Id equals kv.Key
                         join td in staticTypeDoc on item.IdentificationTypeId.ToString() equals td.Value
+                        orderby item.CreationDate descending
                         select new UserFreeBillerModel()
                         {
                             Id = item.Id,

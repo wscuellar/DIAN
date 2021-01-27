@@ -151,7 +151,7 @@
                 @Html.ValidationMessageFor(m => m.EndorsementProcurationTotalRequired, "", new { @class = "control-label" })
             </div>
         </div>
-        <div class="col-sm-3 padding-xs-0">
+        <div class="col-sm-2 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.EndCirculationLimitationTotalRequired, new { @class = "control-label claseLabel" })
                 @Html.TextBoxFor(m => m.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
@@ -160,14 +160,18 @@
         </div>
         <div class="col-sm-2 padding-xs-0">
             <div class="form-group">
-                <div class="">
-                    @Html.LabelFor(m => m.ApplicationAvailableTotalRequired, new { @class = "control-label claseLabel" })
-                </div>
+                @Html.LabelFor(m => m.ApplicationAvailableTotalRequired, new { @class = "control-label claseLabel" })
                 @Html.TextBoxFor(m => m.ApplicationAvailableTotalRequired, defaultHtmlAttr)
                 @Html.ValidationMessageFor(m => m.ApplicationAvailableTotalRequired, "", new { @class = "control-label" })
             </div>
         </div>
-
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.ReportForPaymentTotalRequired, new { @class = "control-label claseLabel" })
+                @Html.TextBoxFor(m => m.ReportForPaymentTotalRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.ReportForPaymentTotalRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
     </div>
 
 </div>
@@ -289,7 +293,7 @@
                 @Html.ValidationMessageFor(m => m.EndorsementProcurationTotalAcceptedRequired, "", new { @class = "control-label" })
             </div>
         </div>
-        <div class="col-sm-3 padding-xs-0">
+        <div class="col-sm-2 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.EndCirculationLimitationTotalAcceptedRequired, new { @class = "control-label claseLabel" })
                 @Html.TextBoxFor(m => m.EndCirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
@@ -301,6 +305,13 @@
                 @Html.LabelFor(m => m.ApplicationAvailableTotalAcceptedRequired, new { @class = "control-label claseLabel" })
                 @Html.TextBoxFor(m => m.ApplicationAvailableTotalAcceptedRequired, defaultHtmlAttr)
                 @Html.ValidationMessageFor(m => m.ApplicationAvailableTotalAcceptedRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.ReportForPaymentTotalAcceptedRequired, new { @class = "control-label claseLabel" })
+                @Html.TextBoxFor(m => m.ReportForPaymentTotalAcceptedRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.ReportForPaymentTotalAcceptedRequired, "", new { @class = "control-label" })
             </div>
         </div>
     </div>

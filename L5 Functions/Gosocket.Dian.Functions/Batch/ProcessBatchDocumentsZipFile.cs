@@ -138,7 +138,7 @@ namespace Gosocket.Dian.Functions.Batch
                 }
 
                 SetLogger(null, "Step prueba nomina", " Paso el segundo If ");
-
+                SetLogger(null, "Step" , ConfigurationManager.GetValue("BatchThreads"), "PN-02");
                 var threads = int.Parse(ConfigurationManager.GetValue("BatchThreads"));
 
                 BlockingCollection<ResponseXpathDataValue> xPathDataValueResponses = new BlockingCollection<ResponseXpathDataValue>();
@@ -188,11 +188,12 @@ namespace Gosocket.Dian.Functions.Batch
 
                 // Check permissions
                 var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, habNomina, nitNomina, flagApplicationResponse);
-                SetLogger(null, "Step prueba nomina", " Paso permisos " + result);
+                SetLogger(null, "Step prueba nomina", " Paso permisos " + result.Count.ToString());
                 if (result.Count > 0)
                 {
                     batchFileStatus.StatusCode = "2";
                     batchFileStatus.StatusDescription = result[0].ProcessedMessage;
+                    SetLogger(null, " Reject Description", batchFileStatus.StatusDescription, "RD-Description");
                     await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
                     return;
                 }
@@ -207,7 +208,8 @@ namespace Gosocket.Dian.Functions.Batch
                 log.Info($"Init upload xml�s.");
                 BlockingCollection<ResponseUploadXml> uploadResponses = new BlockingCollection<ResponseUploadXml>();
                 SetLogger(null, "Step prueba nomina", " Paso multipleResponsesXpathDataValue " + multipleResponsesXpathDataValue.Count);
-                
+
+                bool sendTestSet = !string.IsNullOrWhiteSpace(testSetId);
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
                 {
                     Boolean isEvent = flagApplicationResponse;
@@ -217,6 +219,7 @@ namespace Gosocket.Dian.Functions.Batch
                     var documentTypeId = "";
                     var trackId = "";
                     var softwareId = "";
+
 
                     if (setResult != null)
                     {
@@ -244,13 +247,13 @@ namespace Gosocket.Dian.Functions.Batch
                     {
                         var eventCode = response.XpathsValues["AppResEventCodeXpath"];
                         var customizationID = response.XpathsValues["AppResCustomizationIDXpath"];
-                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, isEvent, eventCode, customizationID, eventNomina };
+                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, isEvent, eventCode, customizationID, eventNomina, sendTestSet };
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
                     else
                     {
-                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, eventNomina };
+                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, eventNomina, sendTestSet };
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
@@ -329,7 +332,8 @@ namespace Gosocket.Dian.Functions.Batch
             }
             catch (Exception ex)
             {
-                SetLogger(null, "Step prueba nomina", " Error " + ex.StackTrace);
+                SetLogger(null, "Step prueba nomina", " Error " + ex.StackTrace, "Err-PROCBATCH-trace");
+                SetLogger(null, "Step prueba nomina", " Error " + ex.Message,"Err-PROCBATCH");
                 log.Error($"Error al procesar batch con trackId {zipKey}. Ex: {ex.StackTrace}");
                 batchFileStatus.StatusCode = "ex";
                 batchFileStatus.StatusDescription = $"Error al procesar batch. ZipKey: {zipKey}";
@@ -377,12 +381,22 @@ namespace Gosocket.Dian.Functions.Batch
 
         private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, string habNomina = null, string nitNomina = null, Boolean flagApplicationResponse = false)
         {
+            SetLogger(null, "Step-Checkpermission 1", responseXpathDataValue.Count().ToString(), "CHECK-01");
+            SetLogger(null, "Step-Checkpermission 1", authCode, "CHECK-02");
+            SetLogger(null, "Step-Checkpermission 2", testSetId, "CHECK-03");
+            SetLogger(null, "Step-Checkpermission 3", habNomina, "CHECK-04");
+            SetLogger(null, "Step-Checkpermission 4", nitNomina, "CHECK-05");
+            SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06");
+            
             var result = new List<XmlParamsResponseTrackId>();
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResProviderIdXpath" : "SenderCodeXpath"]).Distinct();
-
+            SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.1");
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
+
+            SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.2");
             foreach (var code in codes.ToList())
             {
+                SetLogger(null, "Step code", code, "CHECK-07");
                 var trimAuthCode = authCode.Trim();
                 var newAuthCode = trimAuthCode.Substring(0, trimAuthCode.Length - 1);
                 GlobalAuthorization authEntity = null;
@@ -391,8 +405,10 @@ namespace Gosocket.Dian.Functions.Batch
                     result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT de la empresa no encontrado en el certificado." });
                 else
                 {
-                    if (!string.IsNullOrEmpty(testSetId) && nitNomina.Length == 0)
+                    SetLogger(null, "Step code", "Ingrese a validar", "CHECK-08");
+                    if (!string.IsNullOrEmpty(testSetId) && string.IsNullOrEmpty(nitNomina))
                     {
+                        SetLogger(null, "Step code", "tengo set pruebas ni nit de nomina --- RADIAN", "CHECK-09");
                         List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
 
                         RadianTestSetResult objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
@@ -400,6 +416,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                         if (objRadianTestSetResult == null)
                         {
+                            SetLogger(null, "Step code", "Estoy verificando Factrua", "CHECK-10.1");
                             authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
                             if (authEntity == null)
                                 authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(newAuthCode, code);
@@ -439,8 +456,9 @@ namespace Gosocket.Dian.Functions.Batch
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
 
                         }
-                        else if (!string.IsNullOrEmpty(habNomina) && nitNomina.Length > 0)
+                        else if (!string.IsNullOrEmpty(habNomina) &&  !string.IsNullOrEmpty(nitNomina))
                         {
+                            SetLogger(null, "Step code", "Estoy verificando nomina", "CHECK-10.2");
                             List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
                             GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(habNomina.Trim(), StringComparison.OrdinalIgnoreCase));
                             var idSoftware = softwareIds.Last();
@@ -488,6 +506,7 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else
                         {
+                            SetLogger(null, "Step code", "Estoy verificando RADIAN", "CHECK-10.3");
                             // Validations to RADIAN  
                             bool isActive = globalRadianOperationService.IsActive(code, new Guid(softwareId));
                             if (isActive)

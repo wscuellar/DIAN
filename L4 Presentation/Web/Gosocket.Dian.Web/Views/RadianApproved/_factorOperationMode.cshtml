@@ -21,7 +21,7 @@
         }
         @if (operationMode == "2")
         {
-            <div class="back-button"><a href="@Url.Action("ElectronicInvoiceView","Radian")"><i class="fa fa-chevron-left"></i> Volver</a></div>
+            <div class="back-button"><a href="@Url.Action("Index","Radian")"><i class="fa fa-chevron-left"></i> Volver</a></div>
         }
 
     </div>
@@ -30,7 +30,7 @@
             <div class="panel-body padding-top-20">
                 <div class="pad-btm padding-bottom-0">
                     <div class="row margin-horizontal-0">
-                        @using (Html.BeginForm("UploadFactorOperationMode", "RadianApproved", FormMethod.Post, new { id = "radian-contributors-form" }))
+                        @using (Html.BeginForm("UpdateFactorOperationMode", "RadianApproved", FormMethod.Post, new { id = "radian-operation-form" }))
                         {
                             @Html.HiddenFor(m => m.Contributor.Id)
                             @Html.HiddenFor(m => m.SoftwareUrl)
@@ -86,15 +86,15 @@
                                                     <div class="col-sm-3 padding-xs-0">
                                                         <div class="form-group">
                                                             @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
-                                                            @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                            @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
+                                                            @Html.TextBoxFor(m => m.SoftwareName, new { @class = "form-control input-general" })
+                                                            @Html.ValidationMessageFor(m => m.SoftwareName, "", new { @class = "text-danger" })
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3 padding-xs-0">
                                                         <div class="form-group">
                                                             @Html.LabelFor(m => m.SoftwarePin, new { @class = "control-label" })
-                                                            @Html.TextBoxFor(m => m.SoftwarePin, new { @id = "SoftwarePin", @name = "SoftwarePin", @class = "form-control input-general", @style = "background: #ffffff;" })
-                                                            @Html.ValidationMessageFor(m => m.SoftwarePin, null, new { @class = "text-danger" })
+                                                            @Html.TextBoxFor(m => m.SoftwarePin, new { @class = "form-control input-general" })
+                                                            @Html.ValidationMessageFor(m => m.SoftwarePin, "", new { @class = "text-danger" })
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3 padding-xs-0">
@@ -111,7 +111,7 @@
                                             {
                                                 <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
                                             }
-                                            <button name="Submit" id="save-operation-mode" class="btn btn-radian-success" type="submit">@(operationMode == "2" ? "Asociar" : "Adicionar")</button>
+                                            <button type="submit" id="save-operation-mode" class="btn btn-radian-success">@(operationMode == "2" ? "Asociar" : "Adicionar")</button>
                                         </div>
 
                                     </div>

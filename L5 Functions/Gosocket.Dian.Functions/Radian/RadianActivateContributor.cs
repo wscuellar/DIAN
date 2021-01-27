@@ -196,6 +196,7 @@ namespace Gosocket.Dian.Functions.Radian
                     contributorActivationTableManager.InsertOrUpdate(contributorActivation);
 
                     SetLogger(contributorActivation, "RA-Exception", ex.Message + " -- -- " + ex);
+                    SetLogger(contributorActivation, "RA-Exception", ex.StackTrace,"Excep-01");
 
                     log.Error($"Exception in RadianActivateContributor. {ex.Message}", ex);
                     //    throw;
