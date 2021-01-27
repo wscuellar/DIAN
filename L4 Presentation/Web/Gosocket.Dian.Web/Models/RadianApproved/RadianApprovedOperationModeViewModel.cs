@@ -16,6 +16,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
 
         [Display(Name = "Nombre del software")]
         [Required(ErrorMessage = "Nombre de software es requerido")]
+        [MaxLength(50, ErrorMessage = "Máximo {1} carácteres")]
         public string SoftwareName { get; set; }
 
         public Guid SoftwareId { get; set; }
