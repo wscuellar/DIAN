@@ -83,6 +83,9 @@ namespace Gosocket.Dian.Plugin.Functions.Event
             public string ListId { get; set; }
             [JsonProperty(PropertyName = "customizationID")]
             public string CustomizationID { get; set; }
+
+            public RequestObject() { }
+
         }
     }
 }
