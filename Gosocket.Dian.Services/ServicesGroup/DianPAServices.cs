@@ -1000,6 +1000,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             start = DateTime.UtcNow;
             trackId = trackIdCude;
             bool isEvent = true;
+            bool sendTestSet = false;
             var uploadXmlRequest = new
             {
                 xmlBase64,
@@ -1008,7 +1009,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 trackId,
                 isEvent,
                 eventCode,
-                customizationID
+                customizationID,
+                sendTestSet
             };
             var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
             if (!uploadXmlResponse.Success)

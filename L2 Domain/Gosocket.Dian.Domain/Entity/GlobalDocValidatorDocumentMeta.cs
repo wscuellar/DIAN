@@ -50,4 +50,5 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public DateTime SigningTimeStamp { get; set; }
     public double NewAmountTV { get; set; }
     public bool IsInvoiceTV { get; set; }
+    public bool SendTestSet { get; set; }
 }
