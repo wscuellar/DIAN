@@ -285,6 +285,7 @@ namespace Gosocket.Dian.Functions.Activation
                             && radianTesSetResult.PaymentNotificationTotalRequired >= radianTesSetResult.PaymentNotificationTotalAcceptedRequired
                             && radianTesSetResult.CirculationLimitationTotalRequired >= radianTesSetResult.CirculationLimitationTotalAcceptedRequired
                             && radianTesSetResult.EndCirculationLimitationTotalRequired >= radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired
+                            && radianTesSetResult.ReportForPaymentTotalRequired >= radianTesSetResult.ReportForPaymentTotalAcceptedRequired
                             && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
                     {
                         radianTesSetResult.Status = (int)TestSetStatus.Accepted;
@@ -671,6 +672,7 @@ namespace Gosocket.Dian.Functions.Activation
             catch (Exception ex)
             {
                 SetLogger(null, "Error-General", ex.Message, "Error-UPT");
+                SetLogger(null, "Error-General", ex.StackTrace, "Error-UPT-Trace");
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 throw;
             }

@@ -208,7 +208,8 @@ namespace Gosocket.Dian.Functions.Batch
                 log.Info($"Init upload xml�s.");
                 BlockingCollection<ResponseUploadXml> uploadResponses = new BlockingCollection<ResponseUploadXml>();
                 SetLogger(null, "Step prueba nomina", " Paso multipleResponsesXpathDataValue " + multipleResponsesXpathDataValue.Count);
-                
+
+                bool sendTestSet = !string.IsNullOrWhiteSpace(testSetId);
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
                 {
                     Boolean isEvent = flagApplicationResponse;
@@ -218,6 +219,7 @@ namespace Gosocket.Dian.Functions.Batch
                     var documentTypeId = "";
                     var trackId = "";
                     var softwareId = "";
+
 
                     if (setResult != null)
                     {
@@ -245,13 +247,13 @@ namespace Gosocket.Dian.Functions.Batch
                     {
                         var eventCode = response.XpathsValues["AppResEventCodeXpath"];
                         var customizationID = response.XpathsValues["AppResCustomizationIDXpath"];
-                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, isEvent, eventCode, customizationID, eventNomina };
+                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, isEvent, eventCode, customizationID, eventNomina, sendTestSet };
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
                     else
                     {
-                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, eventNomina };
+                        var uploadXmlRequest = new { xmlBase64, fileName, documentTypeId, softwareId, trackId, zipKey, testSetId, eventNomina, sendTestSet };
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
