@@ -1880,7 +1880,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
         {
             var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });
             //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateReferenceAttorney", new { trackId });
-
             if (validations.Count > 0)
             {
                 if (response.ErrorMessage.Count == 0)
