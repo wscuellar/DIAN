@@ -301,7 +301,6 @@ namespace Gosocket.Dian.Web.Controllers
             testSetResult.TotalAutomaticAcceptanceSent = 0;
             testSetResult.TotalCirculationLimitationSent = 0;
             testSetResult.TotalDocumentAccepted = 0;
-            testSetResult.TotalDocumentAcceptedRequired = 0;
             testSetResult.TotalDocumentSent = 0;
             testSetResult.TotalDocumentsRejected = 0;
             testSetResult.ReportForPaymentTotalRequired = 0;

@@ -1329,6 +1329,8 @@ button.selectpicker {
     background-position: 20% 50% !important;
     display: inline-flex;
     width: 46%;
+    font-size: 11px;
+    letter-spacing: -0.4px;
 }
 
 #dateFrom {
@@ -1625,7 +1627,7 @@ button.selectpicker {
 
 
 #table-history tr th:nth-child(2) {
-    background-position: 73px;
+    background-position: 95px;
 }
 
 #table-history tr th:nth-child(3) {
@@ -1938,4 +1940,8 @@ ul#list li a:hover {
     position: absolute;
     left: 0;
     z-index: -1;
+}
+
+.dataTables_empty {
+    text-align: center !important;
 }

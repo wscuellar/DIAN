@@ -164,12 +164,12 @@
     <script>
         $(document).ready(function () {
             var urlNewUser = "@Url.Action("FreeBillerUser")";
-            $("#btnSend").click(function (e) {
+            $("#btnSend").click(function (e) {debugger
                 var form = $("#create-user-form");
                 if ($(form).valid()) {
                     showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
                     e.preventDefault();
-                        var data = {
+                    var data = {
                         FullName: $('[name=FullName]').val(),
                         TypeDocId: $('[name=TypeDocId]').val(),
                         NumberDoc: $('[name=NumberDoc]').val(),
