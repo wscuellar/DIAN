@@ -129,7 +129,7 @@ namespace Gosocket.Dian.Functions.Radian
 
                     await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
 
-                    SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ");
+                    SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ", "STA-7");
 
                 }
                 catch (Exception ex)
