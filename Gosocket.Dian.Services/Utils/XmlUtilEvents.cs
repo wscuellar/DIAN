@@ -137,7 +137,12 @@ namespace Gosocket.Dian.Services.Utils
 
             var uuId = $"{processResultEntity.UblVersion}{processResultEntity.DocumentTypeId}{processResultEntity.SenderCode}{processResultEntity.ReceiverCode}{processResultEntity.Serie}{processResultEntity.Number}";
             var profileExecutionId = "1";
-            if (ConfigurationManager.GetValue("Environment") != "Prod") profileExecutionId = "2";
+            var schemeID = "1";
+            if (ConfigurationManager.GetValue("Environment") != "Prod")
+            {
+                profileExecutionId = "2";
+                schemeID = "2";
+            }
 
             var cufe = CreateCufeId(uuId);
             var issueDate = DateTime.UtcNow;
@@ -158,6 +163,7 @@ namespace Gosocket.Dian.Services.Utils
                 new XElement(cbc + "ProfileExecutionID", profileExecutionId),
                 new XElement(cbc + "ID", $"{GetRandomInt()}"),
                 new XElement(cbc + "UUID", cufe,
+                    new XAttribute("schemeID", schemeID),
                     new XAttribute("schemeName", "CUDE-SHA384")),
                 new XElement(cbc + "IssueDate", issueDate.AddHours(-5).ToString("yyyy-MM-dd")),
                 new XElement(cbc + "IssueTime", $"{issueDate.AddHours(-5).ToString("HH:mm:ss")}-05:00"));
@@ -170,7 +176,7 @@ namespace Gosocket.Dian.Services.Utils
                         new XElement(cbc + "RegistrationName", "Unidad Especial Dirección de Impuestos y Aduanas Nacionales"),
                         new XElement(cbc + "CompanyID", $"800197268",
                             new XAttribute("schemeID", "4"),
-                            new XAttribute("schemeName", $"{processResultEntity.SenderTypeCode}")),
+                            new XAttribute("schemeName", $"{processResultEntity.SenderSchemeCode}")),
                         new XElement(cac + "TaxScheme",
                             new XElement(cbc + "ID", "01"),
                             new XElement(cbc + "Name", "IVA"))));
@@ -182,7 +188,7 @@ namespace Gosocket.Dian.Services.Utils
                 new XElement(cac + "PartyTaxScheme",
                  new XElement(cbc + "RegistrationName", $"{docMetadataEntity.SenderName}"),
                     new XElement(cbc + "CompanyID", $"{docMetadataEntity.SenderCode}",
-                        new XAttribute("schemeID", $"{docMetadataEntity.SenderTypeCode}"),
+                        new XAttribute("schemeID", $"{GetDigitCode(docMetadataEntity.SenderCode)}"),
                         new XAttribute("schemeName", $"{docMetadataEntity.SenderSchemeCode}")),
                     new XElement(cac + "TaxScheme",
                         new XElement(cbc + "ID", "01"),
@@ -234,7 +240,7 @@ namespace Gosocket.Dian.Services.Utils
                         new XElement(cac + "PartyTaxScheme",
                             new XElement(cbc + "RegistrationName", $"{originalEvent.SenderName}"),
                             new XElement(cbc + "CompanyID", $"{originalEvent.SenderCode}",
-                                new XAttribute("schemeID", $"{originalEvent.SenderTypeCode}"),
+                                new XAttribute("schemeID", $"{GetDigitCode(originalEvent.SenderCode)}"),
                                 new XAttribute("schemeName", $"{originalEvent.SenderSchemeCode}")),
                             new XElement(cac + "TaxScheme",
                                 new XElement(cbc + "ID", "01"),
@@ -247,7 +253,7 @@ namespace Gosocket.Dian.Services.Utils
                         new XElement(cac + "PartyTaxScheme",
                             new XElement(cbc + "RegistrationName", $"{originalEvent.ReceiverName}"),
                             new XElement(cbc + "CompanyID", $"{originalEvent.ReceiverCode}",
-                                new XAttribute("schemeID", $"{originalEvent.ReceiverTypeCode}"),
+                                new XAttribute("schemeID", $"{GetDigitCode(originalEvent.ReceiverCode)}"),
                                 new XAttribute("schemeName", $"{originalEvent.ReceiverSchemeCode}")),
                             new XElement(cac + "TaxScheme",
                                 new XElement(cbc + "ID", "01"),
@@ -430,6 +436,32 @@ namespace Gosocket.Dian.Services.Utils
                     }
                 }
                 throw new CryptographicException($"No certificate found with thumbprint: {thumbprint}");
+            }
+        }
+
+        private static int GetDigitCode(string code)
+        {
+            try
+            {
+                int[] cousins = new int[] { 0, 3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71 };
+                int dv, actualCousin, _totalOperacion = 0, residue, totalDigits = code.Length;
+
+                for (int i = 0; i < totalDigits; i++)
+                {
+                    actualCousin = int.Parse(code.Substring(i, 1));
+                    _totalOperacion += actualCousin * cousins[totalDigits - i];
+                }
+                residue = _totalOperacion % 11;
+                if (residue > 1)
+                    dv = 11 - residue;
+                else
+                    dv = residue;
+
+                return dv;
+            }
+            catch (Exception)
+            {
+                return 0;
             }
         }
     }

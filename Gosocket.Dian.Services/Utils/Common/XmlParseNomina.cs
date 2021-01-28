@@ -28,7 +28,8 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string Encoding { get; set; }
         public string ParserError { get; set; }
         public string SigningTime { get; set; }
-       
+        public bool Novelty { get; set; }
+
 
         public XmlParseNomina()
         {
@@ -75,6 +76,8 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var nodeComprobanteTotal = "//*[local-name()='ComprobanteTotal']";
                     var nodeNotas = "//*[local-name()='Notas']";
 
+                    var novedadXmlNode = XmlDocument.SelectSingleNode("//*[local-name()='Novedad']");
+                    this.Novelty = (novedadXmlNode != null) ? bool.Parse(novedadXmlNode.InnerText) : false;
                     globalDocPayrolls.devengadosTotal = XmlDocument.SelectSingleNode(nodeDevengadoTotal)?.InnerText;
                     globalDocPayrolls.deduccionesTotal = XmlDocument.SelectSingleNode(nodeDeduccionTotal)?.InnerText;
                     globalDocPayrolls.comprobanteTotal = XmlDocument.SelectSingleNode(nodeComprobanteTotal)?.InnerText;

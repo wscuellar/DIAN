@@ -62,7 +62,11 @@
         color: #2C323C;
     }
 
-    .titleSecondary {
+    .titlecs-new {
+        font-size: 18px;
+    }
+
+        .titleSecondary {
         /* Validaciones del Evento */
         font-family: Arial;
         font-style: normal;
@@ -159,6 +163,7 @@
         padding-top: 2px;
         text-decoration: underline;
         color: #348441;
+        font-size: 18px;
     }
 </style>
 
@@ -170,38 +175,35 @@
         <div class="panel panel-event margin-top-0" id="panel-form_1" data-target="#panel-form_1" data-toggle="panel-form_1">
             <div class="panel-heading padding-15">
                 <div class="row">
-                    <div class="col-sm-8 left-section">
-                        <p class="titlecs">
-                            @Model.Title
-                        </p>
-                        <div class="underline-title"></div>
-                    </div>
-                    <div class="col-sm-4 text-right right-section">
+                    <div class="col-sm-12 text-right right-section">
                         <i class="fa fa-times-circle close-button-acuse" onclick="darClick()"></i>
                     </div>
                 </div>
             </div>
             <div class="panel-body padding-top-20">
                 <div class="row cude-section">
-                    <div class="col-sm-4 left-section">
+                    <div class="col-md-3" style="padding-left: 0;padding-top:7px;">
+                        <img class="img-responsive" style="max-height: 130px;" src="~/Content/img/LogoDian.png">
+                    </div>
+                    <div class="col-sm-5 left-section">
                         <span>CUDE:</span>
                         <span class="cude-text">@Model.CUDE</span>
-                        <div class="left-section ContainerDownload">
-                            <p>
-                                <i class="fa fa-download"></i>
-                                <um>
-                                    <button id="show-graphic-document" class="btn btn-link btn-link-download" onclick="showModal('@Model.CUDE')">Descarga</button>
-                                </um>
-                            </p>
-                        </div>
                     </div>
-                    <div class="col-sm-8 text-right right-section">
+                    <div class="col-sm-4 text-right right-section">
+                        <span class="tipo-doc"><b>@Model.Title</b></span>
                         <span>Prefijo: @Model.Prefix </span>
                         <span>Número: @Model.Number</span>
                         <span>Fecha de emisión del evento: @Model.DateOfIssue.ToString("yyyy-MM-dd")</span>
                     </div>
                 </div>
-
+                <div class="left-section ContainerDownload">
+                    <p>
+                        <i class="fa fa-download"></i>
+                        <um>
+                            <button id="show-graphic-document" class="btn btn-link btn-link-download" onclick="showModal('@Model.CUDE')">Descarga</button>
+                        </um>
+                    </p>
+                </div>
                 <div class="row aditional-data-section padding-panel">
                     <div class="col-sm-4">
                         <h5><strong>DATOS DEL EMISOR DEL EVENTO </strong></h5>

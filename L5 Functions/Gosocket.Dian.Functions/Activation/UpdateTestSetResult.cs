@@ -93,13 +93,17 @@ namespace Gosocket.Dian.Functions.Activation
                     SetLogger(null, "Step 3", "No esta Activo El RadianContributor");
 
                     //Ajustamos los documentType para sean los eventos de la factura
+                    SetLogger(null, "Step 3.1", allGlobalTestSetTracking.Count.ToString(), "GTS-count");
                     foreach (var item in allGlobalTestSetTracking)
                     {
                         //Consigue informacion del CUDE
                         GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(item.TrackId, item.TrackId);
                         item.DocumentTypeId = validatorDocumentMeta.EventCode;
+                        SetLogger(null, "Step 3.2", item.DocumentTypeId, "GTS-count-3.2");
+                        SetLogger(null, "Step 3.3", item.IsValid.ToString(), "GTS-count-3.3");
                     }
-
+                    
+                    SetLogger(null, "Step 3.4", allGlobalTestSetTracking[0].DocumentTypeId, "GTS-count-3.4");
                     // Esto ya no es neceasario 2020-12-14 Roberto Alvarado
                     // Le asigno el Id 
 
@@ -108,137 +112,160 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
 
                     // Acuse de Recibo
-                    string tipo = EventStatus.Receipt.ToString();
-                    radianTesSetResult.TotalReceiptNoticeSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.ReceiptNoticeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.ReceiptNoticeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    int tipo = (int)EventStatus.Received;
+                    radianTesSetResult.TotalReceiptNoticeSent = allGlobalTestSetTracking.Count(a =>  Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ReceiptNoticeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ReceiptNoticeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 3", "Acuse de recibo");
+                    SetLogger(null, "Step 3", "Acuse de recibo", "AR_001");
+                    SetLogger(null, "Step 3.0", tipo.ToString(),"AR_001.1");
+                    SetLogger(null, "Step 3.1", radianTesSetResult.TotalReceiptNoticeSent.ToString(), "AR_002");
+                    SetLogger(null, "Step 3.2", radianTesSetResult.ReceiptNoticeAccepted.ToString(), "AR_003");
+                    SetLogger(null, "Step 3.6", radianTesSetResult.ReceiptNoticeRejected.ToString(), "AR_004");
 
                     // Recibo del Bien
-                    tipo = EventStatus.Received.ToString();
-                    radianTesSetResult.TotalReceiptServiceSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.ReceiptServiceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.ReceiptServiceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    tipo = (int)EventStatus.Receipt;
+                    radianTesSetResult.TotalReceiptServiceSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ReceiptServiceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ReceiptServiceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 4", "Recibo del bien");
+                    SetLogger(null, "Step 4", "Recibo del bien", "RB_001");
+                    SetLogger(null, "Step 4.0", tipo.ToString(), "RB_001.1");
+                    SetLogger(null, "Step 4.1", radianTesSetResult.TotalReceiptServiceSent.ToString(), "RB_002");
+                    SetLogger(null, "Step 4.2", radianTesSetResult.ReceiptServiceAccepted.ToString(), "RB_003");
+                    SetLogger(null, "Step 4.3", radianTesSetResult.ReceiptServiceRejected.ToString(), "RB_004");
 
-                    //  Aceptación expresa
-                    tipo = EventStatus.Accepted.ToString();
-                    radianTesSetResult.TotalExpressAcceptanceSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.ExpressAcceptanceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.ExpressAcceptanceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    ////  Aceptación expresa
+                    tipo = (int)EventStatus.Accepted;
+                    radianTesSetResult.TotalExpressAcceptanceSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ExpressAcceptanceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ExpressAcceptanceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 5", "Aceptacion Expresa");
+                    SetLogger(null, "Step 5", "Aceptacion Expresa", "AE_001");
+                    SetLogger(null, "Step 5.0", tipo.ToString(), "AE_001.1");
+                    SetLogger(null, "Step 5.1", radianTesSetResult.TotalExpressAcceptanceSent.ToString(), "AE_002");
+                    SetLogger(null, "Step 5.2", radianTesSetResult.ExpressAcceptanceAccepted.ToString(), "AE_003");
+                    SetLogger(null, "Step 5.3", radianTesSetResult.ExpressAcceptanceRejected.ToString(), "AE_004");
 
 
-                    // Manifestación de aceptación
-                    tipo = EventStatus.AceptacionTacita.ToString();
-                    radianTesSetResult.TotalAutomaticAcceptanceSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.AutomaticAcceptanceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.AutomaticAcceptanceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Manifestación de aceptación
+                    tipo = (int)EventStatus.AceptacionTacita;
+                    radianTesSetResult.TotalAutomaticAcceptanceSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.AutomaticAcceptanceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.AutomaticAcceptanceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 6", "Manifectacion de aceptacion");
+                    SetLogger(null, "Step 6", "Manifectacion de aceptacion", "MA_001");
+                    SetLogger(null, "Step 6.0", tipo.ToString(), "MA_001.1");
+                    SetLogger(null, "Step 6.1", radianTesSetResult.TotalAutomaticAcceptanceSent.ToString(), "MA_002");
+                    SetLogger(null, "Step 6.2", radianTesSetResult.AutomaticAcceptanceAccepted.ToString(), "MA_003");
+                    SetLogger(null, "Step 6.3", radianTesSetResult.AutomaticAcceptanceRejected.ToString(), "MA_004");
 
-                    // Rechazo factura electrónica
-                    tipo = EventStatus.Rejected.ToString();
-                    radianTesSetResult.TotalRejectInvoiceSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.RejectInvoiceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.RejectInvoiceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Rechazo factura electrónica
+                    tipo = (int)EventStatus.Rejected;
+                    radianTesSetResult.TotalRejectInvoiceSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.RejectInvoiceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.RejectInvoiceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 7", "Rechazo factura electrónica");
 
-                    // Solicitud disponibilización
-                    tipo = EventStatus.SolicitudDisponibilizacion.ToString();
-                    radianTesSetResult.TotalApplicationAvailableSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.ApplicationAvailableAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.ApplicationAvailableRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Solicitud disponibilización
+                    tipo = (int)EventStatus.SolicitudDisponibilizacion;
+                    radianTesSetResult.TotalApplicationAvailableSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ApplicationAvailableAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ApplicationAvailableRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 8", "Solicitud disponibilización");
 
-                    // Endoso de propiedad 
-                    tipo = EventStatus.EndosoPropiedad.ToString();
-                    radianTesSetResult.TotalEndorsementPropertySent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndorsementPropertyAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndorsementPropertyRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Endoso de propiedad 
+                    tipo = (int)EventStatus.EndosoPropiedad;
+                    radianTesSetResult.TotalEndorsementPropertySent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndorsementPropertyAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndorsementPropertyRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 9", "Endoso de propiedad");
 
-                    // Endoso de Garantia 
-                    tipo = EventStatus.EndosoGarantia.ToString();
-                    radianTesSetResult.TotalEndorsementGuaranteeSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndorsementGuaranteeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndorsementGuaranteeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Endoso de Garantia 
+                    tipo = (int)EventStatus.EndosoGarantia;
+                    radianTesSetResult.TotalEndorsementGuaranteeSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndorsementGuaranteeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndorsementGuaranteeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 10", "Endoso de Garantia");
 
-                    // Endoso de Procuracion 
-                    tipo = EventStatus.EndosoProcuracion.ToString();
-                    radianTesSetResult.TotalEndorsementProcurementSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndorsementProcurementAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndorsementProcurementRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Endoso de Procuracion 
+                    tipo = (int)EventStatus.EndosoProcuracion;
+                    radianTesSetResult.TotalEndorsementProcurementSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndorsementProcurementAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndorsementProcurementRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 11", "Endoso de Procuracion");
 
-                    // Cancelación de endoso 
-                    tipo = EventStatus.InvoiceOfferedForNegotiation.ToString();
-                    radianTesSetResult.TotalEndorsementCancellationSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndorsementCancellationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndorsementCancellationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
-
+                    //// Cancelación de endoso 
+                    tipo = (int)EventStatus.InvoiceOfferedForNegotiation;
+                    radianTesSetResult.TotalEndorsementCancellationSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndorsementCancellationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndorsementCancellationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 12", "Cancelación de endoso");
 
-                    // Avales
-                    tipo = EventStatus.Avales.ToString();
-                    radianTesSetResult.TotalGuaranteeSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.GuaranteeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.GuaranteeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Avales
+                    tipo = (int)EventStatus.Avales;
+                    radianTesSetResult.TotalGuaranteeSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.GuaranteeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.GuaranteeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 13", "Avales");
 
 
-                    // Mandato electrónico
-                    tipo = EventStatus.Mandato.ToString();
-                    radianTesSetResult.TotalElectronicMandateSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.ElectronicMandateAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.ElectronicMandateRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Mandato electrónico
+                    tipo = (int)EventStatus.Mandato;
+                    radianTesSetResult.TotalElectronicMandateSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ElectronicMandateAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ElectronicMandateRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 14", "Mandato electrónico");
 
 
-                    // Terminación mandato
-                    tipo = EventStatus.TerminacionMandato.ToString();
-                    radianTesSetResult.TotalEndMandateSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndMandateAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndMandateRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Terminación mandato
+                    tipo = (int)EventStatus.TerminacionMandato;
+                    radianTesSetResult.TotalEndMandateSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndMandateAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndMandateRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 15", "Terminación mandato");
 
-                    // Notificación de pago
-                    tipo = EventStatus.NotificacionPagoTotalParcial.ToString();
-                    radianTesSetResult.TotalPaymentNotificationSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.PaymentNotificationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.PaymentNotificationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Notificación de pago
+                    tipo = (int)EventStatus.NotificacionPagoTotalParcial;
+                    radianTesSetResult.TotalPaymentNotificationSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.PaymentNotificationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.PaymentNotificationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 16", "Notificación de pago");
 
 
-                    // Limitación de circulación     
-                    tipo = EventStatus.NegotiatedInvoice.ToString();
-                    radianTesSetResult.TotalCirculationLimitationSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.CirculationLimitationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.CirculationLimitationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Limitación de circulación     
+                    tipo = (int)EventStatus.NegotiatedInvoice;
+                    radianTesSetResult.TotalCirculationLimitationSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.CirculationLimitationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.CirculationLimitationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 17", "Limitación de circulación");
 
-                    // Terminación limitación  
-                    tipo = EventStatus.AnulacionLimitacionCirculacion.ToString();
-                    radianTesSetResult.TotalEndCirculationLimitationSent = allGlobalTestSetTracking.Count(a => a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndCirculationLimitationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && a.DocumentTypeId == tipo);
-                    radianTesSetResult.EndCirculationLimitationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && a.DocumentTypeId == tipo);
+                    //// Terminación limitación  
+                    tipo = (int)EventStatus.AnulacionLimitacionCirculacion;
+                    radianTesSetResult.TotalEndCirculationLimitationSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndCirculationLimitationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndCirculationLimitationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 18", "Terminación limitación");
+
+                    //// Informe para el pago  
+                    tipo = (int)EventStatus.ValInfoPago;
+                    radianTesSetResult.TotalReportForPaymentSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ReportForPaymentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ReportForPaymentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+
+                    SetLogger(null, "Step 19", "Informe para el pago");
 
                     // Definimos la Aceptacion y cambio de estado
                     if (radianTesSetResult.TotalDocumentAccepted >= radianTesSetResult.TotalDocumentAcceptedRequired
@@ -258,6 +285,7 @@ namespace Gosocket.Dian.Functions.Activation
                             && radianTesSetResult.PaymentNotificationTotalRequired >= radianTesSetResult.PaymentNotificationTotalAcceptedRequired
                             && radianTesSetResult.CirculationLimitationTotalRequired >= radianTesSetResult.CirculationLimitationTotalAcceptedRequired
                             && radianTesSetResult.EndCirculationLimitationTotalRequired >= radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired
+                            && radianTesSetResult.ReportForPaymentTotalRequired >= radianTesSetResult.ReportForPaymentTotalAcceptedRequired
                             && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
                     {
                         radianTesSetResult.Status = (int)TestSetStatus.Accepted;
@@ -295,19 +323,18 @@ namespace Gosocket.Dian.Functions.Activation
                                 var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
 
                                 //Habilitamos el participante en GlobalRadianOperations
-                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.EnableParticipantRadian(radianTesSetResult.PartitionKey, globalTestSetTracking.SoftwareId);
+                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
 
-
-                                SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
+                                //SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
 
                                 //Verificamos si quedo habilitado sino termina
-                                if (isPartipantActive.RadianState != Domain.Common.RadianState.Habilitado.GetDescription()) return;
+                                //if (isPartipantActive.RadianState != Domain.Common.RadianState.Habilitado.GetDescription()) return;
 
-                                SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
+                                //SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
 
 
                                 //--GlobalSoftware 
-                                var softwareId = isPartipantActive.RowKey;
+                                var softwareId = globalTestSetTracking.SoftwareId; //isPartipantActive.RowKey;
                                 var software = softwareService.GetByRadian(Guid.Parse(softwareId));
 
                                 #endregion
@@ -644,6 +671,8 @@ namespace Gosocket.Dian.Functions.Activation
             }
             catch (Exception ex)
             {
+                SetLogger(null, "Error-General", ex.Message, "Error-UPT");
+                SetLogger(null, "Error-General", ex.StackTrace, "Error-UPT-Trace");
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 throw;
             }

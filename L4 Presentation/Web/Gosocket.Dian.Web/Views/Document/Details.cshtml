@@ -1,5 +1,5 @@
 ﻿@model Gosocket.Dian.Web.Models.DocValidatorModel
-
+@using Gosocket.Dian.Infrastructure
 @{
     ViewBag.Title = "Detalles del documento";
 }
@@ -103,6 +103,7 @@
         }
 
         $(document).ready(function () {
+            SetCapcthatoken('@ConfigurationManager.GetValue("Recaptcha")');
             showPdfModal("#show-document", "@Model.Document.DocumentKey", '@Url.Action("PrintDocument", "Document")', '#panel-form');
             showPdfModal("#show-supportdocument", "@Model.Document.DocumentKey", '@Url.Action("PrintSupportDocument", "Document")', '#panel-form');
             $('#container1-title').hide();
@@ -128,6 +129,8 @@
 
             $('#divViewMoreQueryList').hide();
         });
+
+
 
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()

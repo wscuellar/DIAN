@@ -189,7 +189,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-                IsValidCaptcha(recaptchaToken);
+                //IsValidCaptcha(recaptchaToken);
                 string url = ConfigurationManager.GetValue("GetPdfUrl");
 
                 var requestObj = new { trackId };
@@ -604,27 +604,13 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
 
+        [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
             String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
         }
-
-        #region SendMail
-
-        [HttpGet]
-        public ActionResult SendMail(string correo)
-        {
-            ExternalUserViewModel model = new ExternalUserViewModel();
-            model.Names = "Rodolfo Mendieta";
-            model.Email = correo;
-            model.Password = "123456**";
-            bool result = SendMailCreate(model);
-            return Json(result);
-        }
-
-        #endregion
 
         [ExcludeFilter(typeof(Authorization))]
         public async Task<ActionResult> ShowDocumentToPublic(string Id)
@@ -768,7 +754,7 @@ namespace Gosocket.Dian.Web.Controllers
                         if (!string.IsNullOrEmpty(eventItem.EventCode))
                         {
                             GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
-                            if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
+                            if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
                             {
                                 string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
                                 model.Events.Add(new EventsViewModel()
@@ -1097,7 +1083,10 @@ namespace Gosocket.Dian.Web.Controllers
             if (events.Count() == 0)
                 return RadianDocumentStatus.DontApply.GetDescription();
 
-            int lastEventCode = int.Parse(events.OrderBy(t => t.Date).Last().Code);
+            int lastEventCode = int.Parse(events.Where(ev => !ev.Code.Equals($"0{(int)EventStatus.Avales}") 
+                    &&  !ev.Code.Equals($"0{(int)EventStatus.Mandato}") 
+                    &&  !ev.Code.Equals($"0{(int)EventStatus.ValInfoPago}") 
+                    &&  !ev.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).OrderBy(t => t.Date).Last().Code);
 
             if (lastEventCode == ((int)EventStatus.NegotiatedInvoice)
                 || lastEventCode == ((int)EventStatus.AnulacionLimitacionCirculacion))

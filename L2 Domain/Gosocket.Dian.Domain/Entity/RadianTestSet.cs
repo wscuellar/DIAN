@@ -72,5 +72,7 @@ namespace Gosocket.Dian.Domain.Entity
         public string CreatedBy { get; set; }
         public string UpdateBy { get; set; }
         public bool Active { get; set; }
+        public int ReportForPaymentTotalRequired { get; set; }
+        public int ReportForPaymentTotalAcceptedRequired { get; set; }
     }
 }

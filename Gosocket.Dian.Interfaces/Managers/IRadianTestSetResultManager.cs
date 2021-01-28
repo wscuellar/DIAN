@@ -11,5 +11,6 @@ namespace Gosocket.Dian.Interfaces.Managers
         bool InsertOrUpdateTestSetResult(RadianTestSetResult testSetResult);
         List<RadianTestSetResult> GetTestSetResultByNit(string nit);
         List<GlobalTestSetResult> GetTestSetResulByCatalog(string code);
+        bool ResetPreviousCounts(string testSetId);
     }
 }

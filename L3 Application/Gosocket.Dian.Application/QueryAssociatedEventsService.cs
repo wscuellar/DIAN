@@ -83,11 +83,6 @@ namespace Gosocket.Dian.Application
                     if (customizationId == CONS363 || customizationId == CONS364)
                         title = TextResources.SolicitudDisponibilizacion1;
                     break;
-                case EventStatus.EndosoGarantia:
-                case EventStatus.EndosoProcuracion:
-                case EventStatus.EndosoPropiedad:
-                    title = TextResources.Endoso;
-                    break;
                 default:
                     title = EnumHelper.GetEnumDescription(Enum.Parse(typeof(EventStatus), eventCode));
                     break;
@@ -105,7 +100,7 @@ namespace Gosocket.Dian.Application
             GlobalDocValidatorDocument eventVerification = EventVerification(otherEvent.Identifier);
 
             return eventVerification != null
-                && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10);
+                && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10);
         }
 
         public List<GlobalDocValidatorTracking> ListTracking(string eventDocumentKey)

@@ -1,0 +1,52 @@
+﻿<div>
+    <h3 class="panel-title-radian padding-0">Permisos</h3>
+    <hr class="margin-0 margin-bottom-10" />
+</div>
+<div class="row checks-group">
+    @foreach (var menuMain in Model.MenuOptionsByProfile)
+    {
+        if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0)
+        {
+            <div class="col-sm-3">
+                <div class="level-1">
+                    <div>
+                        <spam class="titleMenu">@menuMain.Name</spam>
+                    </div>
+                    @foreach (var subMenuItems in menuMain.Children)
+                    {
+                        if (subMenuItems.MenuLevel == 2)
+                        {
+                            <div class="level-2">
+                                <div>
+                                    <span class="subTitleMenu">@subMenuItems.Name</span>
+                                </div>
+                                @foreach (var subSubMenuItems in subMenuItems.Children)
+                                {
+                                    <div class="level-3">
+                                        <div class="row-cols-1">
+                                            <div class="form-group d-flex margin-0">
+                                                <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" />
+                                                <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="level-3">
+                                <div class="row-cols-1">
+                                    <div class="form-group d-flex margin-0">
+                                        <input type="checkbox" id="@subMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id" />
+                                        <label for="@subMenuItems.Id" class="label-check">@subMenuItems.Name</label>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

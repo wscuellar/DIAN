@@ -2,21 +2,20 @@
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Plugin.Functions.Models;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
+using Gosocket.Dian.Plugin.Functions.Event;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
-using Gosocket.Dian.Plugin.Functions.Event;
-using static Gosocket.Dian.Domain.Common.EnumHelper;
-using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
+using Gosocket.Dian.Plugin.Functions.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
 using Gosocket.Dian.Plugin.Functions.Cufe;
-using Gosocket.Dian.Plugin.Functions.Series;
+using Gosocket.Dian.Plugin.Functions.ValidateReferenceAttorney;
+
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -26,6 +25,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
         static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
+        static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
+
         #endregion
 
         public ValidatorEngine() { }
@@ -66,6 +67,97 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
+        public async Task<List<ValidateListResponse>> StartValidationEventRadianAsync(string trackId)
+        {
+            var validator = new Validator();
+            var validateResponses = new List<ValidateListResponse>();
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            RequestObjectEventApproveCufe eventApproveCufe = new RequestObjectEventApproveCufe();
+            RequestObjectDocReference docReference = new RequestObjectDocReference();
+            RequestObjectParty requestParty = new RequestObjectParty();
+            RequestObjectEventPrev eventPrev = new RequestObjectEventPrev();
+            RequestObjectSigningTime signingTime = new RequestObjectSigningTime();
+            RequestObjectReferenceAttorney referenceAttorney = new RequestObjectReferenceAttorney();
+
+            GlobalDocValidatorDocumentMeta documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (documentMeta != null)
+            {
+                NitModel nitModel = new NitModel();
+                EventRadianModel eventRadian = new EventRadianModel();                
+
+                var xmlBytes = await GetXmlFromStorageAsync(trackId);
+                var xmlParser = new XmlParser(xmlBytes);
+                if (!xmlParser.Parser())
+                    throw new Exception(xmlParser.ParserError);
+
+                nitModel = xmlParser.Fields.ToObject<NitModel>();
+
+                eventRadian = new EventRadianModel(
+                    documentMeta.DocumentReferencedKey,
+                    documentMeta.PartitionKey,
+                    documentMeta.EventCode,
+                    documentMeta.DocumentTypeId,
+                    nitModel.listID, 
+                    documentMeta.CustomizationID,
+                    documentMeta.SigningTimeStamp,
+                    nitModel.ValidityPeriodEndDate,
+                    documentMeta.SenderCode,
+                    documentMeta.ReceiverCode,
+                    nitModel.DocumentTypeIdRef,
+                    xmlParser.DocumentReferenceId,
+                    nitModel.IssuerPartyCode,
+                    nitModel.IssuerPartyName
+                    );
+
+                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;
+
+                responses = await Instance.StartValidateSerieAndNumberAsync(trackId);
+                validateResponses.AddRange(responses);
+
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
+                {
+                    EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);
+                    responses = await Instance.StartEventApproveCufe(eventApproveCufe);
+                    validateResponses.AddRange(responses);
+                }
+                
+                if(Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
+                {
+                    EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
+                    responses = await Instance.StartValidateDocumentReference(docReference);
+                    validateResponses.AddRange(responses);
+                }
+
+                //Si Mandato contiene CUFEs Referenciados
+                if (validaMandatoListID)
+                {
+                    EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
+                    EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
+                    EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);
+                    responses = await Instance.StartValidateParty(requestParty);
+                    validateResponses.AddRange(responses);
+                    responses = await Instance.StartValidateEmitionEventPrevAsync(eventPrev);
+                    validateResponses.AddRange(responses);
+                    responses = await Instance.StartValidateSigningTimeAsync(signingTime);
+                    validateResponses.AddRange(responses);
+                }
+
+                //Si es mandato registra en GlobalDocReferenceAttorney
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato)
+                {
+                    referenceAttorney.TrackId = trackId;
+                    responses = await Instance.StartValidateReferenceAttorney(referenceAttorney);
+                    validateResponses.AddRange(responses);
+                }
+
+                validator.UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
+
+            }                              
+
+            return validateResponses;
+        }
+
         public List<ValidateListResponse> StartDocumentDuplicityValidationAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
@@ -76,7 +168,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return validateResponses;
         }
-        public async Task<List<ValidateListResponse>> StartValidateEmitionEventPrevAsync(ValidateEmitionEventPrev.RequestObject eventPrev)
+
+
+        public async Task<List<ValidateListResponse>> StartValidateEmitionEventPrevAsync(RequestObjectEventPrev eventPrev)
         {
             var validateResponses = new List<ValidateListResponse>();
             var nitModel = new NitModel();
@@ -116,10 +210,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (!xmlParserCude.Parser())
                     throw new Exception(xmlParserCude.ParserError);
 
-                nitModel = xmlParserCude.Fields.ToObject<NitModel>();
-
-                //Si el endoso esta en blanco o el senderCode es diferente a providerCode                
-                nitModel.SenderCode = (nitModel.listID == "2" || (nitModel.SenderCode != nitModel.ProviderCode)) ? nitModel.ProviderCode : nitModel.SenderCode;
+                nitModel = xmlParserCude.Fields.ToObject<NitModel>();               
             }
 
             var validator = new Validator();           
@@ -130,7 +221,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public List<ValidateListResponse> StartValidateDocumentReference(ValidateDocumentReference.RequestObject validateReference)
+        public async Task<List<ValidateListResponse>> StartValidateDocumentReference(RequestObjectDocReference validateReference)
         {
             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
@@ -145,7 +236,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
 
-        public async Task<List<ValidateListResponse>> StartValidateSigningTimeAsync(ValidateSigningTime.RequestObject data)
+        public async Task<List<ValidateListResponse>> StartValidateSigningTimeAsync(RequestObjectSigningTime data)
         {           
             var validateResponses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
@@ -187,19 +278,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     data.TrackId = documentMeta.PartitionKey;
                 }
-                //No encuentra información del Recibo del bien para Aceptación Expresa y Tácita
-                else if (documentMeta == null && (Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.Rejected))
-                {
-                    ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = $"No se encontró evento referenciado CUDE Recibo del Bien para evaluar fecha.";
-                    response.IsValid = false;
-                    response.ErrorCode = "89";
-                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                    validateResponses.Add(response);
-                    return validateResponses;
-                }
                 // Validación de la Sección Signature - Fechas valida transmisión evento Solicitud Disponibilizacion
                 else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
                 {
@@ -209,39 +287,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (documentMeta != null)
                     {
                         data.TrackId = documentMeta.PartitionKey;
-                    }
-                    else
-                    {
-                        ValidateListResponse response = new ValidateListResponse();
-                        response.ErrorMessage = $"No se encuentran registros de Eventos de Aceptación Expresa - Tácita  prerrequisito para esta transmisión de Disponibilizacion";
-                        response.IsValid = false;
-                        response.ErrorCode = "89";
-                        response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                        validateResponses.Add(response);
-                        return validateResponses;
-                    }
-                }
-                //Solo si es eventcode AR Aceptacion Expresa - Tácita
-                else if (Convert.ToInt32(data.EventCode) != (int)EventStatus.Rejected)
-                {
-                    ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = $"No se encontró evento referenciado CUDE y/o CUFE para evaluar fecha.";
-                    response.IsValid = false;
-                    response.ErrorCode = "89";
-                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                    validateResponses.Add(response);
-                    return validateResponses;
-                }
-                else if (documentMeta == null)
-                {                    
-                    ValidateListResponse response = new ValidateListResponse();
-                    response.ErrorMessage = "No se encontró evento referenciado para evaluar fecha";
-                    response.IsValid = false;
-                    response.ErrorCode = "89";
-                    response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                    validateResponses.Add(response);
-                    return validateResponses;
-                }
+                    }                  
+                }               
             }           
             else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice)                   
             {
@@ -292,14 +339,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-        public List<ValidateListResponse> StartValidateSerieAndNumberAsync(ValidateSerieAndNumber.RequestObject data)
+        public async Task<List<ValidateListResponse>> StartValidateSerieAndNumberAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
 
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSerieAndNumber(data));
+            validateResponses.AddRange(validator.ValidateSerieAndNumber(nitModel));
             return validateResponses;
         }
+
         public async Task<List<ValidateListResponse>> StartNitValidationAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
@@ -409,7 +464,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool valid = true;
 
             //Valida existe cambio legitimo tenedor
-            GlobalDocHolderExchange documentHolderExchange = documentMetaTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
+            GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);            
             if (documentHolderExchange != null)
             {
                 //Existe mas de un legitimo tenedor requiere un mandatario
@@ -452,7 +507,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-        public async Task<List<ValidateListResponse>> StartEventApproveCufe(EventApproveCufeObjectParty eventApproveCufe)
+        public async Task<List<ValidateListResponse>> StartEventApproveCufe(RequestObjectEventApproveCufe eventApproveCufe)
         {
             DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
@@ -467,9 +522,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if(xmlParser.PaymentMeansID != "2")
             {
                 ValidateListResponse response = new ValidateListResponse();
-                response.ErrorMessage = $"Tipo factura diferente a Crédito.";
+                response.ErrorMessage = $"Tipo factura no es Crédito.";
                 response.IsValid = false;
-                response.ErrorCode = "89";
+                response.ErrorCode = "Regla: 89-(R): ";
                 response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                 validateResponses.Add(response);
                 return validateResponses;
@@ -572,7 +627,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-        public async Task<List<ValidateListResponse>> StartValidateReferenceAttorney(ValidateReferenceAttorney.RequestObjectReferenceAttorney data)
+        public async Task<List<ValidateListResponse>> StartValidateReferenceAttorney(RequestObjectReferenceAttorney data)
         {
             var validateResponses = new List<ValidateListResponse>();
 

@@ -68,8 +68,14 @@ namespace Gosocket.Dian.Application
             {
                 radianTestSet.State = "En proceso";
             }
-
+            
             return _radianTestSetResultManager.InsertOrUpdateTestSetResult(radianTestSet);
+        }
+
+
+        public bool ResetPreviousCounts(string testSetId)
+        {
+            return _radianTestSetResultManager.ResetPreviousCounts(testSetId);
         }
     }
 }

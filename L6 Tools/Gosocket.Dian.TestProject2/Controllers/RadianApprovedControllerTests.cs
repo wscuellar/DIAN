@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Common.Resources;
+﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
@@ -25,11 +26,13 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         private readonly Mock<IRadianTestSetService> _radianTestSetService = new Mock<IRadianTestSetService>();
         private readonly Mock<IRadianApprovedService> _radianApprovedService = new Mock<IRadianApprovedService>();
         private readonly Mock<IRadianTestSetResultService> _radianTestSetResultService = new Mock<IRadianTestSetResultService>();
+        private readonly Mock<IRadianTestSetAppliedService> _radianTestSetAppliedService = new Mock<IRadianTestSetAppliedService>();
 
         public RadianApprovedControllerTests() => _radianApprovedController = new RadianApprovedController(_radianContributorService.Object,
                                                                                                            _radianTestSetService.Object,
                                                                                                            _radianApprovedService.Object,
-                                                                                                           _radianTestSetResultService.Object);
+                                                                                                           _radianTestSetResultService.Object,
+                                                                                                           _radianTestSetAppliedService.Object);
 
         //[TestMethod()]
         //public void Index_View_CanceledContributor_Test()

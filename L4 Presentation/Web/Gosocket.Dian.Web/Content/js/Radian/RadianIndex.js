@@ -169,7 +169,7 @@ function SetIconsList(fileId) {
 function CancelRegister(url, dataAjax, confirmMessage, successAction, label, errorAction) {
         var metod = 'POST';
         var operation = (description) => ajaxFunction(url, metod, { ...dataAjax, description }, errorAction, successAction);
-    ShowPromptCancel(confirmMessage, operation, label, errorAction, bootboxMessage.CANCEL_REGISTER);
+        ShowPromptCancel(confirmMessage, operation, label, errorAction, bootboxMessage.CANCEL_REGISTER);
 }
 
 function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText) {
@@ -258,4 +258,32 @@ function DeleteOptions(operationMode, radianState) {
     if (radianState == 'En pruebas') {
         $("#RadianApprovalState option[value='1']").remove();
     }
+}
+
+function SetCapcthatoken(configuration) {
+        //grecaptcha.ready(function () {
+        //    grecaptcha.execute(configuration, { action: 'submit' }).then(function (token) {debugger
+        //        $(".downloadPDFUrl").attr("href", $(".downloadPDFUrl").attr("href") + "&recaptchaToken=" + token);
+        //    });
+        //});
+}
+
+function RestartCounters(url, testResult, softwareId) {
+    console.log(testResult);
+    var confirmMessage = bootboxMessage.CONFIRMATION_RESTART;
+    var operation = () => {
+        var actionError = (error) => {
+            window.location.reload();
+        }
+        var actionSuccess = (result) => {
+            window.location.reload();
+        }
+        var data = {
+            result: testResult,
+            softwareId
+        }
+        ajaxFunction(url, "POST", data, actionError, actionSuccess);
+    }
+    var buttons = ConfirmExec(operation)
+    showConfirmation(confirmMessage, buttons);
 }

@@ -12,7 +12,7 @@
     <script src="~/Content/js/Radian/RadianOperationMode.js"></script>
     <script src="~/Content/js/Radian/constants.js"></script>
     <script src="~/Content/js/Radian/RadianSteps.js"></script>
-
+    @Scripts.Render("~/bundles/jqueryval")
     <script>
         $(document).ready(function () {
             var contributorId = @Model.Contributor.Id;
@@ -30,19 +30,22 @@
                 })
             }
 
-            $("#save-operation-mode").click(function (e) {
-                e.preventDefault();
-                showLoading('#panel-form', 'Cargando', 'Guardando datos, por favor espere.')
-                var SetOperationViewModel = {
-                    RadianContributorId: @Model.Contributor.RadianContributorId,
-                    SoftwareType: $("#OperationModeSelectedId").val(),
-                    SoftwareId: $("#SoftwareNameList option:selected").val(),
-                    CustomerId: $("#bussiness-name option:selected").val(),
-                    SoftwareName: $("#SoftwareName").val(),
-                    Pin: $("#SoftwarePin").val(),
-                    Url: '@Model.SoftwareUrl',
-                 };
-                AddOperationMode("@Url.Action("UpdateFactorOperationMode", "RadianApproved")",SetOperationViewModel);
+            $("#save-operation-mode").click(function (e) {debugger
+                var form = $("#radian-operation-form");
+                if ($(form).valid()) {
+                    e.preventDefault();
+                    showLoading('#panel-form', 'Cargando', 'Guardando datos, por favor espere.')
+                    var SetOperationViewModel = {
+                        RadianContributorId: @Model.Contributor.RadianContributorId,
+                        SoftwareType: $("#OperationModeSelectedId").val(),
+                        SoftwareId: $("#SoftwareNameList option:selected").val(),
+                        CustomerId: $("#bussiness-name option:selected").val(),
+                        SoftwareName: $("#SoftwareName").val(),
+                        Pin: $("#SoftwarePin").val(),
+                        Url: '@Model.SoftwareUrl',
+                     };
+                    AddOperationMode("@Url.Action("UpdateFactorOperationMode", "RadianApproved")",SetOperationViewModel);
+                }
             })
 
             $("#combobox").combobox();

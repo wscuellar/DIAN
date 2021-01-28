@@ -6,7 +6,6 @@
 $('#TotalDocumentRequired').attr('readonly', true);
 $('#TotalDocumentAcceptedRequired').attr('redonly', true);
 
-
 $("#EndorsementWarrantyTotalRequired").change(function () {
     var noticeTotal = parseInt($("#EndorsementWarrantyTotalRequired").val());
     if (noticeTotal < 0) {
@@ -336,6 +335,29 @@ $("#EndorsementProcurationTotalAcceptedRequired").change(function () {
 });
 
 
+$("#ReportForPaymentTotalRequired").change(function () {
+    var endcirculationNotificationTotal0 = parseInt($("#ReportForPaymentTotalRequired").val());
+    if (endcirculationNotificationTotal0 < 0) {
+        showErrorMessage(0);
+        $("#ReportForPaymentTotalRequired").val(0);
+    }
+    else {
+        updateTotal();
+    }
+});
+
+$("#ReportForPaymentTotalAcceptedRequired").change(function () {
+    var endcirculationNotificationTotal0 = parseInt($("#ReportForPaymentTotalAcceptedRequired").val());
+    if (endcirculationNotificationTotal0 < 0) {
+        showErrorMessage(0);
+        $("#ReportForPaymentTotalAcceptedRequired").val(0);
+    }
+    else {
+        updateTotalRequired();
+    }
+});
+
+
 $('.btn-save').click(function () {
 
     var form = $('#edit-testset-form');
@@ -346,64 +368,25 @@ $('.btn-save').click(function () {
 });
 
 function updateTotal() {
-    var noticeTotal = parseInt($("#ReceiptNoticeTotalRequired").val());
-    var receiptServiceTotal = parseInt($("#ReceiptServiceTotalRequired").val());
-    var expressAcceptanceTotal = parseInt($("#ExpressAcceptanceTotalRequired").val());
-    var automaticAcceptanceTotal = parseInt($("#AutomaticAcceptanceTotalRequired").val());
-    var rejectInvoiceTotal = parseInt($("#RejectInvoiceTotalRequired").val());
-    var appAvailableTotal = parseInt($("#ApplicationAvailableTotalRequired").val());
-    var endorsementTotal = parseInt($("#EndorsementTotalRequired").val());
-    var endorsmentWarranty = parseInt($("#EndorsementWarrantyTotalRequired").val());
-    var endorsmentProcuration = parseInt($("#EndorsementProcurationTotalRequired").val());
-    var endorsementCancelTotal = parseInt($("#EndorsementCancellationTotalRequired").val());
-    var garanteeTotal = parseInt($("#GuaranteeTotalRequired").val());
-    var electronicMandateTotal = parseInt($("#EndMandateTotalRequired").val());
-    var endMandateTotal = parseInt($("#ElectronicMandateTotalRequired").val());
-    var paymentNotificationTotal = parseInt($("#PaymentNotificationTotalRequired").val());
-    var circulationNotificationTotal = parseInt($("#CirculationLimitationTotalRequired").val());
-    var endcirculationNotificationTotal = parseInt($("#EndCirculationLimitationTotalRequired").val());
-
-    $("#TotalDocumentRequired").val(noticeTotal + receiptServiceTotal + expressAcceptanceTotal + automaticAcceptanceTotal
-        + rejectInvoiceTotal + appAvailableTotal + endorsementTotal + endorsementCancelTotal + garanteeTotal +
-        electronicMandateTotal + endMandateTotal + paymentNotificationTotal + circulationNotificationTotal +
-        endcirculationNotificationTotal + endorsmentWarranty + endorsmentProcuration);
+    var summary = 0;
+    $('.docRequired Div input:not(#TotalDocumentRequired)').each(function () {
+        summary += parseInt($(this).val());
+    });
+    $("#TotalDocumentRequired").val(summary);
 }
 
 function updateTotalRequired() {
-    var noticeTotal0 = parseInt($("#ReceiptNoticeTotalAcceptedRequired").val());
-    var receiptServiceTotal0 = parseInt($("#ReceiptServiceTotalAcceptedRequired").val());
-    var expressAcceptanceTotal0 = parseInt($("#ExpressAcceptanceTotalAcceptedRequired").val());
-    var automaticAcceptanceTotal0 = parseInt($("#AutomaticAcceptanceTotalAcceptedRequired").val());
-    var rejectInvoiceTotal0 = parseInt($("#RejectInvoiceTotalAcceptedRequired").val());
-    var appAvailableTotal0 = parseInt($("#ApplicationAvailableTotalAcceptedRequired").val());
-    var endorsementTotal0 = parseInt($("#EndorsementTotalAcceptedRequired").val());
-    var endorsementCancelTotal0 = parseInt($("#EndorsementCancellationTotalAcceptedRequired").val());
-    var endorsmentWarranty0 = parseInt($("#EndorsementWarrantyTotalAcceptedRequired").val());
-    var endorsmentProcuration0 = parseInt($("#EndorsementProcurationTotalAcceptedRequired").val());
-    var garanteeTotal0 = parseInt($("#GuaranteeTotalAcceptedRequired").val());
-    var electronicMandateTotal0 = parseInt($("#EndMandateTotalAcceptedRequired").val());
-    var endMandateTotal0 = parseInt($("#ElectronicMandateTotalAcceptedRequired").val());
-    var paymentNotificationTotal0 = parseInt($("#PaymentNotificationTotalAcceptedRequired").val());
-    var circulationNotificationTotal0 = parseInt($("#CirculationLimitationTotalAcceptedRequired").val());
-    var endcirculationNotificationTotal0 = parseInt($("#EndCirculationLimitationTotalAcceptedRequired").val());
-
-    $("#TotalDocumentAcceptedRequired").val(noticeTotal0 + receiptServiceTotal0 + expressAcceptanceTotal0 + automaticAcceptanceTotal0
-        + rejectInvoiceTotal0 + appAvailableTotal0 + endorsementTotal0 + endorsementCancelTotal0 + garanteeTotal0 +
-        electronicMandateTotal0 + endMandateTotal0 + paymentNotificationTotal0 + circulationNotificationTotal0 +
-        endcirculationNotificationTotal0 + endorsmentWarranty0 + endorsmentProcuration0);
+    var summary = 0;
+    $('.docAcepted Div input:not(#TotalDocumentAcceptedRequired)').each(function () {
+        summary += parseInt($(this).val());
+    });
+    $("#TotalDocumentAcceptedRequired").val(summary);
 }
 
 function showErrorMessage(total) {
     showNotification('warning', 'fa fa-check fa-2x', 'floating', 'Aviso.', 'El valor no puede ser inferior a ' + total);
 }
 
-//function showDetails(html, objectSet) {
-//    debugger
-//    var jsonData = JSON.parse(objectSet);
-//    var html = html;
-//    var softwareType = data.softwareType;
-//    ShowDetailsTestSet(htmlPartial, "", "", softwareType, url);
-//}
 
 function showDetails(html, softwareName, url) {
     var data = {
