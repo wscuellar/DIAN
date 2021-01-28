@@ -399,6 +399,7 @@
     <Compile Include="Models\ElectronicDocumentViewModel.cs" />
     <Compile Include="Models\ExternalUserViewModel.cs" />
     <Compile Include="Models\GeneralResponseModel.cs" />
+    <Compile Include="Models\PayrollViewModel.cs" />
     <Compile Include="Models\PermissionViewModel.cs" />
     <Compile Include="Models\InvoiceNotesViewModel.cs" />
     <Compile Include="Models\QueryEventViewModel.cs" />
@@ -2947,6 +2948,7 @@
     <Content Include="Views\FreeBiller\_usersFreeBiller.cshtml" />
     <Content Include="Views\ProfileFreeBiller\CreateProfile.cshtml" />
     <Content Include="Views\Document\ExportPDF.cshtml" />
+    <Content Include="Views\Document\_payrolls.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
