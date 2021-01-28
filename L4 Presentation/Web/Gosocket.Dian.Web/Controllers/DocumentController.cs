@@ -499,25 +499,25 @@ namespace Gosocket.Dian.Web.Controllers
                 switch(model.RangoSalarial)
                 {
                     case "01":
-                        result = result.Where(t => Int32.Parse(t.Salario) <= 1000000).ToList();
+                        result = result.Where(t => t.Salario !=null && Int32.Parse(t.Salario) <= 1000000).ToList();
                         break;
                     case "02":
-                        result = result.Where(t => Int32.Parse(t.Salario) > 1000000 && Int32.Parse(t.Salario) <= 2000000).ToList();
+                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 1000000 && Int32.Parse(t.Salario) <= 2000000).ToList();
                         break;
                     case "03":
-                        result = result.Where(t => Int32.Parse(t.Salario) > 2000000 && Int32.Parse(t.Salario) <= 3000000).ToList();
+                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 2000000 && Int32.Parse(t.Salario) <= 3000000).ToList();
                         break;
                     case "04":
-                        result = result.Where(t => Int32.Parse(t.Salario) > 3000000 && Int32.Parse(t.Salario) <= 5000000).ToList();
+                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 3000000 && Int32.Parse(t.Salario) <= 5000000).ToList();
                         break;
                     case "05":
-                        result = result.Where(t => Int32.Parse(t.Salario) > 5000000 && Int32.Parse(t.Salario) <= 10000000).ToList();
+                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 5000000 && Int32.Parse(t.Salario) <= 10000000).ToList();
                         break;
                     case "06":
-                        result = result.Where(t => Int32.Parse(t.Salario) > 10000000 && Int32.Parse(t.Salario) <= 20000000).ToList();
+                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 10000000 && Int32.Parse(t.Salario) <= 20000000).ToList();
                         break;
                     case "07":
-                        result = result.Where(t => Int32.Parse(t.Salario) > 20000000).ToList();
+                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 20000000).ToList();
                         break;
                 }
             }
@@ -1262,8 +1262,8 @@ namespace Gosocket.Dian.Web.Controllers
         List<DocumentViewPayroll> firstLoadPayroll()
         {
             List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
-            //List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t=>t.PrimerApellido.StartsWith("A") && Int32.Parse(t.Salario)<1000000).ToList();
-            List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().ToList();
+            List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t=>t.PrimerApellido.StartsWith("A") && t.Salario != null && Int32.Parse(t.Salario)<1000000).ToList();
+            //List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().ToList();
            foreach (var payroll in payrolls)
            {
                 var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
