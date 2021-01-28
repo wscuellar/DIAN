@@ -26,7 +26,7 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            var data = await req.Content.ReadAsAsync<RequestObject>();
+            var data = await req.Content.ReadAsAsync<RequestObjectDocReference>();
 
             if (data == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Request body is empty");
@@ -40,7 +40,7 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
            
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidateDocumentReference(data);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateDocumentReference(data);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
@@ -62,21 +62,25 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
             }
         }
+    }
+    public class RequestObjectDocReference
+    {
+        [JsonProperty(PropertyName = "trackId")]
+        public string TrackId { get; set; }
+        [JsonProperty(PropertyName = "idDocumentReference")]
+        public string IdDocumentReference { get; set; }
+        [JsonProperty(PropertyName = "eventCode")]
+        public string EventCode { get; set; }
+        [JsonProperty(PropertyName = "documentTypeIdRef")]
+        public string DocumentTypeIdRef { get; set; }
+        [JsonProperty(PropertyName = "issuerPartyCode")]
+        public string IssuerPartyCode { get; set; }
+        [JsonProperty(PropertyName = "issuerPartyName")]
+        public string IssuerPartyName { get; set; }
 
-        public class RequestObject
+        public RequestObjectDocReference()
         {
-            [JsonProperty(PropertyName = "trackId")]
-            public string TrackId { get; set; }
-            [JsonProperty(PropertyName = "idDocumentReference")]
-            public string IdDocumentReference { get; set; }
-            [JsonProperty(PropertyName = "eventCode")]
-            public string EventCode { get; set; }
-            [JsonProperty(PropertyName = "documentTypeIdRef")]
-            public string DocumentTypeIdRef { get; set; }
-            [JsonProperty(PropertyName = "issuerPartyCode")]
-            public string IssuerPartyCode { get; set; }
-            [JsonProperty(PropertyName = "issuerPartyName")]
-            public string IssuerPartyName { get; set; }
+
         }
     }
 }

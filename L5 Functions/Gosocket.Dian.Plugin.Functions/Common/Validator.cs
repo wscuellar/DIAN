@@ -7,7 +7,6 @@ using Gosocket.Dian.Plugin.Functions.Cache;
 using Gosocket.Dian.Plugin.Functions.Common.Encryption;
 using Gosocket.Dian.Plugin.Functions.Cryptography.Verify;
 using Gosocket.Dian.Plugin.Functions.Models;
-using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 using System;
@@ -28,8 +27,6 @@ using Gosocket.Dian.Plugin.Functions.ValidateParty;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.Event;
-using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
-using Gosocket.Dian.Plugin.Functions.Common;
 using System.Text.RegularExpressions;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
 using System.Threading.Tasks;
@@ -1646,7 +1643,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string startDateAttorney = string.Empty;
             string endDate = string.Empty;
             DateTime startDate = DateTime.UtcNow;
-            ValidateSigningTime.RequestObject data = new ValidateSigningTime.RequestObject();
+            RequestObjectSigningTime dataSigningtime = new RequestObjectSigningTime();
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             List<AttorneyModel> attorney = new List<AttorneyModel>();
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
@@ -1662,11 +1659,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string firstName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FirstName']").Item(0)?.InnerText.ToString();
             string familyName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FamilyName']").Item(0)?.InnerText.ToString();
             string name = firstName + " " + familyName;
-            data.EventCode = "043";
-            data.SigningTime = xmlParser.SigningTime;
-            data.DocumentTypeId = "96";
-            data.CustomizationID = customizationID;
-            data.EndDate = "";
+            dataSigningtime.EventCode = "043";
+            dataSigningtime.SigningTime = xmlParser.SigningTime;
+            dataSigningtime.DocumentTypeId = "96";
+            dataSigningtime.CustomizationID = customizationID;
+            dataSigningtime.EndDate = "";
             string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
             string senderId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
@@ -2024,14 +2021,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                     ValidatorEngine validatorEngine = new ValidatorEngine();
-                    data.TrackId = attorneyModel.cufe;
-                    var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+                    dataSigningtime.TrackId = attorneyModel.cufe;
+                    var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(dataSigningtime.TrackId);
                     var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
                     if (!xmlParserCufe.Parser())
                         throw new Exception(xmlParserCufe.ParserError);
 
                     //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-                    var resultValidateSingInTime = ValidateSigningTime(data, xmlParserCufe, nitModel);
+                    var resultValidateSingInTime = ValidateSigningTime(dataSigningtime, xmlParserCufe, nitModel);
                     if (!resultValidateSingInTime[0].IsValid)
                     {
                         validate = false;
@@ -2075,7 +2072,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
                     if (listID != "3")
                     {
-                        var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), new { TrackId = attorneyDocument.cufe, ResponseCode = data.EventCode, TrackIdCude = trackId });
+                        var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), new { TrackId = attorneyDocument.cufe, ResponseCode = dataSigningtime.EventCode, TrackIdCude = trackId });
                         if (processEventResponse.Code != "100")
                         {
                             responses.Add(new ValidateListResponse
@@ -2848,6 +2845,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+
+                    var responseListEndoso = ValidateTransactionCufe(trackId.ToLower());
+                    if (responseListEndoso != null)
+                    {                      
+                        foreach (var item in responseListEndoso)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = item.IsValid,
+                                Mandatory = item.Mandatory,
+                                ErrorCode = item.ErrorCode,
+                                ErrorMessage = item.ErrorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
                 }
             }
 
@@ -2856,7 +2869,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region validation to emition to event
-        public List<ValidateListResponse> ValidateEmitionEventPrev(ValidateEmitionEventPrev.RequestObject eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
         {
             bool validFor = false;
             string eventCode = eventPrev.EventCode;
@@ -3146,9 +3159,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "Regla: LGC12-(R): ",
-                                            ErrorMessage = "Solo se pueda transmitir el evento (033) Aceptación Expresa de la factura, " +
-                                            "después de haber transmitido el evento (032) Recibo del bien o prestación del servicio ",
+                                            ErrorCode = "Regla: LGC14-(R): ",
+                                            ErrorMessage = "Solo se pueda transmitir el evento (034) Aceptación Tácita de la factura, pasados 3 días hábiles, después de la " +
+                                            " transmisión del evento (032) recibo del bien o aceptación de la prestación del servicio ",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
@@ -3913,7 +3926,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validación de la Sección prerrequisitos Solicitud Disponibilizacion
-        public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, EventApproveCufeObjectParty data)
+        public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, EventApproveCufe.RequestObjectEventApproveCufe data)
         {
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
@@ -3971,7 +3984,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateSigningTime
-        public List<ValidateListResponse> ValidateSigningTime(ValidateSigningTime.RequestObject data, XmlParser dataModel, NitModel nitModel, string paymentDueDateFE = null)
+        public List<ValidateListResponse> ValidateSigningTime(RequestObjectSigningTime data, XmlParser dataModel, NitModel nitModel, string paymentDueDateFE = null)
         {
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             int businessDays = 0;
@@ -4439,6 +4452,66 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region UpdateInTransactions
+        public void UpdateInTransactions(string trackId, string eventCode)
+        {
+            //valida InTransaction eventos Endoso en propeidad, Garantia y procuración
+            var arrayTasks = new List<Task>();
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad
+            || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia
+            || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
+            {
+                GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+                if (validatorDocumentMeta != null)
+                {
+                    validatorDocumentMeta.InTransaction = false;
+                    arrayTasks.Add(documentMetaTableManager.InsertOrUpdateAsync(validatorDocumentMeta));
+                }
+            }
+        }
+        #endregion
+
+        #region ValidateTransactionCufe
+        private List<ValidateListResponse> ValidateTransactionCufe(string trackId)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<Task> arrayTasks = new List<Task>();
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validTransaction = false;
+
+            GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (validatorDocumentMeta != null)
+            {
+                if (!validatorDocumentMeta.InTransaction)
+                {
+                    validatorDocumentMeta.InTransaction = true;
+                    arrayTasks.Add(
+                        documentMetaTableManager.InsertOrUpdateAsync(validatorDocumentMeta));
+                }
+                else
+                {
+                    validTransaction = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: 89-(R): ",
+                        ErrorMessage = $"{(string)null}CUFE relacionado ya cuenta con un proceso En Negociación",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    return responses;
+                }                
+            }
+
+            if (validTransaction)
+                return responses;
+
+            return null;
+
+        }
+        #endregion
+
+
         #region validation for CBC ID
         public List<ValidateListResponse> ValidateSerieAndNumber(NitModel nitModel)
         {            
@@ -4457,7 +4530,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
-           
+
             if (documentReference.Count() == 0)
             {
                 responses.Add(new ValidateListResponse

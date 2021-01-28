@@ -1094,7 +1094,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.XmlDocumentKey = trackIdCude;
                     dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                     dianResponse.IsValid = false;
-                    UpdateInTransactions(trackId, eventCode);
+                    UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
 
                     //return dianResponse;
                 }
@@ -1112,7 +1112,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.XmlDocumentKey = trackIdCude;
                         dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                         dianResponse.IsValid = false;
-                        UpdateInTransactions(trackId, eventCode);
+                        UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                         //return dianResponse;
                     }
                 }
@@ -1129,7 +1129,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.XmlDocumentKey = trackIdCude;
                         dianResponse.XmlFileName = contentFileList[0].XmlFileName;
                         dianResponse.IsValid = false;
-                        UpdateInTransactions(trackId, eventCode);
+                        UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                         //return dianResponse;
                     }
                 }

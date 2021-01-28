@@ -24,7 +24,7 @@ namespace Gosocket.Dian.Plugin.Functions.Series
             log.Info("C# HTTP trigger function processed a request.");
 
             // Get request body
-            var data = await req.Content.ReadAsAsync<RequestObject>();
+            var data = await req.Content.ReadAsAsync<RequestObjectSerie>();
 
             if (data == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Request body is empty");
@@ -63,7 +63,7 @@ namespace Gosocket.Dian.Plugin.Functions.Series
             }
         }
 
-        public class RequestObject
+        public class RequestObjectSerie
         {
             [JsonProperty(PropertyName = "trackId")]
             public string TrackId { get; set; }

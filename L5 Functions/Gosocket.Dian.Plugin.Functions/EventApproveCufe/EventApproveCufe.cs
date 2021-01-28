@@ -8,10 +8,8 @@ using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Plugin.Functions.EventApproveCufe
@@ -26,7 +24,7 @@ namespace Gosocket.Dian.Plugin.Functions.EventApproveCufe
             log.Info("C# HTTP trigger function processed a request.");
 
             // Get request body
-            var data = await req.Content.ReadAsAsync<EventApproveCufeObjectParty>();
+            var data = await req.Content.ReadAsAsync<RequestObjectEventApproveCufe>();
 
             if (data == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Request body is empty");
@@ -64,15 +62,19 @@ namespace Gosocket.Dian.Plugin.Functions.EventApproveCufe
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
             }
         }
+    }
+    public class RequestObjectEventApproveCufe
+    {
+        [JsonProperty(PropertyName = "trackId")]
+        public string TrackId { get; set; }
+        [JsonProperty(PropertyName = "ResponseCode")]
+        public string ResponseCode { get; set; }
+        [JsonProperty(PropertyName = "DocumentTypeId")]
+        public string DocumentTypeId { get; set; }
 
-        public class EventApproveCufeObjectParty
+        public RequestObjectEventApproveCufe()
         {
-            [JsonProperty(PropertyName = "trackId")]
-            public string TrackId { get; set; }
-            [JsonProperty(PropertyName = "ResponseCode")]
-            public string ResponseCode { get; set; }
-            [JsonProperty(PropertyName = "DocumentTypeId")]
-            public string DocumentTypeId { get; set; }
+
         }
     }
 }
