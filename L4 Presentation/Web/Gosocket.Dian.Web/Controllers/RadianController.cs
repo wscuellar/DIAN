@@ -317,10 +317,10 @@ namespace Gosocket.Dian.Web.Controllers
             foreach (RadianContributorFile file in radianAdmin.Files)
             {
                 message.Append("<div>");
-                message.AppendFormat("Nombre del Archivo: <strong>{0}</strong>", file.FileName);
+                message.AppendFormat("Nombre del requisito: <strong>{0}</strong>", file.FileName);
                 message.Append("<ul>");
-                message.AppendFormat("<li> Estado: {0}</li>", file.Status.GetDescription());
-                message.AppendFormat("<li> Comentarios: {0}</li>", file.Comments);
+                message.AppendFormat("<li>Estado del requisito: {0}</li>", file.Status.GetDescription());
+                message.AppendFormat("<li>Observación del requisito: {0}</li>", file.Comments);
                 message.Append("</ul>");
                 message.Append("</div>");
             }            
