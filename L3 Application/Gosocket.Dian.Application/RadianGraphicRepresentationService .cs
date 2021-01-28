@@ -146,7 +146,7 @@
                 model.ReceiverCode = model.Endoso.ReceiverCode;
             }
 
-            model.RequestType = TextResources.Event_RequestType;
+            model.RequestType = model.Title;
 
             // SetReferences
             GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
