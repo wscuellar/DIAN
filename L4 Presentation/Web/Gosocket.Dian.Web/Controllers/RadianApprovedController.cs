@@ -237,10 +237,27 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult GetSetTestResult(RadianApprovedViewModel model)
         {
             const int softwareType = 1;
+            string contributorId = Request.QueryString["ContributorId"];
             string sType = softwareType.ToString();
             RadianSoftware software = _radianAprovedService.GetSoftware(model.Contributor.RadianContributorId, softwareType);
             string key = softwareType.ToString() + "|" + software.Id.ToString();
             model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(model.Nit, key);
+            RadianTestSet testSet = _radianTestSetService.GetTestSet(sType, sType);
+            model.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), sType)));
+            model.RadianTestSetResult.StatusDescription = testSet.Description;
+            model.Software = software;
+            model.ContributorId = Int32.Parse(contributorId);
+            return View(model);
+        }
+
+        public ActionResult GetSetTestResult(int RadianContributorId, string Nit)
+        {
+            RadianApprovedViewModel model = new RadianApprovedViewModel();
+            const int softwareType = 1;
+            string sType = softwareType.ToString();
+            RadianSoftware software = _radianAprovedService.GetSoftware(RadianContributorId, softwareType);
+            string key = softwareType.ToString() + "|" + software.Id.ToString();
+            model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(Nit, key);
             RadianTestSet testSet = _radianTestSetService.GetTestSet(sType, sType);
             model.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), sType)));
             model.RadianTestSetResult.StatusDescription = testSet.Description;
