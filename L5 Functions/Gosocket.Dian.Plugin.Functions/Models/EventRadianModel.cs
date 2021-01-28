@@ -1,9 +1,9 @@
 ﻿using Gosocket.Dian.Plugin.Functions.Event;
+using Gosocket.Dian.Plugin.Functions.ValidateParty;
+using Gosocket.Dian.Plugin.Functions.EventApproveCufe;
+using Gosocket.Dian.Plugin.Functions.Cufe;
+using Gosocket.Dian.Plugin.Functions.SigningTime;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Plugin.Functions.Models
 {
@@ -20,6 +20,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
         public string SenderParty { get; set; }
         public string ReceiverParty { get; set; }
         public string DocumentTypeIdRef { get; set; }
+        public string DocumentIdReference { get; set; }
         public string IssuerPartyCode { get; set; }
         public string IssuerPartyName { get; set; }        
 
@@ -29,7 +30,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
             string documentTypeId, string listId, 
             string customizationId, DateTime signingTime, 
             string endDate, string senderParty, 
-            string receiverParty, string documentTypeIdRef, 
+            string receiverParty, string documentTypeIdRef, string documentIdReference,
             string issuerPartyCode, string issuerPartyName)
         {
             TrackId = trackId;
@@ -43,11 +44,12 @@ namespace Gosocket.Dian.Plugin.Functions.Models
             SenderParty = senderParty;
             ReceiverParty = receiverParty;
             DocumentTypeIdRef = documentTypeIdRef;
+            DocumentIdReference = documentIdReference;
             IssuerPartyCode = issuerPartyCode;
             IssuerPartyName = issuerPartyName;
         }
 
-        public static void SetValuesEventPrev(ref EventRadianModel eventRadian, ValidateEmitionEventPrev.RequestObject eventPrev)
+        public static void SetValuesEventPrev(ref EventRadianModel eventRadian, RequestObjectEventPrev eventPrev)
         {
             eventPrev.TrackId = eventRadian.TrackId;
             eventPrev.EventCode = eventRadian.EventCode;
@@ -55,6 +57,44 @@ namespace Gosocket.Dian.Plugin.Functions.Models
             eventPrev.TrackIdCude = eventRadian.TrackIdCude;
             eventPrev.ListId = eventRadian.ListId;
             eventPrev.CustomizationID = eventRadian.CustomizationId;
+        }
+
+        public static void SetValuesValidateParty(ref EventRadianModel eventRadian, RequestObjectParty validateParty)
+        {
+            validateParty.TrackId = eventRadian.TrackId;
+            validateParty.SenderParty = eventRadian.SenderParty;
+            validateParty.ReceiverParty = eventRadian.ReceiverParty;
+            validateParty.ResponseCode = eventRadian.EventCode;
+            validateParty.CustomizationID = eventRadian.CustomizationId;
+            validateParty.TrackIdCude = eventRadian.TrackIdCude;
+            validateParty.ListId = eventRadian.ListId;
+        }
+        
+        public static void SetValueEventAproveCufe(ref EventRadianModel eventRadian, RequestObjectEventApproveCufe eventApproveCufe)
+        {
+            eventApproveCufe.TrackId = eventRadian.TrackId;
+            eventApproveCufe.ResponseCode = eventRadian.EventCode;
+            eventApproveCufe.DocumentTypeId = eventRadian.DocumentTypeId;
+        }
+
+        public static void SetValuesDocReference(ref EventRadianModel eventRadian, RequestObjectDocReference docReference)
+        {
+            docReference.TrackId = eventRadian.TrackId;
+            docReference.IdDocumentReference = eventRadian.DocumentIdReference;
+            docReference.EventCode = eventRadian.EventCode;
+            docReference.DocumentTypeIdRef = eventRadian.DocumentTypeIdRef;
+            docReference.IssuerPartyCode = eventRadian.IssuerPartyCode;
+            docReference.IssuerPartyName = eventRadian.IssuerPartyName;
+        }
+
+        public static void SetValuesSigningTime(ref EventRadianModel eventRadian, RequestObjectSigningTime signingTime)
+        {
+            signingTime.TrackId = eventRadian.TrackId;
+            signingTime.EventCode = eventRadian.EventCode;
+            signingTime.SigningTime = eventRadian.SigningTime.ToString();
+            signingTime.DocumentTypeId = eventRadian.DocumentTypeId;
+            signingTime.CustomizationID = eventRadian.CustomizationId;
+            signingTime.EndDate = eventRadian.EndDate;
         }
     }
 }

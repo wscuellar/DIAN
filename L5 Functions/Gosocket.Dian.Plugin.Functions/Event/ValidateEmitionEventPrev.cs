@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Plugin.Functions.Common;
-using Gosocket.Dian.Plugin.Functions.Document;
 using Gosocket.Dian.Plugin.Functions.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -26,7 +23,7 @@ namespace Gosocket.Dian.Plugin.Functions.Event
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            var data = await req.Content.ReadAsAsync<RequestObject>();
+            var data = await req.Content.ReadAsAsync<RequestObjectEventPrev>();
 
             if (data == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Request body is empty");
@@ -67,25 +64,24 @@ namespace Gosocket.Dian.Plugin.Functions.Event
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
             }
-        }
+        }       
+    }
+    public class RequestObjectEventPrev
+    {
+        [JsonProperty(PropertyName = "trackId")]
+        public string TrackId { get; set; }
+        [JsonProperty(PropertyName = "eventCode")]
+        public string EventCode { get; set; }
+        [JsonProperty(PropertyName = "documentTypeId")]
+        public string DocumentTypeId { get; set; }
+        [JsonProperty(PropertyName = "trackIdCude")]
+        public string TrackIdCude { get; set; }
+        [JsonProperty(PropertyName = "listID")]
+        public string ListId { get; set; }
+        [JsonProperty(PropertyName = "customizationID")]
+        public string CustomizationID { get; set; }
 
-        public class RequestObject
-        {
-            [JsonProperty(PropertyName = "trackId")]
-            public string TrackId { get; set; }
-            [JsonProperty(PropertyName = "eventCode")]
-            public string EventCode { get; set; }
-            [JsonProperty(PropertyName = "documentTypeId")]
-            public string DocumentTypeId { get; set; }
-            [JsonProperty(PropertyName = "trackIdCude")]
-            public string TrackIdCude { get; set; }
-            [JsonProperty(PropertyName = "listID")]
-            public string ListId { get; set; }
-            [JsonProperty(PropertyName = "customizationID")]
-            public string CustomizationID { get; set; }
+        public RequestObjectEventPrev() { }
 
-            public RequestObject() { }
-
-        }
     }
 }
