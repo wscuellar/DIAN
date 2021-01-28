@@ -85,6 +85,7 @@
                     Prefix = eventItem.Serie,
                     Number = eventItem.Number,
                     DateOfIssue = eventItem.SigningTimeStamp,
+                    EmissionDate = eventItem.EmissionDate,
                     SenderCode = eventItem.SenderCode,
                     SenderName = eventItem.SenderName,
                     ReceiverCode = eventItem.ReceiverCode,
@@ -272,7 +273,7 @@
             template = template.Replace("{PaymentState}", string.Empty);
             template = template.Replace("{PaymentConditions}", string.Empty);
             template = template.Replace("{CUFE}", model.References[0].CUFE);
-            template = template.Replace("{IssueDate}", $"{model.DateOfIssue:dd'/'MM'/'yyyy}");
+            template = template.Replace("{IssueDate}", $"{model.EmissionDate:dd'/'MM'/'yyyy}");
             template = template.Replace("{ExpirationDate}", string.Empty);
             template = template.Replace("{OperationType}", string.Empty);
 
