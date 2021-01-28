@@ -69,6 +69,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public async Task<List<ValidateListResponse>> StartValidationEventRadianAsync(string trackId)
         {
+            var validator = new Validator();
             var validateResponses = new List<ValidateListResponse>();
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
@@ -149,12 +150,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses = await Instance.StartValidateReferenceAttorney(referenceAttorney);
                     validateResponses.AddRange(responses);
                 }
-             
-            }
 
-            // Validator instance
-            //var validator = new Validator();
-            //validateResponses.Add(validator.ValidateEventRadian());
+                validator.UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
+
+            }                              
 
             return validateResponses;
         }

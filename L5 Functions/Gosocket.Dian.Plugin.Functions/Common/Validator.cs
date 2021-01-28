@@ -7,7 +7,6 @@ using Gosocket.Dian.Plugin.Functions.Cache;
 using Gosocket.Dian.Plugin.Functions.Common.Encryption;
 using Gosocket.Dian.Plugin.Functions.Cryptography.Verify;
 using Gosocket.Dian.Plugin.Functions.Models;
-using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 using System;
@@ -28,8 +27,6 @@ using Gosocket.Dian.Plugin.Functions.ValidateParty;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.Event;
-using static Gosocket.Dian.Plugin.Functions.EventApproveCufe.EventApproveCufe;
-using Gosocket.Dian.Plugin.Functions.Common;
 using System.Text.RegularExpressions;
 using Gosocket.Dian.Plugin.Functions.Predecesor;
 using System.Threading.Tasks;
@@ -2848,6 +2845,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+
+                    var responseListEndoso = ValidateTransactionCufe(trackId.ToLower());
+                    if (responseListEndoso != null)
+                    {                      
+                        foreach (var item in responseListEndoso)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = item.IsValid,
+                                Mandatory = item.Mandatory,
+                                ErrorCode = item.ErrorCode,
+                                ErrorMessage = item.ErrorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
                 }
             }
 
@@ -3146,9 +3159,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "Regla: LGC12-(R): ",
-                                            ErrorMessage = "Solo se pueda transmitir el evento (034) Aceptacion Tácita de la factura, después de haber transmitido " +
-                                            "el evento (032) recibo del bien o aceptación de la prestación del servicio ",
+                                            ErrorCode = "Regla: LGC14-(R): ",
+                                            ErrorMessage = "Solo se pueda transmitir el evento (034) Aceptación Tácita de la factura, pasados 3 días hábiles, después de la " +
+                                            " transmisión del evento (032) recibo del bien o aceptación de la prestación del servicio ",
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
@@ -4439,6 +4452,66 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region UpdateInTransactions
+        public void UpdateInTransactions(string trackId, string eventCode)
+        {
+            //valida InTransaction eventos Endoso en propeidad, Garantia y procuración
+            var arrayTasks = new List<Task>();
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad
+            || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia
+            || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
+            {
+                GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+                if (validatorDocumentMeta != null)
+                {
+                    validatorDocumentMeta.InTransaction = false;
+                    arrayTasks.Add(documentMetaTableManager.InsertOrUpdateAsync(validatorDocumentMeta));
+                }
+            }
+        }
+        #endregion
+
+        #region ValidateTransactionCufe
+        private List<ValidateListResponse> ValidateTransactionCufe(string trackId)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<Task> arrayTasks = new List<Task>();
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validTransaction = false;
+
+            GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (validatorDocumentMeta != null)
+            {
+                if (!validatorDocumentMeta.InTransaction)
+                {
+                    validatorDocumentMeta.InTransaction = true;
+                    arrayTasks.Add(
+                        documentMetaTableManager.InsertOrUpdateAsync(validatorDocumentMeta));
+                }
+                else
+                {
+                    validTransaction = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "Regla: 89-(R): ",
+                        ErrorMessage = $"{(string)null}CUFE relacionado ya cuenta con un proceso En Negociación",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    return responses;
+                }                
+            }
+
+            if (validTransaction)
+                return responses;
+
+            return null;
+
+        }
+        #endregion
+
+
         #region validation for CBC ID
         public List<ValidateListResponse> ValidateSerieAndNumber(NitModel nitModel)
         {            
@@ -4457,7 +4530,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
-           
+
             if (documentReference.Count() == 0)
             {
                 responses.Add(new ValidateListResponse
