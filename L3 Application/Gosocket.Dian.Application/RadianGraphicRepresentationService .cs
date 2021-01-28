@@ -84,7 +84,7 @@
                 {
                     Prefix = eventItem.Serie,
                     Number = eventItem.Number,
-                    DateOfIssue = eventItem.SigningTimeStamp.Date,
+                    DateOfIssue = eventItem.SigningTimeStamp,
                     SenderCode = eventItem.SenderCode,
                     SenderName = eventItem.SenderName,
                     ReceiverCode = eventItem.ReceiverCode,
@@ -244,6 +244,7 @@
         {
             string sectionHtml = "<div class='text-section padding-top20'> Sección {SectionNumber}</ div > ";
 
+
             #region Mapping Event Data Section
             // Mapping Event Data Section
             template = template.Replace("{EventName}", model.Title);
@@ -254,7 +255,7 @@
             template = template.Replace("{DiscountRate}", string.Empty);
             template = template.Replace("{TotalEventValue}", string.Empty);
             template = template.Replace("{CUDE}", model.CUDE);
-            template = template.Replace("{ExpeditionDate}", model.DateOfIssue.ToShortDateString());
+            template = template.Replace("{ExpeditionDate}", $"{model.DateOfIssue:dd'/'MM'/'yyyy hh:mm:ss tt}");
             template = template.Replace("{RegistrationDate}", string.Empty);
             template = template.Replace("{StartDate}", string.Empty);
             template = template.Replace("{FinishDate}", string.Empty);
@@ -271,7 +272,7 @@
             template = template.Replace("{PaymentState}", string.Empty);
             template = template.Replace("{PaymentConditions}", string.Empty);
             template = template.Replace("{CUFE}", model.References[0].CUFE);
-            template = template.Replace("{IssueDate}", model.References[0].DateOfIssue.ToShortDateString());
+            template = template.Replace("{IssueDate}", $"{model.DateOfIssue:dd'/'MM'/'yyyy}");
             template = template.Replace("{ExpirationDate}", string.Empty);
             template = template.Replace("{OperationType}", string.Empty);
 
