@@ -73,7 +73,7 @@ namespace Gosocket.Dian.Application
             List<Event> events = ListEvents(eventsCosmos, storageEvents);
 
             // Set Variables
-            DateTime expeditionDate = DateTime.Now;
+            DateTime expeditionDate = DateTime.UtcNow.AddHours(-5);
             Bitmap qrCode = GenerateQR($"{webPath}?documentkey={documentMeta.PartitionKey}");
             int page = 1;
 
