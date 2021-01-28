@@ -911,8 +911,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     {
                         dianResponse = new DianResponse()
                         {
-                            StatusMessage = "CUFE relacionado ya cuenta con un proceso En Negociación",
-                            StatusCode = Properties.Settings.Default.Code_89,
+                            StatusMessage = "Regla: LGC63 - (R): La FEV referenciada se encuentra en proceso de negociación.. Inténtelo nuevamente.",
                             IsValid = false
                         };
                         ;
@@ -1897,7 +1896,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     if (!item.IsValid)
                     {
-                        failedList.Add($"{item.ErrorCode} - {item.ErrorMessage}");
+                        failedList.Add($"{item.ErrorCode}{item.ErrorMessage}");
                         response.IsValid = false;
                     }
 

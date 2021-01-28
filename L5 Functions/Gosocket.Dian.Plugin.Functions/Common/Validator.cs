@@ -1861,8 +1861,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "89",
-                    ErrorMessage = "Cantidad de cufes La lista de documentos referenciados supera el limite",
+                    ErrorCode = "Regla: LGC58-(R)",
+                    ErrorMessage = "Cantidad de cufes, referenciados supera el limite de 20 Registros",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }

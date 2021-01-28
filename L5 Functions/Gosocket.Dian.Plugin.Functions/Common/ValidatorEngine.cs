@@ -522,9 +522,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if(xmlParser.PaymentMeansID != "2")
             {
                 ValidateListResponse response = new ValidateListResponse();
-                response.ErrorMessage = $"Tipo factura no es Crédito.";
+                response.ErrorMessage = $"La factura referenciada no es de tipo crédito, PaymentMeansID=2";
                 response.IsValid = false;
-                response.ErrorCode = "Regla: 89-(R): ";
+                response.ErrorCode = "Regla: LGC62-(R): ";
                 response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                 validateResponses.Add(response);
                 return validateResponses;
