@@ -72,13 +72,13 @@ namespace Gosocket.Dian.Functions.Activation
                 if (radianTesSetResult != null && setResultOther == null)
                 {
 
-                    
+
                     // traigo los datos de RadianTestSetResult
                     SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN");
 
                     // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
                     string code = radianTesSetResult.PartitionKey;
-                    
+
 
                     SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN");
 
@@ -102,7 +102,7 @@ namespace Gosocket.Dian.Functions.Activation
                         SetLogger(null, "Step 3.2", item.DocumentTypeId, "GTS-count-3.2");
                         SetLogger(null, "Step 3.3", item.IsValid.ToString(), "GTS-count-3.3");
                     }
-                    
+
                     SetLogger(null, "Step 3.4", allGlobalTestSetTracking[0].DocumentTypeId, "GTS-count-3.4");
                     // Esto ya no es neceasario 2020-12-14 Roberto Alvarado
                     // Le asigno el Id 
@@ -113,12 +113,12 @@ namespace Gosocket.Dian.Functions.Activation
 
                     // Acuse de Recibo
                     int tipo = (int)EventStatus.Received;
-                    radianTesSetResult.TotalReceiptNoticeSent = allGlobalTestSetTracking.Count(a =>  Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.TotalReceiptNoticeSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.ReceiptNoticeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.ReceiptNoticeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 3", "Acuse de recibo", "AR_001");
-                    SetLogger(null, "Step 3.0", tipo.ToString(),"AR_001.1");
+                    SetLogger(null, "Step 3.0", tipo.ToString(), "AR_001.1");
                     SetLogger(null, "Step 3.1", radianTesSetResult.TotalReceiptNoticeSent.ToString(), "AR_002");
                     SetLogger(null, "Step 3.2", radianTesSetResult.ReceiptNoticeAccepted.ToString(), "AR_003");
                     SetLogger(null, "Step 3.6", radianTesSetResult.ReceiptNoticeRejected.ToString(), "AR_004");
@@ -291,24 +291,46 @@ namespace Gosocket.Dian.Functions.Activation
                         radianTesSetResult.Status = (int)TestSetStatus.Accepted;
                         radianTesSetResult.StatusDescription = TestSetStatus.Accepted.GetDescription();
                     }
-                        
-                    if (radianTesSetResult.TotalDocumentsRejected > (radianTesSetResult.TotalDocumentRequired - radianTesSetResult.TotalDocumentAcceptedRequired)
-                            && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
+
+                    // Definimos el rechazo
+                    if (radianTesSetResult.ReceiptNoticeRejected > (radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired) ||
+                        radianTesSetResult.ReceiptServiceRejected > (radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired) ||
+                        radianTesSetResult.ExpressAcceptanceRejected > (radianTesSetResult.ExpressAcceptanceTotalRequired - radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired) ||
+                        radianTesSetResult.AutomaticAcceptanceRejected > (radianTesSetResult.AutomaticAcceptanceTotalRequired - radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired) ||
+                        radianTesSetResult.ApplicationAvailableRejected > (radianTesSetResult.ApplicationAvailableTotalRequired - radianTesSetResult.ApplicationAvailableTotalAcceptedRequired) ||
+                        radianTesSetResult.EndorsementPropertyRejected > (radianTesSetResult.EndorsementPropertyTotalRequired - radianTesSetResult.EndorsementPropertyTotalAcceptedRequired) ||
+                        radianTesSetResult.EndorsementProcurementRejected > (radianTesSetResult.EndorsementProcurationTotalRequired - radianTesSetResult.EndorsementProcurementTotalAcceptedRequired) ||
+                        radianTesSetResult.EndorsementGuaranteeRejected > (radianTesSetResult.EndorsementGuaranteeTotalRequired - radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired) ||
+                        radianTesSetResult.EndorsementCancellationRejected > (radianTesSetResult.EndorsementCancellationTotalRequired - radianTesSetResult.EndorsementCancellationTotalAcceptedRequired) ||
+                        radianTesSetResult.GuaranteeRejected > (radianTesSetResult.GuaranteeTotalRequired - radianTesSetResult.GuaranteeTotalAcceptedRequired) ||
+                        radianTesSetResult.ElectronicMandateRejected > (radianTesSetResult.ElectronicMandateTotalRequired - radianTesSetResult.ElectronicMandateTotalAcceptedRequired) ||
+                        radianTesSetResult.EndMandateRejected > (radianTesSetResult.EndMandateTotalRequired - radianTesSetResult.EndMandateTotalAcceptedRequired) ||
+                        radianTesSetResult.PaymentNotificationRejected > (radianTesSetResult.PaymentNotificationTotalRequired - radianTesSetResult.PaymentNotificationTotalAcceptedRequired) ||
+                        radianTesSetResult.CirculationLimitationRejected > (radianTesSetResult.CirculationLimitationTotalRequired - radianTesSetResult.CirculationLimitationTotalAcceptedRequired) ||
+                        radianTesSetResult.EndCirculationLimitationRejected > (radianTesSetResult.EndCirculationLimitationTotalRequired - radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired) ||
+                        radianTesSetResult.ReportForPaymentRejected > (radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired))
                     {
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
                         radianTesSetResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
-                    }   
+                    }
+
+                    //if (radianTesSetResult.TotalDocumentsRejected > (radianTesSetResult.TotalDocumentRequired - radianTesSetResult.TotalDocumentAcceptedRequired)
+                    //        && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
+                    //{
+                    //    radianTesSetResult.Status = (int)TestSetStatus.Rejected;
+                    //    radianTesSetResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
+                    //}
 
                     SetLogger(null, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status);
 
                     // Escribo el registro de RadianTestResult
-                    
+
                     await radianTestSetResultTableManager.InsertOrUpdateAsync(radianTesSetResult);
 
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (radianTesSetResult.Status == (int)TestSetStatus.Accepted)
                     {
-                        SetLogger(null, "Step 19.1", "Fui aceptado","1111111111");
+                        SetLogger(null, "Step 19.1", "Fui aceptado", "1111111111");
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
@@ -356,7 +378,7 @@ namespace Gosocket.Dian.Functions.Activation
                                 };
 
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
-                                SetLogger(null, "Funciton Path",  functionPath, "6333333");
+                                SetLogger(null, "Funciton Path", functionPath, "6333333");
                                 SetLogger(requestObject, "Funciton Path", functionPath, "7333333");
 
 
@@ -382,7 +404,7 @@ namespace Gosocket.Dian.Functions.Activation
                                 };
                                 await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
 
-                                SetLogger(contributorActivation, "Step 22", " contributorActivationTableManager.InsertOrUpdateAsync " );
+                                SetLogger(contributorActivation, "Step 22", " contributorActivationTableManager.InsertOrUpdateAsync ");
 
                                 #endregion
                             }
@@ -429,8 +451,8 @@ namespace Gosocket.Dian.Functions.Activation
                     setResultOther.OthersDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
 
                     //Validacion Nomina
-                    if(setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired 
-                        && setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentAcceptedRequired) 
+                    if (setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired
+                        && setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
                     {
                         setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
@@ -438,7 +460,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                     SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina");
 
-                    if (setResultOther.OthersDocumentsAccepted >= setResultOther.OthersDocumentsAcceptedRequired) 
+                    if (setResultOther.OthersDocumentsAccepted >= setResultOther.OthersDocumentsAcceptedRequired)
                     {
                         setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
@@ -446,7 +468,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                     SetLogger(null, "Step 4 - Validacion Other Document", "Paso Validacion de Other Document");
 
-                    if(setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
+                    if (setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
                         && setResultOther.ElectronicPayrollAjustmentRejected >= (setResultOther.ElectronicPayrollAjustmentRequired - setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
                         && setResultOther.Status == (int)OtherDocElecSoftwaresStatus.InProcess)
                     {
@@ -455,8 +477,8 @@ namespace Gosocket.Dian.Functions.Activation
                     }
 
                     SetLogger(null, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject");
-                    
-                    if(setResultOther.OthersDocumentsAccepted >= (setResultOther.OthersDocumentsRequired - setResultOther.OthersDocumentsAcceptedRequired)
+
+                    if (setResultOther.OthersDocumentsAccepted >= (setResultOther.OthersDocumentsRequired - setResultOther.OthersDocumentsAcceptedRequired)
                         && setResultOther.Status == (int)OtherDocElecSoftwaresStatus.InProcess)
                     {
                         setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Rejected;
