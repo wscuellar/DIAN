@@ -942,9 +942,9 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
-        public DynamicTableEntity FindhByRadianStatus(string partitionKey, bool deleted, string radianStatus)
+        public T FindhByRadianStatus<T>(string partitionKey, bool deleted, string radianStatus) where T : ITableEntity, new()
         {
-            var query = new TableQuery();
+            var query = new TableQuery<T>();
 
             var prefixCondition = TableQuery.CombineFilters(
                 TableQuery.GenerateFilterCondition("PartitionKey",
@@ -954,20 +954,18 @@ namespace Gosocket.Dian.Infrastructure
                 TableQuery.GenerateFilterConditionForBool("Deleted",
                     QueryComparisons.Equal,
                     deleted));
-            prefixCondition = TableQuery.CombineFilters(
-                prefixCondition,
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("RadianState",
-                    QueryComparisons.Equal,
-                    radianStatus));
-            prefixCondition = TableQuery.CombineFilters(
-                prefixCondition,
-                TableOperators.Or,
-                TableQuery.GenerateFilterCondition("RadianState",
-                    QueryComparisons.Equal,
-                    "En pruebas"));
 
+            var RadianStateHabilitado = TableQuery.GenerateFilterCondition("RadianState",
+                QueryComparisons.Equal,
+                radianStatus);
 
+            var RadianStatePruebas = TableQuery.GenerateFilterCondition("RadianState",
+                QueryComparisons.Equal,
+                "En pruebas");
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.CombineFilters(RadianStateHabilitado,
+             TableOperators.Or,
+             RadianStatePruebas));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 

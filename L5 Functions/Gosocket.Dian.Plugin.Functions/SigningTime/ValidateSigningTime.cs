@@ -23,7 +23,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            var data = await req.Content.ReadAsAsync<RequestObject>();
+            var data = await req.Content.ReadAsAsync<RequestObjectSigningTime>();
 
             if (data == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Request body is empty");
@@ -62,24 +62,28 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
             }
-        }
+        }       
+    }
 
-        public class RequestObject
+    public class RequestObjectSigningTime
+    {
+        [JsonProperty(PropertyName = "trackId")]
+        public string TrackId { get; set; }
+        [JsonProperty(PropertyName = "EventCode")]
+        public string EventCode { get; set; }
+        [JsonProperty(PropertyName = "SigningTime")]
+        public string SigningTime { get; set; }
+        [JsonProperty(PropertyName = "DocumentTypeId")]
+        public string DocumentTypeId { get; set; }
+        [JsonProperty(PropertyName = "customizationID")]
+        public string CustomizationID { get; set; }
+        [JsonProperty(PropertyName = "EndDate")]
+        public string EndDate { get; set; }
+
+        public RequestObjectSigningTime()
         {
-            [JsonProperty(PropertyName = "trackId")]
-            public string TrackId { get; set; }
-            [JsonProperty(PropertyName = "EventCode")]
-            public string EventCode { get; set; }
-            [JsonProperty(PropertyName = "SigningTime")]
-            public string SigningTime { get; set; }
-            [JsonProperty(PropertyName = "DocumentTypeId")]
-            public string DocumentTypeId { get; set; }
-            [JsonProperty(PropertyName = "customizationID")]
-            public string CustomizationID { get; set; }
-            [JsonProperty(PropertyName = "EndDate")]
-            public string EndDate { get; set; }
-
-
+                
         }
+
     }
 }

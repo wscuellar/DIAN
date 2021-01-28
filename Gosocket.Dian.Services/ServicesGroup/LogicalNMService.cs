@@ -1462,19 +1462,31 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (documentsList == null || documentsList.Count <= 0) return null; // no exiten documentos
 
             var currentDate = DateTime.Now.Date;
-            var document = documentsList.FirstOrDefault(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month);
-            if (document == null) return null; // no existe para el mes actual
+            var documents = documentsList.Where(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month).ToList();
+            if (documents == null || documents.Count <= 0) return null; // no existe para el mes actual
 
-            if (novelty) return null; // cuando el documento existe para el mes actual y la novedad es true, se debe permitir la transmisión
-
-            return new DianResponse()
+            foreach (var doc in documents)
             {
-                IsValid = false,
-                StatusCode = "99",
-                StatusMessage = ".",
-                StatusDescription = ".",
-                ErrorMessage = new List<string>() { "Regla: 91: - Documento para este Trabajador ya ha sido enviado anteriormente para este mes." }
-            };
+                var documentApproved = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(doc.Identifier, doc.Identifier);
+                if (documentApproved != null)
+                {
+                    if (!novelty)
+                    {
+                        return new DianResponse()
+                        {
+                            IsValid = false,
+                            StatusCode = "99",
+                            StatusMessage = ".",
+                            StatusDescription = ".",
+                            ErrorMessage = new List<string>() { "Regla: 91: - Documento para este Trabajador ya ha sido enviado anteriormente para este mes." }
+                        };
+                    }
+                    else
+                        return null;
+                }
+            }
+
+            return null;
         }
 
         private DianResponse CkeckIndividualPayrollExists(string cune)
