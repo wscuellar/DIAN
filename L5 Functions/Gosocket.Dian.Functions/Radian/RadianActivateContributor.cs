@@ -201,7 +201,6 @@ namespace Gosocket.Dian.Functions.Radian
 
 
                     log.Error($"Exception in RadianActivateContributor. {ex.Message}", ex);
-                    //    throw;
                 }
             }
             else

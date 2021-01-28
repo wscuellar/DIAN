@@ -503,7 +503,10 @@ namespace Gosocket.Dian.Application
         /// <returns>Un objeto RadianCotributor buscado</returns>
         public RadianContributor GetRadian(int contributorId, int contributorTypeId)
         {
-            return sqlDBContext.RadianContributors.FirstOrDefault(rc => rc.ContributorId == contributorId && rc.RadianContributorTypeId == contributorTypeId);
+            using (var context = new SqlDBContext())
+            {
+                return context.RadianContributors.FirstOrDefault(rc => rc.ContributorId == contributorId && rc.RadianContributorTypeId == contributorTypeId);
+            }
         }
 
         /// <summary>

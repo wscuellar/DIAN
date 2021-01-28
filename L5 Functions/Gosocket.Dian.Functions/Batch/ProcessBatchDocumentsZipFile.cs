@@ -508,13 +508,7 @@ namespace Gosocket.Dian.Functions.Batch
                         {
                             SetLogger(null, "Step code", "Estoy verificando RADIAN", "CHECK-10.3");
                             // Validations to RADIAN  
-                            bool isActive = globalRadianOperationService.IsActive(code, new Guid(softwareId));
-                            if (isActive)
-                            {
-                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {code} ya esta autorizado con el software {softwareId}." });
-                                return result;
-                            }
-
+                         
                             RadianTestSetResult radianTestSetResultEntity = null;
                             if (objRadianTestSetResult != null &&
                                 (objRadianTestSetResult.Status == (int)TestSetStatus.InProcess ||
