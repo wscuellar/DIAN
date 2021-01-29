@@ -499,7 +499,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult SoftwareList(int radianContributorId)
         {
-            List<RadianSoftware> softwares = _radianAprovedService.SoftwareList(radianContributorId, RadianSoftwareStatus.Accepted);
+            List<RadianSoftware> softwares = _radianAprovedService.SoftwareList(radianContributorId);
             List<AutoListModel> filteredItems = softwares.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
             return Json(filteredItems, JsonRequestBehavior.AllowGet);
         }
