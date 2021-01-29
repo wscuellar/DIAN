@@ -167,7 +167,7 @@ namespace Gosocket.Dian.Application
                 {
                     softwareInstance.Deleted = software.Deleted;
                     softwareInstance.Name = software.Name;
-                    softwareInstance.RadianContributorId = software.RadianContributorId;
+                    softwareInstance.ContributorId = software.ContributorId;
                     softwareInstance.SoftwareUser = software.SoftwareUser;
                     softwareInstance.SoftwarePassword = software.SoftwarePassword;
                     softwareInstance.Url = software.Url;
