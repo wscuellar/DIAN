@@ -268,24 +268,23 @@ namespace Gosocket.Dian.Functions.Activation
                     SetLogger(null, "Step 19", "Informe para el pago");
 
                     // Definimos la Aceptacion y cambio de estado
-                    if (radianTesSetResult.TotalDocumentAccepted >= radianTesSetResult.TotalDocumentAcceptedRequired
-                            && radianTesSetResult.ReceiptNoticeTotalRequired >= radianTesSetResult.ReceiptNoticeTotalAcceptedRequired
-                            && radianTesSetResult.ReceiptServiceTotalRequired >= radianTesSetResult.ReceiptServiceTotalAcceptedRequired
-                            && radianTesSetResult.ExpressAcceptanceTotalRequired >= radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired
-                            && radianTesSetResult.AutomaticAcceptanceTotalRequired >= radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired
-                            && radianTesSetResult.RejectInvoiceTotalRequired >= radianTesSetResult.RejectInvoiceTotalAcceptedRequired
-                            && radianTesSetResult.ApplicationAvailableTotalRequired >= radianTesSetResult.ApplicationAvailableTotalAcceptedRequired
-                            && radianTesSetResult.EndorsementPropertyTotalRequired >= radianTesSetResult.EndorsementPropertyTotalAcceptedRequired
-                            && radianTesSetResult.EndorsementProcurementTotalRequired >= radianTesSetResult.EndorsementProcurementTotalAcceptedRequired
-                            && radianTesSetResult.EndorsementGuaranteeTotalRequired >= radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired
-                            && radianTesSetResult.EndorsementCancellationTotalRequired >= radianTesSetResult.EndorsementCancellationTotalAcceptedRequired
-                            && radianTesSetResult.GuaranteeTotalRequired >= radianTesSetResult.GuaranteeTotalAcceptedRequired
-                            && radianTesSetResult.ElectronicMandateTotalRequired >= radianTesSetResult.ElectronicMandateTotalAcceptedRequired
-                            && radianTesSetResult.EndMandateTotalRequired >= radianTesSetResult.EndMandateTotalAcceptedRequired
-                            && radianTesSetResult.PaymentNotificationTotalRequired >= radianTesSetResult.PaymentNotificationTotalAcceptedRequired
-                            && radianTesSetResult.CirculationLimitationTotalRequired >= radianTesSetResult.CirculationLimitationTotalAcceptedRequired
-                            && radianTesSetResult.EndCirculationLimitationTotalRequired >= radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired
-                            && radianTesSetResult.ReportForPaymentTotalRequired >= radianTesSetResult.ReportForPaymentTotalAcceptedRequired
+                    if (radianTesSetResult.ReceiptNoticeAccepted >= radianTesSetResult.ReceiptNoticeTotalAcceptedRequired
+                            && radianTesSetResult.ReceiptServiceAccepted >= radianTesSetResult.ReceiptServiceTotalAcceptedRequired
+                            && radianTesSetResult.ExpressAcceptanceAccepted >= radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired
+                            && radianTesSetResult.AutomaticAcceptanceAccepted >= radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired
+                            && radianTesSetResult.RejectInvoiceAccepted >= radianTesSetResult.RejectInvoiceTotalAcceptedRequired
+                            && radianTesSetResult.ApplicationAvailableAccepted >= radianTesSetResult.ApplicationAvailableTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementPropertyAccepted >= radianTesSetResult.EndorsementPropertyTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementProcurementAccepted >= radianTesSetResult.EndorsementProcurementTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementGuaranteeAccepted >= radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementCancellationAccepted >= radianTesSetResult.EndorsementCancellationTotalAcceptedRequired
+                            && radianTesSetResult.GuaranteeAccepted >= radianTesSetResult.GuaranteeTotalAcceptedRequired
+                            && radianTesSetResult.ElectronicMandateAccepted >= radianTesSetResult.ElectronicMandateTotalAcceptedRequired
+                            && radianTesSetResult.EndMandateAccepted >= radianTesSetResult.EndMandateTotalAcceptedRequired
+                            && radianTesSetResult.PaymentNotificationAccepted >= radianTesSetResult.PaymentNotificationTotalAcceptedRequired
+                            && radianTesSetResult.CirculationLimitationAccepted >= radianTesSetResult.CirculationLimitationTotalAcceptedRequired
+                            && radianTesSetResult.EndCirculationLimitationAccepted >= radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired
+                            && radianTesSetResult.ReportForPaymentAccepted >= radianTesSetResult.ReportForPaymentTotalAcceptedRequired
                             && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
                     {
                         radianTesSetResult.Status = (int)TestSetStatus.Accepted;
@@ -314,13 +313,6 @@ namespace Gosocket.Dian.Functions.Activation
                         radianTesSetResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
                     }
 
-                    //if (radianTesSetResult.TotalDocumentsRejected > (radianTesSetResult.TotalDocumentRequired - radianTesSetResult.TotalDocumentAcceptedRequired)
-                    //        && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
-                    //{
-                    //    radianTesSetResult.Status = (int)TestSetStatus.Rejected;
-                    //    radianTesSetResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
-                    //}
-
                     SetLogger(null, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status);
 
                     // Escribo el registro de RadianTestResult
@@ -346,14 +338,6 @@ namespace Gosocket.Dian.Functions.Activation
 
                                 //Habilitamos el participante en GlobalRadianOperations
                                 GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
-
-                                //SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
-
-                                //Verificamos si quedo habilitado sino termina
-                                //if (isPartipantActive.RadianState != Domain.Common.RadianState.Habilitado.GetDescription()) return;
-
-                                //SetLogger(isPartipantActive, "Step 20", " isPartipantActive.RadianState " + isPartipantActive.RadianState);
-
 
                                 //--GlobalSoftware 
                                 var softwareId = globalTestSetTracking.SoftwareId; //isPartipantActive.RowKey;

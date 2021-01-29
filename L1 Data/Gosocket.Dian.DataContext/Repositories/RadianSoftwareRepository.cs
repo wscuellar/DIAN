@@ -41,7 +41,7 @@ namespace Gosocket.Dian.DataContext.Repositories
 
                 if (radianSoftwareInstance != null)
                 {
-                    radianSoftwareInstance.RadianContributorId = radianSoftware.RadianContributorId;
+                    radianSoftwareInstance.ContributorId = radianSoftware.ContributorId;
                     radianSoftwareInstance.Name = radianSoftware.Name;
                     radianSoftwareInstance.Pin = radianSoftware.Pin;
                     radianSoftwareInstance.Url = radianSoftware.Url;
