@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -11,9 +13,9 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Mes Validacion")]
         public string MesValidacion { get; set; }
         public List<MesModel> MesesValidacion { get; set; }
-        [Display(Name = "De")]
+        [Display(Name = "Del")]
         public string RangoNumeracionMenor { get; set; }
-        [Display(Name = "A")]
+        [Display(Name = "Al")]
         public string RangoNumeracionMayor { get; set; }
         [Display(Name = "Letra Primer Apellido")]
         public string LetraPrimerApellido { get; set; }
@@ -24,6 +26,7 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Numero Documento")]
         public string NumeroDocumento { get; set; }
         public string Ciudad { get; set; }
+        public List<CiudadModelList.CiudadModel> Ciudades { get; set; }
         [Display(Name = "Rango Salarial")]
         public string RangoSalarial { get; set; }
         public List<RangoSalarialModel> RangosSalarial { get; set; }
@@ -177,4 +180,24 @@ namespace Gosocket.Dian.Web.Models
         }
     }
 
+    public class CiudadModelList
+    {
+        public TableManager municipalityTableManager = new TableManager("MunicipalityByCode", ConfigurationManager.GetValue("GlobalBillerStorage"));
+        public class CiudadModel
+        {
+            public string Code { get; set; }
+            public string Name { get; set; }
+        }
+
+        public List<CiudadModel> List()
+        {
+            List<CiudadModel> result = new List<CiudadModel>();
+            result.Add(new CiudadModel() { Code = "00", Name = "Todas" });
+            var cities = municipalityTableManager.FindAll<MunicipalityByCode>();
+            foreach(var city in cities)
+                result.Add(new CiudadModel() { Code = city.Code, Name = city.Name });
+            return result;
+        }
+
+    }
 }

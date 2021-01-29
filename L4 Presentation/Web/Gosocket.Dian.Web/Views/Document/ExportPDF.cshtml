@@ -63,8 +63,8 @@
                                                         </div>
                                                         <div class="col-sm-3 padding-xs-0">
                                                             <div class="form-group">
+                                                                <label style="color:#ffffff;" class="control-label">Rango de Numeracion</label>
                                                                 <div class="row">
-                                                                    <label class="control-label"></label>
                                                                     <div class="btn btn-default col-sm-12" id="export-range">
                                                                         @Html.LabelFor(m => m.RangoNumeracionMayor, new { @class = "control-label" })
                                                                         @Html.TextBoxFor(m => m.RangoNumeracionMayor, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.RangoNumeracionMayor) } })
@@ -79,12 +79,6 @@
                                                     <div class="row">
                                                         <div class="col-sm-3 padding-xs-0">
                                                             <div class="form-group">
-                                                                @Html.LabelFor(m => m.LetraPrimerApellido, new { @class = "control-label" })
-                                                                @Html.DropDownListFor(m => m.LetraPrimerApellido, new SelectList(Model.LetrasPrimerApellido, "Code", "Name", Model.LetraPrimerApellido), new { @class = "form-control selectpicker" })
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-3 padding-xs-0">
-                                                            <div class="form-group">
                                                                 @Html.LabelFor(m => m.TipoDocumento, new { @class = "control-label" })
                                                                 @Html.DropDownListFor(m => m.TipoDocumento, new SelectList(Model.TiposDocumento, "Code", "Name", Model.TipoDocumento), new { @class = "form-control selectpicker" })
                                                             </div>
@@ -97,19 +91,24 @@
                                                         </div>
                                                         <div class="col-sm-3 padding-xs-0">
                                                             <div class="form-group">
-                                                                @Html.LabelFor(m => m.Ciudad, new { @class = "control-label" })
-                                                                @Html.TextBoxFor(m => m.Ciudad, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.Ciudad) } })
+                                                                @Html.LabelFor(m => m.LetraPrimerApellido, new { @class = "control-label" })
+                                                                @Html.DropDownListFor(m => m.LetraPrimerApellido, new SelectList(Model.LetrasPrimerApellido, "Code", "Name", Model.LetraPrimerApellido), new { @class = "form-control selectpicker" })
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="panel-body padding-20 padding-bottom-0">
-                                                    <div class="row">
                                                         <div class="col-sm-3 padding-xs-0">
                                                             <div class="form-group">
                                                                 @Html.LabelFor(m => m.RangoSalarial, new { @class = "control-label" })
                                                                 @Html.DropDownListFor(m => m.RangoSalarial, new SelectList(Model.RangosSalarial, "Code", "Name", Model.RangoSalarial), new { @class = "form-control selectpicker" })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel-body padding-20 padding-bottom-0">
+                                                    <div class="row">
+                                                        <div class="col-sm-3 padding-xs-0">
+                                                            <div class="form-group">
+                                                                @Html.LabelFor(m => m.Ciudad, new { @class = "control-label" })
+                                                                @Html.DropDownListFor(m => m.Ciudad, new SelectList(Model.Ciudades, "Code", "Name", Model.Ciudad), new { @class = "form-control selectpicker" })
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-3 padding-xs-0">
@@ -132,7 +131,7 @@
                                                     <div class="row">
 
                                                         <div class="panel-footer-grey text-right submit-container">
-                                                            <button class="btn btn-default btn-hover-gosocket btn-export-excel"><i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Buscar</button>
+                                                            <button type="submit" class="btn btn-success btn-radian-success">Buscar</button>
                                                         </div>
                                                     </div>
                                                 </div>
