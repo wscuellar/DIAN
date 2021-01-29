@@ -343,6 +343,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult UpdateFactorOperationMode(SetOperationViewModel data)
         {
+            RadianContributor participant = _radianAprovedService.GetRadianContributor(data.RadianContributorId);
             RadianContributorOperation contributorOperation = new RadianContributorOperation()
             {
                 RadianContributorId = data.RadianContributorId,
@@ -364,7 +365,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareDate = System.DateTime.Now,
                 Timestamp = System.DateTime.Now,
                 Updated = System.DateTime.Now,
-                RadianContributorId = data.RadianContributorId
+                ContributorId = participant.ContributorId
             };
 
 
@@ -372,7 +373,7 @@ namespace Gosocket.Dian.Web.Controllers
             ResponseMessage response = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, testSet, !string.IsNullOrEmpty(data.SoftwareName), true);
             if (response.Code != 500)
             {
-                RadianContributor participant = _radianAprovedService.GetRadianContributor(data.RadianContributorId);
+                
                 if (participant.RadianState != RadianState.Habilitado.GetDescription())
                     _radianContributorService.ChangeParticipantStatus(participant.ContributorId, RadianState.Test.GetDescription(), participant.RadianContributorTypeId, participant.RadianState, string.Empty);
             }

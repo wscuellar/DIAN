@@ -33,6 +33,7 @@
         public string Prefix { get; set; }
         public string Number { get; set; }
         public DateTime DateOfIssue { get; set; }
+        public DateTime EmissionDate { get; set; }
         public string SenderCode { get; set; }
         public string ReceiverCode { get; set; }
         public string ReceiverName { get; set; }

@@ -182,6 +182,15 @@ namespace Gosocket.Dian.Application
             return _radianTestSetService.GetTestSet(softwareType, softwareType);
         }
 
+        /// <summary>
+        /// Construye la operacion asignando un software a un participante de radian
+        /// </summary>
+        /// <param name="radianContributorOperation">Operacion que se aplica</param>
+        /// <param name="software">Software que se asocia</param>
+        /// <param name="testSet">Set de pruebas que se asigna</param>
+        /// <param name="isInsert">Si el software es para insertasr</param>
+        /// <param name="validateOperation">True = si valida que exita la operacion.</param>
+        /// <returns>ResponseMessage</returns>
         public ResponseMessage AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation)
         {
             if (testSet == null)

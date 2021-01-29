@@ -100,7 +100,7 @@ namespace Gosocket.Dian.Functions.Others
                             RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted,
                             Url = requestObject.Url,
                             CreatedBy = requestObject.CreatedBy,
-                            RadianContributorId = radianContributorId
+                            ContributorId = requestObject.ContributorId
                         };
 
                         softwareService.AddOrUpdateRadianSoftware(newSoftware);

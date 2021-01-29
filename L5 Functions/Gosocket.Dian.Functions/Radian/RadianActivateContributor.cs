@@ -97,7 +97,7 @@ namespace Gosocket.Dian.Functions.Radian
                             RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted,
                             Url = requestObject.Url,
                             CreatedBy = requestObject.CreatedBy,
-                            RadianContributorId = radianContributorId
+                            ContributorId = requestObject.ContributorId
                         };
 
                         softwareService.AddOrUpdateRadianSoftware(newSoftware);
@@ -201,7 +201,6 @@ namespace Gosocket.Dian.Functions.Radian
 
 
                     log.Error($"Exception in RadianActivateContributor. {ex.Message}", ex);
-                    //    throw;
                 }
             }
             else
