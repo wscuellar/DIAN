@@ -366,8 +366,8 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         [TestMethod()]
         public void RadianTestResultByNit_Result_Test()
         {
-            _radianApprovedService.Setup(ras => ras.RadianTestSetResultByNit(It.IsAny<string>())).Returns(new RadianTestSetResult());
-            JsonResult result = _radianApprovedController.RadianTestResultByNit(string.Empty);
+            _radianApprovedService.Setup(ras => ras.RadianTestSetResultByNit(It.IsAny<string>(), It.IsAny<string>())).Returns(new RadianTestSetResult());
+            JsonResult result = _radianApprovedController.RadianTestResultByNit(string.Empty, string.Empty);
             Assert.IsInstanceOfType(result.Data.GetType().GetProperty("data").GetValue(result.Data, null), typeof(RadianTestSetResult));
         }
 
@@ -406,7 +406,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         [TestMethod()]
         public void SoftwareList_Result_Test()
         {
-            _radianApprovedService.Setup(ras => ras.SoftwareList(It.IsAny<int>(), It.IsAny<RadianSoftwareStatus>()))
+            _radianApprovedService.Setup(ras => ras.SoftwareList(It.IsAny<int>()))
                 .Returns(new List<RadianSoftware>()
                 {
                     new RadianSoftware()
