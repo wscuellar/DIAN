@@ -4,7 +4,7 @@
 @using Newtonsoft.Json
 @{
     ViewBag.title = "Detalle de Set de Pruebas - Propios Medios";
-    var status = "";
+    string status = "";
     switch (Model.RadianTestSetResult.Status)
     {
         case (int)TestSetStatus.InProcess:
@@ -26,7 +26,7 @@
             @ViewBag.title
         </p>
         <div class="underline-title"></div>
-        <div class="back-button"><a href="javascript:history.back()"><i class="fa fa-chevron-left"></i> Volver</a></div>
+        <div class="back-button"><a href="@Url.Action("GetSetTestResult", "RadianApproved", new { RadianContributorId = Model.Contributor.RadianContributorId, Nit = Model.Nit, ContributorId = Model.ContributorId })"><i class="fa fa-chevron-left"></i> Volver</a></div>
     </div>
     <div class="margin-horizontal-0">
         <div class="panel">
@@ -61,198 +61,203 @@
 @section Scripts{
 
     <script>
+
         $(document).ready(function () {
-                        var nit = '@Model.Nit';
 
-                        $.ajax({
-                            url: '@Url.Action("RadianTestResultByNit", "RadianApproved")',
-                            type: "POST",
-                            data: {
-                                nit: nit,
-                            },
-                            error: function (error) { },
-                            success: function (response) {
-                                showChart(response);
-                            }
-                        });
 
-                        function showChart(data) {
-                            var dataChart = data.data;
-                            console.log(dataChart);
-                            Highcharts.chart('setTestDetails', {
-                                chart: {
-                                    type: 'bar'
-                                },
-                                title: {
-                                    text: ''
-                                },
-                                xAxis: {
-                                    alternateGridColor: '#EBEEEC',
-                                    categories: [
-                                        'Documentos',
-                                        'Acuse de recibo',
-                                        'Recibido del bien o prestación del S',
-                                        'Aceptación expresa',
-                                        'Aceptación tácita',
-                                        'Rechazo de la  FEV',
-                                        'Avales',
-                                        'Mandato eléctronico',
-                                        'Terminacion de mandato',
-                                        'Solicitud de disponibilización',
-                                        'Endoso en propiedad',
-                                        'Anulación endoso',
-                                        'Notificación pago parcial o total',
-                                        'Terminación de la limitación de circulación',
-                                        'Endoso en garantia',
-                                        'Endoso en procuración',
-                                        'Limitación de circulación',
-                                        'Informe para el pago'
-                                    ]
-                                },
-                                yAxis: {
-                                    min: 0,
-                                    title: {
-                                        text: ''
-                                    }
-                                },
-                                legend: {
-                                    align: 'right',
-                                    verticalAlign: 'top',
-                                    x: 0,
-                                    y: 15
-                                },
-                                plotOptions: {
-                                    series: {
-                                        stacking: 'normal',
-                                        borderRadius: 8
-                                    }
-                                },
-                                series: [
-                                    {
-                                        name: 'Requeridos',
-                                        color: '#6A197D',
-                                        data: [
-                                            dataChart.TotalDocumentRequired,
-                                            dataChart.ReceiptNoticeTotalRequired,
-                                            dataChart.ReceiptServiceTotalRequired,
-                                            dataChart.ExpressAcceptanceTotalRequired,
-                                            dataChart.AutomaticAcceptanceTotalRequired,
-                                            dataChart.RejectInvoiceTotalRequired,
-                                            dataChart.GuaranteeTotalRequired,
-                                            dataChart.ElectronicMandateTotalRequired,
-                                            dataChart.EndMandateTotalRequired,
-                                            dataChart.ApplicationAvailableTotalRequired,
-                                            dataChart.EndorsementPropertyTotalRequired,
-                                            dataChart.EndorsementCancellationTotalRequired,
-                                            dataChart.PaymentNotificationTotalRequired,
-                                            dataChart.EndCirculationLimitationTotalRequired,
-                                            dataChart.EndorsementGuaranteeTotalRequired,
-                                            dataChart.EndorsementProcurementTotalRequired,
-                                            dataChart.CirculationLimitationTotalRequired,
-                                            dataChart.ReportForPaymentTotalRequired
-                                        ]
-                                    },
-                                    {
-                                        name: 'Min requerido aceptado',
-                                        color: '#D9F489',
-                                        data: [
-                                            dataChart.TotalDocumentAcceptedRequired,
-                                            dataChart.ReceiptNoticeTotalAcceptedRequired,
-                                            dataChart.ReceiptServiceTotalAcceptedRequired,
-                                            dataChart.ExpressAcceptanceTotalAcceptedRequired,
-                                            dataChart.AutomaticAcceptanceTotalAcceptedRequired,
-                                            dataChart.RejectInvoiceTotalAcceptedRequired,
-                                            dataChart.GuaranteeTotalAcceptedRequired,
-                                            dataChart.ElectronicMandateTotalAcceptedRequired,
-                                            dataChart.EndMandateTotalAcceptedRequired,
-                                            dataChart.ApplicationAvailableTotalAcceptedRequired,
-                                            dataChart.EndorsementPropertyTotalAcceptedRequired,
-                                            dataChart.EndorsementCancellationTotalAcceptedRequired,
-                                            dataChart.PaymentNotificationTotalAcceptedRequired,
-                                            dataChart.EndCirculationLimitationTotalAcceptedRequired,
-                                            dataChart.EndorsementGuaranteeTotalAcceptedRequired,
-                                            dataChart.EndorsementProcurementTotalAcceptedRequired,
-                                            dataChart.CirculationLimitationTotalAcceptedRequired,
-                                            dataChart.ReportForPaymentTotalAcceptedRequired
-                                        ]
-                                    },
-                                    {
-                                        name: 'Recibidos',
-                                        color: '#FFD271',
-                                        data: [
-                                            dataChart.TotalDocumentSent,
-                                            dataChart.TotalReceiptNoticeSent,
-                                            dataChart.TotalReceiptServiceSent,
-                                            dataChart.TotalExpressAcceptanceSent,
-                                            dataChart.TotalAutomaticAcceptanceSent,
-                                            dataChart.TotalRejectInvoiceSent,
-                                            dataChart.TotalGuaranteeSent,
-                                            dataChart.TotalElectronicMandateSent,
-                                            dataChart.TotalEndMandateSent,
-                                            dataChart.TotalApplicationAvailableSent,
-                                            dataChart.TotalEndorsementPropertySent,
-                                            dataChart.TotalEndorsementCancellationSent,
-                                            dataChart.TotalPaymentNotificationSent,
-                                            dataChart.TotalEndCirculationLimitationSent,
-                                            dataChart.TotalEndorsementGuaranteeSent,
-                                            dataChart.TotalEndorsementProcurementSent,
-                                            dataChart.TotalCirculationLimitationSent,
-                                            dataChart.TotalReportForPaymentSent
 
-                                        ]
-                                    },
-                                    {
-                                        name: 'Aceptados',
-                                        color: '#348441',
-                                        data: [
-                                            dataChart.TotalDocumentAccepted,
-                                            dataChart.ReceiptNoticeAccepted,
-                                            dataChart.ReceiptServiceAccepted,
-                                            dataChart.ExpressAcceptanceAccepted,
-                                            dataChart.AutomaticAcceptanceAccepted,
-                                            dataChart.RejectInvoiceAccepted,
-                                            dataChart.GuaranteeAccepted,
-                                            dataChart.ElectronicMandateAccepted,
-                                            dataChart.EndMandateAccepted,
-                                            dataChart.ApplicationAvailableAccepted,
-                                            dataChart.EndorsementPropertyAccepted,
-                                            dataChart.EndorsementCancellationAccepted,
-                                            dataChart.PaymentNotificationAccepted,
-                                            dataChart.EndCirculationLimitationAccepted,
-                                            dataChart.EndorsementGuaranteeAccepted,
-                                            dataChart.EndorsementProcurementAccepted,
-                                            dataChart.CirculationLimitationAccepted,
-                                            dataChart.ReportForPaymentAccepted
-                                        ]
-                                    },
-                                    {
-                                        name: 'Rechazados',
-                                        color: '#FF414D',
-                                        data: [
-                                            dataChart.TotalDocumentsRejected,
-                                            dataChart.ReceiptNoticeRejected,
-                                            dataChart.RejectInvoiceAccepted,
-                                            dataChart.ExpressAcceptanceRejected,
-                                            dataChart.AutomaticAcceptanceRejected,
-                                            dataChart.RejectInvoiceRejected,
-                                            dataChart.GuaranteeRejected,
-                                            dataChart.ElectronicMandateRejected,
-                                            dataChart.EndMandateRejected,
-                                            dataChart.ApplicationAvailableRejected,
-                                            dataChart.EndorsementPropertyRejected,
-                                            dataChart.EndorsementCancellationRejected,
-                                            dataChart.PaymentNotificationRejected,
-                                            dataChart.EndCirculationLimitationRejected,
-                                            dataChart.EndorsementGuaranteeRejected,
-                                            dataChart.EndorsementProcurementRejected,
-                                            dataChart.CirculationLimitationRejected,
-                                            dataChart.ReportForPaymentRejected
-                                        ]
-                                    }
-                                ]
-                            });
+            var nit = '@Model.Nit';
+            var idTestSet = '@Model.RadianTestSetResult.Id';
+
+            $.ajax({
+                url: '@Url.Action("RadianTestResultByNit", "RadianApproved")',
+                type: "POST",
+                data: {
+                    nit: nit,
+                    idTestSet: idTestSet
+                },
+                error: function (error) { },
+                success: function (response) {
+                    showChart(response);
+                }
+            });
+
+            function showChart(data) {
+                var dataChart = data.data;
+                Highcharts.chart('setTestDetails', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        alternateGridColor: '#EBEEEC',
+                        categories: [
+                            'Documentos',
+                            'Acuse de recibo',
+                            'Recibido del bien o prestación del S',
+                            'Aceptación expresa',
+                            'Aceptación tácita',
+                            'Rechazo de la  FEV',
+                            'Avales',
+                            'Mandato eléctronico',
+                            'Terminacion de mandato',
+                            'Solicitud de disponibilización',
+                            'Endoso en propiedad',
+                            'Anulación endoso',
+                            'Notificación pago parcial o total',
+                            'Terminación de la limitación de circulación',
+                            'Endoso en garantia',
+                            'Endoso en procuración',
+                            'Limitación de circulación',
+                            'Informe para el pago'
+                        ]
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
                         }
-                    });
+                    },
+                    legend: {
+                        align: 'right',
+                        verticalAlign: 'top',
+                        x: 0,
+                        y: 15
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal',
+                            borderRadius: 8
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'Requeridos',
+                            color: '#6A197D',
+                            data: [
+                                dataChart.TotalDocumentRequired,
+                                dataChart.ReceiptNoticeTotalRequired,
+                                dataChart.ReceiptServiceTotalRequired,
+                                dataChart.ExpressAcceptanceTotalRequired,
+                                dataChart.AutomaticAcceptanceTotalRequired,
+                                dataChart.RejectInvoiceTotalRequired,
+                                dataChart.GuaranteeTotalRequired,
+                                dataChart.ElectronicMandateTotalRequired,
+                                dataChart.EndMandateTotalRequired,
+                                dataChart.ApplicationAvailableTotalRequired,
+                                dataChart.EndorsementPropertyTotalRequired,
+                                dataChart.EndorsementCancellationTotalRequired,
+                                dataChart.PaymentNotificationTotalRequired,
+                                dataChart.EndCirculationLimitationTotalRequired,
+                                dataChart.EndorsementGuaranteeTotalRequired,
+                                dataChart.EndorsementProcurementTotalRequired,
+                                dataChart.CirculationLimitationTotalRequired,
+                                dataChart.ReportForPaymentTotalRequired
+                            ]
+                        },
+                        {
+                            name: 'Min requerido aceptado',
+                            color: '#D9F489',
+                            data: [
+                                dataChart.TotalDocumentAcceptedRequired,
+                                dataChart.ReceiptNoticeTotalAcceptedRequired,
+                                dataChart.ReceiptServiceTotalAcceptedRequired,
+                                dataChart.ExpressAcceptanceTotalAcceptedRequired,
+                                dataChart.AutomaticAcceptanceTotalAcceptedRequired,
+                                dataChart.RejectInvoiceTotalAcceptedRequired,
+                                dataChart.GuaranteeTotalAcceptedRequired,
+                                dataChart.ElectronicMandateTotalAcceptedRequired,
+                                dataChart.EndMandateTotalAcceptedRequired,
+                                dataChart.ApplicationAvailableTotalAcceptedRequired,
+                                dataChart.EndorsementPropertyTotalAcceptedRequired,
+                                dataChart.EndorsementCancellationTotalAcceptedRequired,
+                                dataChart.PaymentNotificationTotalAcceptedRequired,
+                                dataChart.EndCirculationLimitationTotalAcceptedRequired,
+                                dataChart.EndorsementGuaranteeTotalAcceptedRequired,
+                                dataChart.EndorsementProcurementTotalAcceptedRequired,
+                                dataChart.CirculationLimitationTotalAcceptedRequired,
+                                dataChart.ReportForPaymentTotalAcceptedRequired
+                            ]
+                        },
+                        {
+                            name: 'Recibidos',
+                            color: '#FFD271',
+                            data: [
+                                dataChart.TotalDocumentSent,
+                                dataChart.TotalReceiptNoticeSent,
+                                dataChart.TotalReceiptServiceSent,
+                                dataChart.TotalExpressAcceptanceSent,
+                                dataChart.TotalAutomaticAcceptanceSent,
+                                dataChart.TotalRejectInvoiceSent,
+                                dataChart.TotalGuaranteeSent,
+                                dataChart.TotalElectronicMandateSent,
+                                dataChart.TotalEndMandateSent,
+                                dataChart.TotalApplicationAvailableSent,
+                                dataChart.TotalEndorsementPropertySent,
+                                dataChart.TotalEndorsementCancellationSent,
+                                dataChart.TotalPaymentNotificationSent,
+                                dataChart.TotalEndCirculationLimitationSent,
+                                dataChart.TotalEndorsementGuaranteeSent,
+                                dataChart.TotalEndorsementProcurementSent,
+                                dataChart.TotalCirculationLimitationSent,
+                                dataChart.TotalReportForPaymentSent
+
+                            ]
+                        },
+                        {
+                            name: 'Aceptados',
+                            color: '#348441',
+                            data: [
+                                dataChart.TotalDocumentAccepted,
+                                dataChart.ReceiptNoticeAccepted,
+                                dataChart.ReceiptServiceAccepted,
+                                dataChart.ExpressAcceptanceAccepted,
+                                dataChart.AutomaticAcceptanceAccepted,
+                                dataChart.RejectInvoiceAccepted,
+                                dataChart.GuaranteeAccepted,
+                                dataChart.ElectronicMandateAccepted,
+                                dataChart.EndMandateAccepted,
+                                dataChart.ApplicationAvailableAccepted,
+                                dataChart.EndorsementPropertyAccepted,
+                                dataChart.EndorsementCancellationAccepted,
+                                dataChart.PaymentNotificationAccepted,
+                                dataChart.EndCirculationLimitationAccepted,
+                                dataChart.EndorsementGuaranteeAccepted,
+                                dataChart.EndorsementProcurementAccepted,
+                                dataChart.CirculationLimitationAccepted,
+                                dataChart.ReportForPaymentAccepted
+                            ]
+                        },
+                        {
+                            name: 'Rechazados',
+                            color: '#FF414D',
+                            data: [
+                                dataChart.TotalDocumentsRejected,
+                                dataChart.ReceiptNoticeRejected,
+                                dataChart.RejectInvoiceAccepted,
+                                dataChart.ExpressAcceptanceRejected,
+                                dataChart.AutomaticAcceptanceRejected,
+                                dataChart.RejectInvoiceRejected,
+                                dataChart.GuaranteeRejected,
+                                dataChart.ElectronicMandateRejected,
+                                dataChart.EndMandateRejected,
+                                dataChart.ApplicationAvailableRejected,
+                                dataChart.EndorsementPropertyRejected,
+                                dataChart.EndorsementCancellationRejected,
+                                dataChart.PaymentNotificationRejected,
+                                dataChart.EndCirculationLimitationRejected,
+                                dataChart.EndorsementGuaranteeRejected,
+                                dataChart.EndorsementProcurementRejected,
+                                dataChart.CirculationLimitationRejected,
+                                dataChart.ReportForPaymentRejected
+                            ]
+                        }
+                    ]
+                });
+            }
+        });
 
     </script>
 }

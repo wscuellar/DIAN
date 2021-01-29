@@ -254,6 +254,22 @@
                                 </div>
                             </div>
                         }
+
+                        @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoPropiedad)
+                        {
+                            <h5><strong>DATOS DEL ENDOSO</strong></h5>
+                            <span>NIT: @Model.ReceiverCode</span>
+                            <span>ENDOSATARIO: @Model.ReceiverName</span>
+                            <span>NIT: @Model.SenderCode</span>
+                            <span>ENDOSANTE: @Model.SenderName</span>
+
+                            <div class="row">
+                                <div class="second-section-align">
+                                    <h5><strong>TIPO DE ENDOSO </strong></h5>
+                                    <span>Endoso en propiedad</span>
+                                </div>
+                            </div>
+                        }
                     </div>
                     <div class="row radian-subtitle-line"></div>
                 </div>

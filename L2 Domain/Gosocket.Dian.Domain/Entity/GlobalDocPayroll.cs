@@ -104,8 +104,7 @@ namespace Gosocket.Dian.Domain.Entity
         public string Emp_DepartamentoEstado { get; set; }
         public string Emp_MunicipioCiudad { get; set; }
         public string Emp_Direccion { get; set; }
-        public string Emp_Celular { get; set; }
-        public string Emp_Correo { get; set; }
+       
 
         //Trabajador
         public string TipoTrabajador { get; set; }
@@ -139,19 +138,7 @@ namespace Gosocket.Dian.Domain.Entity
 
         public string LugarTrabajoDireccion { get; set; }
 
-        public string Celular { get; set; }
-
-        public string Correo { get; set; }
-
         public bool SalarioIntegral { get; set; }
-
-        public string CodigoArea { get; set; }
-
-        public string NombreArea { get; set; }
-
-        public string CodigoCargo { get; set; }
-
-        public string NombreCargo { get; set; }
 
         public string TipoContrato { get; set; }
 

@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.DataContext.Middle;
 using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Repositories;
 using System;
@@ -35,7 +36,7 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public bool GetParticipantWithActiveProcess(int contributorId, int contributorTypeId)
         {
-            List<RadianContributor> participants = (from p in sqlDBContext.RadianContributors.Where(t => t.ContributorId == contributorId &&  t.RadianState != "Cancelado")
+            List<RadianContributor> participants = (from p in sqlDBContext.RadianContributors.Where(t => t.ContributorId == contributorId && t.RadianState != "Cancelado")
                                                     join o in sqlDBContext.RadianContributorOperations on p.Id equals o.RadianContributorId
                                                     where p.RadianContributorTypeId != contributorTypeId
                                                     && p.RadianOperationModeId == 1
@@ -106,19 +107,19 @@ namespace Gosocket.Dian.DataContext.Repositories
                 .Include("RadianOperationMode")
                 .Include("RadianContributorFile")
                 .Include("RadianContributorOperations");
-            return query.Paginate(page, length, t => t.CreatedDate,true);
+            return query.Paginate(page, length, t => t.CreatedDate, true);
         }
 
 
         public List<RadianContributor> ActiveParticipantsWithSoftware(int radianContributorTypeId)
         {
             string radianStatus = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
-            int softwareStatus = (int)Domain.Common.RadianSoftwareStatus.Accepted;
-            List<RadianContributor> query = sqlDBContext.RadianContributors.Where(t => t.RadianContributorTypeId == radianContributorTypeId && t.RadianState == radianStatus).Include("Contributor").ToList();
-            query = (from rc in query
-                     join s in sqlDBContext.RadianSoftwares.Where(t => t.RadianSoftwareStatusId == softwareStatus) on rc.Id equals s.ContributorId
-                     select rc).Distinct().ToList();
-            return query;
+            return (from c in sqlDBContext.RadianContributors.Include("Contributor").Where(t => t.RadianState == radianStatus && t.RadianContributorTypeId == radianContributorTypeId).ToList()
+                    join ope in sqlDBContext.RadianContributorOperations on c.Id equals ope.RadianContributorId
+                    join s in sqlDBContext.RadianSoftwares on ope.SoftwareId equals s.Id
+                    where ope.SoftwareType == (int)Domain.Common.RadianOperationModeTestSet.OwnSoftware
+                    && ope.OperationStatusId == 4 //que haya pasado pruebas.
+                    select c).Distinct().ToList();
         }
 
         /// <summary>
@@ -170,6 +171,18 @@ namespace Gosocket.Dian.DataContext.Repositories
                 sqlDBContext.RadianContributors.Remove(rc);
                 sqlDBContext.SaveChanges();
             }
+        }
+
+        public List<RadianSoftware> RadianSoftwareByParticipante(int radianContributorId)
+        {
+            int softwareSt = (int)RadianSoftwareStatus.Accepted;
+            return (    
+                    from c in sqlDBContext.RadianContributors.Where(t => t.Id == radianContributorId).Include("Contributor").ToList()
+                    join ope in sqlDBContext.RadianContributorOperations on c.Id equals ope.RadianContributorId
+                    join s in sqlDBContext.RadianSoftwares on ope.SoftwareId equals s.Id
+                    where s.RadianSoftwareStatusId == softwareSt
+                    select s
+                    ).Distinct().ToList();
         }
     }
 }
