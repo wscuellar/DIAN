@@ -315,9 +315,9 @@ namespace Gosocket.Dian.Application
             return radianContributorOperationWithSoftware;
         }
 
-        public RadianTestSetResult RadianTestSetResultByNit(string nit)
+        public RadianTestSetResult RadianTestSetResultByNit(string nit, string idTestSet)
         {
-            return _radianTestSetResultService.GetTestSetResultByNit(nit).FirstOrDefault();
+            return _radianTestSetResultService.GetTestSetResultByNit(nit).FirstOrDefault(t=> t.Id == idTestSet);
         }
 
         /// <summary>

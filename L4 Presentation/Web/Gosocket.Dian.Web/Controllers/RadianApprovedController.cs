@@ -407,16 +407,15 @@ namespace Gosocket.Dian.Web.Controllers
         {
             string contributorId = Request.Params["ContributorId"];
             string radianContributorId = Request.Params["Contributor.RadianContributorId"];
-            radianApprovedViewModel.RadianTestSetResult =
-               _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault(t => t.Id == radianApprovedViewModel.RadianTestSetResult.Id);
+            radianApprovedViewModel.RadianTestSetResult = _radianAprovedService.RadianTestSetResultByNit(radianApprovedViewModel.Nit, radianApprovedViewModel.RadianTestSetResult.Id);
             radianApprovedViewModel.ContributorId = Int32.Parse(contributorId);
             radianApprovedViewModel.Contributor.RadianContributorId = Int32.Parse(radianContributorId);
             return View(radianApprovedViewModel);
         }
 
-        public JsonResult RadianTestResultByNit(string nit)
+        public JsonResult RadianTestResultByNit(string nit, string idTestSet)
         {
-            RadianTestSetResult testSetResult = _radianAprovedService.RadianTestSetResultByNit(nit);
+            RadianTestSetResult testSetResult = _radianAprovedService.RadianTestSetResultByNit(nit, idTestSet);
             return Json(new { data = testSetResult }, JsonRequestBehavior.AllowGet);
         }
 

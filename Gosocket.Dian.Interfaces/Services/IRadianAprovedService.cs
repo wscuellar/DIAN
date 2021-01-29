@@ -37,7 +37,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         ResponseMessage AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation);
 
-        RadianTestSetResult RadianTestSetResultByNit(string nit);
+        RadianTestSetResult RadianTestSetResultByNit(string nit, string idTestSet);
 
         RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId);
 
