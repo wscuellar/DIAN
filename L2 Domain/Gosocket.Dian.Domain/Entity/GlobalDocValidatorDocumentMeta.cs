@@ -51,4 +51,5 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public double NewAmountTV { get; set; }
     public bool IsInvoiceTV { get; set; }
     public bool SendTestSet { get; set; }
+    public bool? Novelty { get; set; }
 }

@@ -1261,7 +1261,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 //Calculo valor de la negociación
-                int resultNegotiationValue = ((Int32)newAmountTV * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
+                int resultNegotiationValue = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
                 resultNegotiationValue = resultNegotiationValue / 100;
 
                 //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
@@ -1861,8 +1861,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "89",
-                    ErrorMessage = "Cantidad de cufes La lista de documentos referenciados supera el limite",
+                    ErrorCode = "Regla: LGC58-(R)",
+                    ErrorMessage = "Cantidad de cufes, referenciados supera el limite de 20 Registros",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -2846,21 +2846,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
-                    var responseListEndoso = ValidateTransactionCufe(trackId.ToLower());
-                    if (responseListEndoso != null)
-                    {                      
-                        foreach (var item in responseListEndoso)
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = item.IsValid,
-                                Mandatory = item.Mandatory,
-                                ErrorCode = item.ErrorCode,
-                                ErrorMessage = item.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
+                    //Ajuste BUG 5920  pendiente
+                    //var responseListEndoso = ValidateTransactionCufe(trackId.ToLower());
+                    //if (responseListEndoso != null)
+                    //{                      
+                    //    foreach (var item in responseListEndoso)
+                    //    {
+                    //        responses.Add(new ValidateListResponse
+                    //        {
+                    //            IsValid = item.IsValid,
+                    //            Mandatory = item.Mandatory,
+                    //            ErrorCode = item.ErrorCode,
+                    //            ErrorMessage = item.ErrorMessage,
+                    //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //        });
+                    //    }
+                    //}
                 }
             }
 
@@ -4488,15 +4489,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     arrayTasks.Add(
                         documentMetaTableManager.InsertOrUpdateAsync(validatorDocumentMeta));
                 }
-                else
+                else              
                 {
                     validTransaction = true;
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: 89-(R): ",
-                        ErrorMessage = $"{(string)null}CUFE relacionado ya cuenta con un proceso En Negociación",
+                        ErrorCode = "Regla: LGC63-(R): ",
+                        ErrorMessage = $"{(string)null}La FEV referenciada se encuentra en proceso de negociación.. Inténtelo nuevamente",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                     return responses;

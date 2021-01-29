@@ -1,0 +1,110 @@
+﻿@using Gosocket.Dian.Domain.Common
+@using Gosocket.Dian.Web.Common;
+@model Gosocket.Dian.Web.Models.PayrollViewModel
+
+<div class="table-responsive padding-bottom-15">
+    <table colspan="12" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th class="text-center" style="width: 50px;"></th>
+                <th class="text-center">No. Nomina</th>
+                <th class="text-center">Nombre</th>
+                <th class="text-center">Tipo Documento</th>
+                <th class="text-center">No. Documento</th>
+                <th class="text-center">Salario</th>
+                <th class="text-center">Devengado</th>
+                <th class="text-center">Deducido</th>
+                <th class="text-center">Valor Total</th>
+                <th class="text-center">Mes de validacion</th>
+                <th class="text-center">Novedad</th>
+                <th class="text-center">No Nomina Ajuste</th>
+                <th class="text-center">Resultado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Payrolls.Any())
+            {
+                <tr style="background-color: transparent !important;">
+                    <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
+                        <div class="alert panel-footer-grey">
+                            Ningun documento de Nomina disponible para mostrar.
+                        </div>
+                    </td>
+                </tr>
+            }
+            @foreach (var p in Model.Payrolls)
+            {
+        <tr>
+            <td><span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@p.link" id="@p.link"></span></td>
+            <td>@p.NumeroNomina</td>
+            <td>@p.ApellidosNombre</td>
+            <td>@p.TipoDocumento</td>
+            <td>@p.NoDocumento</td>
+            <td>@p.Salario</td>
+            <td>@p.Devengado</td>
+            <td>@p.Deducido</td>
+            <td>@p.ValorTotal</td>
+            @switch (p.MesValidacion)
+            {
+                case "1":
+                    <td>Enero</td>
+                    break;
+                case "2":
+                    <td>Febrero</td>
+                    break;
+                case "3":
+                    <td>Marzo</td>
+                    break;
+                case "4":
+                    <td>Abril</td>
+                    break;
+                case "5":
+                    <td>Mayo</td>
+                    break;
+                case "6":
+                    <td>Junio</td>
+                    break;
+                case "7":
+                    <td>Julio</td>
+                    break;
+                case "8":
+                    <td>Agosto</td>
+                    break;
+                case "9":
+                    <td>Septiembre</td>
+                    break;
+                case "10":
+                    <td>Octubre</td>
+                    break;
+                case "11":
+                    <td>Noviembre</td>
+                    break;
+                case "12":
+                    <td>Diciembre</td>
+                    break;
+                default:
+                    <td></td>
+                    break;
+            }
+            @if (!p.Novedad == null && p.Novedad == true)
+            {
+                <td BGCOLOR="#00FF00"></td>
+            }
+            else
+            {
+                <td></td>
+            }
+            <td>@p.NumeroAjuste</td>
+            @if (p.Resultado == "Aprobado")
+            {
+                <td>Validada</td>
+            }
+            else
+            {
+                <td>@p.Resultado</td>
+            }            
+        </tr>
+             }
+            </tbody>
+    </table>
+</div>
