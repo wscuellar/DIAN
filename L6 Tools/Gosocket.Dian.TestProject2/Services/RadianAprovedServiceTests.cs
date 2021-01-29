@@ -237,24 +237,7 @@ namespace Gosocket.Dian.Application.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        [TestMethod()]
-        public void RadianTestSetResultByNitTest()
-        {
-            // Arrange
-            string nit = "";
-
-            _current.Setup(t => t.RadianTestSetResultByNit(nit))
-                .Returns(It.IsAny<RadianTestSetResult>());
-
-            RadianTestSetResult expected = null;
-
-            //ACT
-            var actual = _current.Object.RadianTestSetResultByNit(nit);
-
-            // Assert
-            Assert.AreEqual(expected, actual);
-        }
-
+        
         [TestMethod()]
         public void SoftwareByContributorTest()
         {

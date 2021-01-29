@@ -37,11 +37,11 @@ namespace Gosocket.Dian.Interfaces.Services
 
         ResponseMessage AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation);
 
-        RadianTestSetResult RadianTestSetResultByNit(string nit);
+        RadianTestSetResult RadianTestSetResultByNit(string nit, string idTestSet);
 
         RadianContributorOperationWithSoftware ListRadianContributorOperations(int radianContributorId);
 
-        List<RadianSoftware> SoftwareList(int radianContributorId, RadianSoftwareStatus softwareStatus);
+        List<RadianSoftware> SoftwareList(int radianContributorId);
 
         List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term);
 

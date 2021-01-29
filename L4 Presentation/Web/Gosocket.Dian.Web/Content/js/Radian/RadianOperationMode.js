@@ -51,7 +51,7 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
                 $("#SoftwareNameList").html("");
                 $("#bussiness-name").html("");
                 response.length == 0 && hideLoading('#panel-form');
-                if (response.length) {
+                if (response.length) {debugger
                     LoadSoftwareList(response[0].value);
                 }
                 for (var i = 0; i < response.length; i++) {
@@ -59,11 +59,6 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
                 }
             }
         ajaxFunction(url, metod, data, actionError, actionSuccess);
-
-        $("#bussiness-name").change(function (element) {
-            LoadSoftwareList(element);
-        })
-
 }
 
 function ChangeSelected() {
