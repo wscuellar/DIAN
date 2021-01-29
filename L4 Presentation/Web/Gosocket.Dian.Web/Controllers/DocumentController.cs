@@ -318,16 +318,17 @@ namespace Gosocket.Dian.Web.Controllers
                     contadorValidaciones++;
                 if (!String.IsNullOrEmpty(model.RangoNumeracionMenor) && !String.IsNullOrEmpty(model.RangoNumeracionMayor))
                     contadorValidaciones++;
-                if (!String.IsNullOrEmpty(model.Ciudad))
+                if (model.Ciudad != "00")
                     contadorValidaciones++;
                 if (model.TipoDocumento != "00")
                     contadorValidaciones++;
                 if (model.RangoSalarial != "00")
                     contadorValidaciones++;
-                if (contadorValidaciones <= 3)
+                if (contadorValidaciones < 3)
                 {
                     model.Mensaje = "Debe seleccionar al menos 3 filtros o el Numero de Documento";
                     loadData(ref model);
+                    model.Payrolls = new List<DocumentViewPayroll>();
                     return View(model);
                 }
                 else
