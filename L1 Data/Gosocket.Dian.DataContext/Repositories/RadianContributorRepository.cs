@@ -25,8 +25,6 @@ namespace Gosocket.Dian.DataContext.Repositories
         {
             IQueryable<RadianContributor> query = sqlDBContext.RadianContributors.Where(expression)
                 .Include("Contributor")
-                .Include("RadianSoftwares")
-                .Include("RadianSoftwares.RadianContributorOperations")
                 .Include("RadianContributorType")
                 .Include("RadianOperationMode")
                 .Include("RadianContributorFile")
@@ -52,7 +50,7 @@ namespace Gosocket.Dian.DataContext.Repositories
         public PagedResult<RadianCustomerList> CustomerList(int id, string code, string radianState, int page = 0, int length = 0)
         {
             IQueryable<RadianCustomerList> query = (from rc in sqlDBContext.RadianContributors
-                                                    join s in sqlDBContext.RadianSoftwares on rc.Id equals s.RadianContributorId
+                                                    join s in sqlDBContext.RadianSoftwares on rc.Id equals s.ContributorId
                                                     join rco in sqlDBContext.RadianContributorOperations on s.Id equals rco.SoftwareId
                                                     join rc2 in sqlDBContext.RadianContributors on rco.RadianContributorId equals rc2.Id
                                                     join c in sqlDBContext.Contributors on rc2.ContributorId equals c.Id
@@ -118,8 +116,8 @@ namespace Gosocket.Dian.DataContext.Repositories
             int softwareStatus = (int)Domain.Common.RadianSoftwareStatus.Accepted;
             List<RadianContributor> query = sqlDBContext.RadianContributors.Where(t => t.RadianContributorTypeId == radianContributorTypeId && t.RadianState == radianStatus).Include("Contributor").ToList();
             query = (from rc in query
-                     join s in sqlDBContext.RadianSoftwares.Where(t => t.RadianSoftwareStatusId == softwareStatus) on rc.Id equals s.RadianContributorId
-                     select rc).ToList();
+                     join s in sqlDBContext.RadianSoftwares.Where(t => t.RadianSoftwareStatusId == softwareStatus) on rc.Id equals s.ContributorId
+                     select rc).Distinct().ToList();
             return query;
         }
 

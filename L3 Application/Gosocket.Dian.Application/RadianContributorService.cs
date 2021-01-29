@@ -151,7 +151,7 @@ namespace Gosocket.Dian.Application
             DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
             DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
 
-            var radianContributors = _radianContributorRepository.ListByDateDesc(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
+            PagedResult<RadianContributor> radianContributors = _radianContributorRepository.ListByDateDesc(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
                                                                              (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
                                                                              ((filter.RadianState == null && t.RadianState != cancelState) || t.RadianState == stateDescriptionFilter) &&
                                                                              (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) &&
@@ -320,7 +320,7 @@ namespace Gosocket.Dian.Application
 
                 }
 
-            List<RadianSoftware> softwares = _radianCallSoftwareService.List(competitor.Id);
+            List<RadianSoftware> softwares = _radianCallSoftwareService.List(competitor.ContributorId);
             foreach (RadianSoftware software in softwares)
             {
                 //Quita los software
@@ -384,7 +384,7 @@ namespace Gosocket.Dian.Application
             if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
                 Software ownSoftware = GetSoftwareOwn(contributorId);
-                RadianSoftware radianSoftware = new RadianSoftware(ownSoftware, newRadianContributor.Id, createdBy);
+                RadianSoftware radianSoftware = new RadianSoftware(ownSoftware, contributorId, createdBy);
                 newRadianContributor.RadianSoftwares = new List<RadianSoftware>() { radianSoftware };
             }
 
