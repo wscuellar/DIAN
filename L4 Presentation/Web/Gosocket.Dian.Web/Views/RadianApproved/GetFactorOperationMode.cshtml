@@ -28,6 +28,9 @@
                     var software = $("#OperationModeSelectedId").val();
                     RenderAutocomplete('@Url.Action("AutoCompleteProvider", "RadianApproved")', contributorId, contributorTypeId, software);
                 })
+                $("#bussiness-name").change(function (element) {
+                    LoadSoftwareList(element.target.value);
+                })
             }
 
             $("#save-operation-mode").click(function (e) {debugger
