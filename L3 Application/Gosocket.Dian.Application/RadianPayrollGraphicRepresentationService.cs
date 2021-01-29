@@ -109,7 +109,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EmployeeSettlementPeriod}", this.GetValueFormatToTemplate(""));
             template = template.Replace("{EmployeeTimeWorked}", this.GetValueFormatToTemplate(model.TiempoLaborado));
             template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate(""));
-            template = template.Replace("{EmployeeSalary}", this.GetValueFormatToTemplate(model.SalarioTrabajado));
+            template = template.Replace("{EmployeeSalary}", this.GetMonetaryValueFormatToTemplate(model.SalarioTrabajado));
             template = template.Replace("{EmployeeIsComprehensiveSalary}", (model.SalarioIntegral) ? "Si" : "No");
 
             // Detalle del documento individual de nómina electrónica
@@ -132,10 +132,10 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{Compensaciones}", this.GetMonetaryValueFormatToTemplate("0.00"));
 
             // Deducciones
-            template = template.Replace("{Health}", this.GetValueFormatToTemplate(model.s_Deduccion));
-            template = template.Replace("{Pension}", this.GetValueFormatToTemplate(model.FP_Deduccion));
-            template = template.Replace("{Retefuent}", this.GetValueFormatToTemplate(model.RetencionFuente));
-            template = template.Replace("{EmployeeFund}", this.GetValueFormatToTemplate(model.FSP_Deduccion));
+            template = template.Replace("{Health}", this.GetMonetaryValueFormatToTemplate(model.s_Deduccion));
+            template = template.Replace("{Pension}", this.GetMonetaryValueFormatToTemplate(model.FP_Deduccion));
+            template = template.Replace("{Retefuent}", this.GetMonetaryValueFormatToTemplate(model.RetencionFuente));
+            template = template.Replace("{EmployeeFund}", this.GetMonetaryValueFormatToTemplate(model.FSP_Deduccion));
 
             // TOTAL DEDUCCIONES
             template = template.Replace("{PaymentFormat}", this.GetValueFormatToTemplate(model.Forma));
@@ -144,9 +144,9 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{AccountType}", this.GetValueFormatToTemplate(model.TipoCuenta));
             template = template.Replace("{AccountNumber}", this.GetValueFormatToTemplate(model.NumeroCuenta));
             template = template.Replace("{CurrencyType}", this.GetValueFormatToTemplate(model.TipoMoneda));
-            template = template.Replace("{TotalAccrued}", this.GetValueFormatToTemplate(model.devengadosTotal));
-            template = template.Replace("{TotalDeductions}", this.GetValueFormatToTemplate(model.deduccionesTotal));
-            template = template.Replace("{TotalVoucher}", this.GetValueFormatToTemplate(model.comprobanteTotal));
+            template = template.Replace("{TotalAccrued}", this.GetMonetaryValueFormatToTemplate(model.devengadosTotal));
+            template = template.Replace("{TotalDeductions}", this.GetMonetaryValueFormatToTemplate(model.deduccionesTotal));
+            template = template.Replace("{TotalVoucher}", this.GetMonetaryValueFormatToTemplate(model.comprobanteTotal));
 
             template = template.Replace("{DocumentValidated}", this.GetValueFormatToTemplate(model.Info_FechaGen));
             template = template.Replace("{DocumentGenerated}", this.GetValueFormatToTemplate(model.FechaGen));
@@ -185,7 +185,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{QRCode}", ImgHtml);
 
             // Mapping Events
-            byte[] report = RadianPdfCreationService.GetPdfBytes(template.ToString(), "Representacion gráfica nómina");
+            byte[] report = RadianPdfCreationService.GetPdfBytes(template.ToString(), "NóminaIndividualElectrónica");
 
             return report;
         }

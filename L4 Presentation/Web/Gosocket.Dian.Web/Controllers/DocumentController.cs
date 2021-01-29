@@ -482,7 +482,7 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<FileResult> DownloadPayrollPDF(string id)
         {
             var pdfbytes = this._radianPayrollGraphicRepresentationService.GetPdfReport(id);
-            return File(pdfbytes, "application/pdf", $"NóminaPDF.pdf");
+            return File(pdfbytes, "application/pdf", $"NóminaIndividualElectrónica.pdf");
         }
 
         [ExcludeFilter(typeof(Authorization))]
