@@ -408,7 +408,7 @@ namespace Gosocket.Dian.Web.Controllers
             string contributorId = Request.Params["ContributorId"];
             string radianContributorId = Request.Params["Contributor.RadianContributorId"];
             radianApprovedViewModel.RadianTestSetResult =
-               _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
+               _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault(t => t.Id == radianApprovedViewModel.RadianTestSetResult.Id);
             radianApprovedViewModel.ContributorId = Int32.Parse(contributorId);
             radianApprovedViewModel.Contributor.RadianContributorId = Int32.Parse(radianContributorId);
             return View(radianApprovedViewModel);
