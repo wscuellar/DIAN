@@ -32,7 +32,7 @@
             @ViewBag.title
         </p>
         <div class="underline-title"></div>
-        @if (status == "Aceptado")
+        @if (Model.RadianState == "Habilitado")
         {
             using (Html.BeginForm("GetFactorOperationMode", "RadianApproved", FormMethod.Post))
             {
@@ -81,9 +81,11 @@
                 @using (Html.BeginForm("SetTestDetails", "RadianApproved", FormMethod.Post, new { @class = "setTestForm" }))
                 {
                     @Html.HiddenFor(m => m.Nit);
+                    @Html.HiddenFor(m => m.RadianState);
                     @Html.HiddenFor(m => m.Contributor.RadianContributorId);
                     @Html.HiddenFor(m => m.ContributorId);
                     @Html.HiddenFor(m => m.RadianTestSetResult.Id);
+                    @Html.HiddenFor(m => m.RadianContributorTypeId);
 
                     <div class="row">
                         <h4 class="panel-title-radian padding-0"><strong>Datos del modo operación</strong></h4>

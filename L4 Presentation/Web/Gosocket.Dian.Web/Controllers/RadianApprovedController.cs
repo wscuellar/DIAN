@@ -253,7 +253,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        public ActionResult GetSetTestResult(int RadianContributorId, string Nit, string ContributorId)
+        public ActionResult GetSetTestResult(int RadianContributorId, string Nit, string ContributorId, string RadianState, int RadianContributorTypeId)
         {
             RadianApprovedViewModel model = new RadianApprovedViewModel();
             model.Contributor = new RedianContributorWithTypes();
@@ -268,6 +268,8 @@ namespace Gosocket.Dian.Web.Controllers
             model.Software = software;
             model.ContributorId = Int32.Parse(ContributorId);
             model.Contributor.RadianContributorId = RadianContributorId;
+            model.RadianState = RadianState;
+            model.RadianContributorTypeId = RadianContributorTypeId;
             return View(model);
         }
 
