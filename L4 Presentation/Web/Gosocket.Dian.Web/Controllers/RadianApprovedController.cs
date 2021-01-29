@@ -237,7 +237,9 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult GetSetTestResult(RadianApprovedViewModel model)
         {
             const int softwareType = 1;
-            string contributorId = Request.QueryString["ContributorId"];
+            string contributorId = Request.Params["ContributorId"];
+            string radianContributorId = Request.Params["Contributor.RadianContributorId"];
+
             string sType = softwareType.ToString();
             RadianSoftware software = _radianAprovedService.GetSoftware(model.Contributor.RadianContributorId, softwareType);
             string key = softwareType.ToString() + "|" + software.Id.ToString();
@@ -247,12 +249,15 @@ namespace Gosocket.Dian.Web.Controllers
             model.RadianTestSetResult.StatusDescription = testSet.Description;
             model.Software = software;
             model.ContributorId = Int32.Parse(contributorId);
+            model.Contributor.RadianContributorId = Int32.Parse(radianContributorId);
             return View(model);
         }
 
-        public ActionResult GetSetTestResult(int RadianContributorId, string Nit)
+        [HttpPost]
+        public ActionResult GetSetTestResult(int RadianContributorId, string Nit, string ContributorId)
         {
             RadianApprovedViewModel model = new RadianApprovedViewModel();
+            model.Contributor = new RedianContributorWithTypes();
             const int softwareType = 1;
             string sType = softwareType.ToString();
             RadianSoftware software = _radianAprovedService.GetSoftware(RadianContributorId, softwareType);
@@ -262,6 +267,8 @@ namespace Gosocket.Dian.Web.Controllers
             model.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), sType)));
             model.RadianTestSetResult.StatusDescription = testSet.Description;
             model.Software = software;
+            model.ContributorId = Int32.Parse(ContributorId);
+            model.Contributor.RadianContributorId = RadianContributorId;
             return View(model);
         }
 
@@ -398,8 +405,12 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult SetTestDetails(RadianApprovedViewModel radianApprovedViewModel)
         {
+            string contributorId = Request.Params["ContributorId"];
+            string radianContributorId = Request.Params["Contributor.RadianContributorId"];
             radianApprovedViewModel.RadianTestSetResult =
                _radianTestSetResultService.GetTestSetResultByNit(radianApprovedViewModel.Nit).FirstOrDefault();
+            radianApprovedViewModel.ContributorId = Int32.Parse(contributorId);
+            radianApprovedViewModel.Contributor.RadianContributorId = Int32.Parse(radianContributorId);
             return View(radianApprovedViewModel);
         }
 

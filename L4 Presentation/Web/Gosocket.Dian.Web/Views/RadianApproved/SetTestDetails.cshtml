@@ -26,7 +26,7 @@
             @ViewBag.title
         </p>
         <div class="underline-title"></div>
-        <div class="back-button"><a href="@Url.Action("GetSetTestResult", "RadianApproved", new { RadianContributorId = Model.Contributor.RadianContributorId, Nit = Model.Nit })"><i class="fa fa-chevron-left"></i> Volver</a></div>
+        <div class="back-button"><a href="@Url.Action("GetSetTestResult", "RadianApproved", new { RadianContributorId = Model.Contributor.RadianContributorId, Nit = Model.Nit, ContributorId = Model.ContributorId })"><i class="fa fa-chevron-left"></i> Volver</a></div>
     </div>
     <div class="margin-horizontal-0">
         <div class="panel">
