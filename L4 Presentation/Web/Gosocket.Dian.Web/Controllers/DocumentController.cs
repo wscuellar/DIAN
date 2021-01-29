@@ -56,6 +56,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
         private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
+        private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
         #region Properties
 
 
@@ -69,7 +70,8 @@ namespace Gosocket.Dian.Web.Controllers
         public DocumentController(IRadianPdfCreationService radianPdfCreationService,
                                   IRadianGraphicRepresentationService radianGraphicRepresentationService,
                                   IQueryAssociatedEventsService queryAssociatedEventsService,
-                                  IRadianSupportDocument radianSupportDocument, FileManager fileManager)
+                                  IRadianSupportDocument radianSupportDocument, FileManager fileManager,
+                                  IRadianPayrollGraphicRepresentationService radianPayrollGraphicRepresentationService)
         {
             _radianSupportDocument = radianSupportDocument;
             _radianPdfCreationService = radianPdfCreationService;
@@ -77,6 +79,7 @@ namespace Gosocket.Dian.Web.Controllers
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
+            _radianPayrollGraphicRepresentationService = radianPayrollGraphicRepresentationService;
         }
 
         #endregion
@@ -414,8 +417,7 @@ namespace Gosocket.Dian.Web.Controllers
             List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
             if(Int32.Parse(model.MesValidacion)!=0)
             {
-                foreach (var payroll in resultPayroll)
-                {
+                foreach (var payroll in resultPayroll)                {
                     var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
                     if(documentMeta.Timestamp.Month == Int32.Parse(model.MesValidacion))
                     {
@@ -424,7 +426,7 @@ namespace Gosocket.Dian.Web.Controllers
                         {
                             PartitionKey = payroll.PartitionKey,
                             RowKey = payroll.RowKey,
-                            link = null,
+                            link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
                             NumeroNomina = payroll.Numero,
                             ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
                             TipoDocumento = payroll.TipoDocumento,
@@ -453,7 +455,7 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         PartitionKey = payroll.PartitionKey,
                         RowKey = payroll.RowKey,
-                        link = null,
+                        link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
                         NumeroNomina = payroll.Numero,
                         ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
                         TipoDocumento = payroll.TipoDocumento,
@@ -536,6 +538,13 @@ namespace Gosocket.Dian.Web.Controllers
             model.Payrolls = result;
             loadData(ref model);
             return View(model);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public async Task<FileResult> DownloadPayrollPDF(string id)
+        {
+            var pdfbytes = this._radianPayrollGraphicRepresentationService.GetPdfReport(id);
+            return File(pdfbytes, "application/pdf", $"NóminaIndividualElectrónica.pdf");
         }
 
         [ExcludeFilter(typeof(Authorization))]
