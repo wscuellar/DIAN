@@ -394,8 +394,8 @@ namespace Gosocket.Dian.Web.Controllers
                 if (contadorValidaciones <= 3)
                 {
                     model.Mensaje = "Debe seleccionar al menos 3 filtros o el Numero de Documento";
-                    //loadData(ref model);
-                    //return View(model);
+                    loadData(ref model);
+                    return View(model);
                 }
                 else
                     model.Mensaje = string.Empty;
@@ -485,9 +485,10 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 result = result.Where(t => t.NoDocumento == model.NumeroDocumento).ToList();
             }
-            if (!String.IsNullOrEmpty(model.Ciudad))
+            if (model.Ciudad != "00")
             {
-                result = result.Where(t => t.Ciudad == model.Ciudad).ToList();
+                string ciudad = new CiudadModelList().List().Where(r => r.Code == model.Ciudad).FirstOrDefault().Name;
+                result = result.Where(t => t.Ciudad == ciudad).ToList();
             }
             if (model.TipoDocumento != "00")
             {
@@ -1301,6 +1302,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.RangosSalarial = RangoSalarialModel.List();
             model.MesesValidacion = MesModel.List();
             model.Ordenadores = OrdenarModel.List();
+            model.Ciudades = new CiudadModelList().List();
         }
     }
 }
