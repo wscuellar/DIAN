@@ -77,7 +77,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EmployerSocialReason}", this.GetValueFormatToTemplate(model.Emp_RazonSocial));
             template = template.Replace("{EmployerCountry}", this.GetValueFormatToTemplate(model.Emp_Pais));
             template = template.Replace("{EmployerDepartament}", this.GetValueFormatToTemplate(model.Emp_DepartamentoEstado));
-            template = template.Replace("{EmployerPhonenumber}", this.GetValueFormatToTemplate(model.Emp_Celular));
+            
             template = template.Replace("{EmployerNIT}", this.GetValueFormatToTemplate(model.Emp_NIT));
             template = template.Replace("{EmployerAddress}", this.GetValueFormatToTemplate(model.Emp_Direccion));
             template = template.Replace("{EmployerMunicipality}", this.GetValueFormatToTemplate(model.Emp_MunicipioCiudad));
@@ -96,11 +96,6 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EmployeeMunicipality}", this.GetValueFormatToTemplate(model.LugarTrabajoMunicipioCiudad));
             template = template.Replace("{EmployeeMunicipality}", this.GetValueFormatToTemplate(model.LugarTrabajoMunicipioCiudad));
             template = template.Replace("{EmployeeAddress}", this.GetValueFormatToTemplate(model.LugarTrabajoDireccion));
-            template = template.Replace("{EmployeePhonenumber}", this.GetValueFormatToTemplate(model.Celular));
-            template = template.Replace("{EmployeeArea}", this.GetValueFormatToTemplate(model.NombreArea));
-            template = template.Replace("{EmployeeAreaCode}", this.GetValueFormatToTemplate(model.CodigoArea));
-            template = template.Replace("{EmployeePosition}", this.GetValueFormatToTemplate(model.NombreCargo));
-            template = template.Replace("{EmployeePositionCode}", this.GetValueFormatToTemplate(model.CodigoCargo));
             template = template.Replace("{EmployeePayrollPeriod}", this.GetValueFormatToTemplate(model.PeriodoNomina));
             template = template.Replace("{EmployeeEntryDate}", this.GetValueFormatToTemplate(model.FechaIngreso));
             template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate(""));
