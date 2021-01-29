@@ -278,8 +278,6 @@ namespace Gosocket.Dian.Web.Controllers
             //Set Variables
             DateTime expeditionDate = DateTime.Now;
 
-
-
             template = template.Replace("{SupportDocumentNumber}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
             template = template.Replace("{Cune}", dataValues.globalDocPayrolls.CUNE);
             template = template.Replace("{EmissionDate}", dataValues.globalDocPayrolls.FechaGen.ToString());
@@ -292,8 +290,7 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{DirType}", dataValues.globalDocPayrolls.LugarTrabajoDireccion.ToString());
             template = template.Replace("{PaisType}", dataValues.globalDocPayrolls.Pais.ToString());
             template = template.Replace("{DepType}", dataValues.globalDocPayrolls.DepartamentoEstado.ToString());
-            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());
-            template = template.Replace("{CelType}", dataValues.globalDocPayrolls.Celular.ToString());
+            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());            
 
             // Employer Data
             template = template.Replace("{NitEmp}", dataValues.globalDocPayrolls.Emp_NIT.ToString());
@@ -302,12 +299,7 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{PaisTypeEmp}", dataValues.globalDocPayrolls.Emp_Pais.ToString());
             template = template.Replace("{DepTypeEmp}", dataValues.globalDocPayrolls.Emp_DepartamentoEstado.ToString());
             template = template.Replace("{MunTypeEmp}", dataValues.globalDocPayrolls.Emp_MunicipioCiudad.ToString());
-            template = template.Replace("{CelTypeEmp}", dataValues.globalDocPayrolls.Emp_Celular.ToString());
-            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());
-            template = template.Replace("{AreaTypeEmp}", dataValues.globalDocPayrolls.NombreArea.ToString());
-            template = template.Replace("{CodAreaTypeEmp}", dataValues.globalDocPayrolls.CodigoArea.ToString());
-            template = template.Replace("{CargoType}", dataValues.globalDocPayrolls.NombreCargo.ToString());
-            template = template.Replace("{CodCargo}", dataValues.globalDocPayrolls.CodigoCargo.ToString());
+            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());           
             template = template.Replace("{FrecuencyNomina}", dataValues.globalDocPayrolls.PeriodoNomina.ToString());
             template = template.Replace("{DateEmpIngType}", dataValues.globalDocPayrolls.FechaIngreso.ToString());
             template = template.Replace("{AntType}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
