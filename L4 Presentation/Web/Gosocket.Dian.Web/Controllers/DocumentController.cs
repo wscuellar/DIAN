@@ -481,14 +481,12 @@ namespace Gosocket.Dian.Web.Controllers
                 result = result.Where(t => t.NoDocumento == model.NumeroDocumento).ToList();
             }
             if (model.Ciudad != "00")
-            {
-                string ciudad = new CiudadModelList().List().Where(r => r.Code == model.Ciudad).FirstOrDefault().Name;
-                result = result.Where(t => t.Ciudad == ciudad).ToList();
+            {                
+                result = result.Where(t => t.Ciudad == model.Ciudad).ToList();
             }
             if (model.TipoDocumento != "00")
             {
-                string tipoDocumento = TipoDocumentoModel.List().Where(r => r.Code == model.TipoDocumento).FirstOrDefault().Name;
-                result = result.Where(t => t.TipoDocumento == tipoDocumento).ToList();
+                result = result.Where(t => t.TipoDocumento == model.TipoDocumento).ToList();
             }
             if(model.RangoSalarial != "00")
             {
