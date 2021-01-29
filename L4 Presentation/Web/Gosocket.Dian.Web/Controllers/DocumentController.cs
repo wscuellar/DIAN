@@ -306,7 +306,7 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{TConType}", dataValues.globalDocPayrolls.TipoContrato.ToString());
             template = template.Replace("{TimeWorkTypeEmp}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
             template = template.Replace("{DatePayType}", dataValues.globalDocPayrolls.FechaPagoFin.ToString());
-            template = template.Replace("{SalaryType}", dataValues.globalDocPayrolls.Salario.ToString());
+            template = template.Replace("{SalaryType}", dataValues.globalDocPayrolls.Sueldo.ToString());
             template = template.Replace(" {SalaryIntegralType}", dataValues.globalDocPayrolls.SalarioIntegral.ToString());
 
             // Acquirer Data
@@ -316,13 +316,13 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{BankType}", dataValues.globalDocPayrolls.Banco.ToString());
             template = template.Replace("{LibraryType}", dataValues.globalDocPayrolls.TipoCuenta.ToString());
             template = template.Replace("{NumberLibraryType}", dataValues.globalDocPayrolls.NumeroCuenta.ToString());
-            template = template.Replace("{TotalDevType}", dataValues.globalDocPayrolls.devengadosTotal.ToString());
-            template = template.Replace("{TotalDedType}", dataValues.globalDocPayrolls.deduccionesTotal.ToString());
+            template = template.Replace("{TotalDevType}", dataValues.globalDocPayrolls.DevengadosTotal.ToString());
+            template = template.Replace("{TotalDedType}", dataValues.globalDocPayrolls.DeduccionesTotal.ToString());
            
             // ToTal Advances
             template = template.Replace("{NumNomType}", dataValues.globalDocPayrolls.Numero.ToString());
             template = template.Replace("{DateGenType}", dataValues.globalDocPayrolls.FechaGen.ToString());
-            template = template.Replace("{ComTotalType}", dataValues.globalDocPayrolls.comprobanteTotal.ToString());
+            template = template.Replace("{ComTotalType}", dataValues.globalDocPayrolls.ComprobanteTotal.ToString());
 
             // ToTal Retentions
             template = template.Replace("{RetentionNumber}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
@@ -429,10 +429,10 @@ namespace Gosocket.Dian.Web.Controllers
                             ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
                             TipoDocumento = payroll.TipoDocumento,
                             NoDocumento = payroll.NumeroDocumento,
-                            Salario = payroll.Salario,
-                            Devengado = payroll.devengadosTotal,
-                            Deducido = payroll.deduccionesTotal,
-                            ValorTotal = payroll.devengadosTotal + payroll.deduccionesTotal,
+                            Salario = payroll.Sueldo,
+                            Devengado = payroll.DevengadosTotal,
+                            Deducido = payroll.DeduccionesTotal,
+                            ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
                             MesValidacion = documentMeta.Timestamp.Month.ToString(),
                             Novedad = documentMeta.Novelty,
                             NumeroAjuste = documentMeta.DocumentReferencedKey,
@@ -458,10 +458,10 @@ namespace Gosocket.Dian.Web.Controllers
                         ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
                         TipoDocumento = payroll.TipoDocumento,
                         NoDocumento = payroll.NumeroDocumento,
-                        Salario = payroll.Salario,
-                        Devengado = payroll.devengadosTotal,
-                        Deducido = payroll.deduccionesTotal,
-                        ValorTotal = payroll.devengadosTotal + payroll.deduccionesTotal,
+                        Salario = payroll.Sueldo,
+                        Devengado = payroll.DevengadosTotal,
+                        Deducido = payroll.DeduccionesTotal,
+                        ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
                         MesValidacion = documentMeta.Timestamp.Month.ToString(),
                         Novedad = documentMeta.Novelty,
                         NumeroAjuste = documentMeta.DocumentReferencedKey,
@@ -1256,7 +1256,7 @@ namespace Gosocket.Dian.Web.Controllers
         List<DocumentViewPayroll> firstLoadPayroll()
         {
             List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
-            List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t=>t.PrimerApellido.StartsWith("A") && t.Salario != null && Int32.Parse(t.Salario)<1000000).ToList();
+            List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t=>t.PrimerApellido.StartsWith("A") && t.Sueldo != null && Int32.Parse(t.Sueldo)<1000000).ToList();
             //List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().ToList();
            foreach (var payroll in payrolls)
            {
@@ -1273,10 +1273,10 @@ namespace Gosocket.Dian.Web.Controllers
                         ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
                         TipoDocumento = payroll.TipoDocumento,
                         NoDocumento = payroll.NumeroDocumento,
-                        Salario = payroll.Salario,
-                        Devengado = payroll.devengadosTotal,
-                        Deducido = payroll.deduccionesTotal,
-                        ValorTotal = payroll.devengadosTotal + payroll.deduccionesTotal,
+                        Salario = payroll.Sueldo,
+                        Devengado = payroll.DevengadosTotal,
+                        Deducido = payroll.DeduccionesTotal,
+                        ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
                         MesValidacion = documentMeta.Timestamp.Month.ToString(),
                         Novedad = documentMeta.Novelty,
                         NumeroAjuste = documentMeta.DocumentReferencedKey,
