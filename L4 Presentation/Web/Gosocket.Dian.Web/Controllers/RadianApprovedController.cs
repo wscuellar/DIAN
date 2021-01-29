@@ -253,7 +253,6 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        [HttpPost]
         public ActionResult GetSetTestResult(int RadianContributorId, string Nit, string ContributorId)
         {
             RadianApprovedViewModel model = new RadianApprovedViewModel();
