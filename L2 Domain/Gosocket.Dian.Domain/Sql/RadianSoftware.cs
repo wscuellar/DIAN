@@ -16,12 +16,12 @@ namespace Gosocket.Dian.Domain
         }
 
 
-        public RadianSoftware(Software software, int radianContributorId, string createdBy)
+        public RadianSoftware(Software software, int contributorId, string createdBy)
         {
             Id = software.Id;
             Name = software.Name;
             Pin = software.Pin;
-            RadianContributorId = radianContributorId;
+            ContributorId = contributorId;
             SoftwareDate = software.SoftwareDate;
             SoftwarePassword = software.SoftwarePassword;
             SoftwareUser = software.SoftwareUser;
@@ -37,8 +37,7 @@ namespace Gosocket.Dian.Domain
         [Key]
         public Guid Id { get; set; }
 
-        public int RadianContributorId { get; set; }
-        public virtual RadianContributor Contributor { get; set; }
+        public int ContributorId { get; set; }
 
         public string Name { get; set; }
 
