@@ -363,6 +363,28 @@ namespace Gosocket.Dian.Web.Controllers
             return View(radianApprovedOperationModeViewModel);
         }
 
+
+        //public ActionResult GetFactorOperationModeReturn()
+        //{
+        //    RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(ContributorId, RadianContributorTypeId);
+        //    Software software = _radianAprovedService.SoftwareByContributor(ContributorId);
+        //    List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList((Domain.Common.RadianOperationMode)radianAdmin.Contributor.RadianOperationModeId);
+        //    RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianAdmin.Contributor.RadianContributorId);
+        //    RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
+        //    {
+        //        Contributor = radianAdmin.Contributor,
+        //        Software = software,
+        //        OperationModeList = operationModeList,
+        //        RadianContributorOperations = radianContributorOperations,
+        //        CreatedBy = software.CreatedBy,
+        //        SoftwareId = software.Id,
+        //        SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrl"),
+        //        OperationModes = new SelectList(operationModeList, "Id", "Name")
+        //    };
+
+        //    return View("GetFactorOperationMode");
+        //}
+
         [HttpPost]
         public JsonResult UpdateFactorOperationMode(SetOperationViewModel data)
         {

@@ -4,7 +4,7 @@
 @using Newtonsoft.Json
 @{
     ViewBag.title = "Detalle de Set de Pruebas - Propios Medios";
-    var status = "";
+    string status = "";
     switch (Model.RadianTestSetResult.Status)
     {
         case (int)TestSetStatus.InProcess:
@@ -67,7 +67,7 @@
 
 
             var nit = '@Model.Nit';
-            var idTestSet = '@Model.RadianTestSetResult.Id
+            var idTestSet = '@Model.RadianTestSetResult.Id';
 
             $.ajax({
                 url: '@Url.Action("RadianTestResultByNit", "RadianApproved")',
