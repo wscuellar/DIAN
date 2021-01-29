@@ -56,6 +56,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
         private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
+        private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
         #region Properties
 
 
@@ -69,7 +70,8 @@ namespace Gosocket.Dian.Web.Controllers
         public DocumentController(IRadianPdfCreationService radianPdfCreationService,
                                   IRadianGraphicRepresentationService radianGraphicRepresentationService,
                                   IQueryAssociatedEventsService queryAssociatedEventsService,
-                                  IRadianSupportDocument radianSupportDocument, FileManager fileManager)
+                                  IRadianSupportDocument radianSupportDocument, FileManager fileManager,
+                                  IRadianPayrollGraphicRepresentationService radianPayrollGraphicRepresentationService)
         {
             _radianSupportDocument = radianSupportDocument;
             _radianPdfCreationService = radianPdfCreationService;
@@ -77,6 +79,7 @@ namespace Gosocket.Dian.Web.Controllers
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
+            _radianPayrollGraphicRepresentationService = radianPayrollGraphicRepresentationService;
         }
 
         #endregion
@@ -271,76 +274,6 @@ namespace Gosocket.Dian.Web.Controllers
 
         #endregion
 
-        #region TemplateGlobalMapping
-
-        private StringBuilder TemplateGlobalMappingNomina(StringBuilder template, XmlParseNomina dataValues)
-        {
-            //Set Variables
-            DateTime expeditionDate = DateTime.Now;
-
-
-
-            template = template.Replace("{SupportDocumentNumber}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
-            template = template.Replace("{Cune}", dataValues.globalDocPayrolls.CUNE);
-            template = template.Replace("{EmissionDate}", dataValues.globalDocPayrolls.FechaGen.ToString());
-            template = template.Replace("{PaisType}", dataValues.globalDocPayrolls.Pais.ToString());
-            template = template.Replace("{CityType}", dataValues.globalDocPayrolls.MunicipioCiudad.ToString());
-            template = template.Replace("{DepartamentoType}", dataValues.globalDocPayrolls.DepartamentoEstado.ToString());
-
-            // Seller Data
-            template = template.Replace("{Nit}", dataValues.globalDocPayrolls.NIT.ToString());
-            template = template.Replace("{DirType}", dataValues.globalDocPayrolls.LugarTrabajoDireccion.ToString());
-            template = template.Replace("{PaisType}", dataValues.globalDocPayrolls.Pais.ToString());
-            template = template.Replace("{DepType}", dataValues.globalDocPayrolls.DepartamentoEstado.ToString());
-            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());
-            template = template.Replace("{CelType}", dataValues.globalDocPayrolls.Celular.ToString());
-
-            // Employer Data
-            template = template.Replace("{NitEmp}", dataValues.globalDocPayrolls.Emp_NIT.ToString());
-            template = template.Replace("{SocialType}", dataValues.globalDocPayrolls.Emp_RazonSocial.ToString());
-            template = template.Replace("{DirTypeEmp}", dataValues.globalDocPayrolls.Emp_Direccion.ToString());
-            template = template.Replace("{PaisTypeEmp}", dataValues.globalDocPayrolls.Emp_Pais.ToString());
-            template = template.Replace("{DepTypeEmp}", dataValues.globalDocPayrolls.Emp_DepartamentoEstado.ToString());
-            template = template.Replace("{MunTypeEmp}", dataValues.globalDocPayrolls.Emp_MunicipioCiudad.ToString());
-            template = template.Replace("{CelTypeEmp}", dataValues.globalDocPayrolls.Emp_Celular.ToString());
-            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());
-            template = template.Replace("{AreaTypeEmp}", dataValues.globalDocPayrolls.NombreArea.ToString());
-            template = template.Replace("{CodAreaTypeEmp}", dataValues.globalDocPayrolls.CodigoArea.ToString());
-            template = template.Replace("{CargoType}", dataValues.globalDocPayrolls.NombreCargo.ToString());
-            template = template.Replace("{CodCargo}", dataValues.globalDocPayrolls.CodigoCargo.ToString());
-            template = template.Replace("{FrecuencyNomina}", dataValues.globalDocPayrolls.PeriodoNomina.ToString());
-            template = template.Replace("{DateEmpIngType}", dataValues.globalDocPayrolls.FechaIngreso.ToString());
-            template = template.Replace("{AntType}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
-            template = template.Replace("{TConType}", dataValues.globalDocPayrolls.TipoContrato.ToString());
-            template = template.Replace("{TimeWorkTypeEmp}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
-            template = template.Replace("{DatePayType}", dataValues.globalDocPayrolls.FechaPagoFin.ToString());
-            template = template.Replace("{SalaryType}", dataValues.globalDocPayrolls.Salario.ToString());
-            template = template.Replace(" {SalaryIntegralType}", dataValues.globalDocPayrolls.SalarioIntegral.ToString());
-
-            // Acquirer Data
-            template = template.Replace("{QRCode}", dataValues.globalDocPayrolls.Pago.ToString());
-            template = template.Replace("{PayType}", dataValues.globalDocPayrolls.Pago.ToString());
-            template = template.Replace("{CoinType}", dataValues.globalDocPayrolls.TipoMoneda.ToString());
-            template = template.Replace("{BankType}", dataValues.globalDocPayrolls.Banco.ToString());
-            template = template.Replace("{LibraryType}", dataValues.globalDocPayrolls.TipoCuenta.ToString());
-            template = template.Replace("{NumberLibraryType}", dataValues.globalDocPayrolls.NumeroCuenta.ToString());
-            template = template.Replace("{TotalDevType}", dataValues.globalDocPayrolls.devengadosTotal.ToString());
-            template = template.Replace("{TotalDedType}", dataValues.globalDocPayrolls.deduccionesTotal.ToString());
-           
-            // ToTal Advances
-            template = template.Replace("{NumNomType}", dataValues.globalDocPayrolls.Numero.ToString());
-            template = template.Replace("{DateGenType}", dataValues.globalDocPayrolls.FechaGen.ToString());
-            template = template.Replace("{ComTotalType}", dataValues.globalDocPayrolls.comprobanteTotal.ToString());
-
-            // ToTal Retentions
-            template = template.Replace("{RetentionNumber}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
-            template = template.Replace("{RetentionAmount}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
-
-            return template;
-        }
-
-        #endregion
-
         #region SplitAndSum
 
         private double SplitAndSum(string concateField)
@@ -421,8 +354,7 @@ namespace Gosocket.Dian.Web.Controllers
             List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
             if(Int32.Parse(model.MesValidacion)!=0)
             {
-                foreach (var payroll in resultPayroll)
-                {
+                foreach (var payroll in resultPayroll)                {
                     var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
                     if(documentMeta.Timestamp.Month == Int32.Parse(model.MesValidacion))
                     {
@@ -460,7 +392,7 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         PartitionKey = payroll.PartitionKey,
                         RowKey = payroll.RowKey,
-                        link = null,
+                        link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
                         NumeroNomina = payroll.Numero,
                         ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
                         TipoDocumento = payroll.TipoDocumento,
@@ -542,6 +474,13 @@ namespace Gosocket.Dian.Web.Controllers
             model.Payrolls = result;
             loadData(ref model);
             return View(model);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public async Task<FileResult> DownloadPayrollPDF(string id)
+        {
+            var pdfbytes = this._radianPayrollGraphicRepresentationService.GetPdfReport(id);
+            return File(pdfbytes, "application/pdf", $"NóminaPDF.pdf");
         }
 
         [ExcludeFilter(typeof(Authorization))]

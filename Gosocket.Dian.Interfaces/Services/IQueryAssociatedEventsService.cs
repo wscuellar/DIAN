@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Entity;
 using System;
 using System.Collections.Generic;
 
@@ -18,5 +19,6 @@ namespace Gosocket.Dian.Interfaces.Services
         List<Domain.Entity.GlobalDocValidatorTracking> ListTracking(string eventDocumentKey);
         List<GlobalDocValidatorDocumentMeta> OtherEvents(string documentKey, EventStatus eventCode);
         List<GlobalDocReferenceAttorney> ReferenceAttorneys(string documentKey, string documentReferencedKey, string receiverCode, string senderCode);
+        GlobalDocPayroll GetPayrollById(string partitionKey);
     }
 }
