@@ -364,7 +364,7 @@ namespace Gosocket.Dian.Web.Controllers
                         {
                             PartitionKey = payroll.PartitionKey,
                             RowKey = payroll.RowKey,
-                            link = null,
+                            link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
                             NumeroNomina = payroll.Numero,
                             ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
                             TipoDocumento = payroll.TipoDocumento,
