@@ -23,11 +23,8 @@ namespace Gosocket.Dian.Functions.Activation
     public static class UpdateTestSetResult
     {
         private static readonly ContributorService contributorService = new ContributorService();
-        private static readonly ContributorOperationsService contributorOperationService = new ContributorOperationsService();
         private static readonly SoftwareService softwareService = new SoftwareService();
         private static readonly GlobalOtherDocElecOperationService globalOtherDocElecOperation = new GlobalOtherDocElecOperationService();
-        private static readonly IRadianSoftwareRepository _radianSoftwareRepository = new RadianSoftwareRepository();
-        private static readonly IRadianCallSoftwareService radianSoftwareService = new RadianCallSoftwareService(_radianSoftwareRepository);
         private static readonly TableManager globalTestSetTableManager = new TableManager("GlobalTestSet");
         private static readonly TableManager globalTestSetResultTableManager = new TableManager("GlobalTestSetResult");
         private static readonly TableManager radianTestSetResultTableManager = new TableManager("RadianTestSetResult");
@@ -36,12 +33,9 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
         private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
-        private static readonly TableManager radianTestSetTableManager = new TableManager("RadianTestSet");
-        private static readonly TableManager globalRadianOperations = new TableManager("GlobalRadianOperations");
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager tableGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
-
 
         // Set queue name 
         private const string queueName = "global-test-set-tracking-input%Slot%";
@@ -56,45 +50,42 @@ namespace Gosocket.Dian.Functions.Activation
 
             try
             {
-                var eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
-                var globalTestSetTracking = JsonConvert.DeserializeObject<GlobalTestSetTracking>(eventGridEvent.Data.ToString());
-
+                //Obtengo informacion de la cola e insertamos el registro del tracking de envios
+                EventGridEvent eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
+                GlobalTestSetTracking globalTestSetTracking = JsonConvert.DeserializeObject<GlobalTestSetTracking>(eventGridEvent.Data.ToString());
                 await globalTestSetTrackingTableManager.InsertOrUpdateAsync(globalTestSetTracking);
-                var allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
 
-                var setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindByGlobalOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
+                //Listamos los tracking de los envios realizados para el set de pruebas en proceso
+                List<GlobalTestSetTracking> allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
+                GlobalTestSetOthersDocumentsResult setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindByGlobalOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
 
-                var radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
+                //Se busca el set de pruebas procesado para el testsetid en curso
+                RadianTestSetResult radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
                 SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
                 SetLogger(setResultOther, "Step 0", "Paso setResultOther" + setResultOther + "****" + globalTestSetTracking.TestSetId);
 
-                //Valida RADIAN
+                //Si existe el set de pruebas se Valida RADIAN
                 if (radianTesSetResult != null && setResultOther == null)
                 {
-
-
                     // traigo los datos de RadianTestSetResult
                     SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN");
 
                     // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
                     string code = radianTesSetResult.PartitionKey;
-
-
                     SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN");
-
                     SetLogger(null, "Step 2.1", code, "UPT_Code");
                     SetLogger(null, "Step 2.2", globalTestSetTracking.SoftwareId, "UPT_SofwareID");
+
+                    // Se verifica si la operacion para el cliente y el software que usa esta habilitada en RADIAn
                     bool isActive = globalRadianOperationService.IsActive(code, new Guid(globalTestSetTracking.SoftwareId));
                     SetLogger(null, "Step 2.3", isActive.ToString(), "UPT_IsActive");
-
                     if (isActive)
                         return;
-
                     SetLogger(null, "Step 3", "No esta Activo El RadianContributor");
 
                     //Ajustamos los documentType para sean los eventos de la factura
                     SetLogger(null, "Step 3.1", allGlobalTestSetTracking.Count.ToString(), "GTS-count");
-                    foreach (var item in allGlobalTestSetTracking)
+                    foreach (GlobalTestSetTracking item in allGlobalTestSetTracking)
                     {
                         //Consigue informacion del CUDE
                         GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(item.TrackId, item.TrackId);
@@ -102,11 +93,9 @@ namespace Gosocket.Dian.Functions.Activation
                         SetLogger(null, "Step 3.2", item.DocumentTypeId, "GTS-count-3.2");
                         SetLogger(null, "Step 3.3", item.IsValid.ToString(), "GTS-count-3.3");
                     }
-
                     SetLogger(null, "Step 3.4", allGlobalTestSetTracking[0].DocumentTypeId, "GTS-count-3.4");
-                    // Esto ya no es neceasario 2020-12-14 Roberto Alvarado
-                    // Le asigno el Id 
 
+                    //Total de los documentos
                     radianTesSetResult.TotalDocumentSent = allGlobalTestSetTracking.Count;
                     radianTesSetResult.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
                     radianTesSetResult.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
@@ -267,7 +256,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                     SetLogger(null, "Step 19", "Informe para el pago");
 
-                    // Definimos la Aceptacion y cambio de estado
+                    // Determinamos si se puede ya dar por aceptado al set de pruebas del cliente
                     if (radianTesSetResult.ReceiptNoticeAccepted >= radianTesSetResult.ReceiptNoticeTotalAcceptedRequired
                             && radianTesSetResult.ReceiptServiceAccepted >= radianTesSetResult.ReceiptServiceTotalAcceptedRequired
                             && radianTesSetResult.ExpressAcceptanceAccepted >= radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired
@@ -291,7 +280,7 @@ namespace Gosocket.Dian.Functions.Activation
                         radianTesSetResult.StatusDescription = TestSetStatus.Accepted.GetDescription();
                     }
 
-                    // Definimos el rechazo
+                    // Determinamos si rechazamos el set de pruebas del cliente
                     if (radianTesSetResult.ReceiptNoticeRejected > (radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired) ||
                         radianTesSetResult.ReceiptServiceRejected > (radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired) ||
                         radianTesSetResult.ExpressAcceptanceRejected > (radianTesSetResult.ExpressAcceptanceTotalRequired - radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired) ||
@@ -312,11 +301,9 @@ namespace Gosocket.Dian.Functions.Activation
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
                         radianTesSetResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
                     }
-
                     SetLogger(null, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status);
 
-                    // Escribo el registro de RadianTestResult
-
+                    // Actualizo el registro del set de pruebas del cliente
                     await radianTestSetResultTableManager.InsertOrUpdateAsync(radianTesSetResult);
 
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
@@ -333,20 +320,22 @@ namespace Gosocket.Dian.Functions.Activation
                                 SetLogger(null, "Step 19.2", "Estoy en habilitacion", "1111111112");
 
                                 #region Proceso Radian Habilitacion
-                                //Traemos el contribuyente
-                                var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
 
-                                //Habilitamos el participante en GlobalRadianOperations
+                                //Traemos el contribuyente
+                                Contributor contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
+
+                                //Consultamos al participante en GlobalRadianOperations
                                 GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
 
-                                //--GlobalSoftware 
-                                var softwareId = globalTestSetTracking.SoftwareId; //isPartipantActive.RowKey;
-                                var software = softwareService.GetByRadian(Guid.Parse(softwareId));
+                                //--Traemos la informacion del software
+                                string softwareId = globalTestSetTracking.SoftwareId;
+                                RadianSoftware software = softwareService.GetByRadian(Guid.Parse(softwareId));
 
                                 #endregion
 
                                 #region Pendiente migracion SQL
 
+                                //Organizamos el objeto con la informacion para la habilitacion del participante en la function.
                                 var requestObject = new
                                 {
                                     code = isPartipantActive.PartitionKey,
@@ -361,19 +350,16 @@ namespace Gosocket.Dian.Functions.Activation
                                     softwareName = software.Name
                                 };
 
+                                //Enviamos la habilitacion para el usuario
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
                                 SetLogger(null, "Funciton Path", functionPath, "6333333");
                                 SetLogger(requestObject, "Funciton Path", functionPath, "7333333");
-
-
                                 var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
-
-
                                 SetLogger(activation, "Step 21", activation == null ? "Estoy vacio" : " functionPath " + functionPath, "21212121");
-                                //SetLogger(activation, "Step 21", " functionPath " + functionPath, "21212121");
 
-                                var guid = Guid.NewGuid().ToString();
-                                var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
+                                //Dejamos un registro en la globalradiancontributoractivation.
+                                string guid = Guid.NewGuid().ToString();
+                                GlobalContributorActivation contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
                                 {
                                     Success = true,
                                     ContributorCode = isPartipantActive.PartitionKey,

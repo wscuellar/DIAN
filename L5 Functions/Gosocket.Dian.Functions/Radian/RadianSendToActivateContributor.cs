@@ -30,87 +30,75 @@ namespace Gosocket.Dian.Functions.Radian
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");
-
             SetLogger(null, "Step STA-00", ConfigurationManager.GetValue("Environment"));
 
+            //Solo en ambiente de habilitacion.
             if (ConfigurationManager.GetValue("Environment") == "Hab")
             {
-                RadianContributor radianContributor = null;
-                Contributor contributor = null;
+                //Se obtiene la informacion para habilitar
+                RadianActivationRequest data = await req.Content.ReadAsAsync<RadianActivationRequest>();
+                if (data == null)
+                    throw new Exception("Request body is empty.");
+                SetLogger(data, "Step STA-1.1", "Data");
 
-                var sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnectionProd");
-                SetLogger(null, "Step STA-1", sqlConnectionStringProd);
-
+                //Se obtiene el participante radian para habilitacion.
+                RadianContributor radianContributor = contributorService.GetRadian(data.ContributorId, data.ContributorTypeId);
+                SetLogger(null, "Step STA-4", radianContributor != null ? radianContributor.Id.ToString() : "no hay radian contributor");
+                if (radianContributor == null)
+                    throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
 
                 try
                 {
-                    var data = await req.Content.ReadAsAsync<RadianActivationRequest>();
-                    if (data == null)
-                        throw new Exception("Request body is empty.");
-
-                    SetLogger(data, "Step STA-1.1", "Data");
-
                     if (data.ContributorId == 0)
                         throw new Exception("Please pass a contributor ud in the request body.");
-
                     SetLogger(null, "Step STA-2", " -- Validaciones OK-- ");
 
-                    contributor = contributorService.Get(data.ContributorId);
+                    //Se busca el contribuyente en el ambiente de habilitacion.
+                    Contributor contributor = contributorService.Get(data.ContributorId);
                     SetLogger(null, "Step STA-2.1", contributor != null ? contributor.Id.ToString() : "no tiene");
                     if (contributor == null)
                         throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
 
-                    // Step 1 Contributor Production
-                    var contributorProd = contributorService.GetByCode(data.Code, sqlConnectionStringProd);
+                    //Se obtiene cadena de conexion de prod, para buscar la existencia del contribuyente en ese ambiente.
+                    string sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnectionProd");
+                    SetLogger(null, "Step STA-1", sqlConnectionStringProd);
+
+                    // Se busca el contribuyente en prod
+                    Contributor contributorProd = contributorService.GetByCode(data.Code, sqlConnectionStringProd);
                     SetLogger(null, "Step STA-3", contributorProd != null ? contributorProd.Id.ToString() : "no tiene en prod");
                     if (contributorProd == null)
                         throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {data.Code}.");
 
-
-
-                    //    // Step 2 Get RadianContributor
-                    radianContributor = contributorService.GetRadian(data.ContributorId, data.ContributorTypeId);
-                    SetLogger(null, "Step STA-4", radianContributor != null ? radianContributor.Id.ToString() : "no hay radian contributor");
-                    if (radianContributor == null)
-                        throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
-
-                    // Step 3 RadianTestSetResult
+                    // Se obtiene el set de pruebas par el cliente
                     string key = data.SoftwareType + '|' + data.SoftwareId;
                     SetLogger(null, "Step STA-4.1", data.Code, "code123");
                     SetLogger(null, "Step STA-4.2", key, "key123");
-                    var results = globalTestSetResultTableManager.Find<RadianTestSetResult>(data.Code, key);
+                    RadianTestSetResult results = globalTestSetResultTableManager.Find<RadianTestSetResult>(data.Code, key);
+                    SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(), "sta5-2020");
 
-                    SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(),"sta5-2020");
-
+                    //Se valida que pase el set de pruebas.
                     if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
                         throw new Exception("Contribuyente no a pasado set de pruebas.");
 
                     SetLogger(results, "Step STA-5.1", " -- RadianSendToActivateContributor -- ");
-
-                    // Step 4  Enable Contributor
-
-                    SetLogger(null, "Step STA-5.2", " Radiancontributor", "Radiancontributor_01");
-                    SetLogger(data, "Step STA-5.1", "data", "data_01");
-
-
                     SetLogger(null, "Step STA-6", " -- RadianSendToActivateContributor -- " +
-                        radianContributor.ContributorId + " "
-                        + radianContributor.RadianContributorTypeId + " "
-                        + data.SoftwareId + " "
-                        + data.SoftwareType
-                        , "Step STA-6");
+                                            radianContributor.ContributorId + " "
+                                            + radianContributor.RadianContributorTypeId + " "
+                                            + data.SoftwareId + " "
+                                            + data.SoftwareType
+                                            , "Step STA-6");
 
-
+                    //Se habilita el contribuyente en BD
                     contributorService.SetToEnabledRadian(
                         radianContributor.ContributorId,
                         radianContributor.RadianContributorTypeId,
                         data.SoftwareId,
                         Convert.ToInt32(data.SoftwareType));
 
+                    //Se habilita el contribuyente en la table Storage
                     globalRadianOperationService.EnableParticipantRadian(data.Code, data.SoftwareId, radianContributor);
-
-
-                    // Step 5 Contributor Operations
+                    
+                    //Se recolecta la informacion para la creacion en prod.
                     RadianaActivateContributorRequestObject activateRadianContributorRequestObject = new RadianaActivateContributorRequestObject()
                     {
                         Code = data.Code,
@@ -126,9 +114,8 @@ namespace Gosocket.Dian.Functions.Radian
                         SoftwareType = data.SoftwareType,
                         Url = data.Url
                     };
-
+                    //Se envia para la creacion en prod.
                     await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
-
                     SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ", "STA-7");
 
                 }

@@ -134,10 +134,11 @@ namespace Gosocket.Dian.Functions.Radian
                             Timestamp = System.DateTime.Now,
                             SoftwareType = Convert.ToInt32(requestObject.SoftwareType)
                         };
+                        SetLogger(radianOperation, "RadianOperation", string.Empty, "paso8");
 
-                        int oper = contributorService.AddRadianOperation(radianOperation);
+                        _ = contributorService.AddRadianOperation(radianOperation);
 
-                        SetLogger(null, "Step RA-7", " -- contributorService.AddRadianOperation -- ");
+                        SetLogger(null, "Step RA-7", "Cree la operacion", "paso9");
                     }
                     else //---3. si existe se actualiza.
                     {

@@ -51,7 +51,7 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
                 $("#SoftwareNameList").html("");
                 $("#bussiness-name").html("");
                 response.length == 0 && hideLoading('#panel-form');
-                if (response.length) {debugger
+                if (response.length) {
                     LoadSoftwareList(response[0].value);
                 }
                 for (var i = 0; i < response.length; i++) {
