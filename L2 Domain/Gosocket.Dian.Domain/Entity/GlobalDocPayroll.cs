@@ -142,7 +142,7 @@ namespace Gosocket.Dian.Domain.Entity
 
         public string TipoContrato { get; set; }
 
-        public string Salario { get; set; }
+        public string Sueldo { get; set; }
 
         public string Trab_CodigoTrabajador { get; set; }
 
@@ -205,11 +205,11 @@ namespace Gosocket.Dian.Domain.Entity
 
         public string Deuda { get; set; }
 
-        public string devengadosTotal { get; set; }
+        public string DevengadosTotal { get; set; }
 
-        public string deduccionesTotal { get; set; }
+        public string DeduccionesTotal { get; set; }
 
-        public string comprobanteTotal { get; set; }
+        public string ComprobanteTotal { get; set; }
 
         //Novedad
 

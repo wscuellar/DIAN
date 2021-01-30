@@ -2071,20 +2071,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     };
                     TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
                     if (listID != "3")
-                    {
-                        var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), new { TrackId = attorneyDocument.cufe, ResponseCode = dataSigningtime.EventCode, TrackIdCude = trackId });
-                        if (processEventResponse.Code != "100")
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "Regla:" + processEventResponse.Code + "-(R): ",
-                                ErrorMessage = processEventResponse.Message,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                            return responses;
-                        }
+                    {                       
                         TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
 
                         //Obtiene informacion del CUDE
@@ -2845,23 +2832,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-
-                    //Ajuste BUG 5920  pendiente
-                    //var responseListEndoso = ValidateTransactionCufe(trackId.ToLower());
-                    //if (responseListEndoso != null)
-                    //{                      
-                    //    foreach (var item in responseListEndoso)
-                    //    {
-                    //        responses.Add(new ValidateListResponse
-                    //        {
-                    //            IsValid = item.IsValid,
-                    //            Mandatory = item.Mandatory,
-                    //            ErrorCode = item.ErrorCode,
-                    //            ErrorMessage = item.ErrorMessage,
-                    //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    //        });
-                    //    }
-                    //}
+                    
+                    var responseListEndoso = ValidateTransactionCufe(trackId.ToLower());
+                    if (responseListEndoso != null)
+                    {
+                        foreach (var item in responseListEndoso)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = item.IsValid,
+                                Mandatory = item.Mandatory,
+                                ErrorCode = item.ErrorCode,
+                                ErrorMessage = item.ErrorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
                 }
             }
 
@@ -4483,25 +4469,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             if (validatorDocumentMeta != null)
             {
-                if (!validatorDocumentMeta.InTransaction)
+                if (!validatorDocumentMeta.SendTestSet)
                 {
-                    validatorDocumentMeta.InTransaction = true;
-                    arrayTasks.Add(
-                        documentMetaTableManager.InsertOrUpdateAsync(validatorDocumentMeta));
-                }
-                else              
-                {
-                    validTransaction = true;
-                    responses.Add(new ValidateListResponse
+                    if (!validatorDocumentMeta.InTransaction)
                     {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: LGC63-(R): ",
-                        ErrorMessage = $"{(string)null}La FEV referenciada se encuentra en proceso de negociación.. Inténtelo nuevamente",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                    return responses;
-                }                
+                        validatorDocumentMeta.InTransaction = true;
+                        arrayTasks.Add(
+                            documentMetaTableManager.InsertOrUpdateAsync(validatorDocumentMeta));
+                    }
+                    else
+                    {
+                        validTransaction = true;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "Regla: LGC63-(R): ",
+                            ErrorMessage = $"{(string)null}La FEV referenciada se encuentra en proceso de negociación.. Inténtelo nuevamente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        return responses;
+                    }
+                }                  
             }
 
             if (validTransaction)

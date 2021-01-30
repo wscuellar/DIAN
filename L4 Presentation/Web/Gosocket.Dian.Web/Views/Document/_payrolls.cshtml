@@ -35,7 +35,8 @@
             @foreach (var p in Model.Payrolls)
             {
         <tr>
-            <td><span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@p.link" id="@p.link"></span></td>
+            @*<td><span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@p.link" id="@p.link"></span></td>*@
+            <td><a href="@(p.link)"><span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos"></span></a></td>
             <td>@p.NumeroNomina</td>
             <td>@p.ApellidosNombre</td>
             <td>@p.TipoDocumento</td>
@@ -102,7 +103,7 @@
             else
             {
                 <td>@p.Resultado</td>
-            }            
+            }
         </tr>
              }
             </tbody>

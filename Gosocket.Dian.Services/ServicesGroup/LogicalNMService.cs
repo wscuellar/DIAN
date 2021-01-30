@@ -1160,7 +1160,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 PrimerApellido = xmlParser.globalDocPayrolls.PrimerApellido,
                 PrimerNombre = xmlParser.globalDocPayrolls.PrimerNombre,
                 RetencionFuente = xmlParser.globalDocPayrolls.RetencionFuente,
-                Salario = xmlParser.globalDocPayrolls.Salario,
+                Sueldo = xmlParser.globalDocPayrolls.Sueldo,
                 SalarioIntegral = xmlParser.globalDocPayrolls.SalarioIntegral,
                 SalarioTrabajado = xmlParser.globalDocPayrolls.SalarioTrabajado,
                 SegundoApellido = xmlParser.globalDocPayrolls.SegundoApellido,
