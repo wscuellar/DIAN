@@ -78,9 +78,9 @@ namespace Gosocket.Dian.Services.Utils.Common
 
                     var novedadXmlNode = XmlDocument.SelectSingleNode("//*[local-name()='Novedad']");
                     this.Novelty = (novedadXmlNode != null) ? bool.Parse(novedadXmlNode.InnerText) : false;
-                    globalDocPayrolls.devengadosTotal = XmlDocument.SelectSingleNode(nodeDevengadoTotal)?.InnerText;
-                    globalDocPayrolls.deduccionesTotal = XmlDocument.SelectSingleNode(nodeDeduccionTotal)?.InnerText;
-                    globalDocPayrolls.comprobanteTotal = XmlDocument.SelectSingleNode(nodeComprobanteTotal)?.InnerText;
+                    globalDocPayrolls.DevengadosTotal = XmlDocument.SelectSingleNode(nodeDevengadoTotal)?.InnerText;
+                    globalDocPayrolls.DeduccionesTotal = XmlDocument.SelectSingleNode(nodeDeduccionTotal)?.InnerText;
+                    globalDocPayrolls.ComprobanteTotal = XmlDocument.SelectSingleNode(nodeComprobanteTotal)?.InnerText;
                     globalDocPayrolls.Notas = XmlDocument.SelectSingleNode(nodeNotas)?.InnerText;
 
                     // Load xml document.
@@ -166,7 +166,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.LugarTrabajoDireccion = xTrabajador[j].Attributes["LugarTrabajoDireccion"]?.InnerText;                      
                         globalDocPayrolls.SalarioIntegral = Convert.ToBoolean(xTrabajador[j].Attributes["SalarioIntegral"]?.InnerText);                   
                         globalDocPayrolls.TipoContrato = xTrabajador[j].Attributes["TipoContrato"]?.InnerText;
-                        globalDocPayrolls.Salario = xTrabajador[j].Attributes["Salario"]?.InnerText;
+                        globalDocPayrolls.Sueldo = xTrabajador[j].Attributes["Salario"]?.InnerText;
                         globalDocPayrolls.CodigoTrabajador = xTrabajador[j].Attributes["CodigoTrabajador"]?.InnerText;
                     }
                     XmlNodeList xPago = XmlDocument.GetElementsByTagName("Pago");

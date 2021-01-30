@@ -13,6 +13,7 @@ namespace Gosocket.Dian.Application
         private readonly IGlobalDocValidationDocumentMetaService _radianGlobalDocValidationDocumentMeta;
         private readonly IGlobalDocValidatorDocumentService _globalDocValidatorDocument;
         private readonly IGlobalDocValidatorTrackingService _globalDocValidatorTracking;
+        private readonly IGlobalDocPayrollService _globalDocPayrollService;
 
         const string CONS361 = "361";
         const string CONS362 = "362";
@@ -31,11 +32,12 @@ namespace Gosocket.Dian.Application
         const string CREDITNOTE = "91";
         const string DEBITNOTE = "92";
 
-        public QueryAssociatedEventsService(IGlobalDocValidationDocumentMetaService radianGlobalDocValidationDocumentMeta, IGlobalDocValidatorDocumentService globalDocValidatorDocument, IGlobalDocValidatorTrackingService globalDocValidatorTracking)
+        public QueryAssociatedEventsService(IGlobalDocValidationDocumentMetaService radianGlobalDocValidationDocumentMeta, IGlobalDocValidatorDocumentService globalDocValidatorDocument, IGlobalDocValidatorTrackingService globalDocValidatorTracking, IGlobalDocPayrollService globalDocPayrollService)
         {
             _radianGlobalDocValidationDocumentMeta = radianGlobalDocValidationDocumentMeta;
             _globalDocValidatorDocument = globalDocValidatorDocument;
             _globalDocValidatorTracking = globalDocValidatorTracking;
+            _globalDocPayrollService = globalDocPayrollService;
         }
 
         public GlobalDocValidatorDocumentMeta DocumentValidation(string reference)
@@ -259,6 +261,11 @@ namespace Gosocket.Dian.Application
                 return false;
 
             return true;
+        }
+
+        public GlobalDocPayroll GetPayrollById(string partitionKey)
+        {
+            return this._globalDocPayrollService.Find(partitionKey);
         }
     }
 }
