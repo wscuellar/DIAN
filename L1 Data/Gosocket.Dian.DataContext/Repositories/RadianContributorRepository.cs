@@ -50,26 +50,27 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public PagedResult<RadianCustomerList> CustomerList(int id, string code, string radianState, int page = 0, int length = 0)
         {
-            IQueryable<RadianCustomerList> query = (from rc in sqlDBContext.RadianContributors
-                                                    join s in sqlDBContext.RadianSoftwares on rc.Id equals s.ContributorId
-                                                    join rco in sqlDBContext.RadianContributorOperations on s.Id equals rco.SoftwareId
-                                                    join rc2 in sqlDBContext.RadianContributors on rco.RadianContributorId equals rc2.Id
-                                                    join c in sqlDBContext.Contributors on rc2.ContributorId equals c.Id
-                                                    where rc.Id == id
-                                                    && rco.SoftwareType != 1
-                                                    && rc2.RadianState != "Cancelado"
-                                                    && (string.IsNullOrEmpty(code) || c.Code == code)
-                                                    && (string.IsNullOrEmpty(radianState) || rc2.RadianState == radianState)
+            var query = (from rc in sqlDBContext.RadianContributors
+                         join rcop in sqlDBContext.RadianContributorOperations on new { id = rc.Id, st = 1 } equals new { id = rcop.RadianContributorId, st = rcop.SoftwareType }
+                         join rs in sqlDBContext.RadianSoftwares on new { s = rcop.SoftwareId, c = rc.ContributorId } equals new { s = rs.Id, c = rs.ContributorId }
+                         join rcop2 in sqlDBContext.RadianContributorOperations on rs.Id equals rcop2.SoftwareId
+                         join rc2 in sqlDBContext.RadianContributors on rcop2.RadianContributorId equals rc2.Id
+                         join c in sqlDBContext.Contributors on rc2.ContributorId equals c.Id
+                         where rcop2.SoftwareType != 1
+                         && rc2.RadianState != "Cancelado"
+                         && rc.Id == id
+                         && (string.IsNullOrEmpty(code) || c.Code == code)
+                         && (string.IsNullOrEmpty(radianState) || rc2.RadianState == radianState)
+                         select new RadianCustomerList()
+                         {
+                             Id = rc2.Id,
+                             BussinessName = c.BusinessName,
+                             Nit = c.Code,
+                             RadianState = rc2.RadianState,
+                             Page = page,
+                             Length = length
+                         }).Distinct();
 
-                                                    select new RadianCustomerList()
-                                                    {
-                                                        Id = rc2.Id,
-                                                        BussinessName = c.BusinessName,
-                                                        Nit = c.Code,
-                                                        RadianState = rc2.RadianState,
-                                                        Page = page,
-                                                        Length = length
-                                                    }).Distinct();
             return query.Paginate(page, length, t => t.Id.ToString());
         }
 
@@ -176,7 +177,7 @@ namespace Gosocket.Dian.DataContext.Repositories
         public List<RadianSoftware> RadianSoftwareByParticipante(int radianContributorId)
         {
             int softwareSt = (int)RadianSoftwareStatus.Accepted;
-            return (    
+            return (
                     from c in sqlDBContext.RadianContributors.Where(t => t.Id == radianContributorId).Include("Contributor").ToList()
                     join ope in sqlDBContext.RadianContributorOperations on c.Id equals ope.RadianContributorId
                     join s in sqlDBContext.RadianSoftwares on ope.SoftwareId equals s.Id
