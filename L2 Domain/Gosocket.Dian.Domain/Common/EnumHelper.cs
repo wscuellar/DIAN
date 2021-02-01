@@ -233,7 +233,7 @@ namespace Gosocket.Dian.Domain.Common
         EndosoGarantia = 038,
         [Description("Endoso en procuración")]
         EndosoProcuracion = 039,
-        [Description("Anulacion de endoso electrónico")]
+        [Description("Anulación de endoso")]
         InvoiceOfferedForNegotiation = 040,
         [Description("Limitación de circulación")]
         NegotiatedInvoice = 041,
