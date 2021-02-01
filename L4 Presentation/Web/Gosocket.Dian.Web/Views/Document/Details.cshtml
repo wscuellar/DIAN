@@ -101,6 +101,7 @@
         }
 
         $(document).ready(function () {
+            if (window.location.pathname == "/Document/Details") $(".downloadPDFUrl").hide()
             SetCapcthatoken('@ConfigurationManager.GetValue("Recaptcha")');
             showPdfModal("#show-document", "@Model.Document.DocumentKey", '@Url.Action("PrintDocument", "Document")', '#panel-form');
             showPdfModal("#show-supportdocument", "@Model.Document.DocumentKey", '@Url.Action("PrintSupportDocument", "Document")', '#panel-form');
