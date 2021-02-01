@@ -407,6 +407,7 @@
     <Compile Include="Models\RadianApproved\RadianCustomerViewModel.cs" />
     <Compile Include="Models\MenuViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianApprovedViewModel.cs" />
+    <Compile Include="Models\RadianApproved\RadianGetSetTestViewModel.cs" />
     <Compile Include="Models\RadianApproved\RadianFormSearchViewModel.cs" />
     <Compile Include="Models\RadianContributorFileTypeViewModel.cs" />
     <Compile Include="Models\ContributorFileTypeViewModel.cs" />
