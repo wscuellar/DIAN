@@ -78,9 +78,9 @@ namespace Gosocket.Dian.Services.Utils.Common
 
                     var novedadXmlNode = XmlDocument.SelectSingleNode("//*[local-name()='Novedad']");
                     this.Novelty = (novedadXmlNode != null) ? bool.Parse(novedadXmlNode.InnerText) : false;
-                    globalDocPayrolls.devengadosTotal = XmlDocument.SelectSingleNode(nodeDevengadoTotal)?.InnerText;
-                    globalDocPayrolls.deduccionesTotal = XmlDocument.SelectSingleNode(nodeDeduccionTotal)?.InnerText;
-                    globalDocPayrolls.comprobanteTotal = XmlDocument.SelectSingleNode(nodeComprobanteTotal)?.InnerText;
+                    globalDocPayrolls.DevengadosTotal = XmlDocument.SelectSingleNode(nodeDevengadoTotal)?.InnerText;
+                    globalDocPayrolls.DeduccionesTotal = XmlDocument.SelectSingleNode(nodeDeduccionTotal)?.InnerText;
+                    globalDocPayrolls.ComprobanteTotal = XmlDocument.SelectSingleNode(nodeComprobanteTotal)?.InnerText;
                     globalDocPayrolls.Notas = XmlDocument.SelectSingleNode(nodeNotas)?.InnerText;
 
                     // Load xml document.
@@ -146,9 +146,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.Emp_Pais = xEmpleador[j].Attributes["Pais"]?.InnerText;
                         globalDocPayrolls.Emp_DepartamentoEstado = xEmpleador[j].Attributes["DepartamentoEstado"]?.InnerText;
                         globalDocPayrolls.Emp_MunicipioCiudad = xEmpleador[j].Attributes["MunicipioCiudad"]?.InnerText;
-                        globalDocPayrolls.Emp_Direccion = xEmpleador[j].Attributes["Direccion"]?.InnerText;
-                        globalDocPayrolls.Emp_Celular = xEmpleador[j].Attributes["Celular"]?.InnerText;
-                        globalDocPayrolls.Emp_Correo = xEmpleador[j].Attributes["Correo"]?.InnerText;
+                        globalDocPayrolls.Emp_Direccion = xEmpleador[j].Attributes["Direccion"]?.InnerText;                     
                     }
                     XmlNodeList xTrabajador = XmlDocument.GetElementsByTagName("Trabajador");
                     for (int j = 0; j < xTrabajador.Count; j++)
@@ -165,16 +163,10 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.LugarTrabajoPais = xTrabajador[j].Attributes["LugarTrabajoPais"]?.InnerText;
                         globalDocPayrolls.LugarTrabajoDepartamentoEstado = xTrabajador[j].Attributes["LugarTrabajoDepartamentoEstado"]?.InnerText;
                         globalDocPayrolls.LugarTrabajoMunicipioCiudad = xTrabajador[j].Attributes["LugarTrabajoMunicipioCiudad"]?.InnerText;
-                        globalDocPayrolls.LugarTrabajoDireccion = xTrabajador[j].Attributes["LugarTrabajoDireccion"]?.InnerText;
-                        globalDocPayrolls.Celular = xTrabajador[j].Attributes["Celular"]?.InnerText;
-                        globalDocPayrolls.Correo = xTrabajador[j].Attributes["Correo"]?.InnerText;
-                        globalDocPayrolls.SalarioIntegral = Convert.ToBoolean(xTrabajador[j].Attributes["SalarioIntegral"]?.InnerText);
-                        globalDocPayrolls.CodigoArea = xTrabajador[j].Attributes["CodigoArea"]?.InnerText;
-                        globalDocPayrolls.NombreArea = xTrabajador[j].Attributes["NombreArea"]?.InnerText;
-                        globalDocPayrolls.CodigoCargo = xTrabajador[j].Attributes["CodigoCargo"]?.InnerText;
-                        globalDocPayrolls.NombreCargo = xTrabajador[j].Attributes["NombreCargo"]?.InnerText;
+                        globalDocPayrolls.LugarTrabajoDireccion = xTrabajador[j].Attributes["LugarTrabajoDireccion"]?.InnerText;                      
+                        globalDocPayrolls.SalarioIntegral = Convert.ToBoolean(xTrabajador[j].Attributes["SalarioIntegral"]?.InnerText);                   
                         globalDocPayrolls.TipoContrato = xTrabajador[j].Attributes["TipoContrato"]?.InnerText;
-                        globalDocPayrolls.Salario = xTrabajador[j].Attributes["Salario"]?.InnerText;
+                        globalDocPayrolls.Sueldo = xTrabajador[j].Attributes["Salario"]?.InnerText;
                         globalDocPayrolls.CodigoTrabajador = xTrabajador[j].Attributes["CodigoTrabajador"]?.InnerText;
                     }
                     XmlNodeList xPago = XmlDocument.GetElementsByTagName("Pago");

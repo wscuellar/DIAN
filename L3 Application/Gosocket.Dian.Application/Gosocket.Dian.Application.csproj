@@ -196,6 +196,7 @@
     <Compile Include="Common\CertificateExtensions.cs" />
     <Compile Include="Common\RedisExtensions.cs" />
     <Compile Include="ElectronicDocumentService.cs" />
+    <Compile Include="GlobalDocPayrollService.cs" />
     <Compile Include="GlobalOtherDocElecOperationService.cs" />
     <Compile Include="FreeBiller\ClaimsDbService.cs" />
     <Compile Include="FreeBiller\ProfileService.cs" />
@@ -234,6 +235,7 @@
     <Compile Include="RadianContributorService.cs" />
     <Compile Include="RadianLoggerService.cs" />
     <Compile Include="QueryAssociatedEventsService.cs" />
+    <Compile Include="RadianPayrollGraphicRepresentationService.cs" />
     <Compile Include="RadianPDFCreationService.cs" />
     <Compile Include="RadianGraphicRepresentationService .cs" />
     <Compile Include="RadianSupportDocument.cs" />

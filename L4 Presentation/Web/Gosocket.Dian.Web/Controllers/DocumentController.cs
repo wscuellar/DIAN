@@ -56,6 +56,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
         private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
+        private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
         #region Properties
 
 
@@ -69,7 +70,8 @@ namespace Gosocket.Dian.Web.Controllers
         public DocumentController(IRadianPdfCreationService radianPdfCreationService,
                                   IRadianGraphicRepresentationService radianGraphicRepresentationService,
                                   IQueryAssociatedEventsService queryAssociatedEventsService,
-                                  IRadianSupportDocument radianSupportDocument, FileManager fileManager)
+                                  IRadianSupportDocument radianSupportDocument, FileManager fileManager,
+                                  IRadianPayrollGraphicRepresentationService radianPayrollGraphicRepresentationService)
         {
             _radianSupportDocument = radianSupportDocument;
             _radianPdfCreationService = radianPdfCreationService;
@@ -77,6 +79,7 @@ namespace Gosocket.Dian.Web.Controllers
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
+            _radianPayrollGraphicRepresentationService = radianPayrollGraphicRepresentationService;
         }
 
         #endregion
@@ -278,8 +281,6 @@ namespace Gosocket.Dian.Web.Controllers
             //Set Variables
             DateTime expeditionDate = DateTime.Now;
 
-
-
             template = template.Replace("{SupportDocumentNumber}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
             template = template.Replace("{Cune}", dataValues.globalDocPayrolls.CUNE);
             template = template.Replace("{EmissionDate}", dataValues.globalDocPayrolls.FechaGen.ToString());
@@ -292,8 +293,7 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{DirType}", dataValues.globalDocPayrolls.LugarTrabajoDireccion.ToString());
             template = template.Replace("{PaisType}", dataValues.globalDocPayrolls.Pais.ToString());
             template = template.Replace("{DepType}", dataValues.globalDocPayrolls.DepartamentoEstado.ToString());
-            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());
-            template = template.Replace("{CelType}", dataValues.globalDocPayrolls.Celular.ToString());
+            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());            
 
             // Employer Data
             template = template.Replace("{NitEmp}", dataValues.globalDocPayrolls.Emp_NIT.ToString());
@@ -302,19 +302,14 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{PaisTypeEmp}", dataValues.globalDocPayrolls.Emp_Pais.ToString());
             template = template.Replace("{DepTypeEmp}", dataValues.globalDocPayrolls.Emp_DepartamentoEstado.ToString());
             template = template.Replace("{MunTypeEmp}", dataValues.globalDocPayrolls.Emp_MunicipioCiudad.ToString());
-            template = template.Replace("{CelTypeEmp}", dataValues.globalDocPayrolls.Emp_Celular.ToString());
-            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());
-            template = template.Replace("{AreaTypeEmp}", dataValues.globalDocPayrolls.NombreArea.ToString());
-            template = template.Replace("{CodAreaTypeEmp}", dataValues.globalDocPayrolls.CodigoArea.ToString());
-            template = template.Replace("{CargoType}", dataValues.globalDocPayrolls.NombreCargo.ToString());
-            template = template.Replace("{CodCargo}", dataValues.globalDocPayrolls.CodigoCargo.ToString());
+            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());           
             template = template.Replace("{FrecuencyNomina}", dataValues.globalDocPayrolls.PeriodoNomina.ToString());
             template = template.Replace("{DateEmpIngType}", dataValues.globalDocPayrolls.FechaIngreso.ToString());
             template = template.Replace("{AntType}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
             template = template.Replace("{TConType}", dataValues.globalDocPayrolls.TipoContrato.ToString());
             template = template.Replace("{TimeWorkTypeEmp}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
             template = template.Replace("{DatePayType}", dataValues.globalDocPayrolls.FechaPagoFin.ToString());
-            template = template.Replace("{SalaryType}", dataValues.globalDocPayrolls.Salario.ToString());
+            template = template.Replace("{SalaryType}", dataValues.globalDocPayrolls.Sueldo.ToString());
             template = template.Replace(" {SalaryIntegralType}", dataValues.globalDocPayrolls.SalarioIntegral.ToString());
 
             // Acquirer Data
@@ -324,13 +319,13 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{BankType}", dataValues.globalDocPayrolls.Banco.ToString());
             template = template.Replace("{LibraryType}", dataValues.globalDocPayrolls.TipoCuenta.ToString());
             template = template.Replace("{NumberLibraryType}", dataValues.globalDocPayrolls.NumeroCuenta.ToString());
-            template = template.Replace("{TotalDevType}", dataValues.globalDocPayrolls.devengadosTotal.ToString());
-            template = template.Replace("{TotalDedType}", dataValues.globalDocPayrolls.deduccionesTotal.ToString());
+            template = template.Replace("{TotalDevType}", dataValues.globalDocPayrolls.DevengadosTotal.ToString());
+            template = template.Replace("{TotalDedType}", dataValues.globalDocPayrolls.DeduccionesTotal.ToString());
            
             // ToTal Advances
             template = template.Replace("{NumNomType}", dataValues.globalDocPayrolls.Numero.ToString());
             template = template.Replace("{DateGenType}", dataValues.globalDocPayrolls.FechaGen.ToString());
-            template = template.Replace("{ComTotalType}", dataValues.globalDocPayrolls.comprobanteTotal.ToString());
+            template = template.Replace("{ComTotalType}", dataValues.globalDocPayrolls.ComprobanteTotal.ToString());
 
             // ToTal Retentions
             template = template.Replace("{RetentionNumber}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
@@ -422,8 +417,7 @@ namespace Gosocket.Dian.Web.Controllers
             List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
             if(Int32.Parse(model.MesValidacion)!=0)
             {
-                foreach (var payroll in resultPayroll)
-                {
+                foreach (var payroll in resultPayroll)                {
                     var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
                     if(documentMeta.Timestamp.Month == Int32.Parse(model.MesValidacion))
                     {
@@ -432,15 +426,15 @@ namespace Gosocket.Dian.Web.Controllers
                         {
                             PartitionKey = payroll.PartitionKey,
                             RowKey = payroll.RowKey,
-                            link = null,
+                            link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
                             NumeroNomina = payroll.Numero,
                             ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
                             TipoDocumento = payroll.TipoDocumento,
                             NoDocumento = payroll.NumeroDocumento,
-                            Salario = payroll.Salario,
-                            Devengado = payroll.devengadosTotal,
-                            Deducido = payroll.deduccionesTotal,
-                            ValorTotal = payroll.devengadosTotal + payroll.deduccionesTotal,
+                            Salario = payroll.Sueldo,
+                            Devengado = payroll.DevengadosTotal,
+                            Deducido = payroll.DeduccionesTotal,
+                            ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
                             MesValidacion = documentMeta.Timestamp.Month.ToString(),
                             Novedad = documentMeta.Novelty,
                             NumeroAjuste = documentMeta.DocumentReferencedKey,
@@ -461,15 +455,15 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         PartitionKey = payroll.PartitionKey,
                         RowKey = payroll.RowKey,
-                        link = null,
+                        link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
                         NumeroNomina = payroll.Numero,
                         ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
                         TipoDocumento = payroll.TipoDocumento,
                         NoDocumento = payroll.NumeroDocumento,
-                        Salario = payroll.Salario,
-                        Devengado = payroll.devengadosTotal,
-                        Deducido = payroll.deduccionesTotal,
-                        ValorTotal = payroll.devengadosTotal + payroll.deduccionesTotal,
+                        Salario = payroll.Sueldo,
+                        Devengado = payroll.DevengadosTotal,
+                        Deducido = payroll.DeduccionesTotal,
+                        ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
                         MesValidacion = documentMeta.Timestamp.Month.ToString(),
                         Novedad = documentMeta.Novelty,
                         NumeroAjuste = documentMeta.DocumentReferencedKey,
@@ -487,14 +481,12 @@ namespace Gosocket.Dian.Web.Controllers
                 result = result.Where(t => t.NoDocumento == model.NumeroDocumento).ToList();
             }
             if (model.Ciudad != "00")
-            {
-                string ciudad = new CiudadModelList().List().Where(r => r.Code == model.Ciudad).FirstOrDefault().Name;
-                result = result.Where(t => t.Ciudad == ciudad).ToList();
+            {                
+                result = result.Where(t => t.Ciudad == model.Ciudad).ToList();
             }
             if (model.TipoDocumento != "00")
             {
-                string tipoDocumento = TipoDocumentoModel.List().Where(r => r.Code == model.TipoDocumento).FirstOrDefault().Name;
-                result = result.Where(t => t.TipoDocumento == tipoDocumento).ToList();
+                result = result.Where(t => t.TipoDocumento == model.TipoDocumento).ToList();
             }
             if(model.RangoSalarial != "00")
             {
@@ -544,6 +536,13 @@ namespace Gosocket.Dian.Web.Controllers
             model.Payrolls = result;
             loadData(ref model);
             return View(model);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public async Task<FileResult> DownloadPayrollPDF(string id)
+        {
+            var pdfbytes = this._radianPayrollGraphicRepresentationService.GetPdfReport(id);
+            return File(pdfbytes, "application/pdf", $"NóminaIndividualElectrónica.pdf");
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -1264,7 +1263,7 @@ namespace Gosocket.Dian.Web.Controllers
         List<DocumentViewPayroll> firstLoadPayroll()
         {
             List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
-            List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t=>t.PrimerApellido.StartsWith("A") && t.Salario != null && Int32.Parse(t.Salario)<1000000).ToList();
+            List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t=>t.PrimerApellido.StartsWith("A") && t.Sueldo != null && Int32.Parse(t.Sueldo)<1000000).ToList();
             //List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().ToList();
            foreach (var payroll in payrolls)
            {
@@ -1281,10 +1280,10 @@ namespace Gosocket.Dian.Web.Controllers
                         ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
                         TipoDocumento = payroll.TipoDocumento,
                         NoDocumento = payroll.NumeroDocumento,
-                        Salario = payroll.Salario,
-                        Devengado = payroll.devengadosTotal,
-                        Deducido = payroll.deduccionesTotal,
-                        ValorTotal = payroll.devengadosTotal + payroll.deduccionesTotal,
+                        Salario = payroll.Sueldo,
+                        Devengado = payroll.DevengadosTotal,
+                        Deducido = payroll.DeduccionesTotal,
+                        ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
                         MesValidacion = documentMeta.Timestamp.Month.ToString(),
                         Novedad = documentMeta.Novelty,
                         NumeroAjuste = documentMeta.DocumentReferencedKey,

@@ -215,7 +215,8 @@ namespace Gosocket.Dian.Application
                 radianContributorOperation.SoftwareId = soft.Id;
             }
 
-            radianContributorOperation.OperationStatusId = (int)(radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test : RadianState.Registrado);
+            if(radianContributorOperation.OperationStatusId != (int)RadianState.Test)
+                radianContributorOperation.OperationStatusId = (int)(radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test : RadianState.Registrado);
             int operationId = _radianContributorOperationRepository.Add(radianContributorOperation);
             existingOperation = _radianContributorOperationRepository.Get(t => t.Id == operationId);
 

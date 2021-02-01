@@ -466,27 +466,34 @@ namespace Gosocket.Dian.Application
         {
             using (var context = new SqlDBContext())
             {
-                var radianc = context.RadianContributors.FirstOrDefault(t => t.ContributorId == contributorId
+                //Ubicar el participante que se habilitara
+                RadianContributor radianc = context.RadianContributors.FirstOrDefault(t => t.ContributorId == contributorId
                                         && t.RadianContributorTypeId == contributorTypeId);
+
                 if (radianc != null)
                 {
+                    //Cambiar estado habilitado
                     radianc.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
                     radianc.Step = 4;
                     Guid softId = new Guid(softwareId);
+
+                    //Si es software propio lo habilita.
                     if (radianc.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
                     {
                         RadianSoftware soft = context.RadianSoftwares.FirstOrDefault(t => t.Id.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase));
                         soft.RadianSoftwareStatusId = (int)Domain.Common.RadianSoftwareStatus.Accepted;
                     }
 
+                    //Se ubica la operacion del participante para habilitarla
                     RadianContributorOperation radianOperation = context.RadianContributorOperations.FirstOrDefault(
                                                  t => t.RadianContributorId == radianc.Id
                                                  && t.SoftwareType == softwareType
                                                  && t.SoftwareId.ToString().Trim().ToLower().Equals(softId.ToString().Trim().ToLower(), StringComparison.OrdinalIgnoreCase)
                                                  && t.OperationStatusId == (int)Domain.Common.RadianState.Test
+                                                 && !t.Deleted 
                                                  );
                     if (radianOperation != null)
-                        radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado;
+                        radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado; //Aceptada la operacion.
 
                     context.SaveChanges();
                 }
@@ -568,7 +575,7 @@ namespace Gosocket.Dian.Application
             int affectedRecords = 0;
             using (var context = new SqlDBContext())
             {
-                context.RadianContributorOperations.Add(operation);
+                context.Entry(operation).State = System.Data.Entity.EntityState.Added;
                 affectedRecords = context.SaveChanges();
             }
             return affectedRecords > 0 ? operation.Id : 0;

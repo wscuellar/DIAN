@@ -22,7 +22,6 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianContributorService _radianContributorService;
         private readonly UserService userService = new UserService();
 
-
         public RadianController(IRadianContributorService radianContributorService)
         {
             _radianContributorService = radianContributorService;
@@ -312,24 +311,21 @@ namespace Gosocket.Dian.Web.Controllers
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
             message.Append("A continuacion encontrara el resultado de validación de los documentos requisitos que la DIAN verificó en su proceso RADIAN");
-
-
+                        
             foreach (RadianContributorFile file in radianAdmin.Files)
             {
+                message.Append("<br/>");
                 message.Append("<div>");
                 message.AppendFormat("Nombre del requisito: <strong>{0}</strong>", file.FileName);
                 message.Append("<ul>");
-                message.AppendFormat("<li>Estado del requisito: {0}</li>", file.Status.GetDescription());
+                message.AppendFormat("<li>Estado del requisito: {0}</li>", ReturnStatus(file.Status));
                 message.AppendFormat("<li>Observación del requisito: {0}</li>", file.Comments);
                 message.Append("</ul>");
                 message.Append("</div>");
-            }            
+            }
 
             message.Append("<div>");
             message.AppendFormat("Observaciones: {0}", radianAdmin.Contributor.RadianState);
-            message.Append("</div>");
-            message.Append("<div>");
-
             message.Append("</div>");
 
             //Nombre del documento, estado, observaciones
@@ -399,7 +395,24 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(events, JsonRequestBehavior.AllowGet);
         }
 
-
+        private string ReturnStatus(int idStatus)
+        {
+            switch (idStatus)
+            {
+                case 0:
+                    return "Pendiente";
+                case 1:
+                    return "Cargado y en revisión";
+                case 2:
+                    return "Aprobado";
+                case 3:
+                    return "Rechazado";
+                case 4:
+                    return "Observaciones";
+                default:
+                    return "Pendiente";
+            }
+        }
     }
 
 

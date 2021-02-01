@@ -19,6 +19,9 @@ namespace Gosocket.Dian.Functions.Events
 {
     public static class ApplicationResponseProcess
     {
+        private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+        private static readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+
         [FunctionName("ApplicationResponseProcess")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
@@ -72,10 +75,7 @@ namespace Gosocket.Dian.Functions.Events
                 var message = EnumHelper.GetEnumDescription(EventValidationMessage.NotImplemented);
                 message = string.Format(message, responseCode, EnumHelper.GetEnumDescription((EventStatus)int.Parse(responseCode)));
                 return new EventResponse { Code = ((int)EventValidationMessage.NotImplemented).ToString(), Message = message };
-            }
-
-            TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-            TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+            }           
 
              //Obtiene informacion del CUFE
             var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);

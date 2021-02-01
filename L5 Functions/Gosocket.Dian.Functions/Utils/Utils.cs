@@ -111,5 +111,20 @@ namespace Gosocket.Dian.Functions.Utils
                 return null;
             }
         }
+
+        public static async Task<byte[]> GetXmlFromStorageAsync(string trackId)
+        {
+            var TableManager = new TableManager("GlobalDocValidatorRuntime");
+            var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
+            if (documentStatusValidation == null)
+                return null;
+
+            var fileManager = new FileManager();
+            var container = $"global";
+            var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
+            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+
+            return xmlBytes;
+        }
     }
 }

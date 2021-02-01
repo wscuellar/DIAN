@@ -1,5 +1,4 @@
-﻿using Gosocket.Dian.Domain.Common;
-using Gosocket.Dian.Domain.Domain;
+﻿using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Services.Models;
@@ -911,39 +910,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var result = this.CkeckIndividualPayrollExists(trackIdPred);
                 if (result != null) return result;
             }
-
-            //Valdiar codigo trabajador
-            var response = ValdiateWorkedCode(xmlParser.globalDocPayrolls);
-            if (!response)
-            {
-                //string errorCode = documentTypeId == "11" ? "Regla:  NIE009-(R): " : "Regla: NIAE009-(R): ";
-                string errorCode = "Regla:  89-(R): ";
-                string errorMessage = "Código trabaajador no corresponde a un valor entero calculado con la " +
-                    "Identificación del trabajador + código del área de trabajo + código del cargo del trabajador";              
-                dianResponse.IsValid = false;
-                dianResponse.StatusCode = "99";
-                dianResponse.StatusMessage = "Documento con errores en campos mandatorios.";
-                dianResponse.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                dianResponse.ErrorMessage.Add($"{errorCode} - {errorMessage}");
-
-            }
-            var valdiateWorkedCode = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-
-            //// Validar el tiempo laborado
-            //var responseTimeWorked = ValidateTimeWorked(xmlParser.globalDocPayrolls);
-            //if (!responseTimeWorked)
-            //{
-            //    var ruleCode = (documentParsed.DocumentTypeId == "11") ? "NIE006" : "NIAE006";
-            //    string errorCode = $"Regla:  {ruleCode}: ";
-            //    string errorMessage = "Se debe indicar el Tiempo laborado del trabajador según la definición establecida.";
-            //    dianResponse.IsValid = false;
-            //    dianResponse.StatusCode = "99";
-            //    dianResponse.StatusMessage = "Documento con errores en campos mandatorios.";
-            //    dianResponse.StatusDescription = "Validación contiene errores en campos mandatorios.";
-            //    dianResponse.ErrorMessage.Add($"{errorCode} - {errorMessage}");
-            //}
-            //var validateTimeWorked = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-
+       
             //Valida CUNE
             var validatorCuneRequest = validatorCune(trackId, dianResponse);
             if (!validatorCuneRequest.IsValid)
@@ -1093,8 +1060,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validate),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(application),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone1),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(zone2),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(valdiateWorkedCode),
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(zone2),                    
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validatorCuneResponse)
                     //TableManagerGlobalLogger.InsertOrUpdateAsync(validateTimeWorked)
                 };
@@ -1159,16 +1125,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 AltoRiesgoPension = xmlParser.globalDocPayrolls.AltoRiesgoPension,
                 Banco = xmlParser.globalDocPayrolls.Banco,
                 BonificacionNS = xmlParser.globalDocPayrolls.BonificacionNS,
-                Cantidad = xmlParser.globalDocPayrolls.Cantidad,
-                Celular = xmlParser.globalDocPayrolls.Celular,
-                CodigoArea = xmlParser.globalDocPayrolls.CodigoArea,
-                CodigoCargo = xmlParser.globalDocPayrolls.CodigoCargo,
-                Correo = xmlParser.globalDocPayrolls.Correo,
+                Cantidad = xmlParser.globalDocPayrolls.Cantidad,               
                 CUNEPred = xmlParser.globalDocPayrolls.CUNEPred,
                 Deuda = xmlParser.globalDocPayrolls.Deuda,
-                DiasTrabajados = xmlParser.globalDocPayrolls.DiasTrabajados,
-                Emp_Celular = xmlParser.globalDocPayrolls.Emp_Celular,
-                Emp_Correo = xmlParser.globalDocPayrolls.Emp_Correo,
+                DiasTrabajados = xmlParser.globalDocPayrolls.DiasTrabajados,              
                 Emp_DepartamentoEstado = xmlParser.globalDocPayrolls.Emp_DepartamentoEstado,
                 Emp_Direccion = xmlParser.globalDocPayrolls.Emp_Direccion,
                 Emp_DV = xmlParser.globalDocPayrolls.Emp_DV,
@@ -1189,9 +1149,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 LugarTrabajoDireccion = xmlParser.globalDocPayrolls.LugarTrabajoDireccion,
                 LugarTrabajoMunicipioCiudad = xmlParser.globalDocPayrolls.LugarTrabajoMunicipioCiudad,
                 LugarTrabajoPais = xmlParser.globalDocPayrolls.LugarTrabajoPais,
-                Metodo = xmlParser.globalDocPayrolls.Metodo,
-                NombreArea = xmlParser.globalDocPayrolls.NombreArea,
-                NombreCargo = xmlParser.globalDocPayrolls.NombreCargo,
+                Metodo = xmlParser.globalDocPayrolls.Metodo,               
                 Notas = xmlParser.globalDocPayrolls.Notas,
                 NumeroCuenta = xmlParser.globalDocPayrolls.NumeroCuenta,
                 NumeroDocumento = xmlParser.globalDocPayrolls.NumeroDocumento,
@@ -1202,7 +1160,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 PrimerApellido = xmlParser.globalDocPayrolls.PrimerApellido,
                 PrimerNombre = xmlParser.globalDocPayrolls.PrimerNombre,
                 RetencionFuente = xmlParser.globalDocPayrolls.RetencionFuente,
-                Salario = xmlParser.globalDocPayrolls.Salario,
+                Sueldo = xmlParser.globalDocPayrolls.Sueldo,
                 SalarioIntegral = xmlParser.globalDocPayrolls.SalarioIntegral,
                 SalarioTrabajado = xmlParser.globalDocPayrolls.SalarioTrabajado,
                 SegundoApellido = xmlParser.globalDocPayrolls.SegundoApellido,
@@ -1288,27 +1246,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.StatusDescription = "Validación contiene errores en campos mandatorios.";
             }
             return response;
-        }
-
-        public bool ValdiateWorkedCode(GlobalDocPayroll globaldoc)
-        {
-            var codJob = globaldoc.CodigoTrabajador;
-            var numDoc = Convert.ToString(globaldoc.NumeroDocumento).Length;
-            var codArea = globaldoc.CodigoArea;
-            var codCargo = globaldoc.CodigoCargo;
-
-            var subCodJob = codJob.ToString().Substring(0, numDoc);
-            var subCodArea = codJob.ToString().Substring(numDoc, 2);
-            var subCodCargo = codJob.ToString().Substring(numDoc + 2, 2);
-
-            var vNumbDoc = Int32.Parse(subCodJob) == Convert.ToInt32(globaldoc.NumeroDocumento) ? true : false;
-            var vCodArea = Int32.Parse(subCodArea) == Convert.ToInt32(codArea) ? true : false;
-            var vCodCargo = Int32.Parse(subCodCargo) == Convert.ToInt32(codCargo) ? true : false;
-
-            if (vNumbDoc && vCodArea && vCodCargo)
-                return true;
-
-            return false;
         }
 
         private ValidatePayroll CalculatePayrollvalues(ValidatePayroll payroll)
