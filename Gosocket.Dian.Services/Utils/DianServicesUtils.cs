@@ -807,16 +807,16 @@ namespace Gosocket.Dian.Services.Utils
             if (docTypeCode == "96")
             {              
                 if (!UBLVersionID.Equals("UBL 2.1"))
-                {
-                    stringBuilder.AppendLine($"{codeMessage}D01-(R): El elemento no contiene el literal 'UBL 2.1'");
+                {                    
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD01") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAD01"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
                 }
 
                 if (string.IsNullOrEmpty(documentID))
-                {
-                    stringBuilder.AppendLine($"{codeMessage}H06-(R): El número de documento electrónico referenciado no coinciden con reportado..");
+                {                    
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH06") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAH06"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -824,7 +824,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(eventCode))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH03") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -835,7 +835,7 @@ namespace Gosocket.Dian.Services.Utils
                    || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
                    || eventCode == "045" || eventCode == "046"))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}H03-(R): Debe corresponder a un identificador valido.");
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH03") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -860,14 +860,14 @@ namespace Gosocket.Dian.Services.Utils
                     {
                         if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34 && flagEvento)
                         {
-                            stringBuilder.AppendLine($"{codeMessage}D05-(R): No fue informado un número para el evento.");
+                            stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD05") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAD05"));
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
                         }
                         if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 46)
                         {
-                            stringBuilder.AppendLine($"{codeMessage}D05a-(R): No fue informado un número para el evento.");
+                            stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD05a") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAD05a"));
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
@@ -933,7 +933,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentCude))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D06-(R): el valor UUID no está correctamente calculado.");
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD06") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAD06"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
