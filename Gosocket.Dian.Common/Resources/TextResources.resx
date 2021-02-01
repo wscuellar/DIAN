@@ -262,4 +262,7 @@
   <data name="UserUpdatedSuccess" xml:space="preserve">
     <value>El usuario fue actualizado exitosamente</value>
   </data>
+  <data name="UserExistingEmail" xml:space="preserve">
+    <value>Ya existe un Usuario con el correo suministrado</value>
+  </data>
 </root>

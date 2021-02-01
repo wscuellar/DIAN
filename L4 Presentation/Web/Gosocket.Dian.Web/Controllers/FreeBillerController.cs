@@ -321,14 +321,14 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             //identifica el usuario que esta crean los nuevos registros
-            var uCompany = userService.Get(User.Identity.GetUserId());
+            ApplicationUser uCompany = userService.Get(User.Identity.GetUserId());
             if (uCompany == null)
                 return Json(new ResponseMessage(TextResources.UserWithOutCompany, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
             //Crea nuevo registro para AspNetUser
             model.FullName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(model.FullName);
             model.Password = CreateStringPassword(model);
-            var user = new ApplicationUser
+            ApplicationUser user = new ApplicationUser
             {
                 CreatorNit = uCompany.Code,
                 IdentificationTypeId = Convert.ToInt32(model.TypeDocId),
@@ -344,10 +344,13 @@ namespace Gosocket.Dian.Web.Controllers
                 Active = 1
             };
 
-
+            //validar si ya existe un Usuario con el mismo correo en AspNetUser
+            ApplicationUser vUserDB = userService.FindUserByEmail(string.Empty, user.Email);
+            if (vUserDB != null)
+                return Json(new ResponseMessage(TextResources.UserExistingEmail, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
             //validar si ya existe un Usuario con el tipo documento y documento suministrados en AspNetUser
-            var vUserDB = userService.FindUserByIdentificationAndTypeId(string.Empty, user.IdentificationTypeId, model.NumberDoc);
+            vUserDB = userService.FindUserByIdentificationAndTypeId(string.Empty, user.IdentificationTypeId, model.NumberDoc);
             if (vUserDB != null)
                 return Json(new ResponseMessage(TextResources.UserExistingDoc, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
@@ -370,7 +373,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }), "Creación");
 
                 // Revisar calse estatica para colocar el valor del nuevo rol.
-                var resultRole = userManager.AddToRole(user.Id, ROLEFREEBILLER);
+                IdentityResult resultRole = userManager.AddToRole(user.Id, ROLEFREEBILLER);
                 if (!resultRole.Succeeded)
                 {
                     userManager.Delete(user);
@@ -378,7 +381,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 //incluir el asociacion del registro. UserFreeBillerProfile
-                foreach (var profileId in model.ProfileIds)
+                foreach (int profileId in model.ProfileIds)
                 {
                     // Claim para reconocer el perfi del nuevo usuario para el Facturador Gratuito.
                     userManager.AddClaim(user.Id, new System.Security.Claims.Claim(CLAIMPROFILE, profileId.ToString()));
