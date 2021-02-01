@@ -47,6 +47,7 @@ namespace Gosocket.Dian.Application
 
             StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
             StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
+            StringBuilder footerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFooter.html"));
 
             // Load Document Data
             GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
@@ -99,35 +100,41 @@ namespace Gosocket.Dian.Application
             // Mapping Events
 
             // se realiza el mapeo del primer evento
+            // si tiene más eventos realiza el mapeo del siguiente template
+            StringBuilder middleTemplate = new StringBuilder();
+            StringBuilder eventTemplate = new StringBuilder();
+            StringBuilder headerTemplate = new StringBuilder();
+
             if (events.Any())
             {
-                templateFirstPage = EventTemplateMapping(templateFirstPage, events[0], string.Empty);
-
-                // si tiene más eventos realiza el mapeo del siguiente template
-                if (events.Count > 1)
+                for (int i = 0; i < events.Count; i++)
                 {
-                    bool changePage = false;
-                    StringBuilder middleTemplate = new StringBuilder();
 
-                    for (int i = 1; i < events.Count; i++)
+                    if(i == 0)
                     {
-                        if (i % 2 == 1)
-                        {
-                            page++;
-                            middleTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
-                            middleTemplate = CommonDataTemplateMapping(middleTemplate, expeditionDate, page, documentMeta);
-
-                        }
-                        else
-                        {
-                            changePage = true;
-                        }
-                        middleTemplate = EventTemplateMapping(middleTemplate, events[i], changePage ? string.Empty : "1");
-                        if (changePage)
-                        {
-                            templateFirstPage = templateFirstPage.Append(middleTemplate);
-                            changePage = false;
-                        }
+                        eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
+                        EventTemplateMapping(eventTemplate, events[i], string.Empty);
+                        templateFirstPage = templateFirstPage.Append(eventTemplate);
+                        templateFirstPage = templateFirstPage.Append(footerTemplate);
+                        templateFirstPage = CommonDataTemplateMapping(templateFirstPage, expeditionDate, page, documentMeta);
+                    }
+                    if (i % 2 == 1 && i > 0)
+                    {
+                        page++;
+                        middleTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaHeader.html"));
+                        eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
+                        eventTemplate = EventTemplateMapping(eventTemplate, events[i], string.Empty);
+                        middleTemplate = middleTemplate.Append(eventTemplate);
+                        middleTemplate = CommonDataTemplateMapping(middleTemplate, expeditionDate, page, documentMeta);
+                        templateFirstPage = templateFirstPage.Append(middleTemplate);
+                    }
+                    if (i % 2 == 0 && i > 0)
+                    {
+                        eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
+                        eventTemplate = EventTemplateMapping(eventTemplate, events[i], string.Empty);
+                        templateFirstPage = templateFirstPage.Append(eventTemplate);
+                        footerTemplate = CommonDataTemplateMapping(footerTemplate, expeditionDate, page, documentMeta);
+                        templateFirstPage = templateFirstPage.Append(footerTemplate);
                     }
                 }
             }
@@ -135,13 +142,28 @@ namespace Gosocket.Dian.Application
             //Mapping last page
 
             // se aumenta el número de la pagina y se mapean los datos comunes de pagina
-            page++;
-            templateLastPage = CommonDataTemplateMapping(templateLastPage, expeditionDate, page, documentMeta);
-
-            templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
-            templateLastPage = templateLastPage.Replace("{EventsTotal}", events.Count.ToString());
-            templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
-            templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
+            if(events.Count % 2 == 0)
+            {
+                templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
+                templateLastPage = templateLastPage.Replace("{EventsTotal}", events.Count.ToString());
+                templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
+                templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
+                templateLastPage = templateLastPage.Append(footerTemplate);
+                templateLastPage = CommonDataTemplateMapping(templateLastPage, expeditionDate, page, documentMeta);
+            }
+            else
+            {
+                page++;
+                headerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaHeader.html"));
+                templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
+                templateLastPage = templateLastPage.Replace("{EventsTotal}", events.Count.ToString());
+                templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
+                templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
+                templateLastPage = templateLastPage.Append(footerTemplate);
+                headerTemplate = headerTemplate.Append(templateLastPage);
+                templateLastPage = CommonDataTemplateMapping(headerTemplate, expeditionDate, page, documentMeta);
+            }
+               
 
             byte[] report = GetPdfBytes(templateFirstPage.Append(templateLastPage.ToString()).ToString(), "Factura electronica");
 
@@ -261,7 +283,7 @@ namespace Gosocket.Dian.Application
                 }
             }
 
-            finalEvents = finalEvents.Where(e=>e.Code!=null).ToList();
+            finalEvents = finalEvents.Where(e=>e.Code!=null).OrderBy(t => t.Date).ToList();
 
             return finalEvents;
         }

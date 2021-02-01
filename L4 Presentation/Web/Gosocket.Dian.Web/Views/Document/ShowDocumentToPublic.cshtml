@@ -92,7 +92,7 @@
         }
 
         $(document).ready(function () {
-            showPdfModal("#show-document", "@Model.GlobalDocValidatorDocument.DocumentKey", '@Url.Action("PrintDocument", "Document")');
+            showPdfModal("#show-document", "@Model.GlobalDocValidatorDocument.DocumentKey", '@Url.Action("PrintDocument", "Document")', "#panel-form");
             $('#container1-title').hide();
             $('.document-row').click('onClick', function () {
                 if (!$(this).hasClass('not-redirect')) {
