@@ -86,8 +86,6 @@ namespace Gosocket.Dian.Web.Models
         public string Email { get; set; }
 
         [Display(Name = "Correo electrónico")]
-        [Required(ErrorMessage = "El correo electrónico es requerido")]
-        [EmailAddress(ErrorMessage = "Correo electrónico inválido")]
         public string EmailRemember { get; set; }
 
         [Required(ErrorMessage = "La contraseña es requerida")]
