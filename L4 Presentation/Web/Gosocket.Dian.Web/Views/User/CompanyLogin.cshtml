@@ -110,6 +110,7 @@
     @*<script src="https://www.google.com/recaptcha/api.js?render=@ConfigurationManager.GetValue("Recaptcha")"></script>*@
     <script src="~/Content/js/user/forgot-password.js"></script>
     <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
     <script>
 
@@ -148,7 +149,7 @@
                 $('#CompanyCode').val('');
                 $('#UserCode').val('');
             };
-            rememberPassword(htmlPartial);
+            rememberPassword(htmlPartial, '@Url.Action("RecoveryPassword", "User")');
             @*grecaptcha.ready(function () {
                 grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
                     $(".RecaptchaToken").val(token);
