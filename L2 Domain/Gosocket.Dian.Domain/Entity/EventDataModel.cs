@@ -32,13 +32,21 @@
         public string CUDE { get; set; }
         public string Prefix { get; set; }
         public string Number { get; set; }
-        public DateTime DateOfIssue { get; set; }
-        public DateTime EmissionDate { get; set; }
+        public string DateOfIssue { get; set; }
+        public string EmissionDate { get; set; }
         public string SenderCode { get; set; }
         public string ReceiverCode { get; set; }
         public string ReceiverName { get; set; }
         public string ReceiverType { get; set; }
+        public string ReceiverEmail { get; set; }
+        public string SenderEmail { get; set; }
         public string SenderName { get; set; }
+        public string SenderPhoneNumber { get; set; }
+        public string ReceiverPhoneNumber { get; set; }
+        public string ReceiverDocumentType { get; set; }
+        public string EventTotalAmount { get; set; }
+        public string EventStartDate { get; set; }
+        public string EventFinishDate { get; set; }
         public bool ShowTitleValueSection { get; set; }
         public string EntityName { get; set; }
         public string CertificateNumber { get; set; }
@@ -51,15 +59,19 @@
             get; set;
         }
 
-        public ElectronicMandateModel Mandate { get; set; }
-
         public List<AssociatedEventsModel> AssociatedEvents { get; set; }
         public List<GlobalDataDocument> ValueTitleEvents { get; set; }
-        public EndosoModel Endoso { get; set; }
         public string EventTitle { get; set; }
         public string RequestType { get; set; }
+        public string OperationDetails { get; set; }
         public string ValidationTitle { get; set; }
+        public string DiscountRate { get; set; }
+        public string TotalAmount { get; set; }
         public string ReferenceTitle { get; set; }
+        public string SenderNit { get; set; }
+        public string EventDescription { get; set; }
+        public string SenderBusinessName { get; set; }
+        public string SenderDocumentType { get; set; }
     }
 
     public class AssociatedValidationsModel
@@ -96,20 +108,7 @@
         public double TotalAmount { get; set; }
     }
 
-    public class ElectronicMandateModel
-    {
-        public ElectronicMandateModel()
-        {
 
-        }
-
-        public string ContractDate { get; set; }
-        public string ReceiverCode { get; set; }
-        public string ReceiverName { get; set; }
-        public string SenderCode { get; set; }
-        public string SenderName { get; set; }
-        public string MandateType { get; set; }
-    }
 
     public class AssociatedEventsModel
     {
@@ -126,19 +125,5 @@
         public string Sender { get; set; }
         public string ReceiverCode { get; set; }
         public string Receiver { get; set; }
-    }
-
-    public class EndosoModel
-    {
-        public EndosoModel()
-        {
-
-        }
-
-        public string ReceiverCode { get; set; }
-        public string ReceiverName { get; set; }
-        public string SenderCode { get; set; }
-        public string SenderName { get; set; }
-        public string EndosoType { get; set; }
     }
 }

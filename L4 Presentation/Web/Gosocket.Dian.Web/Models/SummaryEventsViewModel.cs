@@ -144,8 +144,11 @@ namespace Gosocket.Dian.Web.Models
         {
             ReceiverCode = eventItem.ReceiverCode;
             ReceiverName = eventItem.ReceiverName;
-            SenderCode = invoice.SenderCode;
-            SenderName = invoice.SenderName;
+            if(eventItem.SenderCode.Length > 0)
+            {
+                SenderCode = invoice.SenderCode;
+                SenderName = invoice.SenderName;
+            }
             EndosoType = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Gosocket.Dian.Domain.Common.EventStatus), eventItem.EventCode)));
         }
 

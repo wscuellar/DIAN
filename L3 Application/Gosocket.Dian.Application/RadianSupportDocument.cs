@@ -96,7 +96,7 @@ namespace Gosocket.Dian.Application
         /// </summary>
         /// <param name="trackId"></param>
         /// <returns></returns>
-        private byte[] GetXmlFromStorageAsync(string trackId)
+        public static byte[] GetXmlFromStorageAsync(string trackId)
         {
             var TableManager = new TableManager("GlobalDocValidatorRuntime");
             var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");

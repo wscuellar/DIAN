@@ -457,6 +457,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Ya existe un Usuario con el correo suministrado.
+        /// </summary>
+        public static string UserExistingEmail {
+            get {
+                return ResourceManager.GetString("UserExistingEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El Usuario no puedo ser asignado al role &apos;Usuario Facturador Gratuito&apos;.
         /// </summary>
         public static string UserRoleFail {

@@ -761,7 +761,8 @@ namespace Gosocket.Dian.Services.Utils
             var serieAndNumber = documentParsed.SerieAndNumber;
             var listID = documentParsed.listID;
             var UBLVersionID = documentParsed.UBLVersionID;
-            var receiverCode = documentParsed.ReceiverCode;                     
+            var receiverCode = documentParsed.ReceiverCode;
+            var providerCode = documentParsed.ProviderCode;
 
             switch (docTypeCode)
             {
@@ -805,7 +806,15 @@ namespace Gosocket.Dian.Services.Utils
             
 
             if (docTypeCode == "96")
-            {              
+            {
+                if (providerCode == "800197268")
+                {
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAB19b") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAB19b"));
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
                 if (!UBLVersionID.Equals("UBL 2.1"))
                 {                    
                     stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD01") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAD01"));
@@ -846,15 +855,6 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (flagEvento)
                 {
-
-                    bool validaUUID = (Convert.ToInt32(eventCode) == 43 && listID == "3") ? false : true;
-                    if (string.IsNullOrEmpty(documentKey) && validaUUID)
-                    {
-                        stringBuilder.AppendLine($"{codeMessage}H07-(R): esta UUID no existe en la base de datos de la DIAN.");
-                        errors.Add(stringBuilder.ToString());
-                        stringBuilder.Clear();
-                        isValid = false;
-                    }
 
                     if (string.IsNullOrEmpty(serieAndNumber))
                     {

@@ -6,8 +6,10 @@
     using Gosocket.Dian.Common.Resources;
     using Gosocket.Dian.Domain.Common;
     using Gosocket.Dian.Domain.Cosmos;
+    using Gosocket.Dian.Domain.Domain;
     using Gosocket.Dian.Infrastructure;
     using Gosocket.Dian.Interfaces.Services;
+    using Gosocket.Dian.Services.Utils.Helpers;
     using System;
     using System.Collections.Generic;
     using System.Drawing;
@@ -75,17 +77,19 @@
 
         #region GetEventDataModel
 
-        private  async Task<Domain.Entity.EventDataModel> GetEventDataModel(string cude)
+        private async Task<Domain.Entity.EventDataModel> GetEventDataModel(string cude)
         {
             GlobalDocValidatorDocumentMeta eventItem = _queryAssociatedEventsService.DocumentValidation(cude);
+            byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(cude);
+            var str = Encoding.Default.GetString(xmlBytes);
 
             Domain.Entity.EventDataModel model =
                 new Domain.Entity.EventDataModel()
                 {
                     Prefix = eventItem.Serie,
                     Number = eventItem.Number,
-                    DateOfIssue = eventItem.SigningTimeStamp,
-                    EmissionDate = eventItem.EmissionDate,
+                    DateOfIssue = eventItem.SigningTimeStamp.ToString(),
+                    EmissionDate = eventItem.EmissionDate.ToString(),
                     SenderCode = eventItem.SenderCode,
                     SenderName = eventItem.SenderName,
                     ReceiverCode = eventItem.ReceiverCode,
@@ -95,58 +99,85 @@
             model.EventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), eventItem.EventCode);
             model.CUDE = cude;
 
+            Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
+            xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
+
+            //ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
+            model = MappingXpathValues(model, fieldValues);
+
             // Set Titles
-            
-            if ((int)model.EventStatus < 40 && (int)model.EventStatus > 36)
+            model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
+
+            switch (model.EventStatus)
             {
-                model.Title = model.EventStatus.GetDescription();
+                case EventStatus.Received:
+                    model.EventTitle = "Acuse de Recibo de la FEV";
+                    break;
+                case EventStatus.Receipt:
+                    model.EventTitle = "Recibo del bien o servicio";
+                    break;
+                case EventStatus.AceptacionTacita:
+                    model.EventTitle = "Aceptación Tácita de FEV";
+                    break;
+                case EventStatus.Accepted:
+                    model.EventTitle = "Aceptación Expresa de FEV";
+                    break;
+                case EventStatus.EndosoGarantia:
+                    model.Title = model.EventStatus.GetDescription();
+                    model.EventTitle = "Endoso En garantía de la FEV TV";
+                    model.RequestType = eventItem.EventCode;
+                    model.DiscountRate = eventItem.TaxAmountIva.ToString();
+                    model.TotalAmount = eventItem.TotalAmount.ToString();
+                    break;
+                case EventStatus.EndosoPropiedad:
+                    model.Title = model.EventStatus.GetDescription();
+                    model.EventTitle = "Endoso En propiedad de la FEV TV";
+                    model.RequestType = eventItem.EventCode;
+                    model.DiscountRate = eventItem.TaxAmountIva.ToString();
+                    model.TotalAmount = eventItem.TotalAmount.ToString();
+                    break;
+                case EventStatus.EndosoProcuracion:
+                    model.Title = model.EventStatus.GetDescription();
+                    model.EventTitle = "Endoso En procuración de la FEV TV";
+                    model.RequestType = eventItem.EventCode;
+                    model.DiscountRate = eventItem.TaxAmountIva.ToString();
+                    model.TotalAmount = eventItem.TotalAmount.ToString();
+                    break;
+                case EventStatus.InvoiceOfferedForNegotiation:
+                    model.Title = model.EventStatus.GetDescription();
+                    model.EventTitle = "Cancelación del endoso electrónico de la FEV";
+                    model.RequestType = eventItem.EventCode;
+                    model.DiscountRate = eventItem.TaxAmountIva.ToString();
+                    model.TotalAmount = eventItem.TotalAmount.ToString();
+                    break;
+                case EventStatus.Avales:
+                    model.EventTitle = "Aval de la FEV";
+                    break;
+                case EventStatus.Mandato:
+                    model.EventTitle = "Mandato de la FEV";
+                    break;
+                case EventStatus.TerminacionMandato:
+                    model.EventTitle = "Terminación Mandato de la FEV TV";
+                    break;
+                case EventStatus.ValInfoPago:
+                    model.EventTitle = "Informe para el pago de la FEV TV";
+                    break;
+                case EventStatus.NotificacionPagoTotalParcial:
+                    model.EventTitle = "Pago de la FEV TV";
+                    break;
+                case EventStatus.AnulacionLimitacionCirculacion:
+                    model.EventTitle = "Terminación Limitación  para circulación de la FEV TV";
+                    break;
+                case EventStatus.NegotiatedInvoice:
+                    model.EventTitle = "Limitación  para circulación de la FEV TV";
+                    break;
+                default:
+                    model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
+                    model.ReceiverType = string.Empty;
+                    //model.RequestType = model.Title;
+                    break;
             }
-            else
-            {
-                model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
-            }
-
-            model.ReceiverType = string.Empty;
-
-            // Set Mandate
-
-            if (model.EventStatus == EventStatus.Mandato)
-            {
-                model.Mandate = new Domain.Entity.ElectronicMandateModel()
-                {
-                    ReceiverCode = eventItem.ReceiverCode,
-                    ReceiverName = eventItem.ReceiverName,
-                    SenderCode = eventItem.SenderCode,
-                    SenderName = eventItem.SenderName,
-                    MandateType = TextResources.Event_MandateType
-                };
-
-                model.ReceiverName = model.Mandate.ReceiverName;
-                model.ReceiverCode = model.Mandate.ReceiverCode;
-                List<GlobalDocReferenceAttorney> referenceAttorneys = _queryAssociatedEventsService.ReferenceAttorneys(eventItem.DocumentKey, eventItem.DocumentReferencedKey, eventItem.ReceiverCode, eventItem.SenderCode);
-
-                if (referenceAttorneys.Any())
-                    model.Mandate.ContractDate = referenceAttorneys.FirstOrDefault().EffectiveDate;
-            }
-
-
-            // Set Endoso
-
-            if (model.EventStatus == EventStatus.EndosoGarantia || model.EventStatus == EventStatus.EndosoProcuracion)
-            {
-                model.Endoso = new Domain.Entity.EndosoModel()
-                {
-                    ReceiverCode = eventItem.ReceiverCode,
-                    ReceiverName = eventItem.ReceiverName,
-                    SenderCode = eventItem.SenderCode,
-                    SenderName = eventItem.SenderName,
-                    EndosoType = EnumHelper.GetEnumDescription((Enum.Parse(typeof(EventStatus), eventItem.EventCode)))
-                };
-                model.ReceiverName = model.Endoso.ReceiverName;
-                model.ReceiverCode = model.Endoso.ReceiverCode;
-            }
-
-            model.RequestType = model.Title;
 
             // SetReferences
             GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
@@ -172,7 +203,6 @@
             model.EntityName = referenceMeta.Serie;
             model.CertificateNumber = referenceMeta.SerieAndNumber;
 
-            //Domain.Entity.GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem.Identifier);
             Domain.Entity.GlobalDocValidatorDocument eventVerification =
                     globalDocValidatorDocumentTableManager.Find<Domain.Entity.GlobalDocValidatorDocument>(referenceMeta?.Identifier, referenceMeta?.Identifier);
 
@@ -199,22 +229,23 @@
                     (bool hasMoreResults, string continuation, List<GlobalDataDocument> globalDataDocuments) cosmosResponse =
                     (false, null, new List<GlobalDataDocument>());
 
-                    cosmosResponse = await _cosmosDBService.ReadDocumentsAsyncOrderByReception(null,
-                                                                                                DateTime.Now,
-                                                                                                DateTime.Now,
-                                                                                                0,
-                                                                                                null,
-                                                                                                null,
-                                                                                                null,
-                                                                                                null,
-                                                                                                null,
-                                                                                                40,
-                                                                                                eventItem.DocumentReferencedKey,
-                                                                                                null,
-                                                                                                pks
-                                                                                                );
-
-                   
+                    cosmosResponse =
+                        await _cosmosDBService
+                        .ReadDocumentsAsyncOrderByReception(
+                            null,
+                            DateTime.Now,
+                            DateTime.Now,
+                            0,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            40,
+                            eventItem.DocumentReferencedKey,
+                            null,
+                            pks
+                            );
 
                     foreach (GlobalDataDocument globalDocu in cosmosResponse.globalDataDocuments)
                     {
@@ -230,7 +261,7 @@
                             globalDocsValueTitle.Add(globalDocu);
                             model.ShowTitleValueSection = true;
                             model.ValueTitleEvents = globalDocsValueTitle;
-                        } 
+                        }
                     }
                 }
             }
@@ -245,21 +276,20 @@
         {
             string sectionHtml = "<div class='text-section padding-top20'> Sección {SectionNumber}</ div > ";
 
-
             #region Mapping Event Data Section
             // Mapping Event Data Section
             template = template.Replace("{EventName}", model.Title);
             template = template.Replace("{EventNumber}", $"{model.Prefix} - {model.Number}");
-            template = template.Replace("{EventType}", model.Title);
+            template = template.Replace("{EventType}", model.EventTitle);
             template = template.Replace("{OperationType}", model.RequestType);
-            template = template.Replace("{OperationDetails}", string.Empty);
-            template = template.Replace("{DiscountRate}", string.Empty);
-            template = template.Replace("{TotalEventValue}", string.Empty);
+            template = template.Replace("{OperationDetails}", model.OperationDetails);
+            template = template.Replace("{DiscountRate}", model.DiscountRate);
+            template = template.Replace("{TotalEventAmount}", model.EventTotalAmount);
             template = template.Replace("{CUDE}", model.CUDE);
-            template = template.Replace("{ExpeditionDate}", $"{model.DateOfIssue:dd'/'MM'/'yyyy hh:mm:ss tt}");
-            template = template.Replace("{RegistrationDate}", string.Empty);
-            template = template.Replace("{StartDate}", string.Empty);
-            template = template.Replace("{FinishDate}", string.Empty);
+            template = template.Replace("{EmissionDate}", $"{model.EmissionDate:dd'/'MM'/'yyyy hh:mm:ss tt}");
+            template = template.Replace("{RegistrationDate}", model.DateOfIssue);
+            template = template.Replace("{StartDate}", model.EventStartDate);
+            template = template.Replace("{FinishDate}", model.EventFinishDate);
             #endregion
 
             #region Mapping reference invoice data section
@@ -273,7 +303,7 @@
             template = template.Replace("{PaymentState}", string.Empty);
             template = template.Replace("{PaymentConditions}", string.Empty);
             template = template.Replace("{CUFE}", model.References[0].CUFE);
-            template = template.Replace("{IssueDate}", $"{model.EmissionDate:dd'/'MM'/'yyyy}");
+            template = template.Replace("{IssueDate}", $"{model.References[0].DateOfIssue:dd'/'MM'/'yyyy}");
             template = template.Replace("{ExpirationDate}", string.Empty);
             template = template.Replace("{OperationType}", string.Empty);
 
@@ -303,12 +333,12 @@
                 subjects = SubjectTemplateMapping(subjects, "1", "1",
                     model.ReceiverName
                     , model.ReceiverType
+                    , model.ReceiverDocumentType
                     , model.ReceiverCode
-                    , model.ReceiverCode
                     , string.Empty
                     , string.Empty
-                    , string.Empty
-                    , string.Empty);
+                    , model.ReceiverEmail
+                    , model.ReceiverPhoneNumber);
 
                 // Section 2
 
@@ -318,12 +348,12 @@
                 subjects = SubjectTemplateMapping(subjects, "2", "1",
                     model.SenderName
                     , model.ReceiverType
+                    , model.SenderDocumentType
                     , model.SenderCode
-                    , model.SenderCode
                     , string.Empty
                     , string.Empty
-                    , string.Empty
-                    , string.Empty);
+                    , model.SenderEmail
+                    , model.SenderPhoneNumber);
 
                 template = template.Replace("{SectionsData}", subjects.ToString());
             }
@@ -405,6 +435,88 @@
 
             return template;
         }
+
+        #endregion
+
+        #region Xpaths
+
+        #region CreateGetXpathData
+
+        private static Dictionary<string, string> CreateGetXpathData(string xmlBase64, string fileName = null)
+        {
+            var requestObj = new Dictionary<string, string>
+            {
+                { "XmlBase64", xmlBase64},
+                { "FileName", fileName},
+                { "ReceiverEmail", "ApplicationResponse/cac:ReceiverParty/cac:Contact/cbc:ElectronicMail" },
+                { "SenderEmail", "ApplicationResponse/cac:SenderParty/cac:Contact/cbc:ElectronicMail" },
+                { "SenderPhoneNumber", "ApplicationResponse/cac:SenderParty/cac:Contact/cbc:Telephone" },
+                { "ReceiverPhoneNumber", "ApplicationResponse/cac:ReceiverParty/cac:Contact/cbc:Telephone" },
+                { "ReceiverDocumentType", "ApplicationResponse[1]/cac:DocumentResponse[1] / cac:IssuerParty[1] / cac:PartyLegalEntity[1] / cbc:CompanyID[1] / @schemeName" },
+                { "EventTotalAmount", "ApplicationResponse[1]/cac:DocumentResponse[1]/cac:IssuerParty[1]/cac:PartyLegalEntity[X]/cbc:CorporateStockAmount[1]" },
+                { "EventStartDate", "ApplicationResponse[1]/cac:DocumentResponse[1]/cac:DocumentReference[1]/cac:ValidityPeriod[1]/cbc:StartDate[1]" },
+                { "EventFinishDate","ApplicationResponse[1]/cac:DocumentResponse[1]/cac:DocumentReference[1]/cac:ValidityPeriod[1]/cbc:EndDate[1]" },
+
+                { "RequestType", "ApplicationResponse[1]/cac:DocumentResponse[1]/cac:Response[1]/cbc:ResponseCode[1]" },
+                { "OperationDetails", "ApplicationResponse[1]/cac:DocumentResponse[1]/cac:Response[1]/cbc:ResponseCode[1]/@listID" },
+                { "DiscountRate", "ApplicationResponse[1]/ext:UBLExtensions[1]/ext:UBLExtension[2]/ext:ExtensionContent[1]/CustomTagGeneral[1]/InformacionNegociacion[1]/Value[3]" },
+                { "EndosoTotalAmount", "ApplicationResponse[1]/ext:UBLExtensions[1]/ext:UBLExtension[2]/ext:ExtensionContent[1]/CustomTagGeneral[1]/InformacionNegociacion[1]/Value[1]" },
+                { "GenerationDate", "ApplicationResponse[1]/cbc:IssueDate[1]ApplicationResponse[1]/cbc:IssueTime[1]" },
+                { "SenderNit", "ApplicationResponse[1]/cac:SenderParty[1]/cac:PartyTaxScheme[1]/cbc:CompanyID[1]" },
+                { "EventDescription","ApplicationResponse[1]/cac:DocumentResponse[1]/cac:Response[1]/cbc:Description[1]" },
+                { "SenderBusinessName","ApplicationResponse[1]/cac:SenderParty[1]/cac:PartyTaxScheme[1]/cbc:RegistrationName[1]" },
+                { "SenderDocumentType","ApplicationResponse[1]/cac:SenderParty[1]/cac:PartyTaxScheme[1]/cbc:CompanyID[1]" },
+                //{ "","" },
+            };
+            return requestObj;
+        }
+
+        #endregion
+
+        #region MappingXpathValues
+
+        private Domain.Entity.EventDataModel MappingXpathValues(Domain.Entity.EventDataModel model, ResponseXpathDataValue dataValues)
+        {
+            model.ReceiverEmail = dataValues.XpathsValues["ReceiverEmail"] != null ?
+                    dataValues.XpathsValues["ReceiverEmail"] : string.Empty;
+            model.SenderEmail = dataValues.XpathsValues["ReceiverEmail"] != null ?
+                    dataValues.XpathsValues["ReceiverEmail"] : string.Empty;
+            model.SenderPhoneNumber = dataValues.XpathsValues["SenderPhoneNumber"] != null ?
+                    dataValues.XpathsValues["SenderPhoneNumber"] : string.Empty;
+            model.ReceiverPhoneNumber = dataValues.XpathsValues["ReceiverPhoneNumber"] != null ?
+                    dataValues.XpathsValues["ReceiverPhoneNumber"] : string.Empty;
+            model.ReceiverDocumentType = dataValues.XpathsValues["ReceiverDocumentType"] != null ?
+                    dataValues.XpathsValues["ReceiverDocumentType"] : string.Empty;
+            model.EventTotalAmount = dataValues.XpathsValues["EventTotalAmount"] != null ?
+                    dataValues.XpathsValues["EventTotalAmount"] : string.Empty;
+            model.EventStartDate = dataValues.XpathsValues["EventStartDate"] != null ?
+                    dataValues.XpathsValues["EventStartDate"] : string.Empty;
+            model.EventFinishDate = dataValues.XpathsValues["EventFinishDate"] != null ?
+                    dataValues.XpathsValues["EventFinishDate"] : string.Empty;
+
+            model.RequestType = dataValues.XpathsValues["RequestType"] != null ?
+                    dataValues.XpathsValues["RequestType"] : string.Empty;
+            model.OperationDetails = dataValues.XpathsValues["OperationDetails"] != null ?
+                    dataValues.XpathsValues["OperationDetails"] : string.Empty;
+            model.DiscountRate = dataValues.XpathsValues["DiscountRate"] != null ?
+                    dataValues.XpathsValues["DiscountRate"] : string.Empty;
+            model.TotalAmount = dataValues.XpathsValues["EventTotalAmount"] != null ?
+                    dataValues.XpathsValues["EventTotalAmount"] : string.Empty;
+            //model.DateOfIssue = dataValues.XpathsValues["GenerationDate"] != null ?
+            //        dataValues.XpathsValues["GenerationDate"] : string.Empty;
+            model.SenderNit = dataValues.XpathsValues["SenderNit"] != null ?
+                    dataValues.XpathsValues["SenderNit"] : string.Empty;
+            model.EventDescription = dataValues.XpathsValues["EventDescription"] != null ?
+                    dataValues.XpathsValues["EventDescription"] : string.Empty;
+            model.SenderBusinessName = dataValues.XpathsValues["SenderBusinessName"] != null ?
+                    dataValues.XpathsValues["SenderBusinessName"] : string.Empty;
+            model.SenderDocumentType = dataValues.XpathsValues["SenderDocumentType"] != null ?
+                    dataValues.XpathsValues["SenderDocumentType"] : string.Empty;
+
+            return model;
+        }
+
+        #endregion
 
         #endregion
     }

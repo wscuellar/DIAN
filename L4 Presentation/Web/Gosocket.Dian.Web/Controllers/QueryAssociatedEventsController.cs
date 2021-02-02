@@ -96,7 +96,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         private void SetValidations(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem, GlobalDocValidatorDocument eventVerification)
         {
-            if (eventVerification.ValidationStatus == 1)
+            if (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 0)
                 model.ValidationMessage = TextResources.Event_ValidationMessage;
 
             if (eventVerification.ValidationStatus == 10)
@@ -109,7 +109,8 @@ namespace Gosocket.Dian.Web.Controllers
 
         private static void SetEndoso(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem, GlobalDocValidatorDocumentMeta invoice)
         {
-            if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia || model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
+            if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia 
+                || model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
                 model.Endoso = new EndosoViewModel(eventItem, invoice);
         }
 
