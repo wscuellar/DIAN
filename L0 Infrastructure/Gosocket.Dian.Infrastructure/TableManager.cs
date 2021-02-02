@@ -1163,5 +1163,32 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
+        public List<T> FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State <T>(string partitionKey, string rowKey, bool deleted, string state) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    rowKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey));
+
+            prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterConditionForBool("Deleted",
+                    QueryComparisons.Equal,
+                    deleted),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("State",
+                    QueryComparisons.Equal,
+                    state));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
     }
 }

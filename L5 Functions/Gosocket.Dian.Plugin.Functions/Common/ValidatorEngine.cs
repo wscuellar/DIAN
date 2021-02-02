@@ -324,18 +324,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-        public async Task<List<ValidateListResponse>> StartValidatePredecesor(RequestObjectPredecesor p)
+        public List<ValidateListResponse> StartValidatePredecesor(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
-            DateTime startDate = DateTime.UtcNow;
-
-            var xmlBytes = await GetXmlFromStorageAsync(p.TrackId);
-            var xmlParser = new XmlParseNomina(xmlBytes);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
-
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateReplacePredecesor(p, xmlParser));
+            validateResponses.AddRange(validator.ValidateReplacePredecesor(trackId));
             return validateResponses;
         }
 
@@ -638,6 +631,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser, data.TrackId));
 
+            return validateResponses;
+        }
+
+        public async Task<List<ValidateListResponse>> StartValidateIndividualPayroll(string trackId)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParser = new XmlParseNomina(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            var documentParsed = xmlParser.Fields.ToObject<DocumentParsedNomina>();
+            DocumentParsedNomina.SetValues(ref documentParsed);
+            
+            // Validator instance
+            var validator = new Validator();
+            validateResponses.Add(validator.ValidateIndividualPayroll(xmlParser, documentParsed));
             return validateResponses;
         }
 

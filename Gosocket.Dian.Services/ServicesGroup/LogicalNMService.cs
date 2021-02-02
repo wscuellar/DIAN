@@ -897,41 +897,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var trackIdPred = documentParsed.CUNEPred;
             var SerieAndNumber = documentParsed.SerieAndNumber;
             // ZONE 3
-
-            if (documentParsed.DocumentTypeId == "11")
-            {
-                var result = this.CheckIndividualPayrollDuplicity(trackId, documentParsed.EmpleadorNIT,
-                    xmlParser.globalDocPayrolls.NumeroDocumento, xmlParser.Novelty);
-                if (result != null) return result;
-            }
-
-            if (documentParsed.DocumentTypeId == "12")
-            {
-                var result = this.CkeckIndividualPayrollExists(trackIdPred);
-                if (result != null) return result;
-            }
-       
-            //Valida CUNE
-            var validatorCuneRequest = validatorCune(trackId, dianResponse);
-            if (!validatorCuneRequest.IsValid)
-            {
-                dianResponse = validatorCuneRequest;
-                dianResponse.XmlDocumentKey = trackId;
-                dianResponse.XmlFileName = filename;
-                dianResponse.IsValid = false;               
-            }
-            var validatorCuneResponse = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateSerie) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
-
-            //Validate CUNE Predesesor
-            var validatePredecesor = ValidateReplacePredecedor(trackId, dianResponse);
-            if (!validatePredecesor.IsValid)
-            {
-                dianResponse = validatePredecesor;
-                dianResponse.XmlDocumentKey = trackId;
-                dianResponse.XmlFileName = filename;
-                dianResponse.IsValid = false;
-            }
-
+           
             // upload xml
             start = DateTime.UtcNow;
             var uploadXmlRequest = new { xmlBase64, filename, documentTypeId = documentParsed.DocumentTypeId, trackId, eventNomina = true };
@@ -1060,9 +1026,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validate),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(application),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone1),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(zone2),                    
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(validatorCuneResponse)
-                    //TableManagerGlobalLogger.InsertOrUpdateAsync(validateTimeWorked)
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(zone2)                   
                 };
 
                 if (dianResponse.IsValid && !existDocument)
@@ -1178,75 +1142,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             };
 
             return docGlobalPayroll;
-        }
-
-        public DianResponse ValidateReplacePredecedor(string trackId, DianResponse response)
-        {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidatePredecesor), new { trackId });
- 
-            if (validations.Count > 0)
-            {
-                if (response.ErrorMessage.Count == 0)
-                {
-                    response = new DianResponse()
-                    {
-                        StatusMessage = "Documento con errores en campos mandatorios.",
-                        StatusCode = Properties.Settings.Default.Code_89,
-                        IsValid = validations[0].IsValid,
-                        ErrorMessage = new List<string>()
-                    };
-                }
-
-                var failedList = new List<string>();
-                foreach (var item in validations)
-                {
-                    if (!item.IsValid)
-                    {
-                        failedList.Add($"{item.ErrorCode} - {item.ErrorMessage}");
-                        response.IsValid = false;
-                    }
-
-                }
-
-                response.ErrorMessage.AddRange(failedList);
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-            }
-            return response;
-        }
-
-        public DianResponse validatorCune(string trackId, DianResponse response)
-        {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateCune), new { trackId });
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateCune", new { trackId });
-            if (validations.Count > 0)
-            {
-                if (response.ErrorMessage.Count == 0)
-                {
-                    response = new DianResponse()
-                    {
-                        StatusMessage = "Documento con errores en campos mandatorios.",
-                        StatusCode = Properties.Settings.Default.Code_89,
-                        IsValid = validations[0].IsValid,
-                        ErrorMessage = new List<string>()
-                    };
-                }
-
-                var failedList = new List<string>();
-                foreach (var item in validations)
-                {
-                    if (!item.IsValid)
-                    {
-                        failedList.Add($"{item.ErrorCode} - {item.ErrorMessage}");
-                        response.IsValid = false;
-                    }
-
-                }
-
-                response.ErrorMessage.AddRange(failedList);
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-            }
-            return response;
-        }
+        }       
 
         private ValidatePayroll CalculatePayrollvalues(ValidatePayroll payroll)
         {
@@ -1263,27 +1159,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
 
             return payroll;
-        }
-
-        private bool ValidateTimeWorked(GlobalDocPayroll model)
-        {
-            if (string.IsNullOrWhiteSpace(model.TiempoLaborado) ||
-                (!string.IsNullOrWhiteSpace(model.TiempoLaborado) && model.TiempoLaborado == "0")) return false;
-
-            // En Contabilidad el mes(cualquier mes) tiene 30 días
-            var entryDay = int.Parse(model.FechaIngreso.Substring(8, 2));
-            if (entryDay > 30) entryDay = 30;
-            var GenDay = int.Parse(model.FechaGen.Substring(8, 2));
-            if (GenDay > 30) GenDay = 30;
-
-            var dateEntry = new DateTime(int.Parse(model.FechaIngreso.Substring(0, 4)),
-                int.Parse(model.FechaIngreso.Substring(5, 2)), entryDay, 0, 0, 0);
-            var dateGen = new DateTime(int.Parse(model.FechaGen.Substring(0, 4)),
-                int.Parse(model.FechaGen.Substring(5, 2)), GenDay, 0, 0, 0);
-
-            var totalTimeWorkedFormatted = this.GetTotalTimeWorkedFormatted(dateEntry, dateGen);
-
-            return model.TiempoLaborado == totalTimeWorkedFormatted;
         }
 
         /// <summary>
@@ -1372,74 +1247,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                    daysStringFormatted = $"{totalDays.ToString().PadLeft(2, char.Parse("0"))}D";
 
             return $"{yearsStringFormatted}{monthsStringFormatted}{daysStringFormatted}";
-        }
-
-        private DianResponse CheckIndividualPayrollDuplicity(string cune, string companyId, string employeeId, bool novelty)
-        {
-            // Solo se podrá transmitir una única vez el número del documento para el trabajador.
-            var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
-            if(documentMeta != null)
-            {
-                var documentApproved = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
-                if(documentApproved != null)
-                {
-                    return new DianResponse()
-                    {
-                        IsValid = false,
-                        StatusCode = "99",
-                        StatusMessage = ".",
-                        StatusDescription = ".",
-                        ErrorMessage = new List<string>() { "Regla: 90: - Documento procesado anteriormente" }
-                    };
-                }
-            }
-
-            // Solo se podrá transmitir para cada trabajador 1 documento NominaIndividual mensual durante cada mes del año. Para el mismo Empleador.
-            var documentsList = TableManagerGlobalDocValidatorDocumentMeta.FindDocumentSenderCodeReceiverCode<GlobalDocValidatorDocumentMeta>(companyId, employeeId);
-            if (documentsList == null || documentsList.Count <= 0) return null; // no exiten documentos
-
-            var currentDate = DateTime.Now.Date;
-            var documents = documentsList.Where(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month).ToList();
-            if (documents == null || documents.Count <= 0) return null; // no existe para el mes actual
-
-            foreach (var doc in documents)
-            {
-                var documentApproved = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(doc.Identifier, doc.Identifier);
-                if (documentApproved != null)
-                {
-                    if (!novelty)
-                    {
-                        return new DianResponse()
-                        {
-                            IsValid = false,
-                            StatusCode = "99",
-                            StatusMessage = ".",
-                            StatusDescription = ".",
-                            ErrorMessage = new List<string>() { "Regla: 91: - Documento para este Trabajador ya ha sido enviado anteriormente para este mes." }
-                        };
-                    }
-                    else
-                        return null;
-                }
-            }
-
-            return null;
-        }
-
-        private DianResponse CkeckIndividualPayrollExists(string cune)
-        {
-            // El documento referenciado debe encontrarse en la base de datos de la DIAN.
-            var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
-            if (documentMeta != null) return null;
-
-            return new DianResponse()
-            {
-                IsValid = false,
-                StatusCode = "99",
-                StatusMessage = ".",
-                StatusDescription = ".",
-                ErrorMessage = new List<string>() { "Regla: NIAE902: - El documento referenciado no se encuentra en la base de datos de la DIAN." }
-            };
-        }
+        }      
     }
 }
