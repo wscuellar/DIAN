@@ -1305,6 +1305,7 @@ namespace Gosocket.Dian.Web.Controllers
         #region RecoveryPassword
 
         [HttpGet]
+        [ExcludeFilter(typeof(Authorization))]
         public JsonResult RecoveryPassword(string email)
         {
             // Encuentra al usuario con su correo electrónico
