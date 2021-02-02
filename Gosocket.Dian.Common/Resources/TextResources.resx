@@ -265,4 +265,10 @@
   <data name="UserExistingEmail" xml:space="preserve">
     <value>Ya existe un Usuario con el correo suministrado</value>
   </data>
+  <data name="EmailSentSuccessfully" xml:space="preserve">
+    <value>Correo electrónico enviado correctamente</value>
+  </data>
+  <data name="SendEmailFailed" xml:space="preserve">
+    <value>No fue posible enviar el correo</value>
+  </data>
 </root>

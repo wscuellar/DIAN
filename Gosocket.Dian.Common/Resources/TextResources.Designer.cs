@@ -106,6 +106,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Correo electrónico enviado correctamente.
+        /// </summary>
+        public static string EmailSentSuccessfully {
+            get {
+                return ResourceManager.GetString("EmailSentSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Endoso electrónico.
         /// </summary>
         public static string Endoso {
@@ -363,6 +372,15 @@ namespace Gosocket.Dian.Common.Resources {
         public static string RequiredSoftware {
             get {
                 return ResourceManager.GetString("RequiredSoftware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No fue posible enviar el correo.
+        /// </summary>
+        public static string SendEmailFailed {
+            get {
+                return ResourceManager.GetString("SendEmailFailed", resourceCulture);
             }
         }
         

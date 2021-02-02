@@ -115,6 +115,10 @@ namespace Gosocket.Dian.Web.Controllers
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
+                    if (dt == 0)
+                    {
+                        _ = SendEmailInactive(user);
+                    }
                     ResponseMessage resultx = new ResponseMessage()
                     {
                         Message = "Estado actualizado correctamente",
@@ -170,7 +174,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult EditOrViewFreeBillerUser(string id, bool isEdit = true)
         {
             var tdocs = GetTypesDoc();
-            ViewBag.tdocs = tdocs.Where(p=> p.Value != null).Select(p => new SelectListItem() { Value = p.Value.ToString(), Text = p.Text }).ToList<SelectListItem>();
+            ViewBag.tdocs = tdocs.Where(p => p.Value != null).Select(p => new SelectListItem() { Value = p.Value.ToString(), Text = p.Text }).ToList<SelectListItem>();
             UserService user = new UserService();
             var data = user.Get(id);
             UserFreeBillerModel model = new UserFreeBillerModel();
@@ -190,9 +194,9 @@ namespace Gosocket.Dian.Web.Controllers
             foreach (var claim in data.Claims)
             {
                 int profileId = 0;
-                if(int.TryParse(claim.ClaimValue, out profileId))
+                if (int.TryParse(claim.ClaimValue, out profileId))
                     model.ProfileIds.Add(profileId);
-                
+
             }
 
             model.TypeDocId = Convert.ToString(data.IdentificationTypeId);
@@ -312,7 +316,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            if(!int.TryParse(model.TypeDocId,out _))
+            if (!int.TryParse(model.TypeDocId, out _))
                 return Json(new ResponseMessage("Seleccione un tipo de documento..", TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
             if (model.ProfileIds == null)
@@ -413,6 +417,31 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
+        #region RecoveryPassword
+
+        [HttpGet]
+        public JsonResult RecoveryPassword(string email)
+        {
+            // Encuentra al usuario con su correo electrónico
+            ApplicationUser user = userService.FindUserByEmail(string.Empty, email);
+            if (user == null)
+                return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+
+            // Actualiza el password del usuario
+            string password = CreateStringPassword(user);
+
+            var remove = userManager.RemovePassword(user.Id);
+            var result = userManager.AddPassword(user.Id, password);
+            if (result.Succeeded)
+            {
+                _ = SendMailRecoveryPassword(email, password);
+                return Json(new ResponseMessage(TextResources.EmailSentSuccessfully, TextResources.alertType), JsonRequestBehavior.AllowGet);
+            }
+            return Json(new ResponseMessage(TextResources.SendEmailFailed, TextResources.alertType), JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
+
         /// <summary>
         /// Enviar notificacion email para creacion de usuario externo.
         /// </summary>
@@ -465,6 +494,64 @@ namespace Gosocket.Dian.Web.Controllers
 
             return true;
         }
+
+        #region SendEmailInactive
+
+        /// <summary>
+        /// Enviar notificacion email para creacion de usuario externo.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        private bool SendEmailInactive(ApplicationUser user)
+        {
+            var emailService = new Gosocket.Dian.Application.EmailService();
+            StringBuilder message = new StringBuilder();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("</br> <span style='font-size:18px;'><b>Se ha realizado una actualizacion y su usuario ha sido desactivado</b></span></br>");
+            message.AppendFormat("</br> Señor (a) usuario (a): {0}", user.Name);
+
+            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+
+            //Nombre del documento, estado, observaciones
+            dic.Add("##CONTENT##", message.ToString());
+
+            emailService.SendEmail(user.Email, "DIAN - Edición de Usuario Registrado", dic);
+
+            return true;
+        }
+
+        #endregion
+
+        #region SendMailRecoveryPassword
+
+        /// <summary>
+        /// Enviar notificacion email para creacion de usuario externo.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private bool SendMailRecoveryPassword(string email, string password)
+        {
+            var emailService = new Gosocket.Dian.Application.EmailService();
+            StringBuilder message = new StringBuilder();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("</br> <span style='font-size:18px;'><b>Su contraseña para ingresar al sistema es: </b></span></br>");
+            message.AppendFormat("</br> Contraseña: {0}", password);
+
+            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+
+            //Nombre del documento, estado, observaciones
+            dic.Add("##CONTENT##", message.ToString());
+
+            emailService.SendEmail(email, "DIAN - Edición de Usuario Registrado", dic);
+
+            return true;
+        }
+
+        #endregion
 
         #region Carga de combos
 
@@ -563,7 +650,7 @@ namespace Gosocket.Dian.Web.Controllers
             List<KeyText> profilesKey = new List<KeyText>();
             foreach (var item in profilesText)
             {
-                profilesKey.Add( new KeyText()
+                profilesKey.Add(new KeyText()
                 {
                     Key = item.Key,
                     Text = String.Join("</br>", item.Select(t => t.Profile).Distinct())
@@ -571,7 +658,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             profilesKey = profilesKey.Distinct().ToList();
 
-            var query = from item in users.Select(t=> new { t.Id, t.Name,t.UserName,t.IdentificationId, t.IdentificationTypeId, t.LastUpdated, t.Active, t.CreationDate }).Distinct()
+            var query = from item in users.Select(t => new { t.Id, t.Name, t.UserName, t.IdentificationId, t.IdentificationTypeId, t.LastUpdated, t.Active, t.CreationDate }).Distinct()
                         join kv in profilesKey on item.Id equals kv.Key
                         join td in staticTypeDoc on item.IdentificationTypeId.ToString() equals td.Value
                         orderby item.CreationDate descending
@@ -617,6 +704,13 @@ namespace Gosocket.Dian.Web.Controllers
         private string CreateStringPassword(UserFreeBillerModel model)
         {
             string result = model.FullName.Substring(1, 1).ToUpper();
+            result = $"{result}{model.Email.Split('@')[0]}{Guid.NewGuid().ToString("d").Substring(1, 4)}**";
+            return result;
+        }
+
+        private string CreateStringPassword(ApplicationUser model)
+        {
+            string result = model.Name.Substring(1, 1).ToUpper();
             result = $"{result}{model.Email.Split('@')[0]}{Guid.NewGuid().ToString("d").Substring(1, 4)}**";
             return result;
         }
