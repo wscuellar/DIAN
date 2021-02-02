@@ -253,23 +253,23 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        public ActionResult GetSetTestResult(int RadianContributorId, string Nit, string ContributorId, string RadianState, int RadianContributorTypeId)
+        public ActionResult GetSetTestResult(RadianGetSetTestViewModel viewModel)
         {
             RadianApprovedViewModel model = new RadianApprovedViewModel();
             model.Contributor = new RedianContributorWithTypes();
             const int softwareType = 1;
             string sType = softwareType.ToString();
-            RadianSoftware software = _radianAprovedService.GetSoftware(RadianContributorId, softwareType);
+            RadianSoftware software = _radianAprovedService.GetSoftware(viewModel.RadianContributorId, softwareType);
             string key = softwareType.ToString() + "|" + software.Id.ToString();
-            model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(Nit, key);
+            model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(viewModel.Nit, key);
             RadianTestSet testSet = _radianTestSetService.GetTestSet(sType, sType);
             model.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), sType)));
             model.RadianTestSetResult.StatusDescription = testSet.Description;
             model.Software = software;
-            model.ContributorId = Int32.Parse(ContributorId);
-            model.Contributor.RadianContributorId = RadianContributorId;
-            model.RadianState = RadianState;
-            model.RadianContributorTypeId = RadianContributorTypeId;
+            model.ContributorId = Int32.Parse(viewModel.ContributorId);
+            model.Contributor.RadianContributorId = viewModel.RadianContributorId;
+            model.RadianState = viewModel.RadianState;
+            model.RadianContributorTypeId = viewModel.RadianContributorTypeId;
             return View(model);
         }
 
