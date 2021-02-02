@@ -416,32 +416,6 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(new ResponseMessage(errors.ToString(), TextResources.alertType), JsonRequestBehavior.AllowGet);
         }
 
-
-        #region RecoveryPassword
-
-        [HttpGet]
-        public JsonResult RecoveryPassword(string email)
-        {
-            // Encuentra al usuario con su correo electrónico
-            ApplicationUser user = userService.FindUserByEmail(string.Empty, email);
-            if (user == null)
-                return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
-
-            // Actualiza el password del usuario
-            string password = CreateStringPassword(user);
-
-            var remove = userManager.RemovePassword(user.Id);
-            var result = userManager.AddPassword(user.Id, password);
-            if (result.Succeeded)
-            {
-                _ = SendMailRecoveryPassword(email, password);
-                return Json(new ResponseMessage(TextResources.EmailSentSuccessfully, TextResources.alertType), JsonRequestBehavior.AllowGet);
-            }
-            return Json(new ResponseMessage(TextResources.SendEmailFailed, TextResources.alertType), JsonRequestBehavior.AllowGet);
-        }
-
-        #endregion
-
         /// <summary>
         /// Enviar notificacion email para creacion de usuario externo.
         /// </summary>
@@ -518,35 +492,6 @@ namespace Gosocket.Dian.Web.Controllers
             dic.Add("##CONTENT##", message.ToString());
 
             emailService.SendEmail(user.Email, "DIAN - Edición de Usuario Registrado", dic);
-
-            return true;
-        }
-
-        #endregion
-
-        #region SendMailRecoveryPassword
-
-        /// <summary>
-        /// Enviar notificacion email para creacion de usuario externo.
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        private bool SendMailRecoveryPassword(string email, string password)
-        {
-            var emailService = new Gosocket.Dian.Application.EmailService();
-            StringBuilder message = new StringBuilder();
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-
-            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
-            message.Append("</br> <span style='font-size:18px;'><b>Su contraseña para ingresar al sistema es: </b></span></br>");
-            message.AppendFormat("</br> Contraseña: {0}", password);
-
-            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
-
-            //Nombre del documento, estado, observaciones
-            dic.Add("##CONTENT##", message.ToString());
-
-            emailService.SendEmail(email, "DIAN - Edición de Usuario Registrado", dic);
 
             return true;
         }

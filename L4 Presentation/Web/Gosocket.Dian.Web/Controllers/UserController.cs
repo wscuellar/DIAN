@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
@@ -19,6 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -1296,6 +1298,71 @@ namespace Gosocket.Dian.Web.Controllers
             UserManager.AddClaim(user.Id, new System.Security.Claims.Claim(AuthType.ProfileUser.GetDescription(), user.Id));
             var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
             return Redirect(redirectUrl);
+        }
+
+        #endregion
+
+        #region RecoveryPassword
+
+        [HttpGet]
+        public JsonResult RecoveryPassword(string email)
+        {
+            // Encuentra al usuario con su correo electrónico
+            ApplicationUser user = userService.FindUserByEmail(string.Empty, email);
+            if (user == null)
+                return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+
+            // Actualiza el password del usuario
+            string password = CreateStringPassword(user);
+
+            var remove = UserManager.RemovePassword(user.Id);
+            var result = UserManager.AddPassword(user.Id, password);
+            if (result.Succeeded)
+            {
+                _ = SendMailRecoveryPassword(email, password);
+                return Json(new ResponseMessage(TextResources.EmailSentSuccessfully, TextResources.alertType), JsonRequestBehavior.AllowGet);
+            }
+            return Json(new ResponseMessage(TextResources.SendEmailFailed, TextResources.alertType), JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
+
+        #region SendMailRecoveryPassword
+
+        /// <summary>
+        /// Enviar notificacion email para creacion de usuario externo.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private bool SendMailRecoveryPassword(string email, string password)
+        {
+            var emailService = new Gosocket.Dian.Application.EmailService();
+            StringBuilder message = new StringBuilder();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
+            message.Append("</br> <span style='font-size:18px;'><b>Su contraseña para ingresar al sistema es: </b></span></br>");
+            message.AppendFormat("</br> Contraseña: {0}", password);
+
+            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+
+            //Nombre del documento, estado, observaciones
+            dic.Add("##CONTENT##", message.ToString());
+
+            emailService.SendEmail(email, "DIAN - Edición de Usuario Registrado", dic);
+
+            return true;
+        }
+
+        #endregion
+
+        #region CreateStringPassword
+
+        private string CreateStringPassword(ApplicationUser model)
+        {
+            string result = model.Name.Substring(1, 1).ToUpper();
+            result = $"{result}{model.Email.Split('@')[0]}{Guid.NewGuid().ToString("d").Substring(1, 4)}**";
+            return result;
         }
 
         #endregion
