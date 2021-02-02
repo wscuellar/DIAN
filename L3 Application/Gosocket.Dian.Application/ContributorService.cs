@@ -475,6 +475,7 @@ namespace Gosocket.Dian.Application
                     //Cambiar estado habilitado
                     radianc.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
                     radianc.Step = 4;
+                    radianc.Update = System.DateTime.Now;
                     Guid softId = new Guid(softwareId);
 
                     //Si es software propio lo habilita.
