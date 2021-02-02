@@ -1311,7 +1311,10 @@ namespace Gosocket.Dian.Web.Controllers
             // Encuentra al usuario con su correo electrónico
             ApplicationUser user = userService.FindUserByEmail(string.Empty, email);
             if (user == null)
+            {
+                Response.StatusCode = 400;
                 return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
 
             // Actualiza el password del usuario
             string password = CreateStringPassword(user);
@@ -1323,6 +1326,7 @@ namespace Gosocket.Dian.Web.Controllers
                 _ = SendMailRecoveryPassword(email, password);
                 return Json(new ResponseMessage(TextResources.EmailSentSuccessfully, TextResources.alertType), JsonRequestBehavior.AllowGet);
             }
+            Response.StatusCode = 400;
             return Json(new ResponseMessage(TextResources.SendEmailFailed, TextResources.alertType), JsonRequestBehavior.AllowGet);
         }
 
