@@ -2070,95 +2070,95 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ResponseCodeListID = listID
                     };
                     TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
-                    if (listID != "3")
-                    {                       
-                        TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+                    //if (listID != "3")
+                    //{                       
+                    //    TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
 
-                        //Obtiene informacion del CUDE
-                        var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-                        if (documentMeta == null)
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "Regla:89-(R): ",
-                                ErrorMessage = "CUDE no encontrado",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                            return responses;
-                        }
+                    //    //Obtiene informacion del CUDE
+                    //    var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+                    //    if (documentMeta == null)
+                    //    {
+                    //        responses.Add(new ValidateListResponse
+                    //        {
+                    //            IsValid = false,
+                    //            Mandatory = true,
+                    //            ErrorCode = "Regla:89-(R): ",
+                    //            ErrorMessage = "CUDE no encontrado",
+                    //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //        });
+                    //        return responses;
+                    //    }
 
-                        //Obtiene informacion del CUFE
-                        var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyDocument.cufe, attorneyDocument.cufe);
-                        if (documentMetaCUFE == null)
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "Regla:89-(R): ",
-                                ErrorMessage = "CUFE no encontrado",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                            return responses;
-                        }
-                        var partitionKey = $"co|{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}|{documentMeta.DocumentKey.Substring(0, 2)}";
-                        var globalDataDocument = Task.Run(() => CosmosDBService.Instance(documentMeta.EmissionDate).ReadDocumentAsync(documentMeta.DocumentKey, partitionKey, documentMeta.EmissionDate)).Result;
-                        if (globalDataDocument == null)
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "Regla:89-(R): ",
-                                ErrorMessage = "archivo no encontrado en Cosmos",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                            return responses;
-                        }
+                    //    //Obtiene informacion del CUFE
+                    //    var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyDocument.cufe, attorneyDocument.cufe);
+                    //    if (documentMetaCUFE == null)
+                    //    {
+                    //        responses.Add(new ValidateListResponse
+                    //        {
+                    //            IsValid = false,
+                    //            Mandatory = true,
+                    //            ErrorCode = "Regla:89-(R): ",
+                    //            ErrorMessage = "CUFE no encontrado",
+                    //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //        });
+                    //        return responses;
+                    //    }
+                    //    var partitionKey = $"co|{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}|{documentMeta.DocumentKey.Substring(0, 2)}";
+                    //    var globalDataDocument = Task.Run(() => CosmosDBService.Instance(documentMeta.EmissionDate).ReadDocumentAsync(documentMeta.DocumentKey, partitionKey, documentMeta.EmissionDate)).Result;
+                    //    if (globalDataDocument == null)
+                    //    {
+                    //        responses.Add(new ValidateListResponse
+                    //        {
+                    //            IsValid = false,
+                    //            Mandatory = true,
+                    //            ErrorCode = "Regla:89-(R): ",
+                    //            ErrorMessage = "archivo no encontrado en Cosmos",
+                    //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    //        });
+                    //        return responses;
+                    //    }
 
-                        if (!globalDataDocument.References.Any(t => t.DocumentKey == attorneyDocument.cufe))
-                        {
-                            if (globalDataDocument.References.Count == 0)
-                            {
-                                globalDataDocument.References = new List<Reference>()
-                                {
-                                    new Reference
-                                    {
-                                        DocumentTypeId = documentMetaCUFE.DocumentTypeId,
-                                        DocumenTypeName = documentMetaCUFE.DocumentTypeName,
-                                        Date = documentMetaCUFE.EmissionDate,
-                                        DateNumber = int.Parse(documentMetaCUFE.EmissionDate.ToString("yyyyMMdd")),
-                                        DocumentKey = documentMetaCUFE.DocumentKey,
-                                        SenderCode = documentMetaCUFE.SenderCode,
-                                        SenderName = documentMetaCUFE.SenderName,
-                                        ReceiverCode = documentMetaCUFE.ReceiverCode,
-                                        ReceiverName = documentMetaCUFE.ReceiverName,
-                                        Description = ""
-                                    }
-                                };
-                            }
-                            else
-                            {
-                                globalDataDocument.References.Add(new Reference
-                                {
-                                    DocumentTypeId = documentMetaCUFE.DocumentTypeId,
-                                    DocumenTypeName = documentMetaCUFE.DocumentTypeName,
-                                    Date = documentMetaCUFE.EmissionDate,
-                                    DateNumber = int.Parse(documentMetaCUFE.EmissionDate.ToString("yyyyMMdd")),
-                                    DocumentKey = documentMetaCUFE.DocumentKey,
-                                    SenderCode = documentMetaCUFE.SenderCode,
-                                    SenderName = documentMetaCUFE.SenderName,
-                                    ReceiverCode = documentMetaCUFE.ReceiverCode,
-                                    ReceiverName = documentMetaCUFE.ReceiverName,
-                                    Description = ""
-                                });
-                            }
-                            // upsert document in cosmos
-                            var resultCosmos = CosmosDBService.Instance(documentMeta.EmissionDate).UpdateDocument(globalDataDocument);
-                        }
-                    }
+                    //    if (!globalDataDocument.References.Any(t => t.DocumentKey == attorneyDocument.cufe))
+                    //    {
+                    //        if (globalDataDocument.References.Count == 0)
+                    //        {
+                    //            globalDataDocument.References = new List<Reference>()
+                    //            {
+                    //                new Reference
+                    //                {
+                    //                    DocumentTypeId = documentMetaCUFE.DocumentTypeId,
+                    //                    DocumenTypeName = documentMetaCUFE.DocumentTypeName,
+                    //                    Date = documentMetaCUFE.EmissionDate,
+                    //                    DateNumber = int.Parse(documentMetaCUFE.EmissionDate.ToString("yyyyMMdd")),
+                    //                    DocumentKey = documentMetaCUFE.DocumentKey,
+                    //                    SenderCode = documentMetaCUFE.SenderCode,
+                    //                    SenderName = documentMetaCUFE.SenderName,
+                    //                    ReceiverCode = documentMetaCUFE.ReceiverCode,
+                    //                    ReceiverName = documentMetaCUFE.ReceiverName,
+                    //                    Description = ""
+                    //                }
+                    //            };
+                    //        }
+                    //        else
+                    //        {
+                    //            globalDataDocument.References.Add(new Reference
+                    //            {
+                    //                DocumentTypeId = documentMetaCUFE.DocumentTypeId,
+                    //                DocumenTypeName = documentMetaCUFE.DocumentTypeName,
+                    //                Date = documentMetaCUFE.EmissionDate,
+                    //                DateNumber = int.Parse(documentMetaCUFE.EmissionDate.ToString("yyyyMMdd")),
+                    //                DocumentKey = documentMetaCUFE.DocumentKey,
+                    //                SenderCode = documentMetaCUFE.SenderCode,
+                    //                SenderName = documentMetaCUFE.SenderName,
+                    //                ReceiverCode = documentMetaCUFE.ReceiverCode,
+                    //                ReceiverName = documentMetaCUFE.ReceiverName,
+                    //                Description = ""
+                    //            });
+                    //        }
+                    //        // upsert document in cosmos
+                    //        var resultCosmos = CosmosDBService.Instance(documentMeta.EmissionDate).UpdateDocument(globalDataDocument);
+                    //    }
+                    //}
                 }
                 responses.Add(new ValidateListResponse
                 {
