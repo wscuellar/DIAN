@@ -15,11 +15,13 @@
                         email: $('#EmailRemember').val()
                     }
                     var actionError = (error) => {
-                        console.log(error);
+                        hideLoading("#panel-form");
+                        var buttons = AlertExec();
+                        showConfirmation(error.responseJSON.Message, buttons, "", () => { });
                     }
                     var actionSuccess = (success) => {
                         hideLoading("#panel-form");
-                        var className = success.Code == 400 ? "" : "cancel-confirmation";
+                        var className = success.Code == 200 ? "cancel-confirmation" : "";
                         var operationCancel = () => {
                             success.Code == 200 && window.location.reload();
                         }
