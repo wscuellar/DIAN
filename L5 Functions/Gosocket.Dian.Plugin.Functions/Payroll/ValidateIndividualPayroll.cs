@@ -13,35 +13,35 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Gosocket.Dian.Plugin.Functions.Predecesor
+namespace Gosocket.Dian.Plugin.Functions.Payroll
 {
-    public class ValidatorPredecesor
+    public static class ValidateIndividualPayroll
     {
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
 
-        [FunctionName("ValidatePredecesor")]
+        [FunctionName("ValidateIndividualPayroll")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");
 
             // Get request body
-            var data = await req.Content.ReadAsAsync<RequestObjectPredecesor>();
+            var data = await req.Content.ReadAsAsync<RequestObjectIndividualPayroll>();
 
             if (data == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Request body is empty");
 
-            if (string.IsNullOrEmpty(data.TrackId))
+            if (string.IsNullOrEmpty(data.trackId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
 
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidatePredecesor(data.TrackId);
+                var validateResponses = await ValidatorEngine.Instance.StartValidateIndividualPayroll(data.trackId);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"VALIDATEPREDECESORPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"VALIDATEINDIVIDUALPAYROLLPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", data.trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -50,8 +50,8 @@ namespace Gosocket.Dian.Plugin.Functions.Predecesor
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "VALIDATEPREDECESORPLGNS",
-                        ErrorMessage = $"No se pudo validar referencia Predecesor."
+                        ErrorCode = "VALIDATEINDIVIDUALPAYROLLPLGNS",
+                        ErrorMessage = $"No se pudo validar Nómina Individual."
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);
@@ -59,9 +59,9 @@ namespace Gosocket.Dian.Plugin.Functions.Predecesor
         }
     }
 
-    public class RequestObjectPredecesor
+    public class RequestObjectIndividualPayroll
     {
         [JsonProperty(PropertyName = "trackId")]
-        public string TrackId { get; set; }
+        public string trackId { get; set; }
     }
 }

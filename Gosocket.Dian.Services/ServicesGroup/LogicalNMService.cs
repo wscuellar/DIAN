@@ -898,19 +898,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var SerieAndNumber = documentParsed.SerieAndNumber;
             // ZONE 3
 
-            if (documentParsed.DocumentTypeId == "11")
-            {
-                var result = this.CheckIndividualPayrollDuplicity(trackId, documentParsed.EmpleadorNIT,
-                    xmlParser.globalDocPayrolls.NumeroDocumento, xmlParser.Novelty);
-                if (result != null) return result;
-            }
-
-            if (documentParsed.DocumentTypeId == "12")
-            {
-                var result = this.CkeckIndividualPayrollExists(trackIdPred);
-                if (result != null) return result;
-            }
-       
             //Valida CUNE
             var validatorCuneRequest = validatorCune(trackId, dianResponse);
             if (!validatorCuneRequest.IsValid)
@@ -1438,7 +1425,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 StatusCode = "99",
                 StatusMessage = ".",
                 StatusDescription = ".",
-                ErrorMessage = new List<string>() { "Regla: NIAE902: - El documento referenciado no se encuentra en la base de datos de la DIAN." }
+                ErrorMessage = new List<string>() { "Regla: NIAE191a: - Documento a Reemplazar no se encuentra recibido en la Base de Datos." }
             };
         }
     }
