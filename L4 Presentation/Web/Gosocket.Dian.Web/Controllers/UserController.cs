@@ -1306,11 +1306,20 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpGet]
         [ExcludeFilter(typeof(Authorization))]
-        public JsonResult RecoveryPassword(string email)
+        public JsonResult RecoveryPassword(int documentType, string code, string email)
         {
-            // Encuentra al usuario con su correo electrónico
             ApplicationUser user = userService.FindUserByEmail(string.Empty, email);
-            if (user == null)
+            UsersFreeBillerProfile userExisting = user != null ? userService.GetUserFreeBillerProfile(t => t.UserId == user.Id) : null;
+            
+            // Encuentra al usuario con su correo electrónico
+            if (userExisting == null)
+            {
+                Response.StatusCode = 400;
+                return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            ApplicationUser userCode = userService.GetByCode(code);
+            if(userCode.Id != userExisting.UserId ||  userCode.IdentificationTypeId != documentType)
             {
                 Response.StatusCode = 400;
                 return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
@@ -1319,7 +1328,7 @@ namespace Gosocket.Dian.Web.Controllers
             // Actualiza el password del usuario
             string password = CreateStringPassword(user);
 
-            var remove = UserManager.RemovePassword(user.Id);
+            _ = UserManager.RemovePassword(user.Id);
             var result = UserManager.AddPassword(user.Id, password);
             if (result.Succeeded)
             {
