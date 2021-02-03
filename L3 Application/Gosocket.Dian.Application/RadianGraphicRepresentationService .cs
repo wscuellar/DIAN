@@ -102,8 +102,8 @@
             Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
             xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
-            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
-            //ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
+            //ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
             model = MappingXpathValues(model, fieldValues);
 
             // Set Titles
@@ -122,6 +122,12 @@
                     break;
                 case EventStatus.Accepted:
                     model.EventTitle = "Aceptación Expresa de FEV";
+                    break;
+                case EventStatus.SolicitudDisponibilizacion:
+                    if (eventItem.CustomizationID.Equals("361") || eventItem.CustomizationID.Equals("362"))
+                        model.EventTitle = "Registro Primera circulación de la FEV TV";
+                    else
+                        model.EventTitle = "Registro Circulación posterior  de la FEV TV";
                     break;
                 case EventStatus.EndosoGarantia:
                     model.Title = model.EventStatus.GetDescription();
@@ -271,7 +277,7 @@
             #region Mapping Event Data Section
             // Mapping Event Data Section
             template = template.Replace("{EventName}", model.Title);
-            template = template.Replace("{EventNumber}", $"{model.Prefix} - {model.Number}");
+            template = template.Replace("{EventNumber}", $"{model.Number}");
             template = template.Replace("{EventType}", model.EventTitle);
             template = template.Replace("{OperationType}", model.RequestType);
             template = template.Replace("{OperationDetails}", model.OperationDetails);
@@ -297,7 +303,7 @@
             template = template.Replace("{CUFE}", model.References[0].CUFE);
             template = template.Replace("{IssueDate}", $"{model.References[0].DateOfIssue:dd'/'MM'/'yyyy}");
             template = template.Replace("{ExpirationDate}", string.Empty);
-            template = template.Replace("{OperationType}", string.Empty);
+            template = template.Replace("{InvoiceOperationType}", string.Empty);
 
             // Mapping reference event data section
 
