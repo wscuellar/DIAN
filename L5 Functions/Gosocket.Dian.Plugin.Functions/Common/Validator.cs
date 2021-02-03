@@ -360,19 +360,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateIndividualPayroll(XmlParseNomina xmlParser, DocumentParsedNomina model)
         {
             DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> listResponses = new List<ValidateListResponse>();
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            ValidateListResponse response = this.CheckIndividualPayrollDuplicity(model.CUNE);
-            if (!response.IsValid)
+
+            responses = this.CheckIndividualPayrollDuplicity(model.CUNE);
+            
+            if(Convert.ToInt32(model.DocumentTypeId) == Convert.ToInt32(DocumentType.IndividualPayroll))
             {
-                response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                responses.Add(response);
+                responses = this.CheckIndividualPayrollInSameMonth(model.EmpleadorNIT, xmlParser.globalDocPayrolls.NumeroDocumento, xmlParser.Novelty);              
             }
 
-            response = this.CheckIndividualPayrollInSameMonth(model.EmpleadorNIT, xmlParser.globalDocPayrolls.NumeroDocumento, xmlParser.Novelty);
-            response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-            responses.Add(response);
-
-            return responses;
+            listResponses.AddRange(responses);
+            return listResponses;
         }
 
         #endregion
@@ -2723,7 +2722,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
                 if (documentMeta.SerieAndNumber != idDocumentReference)
                 {
-                    string message = Convert.ToInt32(eventCode) == (int)EventStatus.Mandato
+                    string message = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato
+                        || Convert.ToInt32(eventCode) == (int)EventStatus.TerminacionMandato)
                         ? ConfigurationManager.GetValue("ErrorMessage_AAH06_043")
                         : ConfigurationManager.GetValue("ErrorMessage_AAH06");
 
@@ -4675,6 +4675,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(individualPayroll.Identifier, individualPayroll.Identifier);
             if (document != null)
             {
+                //Actualiza Nomina individual con registro de nomina individual de ajustes
+                var arrayTasks = new List<Task>();
+                individualPayroll.DocumentReferencedKey = trackId;
+                arrayTasks.Add(documentMetaTableManager.InsertOrUpdateAsync(individualPayroll));
+
                 item.IsValid = true;
                 item.ErrorCode = "100";
                 item.ErrorMessage = "Evento referenciado correctamente";
@@ -4685,62 +4690,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return responses;
         }
 
-        //public List<ValidateListResponse> ValidateReplacePredecesor(RequestObjectPredecesor predecesor, XmlParseNomina parseNomina)
-        //{
-        //    var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(predecesor.TrackId).FirstOrDefault();
-        //    var document = documentValidatorTableManager.FindByPartition<GlobalDocValidatorDocument>(predecesor.TrackId).FirstOrDefault();
-
-        //    List<ValidateListResponse> responses = new List<ValidateListResponse>();
-        //    DateTime startDate = DateTime.UtcNow;
-
-
-        //    if (documentMeta.SerieAndNumber != parseNomina.globalDocPayrolls.CUNEPred &&
-        //        documentMeta.Identifier != parseNomina.globalDocPayrolls.NumeroPred)
-        //    {
-        //        responses.Add(new ValidateListResponse
-        //        {
-        //            IsValid = true,
-        //            Mandatory = true,
-        //            ErrorCode = "100",
-        //            ErrorMessage = "Evento referenciado correctamente",
-        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-        //        });
-        //    }
-        //    else if (documentMeta.EmissionDate != parseNomina.globalDocPayrolls.FechaGenPred)
-        //    {
-
-        //        responses.Add(new ValidateListResponse
-        //        {
-        //            IsValid = true,
-        //            Mandatory = true,
-        //            ErrorCode = "100",
-        //            ErrorMessage = "Evento referenciado correctamente",
-        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-        //        });
-        //    }
-        //    else
-        //    {
-        //        responses.Add(new ValidateListResponse
-        //        {
-        //            IsValid = true,
-        //            Mandatory = true,
-        //            ErrorCode = "100",
-        //            ErrorMessage = "Evento referenciado correctamente",
-        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-        //        });
-        //    }
-
-        //    return responses;
-
-        //}
-
         #endregion
 
         #region Individual Payroll
 
-        private ValidateListResponse CheckIndividualPayrollDuplicity(string cune)
+        private List<ValidateListResponse> CheckIndividualPayrollDuplicity(string cune)
         {
-            var response = new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "100", ErrorMessage = "Evento referenciado correctamente" };
+            DateTime startDate = DateTime.UtcNow;
+            
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
 
             // Solo se podrá transmitir una única vez el número del documento para el trabajador.
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
@@ -4753,11 +4719,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var documentApproved = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(document.DocumentKey, document.DocumentKey);
                     if (documentApproved != null)
                     {
-                        response.IsValid = false;
-                        response.ErrorCode = "90";
-                        response.ErrorMessage = "Documento procesado anteriormente";
-
-                        return response;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "90",
+                            ErrorMessage = "Documento procesado anteriormente",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });                     
                     }
                 }
                 else
@@ -4768,30 +4737,46 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
                         if (document != null)
                         {
-                            response.IsValid = false;
-                            response.ErrorCode = "90";
-                            response.ErrorMessage = "Documento procesado anteriormente";
-
-                            return response;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "90",
+                                ErrorMessage = "Documento procesado anteriormente",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
                         }
                     }
                 }
             }
 
-            return response;
+            return responses;
         }
 
-        private ValidateListResponse CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty)
+        private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty)
         {
+            DateTime startDate = DateTime.UtcNow;
+
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+
+
             var response = new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "100", ErrorMessage = "Evento referenciado correctamente" };
 
             // Solo se podrá transmitir para cada trabajador 1 documento NominaIndividual mensual durante cada mes del año. Para el mismo Empleador.
             var documentsList = documentMetaTableManager.FindDocumentSenderCodeReceiverCode<GlobalDocValidatorDocumentMeta>(companyId, employeeId);
-            if (documentsList == null || documentsList.Count <= 0) return response; // no exiten documentos
+            if (documentsList == null || documentsList.Count <= 0) return responses; // no exiten documentos
 
             var currentDate = DateTime.Now.Date;
             var documents = documentsList.Where(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month).ToList();
-            if (documents == null || documents.Count <= 0) return response; // no existe para el mes actual
+            if (documents == null || documents.Count <= 0) return responses; // no existe para el mes actual
 
             foreach (var doc in documents)
             {
@@ -4800,18 +4785,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     if (!novelty)
                     {
-                        response.IsValid = false;
-                        response.ErrorCode = "91";
-                        response.ErrorMessage = "Documento para este Trabajador ya ha sido enviado anteriormente para este mes.";
-
-                        return response;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "91",
+                            ErrorMessage = "Documento para este Trabajador ya ha sido enviado anteriormente para este mes.",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        return responses;
                     }
                     else
-                        return response;
+                        return responses;
                 }
             }
 
-            return response;
+            return responses;
         }
 
         #endregion

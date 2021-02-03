@@ -71,8 +71,10 @@
     "CosmosDbAccountEndpointUrl": "AccountEndpoint=https://gtpa-cosmosdb-document-test.documents.azure.com:443/;AccountKey=Kz5FGFLwRVrWYuwDJtYOoQsuSRF3qgPvIz7hPa5Bp2XgSBwhpt42UuKGtT12GMbvaHVl4UtK7ud344Mco1pomQ==;",
     "CosmosDbAuthorizationKey": "Kz5FGFLwRVrWYuwDJtYOoQsuSRF3qgPvIz7hPa5Bp2XgSBwhpt42UuKGtT12GMbvaHVl4UtK7ud344Mco1pomQ==",
     "CosmosDbDataBaseId": "DocumentsData",
-    "CosmosDbCollectionID": "Documents"
-
+    "CosmosDbCollectionID": "Documents",
+    "ErrorCode_AAH06": "AAH06",
+    "ErrorMessage_AAH06": "El nÚmero de documento electrónico referenciado no coinciden con reportado.",
+    "ErrorMessage_AAH06_043": "El número de documento electrónico referenciado no coinciden con un mandato reportado."
 
     // Test UAT INDRA
     //"Environment": "Test",
