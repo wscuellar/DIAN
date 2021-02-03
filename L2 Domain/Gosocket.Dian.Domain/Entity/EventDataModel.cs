@@ -46,6 +46,7 @@
         public string ReceiverDocumentType { get; set; }
         public string EventTotalAmount { get; set; }
         public string EventStartDate { get; set; }
+        public string EndosoTotalAmount { get; set; }
         public string EventFinishDate { get; set; }
         public bool ShowTitleValueSection { get; set; }
         public string EntityName { get; set; }
