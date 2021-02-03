@@ -7,6 +7,9 @@
 @{
     ViewBag.Title = "Acceder";
     Layout = "~/Views/Shared/_LayoutNewLogin.cshtml";
+    RecoverPasswordModel recoverPasswordModel = new RecoverPasswordModel();
+    recoverPasswordModel.IdentificationTypesRecover = Model.IdentificationTypes;
+
 }
 <style>
 
@@ -116,7 +119,7 @@
     <script>
 
         $(document).ready(function () {
-            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordForm").ToString().Trim('"'))));
+            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordForm", recoverPasswordModel).ToString().Trim('"'))));
 
             $(".pxLogin").hide();
 
