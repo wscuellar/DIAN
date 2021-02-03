@@ -6,7 +6,7 @@
             size: 'medium'
         })
         box.bind('shown.bs.modal', function () {
-            $("#submitRememberPassword").click(function (e) {debugger
+            $("#submitRememberPassword").click(function (e) {
                 showLoading('#panel-form', 'Cargando', 'Enviando datos, por favor espere.');
                 var form = $("#forgot-pasword-form");
                 if ($(form).valid()) {

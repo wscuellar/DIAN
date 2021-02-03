@@ -28,6 +28,10 @@
     #table-history tr th:nth-child(2) {
         background-position: 65px;
     }
+
+    #forgot-pasword-form row {
+        width: 100%;
+    }
 }
 
     /*Extra large devices (large desktops, 1200px and up)*/

@@ -1962,3 +1962,8 @@ ul#list li a:hover {
 #forgot-pasword-form .form-group {
     margin-bottom: 35px;
 }
+
+#forgot-pasword-form .row {
+    width: 60%;
+    margin: auto;
+}

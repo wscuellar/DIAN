@@ -1319,7 +1319,8 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             ApplicationUser userCode = userService.GetByCode(code);
-            if(userCode.Id != userExisting.UserId ||  userCode.IdentificationTypeId != documentType)
+
+            if (userCode == null || userCode.Id != userExisting.UserId || userCode.IdentificationTypeId != documentType)
             {
                 Response.StatusCode = 400;
                 return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
