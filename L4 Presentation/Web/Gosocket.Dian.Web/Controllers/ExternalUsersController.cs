@@ -208,7 +208,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public void LoadViewBags()
         {
-            ViewBag.IdentificationTypesList = identificationTypeService.List().Where(t=>t.Id != 10910366)
+            ViewBag.IdentificationTypesList = identificationTypeService.List().Where(t=>t.Id != 10910366 && t.Id != 10910036)
                         .Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList();
 
             //var roles = new SelectList(_context.Roles.Where(u => u.Name.Contains("UsuarioExterno"))

@@ -357,21 +357,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region Payroll
 
-        public ValidateListResponse ValidateIndividualPayroll(XmlParseNomina xmlParser, DocumentParsedNomina model)
+        public List<ValidateListResponse> ValidateIndividualPayroll(XmlParseNomina xmlParser, DocumentParsedNomina model)
         {
             DateTime startDate = DateTime.UtcNow;
-
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
             ValidateListResponse response = this.CheckIndividualPayrollDuplicity(model.CUNE);
             if (!response.IsValid)
             {
                 response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                return response;
+                responses.Add(response);
             }
 
             response = this.CheckIndividualPayrollInSameMonth(model.EmpleadorNIT, xmlParser.globalDocPayrolls.NumeroDocumento, xmlParser.Novelty);
             response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+            responses.Add(response);
 
-            return response;
+            return responses;
         }
 
         #endregion
@@ -4256,44 +4257,82 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                "como título valor antes de la fecha de generación del documento referenciado.",
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
+
+                        // El evento debe incluir la fecha de Vencimiento de la Factura electrónica de Venta 
+                        // (Debe validar el campo EndDate contra el campo  PaymentDueDate de la factura referenciada.)
+                        DateTime endDatePaymentDueDateNotifica = Convert.ToDateTime(data.EndDate).Date;
+                        DateTime paymentDueDateFacturaNotifica = Convert.ToDateTime(paymentDueDateFE).Date;
+
+                        if (endDatePaymentDueDateNotifica == paymentDueDateFacturaNotifica)
+                        {                           
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = "Ok",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });                                                     
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH59") + "-(R): ",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
                     break;
                 case (int)EventStatus.EndosoGarantia:
                 case (int)EventStatus.EndosoProcuracion:
                 case (int)EventStatus.EndosoPropiedad:
-                    //DateTime signingTimeEndoso = Convert.ToDateTime(data.SigningTime);
-                    //DateTime paymentDueDate = Convert.ToDateTime(dataModel.PaymentDueDate);
-                    //if (signingTimeEndoso.Date > paymentDueDate.Date)
-                    //{
-                    //    responses.Add(new ValidateListResponse
-                    //    {
-                    //        IsValid = false,
-                    //        Mandatory = true,
-                    //        ErrorCode = "Regla: 89-(R): ",
-                    //        ErrorMessage = "Fecha de endoso es superior a la fecha de vencimiento de la factura electrónica",
-                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    //    });
-                    //}
-                    //else
-                    //{
-                    //    responses.Add(new ValidateListResponse
-                    //    {
-                    //        IsValid = true,
-                    //        Mandatory = true,
-                    //        ErrorCode = "100",
-                    //        ErrorMessage = "Ok",
-                    //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    //    });
-                    //}
-
-                    responses.Add(new ValidateListResponse
+                    DateTime signingTimeEndoso = Convert.ToDateTime(data.SigningTime);
+                    DateTime signingTimeFEV = Convert.ToDateTime(dataModel.SigningTime);
+                    string errorCode = string.Empty;
+                    string errorMessage = string.Empty;
+                    if ((int)EventStatus.EndosoPropiedad == Convert.ToInt32(data.EventCode))
                     {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = "Ok",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                        errorCode = "DC24j";
+                        errorMessage = "No se puede generar el evento endoso en propiedad antes de la fecha de generación del documento referenciado.";
+                    }
+                    else if ((int)EventStatus.EndosoGarantia == Convert.ToInt32(data.EventCode))
+                    {
+                        errorCode = "DC24l";
+                        errorMessage = "No se puede generar el evento endoso en garantía antes de la fecha de generación del documento referenciado.";
+                    }
+                    else
+                    {
+                        errorCode = "DC24o";
+                        errorMessage = "No se puede generar el evento endoso en procuración antes de la fecha de generación del documento referenciado.";
+                    }
 
+
+                    if (signingTimeEndoso.Date < signingTimeFEV.Date)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCode,
+                            ErrorMessage = errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = "Ok",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                     break;
                 case (int)EventStatus.TerminacionMandato:
                     DateTime signingTime = Convert.ToDateTime(data.SigningTime);
@@ -4707,14 +4746,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
             if (documentMeta != null)
             {
-                var documentApproved = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
-                if (documentApproved != null)
+                var identifier = StringUtil.GenerateIdentifierSHA256($"{documentMeta.SenderCode}{documentMeta.DocumentTypeId}{documentMeta.SerieAndNumber}");
+                var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
+                if(document != null)
                 {
-                    response.IsValid = false;
-                    response.ErrorCode = "90";
-                    response.ErrorMessage = "Documento procesado anteriormente";
-                    
-                    return response;
+                    var documentApproved = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(document.DocumentKey, document.DocumentKey);
+                    if (documentApproved != null)
+                    {
+                        response.IsValid = false;
+                        response.ErrorCode = "90";
+                        response.ErrorMessage = "Documento procesado anteriormente";
+
+                        return response;
+                    }
+                }
+                else
+                {
+                    var meta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
+                    if (meta != null)
+                    {
+                        document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
+                        if (document != null)
+                        {
+                            response.IsValid = false;
+                            response.ErrorCode = "90";
+                            response.ErrorMessage = "Documento procesado anteriormente";
+
+                            return response;
+                        }
+                    }
                 }
             }
 

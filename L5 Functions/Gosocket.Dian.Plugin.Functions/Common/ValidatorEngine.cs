@@ -241,15 +241,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
             EventStatus code;
-            string originalTrackIdSolicitudDisponibilizacion = null;
+            string originalTrackId = data.TrackId;
             switch (int.Parse(data.EventCode))
             {
                 case (int)EventStatus.Receipt:
                     code = EventStatus.Received; 
                     break;              
                 case (int)EventStatus.SolicitudDisponibilizacion:
-                    code = EventStatus.Accepted;
-                    originalTrackIdSolicitudDisponibilizacion = data.TrackId;
+                    code = EventStatus.Accepted;                    
                     break;              
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                 case (int)EventStatus.NegotiatedInvoice:
@@ -307,9 +306,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Por el momento solo para el evento 036 se conserva el trackId original, con el fin de traer el PaymentDueDate del CUFE
             // y enviarlo al validator para una posterior validación contra la fecha de vencimiento del evento (036).
             string parameterPaymentDueDateFE = null;
-            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
+            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion 
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
             {
-                var originalXmlBytes = await GetXmlFromStorageAsync(originalTrackIdSolicitudDisponibilizacion);
+                var originalXmlBytes = await GetXmlFromStorageAsync(originalTrackId);
                 var originalXmlParser = new XmlParser(originalXmlBytes);
                 if (!originalXmlParser.Parser())
                     throw new Exception(originalXmlParser.ParserError);
@@ -648,7 +648,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             
             // Validator instance
             var validator = new Validator();
-            validateResponses.Add(validator.ValidateIndividualPayroll(xmlParser, documentParsed));
+            validateResponses.AddRange(validator.ValidateIndividualPayroll(xmlParser, documentParsed));
             return validateResponses;
         }
 
