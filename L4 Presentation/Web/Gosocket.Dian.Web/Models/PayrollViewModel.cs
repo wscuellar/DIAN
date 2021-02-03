@@ -10,29 +10,47 @@ namespace Gosocket.Dian.Web.Models
     {
         [Display(Name = "CUNE")]
         public string CUNE { get; set; }
-        [Display(Name = "Mes Validacion")]
+
+        [Display(Name = "Mes Validación")]
         public string MesValidacion { get; set; }
+
+        [Display(Name = "Ordenado por")]
+        public string Ordenar { get; set; }
+
         public List<MesModel> MesesValidacion { get; set; }
+
         [Display(Name = "Del")]
         public string RangoNumeracionMenor { get; set; }
+
         [Display(Name = "Al")]
         public string RangoNumeracionMayor { get; set; }
+
         [Display(Name = "Letra Primer Apellido")]
         public string LetraPrimerApellido { get; set; }
+
         public List<LetraModel> LetrasPrimerApellido { get; set; }
+
         [Display(Name = "Tipo Documento")]
         public string TipoDocumento { get; set; }
+
         public List<TipoDocumentoModel> TiposDocumento { get; set; }
-        [Display(Name = "Numero Documento")]
+
+        [Display(Name = "Número de documento")]
         public string NumeroDocumento { get; set; }
+
         public string Ciudad { get; set; }
+
         public List<CiudadModelList.CiudadModel> Ciudades { get; set; }
+
         [Display(Name = "Rango Salarial")]
         public string RangoSalarial { get; set; }
+
         public List<RangoSalarialModel> RangosSalarial { get; set; }
-        public string Ordenar { get; set; }
+                
         public List<OrdenarModel> Ordenadores { get; set; }
+
         public string Mensaje { get; set; }
+
         public List<DocumentViewPayroll> Payrolls { get; set; }
     }
     public class DocumentViewPayroll
@@ -64,7 +82,7 @@ namespace Gosocket.Dian.Web.Models
         {
             return new List<LetraModel>()
             {
-                new LetraModel() { Code = "00", Name = "Todas" },
+                new LetraModel() { Code = "00", Name = "Todos..." },
                 new LetraModel() { Code = "01", Name = "A" },
                 new LetraModel() { Code = "02", Name = "B" },
                 new LetraModel() { Code = "03", Name = "C" },
@@ -104,13 +122,13 @@ namespace Gosocket.Dian.Web.Models
         {
             return new List<TipoDocumentoModel>()
             {
-                new TipoDocumentoModel() { Code = "00", Name = "Todos" },
-                new TipoDocumentoModel() { Code = "01", Name = "CC - Cédula de Ciudadanía" },
-                new TipoDocumentoModel() { Code = "02", Name = "CE - Cédula de Extranjería" },
-                new TipoDocumentoModel() { Code = "03", Name = "No. Identificación Personal" },
-                new TipoDocumentoModel() { Code = "04", Name = "No. Identificación Tributaria" },
-                new TipoDocumentoModel() { Code = "05", Name = "TI - Tarjeta de identidad" },
-                new TipoDocumentoModel() { Code = "06", Name = "PS - Pasaporte" }
+                new TipoDocumentoModel() { Code = "00", Name = "Todos..." },
+                new TipoDocumentoModel() { Code = "01", Name = "Cédula de Ciudadanía" },
+                new TipoDocumentoModel() { Code = "02", Name = "Cédula de Extranjería" },
+                new TipoDocumentoModel() { Code = "03", Name = "No de identificación personal" },
+                new TipoDocumentoModel() { Code = "04", Name = "No de identificación tributaria" },
+                new TipoDocumentoModel() { Code = "05", Name = "Tarjeta de identidad" },
+                new TipoDocumentoModel() { Code = "06", Name = "Pasaporte" }
             };
         }
     }
@@ -124,14 +142,14 @@ namespace Gosocket.Dian.Web.Models
         {
             return new List<RangoSalarialModel>()
             {
-                new RangoSalarialModel() { Code = "00", Name = "Todos" },
-                new RangoSalarialModel() { Code = "01", Name = "0 - 1.000.000" },
-                new RangoSalarialModel() { Code = "02", Name = "1.000.001 - 2.000.000" },
-                new RangoSalarialModel() { Code = "03", Name = "2.000.001- 3.000.000" },
-                new RangoSalarialModel() { Code = "04", Name = "3.000.001- 5.000.000" },
-                new RangoSalarialModel() { Code = "05", Name = "5.000.001 - 10.000.000" },
-                new RangoSalarialModel() { Code = "06", Name = "10.000.001 - 20.000.000" },
-                new RangoSalarialModel() { Code = "07", Name = "20.000.001 o mas" }
+                new RangoSalarialModel() { Code = "00", Name = "Todos..." },
+                new RangoSalarialModel() { Code = "01", Name = "0-$1.000.000" },
+                new RangoSalarialModel() { Code = "02", Name = "$1.000.000-$2.000.000" },
+                new RangoSalarialModel() { Code = "03", Name = "$2.000.000-$3.000.000" },
+                new RangoSalarialModel() { Code = "04", Name = "$3.000.000-$5.000.000" },
+                new RangoSalarialModel() { Code = "05", Name = "$5.000.000-$10.000.000" },
+                new RangoSalarialModel() { Code = "06", Name = "$10.000.000-$20.000.000" },
+                new RangoSalarialModel() { Code = "07", Name = "$20.000.001 o Más" }
             };
         }
     }
@@ -145,7 +163,7 @@ namespace Gosocket.Dian.Web.Models
         {
             return new List<MesModel>()
             {
-                new MesModel() { Code = "00", Name = "Todos" },
+                new MesModel() { Code = "00", Name = "Mes Validación" },
                 new MesModel() { Code = "01", Name = "Enero" },
                 new MesModel() { Code = "02", Name = "Febrero" },
                 new MesModel() { Code = "03", Name = "Marzo" },
@@ -171,9 +189,9 @@ namespace Gosocket.Dian.Web.Models
         {
             return new List<OrdenarModel>()
             {
-                new OrdenarModel() { Code = "00", Name = "Sin Orden" },
-                new OrdenarModel() { Code = "01", Name = "Mayor Valor" },
-                new OrdenarModel() { Code = "02", Name = "Menor Valor" },
+                new OrdenarModel() { Code = "00", Name = "Todos..." },
+                new OrdenarModel() { Code = "01", Name = "Mayor valor" },
+                new OrdenarModel() { Code = "02", Name = "Menor valor" },
                 new OrdenarModel() { Code = "03", Name = "A-Z" },
                 new OrdenarModel() { Code = "04", Name = "Z-A" },
             };
@@ -192,7 +210,7 @@ namespace Gosocket.Dian.Web.Models
         public List<CiudadModel> List()
         {
             List<CiudadModel> result = new List<CiudadModel>();
-            result.Add(new CiudadModel() { Code = "00", Name = "Todas" });
+            result.Add(new CiudadModel() { Code = "00", Name = "Todos..." });
             var cities = municipalityTableManager.FindAll<MunicipalityByCode>();
             foreach(var city in cities)
                 result.Add(new CiudadModel() { Code = city.Code, Name = city.Name });

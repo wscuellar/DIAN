@@ -1,111 +1,135 @@
-﻿@using Gosocket.Dian.Domain.Common
-@using Gosocket.Dian.Web.Common;
-@model Gosocket.Dian.Web.Models.PayrollViewModel
+﻿@model Gosocket.Dian.Web.Models.PayrollViewModel
+
+<style>
+    .fa-download {
+        color: #348441;
+        font-size: 125%;
+    }
+
+    .radian-subtitle-line {
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="row radian-subtitle-container">
+    <p class="subtitle-view">
+        Resultados de búsqueda
+    </p>
+    <div class="radian-subtitle-line"></div>
+</div>
 
 <div class="table-responsive padding-bottom-15">
-    <table colspan="12" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
-        <thead>
-            <tr>
-                <th class="text-center" style="width: 50px;"></th>
-                <th class="text-center">No. Nomina</th>
-                <th class="text-center">Nombre</th>
-                <th class="text-center">Tipo Documento</th>
-                <th class="text-center">No. Documento</th>
-                <th class="text-center">Salario</th>
-                <th class="text-center">Devengado</th>
-                <th class="text-center">Deducido</th>
-                <th class="text-center">Valor Total</th>
-                <th class="text-center">Mes de validacion</th>
-                <th class="text-center">Novedad</th>
-                <th class="text-center">No Nomina Ajuste</th>
-                <th class="text-center">Resultado</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (!Model.Payrolls.Any())
-            {
-                <tr style="background-color: transparent !important;">
-                    <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
-                        <div class="alert panel-footer-grey">
-                            Ningun documento de Nomina disponible para mostrar.
-                        </div>
-                    </td>
+    <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 50px;"></th>
+                    <th class="text-center">No. Nómina</th>
+                    <th class="text-left">Nombre</th>
+                    <th class="text-center">Tipo Documento</th>
+                    <th class="text-left">No. Documento</th>
+                    <th class="text-left">Salario</th>
+                    <th class="text-left">Devengado</th>
+                    <th class="text-left">Deducido</th>
+                    <th class="text-left">Valor Total</th>
+                    <th class="text-left">Mes de validacion</th>
+                    <th class="text-left">Novedad</th>
+                    <th class="text-center">No. Nomina Ajuste</th>
+                    <th class="text-left">Resultado</th>
                 </tr>
-            }
-            @foreach (var p in Model.Payrolls)
-            {
-        <tr>
-            @*<td><span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@p.link" id="@p.link"></span></td>*@
-            <td><a href="@(p.link)"><span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos"></span></a></td>
-            <td>@p.NumeroNomina</td>
-            <td>@p.ApellidosNombre</td>
-            <td>@p.TipoDocumento</td>
-            <td>@p.NoDocumento</td>
-            <td>@p.Salario</td>
-            <td>@p.Devengado</td>
-            <td>@p.Deducido</td>
-            <td>@p.ValorTotal</td>
-            @switch (p.MesValidacion)
-            {
-                case "1":
-                    <td>Enero</td>
-                    break;
-                case "2":
-                    <td>Febrero</td>
-                    break;
-                case "3":
-                    <td>Marzo</td>
-                    break;
-                case "4":
-                    <td>Abril</td>
-                    break;
-                case "5":
-                    <td>Mayo</td>
-                    break;
-                case "6":
-                    <td>Junio</td>
-                    break;
-                case "7":
-                    <td>Julio</td>
-                    break;
-                case "8":
-                    <td>Agosto</td>
-                    break;
-                case "9":
-                    <td>Septiembre</td>
-                    break;
-                case "10":
-                    <td>Octubre</td>
-                    break;
-                case "11":
-                    <td>Noviembre</td>
-                    break;
-                case "12":
-                    <td>Diciembre</td>
-                    break;
-                default:
-                    <td></td>
-                    break;
-            }
-            @if (!p.Novedad == null && p.Novedad == true)
-            {
-                <td BGCOLOR="#00FF00"></td>
-            }
-            else
-            {
-                <td></td>
-            }
-            <td>@p.NumeroAjuste</td>
-            @if (p.Resultado == "Aprobado")
-            {
-                <td>Validada</td>
-            }
-            else
-            {
-                <td>@p.Resultado</td>
-            }
-        </tr>
-             }
+            </thead>
+            <tbody>
+                @if (!Model.Payrolls.Any())
+                {
+                    <tr style="background-color: transparent !important;">
+                        <td class="text-nowrap text-center" colspan="13" style="padding-left: 0 !important; padding-right: 0 !important;">
+                            <div class="alert panel-footer-grey">
+                                Ningun documento disponible para mostrar.
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @foreach (var p in Model.Payrolls)
+                {
+                    <tr>
+                        <td class="text-center"><a href="@(p.link)"><span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos"></span></a></td>
+                        <td class="text-nowrap text-center">@p.NumeroNomina</td>
+                        <td class="text-nowrap text-left">@p.ApellidosNombre</td>
+                        <td class="text-nowrap text-center">@p.TipoDocumento</td>
+                        <td class="text-nowrap text-left">@p.NoDocumento</td>
+                        <td class="text-nowrap text-left">@p.Salario</td>
+                        <td class="text-nowrap text-left">@p.Devengado</td>
+                        <td class="text-nowrap text-left">@p.Deducido</td>
+                        <td class="text-nowrap text-left">@p.ValorTotal</td>
+
+                        @{
+                            var monthName = string.Empty;
+
+                            switch (p.MesValidacion)
+                            {
+                                case "1":
+                                    monthName = "Enero";
+                                    break;
+                                case "2":
+                                    monthName = "Febrero";
+                                    break;
+                                case "3":
+                                    monthName = "Marzo";
+                                    break;
+                                case "4":
+                                    monthName = "Abril";
+                                    break;
+                                case "5":
+                                    monthName = "Mayo";
+                                    break;
+                                case "6":
+                                    monthName = "Junio";
+                                    break;
+                                case "7":
+                                    monthName = "Julio";
+                                    break;
+                                case "8":
+                                    monthName = "Agosto";
+                                    break;
+                                case "9":
+                                    monthName = "Septiembre";
+                                    break;
+                                case "10":
+                                    monthName = "Octubre";
+                                    break;
+                                case "11":
+                                    monthName = "Noviembre";
+                                    break;
+                                case "12":
+                                    monthName = "Diciembre";
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            <td class="text-nowrap text-left">@monthName</td>
+                        }
+
+                        @if (!p.Novedad == null && p.Novedad == true)
+                        {
+                            <td class="text-left" BGCOLOR="#00FF00"></td>
+                        }
+                        else
+                        {
+                            <td class="text-left"></td>
+                        }
+
+                        <td class="text-nowrap text-center">@p.NumeroAjuste</td>
+
+                        @if (p.Resultado == "Aprobado")
+                        {
+                            <td class="text-left">Validada</td>
+                        }
+                        else
+                        {
+                            <td class="text-left">@p.Resultado</td>
+                        }
+                    </tr>
+                }
             </tbody>
-    </table>
+        </table>
 </div>
