@@ -166,19 +166,15 @@ namespace Gosocket.Dian.Web.Models
     public class RecoverPasswordModel
     {
 
-        public RecoverPasswordModel()
-        {
-            IdentificationTypes = new List<IdentificationTypeListViewModel>();
-        }
 
         [Display(Name = "Tipo de identificación")]
-        public List<IdentificationTypeListViewModel> IdentificationTypes { get; set; }
+        public List<IdentificationTypeListViewModel> IdentificationTypesRecover { get; set; }
 
         [Display(Name = "Correo electrónico")]
         public string EmailRemember { get; set; }
 
         [Display(Name = "Tipo de identificación")]
-        public int CompanyIdentificationType { get; set; }
+        public int CompanyIdentificationTypeRecover { get; set; }
 
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         [Display(Name = "Documento Usuario Registrado")]

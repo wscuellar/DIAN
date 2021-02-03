@@ -3,7 +3,7 @@
         var box = bootbox.dialog({
             message: htmlPartial,
             className: "table-data modal-radian set-test-counts",
-            size: 'medium'
+            size: '300'
         })
         box.bind('shown.bs.modal', function () {
             $("#submitRememberPassword").click(function (e) {
@@ -13,7 +13,7 @@
                     e.preventDefault();
                     var data = {
                         email: $('#EmailRemember').val(),
-                        documentType: $('#CompanyIdentificationType').val(),
+                        documentType: $('#CompanyIdentificationTypeRecover option:selected').val(),
                         code: $('#DocumentNumber').val()
                     }
                     var actionError = (error) => {
