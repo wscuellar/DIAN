@@ -28,13 +28,8 @@ using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.Event;
 using System.Text.RegularExpressions;
-using Gosocket.Dian.Plugin.Functions.Predecesor;
 using System.Threading.Tasks;
-using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Services.Utils;
-using Gosocket.Dian.Plugin.Functions.Series;
-using Gosocket.Dian.Application.Cosmos;
-using Gosocket.Dian.Domain.Cosmos;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -1277,6 +1272,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validEndoso = false;
+            bool.TryParse(ConfigurationManager.GetValue("ValidateEndosoTrusted"), out bool ValidateEndosoTrusted);
 
             //Valida informacion Endoso en propiedad                       
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
@@ -1287,8 +1283,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(R): ",
+                        Mandatory = ValidateEndosoTrusted,
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1306,8 +1302,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(R): ",
+                        Mandatory = ValidateEndosoTrusted,
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1338,8 +1334,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19") + "-(R): ",
+                        Mandatory = ValidateEndosoTrusted,
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1351,9 +1347,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "Regla: AAG20-(R): ",
-                        ErrorMessage = "La sumatoria del elemento: cbc:CorporateStockAmount no coincide con el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value ",
+                        Mandatory = ValidateEndosoTrusted,
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAG20") + "-(N): ",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
@@ -1716,7 +1712,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35") + "-(R): ",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF35"),
+                            ErrorMessage = "No fue informado el literal “Mandante Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1730,7 +1726,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35") + "-(R): ",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF35"),
+                            ErrorMessage = "No fue informado el literal “Mandante Legitimo Tenedor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1744,7 +1740,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35") + "-(R): ",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF35"),
+                            ErrorMessage = "No fue informado el literal “Mandante Aval” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1758,7 +1754,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35") + "-(R): ",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF35"),
+                            ErrorMessage = "No fue informado el literal “Mandante Adquirente/Deudor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1777,7 +1773,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65") + "-(R): ",
+                            ErrorCode = "No fue informado el literal “Mandatario Sistema de Negociación Electrónica” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH65"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1792,7 +1788,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65") + "-(R): ",
+                            ErrorCode = "No fue informado el literal “Mandatario Factor” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH65"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1807,7 +1803,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65") + "-(R): ",
+                            ErrorCode = "No fue informado el literal “Mandatario Proveedor Tecnológico” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH65"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -4478,21 +4474,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {            
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentReference = TableManagerGlobalDocRegisterProviderAR.FindDocumentRegisterAR<GlobalDocRegisterProviderAR>(nitModel.ProviderCode, nitModel.DocumentTypeId, nitModel.SerieAndNumber);           
+            List<ValidateListResponse> listResponses = new List<ValidateListResponse>();
+            var documentReference = TableManagerGlobalDocRegisterProviderAR.FindDocumentRegisterAR<GlobalDocRegisterProviderAR>(nitModel.ProviderCode, nitModel.DocumentTypeId, nitModel.SerieAndNumber);
+           
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
 
-            if (documentReference.Count() == 0)
-            {
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = true,
-                    Mandatory = true,
-                    ErrorCode = "100",
-                    ErrorMessage = " El Identificador (" + nitModel.SerieAndNumber + ") ApplicationResponse no existe para este CUDE",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
-            else
-            {
+            if (documentReference.Count() > 0)
+            {                        
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
@@ -4502,9 +4497,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
-            
-        
-            return responses;
+
+            var responseCheckDocument = CheckDocument(nitModel.SenderCode,nitModel.DocumentTypeId, nitModel.SerieAndNumber);
+            if (responseCheckDocument != null)
+            {              
+                foreach (var item in responseCheckDocument)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = item.IsValid,
+                        Mandatory = item.Mandatory,
+                        ErrorCode = item.ErrorCode,
+                        ErrorMessage = item.ErrorMessage,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
+            listResponses.AddRange(responses);
+
+            return listResponses;
         }
         #endregion
 
@@ -4803,6 +4815,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return responses;
         }
 
+        #endregion
+
+
+        #region CheckDocument
+        private List<ValidateListResponse> CheckDocument(string senderCode, string documentType, string serieAndNumber)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            var identifier = StringUtil.GenerateIdentifierSHA256($"{senderCode}{documentType}{serieAndNumber}");
+            var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
+
+            if (document != null)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "Regla: 90, Rechazo: ",
+                    ErrorMessage = $"Documento con CUDE '{document.DocumentKey}' procesado anteriormente.",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            else
+                return null;
+
+
+            return responses;
+        }
         #endregion
     }
 }
