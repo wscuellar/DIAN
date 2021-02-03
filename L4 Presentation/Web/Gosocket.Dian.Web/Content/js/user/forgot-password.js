@@ -6,13 +6,15 @@
             size: 'medium'
         })
         box.bind('shown.bs.modal', function () {
-            $("#submitRememberPassword").click(function (e) {
+            $("#submitRememberPassword").click(function (e) {debugger
                 showLoading('#panel-form', 'Cargando', 'Enviando datos, por favor espere.');
                 var form = $("#forgot-pasword-form");
                 if ($(form).valid()) {
                     e.preventDefault();
                     var data = {
-                        email: $('#EmailRemember').val()
+                        email: $('#EmailRemember').val(),
+                        documentType: $('#CompanyIdentificationType').val(),
+                        code: $('#DocumentNumber').val()
                     }
                     var actionError = (error) => {
                         hideLoading("#panel-form");

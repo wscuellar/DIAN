@@ -85,9 +85,6 @@ namespace Gosocket.Dian.Web.Models
         [EmailAddress(ErrorMessage = "Correo electrónico inválido")]
         public string Email { get; set; }
 
-        [Display(Name = "Correo electrónico")]
-        public string EmailRemember { get; set; }
-
         [Required(ErrorMessage = "La contraseña es requerida")]
         [DataType(DataType.Password)]
         [Display(Name = "Contraseña")]
@@ -166,4 +163,26 @@ namespace Gosocket.Dian.Web.Models
         public List<ContributorViewModel> Contributors { get; set; }
     }
 
+    public class RecoverPasswordModel
+    {
+
+        public RecoverPasswordModel()
+        {
+            IdentificationTypes = new List<IdentificationTypeListViewModel>();
+        }
+
+        [Display(Name = "Tipo de identificación")]
+        public List<IdentificationTypeListViewModel> IdentificationTypes { get; set; }
+
+        [Display(Name = "Correo electrónico")]
+        public string EmailRemember { get; set; }
+
+        [Display(Name = "Tipo de identificación")]
+        public int CompanyIdentificationType { get; set; }
+
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        [Display(Name = "Documento Usuario Registrado")]
+        [MaxLength(30, ErrorMessage = "Máximo {0} caracteres")]
+        public string DocumentNumber { get; set; }
+    }
 }
