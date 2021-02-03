@@ -85,6 +85,9 @@ namespace Gosocket.Dian.Web.Models
         [EmailAddress(ErrorMessage = "Correo electrónico inválido")]
         public string Email { get; set; }
 
+        [Display(Name = "Correo electrónico")]
+        public string EmailRemember { get; set; }
+
         [Required(ErrorMessage = "La contraseña es requerida")]
         [DataType(DataType.Password)]
         [Display(Name = "Contraseña")]
@@ -162,4 +165,5 @@ namespace Gosocket.Dian.Web.Models
 
         public List<ContributorViewModel> Contributors { get; set; }
     }
+
 }

@@ -764,6 +764,7 @@
     <Content Include="Content\js\Radian\RadianPrintDocumentPdf.js" />
     <Content Include="Content\js\Radian\RadianSteps.js" />
     <Content Include="Content\js\Radian\RadianTestSet.js" />
+    <Content Include="Content\js\user\forgot-password.js" />
     <Content Include="Content\js\user\user.js" />
     <Content Include="Content\plugins\animate-css\animate.css" />
     <Content Include="Content\plugins\animate-css\animate.min.css" />
@@ -2957,6 +2958,7 @@
     <Content Include="Views\FreeBiller\_checksGrid.cshtml" />
     <Content Include="Views\ProfileFreeBiller\_checksGrid.cshtml" />
     <Content Include="Views\Document\_payrolls.cshtml" />
+    <Content Include="Views\User\_forgotPasswordForm.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

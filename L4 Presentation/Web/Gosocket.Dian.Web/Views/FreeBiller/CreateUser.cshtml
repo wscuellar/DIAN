@@ -164,7 +164,7 @@
     <script>
         $(document).ready(function () {
             var urlNewUser = "@Url.Action("FreeBillerUser")";
-            $("#btnSend").click(function (e) {debugger
+            $("#btnSend").click(function (e) {
                 var form = $("#create-user-form");
                 if ($(form).valid()) {
                     showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');

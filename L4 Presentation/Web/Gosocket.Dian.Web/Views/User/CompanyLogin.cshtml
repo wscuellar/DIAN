@@ -1,7 +1,9 @@
 ﻿@using Gosocket.Dian.Domain.Common
 @using Gosocket.Dian.Infrastructure
 @using Gosocket.Dian.Web.Models
+@using Newtonsoft.Json
 @model UserLoginViewModel
+
 @{
     ViewBag.Title = "Acceder";
     Layout = "~/Views/Shared/_LayoutNewLogin.cshtml";
@@ -24,10 +26,9 @@
         text-decoration: underline;
         color: #348441;
     }
-
 </style>
- 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
+
 <div class="row">
     <div class="col-lg-6 col-md-6 col-sm-8 col-xs-9 bhoechie-tab-container">
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
@@ -63,7 +64,7 @@
             </div>
         </div>
         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
-            
+
             <div class="container-fluid" id="panel-form-login">
                 <center><a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a></center>
                 <div class="row-fluid">
@@ -105,15 +106,20 @@
 
 @section Scripts
 {
+    @Scripts.Render("~/bundles/jqueryval")
     <script src="https://www.google.com/recaptcha/api.js?render=@ConfigurationManager.GetValue("Recaptcha")"></script>
+    <script src="~/Content/js/user/forgot-password.js"></script>
+    <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+
 
     <script>
 
         $(document).ready(function () {
+            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordForm").ToString().Trim('"'))));
 
             $(".pxLogin").hide();
 
-            
             $('.cCompany').click(function () {
                 $("#panel-form-login").show();
                 $(".pxLogin").hide();
@@ -144,6 +150,7 @@
                 $('#CompanyCode').val('');
                 $('#UserCode').val('');
             };
+            rememberPassword(htmlPartial, '@Url.Action("RecoveryPassword", "User")');
             grecaptcha.ready(function () {
                 grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
                     $(".RecaptchaToken").val(token);

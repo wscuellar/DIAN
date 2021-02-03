@@ -140,7 +140,6 @@ namespace Gosocket.Dian.Application
             }
 
             //Mapping last page
-
             // se aumenta el número de la pagina y se mapean los datos comunes de pagina
             if(events.Count % 2 == 0)
             {

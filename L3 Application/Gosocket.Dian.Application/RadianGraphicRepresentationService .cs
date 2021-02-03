@@ -102,8 +102,8 @@
             Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
             xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
-            //ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
-            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
+            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+            //ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
             model = MappingXpathValues(model, fieldValues);
 
             // Set Titles
@@ -127,29 +127,21 @@
                     model.Title = model.EventStatus.GetDescription();
                     model.EventTitle = "Endoso En garantía de la FEV TV";
                     model.RequestType = eventItem.EventCode;
-                    model.DiscountRate = eventItem.TaxAmountIva.ToString();
-                    model.TotalAmount = eventItem.TotalAmount.ToString();
                     break;
                 case EventStatus.EndosoPropiedad:
                     model.Title = model.EventStatus.GetDescription();
                     model.EventTitle = "Endoso En propiedad de la FEV TV";
                     model.RequestType = eventItem.EventCode;
-                    model.DiscountRate = eventItem.TaxAmountIva.ToString();
-                    model.TotalAmount = eventItem.TotalAmount.ToString();
                     break;
                 case EventStatus.EndosoProcuracion:
                     model.Title = model.EventStatus.GetDescription();
                     model.EventTitle = "Endoso En procuración de la FEV TV";
                     model.RequestType = eventItem.EventCode;
-                    model.DiscountRate = eventItem.TaxAmountIva.ToString();
-                    model.TotalAmount = eventItem.TotalAmount.ToString();
                     break;
                 case EventStatus.InvoiceOfferedForNegotiation:
                     model.Title = model.EventStatus.GetDescription();
                     model.EventTitle = "Cancelación del endoso electrónico de la FEV";
                     model.RequestType = eventItem.EventCode;
-                    model.DiscountRate = eventItem.TaxAmountIva.ToString();
-                    model.TotalAmount = eventItem.TotalAmount.ToString();
                     break;
                 case EventStatus.Avales:
                     model.EventTitle = "Aval de la FEV";
@@ -284,7 +276,7 @@
             template = template.Replace("{OperationType}", model.RequestType);
             template = template.Replace("{OperationDetails}", model.OperationDetails);
             template = template.Replace("{DiscountRate}", model.DiscountRate);
-            template = template.Replace("{TotalEventAmount}", model.EventTotalAmount);
+            template = template.Replace("{TotalEventAmount}", model.EndosoTotalAmount);
             template = template.Replace("{CUDE}", model.CUDE);
             template = template.Replace("{EmissionDate}", $"{model.EmissionDate:dd'/'MM'/'yyyy hh:mm:ss tt}");
             template = template.Replace("{RegistrationDate}", model.DateOfIssue);
@@ -448,25 +440,26 @@
             {
                 { "XmlBase64", xmlBase64},
                 { "FileName", fileName},
-                { "ReceiverEmail", "ApplicationResponse/cac:ReceiverParty/cac:Contact/cbc:ElectronicMail" },
-                { "SenderEmail", "ApplicationResponse/cac:SenderParty/cac:Contact/cbc:ElectronicMail" },
-                { "SenderPhoneNumber", "ApplicationResponse/cac:SenderParty/cac:Contact/cbc:Telephone" },
-                { "ReceiverPhoneNumber", "ApplicationResponse/cac:ReceiverParty/cac:Contact/cbc:Telephone" },
-                { "ReceiverDocumentType", "ApplicationResponse[1]/cac:DocumentResponse[1] / cac:IssuerParty[1] / cac:PartyLegalEntity[1] / cbc:CompanyID[1] / @schemeName" },
-                { "EventTotalAmount", "ApplicationResponse[1]/cac:DocumentResponse[1]/cac:IssuerParty[1]/cac:PartyLegalEntity[X]/cbc:CorporateStockAmount[1]" },
-                { "EventStartDate", "ApplicationResponse[1]/cac:DocumentResponse[1]/cac:DocumentReference[1]/cac:ValidityPeriod[1]/cbc:StartDate[1]" },
-                { "EventFinishDate","ApplicationResponse[1]/cac:DocumentResponse[1]/cac:DocumentReference[1]/cac:ValidityPeriod[1]/cbc:EndDate[1]" },
+                { "ReceiverEmail", "//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='Contact']/*[local-name()='ElectronicMail']" },
+                { "SenderEmail", "//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='Contact']/*[local-name()='ElectronicMail']" },
+                { "SenderPhoneNumber", "//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='Contact']/*[local-name()='Telephone']" },
+                { "ReceiverPhoneNumber", "//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='Contact']/*[local-name()='Telephone']" },
+                { "ReceiverDocumentType", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='IssuerParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']/@schemeName"},
+                { "EventTotalAmount", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']" },
+                { "EventStartDate", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='StartDate']" },
+                { "EventFinishDate","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='EndDate']" },
 
-                { "RequestType", "ApplicationResponse[1]/cac:DocumentResponse[1]/cac:Response[1]/cbc:ResponseCode[1]" },
-                { "OperationDetails", "ApplicationResponse[1]/cac:DocumentResponse[1]/cac:Response[1]/cbc:ResponseCode[1]/@listID" },
-                { "DiscountRate", "ApplicationResponse[1]/ext:UBLExtensions[1]/ext:UBLExtension[2]/ext:ExtensionContent[1]/CustomTagGeneral[1]/InformacionNegociacion[1]/Value[3]" },
-                { "EndosoTotalAmount", "ApplicationResponse[1]/ext:UBLExtensions[1]/ext:UBLExtension[2]/ext:ExtensionContent[1]/CustomTagGeneral[1]/InformacionNegociacion[1]/Value[1]" },
-                { "GenerationDate", "ApplicationResponse[1]/cbc:IssueDate[1]ApplicationResponse[1]/cbc:IssueTime[1]" },
-                { "SenderNit", "ApplicationResponse[1]/cac:SenderParty[1]/cac:PartyTaxScheme[1]/cbc:CompanyID[1]" },
-                { "EventDescription","ApplicationResponse[1]/cac:DocumentResponse[1]/cac:Response[1]/cbc:Description[1]" },
-                { "SenderBusinessName","ApplicationResponse[1]/cac:SenderParty[1]/cac:PartyTaxScheme[1]/cbc:RegistrationName[1]" },
-                { "SenderDocumentType","ApplicationResponse[1]/cac:SenderParty[1]/cac:PartyTaxScheme[1]/cbc:CompanyID[1]" },
-                //{ "","" },
+                { "RequestType", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
+                { "OperationDetails", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']/@listID" },
+                { "DiscountRate", "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value'][3]" },
+                { "EndosoTotalAmount", "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value'][1]" },
+                { "GenerationDate", "//*[local-name()='ApplicationResponse']/*[local-name()='IssueDate']" },
+                { "GenerationTime", "//*[local-name()='ApplicationResponse']/*[local-name()='IssueTime']" },
+                { "SenderNit", "//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme'][1]/*[local-name()='CompanyID']" },
+                { "EventDescription","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='Description']" },
+                { "SenderBusinessName","//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme'][1]/*[local-name()='RegistrationName']" },
+                { "SenderDocumentType","//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme'][1]/*[local-name()='CompanyID']/@schemeName" },
+                ////{ "","" },
             };
             return requestObj;
         }
@@ -502,8 +495,8 @@
                     dataValues.XpathsValues["DiscountRate"] : string.Empty;
             model.TotalAmount = dataValues.XpathsValues["EventTotalAmount"] != null ?
                     dataValues.XpathsValues["EventTotalAmount"] : string.Empty;
-            //model.DateOfIssue = dataValues.XpathsValues["GenerationDate"] != null ?
-            //        dataValues.XpathsValues["GenerationDate"] : string.Empty;
+            model.EndosoTotalAmount = dataValues.XpathsValues["EndosoTotalAmount"] != null ?
+                    dataValues.XpathsValues["EndosoTotalAmount"] : string.Empty;
             model.SenderNit = dataValues.XpathsValues["SenderNit"] != null ?
                     dataValues.XpathsValues["SenderNit"] : string.Empty;
             model.EventDescription = dataValues.XpathsValues["EventDescription"] != null ?
@@ -513,6 +506,15 @@
             model.SenderDocumentType = dataValues.XpathsValues["SenderDocumentType"] != null ?
                     dataValues.XpathsValues["SenderDocumentType"] : string.Empty;
 
+            if (dataValues.XpathsValues["GenerationDate"] != null)
+            {
+                model.EmissionDate = dataValues.XpathsValues["GenerationDate"];
+            }
+            if (dataValues.XpathsValues["GenerationTime"] != null)
+            {
+                model.EmissionDate = string.Format("{0} {1}", model.EmissionDate,
+                dataValues.XpathsValues["GenerationTime"]);
+            }
             return model;
         }
 
