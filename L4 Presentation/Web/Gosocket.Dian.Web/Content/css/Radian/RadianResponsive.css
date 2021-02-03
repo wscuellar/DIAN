@@ -15,29 +15,48 @@
     }
 }
 
-/*Extra large devices (large desktops, 1200px and up)*/
-@media (min-width: 1200px) {
-    .modal-dialog {
-        min-width: 800px;
+/*Large devices (desktops, 992px and up)*/
+@media (max-width: 991px) {
+    #table-history tbody tr td:first-child {
+        width: 120px;
     }
-    .cancel-confirmation .modal-dialog {
-        min-width: 620px;
+
+    #table-history tr th:nth-child(1) {
+        background-position: 104px;
     }
-    .modal .panel-body {
-        padding-left: 0;
-    }
-    .set-test-counts .modal-dialog {
-        width: 1016px;
-    }
-    .set-test-counts .modal .panel-body {
-        padding-left: 50px;
+
+    #table-history tr th:nth-child(2) {
+        background-position: 65px;
     }
 }
 
-@media (max-width: 1299px) {
-    #steps-approved .steps {
-        width: 100%;
+    /*Extra large devices (large desktops, 1200px and up)*/
+    @media (min-width: 1200px) {
+        .modal-dialog {
+            min-width: 800px;
+        }
+
+        .cancel-confirmation .modal-dialog {
+            min-width: 620px;
+        }
+
+        .modal .panel-body {
+            padding-left: 0;
+        }
+
+        .set-test-counts .modal-dialog {
+            width: 1016px;
+        }
+
+        .set-test-counts .modal .panel-body {
+            padding-left: 50px;
+        }
     }
-}
+
+    @media (max-width: 1299px) {
+        #steps-approved .steps {
+            width: 100%;
+        }
+    }
 
 

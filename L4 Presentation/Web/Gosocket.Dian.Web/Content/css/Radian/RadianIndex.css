@@ -1946,3 +1946,19 @@ ul#list li a:hover {
 .dataTables_empty {
     text-align: center !important;
 }
+
+#table-history tbody tr td:first-child{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    width: 200px;
+}
+
+#forgot-pasword-form .input-group {
+    margin: auto;
+}
+
+#forgot-pasword-form .form-group {
+    margin-bottom: 35px;
+}
