@@ -1,9 +1,9 @@
 ﻿function rememberPassword(htmlPartial, url) {
     $("#forgot-password").click(function (e) {
+        e.preventDefault();
         var box = bootbox.dialog({
             message: htmlPartial,
-            className: "table-data modal-radian set-test-counts",
-            size: '300'
+            className: "forgot-password"
         })
         box.bind('shown.bs.modal', function () {
             $("#submitRememberPassword").click(function (e) {
