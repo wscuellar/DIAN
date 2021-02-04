@@ -81,7 +81,7 @@
         {
             GlobalDocValidatorDocumentMeta eventItem = _queryAssociatedEventsService.DocumentValidation(cude);
             byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(cude);
-            var str = Encoding.Default.GetString(xmlBytes);
+            //var str = Encoding.Default.GetString(xmlBytes);
 
             Domain.Entity.EventDataModel model =
                 new Domain.Entity.EventDataModel()
@@ -102,8 +102,8 @@
             Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
             xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
-            //ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
-            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
+            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+            
             model = MappingXpathValues(model, fieldValues);
 
             // Set Titles

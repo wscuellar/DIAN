@@ -10,6 +10,6 @@
     CONFIRMATION_MESSAGE_DESACTIVE: "¿Desea inactivar el usuario seleccionado?",
     CONFIRMATION_MESSAGE_ACTIVE: "¿Desea activar el usuario seleccionado?",
     CONFIRMATION_CORRECT_ENABLED: "Estado actualizado correctamente",
-    CONFIRMATION_RESTART: "¿Está seguro que quiere reiniciar los contadores?",
+    CONFIRMATION_RESTART: "¿Está seguro de reiniciar set de pruebas?",
 
 };
