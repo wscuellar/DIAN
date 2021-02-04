@@ -1433,7 +1433,7 @@ namespace Gosocket.Dian.Web.Controllers
             foreach (var item in result.Errors)
                 errors.Append(item);
 
-            return Json(new ResponseMessage(errors.ToString(), TextResources.alertType), JsonRequestBehavior.AllowGet);
+            return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
         }
 
         #endregion
