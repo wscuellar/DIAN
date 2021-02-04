@@ -76,9 +76,6 @@ namespace Gosocket.Dian.Application
                 case EventStatus.Accepted:
                     title = TextResources.Accepted;
                     break;
-                case EventStatus.Mandato:
-                    title = TextResources.Mandato;
-                    break;
                 case EventStatus.SolicitudDisponibilizacion:
                     if (customizationId == CONS361 || customizationId == CONS362)
                         title = TextResources.SolicitudDisponibilizacion;

@@ -110,9 +110,12 @@ namespace Gosocket.Dian.Functions.Pdf
                 // Sustituir en el HTML la respuesta de la validación del documento y SigningTime
                 var documentApplication = htmlGDoc.GetDocumentResponse();
                 var documentSigningTime = htmlGDoc.GetSigningTime();
+
                 if (documentApplication != null)
                 {
+                    documentApplication = DateNormalized(documentApplication, "Documento validado por la DIAN");
                     Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication);
+                    documentSigningTime = DateNormalized(documentSigningTime, "Documento generado el:");
                     Html_Content = Html_Content.Replace("#SigningTime", documentSigningTime);
                 }
                 else
@@ -148,6 +151,22 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 return result;
             }
+        }
+
+        static string DateNormalized(string currentDate, string dataReplace)
+        {
+            string[] dateparts = currentDate.Replace(dataReplace, "").Trim().Split('/');
+            string[] hours = dateparts[2].Split(':');
+            string[] years = hours[0].Split(' ');
+            string[] rest = years[1].Split(':');
+            int year = Convert.ToInt32(years[0]);
+            int month = Convert.ToInt32(dateparts[1]);
+            int day = Convert.ToInt32(dateparts[0]);
+            int hour = Convert.ToInt32(rest[0]);
+            int min = Convert.ToInt32(hours[1]);
+            int sec = Convert.ToInt32(hours[2]);
+            return dataReplace + " " + (new DateTime(year, month, day, hour, min, sec).AddHours(-5)).ToString("dd/MM/yyyy HH:mm:ss");
+
         }
     }
 }
