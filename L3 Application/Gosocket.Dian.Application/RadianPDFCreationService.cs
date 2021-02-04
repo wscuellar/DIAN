@@ -2,8 +2,10 @@
 using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
+using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Services.Utils.Helpers;
 using OpenHtmlToPdf;
 using QRCoder;
 using System;
@@ -49,13 +51,18 @@ namespace Gosocket.Dian.Application
             StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
             StringBuilder footerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFooter.html"));
 
+            // load xml
+            byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(eventItemIdentifier);
+            //var str = Encoding.Default.GetString(xmlBytes);
+
+            Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
+            xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
+            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+
             // Load Document Data
             GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
             EventStatus eventStatus;
             _ = await _cosmosDBService.ReadDocumentAsync(documentMeta.DocumentKey, documentMeta.PartitionKey, documentMeta.EmissionDate);
-
-            //if (documentMeta.EventCode != null)
-            //    eventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), documentMeta.EventCode);
 
             //Load documents
             List<GlobalDocReferenceAttorney> documents =
@@ -91,8 +98,20 @@ namespace Gosocket.Dian.Application
             templateFirstPage = templateFirstPage.Replace("{SenderNit}", documentMeta.SenderCode);
             templateFirstPage = templateFirstPage.Replace("{InvoiceValue}", Convert.ToString(documentMeta.TotalAmount));
             templateFirstPage = templateFirstPage.Replace("{Badge}", string.Empty);
-            templateFirstPage = templateFirstPage.Replace("{Currency}", string.Empty);
-            templateFirstPage = templateFirstPage.Replace("{PaymentMethod}", string.Empty);
+
+            templateFirstPage = templateFirstPage.Replace("{Currency}",
+                fieldValues.XpathsValues["InvoiceCurrencyId"] != null? fieldValues.XpathsValues["InvoiceCurrencyId"] : string.Empty);
+
+
+            if (fieldValues.XpathsValues["InvoicePaymentId"] != null)
+            {
+                templateFirstPage = templateFirstPage.Replace("{PaymentMethod}", fieldValues.XpathsValues["InvoicePaymentId"].Equals("1") ? "CONTADO" : "A CRÉDITO");
+            }
+            else
+            {
+                templateFirstPage = templateFirstPage.Replace("{PaymentMethod}", string.Empty);
+            }
+
             templateFirstPage = templateFirstPage.Replace("{ExpirationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
             templateFirstPage = templateFirstPage.Replace("{ReceiverBusinessName}", documentMeta.ReceiverName);
             templateFirstPage = templateFirstPage.Replace("{ReceiverNit}", documentMeta.ReceiverCode);
@@ -285,6 +304,23 @@ namespace Gosocket.Dian.Application
             finalEvents = finalEvents.Where(e=>e.Code!=null).OrderBy(t => t.Date).ToList();
 
             return finalEvents;
+        }
+
+        #endregion
+
+        #region CreateGetXpathData
+
+        private static Dictionary<string, string> CreateGetXpathData(string xmlBase64, string fileName = null)
+        {
+            var requestObj = new Dictionary<string, string>
+            {
+                { "XmlBase64", xmlBase64},
+                { "FileName", fileName},
+                { "InvoicePaymentId", "//*[local-name()='PaymentMeans']/*[local-name()='ID']" },
+                { "InvoiceCurrencyId", "//*[local-name()='Invoice']/*[local-name()='DocumentCurrencyCode']" },
+                ////{ "","" },
+            };
+            return requestObj;
         }
 
         #endregion
