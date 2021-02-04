@@ -214,6 +214,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a La contraseña anterior no es correcta.
+        /// </summary>
+        public static string LastPasswordWrong {
+            get {
+                return ResourceManager.GetString("LastPasswordWrong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Inscripción de Mandato Electrónico.
         /// </summary>
         public static string Mandato {
@@ -318,6 +327,33 @@ namespace Gosocket.Dian.Common.Resources {
         public static string ParticipantWithoutSoftware {
             get {
                 return ResourceManager.GetString("ParticipantWithoutSoftware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a La contraseña debe contener: al menos (1) mayúscula, (1) minúscula, (1) dígito, (1) símbolo o carácter especial y debe ser de almenos 6 carácteres..
+        /// </summary>
+        public static string PasswordDoesNotMatch {
+            get {
+                return ResourceManager.GetString("PasswordDoesNotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Las contraseñas no coinciden.
+        /// </summary>
+        public static string PasswordsArentEquals {
+            get {
+                return ResourceManager.GetString("PasswordsArentEquals", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Contraseña actualizada correctamente.
+        /// </summary>
+        public static string PasswordUpdatedSuccessfully {
+            get {
+                return ResourceManager.GetString("PasswordUpdatedSuccessfully", resourceCulture);
             }
         }
         
