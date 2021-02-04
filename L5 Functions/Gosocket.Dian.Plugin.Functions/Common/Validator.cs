@@ -2635,76 +2635,75 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
-            //Valida exista CUFE/CUDE en sistema DIAN
-            var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(trackId.ToLower()).FirstOrDefault();
-            if (documentMeta == null)
+
+            //Valida referencia evento terminacion de mandato
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.TerminacionMandato)
             {
-                //Valida referencia evento terminacion de mandato
-                if (Convert.ToInt32(eventCode) == (int)EventStatus.TerminacionMandato)
+                responses.Add(new ValidateListResponse
                 {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = "Evento referenciado correctamente",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                    IsValid = true,
+                    Mandatory = true,
+                    ErrorCode = "100",
+                    ErrorMessage = "Evento referenciado correctamente",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
 
-                    var referenceAttorneyResult = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(trackId.ToLower());
-                    if (referenceAttorneyResult == null)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: AAH07-(R): ",
-                            ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    else
-                    {
-                        //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
-                        if (referenceAttorneyResult.SerieAndNumber != idDocumentReference)
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH06") + "-(R): ",
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH06"),
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-
-                        //Valida DocumentTypeCode coincida con el documento informado
-                        if ("96" != documentTypeIdRef)
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH09") + "-(R): ",
-                                ErrorMessage = "No corresponde al literal “96",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
-                }
-                else
+                var referenceAttorneyResult = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(trackId.ToLower());
+                if (referenceAttorneyResult == null)
                 {
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = errorCodeReglaUUID,
+                        ErrorCode = "Regla: AAH07-(R): ",
                         ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
+                else
+                {
+                    //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
+                    if (referenceAttorneyResult.SerieAndNumber != idDocumentReference)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH06") + "-(R): ",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH06_043"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //Valida DocumentTypeCode coincida con el documento informado
+                    if ("96" != documentTypeIdRef)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH09") + "-(R): ",
+                            ErrorMessage = "No corresponde al literal “96",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                }
             }
             else
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = errorCodeReglaUUID,
+                    ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida exista CUFE/CUDE en sistema DIAN
+            var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(trackId.ToLower()).FirstOrDefault();
+            if (documentMeta != null && (Convert.ToInt32(eventCode) != (int)EventStatus.TerminacionMandato))
             {
                 responses.Add(new ValidateListResponse
                 {
@@ -2773,7 +2772,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                    
+
                     var responseListEndoso = ValidateTransactionCufe(trackId.ToLower());
                     if (responseListEndoso != null)
                     {
@@ -2790,6 +2789,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
                 }
+            }
+            else
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = errorCodeReglaUUID,
+                    ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
 
             return responses;
