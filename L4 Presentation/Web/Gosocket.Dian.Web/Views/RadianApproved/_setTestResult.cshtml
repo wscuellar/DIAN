@@ -9,7 +9,7 @@
     string parametro = Request.QueryString["radianTypeId"];
     string participantType = ((RadianContributorType)(Enum.Parse(typeof(RadianContributorType), parametro))).GetDescription();
 
-    ViewBag.title = $"Set de pruebas - ({participantType})";
+    ViewBag.title = $"Set de pruebas - {participantType}";
     var status = "";
     switch (Model.RadianTestSetResult.Status)
     {

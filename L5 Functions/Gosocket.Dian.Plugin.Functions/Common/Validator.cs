@@ -1382,8 +1382,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: AAH07-(R): ",
-                            ErrorMessage = $"esta UUID no existe en la base de datos de la DIAN.",
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07") + "-(R): ",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                         return responses;
@@ -1673,7 +1673,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string endDate = string.Empty;
             DateTime startDate = DateTime.UtcNow;
             RequestObjectSigningTime dataSigningtime = new RequestObjectSigningTime();
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();           
             List<AttorneyModel> attorney = new List<AttorneyModel>();
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
             string AttachmentBase64 = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(0)?.InnerText.ToString();
@@ -1973,8 +1973,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                     attorneyModel.idTypeDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
                     //Valida CUFE referenciado existe en sistema DIAN                
-                    var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference, issuerPartyCode, issuerPartyName);
-                    if (resultValidateCufe[0].IsValid)
+                    var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference, issuerPartyCode, issuerPartyName);                   
+                    foreach (var itemCufe in resultValidateCufe)
+                    {                        
+                        if (!itemCufe.IsValid)
+                        {
+                            validate = false;                            
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = itemCufe.IsValid,
+                                Mandatory = true,
+                                ErrorCode = itemCufe.ErrorCode,
+                                ErrorMessage = itemCufe.ErrorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
+                    if (validate)
                     {
                         TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
                         TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
@@ -2036,18 +2052,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             }
                         }                      
                     }
-                    else
-                    {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = resultValidateCufe[0].IsValid,
-                            Mandatory = true,
-                            ErrorCode = resultValidateCufe[0].ErrorCode,
-                            ErrorMessage = resultValidateCufe[0].ErrorMessage,
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
+                    
 
                     ValidatorEngine validatorEngine = new ValidatorEngine();
                     dataSigningtime.TrackId = attorneyModel.cufe;
@@ -2057,18 +2062,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         throw new Exception(xmlParserCufe.ParserError);
 
                     //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-                    var resultValidateSingInTime = ValidateSigningTime(dataSigningtime, xmlParserCufe, nitModel);
-                    if (!resultValidateSingInTime[0].IsValid)
+                    var resultValidateSignInTime = ValidateSigningTime(dataSigningtime, xmlParserCufe, nitModel);
+                    foreach (var itemSingInTIme in resultValidateSignInTime)
                     {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
+                        if (!itemSingInTIme.IsValid)
                         {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "Regla: DC24r-(R): ",
-                            ErrorMessage = "No se puede generar el evento mandato antes de la fecha de generación del documento referenciado.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = itemSingInTIme.IsValid,
+                                Mandatory = true,
+                                ErrorCode = "Regla: DC24r-(R): ",
+                                ErrorMessage = "No se puede generar el evento mandato antes de la fecha de generación del documento referenciado.",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
                     }
                 }
                 else
@@ -2655,8 +2663,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: AAH07-(R): ",
-                        ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07") + "-(R): ",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
@@ -2689,18 +2697,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
             }
-            else
-            {
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = errorCodeReglaUUID,
-                    ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
-
+           
             //Valida exista CUFE/CUDE en sistema DIAN
             var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(trackId.ToLower()).FirstOrDefault();
             if (documentMeta != null && (Convert.ToInt32(eventCode) != (int)EventStatus.TerminacionMandato))
@@ -4844,7 +4841,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = "Regla: 90, Rechazo: ",
-                    ErrorMessage = $"Documento con CUDE '{document.DocumentKey}' procesado anteriormente.",
+                    ErrorMessage = "Documento procesado anteriormente",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }

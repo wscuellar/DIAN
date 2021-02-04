@@ -70,6 +70,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidationEventRadianAsync(string trackId)
         {
             var validator = new Validator();
+            DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
@@ -84,8 +85,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta != null)
             {
                 NitModel nitModel = new NitModel();
-                EventRadianModel eventRadian = new EventRadianModel();                
-
+                EventRadianModel eventRadian = new EventRadianModel();
+                bool validEventRadian = true;
                 var xmlBytes = await GetXmlFromStorageAsync(trackId);
                 var xmlParser = new XmlParser(xmlBytes);
                 if (!xmlParser.Parser())
@@ -112,7 +113,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;
 
-                responses = await Instance.StartValidateSerieAndNumberAsync(trackId);
+                responses = await Instance.StartValidateSerieAndNumberAsync(trackId);                
                 validateResponses.AddRange(responses);
 
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
@@ -126,11 +127,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
                     responses = await Instance.StartValidateDocumentReference(docReference);
+                    foreach(var itemReference in responses)
+                    {
+                        if (!itemReference.IsValid)
+                            validEventRadian = false;
+                    }
                     validateResponses.AddRange(responses);
                 }
 
                 //Si Mandato contiene CUFEs Referenciados
-                if (validaMandatoListID)
+                if (validaMandatoListID && validEventRadian)
                 {
                     EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
                     EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
@@ -144,7 +150,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 //Si es mandato registra en GlobalDocReferenceAttorney
-                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato)
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato 
+                    && validEventRadian)
                 {
                     referenceAttorney.TrackId = trackId;
                     responses = await Instance.StartValidateReferenceAttorney(referenceAttorney);
@@ -153,7 +160,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 validator.UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
 
-            }                              
+            }
+            else
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07") + "-(R): ",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+                validateResponses.AddRange(responses);
+            }                             
 
             return validateResponses;
         }
