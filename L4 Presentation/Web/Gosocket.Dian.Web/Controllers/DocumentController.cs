@@ -49,6 +49,7 @@ namespace Gosocket.Dian.Web.Controllers
         readonly GlobalDocumentService globalDocumentService = new GlobalDocumentService();
         private readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
+        private readonly TableManager globalDocReferenceAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayRoll");
@@ -61,10 +62,10 @@ namespace Gosocket.Dian.Web.Controllers
 
 
         private readonly FileManager _fileManager;
-      
+
         #endregion
-       
-       
+
+
         #region Constructor
 
         public DocumentController(IRadianPdfCreationService radianPdfCreationService,
@@ -120,7 +121,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
             return View(model);
         }
-                
+
 
         public ActionResult Viewer(Navigation.NavigationEnum nav)
         {
@@ -245,9 +246,9 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View(model);
         }
-       
-    
-     
+
+
+
 
         #region GetXmlFromStorageAsync
 
@@ -293,7 +294,7 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{DirType}", dataValues.globalDocPayrolls.LugarTrabajoDireccion.ToString());
             template = template.Replace("{PaisType}", dataValues.globalDocPayrolls.Pais.ToString());
             template = template.Replace("{DepType}", dataValues.globalDocPayrolls.DepartamentoEstado.ToString());
-            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());            
+            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());
 
             // Employer Data
             template = template.Replace("{NitEmp}", dataValues.globalDocPayrolls.Emp_NIT.ToString());
@@ -302,7 +303,7 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{PaisTypeEmp}", dataValues.globalDocPayrolls.Emp_Pais.ToString());
             template = template.Replace("{DepTypeEmp}", dataValues.globalDocPayrolls.Emp_DepartamentoEstado.ToString());
             template = template.Replace("{MunTypeEmp}", dataValues.globalDocPayrolls.Emp_MunicipioCiudad.ToString());
-            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());           
+            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());
             template = template.Replace("{FrecuencyNomina}", dataValues.globalDocPayrolls.PeriodoNomina.ToString());
             template = template.Replace("{DateEmpIngType}", dataValues.globalDocPayrolls.FechaIngreso.ToString());
             template = template.Replace("{AntType}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
@@ -321,7 +322,7 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{NumberLibraryType}", dataValues.globalDocPayrolls.NumeroCuenta.ToString());
             template = template.Replace("{TotalDevType}", dataValues.globalDocPayrolls.DevengadosTotal.ToString());
             template = template.Replace("{TotalDedType}", dataValues.globalDocPayrolls.DeduccionesTotal.ToString());
-           
+
             // ToTal Advances
             template = template.Replace("{NumNomType}", dataValues.globalDocPayrolls.Numero.ToString());
             template = template.Replace("{DateGenType}", dataValues.globalDocPayrolls.FechaGen.ToString());
@@ -369,7 +370,7 @@ namespace Gosocket.Dian.Web.Controllers
         //[ValidateAntiForgeryToken]
         public async Task<ActionResult> ExportPDF(PayrollViewModel model)
         {
-            if(String.IsNullOrEmpty(model.NumeroDocumento))
+            if (String.IsNullOrEmpty(model.NumeroDocumento))
             {
                 int contadorValidaciones = 0;
                 if (!String.IsNullOrEmpty(model.CUNE))
@@ -401,7 +402,7 @@ namespace Gosocket.Dian.Web.Controllers
                 model.Mensaje = string.Empty;
             }
             List<GlobalDocPayroll> resultPayroll = new List<GlobalDocPayroll>();
-            if(!String.IsNullOrEmpty(model.CUNE))
+            if (!String.IsNullOrEmpty(model.CUNE))
             {
                 resultPayroll = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t => t.CUNE == model.CUNE).ToList();
             }
@@ -415,11 +416,12 @@ namespace Gosocket.Dian.Web.Controllers
                 resultPayroll = resultPayroll.Where(t => t.PrimerApellido.StartsWith(letra)).ToList();
             }
             List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
-            if(Int32.Parse(model.MesValidacion)!=0)
+            if (Int32.Parse(model.MesValidacion) != 0)
             {
-                foreach (var payroll in resultPayroll)                {
+                foreach (var payroll in resultPayroll)
+                {
                     var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
-                    if(documentMeta.Timestamp.Month == Int32.Parse(model.MesValidacion))
+                    if (documentMeta.Timestamp.Month == Int32.Parse(model.MesValidacion))
                     {
                         var document = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
                         result.Add(new DocumentViewPayroll
@@ -481,19 +483,19 @@ namespace Gosocket.Dian.Web.Controllers
                 result = result.Where(t => t.NoDocumento == model.NumeroDocumento).ToList();
             }
             if (model.Ciudad != "00")
-            {                
+            {
                 result = result.Where(t => t.Ciudad == model.Ciudad).ToList();
             }
             if (model.TipoDocumento != "00")
             {
                 result = result.Where(t => t.TipoDocumento == model.TipoDocumento).ToList();
             }
-            if(model.RangoSalarial != "00")
+            if (model.RangoSalarial != "00")
             {
-                switch(model.RangoSalarial)
+                switch (model.RangoSalarial)
                 {
                     case "01":
-                        result = result.Where(t => t.Salario !=null && Int32.Parse(t.Salario) <= 1000000).ToList();
+                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) <= 1000000).ToList();
                         break;
                     case "02":
                         result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 1000000 && Int32.Parse(t.Salario) <= 2000000).ToList();
@@ -747,34 +749,61 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.Events = new List<EventsViewModel>();
             List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
-                if (eventsByInvoice.Any())
+            if (eventsByInvoice.Any())
+            {
+                foreach (var eventItem in eventsByInvoice)
                 {
-
-                    foreach (var eventItem in eventsByInvoice)
+                    if (!string.IsNullOrEmpty(eventItem.EventCode))
                     {
-                        if (!string.IsNullOrEmpty(eventItem.EventCode))
+                        GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
+                        if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
                         {
-                            GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
-                            if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
-                            {
-                                string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
-                                model.Events.Add(new EventsViewModel()
-                                {
-                                    DocumentKey = eventItem.DocumentKey,
-                                    EventCode = eventItem.EventCode,
-                                    Description = eventcodetext,
-                                    EventDate = eventItem.SigningTimeStamp,
-                                    SenderCode = eventItem.SenderCode,
-                                    Sender = eventItem.SenderName,
-                                    ReceiverCode = eventItem.ReceiverCode,
-                                    Receiver = eventItem.ReceiverName
-                                });
-                                model.Events = model.Events.OrderBy(t => t.EventCode).ToList();
-                            }
 
+                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                            model.Events.Add(new EventsViewModel()
+                            {
+                                DocumentKey = eventItem.DocumentKey,
+                                EventCode = eventItem.EventCode,
+                                Description = eventcodetext,
+                                EventDate = eventItem.SigningTimeStamp,
+                                SenderCode = eventItem.SenderCode,
+                                Sender = eventItem.SenderName,
+                                ReceiverCode = eventItem.ReceiverCode,
+                                Receiver = eventItem.ReceiverName
+                            });
+                            //Adiciono el evento de finalizacion de mandato.
+                            if (eventItem.EventCode == "043")
+                            {
+                                //Se busca en la GlobalDocReferenceAttorney 
+                                GlobalDocReferenceAttorney attorney = globalDocReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(eventItem.DocumentKey);
+                                //En el campo DocReferencedEndAttorney si tiene valor 
+                                if (attorney != null && !string.IsNullOrEmpty(attorney.DocReferencedEndAthorney))
+                                {
+                                    //Se busca en la GlobalDocValidatorDocumentMeta y se saca el evento de terminacion.
+                                    GlobalDocValidatorDocumentMeta eventEndMandate = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(attorney.DocReferencedEndAthorney, attorney.DocReferencedEndAthorney);
+                                    if(eventEndMandate != null)
+                                    {
+                                        eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode)));
+                                        model.Events.Add(new EventsViewModel()
+                                        {
+                                            DocumentKey = eventEndMandate.DocumentKey,
+                                            EventCode = eventEndMandate.EventCode,
+                                            Description = eventcodetext,
+                                            EventDate = eventEndMandate.SigningTimeStamp,
+                                            SenderCode = eventEndMandate.SenderCode,
+                                            Sender = eventEndMandate.SenderName,
+                                            ReceiverCode = eventEndMandate.ReceiverCode,
+                                            Receiver = eventEndMandate.ReceiverName
+                                        });
+                                    }
+                                }
+                            }
+                            
                         }
+
                     }
-                
+                }
+                model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
             }
 
             return model;
@@ -1084,10 +1113,10 @@ namespace Gosocket.Dian.Web.Controllers
             if (events.Count() == 0)
                 return RadianDocumentStatus.DontApply.GetDescription();
 
-            int lastEventCode = int.Parse(events.Where(ev => !ev.Code.Equals($"0{(int)EventStatus.Avales}") 
-                    &&  !ev.Code.Equals($"0{(int)EventStatus.Mandato}") 
-                    &&  !ev.Code.Equals($"0{(int)EventStatus.ValInfoPago}") 
-                    &&  !ev.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).OrderBy(t => t.Date).Last().Code);
+            int lastEventCode = int.Parse(events.Where(ev => !ev.Code.Equals($"0{(int)EventStatus.Avales}")
+                    && !ev.Code.Equals($"0{(int)EventStatus.Mandato}")
+                    && !ev.Code.Equals($"0{(int)EventStatus.ValInfoPago}")
+                    && !ev.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).OrderBy(t => t.Date).Last().Code);
 
             if (lastEventCode == ((int)EventStatus.NegotiatedInvoice)
                 || lastEventCode == ((int)EventStatus.AnulacionLimitacionCirculacion))
@@ -1263,10 +1292,10 @@ namespace Gosocket.Dian.Web.Controllers
         List<DocumentViewPayroll> firstLoadPayroll()
         {
             List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
-            List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t=>t.PrimerApellido.StartsWith("A") && t.Sueldo != null && Int32.Parse(t.Sueldo)<1000000).ToList();
+            List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t => t.PrimerApellido.StartsWith("A") && t.Sueldo != null && Int32.Parse(t.Sueldo) < 1000000).ToList();
             //List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().ToList();
-           foreach (var payroll in payrolls)
-           {
+            foreach (var payroll in payrolls)
+            {
                 var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
                 var document = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
                 if (documentMeta.Timestamp.Month == DateTime.Now.Month)
@@ -1289,7 +1318,7 @@ namespace Gosocket.Dian.Web.Controllers
                         NumeroAjuste = documentMeta.DocumentReferencedKey,
                         Resultado = document.ValidationStatusName,
                         Ciudad = payroll.MunicipioCiudad
-                    }) ;
+                    });
                 }
             }
             return result;
