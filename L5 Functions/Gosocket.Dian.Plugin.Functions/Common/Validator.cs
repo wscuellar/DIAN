@@ -1382,8 +1382,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "Regla: AAH07-(R): ",
-                            ErrorMessage = $"esta UUID no existe en la base de datos de la DIAN.",
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07") + "-(R): ",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                         return responses;
@@ -2663,8 +2663,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "Regla: AAH07-(R): ",
-                        ErrorMessage = "esta UUID no existe en la base de datos de la DIAN",
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07") + "-(R): ",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
@@ -4841,7 +4841,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = "Regla: 90, Rechazo: ",
-                    ErrorMessage = $"Documento con CUDE '{document.DocumentKey}' procesado anteriormente.",
+                    ErrorMessage = "Documento procesado anteriormente",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
