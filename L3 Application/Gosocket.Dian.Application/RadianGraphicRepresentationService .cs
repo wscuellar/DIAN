@@ -81,7 +81,7 @@
         {
             GlobalDocValidatorDocumentMeta eventItem = _queryAssociatedEventsService.DocumentValidation(cude);
             byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(cude);
-            var str = Encoding.Default.GetString(xmlBytes);
+            //var str = Encoding.Default.GetString(xmlBytes);
 
             Domain.Entity.EventDataModel model =
                 new Domain.Entity.EventDataModel()
