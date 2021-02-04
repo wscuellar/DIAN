@@ -58,6 +58,7 @@ namespace Gosocket.Dian.Application
             Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
             xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
             ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+//            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
 
             // Load Document Data
             GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
@@ -255,6 +256,8 @@ namespace Gosocket.Dian.Application
             byte[] bytesFooter = _fileManager.GetBytes("radian-dian-logos", "GroupFooter.png");
             string imgLogo = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesLogo)}'>";
             string imgFooter = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesFooter)}' class='img-footer'>";
+            Dictionary<int,string> dicStatus = _queryAssociatedEventsService.IconType(null, documentMeta.DocumentKey);
+            string status =  dicStatus.OrderBy(t => t.Key).Last().Value;
 
             template = template.Replace("{Logo}", $"{imgLogo}");
             template = template.Replace("{ImgFooter}", $"{imgFooter}");
@@ -264,7 +267,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{InvoiceNumber}", documentMeta.SerieAndNumber);
             template = template.Replace("{CUFE}", documentMeta.PartitionKey);
             template = template.Replace("{EInvoiceGenerationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
-            template = template.Replace("{Status}", $": ");
+            template = template.Replace("{Status}", status.ToUpper());
             return template;
         }
 
