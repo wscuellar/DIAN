@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta  http-equiv="content-type"  content="text/html; charset=UTF-8"/>
     <title></title>
     <style>
         body {
@@ -128,6 +129,10 @@
             width: 100px;
             height: 100px;
         }
+
+        div{
+            background-color:transparent!important;
+        }
     </style>
 
 </head>
@@ -138,7 +143,12 @@
     <div>
         <hr />
     </div>
+    <div style="font-family: Arial;font-style: normal;position:fixed; z-index:-1; background:transparent; display:block; min-height:100%; min-width:100%; color:rgba(106, 106, 106, 0.06); text-align: center; top: 300px;">
+        <!--<p style="font-size:140px; transform:rotate(300deg); -webkit-transform:rotate(300deg);z-index:-1;">Sin valor fiscal</p>-->
+        <p style="font-size:140px;z-index:-1;">Sin valor fiscal</p>
+    </div>
     <content>
+
         <div id="base">
             <div class="text-green text-small text-margin-01">
                 Impreso el {PrintDay} de {PrintMonth} de {PrintYear} a las {PrintTime}
