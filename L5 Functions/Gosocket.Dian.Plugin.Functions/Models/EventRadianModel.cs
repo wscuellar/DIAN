@@ -91,7 +91,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
         {
             signingTime.TrackId = eventRadian.TrackId;
             signingTime.EventCode = eventRadian.EventCode;
-            signingTime.SigningTime = eventRadian.SigningTime.ToString();
+            signingTime.SigningTime = eventRadian.SigningTime;
             signingTime.DocumentTypeId = eventRadian.DocumentTypeId;
             signingTime.CustomizationID = eventRadian.CustomizationId;
             signingTime.EndDate = eventRadian.EndDate;

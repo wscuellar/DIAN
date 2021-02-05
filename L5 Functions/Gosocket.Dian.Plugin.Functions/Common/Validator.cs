@@ -1699,7 +1699,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string familyName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FamilyName']").Item(0)?.InnerText.ToString();
             string name = firstName + " " + familyName;
             dataSigningtime.EventCode = "043";
-            dataSigningtime.SigningTime = xmlParser.SigningTime;
+            dataSigningtime.SigningTime = Convert.ToDateTime(xmlParser.SigningTime);
             dataSigningtime.DocumentTypeId = "96";
             dataSigningtime.CustomizationID = customizationID;
             dataSigningtime.EndDate = "";
@@ -3963,8 +3963,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.Receipt:
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
                 case (int)EventStatus.Mandato:
-                    DateTime dataSigningTime = Convert.ToDateTime(data.SigningTime).Date;
-                    DateTime modelSigningTime = Convert.ToDateTime(dataModel.SigningTime).Date;
+                    DateTime dataSigningTime = Convert.ToDateTime(data.SigningTime);
+                    DateTime modelSigningTime = Convert.ToDateTime(dataModel.SigningTime);
                     if (dataSigningTime >= modelSigningTime)
                     {
                         responses.Add(new ValidateListResponse
