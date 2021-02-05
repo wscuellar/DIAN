@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -1403,30 +1404,36 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 if (!UserManager.CheckPassword(user, model.UserOldPassword))
                 {
-                    return Json(new ResponseMessage("La contraseña anterior no es correcta", "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                    return Json(new ResponseMessage(TextResources.LastPasswordWrong, "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
                 }
             }
             else
             {
-                return Json(new ResponseMessage("No se encuentra un usuario con ese numero de identificación", "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage(TextResources.UserDoesntExist, "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
+
+            var pass = UserManager.PasswordHasher.HashPassword(model.UserPassword);
 
             if (!model.UserPassword.Equals(model.UserPasswordConfirm))
             {
-                return Json(new ResponseMessage("Las contraseñas no coinciden, verifique por favor.", "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage(TextResources.PasswordsArentEquals, "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+            if (!Regex.IsMatch(model.UserPassword, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{6,}$"))
+            {
+                return Json(new ResponseMessage(TextResources.PasswordDoesNotMatch, "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
             
             UserManager.RemovePassword(user.Id);
             IdentityResult result = UserManager.AddPassword(user.Id, model.UserPassword);
             if (result.Succeeded)
             {
-                return Json(new ResponseMessage("Contraseña actualizada correctamente", "PasswordChangedSuccessfully", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage(TextResources.PasswordUpdatedSuccessfully, "PasswordChangedSuccessfully", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
             }
             
             foreach (var item in result.Errors)
                 errors.Append(item);
 
-            return Json(new ResponseMessage(errors.ToString(), TextResources.alertType), JsonRequestBehavior.AllowGet);
+            return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
         }
 
         #endregion
