@@ -272,6 +272,17 @@ namespace Gosocket.Dian.Infrastructure
             return items;
         }
 
+        public IEnumerable<T> FindAll<T>(int take, ref TableContinuationToken continuationToken) where T : ITableEntity, new()
+        {
+            var items = new List<T>();
+
+            var data = GetRangeRows<T>(take, continuationToken);
+            continuationToken = data.Item2;
+            items.AddRange(data.Item1);
+
+            return items;
+        }
+
         public List<DynamicTableEntity> FindWithinPartitionStartsWithByRowKey(string partitionKey, string startsWithPattern)
         {
             var query = new TableQuery();

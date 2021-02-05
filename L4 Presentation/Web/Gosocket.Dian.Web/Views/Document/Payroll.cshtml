@@ -64,8 +64,11 @@
                             <div class="panel-body padding-top-20">
                                 <div class="pad-btm padding-bottom-0">
                                     <div class="row margin-horizontal-0">
-                                        @using (Html.BeginForm("Payroll", "Document", FormMethod.Post, new { id = "export-form" }))
+                                        @using (Html.BeginForm("Payroll", "Document", FormMethod.Post, new { id = "payroll-form" }))
                                         {
+                                            @Html.HiddenFor(m => m.Page)
+                                            @Html.HiddenFor(m => m.DirectionToPagination)
+
                                             @* @Html.AntiForgeryToken()*@
 
                                             <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
@@ -141,17 +144,17 @@
                                                             </div>
                                                         </div>
 
-                                                        @*@if (!String.IsNullOrEmpty(Model.Mensaje))
+                                                        @if (!String.IsNullOrEmpty(Model.Mensaje))
                                                         {
                                                             <div class="panel-body padding-20 padding-bottom-0">
                                                                 <div class="row" style="color:#FF0000;">
                                                                     @Model.Mensaje
                                                                 </div>
                                                             </div>
-                                                        }*@
+                                                        }
 
                                                         <div class="panel-footer-grey text-right submit-container">
-                                                            <button type="submit" class="btn btn-success btn-radian-success">Buscar</button>
+                                                            <button type="button" class="btn btn-success btn-radian-success btn-search">Buscar</button>
                                                         </div>
 
                                                     </div>
@@ -182,7 +185,30 @@
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
 
-    <script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var $page = $('#Page'),
+                $directionToPagination = $('#DirectionToPagination'),
+                $form = $('#payroll-form');
 
+            // Pagination
+            $('.next-page').click(function () {
+                $page.val(@Model.Page + 1);
+                $directionToPagination.val('next');
+                $form.submit();
+            });
+
+            $('.prev-page').click(function () {
+                $page.val(@Model.Page - 1);
+                $directionToPagination.val('prev');
+                $form.submit();
+            });
+            // Pagination
+
+            $('.btn-search').click(function () {
+                $page.val(0);
+                $form.submit();
+            });
+        });
     </script>
 }

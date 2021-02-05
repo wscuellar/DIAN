@@ -8,6 +8,13 @@ namespace Gosocket.Dian.Web.Models
 {
     public class PayrollViewModel
     {
+        public PayrollViewModel()
+        {
+            MaxItemCount = 20;
+            IsNextPage = false;
+            Page = 0;
+        }
+
         [Display(Name = "CUNE")]
         public string CUNE { get; set; }
 
@@ -51,6 +58,12 @@ namespace Gosocket.Dian.Web.Models
 
         public string Mensaje { get; set; }
 
+        public int Page { get; set; }
+        public bool IsNextPage { get; set; }
+        public int MaxItemCount { get; set; }
+        public string DirectionToPagination { get; set; }
+        public bool HasMoreData { get; set; }
+
         public List<DocumentViewPayroll> Payrolls { get; set; }
     }
     public class DocumentViewPayroll
@@ -62,10 +75,10 @@ namespace Gosocket.Dian.Web.Models
         public string ApellidosNombre { get; set; }
         public string TipoDocumento { get; set; }
         public string NoDocumento { get; set; }
-        public string Salario { get; set; }
-        public string Devengado { get; set; }
-        public string Deducido { get; set; }
-        public string ValorTotal { get; set; }
+        public double Salario { get; set; }
+        public double Devengado { get; set; }
+        public double Deducido { get; set; }
+        public double ValorTotal { get; set; }
         public string MesValidacion { get; set; }
         public bool? Novedad { get; set; }
         public string NumeroAjuste { get; set; }

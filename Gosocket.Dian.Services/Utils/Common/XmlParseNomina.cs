@@ -78,9 +78,14 @@ namespace Gosocket.Dian.Services.Utils.Common
 
                     var novedadXmlNode = XmlDocument.SelectSingleNode("//*[local-name()='Novedad']");
                     this.Novelty = (novedadXmlNode != null) ? bool.Parse(novedadXmlNode.InnerText) : false;
-                    globalDocPayrolls.DevengadosTotal = XmlDocument.SelectSingleNode(nodeDevengadoTotal)?.InnerText;
-                    globalDocPayrolls.DeduccionesTotal = XmlDocument.SelectSingleNode(nodeDeduccionTotal)?.InnerText;
-                    globalDocPayrolls.ComprobanteTotal = XmlDocument.SelectSingleNode(nodeComprobanteTotal)?.InnerText;
+
+                    var tempDevengadosTotal = XmlDocument.SelectSingleNode(nodeDevengadoTotal)?.InnerText;
+                    var tempDeduccionesTotal = XmlDocument.SelectSingleNode(nodeDeduccionTotal)?.InnerText;
+                    var tempComprobanteTotal = XmlDocument.SelectSingleNode(nodeComprobanteTotal)?.InnerText;
+
+                    globalDocPayrolls.DevengadosTotal = (!string.IsNullOrWhiteSpace(tempDevengadosTotal) ? double.Parse(tempDevengadosTotal) : 0);
+                    globalDocPayrolls.DeduccionesTotal = (!string.IsNullOrWhiteSpace(tempDeduccionesTotal) ? double.Parse(tempDeduccionesTotal) : 0);
+                    globalDocPayrolls.ComprobanteTotal = (!string.IsNullOrWhiteSpace(tempComprobanteTotal) ? double.Parse(tempComprobanteTotal) : 0);
                     globalDocPayrolls.Notas = XmlDocument.SelectSingleNode(nodeNotas)?.InnerText;
 
                     // Load xml document.
@@ -129,6 +134,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.TipoNomina = xInformacionGeneral[j].Attributes["TipoNomina"]?.InnerText;
                         globalDocPayrolls.PeriodoNomina = xInformacionGeneral[j].Attributes["PeriodoNomina"]?.InnerText;
                         globalDocPayrolls.TipoMoneda = xInformacionGeneral[j].Attributes["TipoMoneda"]?.InnerText;
+                        globalDocPayrolls.TRM = xInformacionGeneral[j].Attributes["TRM"]?.InnerText;
                     }
                     XmlNodeList xReemplazandoPredecesor = XmlDocument.GetElementsByTagName("ReemplazandoPredecesor");
                     for (int j = 0; j < xReemplazandoPredecesor.Count; j++)
@@ -146,7 +152,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.Emp_Pais = xEmpleador[j].Attributes["Pais"]?.InnerText;
                         globalDocPayrolls.Emp_DepartamentoEstado = xEmpleador[j].Attributes["DepartamentoEstado"]?.InnerText;
                         globalDocPayrolls.Emp_MunicipioCiudad = xEmpleador[j].Attributes["MunicipioCiudad"]?.InnerText;
-                        globalDocPayrolls.Emp_Direccion = xEmpleador[j].Attributes["Direccion"]?.InnerText;                     
+                        globalDocPayrolls.Emp_Direccion = xEmpleador[j].Attributes["Direccion"]?.InnerText;
                     }
                     XmlNodeList xTrabajador = XmlDocument.GetElementsByTagName("Trabajador");
                     for (int j = 0; j < xTrabajador.Count; j++)
@@ -163,11 +169,12 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.LugarTrabajoPais = xTrabajador[j].Attributes["LugarTrabajoPais"]?.InnerText;
                         globalDocPayrolls.LugarTrabajoDepartamentoEstado = xTrabajador[j].Attributes["LugarTrabajoDepartamentoEstado"]?.InnerText;
                         globalDocPayrolls.LugarTrabajoMunicipioCiudad = xTrabajador[j].Attributes["LugarTrabajoMunicipioCiudad"]?.InnerText;
-                        globalDocPayrolls.LugarTrabajoDireccion = xTrabajador[j].Attributes["LugarTrabajoDireccion"]?.InnerText;                      
-                        globalDocPayrolls.SalarioIntegral = Convert.ToBoolean(xTrabajador[j].Attributes["SalarioIntegral"]?.InnerText);                   
+                        globalDocPayrolls.LugarTrabajoDireccion = xTrabajador[j].Attributes["LugarTrabajoDireccion"]?.InnerText;
+                        globalDocPayrolls.SalarioIntegral = Convert.ToBoolean(xTrabajador[j].Attributes["SalarioIntegral"]?.InnerText);
                         globalDocPayrolls.TipoContrato = xTrabajador[j].Attributes["TipoContrato"]?.InnerText;
-                        globalDocPayrolls.Sueldo = xTrabajador[j].Attributes["Salario"]?.InnerText;
-                        globalDocPayrolls.CodigoTrabajador = xTrabajador[j].Attributes["CodigoTrabajador"]?.InnerText;
+                        var tempSueldo = xTrabajador[j].Attributes["Sueldo"]?.InnerText;
+                        globalDocPayrolls.Sueldo = (!string.IsNullOrWhiteSpace(tempSueldo) ? double.Parse(tempSueldo) : 0);
+                        globalDocPayrolls.Trab_CodigoTrabajador = xTrabajador[j].Attributes["CodigoTrabajador"]?.InnerText;
                     }
                     XmlNodeList xPago = XmlDocument.GetElementsByTagName("Pago");
                     for (int j = 0; j < xPago.Count; j++)
@@ -182,8 +189,76 @@ namespace Gosocket.Dian.Services.Utils.Common
                     for (int j = 0; j < xBasico.Count; j++)
                     {
                         globalDocPayrolls.DiasTrabajados = xBasico[j].Attributes["DiasTrabajados"]?.InnerText;
-                        globalDocPayrolls.SalarioTrabajado = xBasico[j].Attributes["SalarioTrabajado"]?.InnerText;
+                        globalDocPayrolls.SalarioTrabajado = xBasico[j].Attributes["SueldoTrabajado"]?.InnerText;
                     }
+                    XmlNodeList xAuxTransporte = XmlDocument.GetElementsByTagName("Transporte");
+                    for (int j = 0; j < xAuxTransporte.Count; j++)
+                    {
+                        globalDocPayrolls.AuxTransporte = xAuxTransporte[j].Attributes["AuxilioTransporte"]?.InnerText;
+                    }
+                    XmlNodeList xHEDs = XmlDocument.GetElementsByTagName("HED");
+                    double HEDsTotal = 0;
+                    for (int j = 0; j < xHEDs.Count; j++)
+                    {
+                        var temp = xHEDs[j].Attributes["Pago"]?.InnerText;
+                        if (!string.IsNullOrWhiteSpace(temp)) HEDsTotal += double.Parse(temp);
+                    }
+                    globalDocPayrolls.HED = HEDsTotal.ToString();
+                    //
+                    XmlNodeList xHENs = XmlDocument.GetElementsByTagName("HEN");
+                    double HENsTotal = 0;
+                    for (int j = 0; j < xHENs.Count; j++)
+                    {
+                        var temp = xHENs[j].Attributes["Pago"]?.InnerText;
+                        if (!string.IsNullOrWhiteSpace(temp)) HENsTotal += double.Parse(temp);
+                    }
+                    globalDocPayrolls.HEN = HENsTotal.ToString();
+                    //
+                    XmlNodeList xHRNs = XmlDocument.GetElementsByTagName("HRN");
+                    double HRNsTotal = 0;
+                    for (int j = 0; j < xHRNs.Count; j++)
+                    {
+                        var temp = xHRNs[j].Attributes["Pago"]?.InnerText;
+                        if (!string.IsNullOrWhiteSpace(temp)) HRNsTotal += double.Parse(temp);
+                    }
+                    globalDocPayrolls.HRN = HRNsTotal.ToString();
+                    //
+                    XmlNodeList xHEDDFs = XmlDocument.GetElementsByTagName("HEDDF");
+                    double HEDDFsTotal = 0;
+                    for (int j = 0; j < xHEDDFs.Count; j++)
+                    {
+                        var temp = xHEDDFs[j].Attributes["Pago"]?.InnerText;
+                        if (!string.IsNullOrWhiteSpace(temp)) HEDDFsTotal += double.Parse(temp);
+                    }
+                    globalDocPayrolls.HEDDF = HEDDFsTotal.ToString();
+                    //
+                    XmlNodeList xHRDDFs = XmlDocument.GetElementsByTagName("HRDDF");
+                    double HRDDFsTotal = 0;
+                    for (int j = 0; j < xHRDDFs.Count; j++)
+                    {
+                        var temp = xHRDDFs[j].Attributes["Pago"]?.InnerText;
+                        if (!string.IsNullOrWhiteSpace(temp)) HRDDFsTotal += double.Parse(temp);
+                    }
+                    globalDocPayrolls.HRDDF = HRDDFsTotal.ToString();
+                    //
+                    XmlNodeList xHENDFs = XmlDocument.GetElementsByTagName("HENDF");
+                    double HENDFsTotal = 0;
+                    for (int j = 0; j < xHENDFs.Count; j++)
+                    {
+                        var temp = xHENDFs[j].Attributes["Pago"]?.InnerText;
+                        if (!string.IsNullOrWhiteSpace(temp)) HENDFsTotal += double.Parse(temp);
+                    }
+                    globalDocPayrolls.HENDF = HENDFsTotal.ToString();
+                    //
+                    XmlNodeList xHRNDFs = XmlDocument.GetElementsByTagName("HRNDF");
+                    double HRNDFsTotal = 0;
+                    for (int j = 0; j < xHRNDFs.Count; j++)
+                    {
+                        var temp = xHRNDFs[j].Attributes["Pago"]?.InnerText;
+                        if (!string.IsNullOrWhiteSpace(temp)) HRNDFsTotal += double.Parse(temp);
+                    }
+                    globalDocPayrolls.HRNDF = HRNDFsTotal.ToString();
+
                     XmlNodeList xVacacionesComunes = XmlDocument.GetElementsByTagName("VacacionesComunes");
                     for (int j = 0; j < xVacacionesComunes.Count; j++)
                     {
@@ -192,11 +267,61 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.Cantidad = xVacacionesComunes[j].Attributes["Cantidad"]?.InnerText;
                         globalDocPayrolls.Pago = xVacacionesComunes[j].Attributes["Pago"]?.InnerText;
                     }
+                    XmlNodeList xPrimas = XmlDocument.GetElementsByTagName("Primas");
+                    for (int j = 0; j < xPrimas.Count; j++)
+                    {
+                        globalDocPayrolls.Pri_Cantidad = xPrimas[j].Attributes["Cantidad"]?.InnerText;
+                        globalDocPayrolls.Pri_Pago = xPrimas[j].Attributes["Pago"]?.InnerText;
+                        globalDocPayrolls.Pri_PagoNS = xPrimas[j].Attributes["PagoNS"]?.InnerText;
+                    }
+                    XmlNodeList xCesantias = XmlDocument.GetElementsByTagName("Cesantias");
+                    for (int j = 0; j < xCesantias.Count; j++)
+                    {
+                        globalDocPayrolls.Ces_Pago = xCesantias[j].Attributes["Pago"]?.InnerText;
+                        globalDocPayrolls.Ces_PagoIntereses = xCesantias[j].Attributes["PagoIntereses"]?.InnerText;
+                        globalDocPayrolls.Ces_Porcentaje = xCesantias[j].Attributes["Porcentaje"]?.InnerText;
+                    }
+
+                    XmlNodeList xIncapacidades = XmlDocument.GetElementsByTagName("Incapacidad");
+                    double incapacidadesCantidadTotal = 0, incapacidadesPagoTotal = 0;
+                    for (int j = 0; j < xIncapacidades.Count; j++)
+                    {
+                        var tempCantidad = xIncapacidades[j].Attributes["Cantidad"]?.InnerText;
+                        var tempPago = xIncapacidades[j].Attributes["Pago"]?.InnerText;
+                        if (!string.IsNullOrWhiteSpace(tempCantidad)) incapacidadesCantidadTotal += double.Parse(tempCantidad);
+                        if (!string.IsNullOrWhiteSpace(tempPago)) incapacidadesPagoTotal += double.Parse(tempPago);
+                    }
+                    globalDocPayrolls.Inc_Cantidad = incapacidadesCantidadTotal.ToString();
+                    globalDocPayrolls.Inc_Pago = incapacidadesPagoTotal.ToString();
+
+                    // PENDIENTE Licencias...
+
+
+
                     XmlNodeList xBonificacion = XmlDocument.GetElementsByTagName("Bonificacion");
                     for (int j = 0; j < xBonificacion.Count; j++)
                     {
                         globalDocPayrolls.BonificacionNS = xBonificacion[j].Attributes["BonificacionNS"]?.InnerText;
+                        globalDocPayrolls.BonificacionS = xBonificacion[j].Attributes["BonificacionS"]?.InnerText;
                     }
+                    XmlNodeList xComisiones = XmlDocument.GetElementsByTagName("Comision");
+                    for (int j = 0; j < xComisiones.Count; j++)
+                    {
+                        globalDocPayrolls.Comisiones = xComisiones[j].InnerText;
+                    }
+                    XmlNodeList xCompensacion = XmlDocument.GetElementsByTagName("Compensacion");
+                    double compensacionETotal = 0, CompensacionOTotal = 0;
+                    for (int j = 0; j < xCompensacion.Count; j++)
+                    {
+                        var tempE = xCompensacion[j].Attributes["CompensacionE"]?.InnerText;
+                        var tempO = xCompensacion[j].Attributes["CompensacionO"]?.InnerText;
+                        if (!string.IsNullOrWhiteSpace(tempE)) compensacionETotal += double.Parse(tempE);
+                        if (!string.IsNullOrWhiteSpace(tempO)) CompensacionOTotal += double.Parse(tempO);
+                    }
+                    globalDocPayrolls.CompensacionE = compensacionETotal.ToString();
+                    globalDocPayrolls.CompensacionO = CompensacionOTotal.ToString();
+
+
                     XmlNodeList xSalud = XmlDocument.GetElementsByTagName("Salud");
                     for (int j = 0; j < xSalud.Count; j++)
                     {
@@ -211,15 +336,25 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.FP_ValorBase = xFondoPension[j].Attributes["ValorBase"]?.InnerText;
                         globalDocPayrolls.FP_Deduccion = xFondoPension[j].Attributes["Deduccion"]?.InnerText;
                     }
+                    XmlNodeList xRetencionFuente = XmlDocument.GetElementsByTagName("RetencionFuente");
+                    for (int j = 0; j < xRetencionFuente.Count; j++)
+                    {
+                        globalDocPayrolls.RetencionFuente = xRetencionFuente[j].InnerText;
+                    }
                     XmlNodeList xFondoSP = XmlDocument.GetElementsByTagName("FondoSP");
                     for (int j = 0; j < xFondoSP.Count; j++)
                     {
                         globalDocPayrolls.FSP_Porcentaje = xFondoSP[j].Attributes["Porcentaje"]?.InnerText;
-                        globalDocPayrolls.FSP_Porcentaje = xFondoSP[j].Attributes["Deduccion"]?.InnerText;
+                        globalDocPayrolls.FSP_PorcentajeSub = xFondoSP[j].Attributes["PorcentajeSub"]?.InnerText;
+                        globalDocPayrolls.FSP_Deduccion = xFondoSP[j].Attributes["Deduccion"]?.InnerText;
+                        globalDocPayrolls.FSP_DeduccionSub = xFondoSP[j].Attributes["DeduccionSub"]?.InnerText;
                     }
 
                 }
             }
+
+            globalDocPayrolls.PartitionKey = globalDocPayrolls.CUNE;
+            globalDocPayrolls.RowKey = globalDocPayrolls.PartitionKey;
         }
 
         public virtual bool Parser(bool validate = true)

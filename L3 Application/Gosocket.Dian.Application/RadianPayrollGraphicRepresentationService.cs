@@ -45,9 +45,13 @@ namespace Gosocket.Dian.Application
 
         private string GetMonetaryValueFormatToTemplate(string value)
         {
-            var val = "0.00";
-            if (!string.IsNullOrWhiteSpace(value)) return value;
-            return val;
+            double val = 0;
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                val = double.Parse(value);
+            }
+                
+            return val.ToString("C0");
         }
 
         private string BuildEmployeeName(string firstName, string otherNames, string firstLastname, string secondLastname)
@@ -77,7 +81,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EmployerSocialReason}", this.GetValueFormatToTemplate(model.Emp_RazonSocial));
             template = template.Replace("{EmployerCountry}", this.GetValueFormatToTemplate(model.Emp_Pais));
             template = template.Replace("{EmployerDepartament}", this.GetValueFormatToTemplate(model.Emp_DepartamentoEstado));
-            
+
             template = template.Replace("{EmployerNIT}", this.GetValueFormatToTemplate(model.Emp_NIT));
             template = template.Replace("{EmployerAddress}", this.GetValueFormatToTemplate(model.Emp_Direccion));
             template = template.Replace("{EmployerMunicipality}", this.GetValueFormatToTemplate(model.Emp_MunicipioCiudad));
@@ -104,27 +108,27 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EmployeeSettlementPeriod}", this.GetValueFormatToTemplate(""));
             template = template.Replace("{EmployeeTimeWorked}", this.GetValueFormatToTemplate(model.TiempoLaborado));
             template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate(""));
-            template = template.Replace("{EmployeeSalary}", this.GetMonetaryValueFormatToTemplate(model.SalarioTrabajado));
+            template = template.Replace("{EmployeeSalary}", model.Sueldo.ToString("C0"));
             template = template.Replace("{EmployeeIsComprehensiveSalary}", (model.SalarioIntegral) ? "Si" : "No");
 
             // Detalle del documento individual de nómina electrónica
-            template = template.Replace("{1 SB}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{HEDs}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{HENs}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{HRNs}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{HEDDFs}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{HRDDFs}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{HENDFs}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{HRNDFs}", this.GetMonetaryValueFormatToTemplate("0.00"));
+            template = template.Replace("{1 SB}", this.GetMonetaryValueFormatToTemplate(model.SalarioTrabajado));
+            template = template.Replace("{HEDs}", this.GetMonetaryValueFormatToTemplate(model.HED));
+            template = template.Replace("{HENs}", this.GetMonetaryValueFormatToTemplate(model.HEN));
+            template = template.Replace("{HRNs}", this.GetMonetaryValueFormatToTemplate(model.HRN));
+            template = template.Replace("{HEDDFs}", this.GetMonetaryValueFormatToTemplate(model.HEDDF));
+            template = template.Replace("{HRDDFs}", this.GetMonetaryValueFormatToTemplate(model.HRDDF));
+            template = template.Replace("{HENDFs}", this.GetMonetaryValueFormatToTemplate(model.HENDF));
+            template = template.Replace("{HRNDFs}", this.GetMonetaryValueFormatToTemplate(model.HRNDF));
             template = template.Replace("{Vacaciones}", this.GetMonetaryValueFormatToTemplate(model.Pago));
-            template = template.Replace("{Primas}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{Cesantias}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{Incapacidades}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{Licencias}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{Aux. Transporte}", this.GetMonetaryValueFormatToTemplate("0.00"));
+            template = template.Replace("{Primas}", this.GetMonetaryValueFormatToTemplate(model.Pri_Pago));
+            template = template.Replace("{Cesantias}", this.GetMonetaryValueFormatToTemplate(model.Ces_Pago));
+            template = template.Replace("{Incapacidades}", this.GetMonetaryValueFormatToTemplate(model.Inc_Pago));
+            template = template.Replace("{Licencias}", this.GetMonetaryValueFormatToTemplate(model.Lic_Pago));
+            template = template.Replace("{Aux. Transporte}", this.GetMonetaryValueFormatToTemplate(model.AuxTransporte));
             template = template.Replace("{Bonificaciones}", this.GetMonetaryValueFormatToTemplate(model.BonificacionNS));
-            template = template.Replace("{Comisiones}", this.GetMonetaryValueFormatToTemplate("0.00"));
-            template = template.Replace("{Compensaciones}", this.GetMonetaryValueFormatToTemplate("0.00"));
+            template = template.Replace("{Comisiones}", this.GetMonetaryValueFormatToTemplate(model.Comisiones));
+            template = template.Replace("{Compensaciones}", this.GetMonetaryValueFormatToTemplate(model.CompensacionE));
 
             // Deducciones
             template = template.Replace("{Health}", this.GetMonetaryValueFormatToTemplate(model.s_Deduccion));
@@ -139,9 +143,9 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{AccountType}", this.GetValueFormatToTemplate(model.TipoCuenta));
             template = template.Replace("{AccountNumber}", this.GetValueFormatToTemplate(model.NumeroCuenta));
             template = template.Replace("{CurrencyType}", this.GetValueFormatToTemplate(model.TipoMoneda));
-            template = template.Replace("{TotalAccrued}", this.GetMonetaryValueFormatToTemplate(model.DevengadosTotal));
-            template = template.Replace("{TotalDeductions}", this.GetMonetaryValueFormatToTemplate(model.DeduccionesTotal));
-            template = template.Replace("{TotalVoucher}", this.GetMonetaryValueFormatToTemplate(model.ComprobanteTotal));
+            template = template.Replace("{TotalAccrued}", model.DevengadosTotal.ToString("C0"));
+            template = template.Replace("{TotalDeductions}", model.DeduccionesTotal.ToString("C0"));
+            template = template.Replace("{TotalVoucher}", model.ComprobanteTotal.ToString("C0"));
 
             template = template.Replace("{DocumentValidated}", this.GetValueFormatToTemplate(model.Info_FechaGen));
             template = template.Replace("{DocumentGenerated}", this.GetValueFormatToTemplate(model.FechaGen));

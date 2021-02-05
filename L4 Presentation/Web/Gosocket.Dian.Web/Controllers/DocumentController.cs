@@ -39,6 +39,7 @@ using iTextSharp.tool.xml.html;
 using iTextSharp.tool.xml.pipeline.css;
 using iTextSharp.tool.xml.pipeline.end;
 using iTextSharp.tool.xml.parser;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -57,6 +58,32 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
+
+        public TableContinuationToken ContinuationTokenObject
+        {
+            get
+            {
+                if (Session[$"ContinuationTokenObject"] == null) return null;
+                return Session[$"ContinuationTokenObject"] as TableContinuationToken;
+            }
+            set
+            {
+                Session[$"ContinuationTokenObject"] = value;
+            }
+        }
+        public TableContinuationToken PreviousTokenObject
+        {
+            get
+            {
+                if (Session[$"PreviousTokenObject"] == null) return null;
+                return Session[$"PreviousTokenObject"] as TableContinuationToken;
+            }
+            set
+            {
+                Session[$"PreviousTokenObject"] = value;
+            }
+        }
+
         #region Properties
 
 
@@ -293,7 +320,7 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{DirType}", dataValues.globalDocPayrolls.LugarTrabajoDireccion.ToString());
             template = template.Replace("{PaisType}", dataValues.globalDocPayrolls.Pais.ToString());
             template = template.Replace("{DepType}", dataValues.globalDocPayrolls.DepartamentoEstado.ToString());
-            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());            
+            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());
 
             // Employer Data
             template = template.Replace("{NitEmp}", dataValues.globalDocPayrolls.Emp_NIT.ToString());
@@ -302,7 +329,7 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{PaisTypeEmp}", dataValues.globalDocPayrolls.Emp_Pais.ToString());
             template = template.Replace("{DepTypeEmp}", dataValues.globalDocPayrolls.Emp_DepartamentoEstado.ToString());
             template = template.Replace("{MunTypeEmp}", dataValues.globalDocPayrolls.Emp_MunicipioCiudad.ToString());
-            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());           
+            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());
             template = template.Replace("{FrecuencyNomina}", dataValues.globalDocPayrolls.PeriodoNomina.ToString());
             template = template.Replace("{DateEmpIngType}", dataValues.globalDocPayrolls.FechaIngreso.ToString());
             template = template.Replace("{AntType}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
@@ -321,7 +348,7 @@ namespace Gosocket.Dian.Web.Controllers
             template = template.Replace("{NumberLibraryType}", dataValues.globalDocPayrolls.NumeroCuenta.ToString());
             template = template.Replace("{TotalDevType}", dataValues.globalDocPayrolls.DevengadosTotal.ToString());
             template = template.Replace("{TotalDedType}", dataValues.globalDocPayrolls.DeduccionesTotal.ToString());
-           
+
             // ToTal Advances
             template = template.Replace("{NumNomType}", dataValues.globalDocPayrolls.Numero.ToString());
             template = template.Replace("{DateGenType}", dataValues.globalDocPayrolls.FechaGen.ToString());
@@ -370,193 +397,6 @@ namespace Gosocket.Dian.Web.Controllers
         //[ValidateAntiForgeryToken]
         public async Task<ActionResult> ExportPDF(PayrollViewModel model)
         {
-            if(String.IsNullOrEmpty(model.NumeroDocumento))
-            {
-                int contadorValidaciones = 0;
-                if (!String.IsNullOrEmpty(model.CUNE))
-                    contadorValidaciones++;
-                if (model.LetraPrimerApellido != "00")
-                    contadorValidaciones++;
-                if (Int32.Parse(model.MesValidacion) != 0)
-                    contadorValidaciones++;
-                if (!String.IsNullOrEmpty(model.RangoNumeracionMenor) && !String.IsNullOrEmpty(model.RangoNumeracionMayor))
-                    contadorValidaciones++;
-                if (model.Ciudad != "00")
-                    contadorValidaciones++;
-                if (model.TipoDocumento != "00")
-                    contadorValidaciones++;
-                if (model.RangoSalarial != "00")
-                    contadorValidaciones++;
-                if (contadorValidaciones < 3)
-                {
-                    model.Mensaje = "Debe seleccionar al menos 3 filtros o el Numero de Documento";
-                    loadData(ref model);
-                    model.Payrolls = new List<DocumentViewPayroll>();
-                    return View(model);
-                }
-                else
-                    model.Mensaje = string.Empty;
-            }
-            else
-            {
-                model.Mensaje = string.Empty;
-            }
-            List<GlobalDocPayroll> resultPayroll = new List<GlobalDocPayroll>();
-            if(!String.IsNullOrEmpty(model.CUNE))
-            {
-                resultPayroll = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t => t.CUNE == model.CUNE).ToList();
-            }
-            else
-            {
-                resultPayroll = payrollTableManager.FindAll<GlobalDocPayroll>().ToList();
-            }
-            if (model.LetraPrimerApellido != "00")
-            {
-                string letra = LetraModel.List().Where(r => r.Code == model.LetraPrimerApellido).FirstOrDefault().Name;
-                resultPayroll = resultPayroll.Where(t => t.PrimerApellido.StartsWith(letra)).ToList();
-            }
-            List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
-            if(Int32.Parse(model.MesValidacion)!=0)
-            {
-                foreach (var payroll in resultPayroll)                {
-                    var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
-                    if(documentMeta.Timestamp.Month == Int32.Parse(model.MesValidacion))
-                    {
-                        var document = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
-                        result.Add(new DocumentViewPayroll
-                        {
-                            PartitionKey = payroll.PartitionKey,
-                            RowKey = payroll.RowKey,
-                            link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
-                            NumeroNomina = payroll.Numero,
-                            ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
-                            TipoDocumento = payroll.TipoDocumento,
-                            NoDocumento = payroll.NumeroDocumento,
-                            Salario = payroll.Sueldo,
-                            Devengado = payroll.DevengadosTotal,
-                            Deducido = payroll.DeduccionesTotal,
-                            ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
-                            MesValidacion = documentMeta.Timestamp.Month.ToString(),
-                            Novedad = documentMeta.Novelty,
-                            NumeroAjuste = documentMeta.DocumentReferencedKey,
-                            Resultado = document.ValidationStatusName,
-                            Ciudad = payroll.MunicipioCiudad
-                        });
-                    }
-                }
-
-            }
-            else
-            {
-                foreach (var payroll in resultPayroll)
-                {
-                    var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
-                    var document = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
-                    result.Add(new DocumentViewPayroll
-                    {
-                        PartitionKey = payroll.PartitionKey,
-                        RowKey = payroll.RowKey,
-                        link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
-                        NumeroNomina = payroll.Numero,
-                        ApellidosNombre = payroll.PrimerApellido + payroll.SegundoApellido + payroll.PrimerNombre,
-                        TipoDocumento = payroll.TipoDocumento,
-                        NoDocumento = payroll.NumeroDocumento,
-                        Salario = payroll.Sueldo,
-                        Devengado = payroll.DevengadosTotal,
-                        Deducido = payroll.DeduccionesTotal,
-                        ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
-                        MesValidacion = documentMeta.Timestamp.Month.ToString(),
-                        Novedad = documentMeta.Novelty,
-                        NumeroAjuste = documentMeta.DocumentReferencedKey,
-                        Resultado = document.ValidationStatusName,
-                        Ciudad = payroll.MunicipioCiudad
-                    });
-                }
-            }
-            if (!String.IsNullOrEmpty(model.RangoNumeracionMenor) && !String.IsNullOrEmpty(model.RangoNumeracionMayor))
-            {
-                result = result.Where(t => Int32.Parse(t.NumeroNomina) >= Int32.Parse(model.RangoNumeracionMenor) && Int32.Parse(t.NumeroNomina) <= Int32.Parse(model.RangoNumeracionMayor)).ToList();
-            }
-            if (!String.IsNullOrEmpty(model.NumeroDocumento))
-            {
-                result = result.Where(t => t.NoDocumento == model.NumeroDocumento).ToList();
-            }
-            if (model.Ciudad != "00")
-            {                
-                result = result.Where(t => t.Ciudad == model.Ciudad).ToList();
-            }
-            if (model.TipoDocumento != "00")
-            {
-                result = result.Where(t => t.TipoDocumento == model.TipoDocumento).ToList();
-            }
-            if(model.RangoSalarial != "00")
-            {
-                switch(model.RangoSalarial)
-                {
-                    case "01":
-                        result = result.Where(t => t.Salario !=null && Int32.Parse(t.Salario) <= 1000000).ToList();
-                        break;
-                    case "02":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 1000000 && Int32.Parse(t.Salario) <= 2000000).ToList();
-                        break;
-                    case "03":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 2000000 && Int32.Parse(t.Salario) <= 3000000).ToList();
-                        break;
-                    case "04":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 3000000 && Int32.Parse(t.Salario) <= 5000000).ToList();
-                        break;
-                    case "05":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 5000000 && Int32.Parse(t.Salario) <= 10000000).ToList();
-                        break;
-                    case "06":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 10000000 && Int32.Parse(t.Salario) <= 20000000).ToList();
-                        break;
-                    case "07":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 20000000).ToList();
-                        break;
-                }
-            }
-            if (model.Ordenar != "00")
-            {
-                switch (model.Ordenar)
-                {
-                    case "01":
-                        result = result.OrderBy(t => t.NoDocumento).ToList();
-                        break;
-                    case "02":
-                        result = result.OrderByDescending(t => t.NoDocumento).ToList();
-                        break;
-                    case "03":
-                        result = result.OrderBy(t => t.ApellidosNombre).ToList();
-                        break;
-                    case "04":
-                        result = result.OrderByDescending(t => t.ApellidosNombre).ToList();
-                        break;
-                }
-            }
-            model.Payrolls = result;
-            loadData(ref model);
-            return View(model);
-        }
-
-        [ExcludeFilter(typeof(Authorization))]
-        public ActionResult Payroll()
-        {
-            var model = new PayrollViewModel();
-
-            loadData(ref model);
-            model.Payrolls = firstLoadPayroll();
-            ViewBag.CurrentPage = Navigation.NavigationEnum.Payroll;
-
-            return View(model);
-        }
-
-        [ExcludeFilter(typeof(Authorization))]
-        [HttpPost]
-        public async Task<ActionResult> Payroll(PayrollViewModel model)
-        {
-            ViewBag.CurrentPage = Navigation.NavigationEnum.Payroll;
-
             if (String.IsNullOrEmpty(model.NumeroDocumento))
             {
                 int contadorValidaciones = 0;
@@ -682,25 +522,242 @@ namespace Gosocket.Dian.Web.Controllers
                 switch (model.RangoSalarial)
                 {
                     case "01":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) <= 1000000).ToList();
+                        result = result.Where(t => t.Salario != null && t.Salario <= 1000000).ToList();
                         break;
                     case "02":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 1000000 && Int32.Parse(t.Salario) <= 2000000).ToList();
+                        result = result.Where(t => t.Salario != null && t.Salario > 1000000 && t.Salario <= 2000000).ToList();
                         break;
                     case "03":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 2000000 && Int32.Parse(t.Salario) <= 3000000).ToList();
+                        result = result.Where(t => t.Salario != null && t.Salario > 2000000 && t.Salario <= 3000000).ToList();
                         break;
                     case "04":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 3000000 && Int32.Parse(t.Salario) <= 5000000).ToList();
+                        result = result.Where(t => t.Salario != null && t.Salario > 3000000 && t.Salario <= 5000000).ToList();
                         break;
                     case "05":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 5000000 && Int32.Parse(t.Salario) <= 10000000).ToList();
+                        result = result.Where(t => t.Salario != null && t.Salario > 5000000 && t.Salario <= 10000000).ToList();
                         break;
                     case "06":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 10000000 && Int32.Parse(t.Salario) <= 20000000).ToList();
+                        result = result.Where(t => t.Salario != null && t.Salario > 10000000 && t.Salario <= 20000000).ToList();
                         break;
                     case "07":
-                        result = result.Where(t => t.Salario != null && Int32.Parse(t.Salario) > 20000000).ToList();
+                        result = result.Where(t => t.Salario != null && t.Salario > 20000000).ToList();
+                        break;
+                }
+            }
+            if (model.Ordenar != "00")
+            {
+                switch (model.Ordenar)
+                {
+                    case "01":
+                        result = result.OrderBy(t => t.NoDocumento).ToList();
+                        break;
+                    case "02":
+                        result = result.OrderByDescending(t => t.NoDocumento).ToList();
+                        break;
+                    case "03":
+                        result = result.OrderBy(t => t.ApellidosNombre).ToList();
+                        break;
+                    case "04":
+                        result = result.OrderByDescending(t => t.ApellidosNombre).ToList();
+                        break;
+                }
+            }
+            model.Payrolls = result;
+            loadData(ref model);
+            return View(model);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult Payroll()
+        {
+            var model = new PayrollViewModel();
+
+            loadData(ref model);
+            model.Payrolls = firstLoadPayroll();
+            ViewBag.CurrentPage = Navigation.NavigationEnum.Payroll;
+
+            return View(model);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        [HttpPost]
+        public async Task<ActionResult> Payroll(PayrollViewModel model)
+        {
+            ViewBag.CurrentPage = Navigation.NavigationEnum.Payroll;
+            
+            if (String.IsNullOrEmpty(model.NumeroDocumento))
+            {
+                int contadorValidaciones = 0;
+                if (!String.IsNullOrEmpty(model.CUNE))
+                    contadorValidaciones++;
+                if (model.LetraPrimerApellido != "00")
+                    contadorValidaciones++;
+                if (Int32.Parse(model.MesValidacion) != 0)
+                    contadorValidaciones++;
+                if (!String.IsNullOrEmpty(model.RangoNumeracionMenor) && !String.IsNullOrEmpty(model.RangoNumeracionMayor))
+                    contadorValidaciones++;
+                if (model.Ciudad != "00")
+                    contadorValidaciones++;
+                if (model.TipoDocumento != "00")
+                    contadorValidaciones++;
+                if (model.RangoSalarial != "00")
+                    contadorValidaciones++;
+                if (contadorValidaciones < 3)
+                {
+                    model.Mensaje = "Debe seleccionar al menos 3 filtros o el Número de Documento";
+                    loadData(ref model);
+                    model.Payrolls = new List<DocumentViewPayroll>();
+                    return View(model);
+                }
+                else
+                    model.Mensaje = string.Empty;
+            }
+            else
+            {
+                model.Mensaje = string.Empty;
+            }
+
+            // Cuando 'model.Page == 0' es porque se dio click en el botón 'Buscar' 
+            // o volvió al inicio de la paginación.
+            // Se reinician las variables de Sesión...
+            if (model.Page == 0)
+            {
+                this.ContinuationTokenObject = null;
+                this.PreviousTokenObject = null;
+            }
+
+            TableContinuationToken continuationToken = null;
+            if (model.DirectionToPagination == "next") continuationToken = this.ContinuationTokenObject;
+            else if (model.DirectionToPagination == "prev") continuationToken = this.PreviousTokenObject;
+            else continuationToken = null;
+
+            List<GlobalDocPayroll> resultPayroll = new List<GlobalDocPayroll>();
+            if (!String.IsNullOrEmpty(model.CUNE))
+            {
+                resultPayroll = payrollTableManager.FindAll<GlobalDocPayroll>(model.MaxItemCount, ref continuationToken).Where(t => t.CUNE == model.CUNE).ToList();
+            }
+            else
+            {
+                resultPayroll = payrollTableManager.FindAll<GlobalDocPayroll>(model.MaxItemCount, ref continuationToken).ToList();
+            }
+            // Si la variable 'continuationToken' es diferente de NULL, quiere decir que hay más datos para mostrar...
+            if (continuationToken != null)
+            {
+                this.PreviousTokenObject = this.ContinuationTokenObject;
+                this.ContinuationTokenObject = continuationToken;
+                model.HasMoreData = true;
+            }
+            else
+            {
+                this.PreviousTokenObject = this.ContinuationTokenObject;
+                this.ContinuationTokenObject = null;
+                model.HasMoreData = false;
+            }
+
+            if (model.LetraPrimerApellido != "00")
+            {
+                string letra = LetraModel.List().Where(r => r.Code == model.LetraPrimerApellido).FirstOrDefault().Name;
+                resultPayroll = resultPayroll.Where(t => t.PrimerApellido.StartsWith(letra)).ToList();
+            }
+            List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
+            if (Int32.Parse(model.MesValidacion) != 0)
+            {
+                foreach (var payroll in resultPayroll)
+                {
+                    var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
+                    if (documentMeta.Timestamp.Month == Int32.Parse(model.MesValidacion))
+                    {
+                        var document = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
+                        result.Add(new DocumentViewPayroll
+                        {
+                            PartitionKey = payroll.PartitionKey,
+                            RowKey = payroll.RowKey,
+                            link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
+                            NumeroNomina = payroll.Numero,
+                            ApellidosNombre = $"{payroll.PrimerApellido} {payroll.SegundoApellido} {payroll.PrimerNombre}",
+                            TipoDocumento = payroll.TipoDocumento,
+                            NoDocumento = payroll.NumeroDocumento,
+                            Salario = payroll.Sueldo,
+                            Devengado = payroll.DevengadosTotal,
+                            Deducido = payroll.DeduccionesTotal,
+                            ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
+                            MesValidacion = documentMeta.Timestamp.Month.ToString(),
+                            Novedad = documentMeta.Novelty,
+                            NumeroAjuste = documentMeta.DocumentReferencedKey,
+                            Resultado = document.ValidationStatusName,
+                            Ciudad = payroll.MunicipioCiudad
+                        });
+                    }
+                }
+
+            }
+            else
+            {
+                foreach (var payroll in resultPayroll)
+                {
+                    var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
+                    var document = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
+                    result.Add(new DocumentViewPayroll
+                    {
+                        PartitionKey = payroll.PartitionKey,
+                        RowKey = payroll.RowKey,
+                        link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
+                        NumeroNomina = payroll.Numero,
+                        ApellidosNombre = $"{payroll.PrimerApellido} {payroll.SegundoApellido} {payroll.PrimerNombre}",
+                        TipoDocumento = payroll.TipoDocumento,
+                        NoDocumento = payroll.NumeroDocumento,
+                        Salario = payroll.Sueldo,
+                        Devengado = payroll.DevengadosTotal,
+                        Deducido = payroll.DeduccionesTotal,
+                        ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
+                        MesValidacion = documentMeta.Timestamp.Month.ToString(),
+                        Novedad = documentMeta.Novelty,
+                        NumeroAjuste = documentMeta.DocumentReferencedKey,
+                        Resultado = document.ValidationStatusName,
+                        Ciudad = payroll.MunicipioCiudad
+                    });
+                }
+            }
+            if (!String.IsNullOrEmpty(model.RangoNumeracionMenor) && !String.IsNullOrEmpty(model.RangoNumeracionMayor))
+            {
+                result = result.Where(t => Int32.Parse(t.NumeroNomina) >= Int32.Parse(model.RangoNumeracionMenor) && Int32.Parse(t.NumeroNomina) <= Int32.Parse(model.RangoNumeracionMayor)).ToList();
+            }
+            if (!String.IsNullOrEmpty(model.NumeroDocumento))
+            {
+                result = result.Where(t => t.NoDocumento == model.NumeroDocumento).ToList();
+            }
+            if (model.Ciudad != "00")
+            {
+                result = result.Where(t => t.Ciudad == model.Ciudad).ToList();
+            }
+            if (model.TipoDocumento != "00")
+            {
+                result = result.Where(t => t.TipoDocumento == model.TipoDocumento).ToList();
+            }
+            if (model.RangoSalarial != "00")
+            {
+                switch (model.RangoSalarial)
+                {
+                    case "01":
+                        result = result.Where(t => t.Salario <= 1000000).ToList();
+                        break;
+                    case "02":
+                        result = result.Where(t => t.Salario > 1000000 && t.Salario <= 2000000).ToList();
+                        break;
+                    case "03":
+                        result = result.Where(t => t.Salario > 2000000 && t.Salario <= 3000000).ToList();
+                        break;
+                    case "04":
+                        result = result.Where(t => t.Salario > 3000000 && t.Salario <= 5000000).ToList();
+                        break;
+                    case "05":
+                        result = result.Where(t => t.Salario > 5000000 && t.Salario <= 10000000).ToList();
+                        break;
+                    case "06":
+                        result = result.Where(t => t.Salario > 10000000 && t.Salario <= 20000000).ToList();
+                        break;
+                    case "07":
+                        result = result.Where(t => t.Salario > 20000000).ToList();
                         break;
                 }
             }
@@ -1453,10 +1510,10 @@ namespace Gosocket.Dian.Web.Controllers
         List<DocumentViewPayroll> firstLoadPayroll()
         {
             List<DocumentViewPayroll> result = new List<DocumentViewPayroll>();
-            List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t=>t.PrimerApellido.StartsWith("A") && t.Sueldo != null && Int32.Parse(t.Sueldo)<1000000).ToList();
+            List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().Where(t => t.PrimerApellido.StartsWith("A") && t.Sueldo < 1000000).ToList();
             //List<GlobalDocPayroll> payrolls = payrollTableManager.FindAll<GlobalDocPayroll>().ToList();
-           foreach (var payroll in payrolls)
-           {
+            foreach (var payroll in payrolls)
+            {
                 var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(payroll.CUNE, payroll.CUNE);
                 var document = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
                 if (documentMeta.Timestamp.Month == DateTime.Now.Month)
@@ -1479,7 +1536,7 @@ namespace Gosocket.Dian.Web.Controllers
                         NumeroAjuste = documentMeta.DocumentReferencedKey,
                         Resultado = document.ValidationStatusName,
                         Ciudad = payroll.MunicipioCiudad
-                    }) ;
+                    });
                 }
             }
             return result;
