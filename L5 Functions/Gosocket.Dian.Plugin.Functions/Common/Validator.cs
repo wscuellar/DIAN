@@ -270,9 +270,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             data.trackId = data.trackId.ToLower();
-            var ValDev = objCune.ValDev?.Trim();
-            var ValDesc = objCune.ValDesc?.Trim();
-            var ValTol = objCune.ValTol?.Trim();
+
+            var ValDev = objCune?.ValDev.ToString("F2");
+            var ValDesc = objCune?.ValDesc.ToString("F2");
+            var ValTol = objCune?.ValTol.ToString("F2");
+
             var errorCode = ConfigurationManager.GetValue("ErrorCode_NIE024");
 
             string key = string.Empty;
@@ -295,9 +297,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             errorMessarge = ConfigurationManager.GetValue("ErrorMessage_NIE024");
             var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessarge };
 
-            //if (string.IsNullOrEmpty(ValDev)) ValDev = "0.00"; else ValDev = TruncateDecimal(decimal.Parse(ValDev), 2).ToString("F2");
-            //if (string.IsNullOrEmpty(ValDesc)) ValDesc = "0.00"; else ValDesc = TruncateDecimal(decimal.Parse(ValDesc), 2).ToString("F2");
-            //if (string.IsNullOrEmpty(ValTol)) ValTol = "0.00"; else ValTol = TruncateDecimal(decimal.Parse(ValTol), 2).ToString("F2");
+            ValDev = (ValDev == null) ? "0.00" : ValDev = TruncateDecimal(decimal.Parse(ValDev), 2).ToString("F2");
+            ValDesc = (ValDesc == null) ? "0.00" : ValDesc = TruncateDecimal(decimal.Parse(ValDesc), 2).ToString("F2");
+            ValTol = (ValTol == null) ? "0.00" :  ValTol = TruncateDecimal(decimal.Parse(ValTol), 2).ToString("F2");
 
             var NumNIE = objCune.NumNIE;
             var FechNIE = objCune.FecNIE;
