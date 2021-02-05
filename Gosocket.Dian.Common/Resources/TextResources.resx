@@ -271,4 +271,16 @@
   <data name="SendEmailFailed" xml:space="preserve">
     <value>No fue posible enviar el correo</value>
   </data>
+  <data name="LastPasswordWrong" xml:space="preserve">
+    <value>La contraseña anterior no es correcta</value>
+  </data>
+  <data name="PasswordDoesNotMatch" xml:space="preserve">
+    <value>La contraseña debe contener: al menos (1) mayúscula, (1) minúscula, (1) dígito, (1) símbolo o carácter especial y debe ser de almenos 6 carácteres.</value>
+  </data>
+  <data name="PasswordsArentEquals" xml:space="preserve">
+    <value>Las contraseñas no coinciden</value>
+  </data>
+  <data name="PasswordUpdatedSuccessfully" xml:space="preserve">
+    <value>Contraseña actualizada correctamente</value>
+  </data>
 </root>

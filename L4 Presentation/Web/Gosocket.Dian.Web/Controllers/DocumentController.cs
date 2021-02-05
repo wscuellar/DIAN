@@ -50,6 +50,7 @@ namespace Gosocket.Dian.Web.Controllers
         readonly GlobalDocumentService globalDocumentService = new GlobalDocumentService();
         private readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
+        private readonly TableManager globalDocReferenceAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayRoll");
@@ -88,10 +89,10 @@ namespace Gosocket.Dian.Web.Controllers
 
 
         private readonly FileManager _fileManager;
-      
+
         #endregion
-       
-       
+
+
         #region Constructor
 
         public DocumentController(IRadianPdfCreationService radianPdfCreationService,
@@ -147,7 +148,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
             return View(model);
         }
-                
+
 
         public ActionResult Viewer(Navigation.NavigationEnum nav)
         {
@@ -272,9 +273,9 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View(model);
         }
-       
-    
-     
+
+
+
 
         #region GetXmlFromStorageAsync
 
@@ -994,34 +995,61 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.Events = new List<EventsViewModel>();
             List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
-                if (eventsByInvoice.Any())
+            if (eventsByInvoice.Any())
+            {
+                foreach (var eventItem in eventsByInvoice)
                 {
-
-                    foreach (var eventItem in eventsByInvoice)
+                    if (!string.IsNullOrEmpty(eventItem.EventCode))
                     {
-                        if (!string.IsNullOrEmpty(eventItem.EventCode))
+                        GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
+                        if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
                         {
-                            GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
-                            if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
-                            {
-                                string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
-                                model.Events.Add(new EventsViewModel()
-                                {
-                                    DocumentKey = eventItem.DocumentKey,
-                                    EventCode = eventItem.EventCode,
-                                    Description = eventcodetext,
-                                    EventDate = eventItem.SigningTimeStamp,
-                                    SenderCode = eventItem.SenderCode,
-                                    Sender = eventItem.SenderName,
-                                    ReceiverCode = eventItem.ReceiverCode,
-                                    Receiver = eventItem.ReceiverName
-                                });
-                                model.Events = model.Events.OrderBy(t => t.EventCode).ToList();
-                            }
 
+                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                            model.Events.Add(new EventsViewModel()
+                            {
+                                DocumentKey = eventItem.DocumentKey,
+                                EventCode = eventItem.EventCode,
+                                Description = eventcodetext,
+                                EventDate = eventItem.SigningTimeStamp,
+                                SenderCode = eventItem.SenderCode,
+                                Sender = eventItem.SenderName,
+                                ReceiverCode = eventItem.ReceiverCode,
+                                Receiver = eventItem.ReceiverName
+                            });
+                            //Adiciono el evento de finalizacion de mandato.
+                            if (eventItem.EventCode == "043")
+                            {
+                                //Se busca en la GlobalDocReferenceAttorney 
+                                GlobalDocReferenceAttorney attorney = globalDocReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(eventItem.DocumentKey);
+                                //En el campo DocReferencedEndAttorney si tiene valor 
+                                if (attorney != null && !string.IsNullOrEmpty(attorney.DocReferencedEndAthorney))
+                                {
+                                    //Se busca en la GlobalDocValidatorDocumentMeta y se saca el evento de terminacion.
+                                    GlobalDocValidatorDocumentMeta eventEndMandate = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(attorney.DocReferencedEndAthorney, attorney.DocReferencedEndAthorney);
+                                    if(eventEndMandate != null)
+                                    {
+                                        eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode)));
+                                        model.Events.Add(new EventsViewModel()
+                                        {
+                                            DocumentKey = eventEndMandate.DocumentKey,
+                                            EventCode = eventEndMandate.EventCode,
+                                            Description = eventcodetext,
+                                            EventDate = eventEndMandate.SigningTimeStamp,
+                                            SenderCode = eventEndMandate.SenderCode,
+                                            Sender = eventEndMandate.SenderName,
+                                            ReceiverCode = eventEndMandate.ReceiverCode,
+                                            Receiver = eventEndMandate.ReceiverName
+                                        });
+                                    }
+                                }
+                            }
+                            
                         }
+
                     }
-                
+                }
+                model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
             }
 
             return model;
@@ -1331,10 +1359,10 @@ namespace Gosocket.Dian.Web.Controllers
             if (events.Count() == 0)
                 return RadianDocumentStatus.DontApply.GetDescription();
 
-            int lastEventCode = int.Parse(events.Where(ev => !ev.Code.Equals($"0{(int)EventStatus.Avales}") 
-                    &&  !ev.Code.Equals($"0{(int)EventStatus.Mandato}") 
-                    &&  !ev.Code.Equals($"0{(int)EventStatus.ValInfoPago}") 
-                    &&  !ev.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).OrderBy(t => t.Date).Last().Code);
+            int lastEventCode = int.Parse(events.Where(ev => !ev.Code.Equals($"0{(int)EventStatus.Avales}")
+                    && !ev.Code.Equals($"0{(int)EventStatus.Mandato}")
+                    && !ev.Code.Equals($"0{(int)EventStatus.ValInfoPago}")
+                    && !ev.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).OrderBy(t => t.Date).Last().Code);
 
             if (lastEventCode == ((int)EventStatus.NegotiatedInvoice)
                 || lastEventCode == ((int)EventStatus.AnulacionLimitacionCirculacion))

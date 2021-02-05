@@ -7,6 +7,7 @@ namespace Gosocket.Dian.Application
     public class GlobalDocValidationDocumentMetaService : IGlobalDocValidationDocumentMetaService
     {
         private readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
+        private readonly TableManager ReferenceAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
 
         //Se utiliza en invoice, eventitem, referenceMeta
         public GlobalDocValidatorDocumentMeta DocumentValidation(string reference)
@@ -16,8 +17,7 @@ namespace Gosocket.Dian.Application
 
         public List<GlobalDocReferenceAttorney> ReferenceAttorneys(string documentKey, string documentReferencedKey, string receiverCode, string senderCode)
         {
-            return documentMetaTableManager
-                .FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(documentReferencedKey, senderCode);
+            return new List<GlobalDocReferenceAttorney>() { ReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(documentKey) };
         }
 
         public List<GlobalDocValidatorDocumentMeta> GetAssociatedDocuments(string documentKey, string eventCode)

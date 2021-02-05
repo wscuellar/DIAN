@@ -12,7 +12,9 @@
 
 }
 <style>
-
+    .bhoechie-tab-menu {
+        padding: 0px !important;
+    }
     .textRecovery {
         margin-top: 15px;
         margin-bottom: 15px;
@@ -30,6 +32,7 @@
         color: #348441;
     }
 </style>
+
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 
 <div class="row">
@@ -131,11 +134,13 @@
             $('#legalRepresentative').click(function () {
                 $("#panel-form-login").hide();
                 $(".companyLogin").show();
+                cleanFields();
             });
 
             $('#authorizedUser').click(function () {
                 $("#panel-form-login").hide();
                 $(".userExLogin").show();
+                cleanFields();
             });
 
             $('.certificate-login-link').click(function () {
@@ -150,8 +155,9 @@
                 $('.field-validation-error').html('');
                 $('#DocumentKey').val('');
                 $('#PersonCode').val('');
-                $('#CompanyCode').val('');
-                $('#UserCode').val('');
+                $('input[name="CompanyCode"]').val('');
+                $('input[name="UserCode"]').val('');
+                $('#Password').val('');
             };
             rememberPassword(htmlPartial, '@Url.Action("RecoveryPassword", "User")');
             grecaptcha.ready(function () {

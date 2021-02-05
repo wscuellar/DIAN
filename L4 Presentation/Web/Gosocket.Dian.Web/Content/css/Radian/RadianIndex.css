@@ -1955,6 +1955,10 @@ ul#list li a:hover {
     width: 200px;
 }
 
+#forgot-pasword-form{
+    margin-top: 20px;
+}
+
 #forgot-pasword-form .input-group {
     margin: auto;
 }
@@ -1964,6 +1968,14 @@ ul#list li a:hover {
 }
 
 #forgot-pasword-form .row {
-    width: 60%;
+    width: 75%;
     margin: auto;
+}
+
+.forgot-password .modal-dialog {
+    width: 500px;
+}
+
+.bhoechie-tab-menu {
+    padding: 0px !important;
 }

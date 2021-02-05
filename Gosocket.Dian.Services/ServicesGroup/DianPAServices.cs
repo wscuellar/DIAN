@@ -1455,54 +1455,25 @@ namespace Gosocket.Dian.Services.ServicesGroup
         {
             List<string> failedList = new List<string>();
             if (document != null)
-            {
-                if(eventCode == "043")
+            {               
+                if (meta == null)
+                    meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(
+                        document.DocumentKey, document.DocumentKey);
+               
+                failedList = new List<string>
                 {
-                    var cudeList = new List<string>
-                         {
-                             $"Regla: 90, Rechazo: Documento con CUDE '{document.DocumentKey}' procesado anteriormente."
-                         };
-                    failedList.AddRange(cudeList);
-                    response.IsValid = false;
-                    response.StatusCode = "99";
-                    response.StatusMessage = "Documento con errores en campos mandatorios.";
-                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                    response.ErrorMessage.AddRange(failedList);
-                    response.XmlDocumentKey = document.DocumentKey;
-                }
-                else
-                {
-                    if (meta == null)
-                        meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(document.DocumentKey, document.DocumentKey);
-
-                    if (documentType == "96")
-                    {
-                        var cudeList = new List<string>
-                         {
-                             $"Regla: 90, Rechazo: Documento con CUDE '{document.DocumentKey}' procesado anteriormente."
-                         };
-                        failedList.AddRange(cudeList);
-                    }
-                    else
-                    {
-                        var cudeList = new List<string>
-                         {
-                             $"Regla: 90, Rechazo: Documento con CUFE '{document.DocumentKey}' procesado anteriormente."
-                         };
-                        failedList.AddRange(cudeList);
-                    }
+                    $"Regla: 90, Rechazo: Documento procesado anteriormente."
+                };                          
+                response.IsValid = false;
+                response.StatusCode = "99";
+                response.StatusMessage = "Documento con errores en campos mandatorios.";
+                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                response.ErrorMessage.AddRange(failedList);
+                var xmlBytes = XmlUtil.GetApplicationResponseIfExist(meta);
+                response.XmlBase64Bytes = xmlBytes;
+                response.XmlDocumentKey = document.DocumentKey;
+                response.XmlFileName = meta.FileName;
                 
-
-                    response.IsValid = false;
-                    response.StatusCode = "99";
-                    response.StatusMessage = "Documento con errores en campos mandatorios.";
-                    response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                    response.ErrorMessage.AddRange(failedList);
-                    var xmlBytes = XmlUtil.GetApplicationResponseIfExist(meta);
-                    response.XmlBase64Bytes = xmlBytes;
-                    response.XmlDocumentKey = document.DocumentKey;
-                    response.XmlFileName = meta.FileName;
-                }
             }
 
             return response;

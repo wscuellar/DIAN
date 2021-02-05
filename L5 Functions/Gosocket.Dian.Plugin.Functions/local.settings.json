@@ -73,8 +73,19 @@
     "CosmosDbDataBaseId": "DocumentsData",
     "CosmosDbCollectionID": "Documents",
     "ErrorCode_AAH06": "AAH06",
+    "ErrorCode_AAH07": "AAH07",
+    "ErrorMessage_AAH07": "Esta UUID no existe en la base de datos de la DIAN",
     "ErrorMessage_AAH06": "El nÚmero de documento electrónico referenciado no coinciden con reportado.",
-    "ErrorMessage_AAH06_043": "El número de documento electrónico referenciado no coinciden con un mandato reportado."
+    "ErrorMessage_AAH06_043": "El número de documento electrónico referenciado no coinciden con un mandato reportado.",
+    "ErrorMessage_LGC01": "Evento registrado previamente",
+    "ErrorCode_LGC01": "LGC01",
+    "ErrorCode_LGC36": "LGC36",
+    "ErrorMessage_LGC36": "El mandatario no puede enviar este evento ya que no cuenta con un mandato vigente",
+    "ErrorCode_NIE024": "NIE024",
+    "ErrorMessage_NIE024": "Se debe indicar el CUNE según la definición establecida."
+
+
+
 
     // Test UAT INDRA
     //"Environment": "Test",

@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -1310,7 +1311,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ApplicationUser user = userService.FindUserByEmail(string.Empty, email);
             UsersFreeBillerProfile userExisting = user != null ? userService.GetUserFreeBillerProfile(t => t.UserId == user.Id) : null;
-            
+
             // Encuentra al usuario con su correo electrónico
             if (userExisting == null)
             {
@@ -1378,6 +1379,61 @@ namespace Gosocket.Dian.Web.Controllers
             string result = model.Name.Substring(1, 1).ToUpper();
             result = $"{result}{model.Email.Split('@')[0]}{Guid.NewGuid().ToString("d").Substring(1, 4)}**";
             return result;
+        }
+
+        #endregion
+
+        #region EditUserPassword
+
+        [HttpPost]
+        [ExcludeFilter(typeof(Authorization))]
+        public JsonResult EditUserPassword(ChangePasswordModel model)
+        {
+            StringBuilder errors = new StringBuilder();
+            if (!ModelState.IsValid)
+            {
+                IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var item in allErrors)
+                    errors.AppendLine(item.ErrorMessage);
+                return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+            
+            ApplicationUser user = userService.GetByCode(model.UserCode);
+
+            if (user != null)
+            {
+                if (!UserManager.CheckPassword(user, model.UserOldPassword))
+                {
+                    return Json(new ResponseMessage(TextResources.LastPasswordWrong, "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                return Json(new ResponseMessage(TextResources.UserDoesntExist, "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            var pass = UserManager.PasswordHasher.HashPassword(model.UserPassword);
+
+            if (!model.UserPassword.Equals(model.UserPasswordConfirm))
+            {
+                return Json(new ResponseMessage(TextResources.PasswordsArentEquals, "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+            if (!Regex.IsMatch(model.UserPassword, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{6,}$"))
+            {
+                return Json(new ResponseMessage(TextResources.PasswordDoesNotMatch, "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+            
+            UserManager.RemovePassword(user.Id);
+            IdentityResult result = UserManager.AddPassword(user.Id, model.UserPassword);
+            if (result.Succeeded)
+            {
+                return Json(new ResponseMessage(TextResources.PasswordUpdatedSuccessfully, "PasswordChangedSuccessfully", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
+            }
+            
+            foreach (var item in result.Errors)
+                errors.Append(item);
+
+            return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
         }
 
         #endregion

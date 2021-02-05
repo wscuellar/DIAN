@@ -395,7 +395,7 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         ProfileFreeBillerId = profileId,
                         UserId = user.Id,
-                        CompanyCode = User.ContributorCode(),
+                        CompanyCode = uCompany.Code,
                         CompanyIdentificationType = User.IdentificationTypeId()
                     });
                 }
