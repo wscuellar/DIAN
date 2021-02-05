@@ -101,7 +101,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     documentMeta.DocumentTypeId,
                     nitModel.listID, 
                     documentMeta.CustomizationID,
-                    documentMeta.SigningTimeStamp,
+                    xmlParser.SigningTime,
                     nitModel.ValidityPeriodEndDate,
                     documentMeta.SenderCode,
                     documentMeta.ReceiverCode,
@@ -111,7 +111,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     nitModel.IssuerPartyName
                     );
 
-                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;
+                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;               
 
                 responses = await Instance.StartValidateSerieAndNumberAsync(trackId);                
                 validateResponses.AddRange(responses);

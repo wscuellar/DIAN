@@ -630,7 +630,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["DocumentKeyXpath"]) && !noteCodes.Contains(docTypeCode))
             {
-                stringBuilder.AppendLine($"{codeMessage}D06-(R) el valor UUID no está correctamente calculado.");
+                stringBuilder.AppendLine($"{codeMessage}D06: El valor UUID no está correctamente calculado.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -638,7 +638,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["NumberXpath"]))
             {
-                stringBuilder.AppendLine($"{codeMessage}D05-(R) El ID del Documento no puede estar vacío.");
+                stringBuilder.AppendLine($"{codeMessage}D05: El ID del Documento no puede estar vacío.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -646,7 +646,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]))
             {
-                stringBuilder.AppendLine($"{codeMessage}J21-(R) El NIT del Emisor no puede estar vacío.");
+                stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -654,7 +654,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(docTypeCode))
             {
-                stringBuilder.AppendLine("ZB05-(R) XML informado no corresponde a un tipo de documento valido: Facturas (nodo padre y tipos de documemto no son validos) o Nota de Crédito (nodo padre y tipo de documemto no es valido) o Nota de Débito (nodo padre no es valido) o Application Response (nodo padre no es valido)");
+                stringBuilder.AppendLine("ZB05: XML informado no corresponde a un tipo de documento valido: Facturas (nodo padre y tipos de documemto no son validos) o Nota de Crédito (nodo padre y tipo de documemto no es valido) o Nota de Débito (nodo padre no es valido) o Application Response (nodo padre no es valido)");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -712,7 +712,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(cune))
             {
-                stringBuilder.AppendLine($"{codeMessage}024-(R): Se debe indicar el CUNE según la definición establecida.");
+                stringBuilder.AppendLine($"{codeMessage}024: Se debe indicar el CUNE según la definición establecida.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -720,7 +720,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(cunePred) && docTypeCode == "12")
             {
-                stringBuilder.AppendLine($"{codeMessage}191-(R): Debe ir el CUNE del documento a Reemplazar");
+                stringBuilder.AppendLine($"{codeMessage}191: Debe ir el CUNE del documento a Reemplazar");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -728,7 +728,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(codigoTrabajador))
             {
-                stringBuilder.AppendLine($"{codeMessage}009-(R): Se debe indicar el Codigo del Trabajador.");
+                stringBuilder.AppendLine($"{codeMessage}009: Se debe indicar el Codigo del Trabajador.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -809,7 +809,7 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (providerCode == "800197268")
                 {
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAB19b") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAB19b"));
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAB19b") + ConfigurationManager.GetValue("ErrorMessage_AAB19b"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -817,7 +817,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (!UBLVersionID.Equals("UBL 2.1"))
                 {                    
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD01") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAD01"));
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD01") + ConfigurationManager.GetValue("ErrorMessage_AAD01"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -825,7 +825,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentID))
                 {                    
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH06") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAH06"));
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH06") + ConfigurationManager.GetValue("ErrorMessage_AAH06"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -833,7 +833,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(eventCode))
                 {
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH03") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH03") + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -844,7 +844,7 @@ namespace Gosocket.Dian.Services.Utils
                    || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
                    || eventCode == "045" || eventCode == "046"))
                 {
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH03") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH03") + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -860,14 +860,14 @@ namespace Gosocket.Dian.Services.Utils
                     {
                         if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34 && flagEvento)
                         {
-                            stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD05") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAD05"));
+                            stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD05") + ConfigurationManager.GetValue("ErrorMessage_AAD05"));
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
                         }
                         if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 46)
                         {
-                            stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD05a") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAD05a"));
+                            stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD05a") + ConfigurationManager.GetValue("ErrorMessage_AAD05a"));
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
@@ -876,28 +876,28 @@ namespace Gosocket.Dian.Services.Utils
 
                     if ((Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) && string.IsNullOrEmpty(receiverCode) && flagEvento)
                     {
-                        stringBuilder.AppendLine($"{codeMessage}G04-(R): El ID de receptor del evento no es Válido");
+                        stringBuilder.AppendLine($"{codeMessage}G04: El ID de receptor del evento no es Válido");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
                     }
                     else if ((Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(receiverCode) && flagEvento)
                     {
-                        stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el documento del endosatario");
+                        stringBuilder.AppendLine($"{codeMessage}G04: No fue informado el documento del endosatario");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
                     }
                     else if ( (Convert.ToInt32(eventCode) == 45 || Convert.ToInt32(eventCode) == 46) && string.IsNullOrEmpty(receiverCode) && flagEvento)
                     {
-                        stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el número de identificación.");
+                        stringBuilder.AppendLine($"{codeMessage}G04: No fue informado el número de identificación.");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
                     }
                     else if (string.IsNullOrEmpty(receiverCode))
                     {
-                        stringBuilder.AppendLine($"{codeMessage}G04-(R): No fue informado el literal “800197268”");
+                        stringBuilder.AppendLine($"{codeMessage}G04: No fue informado el literal “800197268”");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
@@ -905,7 +905,7 @@ namespace Gosocket.Dian.Services.Utils
 
                     if (listID == "1" && (Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(senderCode) && flagEvento)
                     {
-                        stringBuilder.AppendLine($"{codeMessage}F04-(R): No fue informado el Nit.");
+                        stringBuilder.AppendLine($"{codeMessage}F04: No fue informado el Nit.");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
@@ -915,14 +915,14 @@ namespace Gosocket.Dian.Services.Utils
                         if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34)
                         {
 
-                            stringBuilder.AppendLine($"{codeMessage}F04-(R): El ID de emisor del evento no es Valido..");
+                            stringBuilder.AppendLine($"{codeMessage}F04: El ID de emisor del evento no es Valido..");
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
                         }
                         else if (!(listID == "2" && (eventCode == "037" || eventCode == "038" || eventCode == "039")))
                         {
-                            stringBuilder.AppendLine($"{codeMessage}F04-(R): No fue informado el Nit.");
+                            stringBuilder.AppendLine($"{codeMessage}F04: No fue informado el Nit.");
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
@@ -933,7 +933,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentCude))
                 {
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD06") + "-(R): " + ConfigurationManager.GetValue("ErrorMessage_AAD06"));
+                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD06") + ":" + ConfigurationManager.GetValue("ErrorMessage_AAD06"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -941,7 +941,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(customizationId))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D02-(R): No corresponde a un código valido.");
+                    stringBuilder.AppendLine($"{codeMessage}D02: No corresponde a un código valido.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -952,7 +952,7 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (string.IsNullOrEmpty(documentKey))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D06-(R): el valor UUID no está correctamente calculado.");
+                    stringBuilder.AppendLine($"{codeMessage}D06: el valor UUID no está correctamente calculado.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -960,7 +960,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D05-(R): El ID del Documento no puede estar vacío.");
+                    stringBuilder.AppendLine($"{codeMessage}D05: El ID del Documento no puede estar vacío.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -968,7 +968,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(senderCode))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}J21-(R): El NIT del Emisor no puede estar vacío.");
+                    stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -977,7 +977,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(docTypeCode))
             {
-                stringBuilder.AppendLine("ZB05-(R): XML informado no corresponde a un tipo de documento valido: Facturas (nodo padre y tipos de documemto no son validos) o Nota de Crédito (nodo padre y tipo de documemto no es valido) o Nota de Débito (nodo padre no es valido) o Application Response (nodo padre no es valido)");
+                stringBuilder.AppendLine("ZB05: XML informado no corresponde a un tipo de documento valido: Facturas (nodo padre y tipos de documemto no son validos) o Nota de Crédito (nodo padre y tipo de documemto no es valido) o Nota de Débito (nodo padre no es valido) o Application Response (nodo padre no es valido)");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
