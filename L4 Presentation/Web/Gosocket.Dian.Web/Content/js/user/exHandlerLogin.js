@@ -1,16 +1,17 @@
-﻿function OnBeginAjax(response) {
-    showLoading("#panel-form", "Validando datos", "Por favor esperar");
+﻿
+function OnBeginAjax(response) {
+    showLoading("#panel-forma", "Validando datos", "Por favor esperar");
 }
 
 function OnSuccessAjax(response) {
-    hideLoading("#panel-form");
     if (response.Code == 200) {
-        setTimeout(() => showLoading("#panel-form", "Redireccionando...", "Por favor esperar"), 500);
         window.location.href = response.Message;
     } else {
+        hideLoading("#panel-forma");
         var confirmMessage = response.Message;
+        var closeEvent = () => {}
         var buttons = AlertExec();
-        showConfirmation(confirmMessage, buttons);
+        showConfirmation(confirmMessage, buttons, null, closeEvent);
     }
 }
 
