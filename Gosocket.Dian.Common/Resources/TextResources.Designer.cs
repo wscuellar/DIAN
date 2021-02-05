@@ -88,11 +88,38 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a CaptchaError.
+        /// </summary>
+        public static string CaptchaError {
+            get {
+                return ResourceManager.GetString("CaptchaError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Empresa no asociada a representante legal..
+        /// </summary>
+        public static string CompanyDoesntAssociate {
+            get {
+                return ResourceManager.GetString("CompanyDoesntAssociate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a confirm.
         /// </summary>
         public static string confirmType {
             get {
                 return ResourceManager.GetString("confirmType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Empresa no se encuentra habilitada..
+        /// </summary>
+        public static string DisabledCompany {
+            get {
+                return ResourceManager.GetString("DisabledCompany", resourceCulture);
             }
         }
         
@@ -214,6 +241,33 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Usuario no se encuentra activo.
+        /// </summary>
+        public static string InactiveUser {
+            get {
+                return ResourceManager.GetString("InactiveUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Falta algún dato del formulario.
+        /// </summary>
+        public static string IncompleteForm {
+            get {
+                return ResourceManager.GetString("IncompleteForm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Contribuyente tiene RUT en estado cancelado..
+        /// </summary>
+        public static string InvalidUserRut {
+            get {
+                return ResourceManager.GetString("InvalidUserRut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a La contraseña anterior no es correcta.
         /// </summary>
         public static string LastPasswordWrong {
@@ -237,6 +291,15 @@ namespace Gosocket.Dian.Common.Resources {
         public static string ModeElectroniDocWithoutTestSet {
             get {
                 return ResourceManager.GetString("ModeElectroniDocWithoutTestSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a ModelError.
+        /// </summary>
+        public static string ModelError {
+            get {
+                return ResourceManager.GetString("ModelError", resourceCulture);
             }
         }
         
@@ -336,6 +399,15 @@ namespace Gosocket.Dian.Common.Resources {
         public static string PasswordDoesNotMatch {
             get {
                 return ResourceManager.GetString("PasswordDoesNotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a PasswordError.
+        /// </summary>
+        public static string PasswordError {
+            get {
+                return ResourceManager.GetString("PasswordError", resourceCulture);
             }
         }
         
@@ -502,6 +574,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a UserError.
+        /// </summary>
+        public static string UserError {
+            get {
+                return ResourceManager.GetString("UserError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Ya existe un Usuario con el Tipo de Documento y Documento suministrados.
         /// </summary>
         public static string UserExistingDoc {
@@ -552,6 +633,24 @@ namespace Gosocket.Dian.Common.Resources {
         public static string WithCustomerList {
             get {
                 return ResourceManager.GetString("WithCustomerList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Error en el captcha.
+        /// </summary>
+        public static string WrongCaptcha {
+            get {
+                return ResourceManager.GetString("WrongCaptcha", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Contraseña incorrecta.
+        /// </summary>
+        public static string WrongPassword {
+            get {
+                return ResourceManager.GetString("WrongPassword", resourceCulture);
             }
         }
     }
