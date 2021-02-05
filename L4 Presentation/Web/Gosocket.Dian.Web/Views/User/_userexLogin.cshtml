@@ -6,12 +6,18 @@
         <a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
 
 
+
         @using (Ajax.BeginForm("ContributorUserLogin", "User", new AjaxOptions()
         {
             HttpMethod = "POST",
-            OnBegin = "start"
+            OnBegin = "OnBeginAjax",
+            OnSuccess = "OnSuccessAjax",
+            OnFailure = "OnFailureAjax"
         }))
         {
+
+        @*@using (Html.BeginForm("ContributorUserLogin", "User", FormMethod.Post, new { id = "userex-login-form" }))
+        {*@
             @Html.AntiForgeryToken()
             @Html.HiddenFor(x => x.RecaptchaToken, new { id = "CompanyRecaptchaToken", @class = "RecaptchaToken" })
             <div class="form-group">
@@ -48,13 +54,7 @@
                 @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger text-left" })
                 @Html.ValidationMessageFor(m => m.CompanyLoginFailed, "", new { @class = "text-danger text-left" })
             </div>
-            <div class="left-section textRecovery">
-                <p>
-                    <um>
-                        <button id="forgot-password" class="btn btn-link btn-link-recovery">Olvidé mi contraseña</button>
-                    </um>
-                </p>
-            </div>
+
             <button type="submit" id="login-auth-user" class="btn btn-gosocket btn-lg btn-block" style="margin-top: 10px;">
                 <i class=""></i> Entrar
             </button>

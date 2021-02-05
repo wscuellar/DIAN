@@ -1,18 +1,21 @@
-﻿//function OnBegin1(response) {debugger
-//    console.log(response);
-//}
+﻿function OnBeginAjax(response) {
+    showLoading("#panel-form", "Validando datos", "Por favor esperar");
+}
 
-//function OnSuccess1(response) {debugger
-//    if (response.Code == 200) {
-//        window.location.href = response.Message;
-//    } else {
-//        var confirmMessage = response.Message;
-//        var buttons = AlertExec();
-//        operationCancel
-//        showConfirmation(confirmMessage, buttons);
-//    }
-//}
+function OnSuccessAjax(response) {
+    hideLoading("#panel-form");
+    if (response.Code == 200) {
+        setTimeout(() => showLoading("#panel-form", "Redireccionando...", "Por favor esperar"), 500);
+        window.location.href = response.Message;
+    } else {
+        var confirmMessage = response.Message;
+        var buttons = AlertExec();
+        showConfirmation(confirmMessage, buttons);
+    }
+}
 
-//function OnFailure1(response) {debugger
-//    console.log(response);
-//}
+function OnFailureAjax(response) {
+    var confirmMessage = response.responseJSON.message;
+    var buttons = AlertExec();
+    showConfirmation(confirmMessage, buttons);
+}

@@ -36,7 +36,7 @@
 
 <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
 
-<div class="row">
+<div class="row" id="panel-form" data-target="#panel-form" data-toogle="panel-overlay">
     <div class="col-lg-6 col-md-6 col-sm-8 col-xs-9 bhoechie-tab-container">
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
             <div class="list-group">
@@ -119,12 +119,15 @@
     <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
     <script src="~/Content/js/user/exHandlerLogin.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+
+
 
     <script>
 
         $(document).ready(function () {
             var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordForm", recoverPasswordModel).ToString().Trim('"'))));
-
 
             $(".pxLogin").hide();
 
@@ -168,28 +171,6 @@
                 });
             });
         });
-
-        function start(response) {
-            debugger
-            console.log(response);
-        }
-
-        function success(response) {
-            debugger
-            if (response.Code == 200) {
-                window.location.href = response.Message;
-            } else {
-                var confirmMessage = response.Message;
-                var buttons = AlertExec();
-                operationCancel
-                showConfirmation(confirmMessage, buttons);
-            }
-        }
-
-        function failure(response) {
-            debugger
-            console.log(response);
-        }
 
     </script>
 }

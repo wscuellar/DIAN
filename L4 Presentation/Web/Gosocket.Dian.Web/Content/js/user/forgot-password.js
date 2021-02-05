@@ -1,5 +1,5 @@
 ﻿function rememberPassword(htmlPartial, url) {
-    $("#forgot-password").click(function (e) {debugger
+    $("#forgot-password").click(function (e) {
         e.preventDefault();
         var box = bootbox.dialog({
             message: htmlPartial,
