@@ -424,9 +424,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
             cmObject.FecNIE = xmlParser.globalDocPayrolls.Info_FechaGen;
             cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen;
-            cmObject.ValDev = Convert.ToString(xmlParser.globalDocPayrolls.DevengadosTotal);
-            cmObject.ValDesc = Convert.ToString(xmlParser.globalDocPayrolls.DeduccionesTotal);
-            cmObject.ValTol = Convert.ToString(xmlParser.globalDocPayrolls.ComprobanteTotal);
+            cmObject.ValDev = xmlParser.globalDocPayrolls.DevengadosTotal;
+            cmObject.ValDesc = xmlParser.globalDocPayrolls.DeduccionesTotal;
+            cmObject.ValTol = xmlParser.globalDocPayrolls.ComprobanteTotal;
             cmObject.NitNIE = Convert.ToString(xmlParser.globalDocPayrolls.Emp_NIT);
             cmObject.DocEmp = Convert.ToString(xmlParser.globalDocPayrolls.NumeroDocumento);
             cmObject.SoftwareId = xmlParser.globalDocPayrolls.SoftwareID;
