@@ -15,6 +15,7 @@
     .bhoechie-tab-menu {
         padding: 0px !important;
     }
+
     .textRecovery {
         margin-top: 15px;
         margin-bottom: 15px;
@@ -117,7 +118,7 @@
     <script src="~/Content/js/user/forgot-password.js"></script>
     <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
-
+    <script src="~/Content/js/user/exHandlerLogin.js"></script>
 
     <script>
 
@@ -167,6 +168,28 @@
                 });
             });
         });
+
+        function start(response) {
+            debugger
+            console.log(response);
+        }
+
+        function success(response) {
+            debugger
+            if (response.Code == 200) {
+                window.location.href = response.Message;
+            } else {
+                var confirmMessage = response.Message;
+                var buttons = AlertExec();
+                operationCancel
+                showConfirmation(confirmMessage, buttons);
+            }
+        }
+
+        function failure(response) {
+            debugger
+            console.log(response);
+        }
 
     </script>
 }
