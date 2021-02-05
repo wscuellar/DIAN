@@ -31,9 +31,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
             if (string.IsNullOrEmpty(data.TrackId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId in the request body");
             if (string.IsNullOrEmpty(data.EventCode))
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a EventCode in the request body");
-            if (string.IsNullOrEmpty(data.SigningTime))
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a SigningTime in the request body");
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a EventCode in the request body");           
             if (string.IsNullOrEmpty(data.DocumentTypeId))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId in the request body");
             if (string.IsNullOrEmpty(data.CustomizationID))
@@ -72,7 +70,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
         [JsonProperty(PropertyName = "EventCode")]
         public string EventCode { get; set; }
         [JsonProperty(PropertyName = "SigningTime")]
-        public string SigningTime { get; set; }
+        public DateTime SigningTime { get; set; }
         [JsonProperty(PropertyName = "DocumentTypeId")]
         public string DocumentTypeId { get; set; }
         [JsonProperty(PropertyName = "customizationID")]
