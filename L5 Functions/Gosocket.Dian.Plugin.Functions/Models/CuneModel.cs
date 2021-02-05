@@ -16,11 +16,11 @@ namespace Gosocket.Dian.Plugin.Functions.Models
 
         public string HorNIE { get; set; }
 
-        public string ValDev { get; set; }
+        public double ValDev { get; set; }
 
-        public string ValDesc { get; set; }
+        public double ValDesc { get; set; }
 
-        public string ValTol { get; set; }
+        public double ValTol { get; set; }
 
         public string NitNIE { get; set; }
 
