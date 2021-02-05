@@ -1214,7 +1214,6 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpPost]
         [ExcludeFilter(typeof(Authorization))]
-        [ValidateAntiForgeryToken]
         public JsonResult ContributorUserLogin(UserLoginViewModel model)
         {
             model.IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList();
