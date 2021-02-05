@@ -80,7 +80,10 @@
     "ErrorMessage_LGC01": "Evento registrado previamente",
     "ErrorCode_LGC01": "LGC01",
     "ErrorCode_LGC36": "LGC36",
-    "ErrorMessage_LGC36": "El mandatario no puede enviar este evento ya que no cuenta con un mandato vigente"
+    "ErrorMessage_LGC36": "El mandatario no puede enviar este evento ya que no cuenta con un mandato vigente",
+    "ErrorCode_NIE024": "NIE024",
+    "ErrorMessage_NIE024": "Se debe indicar el CUNE según la definición establecida."
+
 
 
 
