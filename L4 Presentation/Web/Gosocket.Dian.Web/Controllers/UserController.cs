@@ -1215,7 +1215,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         [ExcludeFilter(typeof(Authorization))]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ContributorUserLogin(UserLoginViewModel model)
+        public JsonResult ContributorUserLogin(UserLoginViewModel model)
         {
             model.IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList();
             ClearUnnecessariesModelStateErrorsForAuthentication(false);
@@ -1223,11 +1223,12 @@ namespace Gosocket.Dian.Web.Controllers
             var recaptchaValidation = IsValidCaptcha(model.RecaptchaToken);
             if (!recaptchaValidation.Item1)
             {
-                ModelState.AddModelError($"CompanyLoginFailed", recaptchaValidation.Item2);
-                return View("CompanyLogin", model);
+                ModelState.AddModelError($"ContributorUserLoginFailed", recaptchaValidation.Item2);
+                return Json(new ResponseMessage(TextResources.WrongCaptcha, TextResources.CaptchaError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+
             }
             if (!ModelState.IsValid)
-                return View("CompanyLogin", model);
+                return Json(new ResponseMessage(TextResources.IncompleteForm, TextResources.ModelError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
             var pk = $"{model.IdentificationType}|{model.UserCode}";
             var rk = $"{model.CompanyCode}";
@@ -1236,23 +1237,22 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError($"CompanyLoginFailed", "Error de ingreso, verifique sus datos");
-                return View("CompanyLogin", model);
+                ModelState.AddModelError($"ContributorUserLoginFailed", TextResources.UserDoesntExist);
+                return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.UserError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            var result = await SignInManager.PasswordSignInAsync(user.Email, model.Password, true, shouldLockout: true);
+            var result = SignInManager.PasswordSignIn(user.Email, model.Password, true, shouldLockout: true);
 
-            //var pass = UserManager.PasswordHasher.VerifyHashedPassword(model.Password, user.PasswordHash);
             if (result != SignInStatus.Success)
             {
-                ModelState.AddModelError($"CompanyLoginFailed", "Contraseña incorrecta");
-                return View("CompanyLogin", model);
+                ModelState.AddModelError($"ContributorUserLoginFailed", TextResources.WrongPassword);
+                return Json(new ResponseMessage(TextResources.WrongPassword, TextResources.PasswordError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if (!Convert.ToBoolean(user.Active))
             {
-                ModelState.AddModelError($"CompanyLoginFailed", "Usuario no se encuentra activo");
-                return View("CompanyLogin", model);
+                ModelState.AddModelError($"ContributorUserLoginFailed", TextResources.InactiveUser);
+                return Json(new ResponseMessage(TextResources.InactiveUser, TextResources.UserError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             UsersFreeBillerProfile freeBiller = userService.GetUserFreeBillerProfile(u => u.CompanyCode == model.CompanyCode && u.CompanyIdentificationType == model.CompanyIdentificationType);
@@ -1260,20 +1260,20 @@ namespace Gosocket.Dian.Web.Controllers
             var contributor = contributorService.GetByCode(model.CompanyCode);
             if (freeBiller == null)
             {
-                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no asociada a representante legal.");
-                return View("CompanyLogin", model);
+                ModelState.AddModelError($"ContributorUserLoginFailed", TextResources.CompanyDoesntAssociate);
+                return Json(new ResponseMessage(TextResources.CompanyDoesntAssociate, TextResources.UserError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if (contributor.StatusRut == (int)StatusRut.Cancelled)
             {
-                ModelState.AddModelError($"CompanyLoginFailed", "Contribuyente tiene RUT en estado cancelado.");
-                return View("CompanyLogin", model);
+                ModelState.AddModelError($"ContributorUserLoginFailed", TextResources.InvalidUserRut);
+                return Json(new ResponseMessage(TextResources.InvalidUserRut, TextResources.UserError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)Domain.Common.ContributorStatus.Enabled)
             {
-                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no se encuentra habilitada.");
-                return View("CompanyLogin", model);
+                ModelState.AddModelError($"ContributorUserLoginFailed", TextResources.DisabledCompany);
+                return Json(new ResponseMessage(TextResources.DisabledCompany, TextResources.UserError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
@@ -1298,7 +1298,8 @@ namespace Gosocket.Dian.Web.Controllers
             }
             UserManager.AddClaim(user.Id, new System.Security.Claims.Claim(AuthType.ProfileUser.GetDescription(), user.Id));
             var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
-            return Redirect(redirectUrl);
+            return Json(new ResponseMessage(redirectUrl, "OK", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
+
         }
 
         #endregion
@@ -1397,7 +1398,7 @@ namespace Gosocket.Dian.Web.Controllers
                     errors.AppendLine(item.ErrorMessage);
                 return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
-            
+
             ApplicationUser user = userService.GetByCode(model.UserCode);
 
             if (user != null)
@@ -1422,14 +1423,14 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 return Json(new ResponseMessage(TextResources.PasswordDoesNotMatch, "ChangePasswordFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
-            
+
             UserManager.RemovePassword(user.Id);
             IdentityResult result = UserManager.AddPassword(user.Id, model.UserPassword);
             if (result.Succeeded)
             {
                 return Json(new ResponseMessage(TextResources.PasswordUpdatedSuccessfully, "PasswordChangedSuccessfully", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
             }
-            
+
             foreach (var item in result.Errors)
                 errors.Append(item);
 

@@ -124,6 +124,7 @@
         $(document).ready(function () {
             var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordForm", recoverPasswordModel).ToString().Trim('"'))));
 
+
             $(".pxLogin").hide();
 
             $('.cCompany').click(function () {
