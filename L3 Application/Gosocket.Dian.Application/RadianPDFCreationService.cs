@@ -81,6 +81,9 @@ namespace Gosocket.Dian.Application
 
             List<Event> events = ListEvents(eventsCosmos, storageEvents);
 
+            Dictionary<int, string> dicStatus = _queryAssociatedEventsService.IconType(null, documentMeta.DocumentKey);
+            string invoiceStatus = dicStatus.OrderBy(t => t.Key).Last().Value;
+
             // Set Variables
             DateTime expeditionDate = DateTime.UtcNow.AddHours(-5);
             Bitmap qrCode = GenerateQR($"{webPath}?documentkey={documentMeta.PartitionKey}");
@@ -92,7 +95,7 @@ namespace Gosocket.Dian.Application
 
             // Mapping Labels common data
 
-            templateFirstPage = CommonDataTemplateMapping(templateFirstPage, expeditionDate, page, documentMeta);
+            templateFirstPage = CommonDataTemplateMapping(templateFirstPage, expeditionDate, page, documentMeta, invoiceStatus);
 
             // Mapping firts page
             templateFirstPage = templateFirstPage.Replace("{SenderBusinessName}", documentMeta.SenderName);
@@ -117,6 +120,8 @@ namespace Gosocket.Dian.Application
             templateFirstPage = templateFirstPage.Replace("{ReceiverBusinessName}", documentMeta.ReceiverName);
             templateFirstPage = templateFirstPage.Replace("{ReceiverNit}", documentMeta.ReceiverCode);
 
+            
+
             // Mapping Events
 
             // se realiza el mapeo del primer evento
@@ -136,7 +141,7 @@ namespace Gosocket.Dian.Application
                         EventTemplateMapping(eventTemplate, events[i], string.Empty);
                         templateFirstPage = templateFirstPage.Append(eventTemplate);
                         templateFirstPage = templateFirstPage.Append(footerTemplate);
-                        templateFirstPage = CommonDataTemplateMapping(templateFirstPage, expeditionDate, page, documentMeta);
+                        templateFirstPage = CommonDataTemplateMapping(templateFirstPage, expeditionDate, page, documentMeta, invoiceStatus);
                     }
                     if (i % 2 == 1 && i > 0)
                     {
@@ -145,7 +150,7 @@ namespace Gosocket.Dian.Application
                         eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
                         eventTemplate = EventTemplateMapping(eventTemplate, events[i], string.Empty);
                         middleTemplate = middleTemplate.Append(eventTemplate);
-                        middleTemplate = CommonDataTemplateMapping(middleTemplate, expeditionDate, page, documentMeta);
+                        middleTemplate = CommonDataTemplateMapping(middleTemplate, expeditionDate, page, documentMeta, invoiceStatus);
                         templateFirstPage = templateFirstPage.Append(middleTemplate);
                     }
                     if (i % 2 == 0 && i > 0)
@@ -153,7 +158,7 @@ namespace Gosocket.Dian.Application
                         eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
                         eventTemplate = EventTemplateMapping(eventTemplate, events[i], string.Empty);
                         templateFirstPage = templateFirstPage.Append(eventTemplate);
-                        footerTemplate = CommonDataTemplateMapping(footerTemplate, expeditionDate, page, documentMeta);
+                        footerTemplate = CommonDataTemplateMapping(footerTemplate, expeditionDate, page, documentMeta, invoiceStatus);
                         templateFirstPage = templateFirstPage.Append(footerTemplate);
                     }
                 }
@@ -168,7 +173,7 @@ namespace Gosocket.Dian.Application
                 templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
                 templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
                 templateLastPage = templateLastPage.Append(footerTemplate);
-                templateLastPage = CommonDataTemplateMapping(templateLastPage, expeditionDate, page, documentMeta);
+                templateLastPage = CommonDataTemplateMapping(templateLastPage, expeditionDate, page, documentMeta, invoiceStatus);
             }
             else
             {
@@ -180,7 +185,7 @@ namespace Gosocket.Dian.Application
                 templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
                 templateLastPage = templateLastPage.Append(footerTemplate);
                 headerTemplate = headerTemplate.Append(templateLastPage);
-                templateLastPage = CommonDataTemplateMapping(headerTemplate, expeditionDate, page, documentMeta);
+                templateLastPage = CommonDataTemplateMapping(headerTemplate, expeditionDate, page, documentMeta, invoiceStatus);
             }
                
 
@@ -250,15 +255,13 @@ namespace Gosocket.Dian.Application
 
         #region CommonDataTemplateMapping
 
-        private StringBuilder CommonDataTemplateMapping(StringBuilder template, DateTime expeditionDate, int page, GlobalDocValidatorDocumentMeta documentMeta)
+        private StringBuilder CommonDataTemplateMapping(StringBuilder template, DateTime expeditionDate, int page, GlobalDocValidatorDocumentMeta documentMeta, string invoiceStatus)
         {
             byte[] bytesLogo = _fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg");
             byte[] bytesFooter = _fileManager.GetBytes("radian-dian-logos", "GroupFooter.png");
             string imgLogo = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesLogo)}'>";
             string imgFooter = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesFooter)}' class='img-footer'>";
-            Dictionary<int,string> dicStatus = _queryAssociatedEventsService.IconType(null, documentMeta.DocumentKey);
-            string status =  dicStatus.OrderBy(t => t.Key).Last().Value;
-
+            
             template = template.Replace("{Logo}", $"{imgLogo}");
             template = template.Replace("{ImgFooter}", $"{imgFooter}");
             template = template.Replace("{PrintDate}", $"Impreso el {expeditionDate:d 'de' MM 'de' yyyy 'a las' hh:mm:ss tt}");
@@ -267,7 +270,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{InvoiceNumber}", documentMeta.SerieAndNumber);
             template = template.Replace("{CUFE}", documentMeta.PartitionKey);
             template = template.Replace("{EInvoiceGenerationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
-            template = template.Replace("{Status}", status.ToUpper());
+            template = template.Replace("{Status}", invoiceStatus.ToUpper());
             return template;
         }
 

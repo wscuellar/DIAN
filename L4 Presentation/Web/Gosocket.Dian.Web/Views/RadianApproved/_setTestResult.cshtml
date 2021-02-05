@@ -6,7 +6,7 @@
     int ContributorId = Model.ContributorId;
     int RadianOperationMode = Model.RadianTestSetResult.OperationModeId;
     string RadianContributorType = Model.RadianTestSetResult.ContributorTypeId;
-    string parametro = Request.QueryString["radianTypeId"];
+    string parametro = Model.RadianContributorTypeId.ToString(); // Request.QueryString["radianTypeId"];
     string participantType = ((RadianContributorType)(Enum.Parse(typeof(RadianContributorType), parametro))).GetDescription();
 
     ViewBag.title = $"Set de pruebas - {participantType}";
