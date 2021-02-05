@@ -274,7 +274,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var ValDesc = objCune.ValDesc?.Trim();
             var ValTol = objCune.ValTol?.Trim();
             var errorCode = ConfigurationManager.GetValue("ErrorCode_NIE024") + "-(R): ";
-            var prop = "CUNE";
 
             string key = string.Empty;
 
@@ -293,12 +292,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }         
 
             string errorMessarge = string.Empty;
-            errorMessarge = $"Valor del { prop} no está calculado correctamente.";
+            errorMessarge = ConfigurationManager.GetValue("ErrorMessage_NIE024");
             var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessarge };
 
-            if (string.IsNullOrEmpty(ValDev)) ValDev = "0.00"; else ValDev = TruncateDecimal(decimal.Parse(ValDev), 2).ToString("F2");
-            if (string.IsNullOrEmpty(ValDesc)) ValDesc = "0.00"; else ValDesc = TruncateDecimal(decimal.Parse(ValDesc), 2).ToString("F2");
-            if (string.IsNullOrEmpty(ValTol)) ValTol = "0.00"; else ValTol = TruncateDecimal(decimal.Parse(ValTol), 2).ToString("F2");
+            //if (string.IsNullOrEmpty(ValDev)) ValDev = "0.00"; else ValDev = TruncateDecimal(decimal.Parse(ValDev), 2).ToString("F2");
+            //if (string.IsNullOrEmpty(ValDesc)) ValDesc = "0.00"; else ValDesc = TruncateDecimal(decimal.Parse(ValDesc), 2).ToString("F2");
+            //if (string.IsNullOrEmpty(ValTol)) ValTol = "0.00"; else ValTol = TruncateDecimal(decimal.Parse(ValTol), 2).ToString("F2");
 
             var NumNIE = objCune.NumNIE;
             var FechNIE = objCune.FecNIE;
@@ -315,7 +314,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (objCune.Cune.ToLower() == hash)
             {
                 response.IsValid = true;
-                response.ErrorMessage = $"Valor del {prop} calculado correctamente.";
+                response.ErrorMessage = $"Valor calculado correctamente.";
             }
             else
             {
@@ -3964,8 +3963,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.Receipt:
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
                 case (int)EventStatus.Mandato:
-                    DateTime dataSigningTime = Convert.ToDateTime(data.SigningTime);
-                    DateTime modelSigningTime = Convert.ToDateTime(dataModel.SigningTime);
+                    DateTime dataSigningTime = Convert.ToDateTime(data.SigningTime).Date;
+                    DateTime modelSigningTime = Convert.ToDateTime(dataModel.SigningTime).Date;
                     if (dataSigningTime >= modelSigningTime)
                     {
                         responses.Add(new ValidateListResponse
