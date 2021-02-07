@@ -3895,7 +3895,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
             }
-            if (count == 3)
+            if (count >= 3)
             {
                 responses.Add(new ValidateListResponse
                 {
@@ -4256,9 +4256,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "LGC38",
-                            ErrorMessage = "No se puede registrar este evento si previamente no se ha registrado el " +
-                            "evento inscripción de la factura electrónica de venta como título valor",
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_DC24g"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24g"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -4602,8 +4601,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorMessageMandato = string.Empty
             };
 
-            response.errorCodeNote = "AAD11";
-            response.errorMessageNote = "No fue informada la nota cuando el evento fue generado por un mandato. ";
+            response.errorCodeNote = ConfigurationManager.GetValue("ErrorCode_AAD11");
+            response.errorMessageNote = ConfigurationManager.GetValue("ErrorMessage_AAD11");
             response.errorMessageFETV = "Nombre o Razón social no esta autorizado para generar esté evento";
             response.errorMessageReceiverFETV = "El adquiriente no esta autorizado para recibir esté evento";
             response.errorMessageEndoso = ConfigurationManager.GetValue("ErrorMessage_LGC32");
@@ -4818,21 +4817,42 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var currentDate = DateTime.Now.Date;
             var documents = documentsList.Where(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month).ToList();
-            if (documents == null || documents.Count <= 0) return responses; // no existe para el mes actual
+            if (documents == null || documents.Count <= 0)
+            {
+                //Novedad XML true
+                if (novelty)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "NIE199a",
+                        ErrorMessage = "Elemento Novedad con valor “true” no puede ser recibido por primera vez, " +
+                        "ya que no existe una Nómina Electrónica recibida para este trabajador reportada por este Emisor durante este mes.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    return responses;
+                }
+                else
+                    return responses; // no existe para el mes actual
 
+            }
+                          
             foreach (var doc in documents)
             {
                 var documentApproved = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(doc.Identifier, doc.Identifier);
                 if (documentApproved != null)
                 {
+                    //Novedad XML False
                     if (!novelty)
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "91",
-                            ErrorMessage = "Documento para este Trabajador ya ha sido enviado anteriormente para este mes.",
+                            ErrorCode = "NIE199",
+                            ErrorMessage = "Únicamente pueden ser aceptados documentos “NominaIndividual” del mismo trabajador" +
+                            " durante el Mes indicado en el documento que posean como 'True' este elemento.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                         return responses;
