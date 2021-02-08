@@ -125,5 +125,8 @@
     <Setting Name="Msg_Error_NominaOnlyDocument" Type="System.String" Scope="Application">
       <Value Profile="(Default)">El método síncrono SendNominaSync solo puede recibir un documento.</Value>
     </Setting>
+    <Setting Name="Param_RegistrateCompletedRadianUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">RegistrateCompletedRadianUrl</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

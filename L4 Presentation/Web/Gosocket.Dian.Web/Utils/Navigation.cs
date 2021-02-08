@@ -61,7 +61,8 @@ namespace Gosocket.Dian.Web.Utils
             /// <summary>
             /// Otros documentos
             /// </summary>
-            OthersEletronicDocuments
+            OthersEletronicDocuments,
+            Payroll
         }
     }
 }

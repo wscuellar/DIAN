@@ -2962,6 +2962,7 @@
     <Content Include="Views\ProfileFreeBiller\_checksGrid.cshtml" />
     <Content Include="Views\Document\_payrolls.cshtml" />
     <Content Include="Views\User\_forgotPasswordForm.cshtml" />
+    <Content Include="Views\Document\Payroll.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

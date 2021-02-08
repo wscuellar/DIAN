@@ -94,13 +94,24 @@ function CallExecutionWithData(callMethod, url, jsonvalue, method, showMessage, 
 function showConfirmation(confirmMessage, buttons, className, operationCancel) {
     bootbox.dialog({
         className: className && className,
-        message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
+        message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4> " + complement + "</div></div>",
         buttons: buttons,
         onEscape: () => {
             operationCancel ? operationCancel() : window.location.reload();
         }
     });
 
+}
+
+function showConfirmationComplement(confirmMessage, buttons, className, operationCancel, complement){
+    bootbox.dialog({
+        className: className && className,
+        message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4> <p class='text-center subtitle-modal'>" + complement + "</p></div></div>",
+        buttons: buttons,
+        onEscape: () => {
+            operationCancel ? operationCancel() : window.location.reload();
+        }
+    });
 }
 
 function ConfirmExec(operation, param, operationCancel) {
@@ -271,6 +282,7 @@ function SetCapcthatoken(configuration) {
 function RestartCounters(url, testResult, softwareId) {
     console.log(testResult);
     var confirmMessage = bootboxMessage.CONFIRMATION_RESTART;
+    var complement = bootboxMessage.CONFIRMATION_RESTART_COMPLEMENT;
     var operation = () => {
         var actionError = (error) => {
             window.location.reload();
@@ -285,5 +297,5 @@ function RestartCounters(url, testResult, softwareId) {
         ajaxFunction(url, "POST", data, actionError, actionSuccess);
     }
     var buttons = ConfirmExec(operation)
-    showConfirmation(confirmMessage, buttons);
+    showConfirmationComplement(confirmMessage, buttons,null, null, complement);
 }
