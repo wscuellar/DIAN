@@ -91,6 +91,7 @@ function CallExecutionWithData(callMethod, url, jsonvalue, method, showMessage, 
     });
 }
 
+
 function showConfirmation(confirmMessage, buttons, className, operationCancel) {
     bootbox.dialog({
         className: className && className,

@@ -501,6 +501,26 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        public void OperationReject(int contributorId, int contributorTypeId, string softwareId, int softwareType)
+        {
+            using (var context = new SqlDBContext())
+            {
+                RadianContributor radianc = context.RadianContributors.FirstOrDefault(t => t.ContributorId == contributorId
+                                      && t.RadianContributorTypeId == contributorTypeId);
+
+                RadianContributorOperation radianOperation = context.RadianContributorOperations.FirstOrDefault(
+                                                t => t.RadianContributorId == radianc.Id
+                                                && t.SoftwareType == softwareType
+                                                && t.SoftwareId.ToString().Trim().ToLower().Equals(softwareId.ToString().Trim().ToLower(), StringComparison.OrdinalIgnoreCase)
+                                                && !t.Deleted
+                                                );
+                if (radianOperation != null)
+                    radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Cancelado; //cancelo = rechazo.
+
+                context.SaveChanges();
+            }
+        }
+
         #region Funciones Radian para Migracion
 
 
