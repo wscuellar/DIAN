@@ -1437,6 +1437,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             return null;
         }
+        #endregion
 
         /// <summary>
         /// 
