@@ -355,7 +355,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             }
 
             globalDocPayrolls.PartitionKey = globalDocPayrolls.CUNE;
-            globalDocPayrolls.RowKey = globalDocPayrolls.PartitionKey;
+            globalDocPayrolls.RowKey = globalDocPayrolls.Emp_NIT;
         }
 
         public virtual bool Parser(bool validate = true)
