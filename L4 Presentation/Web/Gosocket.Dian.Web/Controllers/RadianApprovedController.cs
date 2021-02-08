@@ -257,7 +257,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             RadianApprovedViewModel model = new RadianApprovedViewModel();
             model.Contributor = new RedianContributorWithTypes();
-            const int softwareType = 1;
+            int softwareType = viewModel.SoftwareType;
             string sType = softwareType.ToString();
             RadianSoftware software = _radianAprovedService.GetSoftware(new Guid(viewModel.SoftwareId));
             string key = sType + "|" + viewModel.SoftwareId.ToString();
