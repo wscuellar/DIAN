@@ -257,9 +257,9 @@ namespace Gosocket.Dian.Web.Controllers
         {
             RadianApprovedViewModel model = new RadianApprovedViewModel();
             model.Contributor = new RedianContributorWithTypes();
-            const int softwareType = 1;
+            int softwareType = viewModel.SoftwareType;
             string sType = softwareType.ToString();
-            RadianSoftware software = _radianAprovedService.GetSoftware(viewModel.RadianContributorId, softwareType);
+            RadianSoftware software = _radianAprovedService.GetSoftware(new Guid(viewModel.SoftwareId));
             string key = sType + "|" + viewModel.SoftwareId.ToString();
             model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(viewModel.Nit, key);
             RadianTestSet testSet = _radianTestSetService.GetTestSet(sType, sType);
@@ -410,9 +410,11 @@ namespace Gosocket.Dian.Web.Controllers
         {
             string contributorId = Request.Params["ContributorId"];
             string radianContributorId = Request.Params["Contributor.RadianContributorId"];
+            string softwareType = Request.Params["SoftwareType"];
             radianApprovedViewModel.RadianTestSetResult = _radianAprovedService.RadianTestSetResultByNit(radianApprovedViewModel.Nit, radianApprovedViewModel.RadianTestSetResult.Id);
             radianApprovedViewModel.ContributorId = Int32.Parse(contributorId);
             radianApprovedViewModel.Contributor.RadianContributorId = Int32.Parse(radianContributorId);
+            radianApprovedViewModel.SoftwareType = Convert.ToInt32(softwareType);
             return View(radianApprovedViewModel);
         }
 
@@ -467,7 +469,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.RadianState = radianAdmin.Contributor.RadianState;
             radianApprovedViewModel.RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId;
             radianApprovedViewModel.Software = _radianAprovedService.GetSoftware(new Guid(softwareId));
-
+            radianApprovedViewModel.SoftwareType = softwareType;
             return View("GetSetTestResult", radianApprovedViewModel);
         }
 

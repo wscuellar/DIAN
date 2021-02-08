@@ -104,7 +104,6 @@ namespace Gosocket.Dian.Web.Models
             ReceiverName = eventItem.ReceiverName;
             SenderCode = invoice.SenderCode;
             SenderName = invoice.SenderName;
-            MandateType = TextResources.Event_MandateType;
         }
 
         public string ContractDate { get; internal set; }
