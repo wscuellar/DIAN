@@ -280,6 +280,9 @@ namespace Gosocket.Dian.Functions.Activation
                         radianTesSetResult.StatusDescription = TestSetStatus.Accepted.GetDescription();
                     }
 
+                    Contributor contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
+                    GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
+
                     // Determinamos si rechazamos el set de pruebas del cliente
                     if (radianTesSetResult.ReceiptNoticeRejected > (radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired) ||
                         radianTesSetResult.ReceiptServiceRejected > (radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired) ||
@@ -300,6 +303,8 @@ namespace Gosocket.Dian.Functions.Activation
                     {
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
                         radianTesSetResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
+                        contributorService.OperationReject(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
+
                     }
                     SetLogger(null, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status);
 
@@ -322,10 +327,10 @@ namespace Gosocket.Dian.Functions.Activation
                                 #region Proceso Radian Habilitacion
 
                                 //Traemos el contribuyente
-                                Contributor contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
+                               
 
                                 //Consultamos al participante en GlobalRadianOperations
-                                GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
+                                
 
                                 //--Traemos la informacion del software
                                 string softwareId = globalTestSetTracking.SoftwareId;
