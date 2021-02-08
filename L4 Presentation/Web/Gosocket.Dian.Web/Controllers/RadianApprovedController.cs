@@ -260,13 +260,13 @@ namespace Gosocket.Dian.Web.Controllers
             const int softwareType = 1;
             string sType = softwareType.ToString();
             RadianSoftware software = _radianAprovedService.GetSoftware(viewModel.RadianContributorId, softwareType);
-            string key = softwareType.ToString() + "|" + software.Id.ToString();
+            string key = sType + "|" + viewModel.SoftwareId.ToString();
             model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(viewModel.Nit, key);
             RadianTestSet testSet = _radianTestSetService.GetTestSet(sType, sType);
             model.RadianTestSetResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), sType)));
             model.RadianTestSetResult.StatusDescription = testSet.Description;
             model.Software = software;
-            model.ContributorId = Int32.Parse(viewModel.ContributorId);
+            model.ContributorId = viewModel.ContributorId;
             model.Contributor.RadianContributorId = viewModel.RadianContributorId;
             model.RadianState = viewModel.RadianState;
             model.RadianContributorTypeId = viewModel.RadianContributorTypeId;

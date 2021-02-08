@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Gosocket.Dian.Web.Utils;
 using System.ComponentModel.DataAnnotations;
+using Gosocket.Dian.Domain;
 
 namespace Gosocket.Dian.Web.Models.RadianApproved
 {
@@ -13,7 +14,8 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         public string Nit { get; set; }
         public string RadianState { get; set; }
         public int RadianContributorTypeId { get; set; }
-        public string ContributorId { get; set; }
+        public int ContributorId { get; set; }
+        public string SoftwareId { get; set; }
     }
 
 }
