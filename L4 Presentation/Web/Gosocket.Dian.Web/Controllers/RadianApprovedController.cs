@@ -259,7 +259,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.Contributor = new RedianContributorWithTypes();
             const int softwareType = 1;
             string sType = softwareType.ToString();
-            RadianSoftware software = _radianAprovedService.GetSoftware(viewModel.RadianContributorId, softwareType);
+            RadianSoftware software = _radianAprovedService.GetSoftware(new Guid(viewModel.SoftwareId));
             string key = sType + "|" + viewModel.SoftwareId.ToString();
             model.RadianTestSetResult = _radianTestSetResultService.GetTestSetResult(viewModel.Nit, key);
             RadianTestSet testSet = _radianTestSetService.GetTestSet(sType, sType);
