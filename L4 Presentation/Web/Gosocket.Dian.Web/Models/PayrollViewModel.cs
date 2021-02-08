@@ -10,6 +10,7 @@ namespace Gosocket.Dian.Web.Models
     {
         public PayrollViewModel()
         {
+            this.Payrolls = new List<DocumentViewPayroll>();
             MaxItemCount = 20;
             IsNextPage = false;
             Page = 0;
@@ -27,22 +28,22 @@ namespace Gosocket.Dian.Web.Models
         public List<MesModel> MesesValidacion { get; set; }
 
         [Display(Name = "Del")]
-        public string RangoNumeracionMenor { get; set; }
+        public int? RangoNumeracionMenor { get; set; }
 
-        [Display(Name = "Al")]
-        public string RangoNumeracionMayor { get; set; }
+        [Display(Name = "al")]
+        public int? RangoNumeracionMayor { get; set; }
 
-        [Display(Name = "Letra Primer Apellido")]
+        [Display(Name = "Primer Apellido")]
         public string LetraPrimerApellido { get; set; }
 
         public List<LetraModel> LetrasPrimerApellido { get; set; }
 
-        [Display(Name = "Tipo Documento")]
+        [Display(Name = "Tipo Documento Empleado")]
         public string TipoDocumento { get; set; }
 
         public List<TipoDocumentoModel> TiposDocumento { get; set; }
 
-        [Display(Name = "Número de documento")]
+        [Display(Name = "Número de Documento Empleado")]
         public string NumeroDocumento { get; set; }
 
         public string Ciudad { get; set; }
@@ -63,6 +64,7 @@ namespace Gosocket.Dian.Web.Models
         public int MaxItemCount { get; set; }
         public string DirectionToPagination { get; set; }
         public bool HasMoreData { get; set; }
+        public int TotalItems { get; set; }
 
         public List<DocumentViewPayroll> Payrolls { get; set; }
     }
@@ -136,7 +138,7 @@ namespace Gosocket.Dian.Web.Models
             return new List<TipoDocumentoModel>()
             {
                 new TipoDocumentoModel() { Code = "00", Name = "Todos..." },
-                new TipoDocumentoModel() { Code = "01", Name = "Cédula de Ciudadanía" },
+                new TipoDocumentoModel() { Code = "13", Name = "Cédula de Ciudadanía" },
                 new TipoDocumentoModel() { Code = "02", Name = "Cédula de Extranjería" },
                 new TipoDocumentoModel() { Code = "03", Name = "No de identificación personal" },
                 new TipoDocumentoModel() { Code = "04", Name = "No de identificación tributaria" },

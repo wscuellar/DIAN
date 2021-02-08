@@ -2956,7 +2956,6 @@
     <Content Include="Views\FreeBiller\CreateUser.cshtml" />
     <Content Include="Views\FreeBiller\_usersFreeBiller.cshtml" />
     <Content Include="Views\ProfileFreeBiller\CreateProfile.cshtml" />
-    <Content Include="Views\Document\ExportPDF.cshtml" />
     <Content Include="Views\User\_userexLogin.cshtml" />
     <Content Include="Views\FreeBiller\_checksGrid.cshtml" />
     <Content Include="Views\ProfileFreeBiller\_checksGrid.cshtml" />
