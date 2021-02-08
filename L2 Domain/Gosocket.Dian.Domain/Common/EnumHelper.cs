@@ -451,11 +451,11 @@ namespace Gosocket.Dian.Domain.Common
     {
         [Description("Cero")]
         Zero = 0,
-        [Description("Facturador Electronico")]
+        [Description("Facturador Electrónico")]
         ElectronicInvoice = 1,
-        [Description("Proveedor Tecnologico")]
+        [Description("Proveedor Tecnológico")]
         TechnologyProvider = 2,
-        [Description("Sistema de Negociacion")]
+        [Description("Sistema de Negociación")]
         TradingSystem = 3,
         [Description("Factor")]
         Factor = 4

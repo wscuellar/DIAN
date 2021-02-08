@@ -106,9 +106,9 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Tipo de identificación")]
         public int IdentificationType { get; set; }
 
-        ////Para el login de persona al facturador gratuito
-        [Display(Name = "Tipo de identificación")]
-        public int CompanyIdentificationType { get; set; }
+        //////Para el login de persona al facturador gratuito
+        //[Display(Name = "Tipo de identificación")]
+        //public int CompanyIdentificationType { get; set; }
 
         public List<IdentificationTypeListViewModel> IdentificationTypes { get; set; }
     }
@@ -124,7 +124,7 @@ namespace Gosocket.Dian.Web.Models
         }
 
         public string Id { get; set; }
-        
+
         [DataType(DataType.Text)]
         [Display(Name = "NIT")]
         [Required(ErrorMessage = "NIT representante legal es requerido.")]

@@ -18,9 +18,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 {
     public class LogicalNMService : IDisposable
     {
-        private TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");
-        private TableManager TableManagerDianProcessResult = new TableManager("DianProcessResult");
-        private TableManager TableManagerGlobalBigContributorRequestAuthorization = new TableManager("GlobalBigContributorRequestAuthorization");
+        private TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");       
         private TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
         private TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
@@ -30,10 +28,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalBatchFileRuntime = new TableManager("GlobalBatchFileRuntime");
         private TableManager TableManagerGlobalBatchFileResult = new TableManager("GlobalBatchFileResult");
         private TableManager TableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
-        private TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
-
-        private TableManager TableManagerGlobalNumberRange = new TableManager("GlobalNumberRange");
-        //private TableManager TableManagerDianOfeControl = new TableManager("DianOfeControl");
+        private TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");    
         private TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");

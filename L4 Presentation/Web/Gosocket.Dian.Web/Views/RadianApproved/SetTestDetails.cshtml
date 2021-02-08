@@ -30,9 +30,11 @@
             <a href="@Url.Action("GetSetTestResult", "RadianApproved",
                                          new {
                                              RadianContributorId = Model.Contributor.RadianContributorId,
-                                             Nit = Model.Nit, ContributorId = Model.ContributorId,
+                                             Nit = Model.Nit, 
+                                             ContributorId = Model.ContributorId,
                                              RadianState = Model.RadianState,
-                                             RadianContributorTypeId = Model.RadianContributorTypeId
+                                             RadianContributorTypeId = Model.RadianContributorTypeId,
+                                             SoftwareId = Model.Software.Id
                                          })"><i class="fa fa-chevron-left"></i> Volver</a>
         </div>
     </div>
@@ -244,7 +246,7 @@
                             data: [
                                 dataChart.TotalDocumentsRejected,
                                 dataChart.ReceiptNoticeRejected,
-                                dataChart.RejectInvoiceAccepted,
+                                dataChart.ReceiptServiceRejected,
                                 dataChart.ExpressAcceptanceRejected,
                                 dataChart.AutomaticAcceptanceRejected,
                                 dataChart.RejectInvoiceRejected,

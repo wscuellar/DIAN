@@ -395,8 +395,7 @@ namespace Gosocket.Dian.Web.Controllers
                     {
                         ProfileFreeBillerId = profileId,
                         UserId = user.Id,
-                        CompanyCode = uCompany.Code,
-                        CompanyIdentificationType = User.IdentificationTypeId()
+                        CompanyCode = User.ContributorCode()
                     });
                 }
 
@@ -579,6 +578,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns>List<UserFreeBillerModel></returns>
         private UserFreeBillerContainerModel GetUsers(UserFiltersFreeBillerModel model)
         {
+
             string companyCode = User.ContributorCode();
             List<ApplicationUser> users = userService.UserFreeBillerProfile(t => (model.DocTypeId == 0 || t.IdentificationTypeId == model.DocTypeId)
                                               && (model.DocNumber == null || t.IdentificationId == model.DocNumber)

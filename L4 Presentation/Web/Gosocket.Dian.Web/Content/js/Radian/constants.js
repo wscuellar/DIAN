@@ -10,6 +10,6 @@
     CONFIRMATION_MESSAGE_DESACTIVE: "¿Desea inactivar el usuario seleccionado?",
     CONFIRMATION_MESSAGE_ACTIVE: "¿Desea activar el usuario seleccionado?",
     CONFIRMATION_CORRECT_ENABLED: "Estado actualizado correctamente",
-    CONFIRMATION_RESTART: "¿Está seguro de reiniciar set de pruebas?",
-
+    CONFIRMATION_RESTART: "¿Está seguro que desea reiniciar el set de pruebas?",
+    CONFIRMATION_RESTART_COMPLEMENT: "Al realizar esta acción deberá enviar otro set de pruebas con documentos diferentes. Todas las estadísticas de la certificación serán reiniciadas",
 };

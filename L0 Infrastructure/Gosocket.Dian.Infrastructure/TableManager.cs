@@ -672,13 +672,6 @@ namespace Gosocket.Dian.Infrastructure
                     QueryComparisons.Equal,
                     senderCode));
 
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, 
-                TableOperators.And, 
-                TableQuery.GenerateFilterCondition("RowKey",
-                    QueryComparisons.Equal,
-                    null));
-
-
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
             return entities.ToList();

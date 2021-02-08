@@ -393,5 +393,14 @@ namespace Gosocket.Dian.Services.Properties {
                 return ((string)(this["Msg_Error_NominaOnlyDocument"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("RegistrateCompletedRadianUrl")]
+        public string Param_RegistrateCompletedRadianUrl {
+            get {
+                return ((string)(this["Param_RegistrateCompletedRadianUrl"]));
+            }
+        }
     }
 }

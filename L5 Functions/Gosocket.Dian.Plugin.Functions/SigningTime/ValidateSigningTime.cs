@@ -36,7 +36,9 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a DocumentTypeId in the request body");
             if (string.IsNullOrEmpty(data.CustomizationID))
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a Customization in the request body");
-   
+            if (string.IsNullOrEmpty(data.SigningTime))
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a SigningTime in the request body");
+
             try
             {
                 var validateResponses = await ValidatorEngine.Instance.StartValidateSigningTimeAsync(data);
@@ -70,7 +72,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
         [JsonProperty(PropertyName = "EventCode")]
         public string EventCode { get; set; }
         [JsonProperty(PropertyName = "SigningTime")]
-        public DateTime SigningTime { get; set; }
+        public string SigningTime { get; set; }
         [JsonProperty(PropertyName = "DocumentTypeId")]
         public string DocumentTypeId { get; set; }
         [JsonProperty(PropertyName = "customizationID")]

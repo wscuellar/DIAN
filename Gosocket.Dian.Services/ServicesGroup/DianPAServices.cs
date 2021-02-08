@@ -1130,22 +1130,16 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         return dianResponse;
                     }
 
-                    documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-
-                    GlobalDocRegisterProviderAR documentRegisterAR = new GlobalDocRegisterProviderAR(trackIdCude, documentMeta.TechProviderCode)
+                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedRadianUrl), new { TrackId = trackIdCude });
+                    if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
                     {
-                        DocumentTypeId = docTypeCode,
-                        SerieAndNumber = serieAndNumber,
-                        SenderCode = senderCode,
-                        GlobalCufeId = documentParsed.DocumentKey.ToLower(),
-                        EventCode = eventCode,
-                        CustomizationID = customizationID
-                    };
-
-                    InsertGlobalDocRegisterProviderAR(documentRegisterAR);                   
-                    UpdateFinishAttorney(trackIdCude, documentParsed.DocumentKey.ToLower(), eventCode);                                     
-                    UpdateEndoso(xmlParser, documentParsed);
-                    UpdateIsInvoiceTV(documentParsed.DocumentKey.ToLower(), eventCode);                    
+                        dianResponse.IsValid = false;
+                        dianResponse.XmlFileName = contentFileList.First().XmlFileName;
+                        dianResponse.StatusCode = processEventResponse.Code;
+                        dianResponse.StatusDescription = processEventResponse.Message;
+                        UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+                        return dianResponse;
+                    }          
                 }
                 else
                 {
@@ -1443,6 +1437,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             return null;
         }
+        #endregion
 
         /// <summary>
         /// 
@@ -1497,6 +1492,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             return authorization;
         }
+
+
         private GlobalContributor GetGlobalContributor(string authCode)
         {
             var globalContributor = new GlobalContributor();
@@ -1507,6 +1504,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             return globalContributor;
         }
+
         public static byte[] GetXmlFromStorage(string trackId)
         {
             var tableManager = new TableManager("GlobalDocValidatorRuntime");
@@ -1522,278 +1520,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             tableManager = null;
             return xmlBytes;
         }
-
-
-        private DianResponse ValidateSerie(string trakidCude, DianResponse response)
-        {
-            var trackId = trakidCude;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSerie), new { trackId });            
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateSerieAndNumber", new { trackId });
-            if (validations.Count > 0)
-            {
-                if (response.ErrorMessage.Count == 0)
-                {
-                    response = new DianResponse()
-                    {
-                        StatusMessage = "Documento con errores en campos mandatorios.",
-                        StatusCode = Properties.Settings.Default.Code_89,
-                        IsValid = validations[0].IsValid,
-                        ErrorMessage = new List<string>()
-                    };
-                }
-                var failedList = new List<string>();
-                foreach (var item in validations)
-                {
-                    if (!item.IsValid)
-                    {
-                        failedList.Add($"{item.ErrorCode}{item.ErrorMessage}");
-                        response.IsValid = false;
-                    }
-
-                }
-                response.ErrorMessage.AddRange(failedList);
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-            }
-            return response;
-        }
-
-
-        //private DianResponse ValidateEventRadian(string trackId, DianResponse response)
-        //{                 
-        //    var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEventRadian", new { trackId });
-        //    if (validations.Count > 0)
-        //    {
-        //        if (response.ErrorMessage.Count == 0)
-        //        {
-        //            response = new DianResponse()
-        //            {
-        //                StatusMessage = "Documento con errores en campos mandatorios.",
-        //                StatusCode = Properties.Settings.Default.Code_89,
-        //                IsValid = validations[0].IsValid,
-        //                ErrorMessage = new List<string>()
-        //            };
-        //        }
-        //        var failedList = new List<string>();
-        //        foreach (var item in validations)
-        //        {
-        //            if (!item.IsValid)
-        //            {
-        //                failedList.Add($"{item.ErrorCode}{item.ErrorMessage}");
-        //                response.IsValid = false;
-        //            }
-
-        //        }
-        //        response.ErrorMessage.AddRange(failedList);
-        //        response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-        //    }
-        //    return response;
-        //}
-
-        private DianResponse EventApproveCufe(string trackId, string eventCode, string DocumentTypeId, DianResponse response)
-        {
-            var ResponseCode = eventCode;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_EventApproveCufe), new { trackId, ResponseCode, DocumentTypeId });
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/EventApproveCufe", new { trackId, ResponseCode, DocumentTypeId });
-            if (validations.Count > 0)
-            {
-                if (response.ErrorMessage.Count == 0)
-                {
-                    response = new DianResponse()
-                    {
-                        StatusMessage = "Documento con errores en campos mandatorios.",
-                        StatusCode = Properties.Settings.Default.Code_89,
-                        IsValid = validations[0].IsValid,
-                        ErrorMessage = new List<string>()
-                    };
-                }
-                var failedList = new List<string>();
-                foreach (var item in validations)
-                {
-                    if (!item.IsValid)
-                    {
-                        failedList.Add($"{item.ErrorCode}{item.ErrorMessage}");
-                        response.IsValid = false;
-                    }
-
-                }
-                response.ErrorMessage.AddRange(failedList);
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-            }
-            return response;
-        }
-
-        private DianResponse ValidateParty(string trackId, string trackIdCude, string senderCode, string receiverCode, string eventCode, string customizationID, string listID, DianResponse response)
-        {
-            var SenderParty = senderCode;
-            var ReceiverParty = receiverCode;
-            var ResponseCode = eventCode;
-            var ListID = listID;
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateParty), new { trackId, trackIdCude, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateParty", new { trackId, trackIdCude, SenderParty, ReceiverParty, ResponseCode, customizationID, ListID });
-            if (validations.Count > 0)
-            {
-                if (response.ErrorMessage.Count == 0)
-                {
-                    response = new DianResponse()
-                    {
-                        StatusMessage = "Documento con errores en campos mandatorios.",
-                        StatusCode = Properties.Settings.Default.Code_89,
-                        IsValid = validations[0].IsValid,
-                        ErrorMessage = new List<string>()
-                    };
-                }
-                var failedList = new List<string>();
-                foreach (var item in validations)
-                {
-                    if (!item.IsValid)
-                    {
-                        failedList.Add($"{item.ErrorCode}{item.ErrorMessage}");
-                        response.IsValid = false;
-                    }
-
-                }
-                response.ErrorMessage.AddRange(failedList);
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-            }
-            return response;
-        }
-
-        private DianResponse ValidateEventCode(string trackId, string eventCode, string documentTypeId, string trackIdCude, string customizationID, string listID, DianResponse response)
-        {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateEventCode), new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateEmitionEventPrev", new { trackId, eventCode, documentTypeId, trackIdCude, customizationID, listID });
-
-            if (validations.Count > 0)
-            {
-                if(response.ErrorMessage.Count == 0)
-                {
-                    response = new DianResponse()
-                    {
-                        StatusMessage = "Documento con errores en campos mandatorios.",
-                        StatusCode = Properties.Settings.Default.Code_89,
-                        IsValid = validations[0].IsValid,
-                        ErrorMessage = new List<string>()
-                    };
-                }
-
-                var failedList = new List<string>();
-                foreach (var item in validations)
-                {
-                    if (!item.IsValid)
-                    {
-                        failedList.Add($"{item.ErrorCode}{item.ErrorMessage}");
-                        response.IsValid = false;
-                    }
-                       
-                }            
-
-                response.ErrorMessage.AddRange(failedList);         
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-            }
-            return response;
-        }
-
-        private DianResponse ValidationSigningTime(string trackId, string eventCode, string signingTime, string documentTypeId, string customizationID, string endDate,  DianResponse response)
-        {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateSigningTime), new { trackId, eventCode, signingTime, documentTypeId, customizationID, endDate });            
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateSigningTime", new { trackId, eventCode, signingTime, documentTypeId, customizationID, endDate });
-            if (validations.Count > 0)
-            {
-                if (response.ErrorMessage.Count == 0)
-                {
-                    response = new DianResponse()
-                    {
-                        StatusMessage = "Documento con errores en campos mandatorios.",
-                        StatusCode = Properties.Settings.Default.Code_89,
-                        IsValid = validations[0].IsValid,
-                        ErrorMessage = new List<string>()
-                    };
-                }
-                var failedList = new List<string>();
-                foreach (var item in validations)
-                {
-                    if (!item.IsValid)
-                    {
-                        failedList.Add($"{item.ErrorCode}{item.ErrorMessage}");
-                        response.IsValid = false;
-                    }
-
-                }
-               
-                response.ErrorMessage.AddRange(failedList);
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-            }
-            return response;
-        }
-        
-        private DianResponse ValidationDocumentReferenceCufe(string trackId, string idDocumentReference, string eventCode, string documentTypeIdRef, string issuerPartyCode, string issuerPartyName, DianResponse response)
-        {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentReferenceId), new { trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName });
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateDocumentReference", new { trackId, idDocumentReference, eventCode, documentTypeIdRef, issuerPartyCode, issuerPartyName });
-            if (validations.Count > 0)
-            {
-                if (response.ErrorMessage.Count == 0)
-                {
-                    response = new DianResponse()
-                    {
-                        StatusMessage = "Documento con errores en campos mandatorios.",
-                        StatusCode = Properties.Settings.Default.Code_89,
-                        IsValid = validations[0].IsValid,
-                        ErrorMessage = new List<string>()
-                    };
-                }
-                var failedList = new List<string>();
-                foreach (var item in validations)
-                {
-                    if (!item.IsValid)
-                    {
-                        failedList.Add($"{item.ErrorCode}{item.ErrorMessage}");
-                        response.IsValid = false;
-                    }
-
-                }
-
-                response.ErrorMessage.AddRange(failedList);
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-            }
-            return response;
-        }
-        
-        private DianResponse ValidationReferenceAttorney(string trackId, DianResponse response)
-        {
-            var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateReferenceAttorney), new { trackId });
-            //var validations = ApiHelpers.ExecuteRequest<List<ValidateListResponse>>("http://localhost:7071/api/ValidateReferenceAttorney", new { trackId });
-            if (validations.Count > 0)
-            {
-                if (response.ErrorMessage.Count == 0)
-                {
-                    response = new DianResponse()
-                    {
-                        StatusMessage = "Documento con errores en campos mandatorios.",
-                        StatusCode = Properties.Settings.Default.Code_89,
-                        IsValid = validations[0].IsValid,
-                        ErrorMessage = new List<string>()
-                    };
-                }
-                var failedList = new List<string>();
-                foreach (var item in validations)
-                {
-                    if (!item.IsValid)
-                    {
-                        failedList.Add($"{item.ErrorCode}{item.ErrorMessage}");
-                        response.IsValid = false;
-                    }
-
-                }
-
-                response.ErrorMessage.AddRange(failedList);
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
-            }
-            return response;
-        }
-
-        #endregion
-
+      
         private void UpdateInTransactions(string trackId, string eventCode)
         {
             //valida InTransaction Factura - eventos Endoso en propeidad, Garantia y procuración
