@@ -15,7 +15,7 @@ namespace Gosocket.Dian.Application
 
         public GlobalDocPayroll Find(string partitionKey)
         {
-            return this.payrollTableManager.Find<GlobalDocPayroll>(partitionKey, partitionKey);
+            return this.payrollTableManager.FindByPartition<GlobalDocPayroll>(partitionKey).FirstOrDefault();
         }
     }
 }

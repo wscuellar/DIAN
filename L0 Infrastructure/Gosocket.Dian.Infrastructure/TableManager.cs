@@ -1201,5 +1201,94 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
+        public T FindGlobalPayrollByCUNE<T>(string cune) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("CUNE", QueryComparisons.Equal, cune));
+            return CloudTable.ExecuteQuery(query).FirstOrDefault();
+        }
+
+        public List<T> FindGlobalPayrollByDocumentNumber<T>(int take, string employeeDocNumber) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("NumeroDocumento", QueryComparisons.Equal, employeeDocNumber));
+            return CloudTable.ExecuteQuery(query).Take(take).OrderByDescending(x => x.Timestamp).ToList();
+        }
+
+        public List<T> FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<T>
+            (int take, DateTime? monthStart, DateTime? monthEnd, int? enumerationStart, int? enumerationEnd, string employeeDocType, 
+            string employeeDocNumber, string firstSurname, double? employeeSalaryStart, double? employeeSalaryEnd, string employeeCity) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+            string prefixCondition = null;
+
+            if (enumerationStart.HasValue)
+            {
+                var tempPrefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("Consecutivo", QueryComparisons.GreaterThanOrEqual,
+                    enumerationStart.ToString()), TableOperators.And,
+                TableQuery.GenerateFilterCondition("Consecutivo", QueryComparisons.LessThanOrEqual, enumerationEnd.ToString()));
+
+                if (prefixCondition == null) prefixCondition = tempPrefixCondition;
+                else prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, tempPrefixCondition);
+            }
+
+            if (monthStart.HasValue)
+            {
+                var tempPrefixCondition = TableQuery.CombineFilters(
+                    TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThanOrEqual,
+                        monthStart.Value), TableOperators.And,
+                    TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.LessThanOrEqual, monthEnd.Value));
+
+                if (prefixCondition == null) prefixCondition = tempPrefixCondition;
+                else prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, tempPrefixCondition);
+            }
+                        
+            if(!string.IsNullOrWhiteSpace(employeeDocType))
+            {
+                var tempPrefixCondition = TableQuery.GenerateFilterCondition("TipoDocumento", QueryComparisons.Equal, employeeDocType);
+
+                if (prefixCondition == null) prefixCondition = tempPrefixCondition;
+                else prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, tempPrefixCondition);
+            }
+
+            if (!string.IsNullOrWhiteSpace(employeeDocNumber))
+            {
+                var tempPrefixCondition = TableQuery.GenerateFilterCondition("NumeroDocumento", QueryComparisons.Equal, employeeDocNumber);
+
+                if (prefixCondition == null) prefixCondition = tempPrefixCondition;
+                else prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, tempPrefixCondition);
+            }
+
+            if (!string.IsNullOrWhiteSpace(firstSurname))
+            {
+                var tempPrefixCondition = TableQuery.GenerateFilterCondition("PrimerApellido", QueryComparisons.Equal, firstSurname);
+
+                if (prefixCondition == null) prefixCondition = tempPrefixCondition;
+                else prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, tempPrefixCondition);
+            }
+
+            if (employeeSalaryStart.HasValue)
+            {
+                var tempPrefixCondition = TableQuery.CombineFilters(
+                    TableQuery.GenerateFilterConditionForDouble("Sueldo", QueryComparisons.GreaterThanOrEqual,
+                        employeeSalaryStart.Value), TableOperators.And,
+                    TableQuery.GenerateFilterConditionForDouble("Sueldo", QueryComparisons.LessThanOrEqual, employeeSalaryEnd.Value));
+
+                if (prefixCondition == null) prefixCondition = tempPrefixCondition;
+                else prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, tempPrefixCondition);
+            }
+
+            if (!string.IsNullOrWhiteSpace(employeeCity))
+            {
+                var tempPrefixCondition = TableQuery.GenerateFilterCondition("LugarTrabajoMunicipioCiudad", QueryComparisons.Equal, employeeCity);
+
+                if (prefixCondition == null) prefixCondition = tempPrefixCondition;
+                else prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, tempPrefixCondition);
+            }
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition)).Take(take).OrderByDescending(x => x.Timestamp);
+
+            return entities.ToList();
+        }
     }
 }

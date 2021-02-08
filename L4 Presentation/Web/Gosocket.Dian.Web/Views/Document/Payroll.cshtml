@@ -1,8 +1,10 @@
 ﻿@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Domain.Entity;
 @model Gosocket.Dian.Web.Models.PayrollViewModel
 
 @{
     ViewBag.Title = "Consultar Nómina";
+    var firstSurnameData = ViewBag.FirstSurnameData as List<string>;
 }
 
 @section css
@@ -10,6 +12,7 @@
     <!--Bootstrap Select [ OPTIONAL ]-->
     <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+    <link href="~/Content/jquery-ui.css" rel="stylesheet" />
 }
 
 <style>
@@ -100,8 +103,13 @@
 
                                                                 <div class="col-sm-3 padding-xs-0">
                                                                     <div class="form-group">
-                                                                        @Html.LabelFor(m => m.Ordenar, new { @class = "control-label" })
-                                                                        @Html.DropDownListFor(m => m.Ordenar, new SelectList(Model.Ordenadores, "Code", "Name", Model.Ordenar), new { @class = "form-control selectpicker" })
+                                                                        @Html.Label("Rango de Numeración", new { @class = "control-label" })
+                                                                        <div class="form-control">
+                                                                            <span>Del</span>
+                                                                            <input id="RangoNumeracionMenor" name="RangoNumeracionMenor" type="number" style="width: 40%" value="@Model.RangoNumeracionMenor" />
+                                                                            <span>al</span>
+                                                                            <input id="RangoNumeracionMayor" name="RangoNumeracionMayor" type="number" style="width: 40%" value="@Model.RangoNumeracionMayor" />
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -122,7 +130,7 @@
                                                                 <div class="col-sm-3 padding-xs-0">
                                                                     <div class="form-group">
                                                                         @Html.LabelFor(m => m.LetraPrimerApellido, new { @class = "control-label" })
-                                                                        @Html.DropDownListFor(m => m.LetraPrimerApellido, new SelectList(Model.LetrasPrimerApellido, "Code", "Name", Model.LetraPrimerApellido), new { @class = "form-control selectpicker" })
+                                                                        <input type="text" id="LetraPrimerApellido" name="LetraPrimerApellido" class="form-control" value="@Model.LetraPrimerApellido" />
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-sm-3 padding-xs-0">
@@ -185,11 +193,15 @@
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
 
+    <script src="~/Scripts/jquery-ui.js"></script>
+
     <script type="text/javascript">
         $(document).ready(function () {
             var $page = $('#Page'),
                 $directionToPagination = $('#DirectionToPagination'),
-                $form = $('#payroll-form');
+                $form = $('#payroll-form'),
+                $enumerationRangeMin = $('#RangoNumeracionMenor'),
+                $enumerationRangeMax = $('#RangoNumeracionMayor');
 
             // Pagination
             $('.next-page').click(function () {
@@ -208,6 +220,69 @@
             $('.btn-search').click(function () {
                 $page.val(0);
                 $form.submit();
+            });
+
+            $enumerationRangeMin.change(function () {
+                let $this = $(this);
+                if ($this.val() != null) {
+                    let value = parseInt($this.val());
+                    if (value < 0) {
+                        value = 0;
+                        $this.val(value);
+                    }
+
+                    if ($enumerationRangeMax.val() != null) {
+                        let maxValue = parseInt($enumerationRangeMax.val());
+                        if (value > maxValue) {
+                            $enumerationRangeMax.val(value);
+                        }
+                        else {
+                            if ((maxValue - value) > 50) {
+                                $enumerationRangeMax.val((value + 50));
+                            }
+                        }
+                    }
+                }
+            });
+
+            $enumerationRangeMax.change(function () {
+                let $this = $(this);
+                if ($this.val() != null) {
+                    let value = parseInt($this.val());
+                    if (value < 0) {
+                        value = 1;
+                        $this.val(value);
+                        $enumerationRangeMin.val(0);
+                        return;
+                    }
+
+                    if ($enumerationRangeMin.val() != null) {
+                        let minValue = parseInt($enumerationRangeMin.val());
+                        if (value < minValue) {
+                            $enumerationRangeMin.val(value);
+                        }
+                        else {
+
+                            if ((value - minValue) > 50) {
+                                $enumerationRangeMin.val((value - 50));
+                            }
+                        }
+
+                    }
+                }
+            });
+
+            var arrayFirstSurname = [];
+            @foreach (var item in firstSurnameData)
+            {
+                <text>arrayFirstSurname.push({ value: '@item' });</text>
+            }
+
+            $("#LetraPrimerApellido").autocomplete({
+                source: arrayFirstSurname,
+                select: function (event, ui) {
+                    
+                }
             });
         });
     </script>
