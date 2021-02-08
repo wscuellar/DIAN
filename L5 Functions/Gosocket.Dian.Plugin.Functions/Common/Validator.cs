@@ -1067,7 +1067,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     else if (party.CustomizationID == "442")
                     {
                         //Renuncia es información del mandatario
-                        if (party.SenderParty != nitModel.IssuerPartyID)
+                        if (party.SenderParty != senderCode)
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -1428,8 +1428,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool validError = false;
 
             //Valida exista informacion mandato - Mandatario - CUFE para eventos disitintos a Mandato 043
-            if (eventCode != "043" && !validError)
+            if (Convert.ToInt32(eventCode) != (int)EventStatus.Mandato && !validError)
             {
+                if (Convert.ToInt32(eventCode) == (int)EventStatus.TerminacionMandato)
+                {
+                    var referenceCudeMandato = TableManagerGlobalDocReferenceAttorney.FindByPartition<GlobalDocReferenceAttorney>(party.TrackId);
+                    if(referenceCudeMandato != null)
+                    {
+                        foreach (var cufeMandato in referenceCudeMandato)
+                            cufe = cufeMandato.RowKey;
+                    }
+                }
+
                 var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cufe, senderCode);
 
                 if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
@@ -1457,7 +1467,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (docReferenceAttorney.IssuerAttorney == issueAtorney)
                     {
                         if ((String.IsNullOrEmpty(docReferenceAttorney.EndDate)
-                            || (DateTime.Now >= DateTime.ParseExact(docReferenceAttorney.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture))
+                            || (DateTime.ParseExact(docReferenceAttorney.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture) >= DateTime.Now)
                             ) && docReferenceAttorney.Active)
                         {
                             //Valida se encuetre habilitado Modo Operacion RadianOperation
