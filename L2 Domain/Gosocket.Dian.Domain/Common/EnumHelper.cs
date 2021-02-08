@@ -164,9 +164,9 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Factura electrónica de contingencia DIAN")]
         ContingencyDianInvoice = 4,
         [Description("Nomina Individual")]
-        IndividualPayroll = 11,
+        IndividualPayroll = 102,
         [Description("Nomina Individual de Ajustes")]
-        IndividualPayrollAdjustments = 12,
+        IndividualPayrollAdjustments = 103,
         [Description("Nota de crédito electrónica")]
         CreditNote = 91,
         [Description("Nota de débito electrónica")]

@@ -225,7 +225,9 @@ namespace Gosocket.Dian.Functions.Batch
                     {
                         xmlBase64 = response.XpathsValues["XmlBase64"];
                         fileName = response.XpathsValues["FileName"];
-                        documentTypeId = "11";
+                        documentTypeId = !string.IsNullOrWhiteSpace(xmlParser.globalDocPayrolls.CUNEPred)
+                        ? DocumentType.IndividualPayrollAdjustments.ToString() : DocumentType.IndividualPayroll.ToString();
+
                         trackId = xmlParser.globalDocPayrolls.CUNE;
                         eventNomina = true;
                     }

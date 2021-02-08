@@ -386,7 +386,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Validación de DV para documentos de Nómina
             if (nominaModel != null)
             {
-                if (nominaModel.DocumentTypeId == "11")
+                if (Convert.ToInt32(nominaModel.DocumentTypeId) == (int)DocumentType.IndividualPayroll)
                 {
                     // Proveedor
                     if (ValidateDigitCode(nominaModel.ProveedorNIT, int.Parse(nominaModel.ProveedorDV)))
@@ -1398,8 +1398,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "AAD11a",
-                            ErrorMessage = $"No se encuentra informada la Nota para Cancelación de Endoso en Procuración",
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAD11a_040"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAD11a_040"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -2322,12 +2322,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 response.ErrorCode = "DAB27b";
             if (documentMeta.DocumentTypeId == "96")
                 response.ErrorCode = "AAB27b";
-            if (documentMeta.DocumentTypeId == "11")
+            if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll)
                 response.ErrorCode = "NIE020";
-            if (documentMeta.DocumentTypeId == "12")
+            if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                 response.ErrorCode = "NIAE020";
 
-            if (documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+            if ( Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
+                ||Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
             {
                 response.ErrorMessage = "Se debe indicar el Software Security Code según la definición establecida.";
             }
@@ -2355,12 +2356,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         response.ErrorCode = "DAB24b";
                     if (documentMeta.DocumentTypeId == "96")
                         response.ErrorCode = "AAB24b";
-                    if (documentMeta.DocumentTypeId == "11")
+                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll)
                         response.ErrorCode = "NIE019";
-                    if (documentMeta.DocumentTypeId == "12")
+                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                         response.ErrorCode = "NIAE019";
 
-                    if (documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
+                         || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                     {
                         response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Documento Soporte de Pago de Nómina Electrónica, debe corresponder a un software autorizado para este Emisor";
                     }
@@ -2377,12 +2379,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         response.ErrorCode = "DAB24c";
                     if (documentMeta.DocumentTypeId == "96")
                         response.ErrorCode = "AAB24c";
-                    if (documentMeta.DocumentTypeId == "11")
+                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll)
                         response.ErrorCode = "NIE019";
-                    if (documentMeta.DocumentTypeId == "12")
+                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                         response.ErrorCode = "NIAE019";
 
-                    if (documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
+                        || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                     {
                         response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Documento Soporte de Pago de Nómina Electrónica, debe corresponder a un software autorizado para este Emisor";
                     }

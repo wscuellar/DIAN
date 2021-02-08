@@ -378,7 +378,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             XmlParser xmlParser = null;
             XmlParseNomina xmlParserNomina = null;
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if(documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+            
+            if(Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
+                || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)           
             {
                 xmlParserNomina = new XmlParseNomina(xmlBytes);
                 if (!xmlParserNomina.Parser())
@@ -598,7 +600,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             XmlParser xmlParser = null;
             XmlParseNomina xmlParserNomina = null;
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (documentMeta.DocumentTypeId == "11" || documentMeta.DocumentTypeId == "12")
+            
+            if(Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
+                || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)           
             {
                 xmlParserNomina = new XmlParseNomina(xmlBytes);
                 if (!xmlParserNomina.Parser())
