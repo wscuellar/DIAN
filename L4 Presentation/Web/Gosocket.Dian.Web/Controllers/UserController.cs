@@ -1254,7 +1254,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage(TextResources.InactiveUser, TextResources.UserError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            UsersFreeBillerProfile freeBiller = userService.GetUserFreeBillerProfile(u => u.CompanyCode == model.CompanyCode && u.CompanyIdentificationType == model.CompanyIdentificationType);
+            UsersFreeBillerProfile freeBiller = userService.GetUserFreeBillerProfile(u => u.CompanyCode == model.CompanyCode);
 
             var contributor = contributorService.GetByCode(model.CompanyCode);
             if (freeBiller == null)
