@@ -1131,7 +1131,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     }
 
                     var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedRadianUrl), new { TrackId = trackIdCude });
-                    if (processEventResponse.Code != Properties.Settings.Default.Code_100)
+                    if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
                     {
                         dianResponse.IsValid = false;
                         dianResponse.XmlFileName = contentFileList.First().XmlFileName;
