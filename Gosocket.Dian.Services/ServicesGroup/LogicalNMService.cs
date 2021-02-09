@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain.Domain;
+﻿using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Services.Models;
@@ -1029,8 +1030,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     docGlobalPayroll.Timestamp = DateTime.Now;
 
                     arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
+
                     // Nómina Individual de Ajuste...
-                    if (documentParsed.DocumentTypeId == "12")
+                    if (Convert.ToInt32(documentParsed.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                     {
                         var docGlobalPayrollHistoric = new GlobalDocPayrollHistoric(trackIdPred, trackId);
                         arrayTasks.Add(TableManagerGlobalDocPayrollHistoric.InsertOrUpdateAsync(docGlobalPayrollHistoric));
