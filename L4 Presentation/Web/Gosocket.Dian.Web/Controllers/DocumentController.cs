@@ -981,6 +981,12 @@ namespace Gosocket.Dian.Web.Controllers
             if (events.Count() == 0)
                 return RadianDocumentStatus.DontApply.GetDescription();
 
+            if (events.Count(ev => !ev.Code.Equals($"0{(int)EventStatus.Avales}")
+                    && !ev.Code.Equals($"0{(int)EventStatus.Mandato}")
+                    && !ev.Code.Equals($"0{(int)EventStatus.ValInfoPago}")
+                    && !ev.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")) == 0)
+                return RadianDocumentStatus.DontApply.GetDescription();
+
             int lastEventCode = int.Parse(events.Where(ev => !ev.Code.Equals($"0{(int)EventStatus.Avales}")
                     && !ev.Code.Equals($"0{(int)EventStatus.Mandato}")
                     && !ev.Code.Equals($"0{(int)EventStatus.ValInfoPago}")
