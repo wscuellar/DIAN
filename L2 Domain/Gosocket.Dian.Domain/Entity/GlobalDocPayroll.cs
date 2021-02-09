@@ -27,7 +27,7 @@ namespace Gosocket.Dian.Domain.Entity
         //NumeroSecuenciaXML
         public string CodigoTrabajador { get; set; }
         public string Prefijo { get; set; }
-        public string Consecutivo { get; set; }
+        public double Consecutivo { get; set; }
         public string Numero { get; set; }
 
         //LugarGeneracionXML

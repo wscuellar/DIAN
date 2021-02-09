@@ -356,7 +356,7 @@ namespace Gosocket.Dian.Web.Controllers
                 var document = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
                 var numAdjustment = string.Empty;
 
-                if(documentMeta.DocumentTypeId == "102") // Nómina Individual
+                if(int.Parse(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll && !string.IsNullOrWhiteSpace(documentMeta.DocumentReferencedKey)) // Nómina Individual con Ajuste...
                 {
                     var adjustmentDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentMeta.DocumentReferencedKey, documentMeta.DocumentReferencedKey);
                     if (adjustmentDocumentMeta != null) numAdjustment = adjustmentDocumentMeta.SerieAndNumber;
@@ -370,7 +370,7 @@ namespace Gosocket.Dian.Web.Controllers
                     NumeroNomina = payroll.Numero,
                     ApellidosNombre = $"{payroll.PrimerApellido} {payroll.SegundoApellido} {payroll.PrimerNombre}",
                     TipoDocumento = payroll.TipoDocumento,
-                    NoDocumento = payroll.Consecutivo,
+                    NoDocumento = payroll.NumeroDocumento,
                     Salario = payroll.Sueldo,
                     Devengado = payroll.DevengadosTotal,
                     Deducido = payroll.DeduccionesTotal,
