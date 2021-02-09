@@ -1493,7 +1493,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return authorization;
         }
 
-
         private GlobalContributor GetGlobalContributor(string authCode)
         {
             var globalContributor = new GlobalContributor();
