@@ -2035,7 +2035,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
-                                        ErrorMessage = "CUFE referenciado no pertenece al emisor del mandato como el legítimo tenedor de la factura",
+                                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
@@ -2068,7 +2068,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     IsValid = false,
                                     Mandatory = true,
                                     ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
-                                    ErrorMessage = "CUFE referenciado no pertenece al emisor del mandato como el legítimo tenedor de la factura",
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
