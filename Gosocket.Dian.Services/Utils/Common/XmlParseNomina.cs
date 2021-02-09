@@ -104,7 +104,8 @@ namespace Gosocket.Dian.Services.Utils.Common
                     {
                         globalDocPayrolls.CodigoTrabajador = xNumeroSecuenciaXML[j].Attributes["CodigoTrabajador"]?.InnerText;
                         globalDocPayrolls.Prefijo = xNumeroSecuenciaXML[j].Attributes["Prefijo"]?.InnerText;
-                        globalDocPayrolls.Consecutivo = xNumeroSecuenciaXML[j].Attributes["Consecutivo"]?.InnerText;
+                        var tempConsecutivo = xNumeroSecuenciaXML[j].Attributes["Consecutivo"]?.InnerText;
+                        globalDocPayrolls.Consecutivo = (!string.IsNullOrWhiteSpace(tempConsecutivo) ? double.Parse(tempConsecutivo) : 0);
                         globalDocPayrolls.Numero = xNumeroSecuenciaXML[j].Attributes["Numero"]?.InnerText;
                     }
                     XmlNodeList xLugarGeneracionXML = xmlDocument.GetElementsByTagName("LugarGeneracionXML");
