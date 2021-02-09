@@ -187,7 +187,6 @@ namespace Gosocket.Dian.Application
                 headerTemplate = headerTemplate.Append(templateLastPage);
                 templateLastPage = CommonDataTemplateMapping(headerTemplate, expeditionDate, page, documentMeta, invoiceStatus);
             }
-               
 
             byte[] report = GetPdfBytes(templateFirstPage.Append(templateLastPage.ToString()).ToString(), "Factura electronica");
 
@@ -205,9 +204,10 @@ namespace Gosocket.Dian.Application
             // Convert
             pdf = Pdf
                 .From(htmlContent)
-                .OfSize(PaperSize.A4)
                 .WithTitle(documentName)
-                .WithMargins(1.0.Centimeters())
+                .WithGlobalSetting("orientation", "Portrait")
+                .WithObjectSetting("web.defaultEncoding", "utf-8")
+                .OfSize(PaperSize.A4)
                 .Content();
 
             return pdf;
