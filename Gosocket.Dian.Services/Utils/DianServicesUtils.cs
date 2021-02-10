@@ -747,6 +747,9 @@ namespace Gosocket.Dian.Services.Utils
         public static bool ValidateParserValuesSync(DocumentParsed documentParsed, ref DianResponse dianResponse)
         {
             string codeMessage = string.Empty;
+            string txtRegla = string.Empty;
+            string txtRechazo = string.Empty;
+
             bool isValid = true;
             StringBuilder stringBuilder = new StringBuilder();
 
@@ -791,6 +794,8 @@ namespace Gosocket.Dian.Services.Utils
                 case "96":
                     {
                         codeMessage = "Regla: AA";
+                        txtRegla = "Regla: ";
+                        txtRechazo = ", Rechazo: ";
                         break;
                     }
                 default:
@@ -809,15 +814,15 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (providerCode == "800197268")
                 {
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAB19b") + ConfigurationManager.GetValue("ErrorMessage_AAB19b"));
+                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAB19b") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAB19b"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
                 }
 
                 if (!UBLVersionID.Equals("UBL 2.1"))
-                {                    
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD01") + ConfigurationManager.GetValue("ErrorMessage_AAD01"));
+                {
+                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAD01") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD01"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -825,7 +830,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentID))
                 {                    
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH06") + ConfigurationManager.GetValue("ErrorMessage_AAH06"));
+                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAH06") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAH06"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -833,7 +838,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(eventCode))
                 {
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH03") + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
+                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAH03") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -844,14 +849,12 @@ namespace Gosocket.Dian.Services.Utils
                    || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
                    || eventCode == "045" || eventCode == "046"))
                 {
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAH03") + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
+                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAH03") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
                     flagEvento = false;
                 }
-
-
 
                 if (flagEvento)
                 {
@@ -860,14 +863,14 @@ namespace Gosocket.Dian.Services.Utils
                     {
                         if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34 && flagEvento)
                         {
-                            stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD05") + ConfigurationManager.GetValue("ErrorMessage_AAD05"));
+                            stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAD05") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD05"));
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
                         }
                         if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 46)
                         {
-                            stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD05a") + ConfigurationManager.GetValue("ErrorMessage_AAD05a"));
+                            stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAD05a") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD05a"));
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
@@ -876,28 +879,28 @@ namespace Gosocket.Dian.Services.Utils
 
                     if ((Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) && string.IsNullOrEmpty(receiverCode) && flagEvento)
                     {
-                        stringBuilder.AppendLine($"{codeMessage}G04: El ID de receptor del evento no es Válido");
+                        stringBuilder.AppendLine(txtRegla + $"{codeMessage}G04" + txtRechazo + "El ID de receptor del evento no es Válido");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
                     }
                     else if ((Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(receiverCode) && flagEvento)
                     {
-                        stringBuilder.AppendLine($"{codeMessage}G04: No fue informado el documento del endosatario");
+                        stringBuilder.AppendLine(txtRegla + $"{codeMessage}G04" + txtRechazo + "No fue informado el documento del endosatario");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
                     }
                     else if ( (Convert.ToInt32(eventCode) == 45 || Convert.ToInt32(eventCode) == 46) && string.IsNullOrEmpty(receiverCode) && flagEvento)
                     {
-                        stringBuilder.AppendLine($"{codeMessage}G04: No fue informado el número de identificación.");
+                        stringBuilder.AppendLine(txtRegla + $"{codeMessage}G04" + txtRechazo + "No fue informado el número de identificación.");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
                     }
                     else if (string.IsNullOrEmpty(receiverCode))
                     {
-                        stringBuilder.AppendLine($"{codeMessage}G04: No fue informado el literal “800197268”");
+                        stringBuilder.AppendLine(txtRegla + $"{codeMessage}G04" + txtRechazo + "No fue informado el literal “800197268”");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
@@ -905,7 +908,7 @@ namespace Gosocket.Dian.Services.Utils
 
                     if (listID == "1" && (Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(senderCode) && flagEvento)
                     {
-                        stringBuilder.AppendLine($"{codeMessage}F04: No fue informado el Nit.");
+                        stringBuilder.AppendLine(txtRegla + $"{codeMessage}F04" + txtRechazo + "No fue informado el Nit.");
                         errors.Add(stringBuilder.ToString());
                         stringBuilder.Clear();
                         isValid = false;
@@ -915,14 +918,14 @@ namespace Gosocket.Dian.Services.Utils
                         if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34)
                         {
 
-                            stringBuilder.AppendLine($"{codeMessage}F04: El ID de emisor del evento no es Valido..");
+                            stringBuilder.AppendLine(txtRegla + $"{codeMessage}F04" + txtRechazo + "El ID de emisor del evento no es Valido..");
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
                         }
                         else if (!(listID == "2" && (eventCode == "037" || eventCode == "038" || eventCode == "039")))
                         {
-                            stringBuilder.AppendLine($"{codeMessage}F04: No fue informado el Nit.");
+                            stringBuilder.AppendLine(txtRegla + $"{codeMessage}F04" + txtRechazo + "No fue informado el Nit.");
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
@@ -933,7 +936,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentCude))
                 {
-                    stringBuilder.AppendLine(ConfigurationManager.GetValue("ErrorCode_AAD06") + ":" + ConfigurationManager.GetValue("ErrorMessage_AAD06"));
+                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAD06") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD06"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -941,7 +944,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(customizationId))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D02: No corresponde a un código valido.");
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D02" + txtRechazo + "No corresponde a un código valido.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -985,9 +988,10 @@ namespace Gosocket.Dian.Services.Utils
           
             if (!isValid)
             {
-
                 dianResponse.StatusCode = "66";
                 dianResponse.ErrorMessage = errors;
+                dianResponse.StatusDescription = Properties.Settings.Default.Msg_Error_FieldMandatori;
+                dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios.";
             }
             else
             {

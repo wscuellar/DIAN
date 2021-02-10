@@ -880,7 +880,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // ZONE 3
             start = DateTime.UtcNow;
-            //Validar campos mandatorios basicos para el trabajo del WS
+            //Validar campos mandatorios basicos para el trabajo del WS      
+            dianResponse.XmlDocumentKey = documentParsed.Cude;
             if (!DianServicesUtils.ValidateParserValuesSync(documentParsed, ref dianResponse)) return dianResponse;
 
             var senderCode = documentParsed.SenderCode;

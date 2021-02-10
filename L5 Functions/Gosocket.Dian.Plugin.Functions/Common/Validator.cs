@@ -693,7 +693,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //valida si existe los permisos del mandatario
-            if (party.SenderParty != xmlParserCude.ProviderCode)
+            if (party.SenderParty != xmlParserCude.ProviderCode && xmlParserCude.ProviderCode != "800197268")
             {
                 var responseVal = ValidateFacultityAttorney(nitModel, party, xmlParserCude);
                 if (responseVal != null)
