@@ -1208,7 +1208,7 @@ namespace Gosocket.Dian.Infrastructure
         }
 
         public List<T> FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<T>
-            (int take, DateTime? monthStart, DateTime? monthEnd, int? enumerationStart, int? enumerationEnd, string employeeDocType, 
+            (int take, DateTime? monthStart, DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType, 
             string employeeDocNumber, string firstSurname, double? employeeSalaryStart, double? employeeSalaryEnd, string employeeCity) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -1217,9 +1217,9 @@ namespace Gosocket.Dian.Infrastructure
             if (enumerationStart.HasValue)
             {
                 var tempPrefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("Consecutivo", QueryComparisons.GreaterThanOrEqual,
-                    enumerationStart.ToString()), TableOperators.And,
-                TableQuery.GenerateFilterCondition("Consecutivo", QueryComparisons.LessThanOrEqual, enumerationEnd.ToString()));
+                TableQuery.GenerateFilterConditionForDouble("Consecutivo", QueryComparisons.GreaterThanOrEqual,
+                    enumerationStart.Value), TableOperators.And,
+                TableQuery.GenerateFilterConditionForDouble("Consecutivo", QueryComparisons.LessThanOrEqual, enumerationEnd.Value));
 
                 if (prefixCondition == null) prefixCondition = tempPrefixCondition;
                 else prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, tempPrefixCondition);

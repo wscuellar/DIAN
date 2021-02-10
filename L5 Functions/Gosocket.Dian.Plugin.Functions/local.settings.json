@@ -92,7 +92,11 @@
     "ErrorCode_LGC60": "LGC60",
     "ErrorMessage_LGC60": "Mandatario Factor no se encuentra Habilitado",
     "ErrorCode_AAD11": "AAD11",
-    "ErrorMessage_AAD11": "No fue informo la nota cuando el evento fue generado por un mandato."
+    "ErrorMessage_AAD11": "No fue informo la nota cuando el evento fue generado por un mandato.",
+    "ErrorCode_LGC39": "LGC39",
+    "ErrorMessage_LGC39": "No se puede registrar este evento si previamente se ha registrado el evento Limitación de circulación",
+    "ErrorCode_LGC09": "LGC09",
+    "ErrorMessage_LGC09": "No puede generar una recepción de bienes y prestación de servicios sobre un documento que no cuente con un evento de acuse de recibo"
 
 
 

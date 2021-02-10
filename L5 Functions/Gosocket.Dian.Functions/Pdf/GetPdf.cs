@@ -87,7 +87,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 string logoDianaStrBase64 = Convert.ToBase64String(logoDianStream.ToArray());
                 var logoDianBase64 = $@"data:image/png;base64,{logoDianaStrBase64}";
 
-                MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytes("logo", $"{documentMetaEntity.ReceiverCode}.jpg") ?? fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
+                MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytes("logo", $"{documentMetaEntity.SenderCode}.jpg") ?? fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
                 string logoStrBase64 = Convert.ToBase64String(logoStream.ToArray());
                 var logoBase64 = $@"data:image/png;base64,{logoStrBase64}";
 

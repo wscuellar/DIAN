@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
@@ -63,7 +64,7 @@ namespace Gosocket.Dian.Application
             return fullName;
         }
 
-        private StringBuilder DataTemplateMapping(StringBuilder template, GlobalDocPayroll model)
+        private StringBuilder IndividualPayrollDataTemplateMapping(StringBuilder template, GlobalDocPayroll model)
         {
             //Set Variables
             DateTime expeditionDate = DateTime.Now;
@@ -71,9 +72,9 @@ namespace Gosocket.Dian.Application
             // PENDIENTES
             // Datos del documento
             template = template.Replace("{Cune}", this.GetValueFormatToTemplate(model.CUNE));
-            template = template.Replace("{PayrollNumber}", this.GetValueFormatToTemplate(""));
+            template = template.Replace("{PayrollNumber}", this.GetValueFormatToTemplate(model.Numero));
             template = template.Replace("{Country}", this.GetValueFormatToTemplate(model.Pais));
-            template = template.Replace("{GenerationPeriod}", this.GetValueFormatToTemplate(""));
+            template = template.Replace("{GenerationPeriod}", this.GetValueFormatToTemplate(model.FechaGen)); //...
             template = template.Replace("{City}", this.GetValueFormatToTemplate(model.MunicipioCiudad));
             template = template.Replace("{Departament}", this.GetValueFormatToTemplate(model.DepartamentoEstado));
 
@@ -102,12 +103,12 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EmployeeAddress}", this.GetValueFormatToTemplate(model.LugarTrabajoDireccion));
             template = template.Replace("{EmployeePayrollPeriod}", this.GetValueFormatToTemplate(model.PeriodoNomina));
             template = template.Replace("{EmployeeEntryDate}", this.GetValueFormatToTemplate(model.FechaIngreso));
-            template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate(""));
-            template = template.Replace("{EmployeeAntique}", this.GetValueFormatToTemplate(""));
+            template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate(model.FechaPagoFin)); //...
+            template = template.Replace("{EmployeeAntique}", this.GetTotalTimeWorkedFormatted(DateTime.Parse(model.FechaIngreso), DateTime.Parse(model.FechaPagoFin)));
             template = template.Replace("{EmployeeContractType}", this.GetValueFormatToTemplate(model.TipoContrato));
-            template = template.Replace("{EmployeeSettlementPeriod}", this.GetValueFormatToTemplate(""));
+            template = template.Replace("{EmployeeSettlementPeriod}", this.GetValueFormatToTemplate(model.FechaLiquidacion));
             template = template.Replace("{EmployeeTimeWorked}", this.GetValueFormatToTemplate(model.TiempoLaborado));
-            template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate(""));
+            template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate(model.FechaPagoFin));
             template = template.Replace("{EmployeeSalary}", model.Sueldo.ToString("C0"));
             template = template.Replace("{EmployeeIsComprehensiveSalary}", (model.SalarioIntegral) ? "Si" : "No");
 
@@ -147,8 +148,8 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{TotalDeductions}", model.DeduccionesTotal.ToString("C0"));
             template = template.Replace("{TotalVoucher}", model.ComprobanteTotal.ToString("C0"));
 
-            template = template.Replace("{DocumentValidated}", this.GetValueFormatToTemplate(model.Info_FechaGen));
-            template = template.Replace("{DocumentGenerated}", this.GetValueFormatToTemplate(model.FechaGen));
+            template = template.Replace("{DocumentValidated}", this.GetValueFormatToTemplate(model.Timestamp.DateTime.ToString("yyyy-MM-dd")));
+            template = template.Replace("{DocumentGenerated}", this.GetValueFormatToTemplate(DateTime.Now.ToString("yyyy-MM-dd")));
 
             // PENDIENTES
             // Footer
@@ -160,6 +161,105 @@ namespace Gosocket.Dian.Application
             return template;
         }
 
+        private StringBuilder AdjustmentIndividualPayrollDataTemplateMapping(StringBuilder template, GlobalDocPayroll model, GlobalDocValidatorDocumentMeta adjustment)
+        {
+            template = this.IndividualPayrollDataTemplateMapping(template, model);
+
+            template = template.Replace("{AdjCune}", this.GetValueFormatToTemplate(adjustment.PartitionKey));
+            template = template.Replace("{AdjPayrollNumber}", this.GetValueFormatToTemplate(adjustment.SerieAndNumber));
+            template = template.Replace("{AdjGenerationDate}", this.GetValueFormatToTemplate(adjustment.Timestamp.DateTime.ToString("yyyy-MM-dd")));
+
+            return template;
+        }
+
+        /// <summary>
+        /// Función que realiza el cálculo del tiempo laborado en base a un rango de fechas.
+        /// </summary>
+        /// <param name="initialDate">Fecha inicial del rango</param>
+        /// <param name="finalDate">Fecha final del rango</param>
+        /// <returns>Cadena con formato '00A00M00D'</returns>
+        private string GetTotalTimeWorkedFormatted(DateTime initialDate, DateTime finalDate)
+        {
+            const int monthsInYear = 12,
+                      daysInMonth = 30;
+
+            var totalYears = finalDate.Year - initialDate.Year;
+            var totalMonths = finalDate.Month - initialDate.Month;
+            var totalDays = finalDate.Day - initialDate.Day;
+
+            if (totalYears == 0) // mismo año
+            {
+                if (totalMonths > 0) // diferente mes, en el mismo año
+                {
+                    if (totalDays < 0) // no se completaron los 30 días...se elimina 1 mes y se hace el cálculo de los días
+                    {
+                        totalMonths--;
+                        totalDays = (daysInMonth - initialDate.Day) + finalDate.Day;
+                    }
+                    else
+                        totalDays++; // se suma 1 día
+                }
+                else // mismo mes
+                    totalDays++; // se suma 1 día
+            }
+            else
+            {
+                // 12 o más meses...
+                if (totalMonths >= 0)
+                {
+                    if (totalDays < 0)
+                    {
+                        // no alcanza el mes completo, se elimina un mes y se sumas los días
+                        if (totalMonths == 0)
+                        {
+                            totalYears--;
+                            totalMonths = (monthsInYear - 1);
+                        }
+                        else
+                            totalMonths--;
+
+                        totalDays = (daysInMonth - initialDate.Day) + finalDate.Day;
+                    }
+                    else
+                        totalDays++; // se suma 1 día
+                }
+                else
+                {
+                    // no se completan los 12 meses, se tiene que restar 1 año y sumar los meses (totalMonths)
+                    totalYears--;
+                    totalMonths = (monthsInYear - initialDate.Month) + finalDate.Month;
+
+                    // no se completan los 30 días
+                    if (totalDays < 0)
+                    {
+                        // no se completan los 30 días, se tiene que restar 1 mes y sumar los días (totalDays)
+                        totalMonths--;
+                        totalDays = (daysInMonth - initialDate.Day) + finalDate.Day;
+                    }
+                    else
+                        totalDays++; // se suma 1 día
+                }
+            }
+
+            // validaciones finales para ajustar unidades...
+            if (totalDays == 30) // si se completan 30 días, se suma 1 mes y se reinician los días
+            {
+                totalMonths++;
+                totalDays = 0;
+            }
+            if (totalMonths == 12) // si se completan 12 meses, se suma 1 año y se reinician los meses
+            {
+                totalYears++;
+                totalMonths = 0;
+            }
+
+            string yearsStringFormatted = $"{totalYears.ToString().PadLeft(2, char.Parse("0"))}A",
+                   monthsStringFormatted = $"{totalMonths.ToString().PadLeft(2, char.Parse("0"))}M",
+                   daysStringFormatted = $"{totalDays.ToString().PadLeft(2, char.Parse("0"))}D";
+
+            return $"{yearsStringFormatted}{monthsStringFormatted}{daysStringFormatted}";
+        }
+
         #endregion
 
         #region [ public methods ]
@@ -167,18 +267,34 @@ namespace Gosocket.Dian.Application
         public byte[] GetPdfReport(string id)
         {
             // Load Templates            
-            StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNomina.html"));
-
+            //StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNomina.html"));
+            StringBuilder template = new StringBuilder();
             var payrollModel = this.GetPayrollData(id);
+
+            //NÓMINA REEMPLAZADA POR AJUSTE
+            var documentMeta = this._queryAssociatedEventsService.DocumentValidation(payrollModel.CUNE);
+            // Si es Nómina Individual y tiene DocumentReferencedKey, es porque tiene un Ajuste de Nómina
+            if (int.Parse(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll && !string.IsNullOrWhiteSpace(documentMeta.DocumentReferencedKey))
+            {
+                // Load template
+                template.Append(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNominaAjuste.html"));
+                // Adjustment data...
+                var adjustmentDocumentMeta = this._queryAssociatedEventsService.DocumentValidation(documentMeta.DocumentReferencedKey);
+                template = this.AdjustmentIndividualPayrollDataTemplateMapping(template, payrollModel, adjustmentDocumentMeta);
+            }
+            else
+            {
+                // Load template
+                template.Append(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNomina.html"));
+                // Mapping Labels common data
+                template = this.IndividualPayrollDataTemplateMapping(template, payrollModel);
+            }
 
             // Set Variables
             Bitmap qrCode = RadianPdfCreationService.GenerateQR(TextResources.RadianReportQRCode.Replace("{CUFE}", payrollModel.CUNE));
 
             string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
             string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
-
-            // Mapping Labels common data
-            template = DataTemplateMapping(template, payrollModel);
 
             // Replace QrLabel
             template = template.Replace("{QRCode}", ImgHtml);
