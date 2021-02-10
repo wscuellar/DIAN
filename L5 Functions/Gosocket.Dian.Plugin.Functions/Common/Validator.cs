@@ -3248,50 +3248,49 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         validFor = true;
                                         responses.Add(response);
                                     }
+                                  
+                                    //Valida no tenga Limitaciones la FETV
+                                    if (documentMeta
+                                        .Where(t => t.EventCode == "041" && t.CancelElectronicEvent == null).ToList()
+                                        .Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC39"),
+                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC39"),
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    //Valida Pago Total FETV     
+                                    else if (documentMeta
+                                            .Where(t => t.EventCode == "045" && t.CustomizationID == "452").ToList()
+                                            .Count > decimal.Zero)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC40"),
+                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC40"),
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
                                     else
                                     {
-                                        //Valida no tenga Limitaciones la FETV
-                                        if (documentMeta
-                                           .Where(t => t.EventCode == "041" && t.CancelElectronicEvent == null && t.Identifier == document.PartitionKey).ToList()
-                                           .Count > decimal.Zero)
+                                        responses.Add(new ValidateListResponse
                                         {
-                                            validFor = true;
-                                            responses.Add(new ValidateListResponse
-                                            {
-                                                IsValid = false,
-                                                Mandatory = true,
-                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC39"),
-                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC39"),
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                        }
-                                        //Valida Pago Total FETV     
-                                        else if (documentMeta
-                                             .Where(t => t.EventCode == "045" && t.CustomizationID == "452" && t.Identifier == document.PartitionKey).ToList()
-                                             .Count > decimal.Zero)
-                                        {
-                                            validFor = true;
-                                            responses.Add(new ValidateListResponse
-                                            {
-                                                IsValid = false,
-                                                Mandatory = true,
-                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC40"),
-                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC40"),
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                        }
-                                        else
-                                        {
-                                            responses.Add(new ValidateListResponse
-                                            {
-                                                IsValid = true,
-                                                Mandatory = true,
-                                                ErrorCode = "100",
-                                                ErrorMessage = errorMessage,
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                        }
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = errorMessage,
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
                                     }
+                                    
                                 }
                                 else
                                 {
