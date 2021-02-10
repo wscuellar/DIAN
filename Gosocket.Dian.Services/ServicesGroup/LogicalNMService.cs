@@ -986,20 +986,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
            
                 if (dianResponse.IsValid)
                 {
-                    //dianResponse.StatusCode = Properties.Settings.Default.Code_00;
-                    //dianResponse.StatusMessage = message;
-                    //dianResponse.StatusDescription = Properties.Settings.Default.Msg_Procees_Sucessfull;
-                    //validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { DocumentKey = trackId, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };                   
+                    dianResponse.StatusCode = Properties.Settings.Default.Code_00;
+                    dianResponse.StatusMessage = message;
+                    dianResponse.StatusDescription = Properties.Settings.Default.Msg_Procees_Sucessfull;
+                    validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { DocumentKey = trackId, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };                   
 
-                    //var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.CUNE, documentParsed.DocumentTypeId });
-                    //if (processEventResponse.Code != Properties.Settings.Default.Code_100)
-                    //{
-                    //    dianResponse.IsValid = false;
-                    //    dianResponse.XmlFileName = filename;
-                    //    dianResponse.StatusCode = processEventResponse.Code;
-                    //    dianResponse.StatusDescription = processEventResponse.Message;
-                    //    return dianResponse;
-                    //}
+          
                 }
                 else
                 {

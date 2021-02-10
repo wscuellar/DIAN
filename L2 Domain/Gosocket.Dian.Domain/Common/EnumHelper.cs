@@ -229,7 +229,7 @@ namespace Gosocket.Dian.Domain.Common
         AceptacionTacita = 034,
         [Description("Avales")]
         Avales = 035,
-        [Description("Solicitud de disponibilizacion")]
+        [Description("Solicitud de disponibilización")]
         SolicitudDisponibilizacion = 036,
         [Description("Endoso en propiedad")]
         EndosoPropiedad = 037,
@@ -385,6 +385,10 @@ namespace Gosocket.Dian.Domain.Common
     {
         [Description("Registro cancelado")]
         Cancelled = 12310324,
+        [Description("Registro inactivo")]
+        Inactive = 12310343,
+        [Description("Registro suspension")]
+        Suspension = 12310396,
     }
 
 
