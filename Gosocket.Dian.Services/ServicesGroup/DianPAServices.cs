@@ -806,7 +806,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var start = DateTime.UtcNow;
             var globalStart = DateTime.UtcNow;
             var contentFileList = contentFile.ExtractMultipleZip();
-            List<Task> arrayTasks = new List<Task>();           
+            List<Task> arrayTasks = new List<Task>();
             var unzip = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_GlobalLogger)
             {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
@@ -844,7 +844,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse.StatusCode = Properties.Settings.Default.Code_89;
                 return dianResponse;
             }
-            var zone1 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone1) { 
+            var zone1 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone1)
+            {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                 Action = contentFileList.First().XmlFileName
             };
@@ -853,7 +854,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE 2
             start = DateTime.UtcNow;
             var xmlBase64 = Convert.ToBase64String(contentFileList.First().XmlBytes);
-            var zone2 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone2) { 
+            var zone2 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone2)
+            {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                 Action = "Convert.ToBase64String"
             };
@@ -869,7 +871,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
             documentParsed.SigningTime = xmlParser.SigningTime;
             DocumentParsed.SetValues(ref documentParsed);
-            var parser = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Parser) { 
+            var parser = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Parser)
+            {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                 Action = "DocumentParsed.SetValues"
             };
@@ -890,16 +893,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var receiverCode = documentParsed.ReceiverCode;
             var signingTime = xmlParser.SigningTime;
             var customizationID = documentParsed.CustomizationId;
-            var listId = documentParsed.listID == "" ? "1": documentParsed.listID;
+            var listId = documentParsed.listID == "" ? "1" : documentParsed.listID;
             var UBLVersionID = documentParsed.UBLVersionID;
             var documentTypeIdRef = documentParsed.DocumentTypeIdRef;
             var issuerPartyCode = documentParsed.IssuerPartyCode;
             var issuerPartyName = documentParsed.IssuerPartyName;
-            var endDate = documentParsed.ValidityPeriodEndDate;        
+            var endDate = documentParsed.ValidityPeriodEndDate;
             bool validaMandatoListID = (Convert.ToInt32(eventCode) == 43 && listId == "3") ? false : true;
             var documentReferenceId = xmlParser.DocumentReferenceId;
 
-            var zone3 = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone3) { 
+            var zone3 = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone3)
+            {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                 Action = "DianServicesUtils.ValidateParserValuesSync"
             };
@@ -935,7 +939,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             //    }
             //}
 
-            var auth = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Auth3) {
+            var auth = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Auth3)
+            {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                 Action = "GetAuthorization"
             };
@@ -957,27 +962,28 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(unzip),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(parser),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(auth),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(duplicity),                  
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(duplicity),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone1),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone2),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(zone3)                   
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(zone3)
                 };
 
                 Task.WhenAll(arrayTasks);
                 return response;
             }
-                                  
+
             // Duplicity     
 
             // ZONE MAPPER
             start = DateTime.UtcNow;
-            if (contentFileList.First().XmlFileName.Split(Properties.Settings.Default.Symbol_Slash).Count() > 1 && 
+            if (contentFileList.First().XmlFileName.Split(Properties.Settings.Default.Symbol_Slash).Count() > 1 &&
                 contentFileList.First().XmlFileName.Split(Properties.Settings.Default.Symbol_Slash).Last() != null)
                 contentFileList.First().XmlFileName = contentFileList.First().XmlFileName.Split(Properties.Settings.Default.Symbol_Slash).Last();
 
             var trackIdMapperEntity = new GlobalOseTrackIdMapper(contentFileList[0].XmlFileName, trackIdCude);
             TableManagerDianFileMapper.InsertOrUpdate(trackIdMapperEntity);
-            var mapper = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone4Mapper) { 
+            var mapper = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone4Mapper)
+            {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                 Action = "trackIdMapperEntity"
             };
@@ -1010,21 +1016,23 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
-                }              
+                }
                 return dianResponse;
             }
-            var upload = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Upload5) { 
+            var upload = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Upload5)
+            {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                 Action = "UploadXml"
             };
             // upload xml
-      
+
             // send to validate document sync
             start = DateTime.UtcNow;
             trackId = trackIdCude;
             var requestObjTrackId = new { trackId, draft = Properties.Settings.Default.Param_False };
             var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentUrl), requestObjTrackId);
-            var validate = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Validate6) { 
+            var validate = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Validate6)
+            {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                 Action = "ValidateDocument",
                 StackTrace = "validations.Count => " + validations.Count
@@ -1039,14 +1047,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
                 if (globalEnd >= 10)
                 {
-                    var globalTimeValidation = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Validate) {
+                    var globalTimeValidation = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Validate)
+                    {
                         Message = globalEnd.ToString(CultureInfo.InvariantCulture),
                         Action = "globalEnd",
                         StackTrace = $"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}"
                     };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
                 }
-               
+
                 return dianResponse;
             }
             else
@@ -1055,12 +1064,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 start = DateTime.UtcNow;
                 string message = string.Empty;
                 bool existDocument = false;
-                GlobalDocValidatorDocumentMeta documentMeta = null; 
-     
+                GlobalDocValidatorDocumentMeta documentMeta = null;
+
                 Task secondLocalRun = Task.Run(() =>
                 {
                     documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude.ToLower(), trackIdCude.ToLower());
-                    message = $"La {documentMeta.DocumentTypeName} {serieAndNumber}, ha sido autorizada."; 
+                    message = $"La {documentMeta.DocumentTypeName} {serieAndNumber}, ha sido autorizada.";
                     existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
                 });
 
@@ -1097,15 +1106,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.ErrorMessage.AddRange(notificationList);
                 }
 
-              
+
                 arrayTasks.Add(secondLocalRun);
                 Task.WhenAll(arrayTasks).Wait();
 
                 var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
                 dianResponse.XmlBase64Bytes = applicationResponse ?? XmlUtil.GenerateApplicationResponseBytes(trackIdCude, documentMeta, validations);
-                             
+
                 dianResponse.XmlDocumentKey = trackIdCude;
-                GlobalDocValidatorDocument validatorDocument = null;                                     
+                GlobalDocValidatorDocument validatorDocument = null;
 
                 if (dianResponse.IsValid)
                 {
@@ -1113,10 +1122,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.StatusMessage = message;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Procees_Sucessfull;
                     validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier)
-                    { 
+                    {
                         GlobalDocumentId = trackIdCude,
-                        DocumentKey = trackIdCude, 
-                        EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") 
+                        DocumentKey = trackIdCude,
+                        EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd")
                     };
 
                     var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude, listId });
@@ -1152,7 +1161,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.XmlBase64Bytes = errors.Any() || notifications.Any() ? dianResponse.XmlBase64Bytes : null;
                 }
 
-                var application = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_7AplicattionSendEvent) { 
+                var application = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_7AplicattionSendEvent)
+                {
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "dianResponse.IsValid => " + dianResponse.IsValid
                 };
@@ -1172,15 +1182,16 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone1),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone2),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone3),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(mapper)                    
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(mapper)
                 };
 
-                if(dianResponse.IsValid && !existDocument)                
+                if (dianResponse.IsValid && !existDocument)
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
-                
-                Task.WhenAll(arrayTasks);                
 
-                var lastZone = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_LastZone) { 
+                Task.WhenAll(arrayTasks);
+
+                var lastZone = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_LastZone)
+                {
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "existDocument => " + existDocument + " dianResponse.IsValid " + dianResponse.IsValid
                 };
@@ -1423,7 +1434,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             {
                 document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
 
-                CheckDocument(ref response, document, documentType, eventCode,meta);
+                CheckDocument(ref response, document, documentType, eventCode, meta);
 
                 // Check if response has errors
                 if (response.ErrorMessage.Any())
@@ -1452,15 +1463,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
         {
             List<string> failedList = new List<string>();
             if (document != null)
-            {               
+            {
                 if (meta == null)
                     meta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(
                         document.DocumentKey, document.DocumentKey);
-               
+
                 failedList = new List<string>
                 {
                     $"Regla: 90, Rechazo: Documento procesado anteriormente."
-                };                          
+                };
                 response.IsValid = false;
                 response.StatusCode = "99";
                 response.StatusMessage = "Documento con errores en campos mandatorios.";
@@ -1470,7 +1481,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.XmlBase64Bytes = xmlBytes;
                 response.XmlDocumentKey = document.DocumentKey;
                 response.XmlFileName = meta.FileName;
-                
+
             }
 
             return response;
@@ -1521,7 +1532,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             tableManager = null;
             return xmlBytes;
         }
-      
+
         private void UpdateInTransactions(string trackId, string eventCode)
         {
             //valida InTransaction Factura - eventos Endoso en propeidad, Garantia y procuración
@@ -1559,11 +1570,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private void UpdateFinishAttorney(string trackId, string trackIdAttorney, string eventCode)
         {
             //validation if is an anulacion de mandato (Code 044)
-            var arrayTasks = new List<Task>();            
+            var arrayTasks = new List<Task>();
             if (Convert.ToInt32(eventCode) == (int)EventStatus.TerminacionMandato)
             {
                 List<GlobalDocReferenceAttorney> documentsAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(trackIdAttorney).ToList();
-                foreach(var documentAttorney in documentsAttorney)
+                foreach (var documentAttorney in documentsAttorney)
                 {
                     documentAttorney.Active = false;
                     documentAttorney.DocReferencedEndAthorney = trackId;
@@ -1574,7 +1585,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private void InsertGlobalDocRegisterProviderAR(GlobalDocRegisterProviderAR documentRegisterAR)
         {
-            var arrayTasks = new List<Task>();           
+            var arrayTasks = new List<Task>();
             arrayTasks.Add(TableManagerGlobalDocRegisterProviderAR.InsertOrUpdateAsync(documentRegisterAR));
         }
 
@@ -1600,15 +1611,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     sender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CompanyID']").Item(i)?.InnerText.ToString();
                     valueStockAmountSender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    if(i == 0)
+                    if (i == 0)
                     {
                         senderList += sender;
                         valueStockAmountSenderList += valueStockAmountSender;
                     }
                     else
                     {
-                        senderList += "|" + sender  ;
-                        valueStockAmountSenderList += "|" + valueStockAmountSender ;
+                        senderList += "|" + sender;
+                        valueStockAmountSenderList += "|" + valueStockAmountSender;
                     }
                 }
 
