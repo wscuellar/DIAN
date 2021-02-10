@@ -239,7 +239,6 @@ namespace Gosocket.Dian.Web.Controllers
             const int softwareType = 1;
             string contributorId = Request.Params["ContributorId"];
             string radianContributorId = Request.Params["Contributor.RadianContributorId"];
-
             string sType = softwareType.ToString();
             RadianSoftware software = _radianAprovedService.GetSoftware(model.Contributor.RadianContributorId, softwareType);
             string key = softwareType.ToString() + "|" + software.Id.ToString();
@@ -250,6 +249,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.Software = software;
             model.ContributorId = Int32.Parse(contributorId);
             model.Contributor.RadianContributorId = Int32.Parse(radianContributorId);
+            model.SoftwareType = softwareType;
             return View(model);
         }
 
@@ -268,8 +268,10 @@ namespace Gosocket.Dian.Web.Controllers
             model.Software = software;
             model.ContributorId = viewModel.ContributorId;
             model.Contributor.RadianContributorId = viewModel.RadianContributorId;
+            model.Contributor.RadianOperationModeId = viewModel.OperationMode;
             model.RadianState = viewModel.RadianState;
             model.RadianContributorTypeId = viewModel.RadianContributorTypeId;
+            model.SoftwareType = softwareType;
             return View(model);
         }
 
@@ -410,7 +412,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             string contributorId = Request.Params["ContributorId"];
             string radianContributorId = Request.Params["Contributor.RadianContributorId"];
-            string softwareType = Request.Params["SoftwareType"];
+            string softwareType = Request.Params["SoftwareT"];
             radianApprovedViewModel.RadianTestSetResult = _radianAprovedService.RadianTestSetResultByNit(radianApprovedViewModel.Nit, radianApprovedViewModel.RadianTestSetResult.Id);
             radianApprovedViewModel.ContributorId = Int32.Parse(contributorId);
             radianApprovedViewModel.Contributor.RadianContributorId = Int32.Parse(radianContributorId);

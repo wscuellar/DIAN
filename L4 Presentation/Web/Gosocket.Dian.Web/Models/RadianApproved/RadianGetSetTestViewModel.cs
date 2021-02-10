@@ -17,6 +17,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         public int ContributorId { get; set; }
         public string SoftwareId { get; set; }
         public int SoftwareType { get; set; }
+        public int OperationMode { get; set; }
     }
 
 }
