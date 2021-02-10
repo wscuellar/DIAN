@@ -207,7 +207,7 @@ namespace Gosocket.Dian.Application
                 .From(htmlContent)
                 .OfSize(PaperSize.A4)
                 .WithTitle(documentName)
-                .WithMargins(1.0.Centimeters())
+                .WithMargins(0.5.Centimeters())
                 .Content();
 
             return pdf;
