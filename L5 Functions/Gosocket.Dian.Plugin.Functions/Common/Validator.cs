@@ -2990,9 +2990,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             case (int)EventStatus.Receipt:
-                                if (!documentMeta.Any(t => t.EventCode == "030"
-                                            && document != null))
+                                if (documentMeta.Any(t => t.EventCode == "030"
+                                            && document != null && t.Identifier == document.PartitionKey))
                                 //if (documentMeta.Where(t => t.EventCode == "030").ToList().Count == decimal.Zero)
+                                {
+                                    validFor = true;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = errorMessage,
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });                                  
+                                }
+                                else
                                 {
                                     validFor = true;
                                     responses.Add(new ValidateListResponse
@@ -3001,17 +3013,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         Mandatory = true,
                                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC09"),
                                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC09"),
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
-                                }
-                                else
-                                {
-                                    responses.Add(new ValidateListResponse
-                                    {
-                                        IsValid = true,
-                                        Mandatory = true,
-                                        ErrorCode = "100",
-                                        ErrorMessage = errorMessage,
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
