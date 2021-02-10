@@ -1795,8 +1795,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "No fue informado el literal “Mandatario Sistema de Negociación Electrónica” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH65"),
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65"),
+                            ErrorMessage = "No fue informado el literal “Mandatario Sistema de Negociación Electrónica” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",                            
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1810,8 +1810,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "No fue informado el literal “Mandatario Factor” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH65"),
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65"),
+                            ErrorMessage = "No fue informado el literal “Mandatario Factor” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",                            
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1825,8 +1825,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "No fue informado el literal “Mandatario Proveedor Tecnológico” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH65"),
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65"),
+                            ErrorMessage = "No fue informado el literal “Mandatario Proveedor Tecnológico” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",                           
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1983,8 +1983,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "AAL02",
-                        ErrorMessage = "No corresponde a un código valido de la lista.",
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL02"),
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
@@ -2990,7 +2990,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             case (int)EventStatus.Receipt:
-                                if (documentMeta.Where(t => t.EventCode == "030").ToList().Count == decimal.Zero)
+                                if (!documentMeta.Any(t => t.EventCode == "030"
+                                            && document != null))
+                                //if (documentMeta.Where(t => t.EventCode == "030").ToList().Count == decimal.Zero)
                                 {
                                     validFor = true;
                                     responses.Add(new ValidateListResponse
@@ -3248,11 +3250,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         validFor = true;
                                         responses.Add(response);
                                     }
-                                  
+
                                     //Valida no tenga Limitaciones la FETV
-                                    if (documentMeta
-                                        .Where(t => t.EventCode == "041" && t.CancelElectronicEvent == null).ToList()
-                                        .Count > decimal.Zero)
+                                    if (documentMeta.Any(t => t.EventCode == "041"
+                                             && document != null && t.CancelElectronicEvent == null))
+                                        //if (documentMeta
+                                        //.Where(t => t.EventCode == "041" && t.CancelElectronicEvent == null).ToList()
+                                        //.Count > decimal.Zero)
                                     {
                                         validFor = true;
                                         responses.Add(new ValidateListResponse

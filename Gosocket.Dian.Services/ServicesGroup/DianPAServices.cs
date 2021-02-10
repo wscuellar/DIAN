@@ -1128,18 +1128,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd")
                     };
 
-                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude, listId });
-                    //var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>("http://localhost:7071/api/ApplicationResponseProcess", new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude, listId });
-                    if (processEventResponse.Code != Properties.Settings.Default.Code_100)
-                    {
-                        dianResponse.IsValid = false;
-                        dianResponse.XmlFileName = contentFileList.First().XmlFileName;
-                        dianResponse.StatusCode = processEventResponse.Code;
-                        dianResponse.StatusDescription = processEventResponse.Message;
-                        UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
-                        return dianResponse;
-                    }
-
                     var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedRadianUrl), new { TrackId = trackIdCude });
                     //var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>("http://localhost:7071/api/RegistrateCompletedRadian", new { TrackId = trackIdCude });
                     if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
@@ -1151,6 +1139,18 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                         return dianResponse;
                     }
+
+                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude, listId });
+                    //var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>("http://localhost:7071/api/ApplicationResponseProcess", new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude, listId });
+                    if (processEventResponse.Code != Properties.Settings.Default.Code_100)
+                    {
+                        dianResponse.IsValid = false;
+                        dianResponse.XmlFileName = contentFileList.First().XmlFileName;
+                        dianResponse.StatusCode = processEventResponse.Code;
+                        dianResponse.StatusDescription = processEventResponse.Message;
+                        UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
+                        return dianResponse;
+                    }                   
                 }
                 else
                 {
