@@ -36,8 +36,15 @@ namespace Gosocket.Dian.Functions.Events
             if (string.IsNullOrEmpty(data.ResponseCode))
                 return new EventResponse { Code = "400", Message = "Please pass a responseCode in the request body." };
 
-            if (string.IsNullOrEmpty(data.TrackId))
-                return new EventResponse { Code = "400", Message = "Please pass a trackId in the request body." };
+            if(!string.IsNullOrWhiteSpace(data.ListId) && data.ListId == "3")
+            {
+                data.TrackId = "01";
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(data.TrackId))
+                    return new EventResponse { Code = "400", Message = "Please pass a trackId in the request body." };                
+            }
 
             if (string.IsNullOrEmpty(data.TrackIdCude))
                 return new EventResponse { Code = "400", Message = "Please pass a trackIdTrackIdCude in the request body." };
@@ -76,12 +83,7 @@ namespace Gosocket.Dian.Functions.Events
                 message = string.Format(message, responseCode, EnumHelper.GetEnumDescription((EventStatus)int.Parse(responseCode)));
                 return new EventResponse { Code = ((int)EventValidationMessage.NotImplemented).ToString(), Message = message };
             }           
-
-             //Obtiene informacion del CUFE
-            var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (documentMeta == null)
-                return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
-            
+           
             //Obtiene informacion del CUDE
             var documentMetaCUDE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
             if (documentMetaCUDE == null)
@@ -92,6 +94,12 @@ namespace Gosocket.Dian.Functions.Events
             if (Convert.ToInt32(responseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
                 Convert.ToInt32(responseCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
+                //Obtiene informacion del CUFE
+                var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+                if (documentMeta == null)
+                    return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
+
+
                 var documentMetaReferenced = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(documentMeta.DocumentReferencedKey, documentMeta.DocumentReferencedKey);
                 if (documentMetaReferenced == null)
                     return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
@@ -121,7 +129,7 @@ namespace Gosocket.Dian.Functions.Events
                 if (result == null)
                     return new EventResponse { Code = ((int)EventValidationMessage.Error).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.Error) };
             }
-            else if (Convert.ToInt32(responseCode) == (int)EventStatus.Mandato)
+            else if (Convert.ToInt32(responseCode) == (int)EventStatus.Mandato && data.ListId != "3")
             {
                 List<GlobalDocReferenceAttorney> listAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(trackIdCude).ToList();
                 if (listAttorney != null)
@@ -160,8 +168,13 @@ namespace Gosocket.Dian.Functions.Events
                     }
                 }
             }
-            else
+            else if (data.TrackId != "01")
             {
+                //Obtiene informacion del CUFE
+                var documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+                if (documentMeta == null)
+                    return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
+
                 var partitionKey = $"co|{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}|{documentMeta.DocumentKey.Substring(0, 2)}";
 
                 var globalDataDocument = await CosmosDBService.Instance(documentMeta.EmissionDate).ReadDocumentAsync(documentMeta.DocumentKey, partitionKey, documentMeta.EmissionDate);
@@ -218,7 +231,7 @@ namespace Gosocket.Dian.Functions.Events
             };
         }
 
-        public class RequestObject
+        public class RequestObject //listId
         {
             [JsonProperty(PropertyName = "responseCode")]
             public string ResponseCode { get; set; }
@@ -226,6 +239,9 @@ namespace Gosocket.Dian.Functions.Events
             public string TrackId { get; set; }
             [JsonProperty(PropertyName = "trackIdCude")]
             public string TrackIdCude { get; set; }
+            [JsonProperty(PropertyName = "listId")]
+            public string ListId { get; set; }
+
         }
     }
 }
