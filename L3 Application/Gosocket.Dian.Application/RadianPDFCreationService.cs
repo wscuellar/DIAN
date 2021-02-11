@@ -44,7 +44,7 @@ namespace Gosocket.Dian.Application
 
         #region GetElectronicInvoicePdf
 
-        public Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier, string webPath)
+        public async Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier, string webPath)
         {
 
             // Load Templates            
@@ -55,6 +55,10 @@ namespace Gosocket.Dian.Application
                 List<Event> events = new List<Event>();
                 List <GlobalDocValidatorDocumentMeta> storageEvents = new List<GlobalDocValidatorDocumentMeta>();
                 List<GlobalDocReferenceAttorney> documents = new List<GlobalDocReferenceAttorney>();
+                string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+                //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+
+
                 StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
                 StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
                 StringBuilder footerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFooter.html"));
@@ -71,8 +75,7 @@ namespace Gosocket.Dian.Application
                     byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(eventItemIdentifier);
                     Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
                     xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
-                    fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
-                    //fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
+                    fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
                 #endregion
 
             });
@@ -82,7 +85,7 @@ namespace Gosocket.Dian.Application
                 #region hilo2
                     byte[] xmlBytes2 = GetXmlFromStorageAsync(eventItemIdentifier, documentMeta);
                     Dictionary<string, string> newXpathRequest = CreateGetXpathValidation(Convert.ToBase64String(xmlBytes2), "InvoiceValidation");
-                    newFieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", newXpathRequest);
+                    newFieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, newXpathRequest);
                 #endregion
 
             });
@@ -242,7 +245,7 @@ namespace Gosocket.Dian.Application
                     page++;
                     headerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaHeader.html"));
                     templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
-                    templateLastPage = templateLastPage.Replace("{EventsTotal}", events.Count.ToString());
+                    templateLastPage = templateLastPage.Replace("{EventsTotal}", (events.Count -1).ToString());
                     templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
                     templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
                     templateLastPage = templateLastPage.Append(footerTemplate);
