@@ -109,7 +109,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     xmlParser.DocumentReferenceId,
                     nitModel.IssuerPartyCode,
                     nitModel.IssuerPartyName
-                    );
+                    );                
+
+                if( Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion 
+                    || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
+                {
+                    eventRadian.TrackId = xmlParser.Fields["DocumentKey"].ToString();
+                }
 
                 bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;               
 

@@ -769,7 +769,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 case (int)EventStatus.AceptacionTacita:
                 case (int)EventStatus.Mandato:
-                    if (party.SenderParty != senderCode)
+                    if (party.SenderParty != senderCode && (Convert.ToInt32(eventCode) != (int)EventStatus.Mandato))
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -2902,8 +2902,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             foreach (var documentIdentifier in documentMeta)
             {
                 document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier);
-                //Valida si el documento AR transmitido ya se encuentra aprobado
-                //if (document != null)
+                //Valida si el documento AR transmitido ya se encuentra aprobado                
                 if (documentMeta.Count >= 2)
                 {
                     //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
@@ -2990,21 +2989,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                                 break;
                             case (int)EventStatus.Receipt:
-                                if (documentMeta.Any(t => t.EventCode == "030"
-                                            && document != null && t.Identifier == document.PartitionKey))
-                                //if (documentMeta.Where(t => t.EventCode == "030").ToList().Count == decimal.Zero)
-                                {
-                                    validFor = true;
-                                    responses.Add(new ValidateListResponse
-                                    {
-                                        IsValid = true,
-                                        Mandatory = true,
-                                        ErrorCode = "100",
-                                        ErrorMessage = errorMessage,
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });                                  
-                                }
-                                else
+                                //Debe existir Acuse de recibo de Factura Electrónica de Venta
+                                var listAcuse = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Received).ToList();
+                                if(listAcuse == null || listAcuse.Count <= 0)
                                 {
                                     validFor = true;
                                     responses.Add(new ValidateListResponse
@@ -3016,50 +3003,159 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
-                                break;
-                            case (int)EventStatus.Accepted:
-                                if (document != null)
+                                else
                                 {
-                                    //Debe existir Recibo del bien o aceptacion de la prestacion del servicio 
-                                    if (documentMeta.Where(t => t.EventCode == "032").ToList().Count > decimal.Zero)
+                                    bool validForItem = false;
+                                    foreach (var itemAcuse in listAcuse)
                                     {
-                                        if (documentMeta.Where(t => t.EventCode == "031" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
+                                        if(itemAcuse != null)
                                         {
-                                            validFor = true;
-                                            responses.Add(new ValidateListResponse
+                                            var documentAcuse = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemAcuse.Identifier, itemAcuse.Identifier);
+                                            if (documentAcuse != null)
                                             {
-                                                IsValid = false,
-                                                Mandatory = true,
-                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC04"),
-                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC04"),
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                        }
-                                        else if (documentMeta.Where(t => t.EventCode == "034" && t.Identifier == document.PartitionKey).ToList().Count > decimal.Zero)
-                                        {
-                                            validFor = true;
-                                            responses.Add(new ValidateListResponse
-                                            {
-                                                IsValid = false,
-                                                Mandatory = true,
-                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC07"),
-                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC07"),
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
+                                                validFor = true;
+                                                validForItem = false;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = true,
+                                                    Mandatory = true,
+                                                    ErrorCode = "100",
+                                                    ErrorMessage = errorMessage,
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                                break;
+                                            }
+                                            else                                            
+                                                validForItem = true;                                                                                                                                 
                                         }
                                         else
                                         {
+                                            validFor = true;
                                             responses.Add(new ValidateListResponse
                                             {
-                                                IsValid = true,
+                                                IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = "100",
-                                                ErrorMessage = errorMessage,
+                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC09"),
+                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC09"),
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
                                         }
                                     }
-                                    else
+
+                                    if (validForItem)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC09"),
+                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC09"),
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                }
+                                break;
+                            case (int)EventStatus.Accepted:
+                                //Debe existir Recibo del bien y/o prestación del servicio
+                                var listReceipt = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Receipt).ToList();
+                                if(listReceipt == null || listReceipt.Count <= 0)
+                                {
+                                    validFor = true;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC12"),
+                                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC12"),
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
+                                else
+                                {
+                                    bool validForItem = false;
+                                    foreach (var itemReceipt in listReceipt)
+                                    {
+                                        if(itemReceipt != null)
+                                        {
+                                            var documentReceipt = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemReceipt.Identifier, itemReceipt.Identifier);
+                                            if (documentReceipt != null)
+                                            {
+                                                validFor = true;
+                                                validForItem = false;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = true,
+                                                    Mandatory = true,
+                                                    ErrorCode = "100",
+                                                    ErrorMessage = errorMessage,
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+
+                                                //Valida exista evento Reclamo de la Factura Electrónica de Venta
+                                                var listRejected = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Rejected).ToList();
+                                                if (listRejected != null && listRejected.Count > 0)
+                                                {
+                                                    foreach (var itemRejected in listRejected)
+                                                    {
+                                                        var documentRejected = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemRejected.Identifier, itemRejected.Identifier);
+                                                        if(documentRejected != null)
+                                                        {
+                                                            validFor = true;
+                                                            responses.Add(new ValidateListResponse
+                                                            {
+                                                                IsValid = false,
+                                                                Mandatory = true,
+                                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC04"),
+                                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC04"),
+                                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                            });
+                                                            break;
+                                                        }                                                                                                         
+                                                    }                                                    
+                                                }
+
+                                                //Valida exista evento Aceptación Tácita
+                                                var listAceptacionTacita = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.AceptacionTacita).ToList();
+                                                if(listAceptacionTacita != null && listAceptacionTacita.Count > 0)
+                                                {
+                                                    foreach (var itemAceptacionTacita in listAceptacionTacita)
+                                                    {
+                                                        var documentAceptacionTacita = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemAceptacionTacita.Identifier, itemAceptacionTacita.Identifier);
+                                                        if (documentAceptacionTacita != null)
+                                                        {
+                                                            validFor = true;
+                                                            responses.Add(new ValidateListResponse
+                                                            {
+                                                                IsValid = false,
+                                                                Mandatory = true,
+                                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC07"),
+                                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC07"),
+                                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                            });
+                                                            break;
+                                                        }                                                    
+                                                    }
+                                                }
+                                            }
+                                            else
+                                                validForItem = true;
+                                        }
+                                        else
+                                        {
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC12"),
+                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC12"),
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+                                    }
+                                    //No existen eventos recibo del bien y/o prestacion del servicio
+                                    if (validForItem)
                                     {
                                         validFor = true;
                                         responses.Add(new ValidateListResponse
@@ -3071,7 +3167,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
-                                }
+                                }                             
                                 break;
                             case (int)EventStatus.AceptacionTacita:
                                 if (document != null)
@@ -3254,10 +3350,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                                     //Valida no tenga Limitaciones la FETV
                                     if (documentMeta.Any(t => t.EventCode == "041"
-                                             && document != null && t.CancelElectronicEvent == null))
-                                        //if (documentMeta
-                                        //.Where(t => t.EventCode == "041" && t.CancelElectronicEvent == null).ToList()
-                                        //.Count > decimal.Zero)
+                                             && document != null && t.CancelElectronicEvent == null))                                     
                                     {
                                         validFor = true;
                                         responses.Add(new ValidateListResponse
@@ -3474,19 +3567,42 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             case (int)EventStatus.InvoiceOfferedForNegotiation:
                                 if (eventPrev.CustomizationID == "401")
                                 {
-                                    //Valida exista un endoso en garantia
-                                    if (documentMeta.Where(t => (t.EventCode == "038") && t.CancelElectronicEvent == null).ToList().Count > decimal.Zero)
+                                    responses.Add(new ValidateListResponse
                                     {
-                                        responses.Add(new ValidateListResponse
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = errorMessage,
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+
+                                    //Valida exista endoso en garantia
+                                    bool validForEndoso = false;
+                                    var endosoGarantia = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia) && t.CancelElectronicEvent == null).ToList();
+                                    if(endosoGarantia != null && endosoGarantia.Count > 0)
+                                    {                                       
+                                        foreach (var itemEndosoGarantia in endosoGarantia)
                                         {
-                                            IsValid = true,
-                                            Mandatory = true,
-                                            ErrorCode = "100",
-                                            ErrorMessage = errorMessage,
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
+                                            var documentGarantia = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemEndosoGarantia.Identifier, itemEndosoGarantia.Identifier);
+                                            if (documentGarantia == null)
+                                            {
+                                                validFor = true;
+                                                validForEndoso = false;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = true,
+                                                    Mandatory = true,
+                                                    ErrorCode = "100",
+                                                    ErrorMessage = errorMessage,
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                                break;
+                                            }
+                                            else
+                                                validForEndoso = true;                                                
+                                        }
                                     }
-                                    else 
+                                    else
                                     {
                                         validFor = true;
                                         responses.Add(new ValidateListResponse
@@ -3498,11 +3614,34 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
+
+                                    if (validForEndoso)
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC46"),
+                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC46"),
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+
                                 }                                
 
                                 //Valida exista un endoso en procuracion
                                 if(eventPrev.CustomizationID == "402")
                                 {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = errorMessage,
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+
                                     //El evento debe informar una nota donde manifieste los motivos de la revocatoria contenida del endoso.
                                     var responseListEndosoNota = this.ValidateEndosoNota(documentMeta, xmlParserCude, eventPrev.EventCode);
                                     if (responseListEndosoNota != null)
@@ -3521,18 +3660,46 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         }
                                     }
 
-                                    if (documentMeta.Where(t => (t.EventCode == "039") && t.CancelElectronicEvent == null).ToList().Count > decimal.Zero)
+                                    //Validar exista endoso en procuracion                                   
+                                    bool validForEndosoProcura = false;
+                                    var endosoProcuracion = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion) && t.CancelElectronicEvent == null).ToList();
+                                    if (endosoProcuracion != null && endosoProcuracion.Count > 0)
                                     {
+                                        foreach (var itemEndosoProcuracion in endosoProcuracion)
+                                        {
+                                            var documentProcuracion = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemEndosoProcuracion.Identifier, itemEndosoProcuracion.Identifier);
+                                            if (documentProcuracion == null)
+                                            {
+                                                validFor = true;
+                                                validForEndosoProcura = false;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = true,
+                                                    Mandatory = true,
+                                                    ErrorCode = "100",
+                                                    ErrorMessage = errorMessage,
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                                break;
+                                            }
+                                            else
+                                                validForEndosoProcura = true;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        validFor = true;
                                         responses.Add(new ValidateListResponse
                                         {
-                                            IsValid = true,
+                                            IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = "100",
-                                            ErrorMessage = errorMessage,
+                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC47"),
+                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC47"),
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                     }
-                                    else 
+
+                                    if (validForEndosoProcura)
                                     {
                                         validFor = true;
                                         responses.Add(new ValidateListResponse
@@ -3546,35 +3713,62 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     }
                                 }                               
 
-
                                 if(eventPrev.CustomizationID == "401" || eventPrev.CustomizationID == "402")
-                                {                                   
-                                    if (documentMeta.Where(t => (t.EventCode == "041") && t.CancelElectronicEvent == null).ToList().Count > decimal.Zero)
+                                {
+                                    responses.Add(new ValidateListResponse
                                     {
-                                        validFor = true;
-                                        responses.Add(new ValidateListResponse
-                                        {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC48"),
-                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC48"),
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
+                                        IsValid = true,
+                                        Mandatory = true,
+                                        ErrorCode = "100",
+                                        ErrorMessage = errorMessage,
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+
+                                    //Valida existe limitacion de circulacion
+                                    var limitacionCirculacion = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice) && t.CancelElectronicEvent == null).ToList();
+                                    if(limitacionCirculacion != null && limitacionCirculacion.Count > 0)
+                                    {
+                                        foreach (var itemLimitacionCirculacion in limitacionCirculacion)
+                                        {                                           
+                                            var documentCirculacion = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemLimitacionCirculacion.Identifier, itemLimitacionCirculacion.Identifier);
+                                            if (documentCirculacion != null)
+                                            {
+                                                validFor = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC48"),
+                                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC48"),
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                                break;
+                                            }                                                                                           
+                                        }
                                     }
 
-                                    if (documentMeta.Where(t => (t.EventCode == "037") && t.CancelElectronicEvent == null).ToList().Count > decimal.Zero)
+                                    //Valida existe endoso en propiedad
+                                    var endosoPropiead = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad) && t.CancelElectronicEvent == null).ToList();
+                                    if(endosoPropiead != null && endosoPropiead.Count > 0)
                                     {
-                                        validFor = true;
-                                        responses.Add(new ValidateListResponse
+                                        foreach (var itemEndosoPropiedad in endosoPropiead)
                                         {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC49"),
-                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC49"),
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
+                                            var documentPropiedad = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemEndosoPropiedad.Identifier, itemEndosoPropiedad.Identifier);
+                                            if(documentPropiedad != null)
+                                            {
+                                                validFor = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC49"),
+                                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC49"),
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                                break;
+                                            }                                        
+                                        }
                                     }
-
                                 }
                                
                                 break;
