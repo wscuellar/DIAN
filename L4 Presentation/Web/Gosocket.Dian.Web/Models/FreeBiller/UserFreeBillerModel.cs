@@ -22,7 +22,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
         [DisplayName("Nombres y apellidos")]
         public string FullName { get; set; }
 
-        [DisplayName("Tipo documento")]
+        [DisplayName("Tipo de documento")]
         [Required(ErrorMessage = "El tipo de documento es requerido")]
         public string TypeDocId { get; set; }
 
@@ -30,7 +30,7 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
 
         [Required(ErrorMessage = "El número de documento es requerido")]
         [MaxLength(30, ErrorMessage = "Máximo {1} carácteres")]
-        [DisplayName("Número documento")]
+        [DisplayName("Número de documento")]
         public string NumberDoc { get; set; }
 
         [Required(ErrorMessage = "El correo electrónico es requerido")]
