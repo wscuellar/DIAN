@@ -45,152 +45,162 @@ namespace Gosocket.Dian.Application
 
         public async Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier, string webPath)
         {
-            // Load Templates            
 
-            StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
-            StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
-            StringBuilder footerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFooter.html"));
+                // Load Templates            
 
-            // load xml
-            byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(eventItemIdentifier);
-            //var str = Encoding.Default.GetString(xmlBytes);
-
-            Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
-            xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
-            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
-            //ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
-
-            // Load Document Data
-            GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
-            EventStatus eventStatus;
-            _ = await _cosmosDBService.ReadDocumentAsync(documentMeta.DocumentKey, documentMeta.PartitionKey, documentMeta.EmissionDate);
-
-            //Load documents
-            List<GlobalDocReferenceAttorney> documents =
-                _queryAssociatedEventsService.ReferenceAttorneys(
-                    documentMeta.DocumentKey,
-                    documentMeta.DocumentReferencedKey,
-                    documentMeta.ReceiverCode,
-                    documentMeta.SenderCode);
-
-            //Load Events
-            GlobalDataDocument cosmosDocument = await DocumentInfoFromCosmos(documentMeta);
-
-            List<Event> eventsCosmos = cosmosDocument.Events;
-            List<GlobalDocValidatorDocumentMeta> storageEvents = _globalDocValidationDocumentMetaService.FindDocumentByReference(documentMeta.DocumentKey);
-
-            List<Event> events = ListEvents(eventsCosmos, storageEvents);
-
-            Dictionary<int, string> dicStatus = _queryAssociatedEventsService.IconType(null, documentMeta.DocumentKey);
-            string invoiceStatus = dicStatus.OrderBy(t => t.Key).Last().Value;
-
-            // Set Variables
-            DateTime expeditionDate = DateTime.UtcNow.AddHours(-5);
-            Bitmap qrCode = GenerateQR($"{webPath}?documentkey={documentMeta.PartitionKey}");
-            int page = 1;
-
-            string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
-            string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
+                StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
+                StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
+                StringBuilder footerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFooter.html"));
+                StringBuilder firstEvent = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFirstEvent.html"));
 
 
-            // Mapping Labels common data
+                // load xml
+                byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(eventItemIdentifier);
+                //var str = Encoding.Default.GetString(xmlBytes);
 
-            templateFirstPage = CommonDataTemplateMapping(templateFirstPage, expeditionDate, page, documentMeta, invoiceStatus);
+                Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
+                xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
+                ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+                //ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
 
-            // Mapping firts page
-            templateFirstPage = templateFirstPage.Replace("{SenderBusinessName}", documentMeta.SenderName);
-            templateFirstPage = templateFirstPage.Replace("{SenderNit}", documentMeta.SenderCode);
-            templateFirstPage = templateFirstPage.Replace("{InvoiceValue}", Convert.ToString(documentMeta.TotalAmount));
-            templateFirstPage = templateFirstPage.Replace("{Badge}", string.Empty);
+                // Load Document Data
+                GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
+                EventStatus eventStatus;
+                _ = await _cosmosDBService.ReadDocumentAsync(documentMeta.DocumentKey, documentMeta.PartitionKey, documentMeta.EmissionDate);
 
-            templateFirstPage = templateFirstPage.Replace("{Currency}",
-                fieldValues.XpathsValues["InvoiceCurrencyId"] != null? fieldValues.XpathsValues["InvoiceCurrencyId"] : string.Empty);
+                //Load documents
+                List<GlobalDocReferenceAttorney> documents =
+                    _queryAssociatedEventsService.ReferenceAttorneys(
+                        documentMeta.DocumentKey,
+                        documentMeta.DocumentReferencedKey,
+                        documentMeta.ReceiverCode,
+                        documentMeta.SenderCode);
 
+                //Load Events
+                GlobalDataDocument cosmosDocument = await DocumentInfoFromCosmos(documentMeta);
+                List<Event> eventsCosmos = cosmosDocument.Events;
+                List<GlobalDocValidatorDocumentMeta> storageEvents = _globalDocValidationDocumentMetaService.FindDocumentByReference(documentMeta.DocumentKey);
+                List<Event> events = ListEvents(eventsCosmos, storageEvents);
+                xmlBytes = RadianSupportDocument.GetXmlDianFromStorage(eventItemIdentifier, documentMeta);
+                Dictionary<string, string> newXpathRequest = CreateGetXpathValidation(Convert.ToBase64String(xmlBytes), "InvoiceValidation");
+                ResponseXpathDataValue newFieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", newXpathRequest);
 
-            if (fieldValues.XpathsValues["InvoicePaymentId"] != null)
-            {
-                templateFirstPage = templateFirstPage.Replace("{PaymentMethod}", fieldValues.XpathsValues["InvoicePaymentId"].Equals("1") ? "CONTADO" : "A CRÉDITO");
-            }
-            else
-            {
-                templateFirstPage = templateFirstPage.Replace("{PaymentMethod}", string.Empty);
-            }
-
-            templateFirstPage = templateFirstPage.Replace("{ExpirationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
-            templateFirstPage = templateFirstPage.Replace("{ReceiverBusinessName}", documentMeta.ReceiverName);
-            templateFirstPage = templateFirstPage.Replace("{ReceiverNit}", documentMeta.ReceiverCode);
-
-            
-
-            // Mapping Events
-
-            // se realiza el mapeo del primer evento
-            // si tiene más eventos realiza el mapeo del siguiente template
-            StringBuilder middleTemplate = new StringBuilder();
-            StringBuilder eventTemplate = new StringBuilder();
-            StringBuilder headerTemplate = new StringBuilder();
-
-            if (events.Any())
-            {
-                for (int i = 0; i < events.Count; i++)
+                events.Insert(0, new Event()
                 {
 
-                    if(i == 0)
+                    Description = newFieldValues.XpathsValues["Description"],
+                    DocumentKey = newFieldValues.XpathsValues["CUDE"],
+                    Date = Convert.ToDateTime(newFieldValues.XpathsValues["SigningTime"]),
+                    SenderName = newFieldValues.XpathsValues["Sender"],
+                    ReceiverName = newFieldValues.XpathsValues["Receiver"]
+
+                });
+
+                Dictionary<int, string> dicStatus = _queryAssociatedEventsService.IconType(null, documentMeta.DocumentKey);
+                string invoiceStatus = dicStatus.OrderBy(t => t.Key).Last().Value;
+
+                // Set Variables
+                DateTime expeditionDate = DateTime.UtcNow.AddHours(-5);
+                Bitmap qrCode = GenerateQR($"{webPath}?documentkey={documentMeta.PartitionKey}");
+                int page = 1;
+
+                string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
+                string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
+
+                firstEvent = EventTemplateMapping(firstEvent, events[0], string.Empty);
+                templateFirstPage = templateFirstPage.Append(firstEvent);
+                templateFirstPage = templateFirstPage.Append(footerTemplate);
+
+                // Mapping Labels common data
+
+                templateFirstPage = CommonDataTemplateMapping(templateFirstPage, expeditionDate, page, documentMeta, invoiceStatus);
+
+                // Mapping firts page
+                templateFirstPage = templateFirstPage.Replace("{SenderBusinessName}", documentMeta.SenderName);
+                templateFirstPage = templateFirstPage.Replace("{SenderNit}", documentMeta.SenderCode);
+                templateFirstPage = templateFirstPage.Replace("{InvoiceValue}", Convert.ToString(documentMeta.TotalAmount));
+                templateFirstPage = templateFirstPage.Replace("{Badge}", string.Empty);
+
+                templateFirstPage = templateFirstPage.Replace("{Currency}",
+                    fieldValues.XpathsValues["InvoiceCurrencyId"] != null ? fieldValues.XpathsValues["InvoiceCurrencyId"] : string.Empty);
+
+
+                if (fieldValues.XpathsValues["InvoicePaymentId"] != null)
+                {
+                    templateFirstPage = templateFirstPage.Replace("{PaymentMethod}", fieldValues.XpathsValues["InvoicePaymentId"].Equals("1") ? "CONTADO" : "A CRÉDITO");
+                }
+                else
+                {
+                    templateFirstPage = templateFirstPage.Replace("{PaymentMethod}", string.Empty);
+                }
+
+                templateFirstPage = templateFirstPage.Replace("{ExpirationDate}", $"{documentMeta.EmissionDate:yyyy'-'MM'-'dd hh:mm:ss.000} UTC-5");
+                templateFirstPage = templateFirstPage.Replace("{ReceiverBusinessName}", documentMeta.ReceiverName);
+                templateFirstPage = templateFirstPage.Replace("{ReceiverNit}", documentMeta.ReceiverCode);
+
+
+
+                // Mapping Events
+
+                // se realiza el mapeo del primer evento
+                // si tiene más eventos realiza el mapeo del siguiente template
+                StringBuilder middleTemplate = new StringBuilder();
+                StringBuilder eventTemplate = new StringBuilder();
+                StringBuilder headerTemplate = new StringBuilder();
+
+                if (events.Any())
+                {
+                    for (int i = 1; i < events.Count; i++)
                     {
-                        eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
-                        EventTemplateMapping(eventTemplate, events[i], string.Empty);
-                        templateFirstPage = templateFirstPage.Append(eventTemplate);
-                        templateFirstPage = templateFirstPage.Append(footerTemplate);
-                        templateFirstPage = CommonDataTemplateMapping(templateFirstPage, expeditionDate, page, documentMeta, invoiceStatus);
-                    }
-                    if (i % 2 == 1 && i > 0)
-                    {
-                        page++;
-                        middleTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaHeader.html"));
-                        eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
-                        eventTemplate = EventTemplateMapping(eventTemplate, events[i], string.Empty);
-                        middleTemplate = middleTemplate.Append(eventTemplate);
-                        middleTemplate = CommonDataTemplateMapping(middleTemplate, expeditionDate, page, documentMeta, invoiceStatus);
-                        templateFirstPage = templateFirstPage.Append(middleTemplate);
-                    }
-                    if (i % 2 == 0 && i > 0)
-                    {
-                        eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
-                        eventTemplate = EventTemplateMapping(eventTemplate, events[i], string.Empty);
-                        templateFirstPage = templateFirstPage.Append(eventTemplate);
-                        footerTemplate = CommonDataTemplateMapping(footerTemplate, expeditionDate, page, documentMeta, invoiceStatus);
-                        templateFirstPage = templateFirstPage.Append(footerTemplate);
+
+                        if (i % 2 == 1)
+                        {
+                            page++;
+                            middleTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaHeader.html"));
+                            eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
+                            eventTemplate = EventTemplateMapping(eventTemplate, events[i], string.Empty);
+                            middleTemplate = middleTemplate.Append(eventTemplate);
+                            middleTemplate = CommonDataTemplateMapping(middleTemplate, expeditionDate, page, documentMeta, invoiceStatus);
+                            templateFirstPage = templateFirstPage.Append(middleTemplate);
+                        }
+                        if (i % 2 == 0)
+                        {
+                            eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
+                            eventTemplate = EventTemplateMapping(eventTemplate, events[i], string.Empty);
+                            templateFirstPage = templateFirstPage.Append(eventTemplate);
+                            footerTemplate = CommonDataTemplateMapping(footerTemplate, expeditionDate, page, documentMeta, invoiceStatus);
+                            templateFirstPage = templateFirstPage.Append(footerTemplate);
+                        }
                     }
                 }
-            }
 
-            //Mapping last page
-            // se aumenta el número de la pagina y se mapean los datos comunes de pagina
-            if(events.Count % 2 == 0)
-            {
-                templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
-                templateLastPage = templateLastPage.Replace("{EventsTotal}", events.Count.ToString());
-                templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
-                templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
-                templateLastPage = templateLastPage.Append(footerTemplate);
-                templateLastPage = CommonDataTemplateMapping(templateLastPage, expeditionDate, page, documentMeta, invoiceStatus);
-            }
-            else
-            {
-                page++;
-                headerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaHeader.html"));
-                templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
-                templateLastPage = templateLastPage.Replace("{EventsTotal}", events.Count.ToString());
-                templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
-                templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
-                templateLastPage = templateLastPage.Append(footerTemplate);
-                headerTemplate = headerTemplate.Append(templateLastPage);
-                templateLastPage = CommonDataTemplateMapping(headerTemplate, expeditionDate, page, documentMeta, invoiceStatus);
-            }
+                //Mapping last page
+                // se aumenta el número de la pagina y se mapean los datos comunes de pagina
+                if (events.Count % 2 == 0)
+                {
+                    templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
+                    templateLastPage = templateLastPage.Replace("{EventsTotal}", events.Count.ToString());
+                    templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
+                    templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
+                    templateLastPage = templateLastPage.Append(footerTemplate);
+                    templateLastPage = CommonDataTemplateMapping(templateLastPage, expeditionDate, page, documentMeta, invoiceStatus);
+                }
+                else
+                {
+                    page++;
+                    headerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaHeader.html"));
+                    templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
+                    templateLastPage = templateLastPage.Replace("{EventsTotal}", events.Count.ToString());
+                    templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
+                    templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
+                    templateLastPage = templateLastPage.Append(footerTemplate);
+                    headerTemplate = headerTemplate.Append(templateLastPage);
+                    templateLastPage = CommonDataTemplateMapping(headerTemplate, expeditionDate, page, documentMeta, invoiceStatus);
+                }
 
-            byte[] report = GetPdfBytes(templateFirstPage.Append(templateLastPage.ToString()).ToString(), "Factura electronica");
+                byte[] report = GetPdfBytes(templateFirstPage.Append(templateLastPage.ToString()).ToString(), "Factura electronica");
 
-            return report;
+                return report;          
         }
 
         #endregion
@@ -301,9 +311,11 @@ namespace Gosocket.Dian.Application
                 if (!string.IsNullOrEmpty(document.EventCode))
                 {
                     Event newEvent = events.LastOrDefault(e => e.DocumentKey == item.DocumentKey);
-                    newEvent.Description = EnumHelper.GetEnumDescription((EventStatus)int.Parse(document.EventCode));
-                    if (newEvent !=null) 
+                    if (newEvent != null)
+                    {
+                        newEvent.Description = EnumHelper.GetEnumDescription((EventStatus)int.Parse(document.EventCode));
                         finalEvents.Add(newEvent);
+                    }    
                 }
             }
 
@@ -330,6 +342,23 @@ namespace Gosocket.Dian.Application
         }
 
         #endregion
+
+        private static Dictionary<string, string> CreateGetXpathValidation(string xmlBase64, string fileName = null)
+
+        {
+            var requestObj = new Dictionary<string, string>
+            {
+                { "XmlBase64", xmlBase64},
+                { "FileName", fileName},
+                { "SigningTime", "//*[local-name()='SigningTime']" },
+                { "CUDE", "//*[local-name()='UUID'][@schemeName='CUDE-SHA384']" },
+                { "Description", "//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='Description']" },
+                { "Sender", "//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='RegistrationName']" },
+                { "Receiver", "//*[local-name()='ReceiverParty']/*[local-name()='PartyTaxScheme']/*[local-name()='RegistrationName']" }
+            };
+            return requestObj;
+
+        }
 
     }
 }
