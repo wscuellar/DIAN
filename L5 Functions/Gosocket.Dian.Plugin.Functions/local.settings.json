@@ -104,7 +104,9 @@
     "ErrorCode_LGC49": "LGC49",
     "ErrorMessage_LGC49": "No se puede registrar este evento si previamente se ha registrado el evento de endoso en propiedad (037)",
     "ErrorCode_LGC46": "LGC46",
-    "ErrorMessage_LGC46": "No se puede registrar este evento si previamente no se ha registrado el evento Endoso en garantía (038)"
+    "ErrorMessage_LGC46": "No se puede registrar este evento si previamente no se ha registrado el evento Endoso en garantía (038)",
+    "ErrorCode_AAL02": "AAL02",
+    "ErrorMessage_AAL02": "No corresponde a un código valido de la lista."
 
 
 
