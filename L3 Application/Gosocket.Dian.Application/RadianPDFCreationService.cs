@@ -3,6 +3,7 @@ using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Services.Utils.Helpers;
@@ -43,65 +44,116 @@ namespace Gosocket.Dian.Application
 
         #region GetElectronicInvoicePdf
 
-        public async Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier, string webPath)
+        public Task<byte[]> GetElectronicInvoicePdf(string eventItemIdentifier, string webPath)
         {
 
-                // Load Templates            
-
+            // Load Templates            
+                string invoiceStatus = string.Empty;
+                ResponseXpathDataValue fieldValues = null;
+                ResponseXpathDataValue newFieldValues = null;
+                Bitmap qrCode = null;
+                List<Event> events = new List<Event>();
+                List <GlobalDocValidatorDocumentMeta> storageEvents = new List<GlobalDocValidatorDocumentMeta>();
+                List<GlobalDocReferenceAttorney> documents = new List<GlobalDocReferenceAttorney>();
                 StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
                 StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
                 StringBuilder footerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFooter.html"));
                 StringBuilder firstEvent = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFirstEvent.html"));
-
-
-                // load xml
-                byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(eventItemIdentifier);
-                //var str = Encoding.Default.GetString(xmlBytes);
-
-                Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
-                xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
-                ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
-                //ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
-
-                // Load Document Data
                 GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
-                EventStatus eventStatus;
-                _ = await _cosmosDBService.ReadDocumentAsync(documentMeta.DocumentKey, documentMeta.PartitionKey, documentMeta.EmissionDate);
 
+
+            List<Task> arrayTasks = new List<Task>();
+
+            Task hilo1 = Task.Run(() =>
+            {
+                #region hilo1
+                    // load xml
+                    byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(eventItemIdentifier);
+                    Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
+                    xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
+                    fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+                    //fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", xpathRequest);
+                #endregion
+
+            });
+
+            Task hilo2 = Task.Run(() =>
+            {
+                #region hilo2
+                    byte[] xmlBytes2 = GetXmlFromStorageAsync(eventItemIdentifier, documentMeta);
+                    Dictionary<string, string> newXpathRequest = CreateGetXpathValidation(Convert.ToBase64String(xmlBytes2), "InvoiceValidation");
+                    newFieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", newXpathRequest);
+                #endregion
+
+            });
+
+            Task hilo3 = Task.Run(() =>
+            {
+                #region hilo3
+                    storageEvents = _globalDocValidationDocumentMetaService.FindDocumentByReference(documentMeta.DocumentKey);
+                    GlobalDataDocument cosmosDocument = DocumentInfoFromCosmos(documentMeta).Result;
+                    List<Event> eventsCosmos = cosmosDocument.Events;
+                    events = ListEvents(eventsCosmos, storageEvents);
+                #endregion
+
+            });
+
+            Task hilo4 = Task.Run(() =>
+            {
+                #region hilo4
+                    Dictionary<int, string> dicStatus = _queryAssociatedEventsService.IconType(null, documentMeta.DocumentKey);
+                    invoiceStatus = dicStatus.OrderBy(t => t.Key).Last().Value;
+                #endregion
+
+            });
+
+            Task hilo5 = Task.Run(() =>
+            {
+                #region hilo5
                 //Load documents
-                List<GlobalDocReferenceAttorney> documents =
+                documents =
                     _queryAssociatedEventsService.ReferenceAttorneys(
                         documentMeta.DocumentKey,
                         documentMeta.DocumentReferencedKey,
                         documentMeta.ReceiverCode,
                         documentMeta.SenderCode);
+                #endregion
 
-                //Load Events
-                GlobalDataDocument cosmosDocument = await DocumentInfoFromCosmos(documentMeta);
-                List<Event> eventsCosmos = cosmosDocument.Events;
-                List<GlobalDocValidatorDocumentMeta> storageEvents = _globalDocValidationDocumentMetaService.FindDocumentByReference(documentMeta.DocumentKey);
-                List<Event> events = ListEvents(eventsCosmos, storageEvents);
-                xmlBytes = RadianSupportDocument.GetXmlDianFromStorage(eventItemIdentifier, documentMeta);
-                Dictionary<string, string> newXpathRequest = CreateGetXpathValidation(Convert.ToBase64String(xmlBytes), "InvoiceValidation");
-                ResponseXpathDataValue newFieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>("https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==", newXpathRequest);
+            });
 
+
+            Task hilo7 = Task.Run(() =>
+            {
+                #region hilo7
+                    qrCode = GenerateQR($"{webPath}?documentkey={documentMeta.PartitionKey}");
+                #endregion
+
+            });
+
+            arrayTasks.Add(hilo1);
+            arrayTasks.Add(hilo2);
+            arrayTasks.Add(hilo3);
+            arrayTasks.Add(hilo4);
+            arrayTasks.Add(hilo5);
+            arrayTasks.Add(hilo7);
+            Task.WhenAll(arrayTasks).Wait();
+
+
+              
                 events.Insert(0, new Event()
                 {
 
                     Description = newFieldValues.XpathsValues["Description"],
                     DocumentKey = newFieldValues.XpathsValues["CUDE"],
-                    Date = Convert.ToDateTime(newFieldValues.XpathsValues["SigningTime"]),
+                    Date = string.IsNullOrWhiteSpace(newFieldValues.XpathsValues["SigningTime"]) ? System.DateTime.Now : Convert.ToDateTime(newFieldValues.XpathsValues["SigningTime"]),
                     SenderName = newFieldValues.XpathsValues["Sender"],
                     ReceiverName = newFieldValues.XpathsValues["Receiver"]
 
                 });
 
-                Dictionary<int, string> dicStatus = _queryAssociatedEventsService.IconType(null, documentMeta.DocumentKey);
-                string invoiceStatus = dicStatus.OrderBy(t => t.Key).Last().Value;
 
                 // Set Variables
                 DateTime expeditionDate = DateTime.UtcNow.AddHours(-5);
-                Bitmap qrCode = GenerateQR($"{webPath}?documentkey={documentMeta.PartitionKey}");
                 int page = 1;
 
                 string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
@@ -362,5 +414,22 @@ namespace Gosocket.Dian.Application
 
         }
 
+
+        private static TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
+        private static TableManager TableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
+
+        public byte[] GetXmlFromStorageAsync(string trackId, GlobalDocValidatorDocumentMeta documentMeta)
+        {
+
+            var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
+            if (!validatorRuntimes.Any(v => v.RowKey == "UPLOAD") || !validatorRuntimes.Any(v => v.RowKey == "END"))
+                return new byte[0];
+
+            bool applicationResponseExist = XmlUtilService.ApplicationResponseExist(documentMeta);
+            List<GlobalDocValidatorTracking> validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
+            return (applicationResponseExist) ? XmlUtilService.GetApplicationResponseIfExist(documentMeta) : XmlUtilService.GenerateApplicationResponseBytes(trackId, documentMeta, validations);
+
+        }
     }
+
 }

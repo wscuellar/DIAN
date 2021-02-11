@@ -247,6 +247,7 @@
     <Compile Include="SoftwareService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Managers\DocumentTypeManager.cs" />
+    <Compile Include="XmlUtilService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Gosocket.Dian.Common\Gosocket.Dian.Common.csproj">
