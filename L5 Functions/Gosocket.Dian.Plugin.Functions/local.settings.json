@@ -100,7 +100,11 @@
     "ErrorCode_LGC03": "LGC03",
     "ErrorMessage_LGC03": "No se puede recibir un reclaro si previamente no se ha recibido los eventos Acuse de recibo de la factura electrónica y un recibo de bien y prestación de servicio ",
     "ErrorCode_LGC02": "LGC02",
-    "ErrorMessage_LGC02": "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente."
+    "ErrorMessage_LGC02": "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente.",
+    "ErrorCode_LGC49": "LGC49",
+    "ErrorMessage_LGC49": "No se puede registrar este evento si previamente se ha registrado el evento de endoso en propiedad (037)",
+    "ErrorCode_LGC46": "LGC46",
+    "ErrorMessage_LGC46": "No se puede registrar este evento si previamente no se ha registrado el evento Endoso en garantía (038)"
 
 
 
