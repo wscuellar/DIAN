@@ -418,6 +418,30 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+
+        public T FindByDocumentKey<T>(string partitionKey, string rowKey, string documentKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+             TableQuery.GenerateFilterCondition("RowKey",
+                 QueryComparisons.Equal,
+                 rowKey),
+             TableOperators.And,
+             TableQuery.GenerateFilterCondition("PartitionKey",
+                 QueryComparisons.Equal,
+                 partitionKey));
+
+            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("DocumentKey",
+             QueryComparisons.Equal,
+             documentKey));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+
+        }
+
         public T Find<T>(string partitionKey, string rowKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();

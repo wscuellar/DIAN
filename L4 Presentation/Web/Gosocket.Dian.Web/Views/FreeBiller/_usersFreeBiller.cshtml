@@ -24,9 +24,10 @@
         <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
             <thead>
                 <tr>
-                    <th class="text-left">Tipo de doocumento</th>
+                    <th class="text-left">Tipo de documento</th>
                     <th>N&uacute;mero de documento</th>
                     <th class="text-left">Nombre y apellido</th>
+                    <th class="text-left">Correo electrónico</th>
                     <th class="text-left">Perfil</th>
                     <th>&Uacute;ltima Modificaci&oacute;n</th>
                     <th colspan="3">Acciones</th>
@@ -49,42 +50,45 @@
                 @foreach (var user in Model.UserContainer.Users)
                 {
 
-                    <tr class="document-row">
-                        <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
-                            <a>@user.DescriptionTypeDoc</a>
-                        </td>
-                        <td class="text-nowrap text-center padding-top-0 padding-bottom-0">
-                            <a>@user.NumberDoc</a>
-                        </td>
-                        <td class="text-left text-nowrap padding-top-0 padding-bottom-0">
-                            @user.FullName
-                        </td>
-                        <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
-                            @Html.Raw(HttpUtility.HtmlDecode(user.DescriptionProfile))
-                        </td>
-                        <td class="text-center padding-top-0 padding-bottom-0">
-                            @user.LastUpdate
-                        </td>
-                        <td class="text-nowrap padding-top-0 padding-bottom-0 view-details-user">
-                            @Html.ActionLink("Ver detalles", "EditOrViewFreeBillerUser",
-                                new { controller = "FreeBiller", id = user.Id, isEdit = false },
-                                new { @class = "btn-link isActive-" + user.IsActive })
-                        </td>
-                        <td class="padding-top-0 padding-bottom-0">
-                            @{ 
-                                string isActive = Convert.ToString(user.IsActive);
-                            }
-                            <a href="@Url.Action("EditOrViewFreeBillerUser","FreeBiller", new { user.Id })" class="isActive-@isActive" id="@user.Id">
-                                <img src="@Url.Content("~/Content/images/Svg/edti.svg")" />
-                            </a>
-                        </td>
-                        <td class="text-nowrap padding-top-0 padding-bottom-0">
-                            <label class="switch">
-                                <input type="checkbox" id="@user.Id@user.NumberDoc" onclick="activo(this, '@user.Id@user.NumberDoc', '@user.Id')">
-                                <span class="slider"></span>
-                            </label>
-                        </td>
-                    </tr>
+            <tr class="document-row">
+                <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
+                    <a>@user.DescriptionTypeDoc</a>
+                </td>
+                <td class="text-nowrap text-center padding-top-0 padding-bottom-0">
+                    <a>@user.NumberDoc</a>
+                </td>
+                <td class="text-left text-nowrap padding-top-0 padding-bottom-0">
+                    @user.FullName
+                </td>
+                <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
+                    @user.Email
+                </td>
+                <td class="text-nowrap text-left padding-top-0 padding-bottom-0">
+                    @Html.Raw(HttpUtility.HtmlDecode(user.DescriptionProfile))
+                </td>
+                <td class="text-center padding-top-0 padding-bottom-0">
+                    @user.LastUpdate
+                </td>
+                <td class="text-nowrap padding-top-0 padding-bottom-0 view-details-user">
+                    @Html.ActionLink("Ver detalles", "EditOrViewFreeBillerUser",
+                        new { controller = "FreeBiller", id = user.Id, isEdit = false },
+                        new { @class = "btn-link isActive-" + user.IsActive })
+                </td>
+                <td class="padding-top-0 padding-bottom-0">
+                    @{
+                        string isActive = Convert.ToString(user.IsActive);
+                    }
+                    <a href="@Url.Action("EditOrViewFreeBillerUser","FreeBiller", new { user.Id })" class="isActive-@isActive" id="@user.Id">
+                        <img src="@Url.Content("~/Content/images/Svg/edti.svg")" />
+                    </a>
+                </td>
+                <td class="text-nowrap padding-top-0 padding-bottom-0">
+                    <label class="switch">
+                        <input type="checkbox" id="@user.Id@user.NumberDoc" onclick="activo(this, '@user.Id@user.NumberDoc', '@user.Id')">
+                        <span class="slider"></span>
+                    </label>
+                </td>
+            </tr>
                 }
             </tbody>
         </table>
