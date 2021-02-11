@@ -18,6 +18,9 @@ namespace Gosocket.Dian.Application
 
         protected IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly FileManager _fileManager;
+        private readonly TableManager _countryTableManager = new TableManager("Country", ConfigurationManager.GetValue("GlobalBillerStorage"));
+        private readonly TableManager _departmentByCodeTableManager = new TableManager("DepartmentByCode", ConfigurationManager.GetValue("GlobalBillerStorage"));
+        private readonly TableManager _municipalityByCodeTableManager = new TableManager("MunicipalityByCode", ConfigurationManager.GetValue("GlobalBillerStorage"));
 
         #endregion
 
@@ -72,19 +75,19 @@ namespace Gosocket.Dian.Application
             // Datos del documento
             template = template.Replace("{Cune}", this.GetValueFormatToTemplate(model.CUNE));
             template = template.Replace("{PayrollNumber}", this.GetValueFormatToTemplate(model.Numero));
-            template = template.Replace("{Country}", this.GetValueFormatToTemplate(model.Pais));
+            template = template.Replace("{Country}", this.GetCountryName(model.Pais));
             template = template.Replace("{GenerationPeriod}", this.GetValueFormatToTemplate(model.FechaGen)); //...
-            template = template.Replace("{City}", this.GetValueFormatToTemplate(model.MunicipioCiudad));
-            template = template.Replace("{Departament}", this.GetValueFormatToTemplate(model.DepartamentoEstado));
+            template = template.Replace("{City}", this.GetMunicipalityName(model.MunicipioCiudad));
+            template = template.Replace("{Departament}", this.GetDepartmentName(model.DepartamentoEstado));
 
             // Datos del empleador
             template = template.Replace("{EmployerSocialReason}", this.GetValueFormatToTemplate(model.Emp_RazonSocial));
-            template = template.Replace("{EmployerCountry}", this.GetValueFormatToTemplate(model.Emp_Pais));
-            template = template.Replace("{EmployerDepartament}", this.GetValueFormatToTemplate(model.Emp_DepartamentoEstado));
+            template = template.Replace("{EmployerCountry}", this.GetCountryName(model.Emp_Pais));
+            template = template.Replace("{EmployerDepartament}", this.GetDepartmentName(model.Emp_DepartamentoEstado));
 
             template = template.Replace("{EmployerNIT}", this.GetValueFormatToTemplate(model.Emp_NIT));
             template = template.Replace("{EmployerAddress}", this.GetValueFormatToTemplate(model.Emp_Direccion));
-            template = template.Replace("{EmployerMunicipality}", this.GetValueFormatToTemplate(model.Emp_MunicipioCiudad));
+            template = template.Replace("{EmployerMunicipality}", this.GetMunicipalityName(model.Emp_MunicipioCiudad));
 
             // Datos del empleado
             template = template.Replace("{EmployeeDocumentType}", this.GetValueFormatToTemplate(model.TipoDocumento));
@@ -94,10 +97,10 @@ namespace Gosocket.Dian.Application
                                                                 model.OtrosNombres,
                                                                 model.PrimerApellido,
                                                                 model.SegundoApellido)));
-            template = template.Replace("{EmployeeCode}", this.GetValueFormatToTemplate(model.CodigoTrabajador));
-            template = template.Replace("{EmployeeDepartament}", this.GetValueFormatToTemplate(model.LugarTrabajoDepartamentoEstado));
-            template = template.Replace("{EmployeeMunicipality}", this.GetValueFormatToTemplate(model.LugarTrabajoMunicipioCiudad));
-            template = template.Replace("{EmployeeMunicipality}", this.GetValueFormatToTemplate(model.LugarTrabajoMunicipioCiudad));
+            template = template.Replace("{EmployeeCode}", this.GetValueFormatToTemplate(model.Trab_CodigoTrabajador));
+            template = template.Replace("{EmployeeCountry}", this.GetCountryName(model.LugarTrabajoPais));
+            template = template.Replace("{EmployeeDepartament}", this.GetDepartmentName(model.LugarTrabajoDepartamentoEstado));
+            template = template.Replace("{EmployeeMunicipality}", this.GetMunicipalityName(model.LugarTrabajoMunicipioCiudad));
             template = template.Replace("{EmployeeAddress}", this.GetValueFormatToTemplate(model.LugarTrabajoDireccion));
             template = template.Replace("{EmployeePayrollPeriod}", this.GetValueFormatToTemplate(model.PeriodoNomina));
             template = template.Replace("{EmployeeEntryDate}", this.GetValueFormatToTemplate(model.FechaIngreso));
@@ -345,6 +348,24 @@ namespace Gosocket.Dian.Application
                 finalPart = $" CON { decimalLetters } PESOS";
             }
             return $"{ this.NumberToLettersProcess(Convert.ToDouble(integerValue)) } { finalPart }";
+        }
+
+        private string GetCountryName(string code)
+        {
+            var country = this._countryTableManager.FindByCode<Country>(code);
+            return (country != null) ? country.Description : string.Empty;
+        }
+
+        private string GetDepartmentName(string code)
+        {
+            var department = this._departmentByCodeTableManager.FindByCode<DepartmentByCode>(code);
+            return (department != null) ? department.Name : string.Empty;
+        }
+
+        private string GetMunicipalityName(string code)
+        {
+            var municipality = this._municipalityByCodeTableManager.FindByCode<MunicipalityByCode>(code);
+            return (municipality != null) ? municipality.Name : string.Empty;
         }
 
         #endregion
