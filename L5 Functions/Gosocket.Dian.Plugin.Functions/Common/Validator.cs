@@ -3419,17 +3419,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
 
-                                // Comparar ValorFEV-TV contra el valor total de la FE
-                                if (xmlParserCude.ValorOriginalTV == xmlParserCufe.TotalInvoice)
+                                if(xmlParserCude.ValorOriginalTV != null)
                                 {
-                                    responses.Add(new ValidateListResponse
+                                    // Comparar ValorFEV-TV contra el valor total de la FE
+                                    if (xmlParserCude.ValorOriginalTV == xmlParserCufe.TotalInvoice)
                                     {
-                                        IsValid = true,
-                                        Mandatory = true,
-                                        ErrorCode = "100",
-                                        ErrorMessage = errorMessage,
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = true,
+                                            Mandatory = true,
+                                            ErrorCode = "100",
+                                            ErrorMessage = errorMessage,
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                    else
+                                    {
+                                        validFor = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC57"),
+                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC57"),
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
                                 }
                                 else
                                 {
@@ -3443,6 +3458,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
+                                    
                                 break;
                            
                             //Validacion de la existensia eventos previos Avales
@@ -4095,14 +4111,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     
                 }
                 // Valida que el primer evento transmitido sea un acuse
-                else if (eventPrev.EventCode != "030")
+                else if (eventPrev.EventCode == "031" || eventPrev.EventCode == "032" 
+                    || eventPrev.EventCode == "033" || eventPrev.EventCode == "034")
                 {
+                    string errorCode = string.Empty;
+                    string errorMeesage = string.Empty;                   
+
+                    if (eventPrev.EventCode == "031")
+                    {
+                        errorCode = ConfigurationManager.GetValue("ErrorCode_LGC03");
+                        errorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC03");
+                    }
+                    else if(eventPrev.EventCode == "032")
+                    {
+                        errorCode = ConfigurationManager.GetValue("ErrorCode_LGC09");
+                        errorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC09");
+                    }
+                    else if(eventPrev.EventCode == "033")
+                    {
+                        errorCode = ConfigurationManager.GetValue("ErrorCode_LGC13");
+                        errorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC13");
+                    }
+                    else
+                    {
+                        errorCode = ConfigurationManager.GetValue("ErrorCode_LGC14");
+                        errorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC14");
+                    }
+
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC13"),
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC13"),
+                        ErrorCode = errorCode,
+                        ErrorMessage = errorMessage,
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
