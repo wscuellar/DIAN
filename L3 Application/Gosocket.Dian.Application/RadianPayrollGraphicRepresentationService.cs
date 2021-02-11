@@ -376,7 +376,7 @@ namespace Gosocket.Dian.Application
             }
 
             // Set Variables
-            Bitmap qrCode = RadianPdfCreationService.GenerateQR(TextResources.RadianReportQRCode.Replace("{CUFE}", payrollModel.CUNE));
+            Bitmap qrCode = RadianPdfCreationService.GenerateQR($"{ ConfigurationManager.GetValue("URL_QR_NOMINA") }{ payrollModel.CUNE }");
 
             string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
             string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
