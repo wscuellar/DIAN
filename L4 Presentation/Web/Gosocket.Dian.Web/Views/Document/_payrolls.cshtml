@@ -138,11 +138,11 @@
     @if (Model.Payrolls.Any())
     {
         <div class="col-md-9 table-toolbar-left padding-left-0">
-            <span>Mostrando @Model.MaxItemCount de @Model.TotalItems resultados</span>
+            <span>Mostrando @((Model.TotalItems) < Model.MaxItemCount ? Model.TotalItems : Model.MaxItemCount) de @Model.TotalItems resultados</span>
         </div>
         <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
             <span class="text-muted">
-                <strong>@(Model.Page * Model.MaxItemCount + 1)-@(Model.MaxItemCount > Model.Payrolls.Count ? (Model.Page) * Model.MaxItemCount + Model.Payrolls.Count : (Model.Page + 1) * Model.MaxItemCount)</strong>
+                <strong>@((Model.Page + 1).ToString().PadLeft(2, char.Parse("0")))-@(((Model.TotalItems) <= Model.MaxItemCount) ? "01" : Math.Ceiling((double)((double)Model.TotalItems / (double)Model.MaxItemCount)).ToString().PadLeft(2, char.Parse("0")))</strong>
             </span>
             <div class="btn-group btn-group margin-left-5">
                 <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
