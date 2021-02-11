@@ -603,7 +603,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             profilesKey = profilesKey.Distinct().ToList();
 
-            var query = from item in users.Select(t => new { t.Id, t.Name, t.UserName, t.IdentificationId, t.IdentificationTypeId, t.LastUpdated, t.Active, t.CreationDate }).Distinct()
+            var query = from item in users.Select(t => new { t.Id, t.Name, t.UserName, t.IdentificationId, t.IdentificationTypeId, t.LastUpdated, t.Active, t.CreationDate, t.Email }).Distinct()
                         join kv in profilesKey on item.Id equals kv.Key
                         join td in staticTypeDoc on item.IdentificationTypeId.ToString() equals td.Value
                         orderby item.CreationDate descending
@@ -615,6 +615,7 @@ namespace Gosocket.Dian.Web.Controllers
                             DescriptionProfile = kv.Text,
                             NumberDoc = item.IdentificationId,
                             LastUpdate = item.LastUpdated,
+                            Email = item.Email,
                             IsActive = Convert.ToBoolean(item.Active)
                         };
             int totalCount = query.Count();
