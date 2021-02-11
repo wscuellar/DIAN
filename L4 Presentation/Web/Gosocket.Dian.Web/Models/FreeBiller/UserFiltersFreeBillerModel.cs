@@ -13,14 +13,15 @@ namespace Gosocket.Dian.Web.Models.FreeBiller
             this.PageSize = 10;
         }
 
-        [DisplayName("Tipo Documento")]
+        [DisplayName("Tipo de documento")]
         public int DocTypeId { get; set; }
 
-        [DisplayName("Número Documento")]
+        [DisplayName("Número de documento")]
         public string DocNumber { get; set; }
 
-        [DisplayName("Nombre Completo")]
+        [DisplayName("Nombre completo")]
         public string FullName { get; set; }
+
 
         [DisplayName("Perfil")]
         public int ProfileId { get; set; }
