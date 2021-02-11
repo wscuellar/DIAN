@@ -113,6 +113,23 @@ namespace Gosocket.Dian.Application
 
         #endregion
 
+        #region GetXmlDianStorage
+        internal static byte[] GetXmlDianFromStorage(string trackId, global::GlobalDocValidatorDocumentMeta documentMeta)
+
+        {
+
+            var fileManager = new FileManager();
+            var container = $"dian";
+            var fileName = $"responses/{documentMeta.SigningTimeStamp.Date.Year}/{documentMeta.SigningTimeStamp.Date.Month.ToString().PadLeft(2, '0')}/{documentMeta.SigningTimeStamp.Date.Day.ToString().PadLeft(2, '0')}/Success/{documentMeta.SenderCode}/01/SETG/{documentMeta.Number}/{trackId}.xml";
+            var xmlBytes = fileManager.GetBytes(container, fileName);
+            return xmlBytes;
+
+        }
+
+        #endregion
+
+
+
         #region CreateGetXpathDataValuesRequestObject
 
         private static Dictionary<string, string> CreateGetXpathDataValuesRequestObject(string xmlBase64, string fileName = null)
