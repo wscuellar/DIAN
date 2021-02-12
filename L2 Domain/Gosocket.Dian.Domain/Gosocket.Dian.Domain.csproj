@@ -155,6 +155,8 @@
     <Compile Include="Domain\ResponseRegisterDocumentData.cs" />
     <Compile Include="Domain\ResponseUploadMultipleXml.cs" />
     <Compile Include="Domain\ResponseUploadXml.cs" />
+    <Compile Include="Entity\Country.cs" />
+    <Compile Include="Entity\DepartmentByCode.cs" />
     <Compile Include="Entity\DianContributorCategory.cs" />
     <Compile Include="Entity\AuthToken.cs" />
     <Compile Include="Entity\DianEmailTracker.cs" />

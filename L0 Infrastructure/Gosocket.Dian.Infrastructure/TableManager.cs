@@ -1307,5 +1307,11 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
+        public T FindByCode<T>(string code) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("Code", QueryComparisons.Equal, code));
+            return CloudTable.ExecuteQuery(query).FirstOrDefault();
+        }
     }
 }
