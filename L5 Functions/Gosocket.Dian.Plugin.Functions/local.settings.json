@@ -98,7 +98,7 @@
     "ErrorCode_LGC09": "LGC09",
     "ErrorMessage_LGC09": "No puede generar una recepción de bienes y prestación de servicios sobre un documento que no cuente con un evento de acuse de recibo",
     "ErrorCode_LGC03": "LGC03",
-    "ErrorMessage_LGC03": "No se puede recibir un reclaro si previamente no se ha recibido los eventos Acuse de recibo de la factura electrónica y un recibo de bien y prestación de servicio ",
+    "ErrorMessage_LGC03": "No se puede recibir un reclamo si previamente no se han recibido los eventos Acuse de recibo de la factura electrónica y un recibo de bien y prestación de servicio ",
     "ErrorCode_LGC02": "LGC02",
     "ErrorMessage_LGC02": "No se puede reclamar un documento que ha sido aceptado (expresa o tácitamente) previamente.",
     "ErrorCode_LGC49": "LGC49",
@@ -106,7 +106,13 @@
     "ErrorCode_LGC46": "LGC46",
     "ErrorMessage_LGC46": "No se puede registrar este evento si previamente no se ha registrado el evento Endoso en garantía (038)",
     "ErrorCode_AAL02": "AAL02",
-    "ErrorMessage_AAL02": "No corresponde a un código valido de la lista."
+    "ErrorMessage_AAL02": "No corresponde a un código valido de la lista.",
+    "ErrorCode_LGC57": "LGC57",
+    "ErrorMessage_LGC57": "Valor original del Titulo Valor es diferente al valor total de la factura referenciada",
+    "ErrorCode_LGC13": "LGC13",
+    "ErrorMessage_LGC13": "Solo se pueda transmitir el evento (033) después de haber transmitido el evento (030) de Acuse de recibo de la factura electrónica de venta",
+    "ErrorCode_LGC14": "LGC14",
+    "ErrorMessage_LGC14": "Solo se pueda transmitir el evento (034) Aceptación Tácita de la factura, pasados 3 días hábiles, después de la transmisión del evento (032) recibo del bien o aceptación de la prestación del servicio"
 
 
 
