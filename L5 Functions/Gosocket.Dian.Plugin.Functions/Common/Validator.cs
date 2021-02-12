@@ -275,7 +275,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var ValDesc = objCune?.ValDesc.ToString("F2");
             var ValTol = objCune?.ValTol.ToString("F2");
 
-            var errorCode = ConfigurationManager.GetValue("ErrorCode_NIE024");
+            var errorCode = Convert.ToInt32(objCune.DocumentType) == (int)DocumentType.IndividualPayroll ?  ConfigurationManager.GetValue("ErrorCode_NIE024") : ConfigurationManager.GetValue("ErrorCode_NIAE024");
 
             string key = string.Empty;
 
@@ -1474,19 +1474,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
                                 docReferenceAttorney.IssuerAttorney, false, "Habilitado", softwareId);
                             if (globalRadianOperation == null)
-                            {                                                               
-                                if (!globalRadianOperation.TecnologicalSupplier && !globalRadianOperation.Factor && !globalRadianOperation.NegotiationSystem) {
-
-                                    validError = true;
-                                    responses.Add(new ValidateListResponse
-                                    {
-                                        IsValid = false,
-                                        Mandatory = true,
-                                        ErrorCode = "AAH62b",
-                                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
-                                }                             
+                            {                                                                                              
+                                validError = true;
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "AAH62b",
+                                    ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });                                                    
                             }
                             else
                             {
@@ -3205,6 +3202,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             });
                                         }
                                     }
+
                                     //No existen eventos recibo del bien y/o prestacion del servicio
                                     if (validForItem)
                                     {
@@ -3335,6 +3333,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 
                                 break;
                             case (int)EventStatus.SolicitudDisponibilizacion:
+
                                 //Validacion de la Solicitud de Disponibilización Posterior  TAKS 723
                                 if (nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                                 {
@@ -3419,9 +3418,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
 
-                                if(xmlParserCude.ValorOriginalTV != null)
-                                {
-                                    // Comparar ValorFEV-TV contra el valor total de la FE
+                                // Comparar ValorFEV-TV contra el valor total de la FE
+                                if (xmlParserCude.ValorOriginalTV != null)
+                                {                                    
                                     if (xmlParserCude.ValorOriginalTV == xmlParserCufe.TotalInvoice)
                                     {
                                         responses.Add(new ValidateListResponse
@@ -3959,6 +3958,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                                 break;
+
                             case (int)EventStatus.NotificacionPagoTotalParcial:
                                 //Valida monto pago parcial o total
                                 var responseListPayment = ValidatePayment(xmlParserCude, nitModel);
@@ -3978,6 +3978,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     }
 
                                 }
+
                                 //Valida exista evento Registro para la circulación
                                 if (documentMeta.Where(t => t.EventCode == "036").ToList().Count == decimal.Zero)
                                 {
@@ -4004,6 +4005,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
 
                                 //Si el titulo valor tiene una limitación previa (041)
+
+
                                 if (documentMeta
                                     .Where(t => t.EventCode == "041" && t.CancelElectronicEvent == null
                                     && document != null                        
@@ -4034,6 +4037,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         });
                                     }
                                 }
+
                                 //Valdia si existe un pago total
                                 else if (documentMeta.Where(t => t.CustomizationID == "452" 
                                     && document != null
@@ -4062,33 +4066,65 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     });
                                 }
                                 break;
+
                             //Validacion de la existensia eventos previos informe de pago
                             case (int)EventStatus.ValInfoPago:
-                                if (documentMeta.Where(t => t.EventCode == "036").ToList().Count > decimal.Zero)
+
+                                responses.Add(new ValidateListResponse
                                 {
-                                    //Valida Pago Total FETV
-                                    if (documentMeta.Where(t => t.EventCode == "045" && t.CustomizationID == "452").ToList().Count > decimal.Zero)
+                                    IsValid = true,
+                                    Mandatory = true,
+                                    ErrorCode = "100",
+                                    ErrorMessage = errorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+
+                                //Debe existir solicitud de disponibilizacion
+                                var listDispnibiliza = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).ToList();
+                                if(listDispnibiliza != null && listDispnibiliza.Count > 0)
+                                {                                 
+                                    foreach (var itemDispnibiliza in listDispnibiliza)
                                     {
-                                        validFor = true;
-                                        responses.Add(new ValidateListResponse
+                                        var documentDisponibiliza = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemDispnibiliza.Identifier, itemDispnibiliza.Identifier);
+                                        if(documentDisponibiliza != null)
                                         {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC50"),
-                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC50"),
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
-                                    else
-                                    {
-                                        responses.Add(new ValidateListResponse
+                                            //Valida Pago Total FETV
+                                            var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                                            && t.CustomizationID == "452").ToList();
+                                            if(listPagoTotal != null && listPagoTotal.Count > 0)
+                                            {
+                                                foreach (var itemPagoTotal in listPagoTotal)
+                                                {
+                                                    var documentPagoTotal = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemPagoTotal.Identifier, itemPagoTotal.Identifier);
+                                                    if (documentPagoTotal != null)
+                                                    {
+                                                        validFor = true;
+                                                        responses.Add(new ValidateListResponse
+                                                        {
+                                                            IsValid = false,
+                                                            Mandatory = true,
+                                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC50"),
+                                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC50"),
+                                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                        });
+                                                        break;
+                                                    }                                                   
+                                                }
+                                            }
+                                            break;
+                                        }
+                                        else
                                         {
-                                            IsValid = true,
-                                            Mandatory = true,
-                                            ErrorCode = "100",
-                                            ErrorMessage = errorMessage,
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
+                                            validFor = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC51"),
+                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC51"),
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
                                     }
                                 }
                                 else
@@ -4103,7 +4139,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                 }
-
                                 break;
                         }
                     }
