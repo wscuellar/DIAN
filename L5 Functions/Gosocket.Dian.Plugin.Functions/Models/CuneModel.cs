@@ -29,6 +29,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
         public string SoftwarePin { get; set; }
 
         public string TipAmb { get; set; }
+        public string DocumentType { get; set; }
 
     }
 }
