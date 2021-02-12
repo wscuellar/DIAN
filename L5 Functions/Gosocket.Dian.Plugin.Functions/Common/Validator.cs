@@ -3708,7 +3708,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         foreach (var itemEndosoGarantia in endosoGarantia)
                                         {
                                             var documentGarantia = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemEndosoGarantia.Identifier, itemEndosoGarantia.Identifier);
-                                            if (documentGarantia == null)
+                                            if (documentGarantia != null)
                                             {
                                                 validFor = true;
                                                 validForEndoso = false;
@@ -3792,7 +3792,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         foreach (var itemEndosoProcuracion in endosoProcuracion)
                                         {
                                             var documentProcuracion = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(itemEndosoProcuracion.Identifier, itemEndosoProcuracion.Identifier);
-                                            if (documentProcuracion == null)
+                                            if (documentProcuracion != null)
                                             {
                                                 validFor = true;
                                                 validForEndosoProcura = false;
