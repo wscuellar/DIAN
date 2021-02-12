@@ -1483,7 +1483,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ErrorCode = "AAH62b",
                                     ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });                                                    
+                                });
+                                break;
                             }
                             else
                             {
