@@ -173,7 +173,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07") + "-(R): ",
+                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07"),
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -427,7 +427,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var xmlParser = new XmlParseNomina(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
+
+
             CuneModel cmObject = new CuneModel();
+            cmObject.DocumentType = xmlParser.Fields["DocumentTypeId"].ToString();
             cmObject.Cune = xmlParser.globalDocPayrolls.CUNE;
             cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
             cmObject.FecNIE = xmlParser.globalDocPayrolls.Info_FechaGen;
