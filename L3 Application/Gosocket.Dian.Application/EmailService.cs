@@ -36,7 +36,7 @@ namespace Gosocket.Dian.Application
                         Port = ConfigurationManager.GetValue("EmailPort"),
                         Receiver = receiver,
                         Subject = subject,
-                        Body = EmailTemplateManager.GenerateHtmlBody("template", replacement),
+                        Body = EmailTemplateManager.GenerateHtmlBody("template-content", replacement),
                         BodyIsHTML = true
                     };
 
