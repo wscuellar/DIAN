@@ -1356,11 +1356,11 @@ namespace Gosocket.Dian.Web.Controllers
             StringBuilder message = new StringBuilder();
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
-            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
-            message.Append("</br> <span style='font-size:18px;'><b>Su contraseña para ingresar al sistema es: </b></span></br>");
-            message.AppendFormat("</br> Contraseña: {0}", password);
+            message.Append("<span><b>Comunicación de servicio</b></span><br>");
+            message.Append("<br> <span><b>Su contraseña para ingresar al sistema es: </b></span><br>");
+            message.AppendFormat("<br> Contraseña: {0}", password);
 
-            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+            message.Append("<br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
 
             //Nombre del documento, estado, observaciones
             dic.Add("##CONTENT##", message.ToString());

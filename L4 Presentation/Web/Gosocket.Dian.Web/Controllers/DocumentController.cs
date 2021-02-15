@@ -1287,13 +1287,13 @@ namespace Gosocket.Dian.Web.Controllers
             StringBuilder message = new StringBuilder();
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
-            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
-            message.Append("</br> <span style='font-size:18px;'><b>Se ha generado una clave de acceso al Catalogo de DIAN</b></span></br>");
-            message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.Names);
-            message.Append("</br> A continuación, se entrega la clave para realizar tramites y gestión de solicitudes recepción documentos electrónicos.");
-            message.AppendFormat("</br> Clave de acceso: {0}", model.Password);
+            message.Append("<span><b>Comunicación de servicio</b></span><br>");
+            message.Append("<br> <span><b>Se ha generado una clave de acceso al Catalogo de DIAN</b></span><br>");
+            message.AppendFormat("<br> Señor (a) usuario (a): {0}", model.Names);
+            message.Append("<br> A continuación, se entrega la clave para realizar tramites y gestión de solicitudes recepción documentos electrónicos.");
+            message.AppendFormat("<br> Clave de acceso: {0}", model.Password);
 
-            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+            message.Append("<br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
 
             //Nombre del documento, estado, observaciones
             dic.Add("##CONTENT##", message.ToString());
