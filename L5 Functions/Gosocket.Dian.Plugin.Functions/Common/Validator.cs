@@ -4206,7 +4206,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.Add(item);
                 return responses;
             }
-           
+
+            var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(individualPayroll.Identifier, individualPayroll.Identifier);
+            if (document != null)
+            {
+                item.IsValid = true;
+                item.ErrorCode = "100";
+                item.ErrorMessage = "Evento ValidateReplacePredecesor referenciado correctamente";
+            }
+
             item.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             responses.Add(item);
             return responses;
