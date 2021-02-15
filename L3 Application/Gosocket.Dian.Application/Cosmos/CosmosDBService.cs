@@ -510,8 +510,18 @@ namespace Gosocket.Dian.Application.Cosmos
 
             if (pks != null && !string.IsNullOrEmpty(documentKey))
             {
+                //---Descarto los documentos que no pueden estar en la consulta asignando los que si.
                 query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
-                    .Where(e => pks.Contains(e.PartitionKey) && e.DocumentKey == documentKey).AsDocumentQuery();
+                    .Where(e => pks.Contains(e.PartitionKey) && e.DocumentKey == documentKey && (e.DocumentTypeId == "01" ||
+                e.DocumentTypeId == "02" ||
+                e.DocumentTypeId == "03" ||
+                e.DocumentTypeId == "04" ||
+                e.DocumentTypeId == "05" ||
+                e.DocumentTypeId == "07" ||
+                e.DocumentTypeId == "08" ||
+                e.DocumentTypeId == "12" ||
+                e.DocumentTypeId == "101"
+                )).AsDocumentQuery();
 
                 result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
                 return (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults,
@@ -586,6 +596,21 @@ namespace Gosocket.Dian.Application.Cosmos
 
             if (providerCode != null)
                 predicate = predicate.And(g => g.TechProviderInfo.TechProviderCode == providerCode);
+
+            //---------Descarta para los filtros los applicationresponse u otros documentos que no deban estar en la consulta.
+            if (documentTypeId.Equals("00"))
+            {
+                predicate = predicate.And(g => g.DocumentTypeId == "01" ||
+                g.DocumentTypeId == "02" ||
+                g.DocumentTypeId == "03" ||
+                g.DocumentTypeId == "04" ||
+                g.DocumentTypeId == "05" ||
+                g.DocumentTypeId == "07" ||
+                g.DocumentTypeId == "08" ||
+                g.DocumentTypeId == "12" ||
+                g.DocumentTypeId == "101"
+                );
+            }
 
             if (radianStatus > 0)
             {

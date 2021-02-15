@@ -59,6 +59,14 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
+        const string TITULOVALORCODES = "030, 032, 033, 034";
+        const string DISPONIBILIZACIONCODES = "036";
+        const string PAGADACODES = "045";
+        const string ENDOSOCODES = "037,038,039";
+        const string LIMITACIONCODES = "041";
+        const string ANULACIONENDOSOCODES = "040";
+        const string ANULACIONLIMITACIONCODES = "042";
+        const string MANDATOCODES = "043";
 
         public List<GlobalDocPayroll> PayrollList
         {
@@ -292,7 +300,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (string.IsNullOrWhiteSpace(model.CUNE) && string.IsNullOrWhiteSpace(model.NumeroDocumento))
             {
-                if(!model.RangoNumeracionMenor.HasValue || !model.RangoNumeracionMayor.HasValue)
+                if (!model.RangoNumeracionMenor.HasValue || !model.RangoNumeracionMayor.HasValue)
                 {
                     model.Mensaje = "Debe seleccionar un Rango de Numeración.";
                     LoadData(ref model);
@@ -307,7 +315,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 if (model.TipoDocumento != "00") totalFiltersSelected++;
 
-                if(!string.IsNullOrWhiteSpace(model.NumeroDocumento)) totalFiltersSelected++;
+                if (!string.IsNullOrWhiteSpace(model.NumeroDocumento)) totalFiltersSelected++;
 
                 if (!string.IsNullOrWhiteSpace(model.LetraPrimerApellido)) totalFiltersSelected++;
 
@@ -323,13 +331,13 @@ namespace Gosocket.Dian.Web.Controllers
                     return View(model);
                 }
             }
-            
+
             this.GetPayrollData(50, model);
 
             model.TotalItems = this.PayrollList.Count;
             model.HasMoreData = false;
             var resultPayroll = new List<GlobalDocPayroll>();
-            if(this.PayrollList != null && this.PayrollList.Count > 0)
+            if (this.PayrollList != null && this.PayrollList.Count > 0)
             {
                 // la paginación se hace de 20 registros...
                 var maxItems = model.MaxItemCount;
@@ -337,12 +345,12 @@ namespace Gosocket.Dian.Web.Controllers
                 var nextIndex = (index + maxItems);
 
                 var totalItemsList = this.PayrollList.Count;
-                if(nextIndex >= totalItemsList)
+                if (nextIndex >= totalItemsList)
                 {
                     maxItems = maxItems - (nextIndex - totalItemsList);
                     model.HasMoreData = false;
                 }
-                else 
+                else
                     model.HasMoreData = true;
 
                 resultPayroll = this.PayrollList.GetRange(index, maxItems);
@@ -356,7 +364,7 @@ namespace Gosocket.Dian.Web.Controllers
                 var document = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
                 var numAdjustment = string.Empty;
 
-                if(int.Parse(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll && !string.IsNullOrWhiteSpace(documentMeta.DocumentReferencedKey)) // Nómina Individual con Ajuste...
+                if (int.Parse(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll && !string.IsNullOrWhiteSpace(documentMeta.DocumentReferencedKey)) // Nómina Individual con Ajuste...
                 {
                     var adjustmentDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentMeta.DocumentReferencedKey, documentMeta.DocumentReferencedKey);
                     if (adjustmentDocumentMeta != null) numAdjustment = adjustmentDocumentMeta.SerieAndNumber;
@@ -404,7 +412,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.Payrolls = result;
             LoadData(ref model);
-            
+
             return View(model);
         }
 
@@ -469,12 +477,12 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintDocument(string cufe)
         {
-                string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
-                byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
-                String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
-                var json = Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
-                json.MaxJsonLength = 500000000;
-                return json;
+            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
+            byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
+            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
+            var json = Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
+            json.MaxJsonLength = 500000000;
+            return json;
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -652,7 +660,7 @@ namespace Gosocket.Dian.Web.Controllers
                                 {
                                     //Se busca en la GlobalDocValidatorDocumentMeta y se saca el evento de terminacion.
                                     GlobalDocValidatorDocumentMeta eventEndMandate = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(attorney.DocReferencedEndAthorney, attorney.DocReferencedEndAthorney);
-                                    if(eventEndMandate != null)
+                                    if (eventEndMandate != null)
                                     {
                                         eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode)));
                                         model.Events.Add(new EventsViewModel()
@@ -669,7 +677,7 @@ namespace Gosocket.Dian.Web.Controllers
                                     }
                                 }
                             }
-                            
+
                         }
 
                     }
@@ -979,47 +987,94 @@ namespace Gosocket.Dian.Web.Controllers
             return View("Index", model);
         }
 
+        private List<EventViewModel> eventListByTimestamp(List<EventViewModel> originalList)
+        {
+            List<EventViewModel> resultList = new List<EventViewModel>();
+
+            foreach (var item in originalList)
+            {
+                if (!string.IsNullOrEmpty(item.Code))
+                {
+                    resultList.Add(item);
+                }
+            }
+
+            return resultList.Where(e => TITULOVALORCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || PAGADACODES.Contains(e.Code.Trim()) || ENDOSOCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || ANULACIONENDOSOCODES.Contains(e.Code.Trim()) || LIMITACIONCODES.Contains(e.Code.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.Code.Trim())).ToList();
+        }
+
+
         private string DeterminateRadianStatus(List<EventViewModel> events, string documentTypeId)
         {
-            if (events.Count() == 0)
+
+            if (events.Count == 0)
                 return RadianDocumentStatus.DontApply.GetDescription();
 
-            if (events.Count(ev => !ev.Code.Equals($"0{(int)EventStatus.Avales}")
-                    && !ev.Code.Equals($"0{(int)EventStatus.Mandato}")
-                    && !ev.Code.Equals($"0{(int)EventStatus.ValInfoPago}")
-                    && !ev.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")) == 0)
-                return RadianDocumentStatus.DontApply.GetDescription();
-
-            int lastEventCode = int.Parse(events.Where(ev => !ev.Code.Equals($"0{(int)EventStatus.Avales}")
-                    && !ev.Code.Equals($"0{(int)EventStatus.Mandato}")
-                    && !ev.Code.Equals($"0{(int)EventStatus.ValInfoPago}")
-                    && !ev.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).OrderBy(t => t.Date).Last().Code);
-
-            if (lastEventCode == ((int)EventStatus.NegotiatedInvoice)
-                || lastEventCode == ((int)EventStatus.AnulacionLimitacionCirculacion))
-                return RadianDocumentStatus.Limited.GetDescription();
-
-            if (lastEventCode == ((int)EventStatus.NotificacionPagoTotalParcial))
-                return RadianDocumentStatus.Paid.GetDescription();
-
-            if (lastEventCode == ((int)EventStatus.EndosoPropiedad)
-                || lastEventCode == ((int)EventStatus.EndosoGarantia)
-                || lastEventCode == ((int)EventStatus.EndosoProcuracion)
-                || lastEventCode == ((int)EventStatus.InvoiceOfferedForNegotiation))
-                return RadianDocumentStatus.Endorsed.GetDescription();
-
-            if (lastEventCode == ((int)EventStatus.SolicitudDisponibilizacion))
-                return RadianDocumentStatus.Readiness.GetDescription();
-
-            if (events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Received))
-                && events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Receipt))
-                && events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Accepted)))
-                return RadianDocumentStatus.SecurityTitle.GetDescription();
+            Dictionary<int, string> statusValue = new Dictionary<int, string>();
+            int securityTitleCounter = 0;
+            int index = 3;
 
             if (documentTypeId == "01")
-                return RadianDocumentStatus.ElectronicInvoice.GetDescription();
+                statusValue.Add(1, $"{RadianDocumentStatus.ElectronicInvoice.GetDescription()}");
 
-            return RadianDocumentStatus.DontApply.GetDescription();
+            events = events.Where(t => t.Code != null).OrderBy(t => t.TimeStamp).ToList();
+            events = eventListByTimestamp(events).OrderBy(t => t.TimeStamp).ThenBy(t => t.Code).ToList();
+
+            bool limitacionAnulation = IsAnulation(events.Count(e => ANULACIONLIMITACIONCODES.Contains(e.Code.Trim())), events.Count(e => LIMITACIONCODES.Contains(e.Code.Trim())));
+            bool endosoAnulation = IsAnulation(events.Count(e => ANULACIONENDOSOCODES.Contains(e.Code.Trim())), events.Count(e => ENDOSOCODES.Contains(e.Code.Trim())));
+
+            foreach (var documentMeta in events)
+            {
+                if (TITULOVALORCODES.Contains(documentMeta.Code.Trim()))
+                    securityTitleCounter++;
+
+                if (!statusValue.Values.Contains(RadianDocumentStatus.SecurityTitle.GetDescription()) && securityTitleCounter >= 3)
+                    statusValue.Add(2, $"{RadianDocumentStatus.SecurityTitle.GetDescription()}");//5
+
+                if (DISPONIBILIZACIONCODES.Contains(documentMeta.Code.Trim()))
+                {
+                    statusValue.Add(index, $"{RadianDocumentStatus.Readiness.GetDescription()}");
+                    index++;
+                }
+
+                if (ENDOSOCODES.Contains(documentMeta.Code.Trim()) && !endosoAnulation)
+                {
+                    statusValue.Add(index, $"{RadianDocumentStatus.Endorsed.GetDescription()}");
+                    index++;
+                }
+
+                if (PAGADACODES.Contains(documentMeta.Code.Trim()))
+                {
+                    statusValue.Add(index, $"{RadianDocumentStatus.Paid.GetDescription()}");
+                    index++;
+                }
+
+                if (LIMITACIONCODES.Contains(documentMeta.Code.Trim()) && !limitacionAnulation)
+                {
+                    statusValue.Add(index, $"{RadianDocumentStatus.Limited.GetDescription()}");
+                    index++;
+                }
+            }
+
+            Dictionary<int, string> cleanDictionary = statusValue.GroupBy(pair => pair.Value)
+                         .Select(group => group.Last())
+                         .ToDictionary(pair => pair.Key, pair => pair.Value);
+
+            if (cleanDictionary.ContainsValue(RadianDocumentStatus.Readiness.GetDescription()) || cleanDictionary.ContainsValue(RadianDocumentStatus.Limited.GetDescription()))
+                cleanDictionary.Remove(1);
+
+            if (cleanDictionary.Count == 0)
+                return RadianDocumentStatus.DontApply.GetDescription();
+
+            return cleanDictionary.OrderBy(t => t.Key).Last().Value;
+
+        }
+
+        private bool IsAnulation(int counterAnulations, int counterInformation)
+        {
+            if (counterInformation > counterAnulations)
+                return false;
+
+            return true;
         }
 
         private void SetView(int filterType)
@@ -1232,13 +1287,13 @@ namespace Gosocket.Dian.Web.Controllers
             StringBuilder message = new StringBuilder();
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
-            message.Append("<span style='font-size:24px;'><b>Comunicación de servicio</b></span></br>");
-            message.Append("</br> <span style='font-size:18px;'><b>Se ha generado una clave de acceso al Catalogo de DIAN</b></span></br>");
-            message.AppendFormat("</br> Señor (a) usuario (a): {0}", model.Names);
-            message.Append("</br> A continuación, se entrega la clave para realizar tramites y gestión de solicitudes recepción documentos electrónicos.");
-            message.AppendFormat("</br> Clave de acceso: {0}", model.Password);
+            message.Append("<span><b>Comunicación de servicio</b></span><br>");
+            message.Append("<br> <span><b>Se ha generado una clave de acceso al Catalogo de DIAN</b></span><br>");
+            message.AppendFormat("<br> Señor (a) usuario (a): {0}", model.Names);
+            message.Append("<br> A continuación, se entrega la clave para realizar tramites y gestión de solicitudes recepción documentos electrónicos.");
+            message.AppendFormat("<br> Clave de acceso: {0}", model.Password);
 
-            message.Append("</br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
+            message.Append("<br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>");
 
             //Nombre del documento, estado, observaciones
             dic.Add("##CONTENT##", message.ToString());
