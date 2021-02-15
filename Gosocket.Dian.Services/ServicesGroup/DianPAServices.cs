@@ -694,16 +694,20 @@ namespace Gosocket.Dian.Services.ServicesGroup
                             events = events.OrderBy(x => x.SigningTimeStamp).ToList();
                             events.ForEach(e =>
                             {
-                                // se consulta el evento por el código y así obtener su descripción.
-                                var docEvent = TableManagerGlobalDocEvent.FindGlobalEvent<GlobalDocEvent>(e.EventCode, e.CustomizationID, "96");
-                                e.EventCodeDescription = (docEvent != null) ? docEvent.Description : string.Empty;
-                                // se consulta la información del evento original.
-                                originalEvents.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(e.DocumentKey, e.DocumentKey));
-                                // se consulta las validaciones del evento original.
-                                var originalValidations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(e.DocumentKey);
-                                if (originalValidations != null && originalValidations.Count > 0)
+                                var approved = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(e?.Identifier, e?.Identifier);
+                                if (approved)
                                 {
-                                    originalEventsValidations.AddRange(originalValidations);
+                                    // se consulta el evento por el código y así obtener su descripción.
+                                    var docEvent = TableManagerGlobalDocEvent.FindGlobalEvent<GlobalDocEvent>(e.EventCode, e.CustomizationID, "96");
+                                    e.EventCodeDescription = (docEvent != null) ? docEvent.Description : string.Empty;
+                                    // se consulta la información del evento original.
+                                    originalEvents.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(e.DocumentKey, e.DocumentKey));
+                                    // se consulta las validaciones del evento original.
+                                    var originalValidations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(e.DocumentKey);
+                                    if (originalValidations != null && originalValidations.Count > 0)
+                                    {
+                                        originalEventsValidations.AddRange(originalValidations);
+                                    } 
                                 }
                             });
                         }

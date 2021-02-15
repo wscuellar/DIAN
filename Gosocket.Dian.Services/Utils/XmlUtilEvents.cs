@@ -206,10 +206,13 @@ namespace Gosocket.Dian.Services.Utils
             {
                 // se busca la información del evento original que se esta procesando.
                 var originalEvent = originalEvents.FirstOrDefault(x => x.PartitionKey == e.DocumentKey);
-                // se busca las notificaciones del evento original que se esta procesando.
-                var originalEventNotifications = originalValidations.Where(x => x.PartitionKey == e.DocumentKey && x.IsNotification).ToList();
-                list.Add(BuildDocumentResponseEventNode(lineId, e, originalEvent, originalEventNotifications));
-                lineId++;
+                if (originalEvent != null)
+                {
+                    // se busca las notificaciones del evento original que se esta procesando.
+                    var originalEventNotifications = originalValidations.Where(x => x.PartitionKey == e.DocumentKey && x.IsNotification).ToList();
+                    list.Add(BuildDocumentResponseEventNode(lineId, e, originalEvent, originalEventNotifications));
+                    lineId++; 
+                }
             });
 
             return list;
