@@ -1,19 +1,18 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
-@using Gosocket.Dian.Domain.Entity
-@using Gosocket.Dian.Domain.Common;
-@using Newtonsoft.Json
+@using help = Gosocket.Dian.Domain.Common;
+
 @{
     ViewBag.title = "Detalle de Set de Pruebas - Propios Medios";
     string status = "";
     switch (Model.RadianTestSetResult.Status)
     {
-        case (int)TestSetStatus.InProcess:
+        case (int)help.TestSetStatus.InProcess:
             status = "En Proceso";
             break;
-        case (int)TestSetStatus.Accepted:
+        case (int)help.TestSetStatus.Accepted:
             status = "Aceptado";
             break;
-        case (int)TestSetStatus.Rejected:
+        case (int)help.TestSetStatus.Rejected:
             status = "Rechazado";
             break;
 
@@ -30,7 +29,7 @@
             <a href="@Url.Action("GetSetTestResult", "RadianApproved",
                                          new {
                                              RadianContributorId = Model.Contributor.RadianContributorId,
-                                             Nit = Model.Nit, 
+                                             Nit = Model.Nit,
                                              ContributorId = Model.ContributorId,
                                              RadianState = Model.RadianState,
                                              RadianContributorTypeId = Model.RadianContributorTypeId,
@@ -107,15 +106,15 @@
                         alternateGridColor: '#EBEEEC',
                         categories: [
                             'Documentos',
-                            'Acuse de recibo',
-                            'Recibido del bien o prestación del S',
-                            'Aceptación expresa',
-                            'Aceptación tácita',
-                            'Rechazo de la  FEV',
-                            'Avales',
-                            'Mandato eléctronico',
-                            'Terminacion de mandato',
-                            'Solicitud de disponibilización',
+                            '@help.EnumHelper.GetDescription("Received")',
+                            '@help.EnumHelper.GetDescription("Receipt")',
+                            '@help.EnumHelper.GetDescription("Accepted")',
+                            '@help.EnumHelper.GetDescription("AceptacionTacita")',
+                            '@help.EnumHelper.GetDescription("Rejected")',
+                            '@help.EnumHelper.GetDescription("Avales")',
+                            '@help.EnumHelper.GetDescription("Mandato")',
+                            '@help.EnumHelper.GetDescription("TerminacionMandato")',
+                            '@help.EnumHelper.GetDescription("SolicitudDisponibilizacion")',
                             'Endoso en propiedad',
                             'Anulación endoso',
                             'Notificación pago parcial o total',
