@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
+using System.ComponentModel.DataAnnotations;
 
 namespace Gosocket.Dian.Domain.Entity
 {
@@ -21,8 +22,12 @@ namespace Gosocket.Dian.Domain.Entity
         public int? ProviderId { get; set; }
         public string TestSetReference { get; set; }
 
+        [Display(Name = "Documentos (Total)")]
         public int TotalDocumentRequired { get; set; }
+        
+        [Display(Name = "Documentos (Total)")]
         public int TotalDocumentAcceptedRequired { get; set; }
+        
         public int TotalDocumentSent { get; set; }
         public int TotalDocumentAccepted { get; set; }
         public int TotalDocumentsRejected { get; set; }
@@ -31,10 +36,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Acuse de recibo - Total requerido
         /// </summary>
+        [Display(Name = "Acuse de recibo de Factura Electrónica de Venta")]
         public int ReceiptNoticeTotalRequired { get; set; }
         /// <summary>
         /// Acuse de recibo - Total requerido aceptado
         /// </summary>
+        [Display(Name = "Acuse de recibo de Factura Electrónica de Venta")]
         public int ReceiptNoticeTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Acuse de recibo - Total documentos enviados
@@ -52,10 +59,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Recibo del bien - Total requerido
         /// </summary>
+        [Display(Name = "Recibo del bien y/o prestación del servicio")]
         public int ReceiptServiceTotalRequired { get; set; }
         /// <summary>
         /// Recibo del bien - Total aceptado requerido
         /// </summary>
+        [Display(Name = "Recibo del bien y/o prestación del servicio")]
         public int ReceiptServiceTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Recibo del bien - Total enviado
@@ -74,10 +83,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Aceptación expresa - Total requerido
         /// </summary>
+        [Display(Name = "Aceptación expresa")]
         public int ExpressAcceptanceTotalRequired { get; set; }
         /// <summary>
         /// Aceptación expresa - Total aceptado
         /// </summary>
+        [Display(Name = "Aceptación expresa")]
         public int ExpressAcceptanceTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Aceptación expresa - Total enviados
@@ -96,10 +107,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Manifestación de aceptación - Total requerido
         /// </summary>
+        [Display(Name = "Aceptación tácita ")]
         public int AutomaticAcceptanceTotalRequired { get; set; }
         /// <summary>
         /// Manifestación de aceptación - Total aceptado
         /// </summary>
+        [Display(Name = "Aceptación tácita ")]
         public int AutomaticAcceptanceTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Manifestación de aceptación - Total enviado
@@ -118,10 +131,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Rechazo factura electrónica - Total Requerido
         /// </summary>
+        [Display(Name = "Rechazo de la factura electrónica")]
         public int RejectInvoiceTotalRequired { get; set; }
         /// <summary>
         /// Rechazo factura electrónica - Total Aceptado
         /// </summary>
+        [Display(Name = "Rechazo de la factura electrónica")]
         public int RejectInvoiceTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Rechazo factura electrónica - Total Enviiados
@@ -140,10 +155,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Solicitud disponibilización - Total requerido
         /// </summary>
+        [Display(Name = "Inscripción de la factura electrónica de venta como título valor - RADIAN")]
         public int ApplicationAvailableTotalRequired { get; set; }
         /// <summary>
         /// Solicitud disponibilización - Total Aceptados
         /// </summary>
+        [Display(Name = "Inscripción de la factura electrónica de venta como título valor - RADIAN")]
         public int ApplicationAvailableTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Solicitud disponibilización - Total Enviados
@@ -163,10 +180,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         ///  Endoso en Propiedad - Total Requerido
         /// </summary>
+        [Display(Name = "Endoso en propiedad ")]
         public int EndorsementPropertyTotalRequired { get; set; }
         /// <summary>
         ///  Endoso en Propiedad - Total Aceptado
         /// </summary>
+        [Display(Name = "Endoso en propiedad ")]
         public int EndorsementPropertyTotalAcceptedRequired { get; set; }
         /// <summary>
         ///  Endoso en Propiedad - Total Enviados
@@ -185,12 +204,14 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Endoso en Procuracion - Total requerido
         /// </summary>
+        [Display(Name = "Endoso en procuración")]
         public int EndorsementProcurementTotalRequired { get; set; }
 
         public int EndorsementTotalRequired { get; set; }
         /// <summary>
         /// Endoso en Procuracion - Total Aceptado
         /// </summary>
+        [Display(Name = "Endoso en procuración")]
         public int EndorsementProcurementTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Endoso en Procuracion - Total Enviados
@@ -209,10 +230,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Endoso en Garantia - Total Requerido
         /// </summary>
+        [Display(Name = "Endoso en garantía          ")]
         public int EndorsementGuaranteeTotalRequired { get; set; }
         /// <summary>
         /// Endoso en Garantia - Total Aceptados
         /// </summary>
+        [Display(Name = "Endoso en garantía          ")]
         public int EndorsementGuaranteeTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Endoso en Garantia - Total Enviados
@@ -231,10 +254,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Cancelación de endoso - Total requerido
         /// </summary>
+        [Display(Name = "Cancelación de endoso")]
         public int EndorsementCancellationTotalRequired { get; set; }
         /// <summary>
         /// Cancelación de endoso - Total Aceptado
         /// </summary>
+        [Display(Name = "Cancelación de endoso")]
         public int EndorsementCancellationTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Cancelación de endoso - Total Enviados
@@ -253,10 +278,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Avales - Total Requerido
         /// </summary>
+        [Display(Name = "Aval")]
         public int GuaranteeTotalRequired { get; set; }
         /// <summary>
         /// Avales - Total Aceptados
         /// </summary>
+        [Display(Name = "Aval")]
         public int GuaranteeTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Avales - Total Enviados
@@ -275,10 +302,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Mandato electrónico - Total requerido
         /// </summary>
+        [Display(Name = "Mandato")]
         public int ElectronicMandateTotalRequired { get; set; }
         /// <summary>
         /// Mandato electrónico - Total Aceptada requerida
         /// </summary>
+        [Display(Name = "Mandato")]
         public int ElectronicMandateTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Mandato electrónico - Total Enviado
@@ -297,10 +326,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Terminación mandato - Total requerido
         /// </summary>
+        [Display(Name = "Terminación del mandato")]
         public int EndMandateTotalRequired { get; set; }
         /// <summary>
         /// Terminación mandato - Total aceptado requerido
         /// </summary>
+        [Display(Name = "Terminación del mandato")]
         public int EndMandateTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Terminación mandato - Total enviados 
@@ -319,10 +350,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Notificación de pago - Total requerido
         /// </summary>
+        [Display(Name = "Pago de la factura electrónica de venta como título valor")]
         public int PaymentNotificationTotalRequired { get; set; }
         /// <summary>
         /// Notificación de pago - Total aceptado requerido
         /// </summary>
+        [Display(Name = "Pago de la factura electrónica de venta como título valor")]
         public int PaymentNotificationTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Notificación de pago - Total enviados
@@ -341,10 +374,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Limitación de circulación - Total Requerido
         /// </summary>
+        [Display(Name = "Limitaciones a la circulación de la factura electrónica de venta como título")]
         public int CirculationLimitationTotalRequired { get; set; }
         /// <summary>
         /// Limitación de circulación - Total Aceptados Requeridos
         /// </summary>
+        [Display(Name = "Limitaciones a la circulación de la factura electrónica de venta como título")]
         public int CirculationLimitationTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Limitación de circulación - Total Enviados
@@ -363,10 +398,12 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Terminación limitación - Total Requerido
         /// </summary>
+        [Display(Name = "Terminación de las limitaciones a la circulación de la factura electrónica de venta como título")]
         public int EndCirculationLimitationTotalRequired { get; set; }
         /// <summary>
         /// Terminación limitación - Total Aceptados Requeridos
         /// </summary>
+        [Display(Name = "Terminación de las limitaciones a la circulación de la factura electrónica de venta como título")]
         public int EndCirculationLimitationTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Terminación limitación - Total Enviados
@@ -380,32 +417,39 @@ namespace Gosocket.Dian.Domain.Entity
         /// Terminación limitación - Total Rechazados
         /// </summary>
         public int EndCirculationLimitationRejected { get; set; }
+
         /// <summary>
         /// Endoso - Total aceptados requeridos
         /// </summary>
+        [Display(Name = "Endoso en propiedad ")]
         public int EndorsementTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Endoso en garantía - Total requeridos
         /// </summary>
+        [Display(Name = "Endoso en garantía          ")]
         public int EndorsementWarrantyTotalRequired { get; set; }
         /// <summary>
         /// Endoso en garantía - Total aceptados requeridos
         /// </summary>
+        [Display(Name = "Endoso en garantía          ")]
         public int EndorsementWarrantyTotalAcceptedRequired { get; set; }
         /// <summary>
         /// Endoso en procuración - Total aceptados requeridos
         /// </summary>
+        [Display(Name = "Endoso en procuración         ")]
         public int EndorsementProcurationTotalRequired { get; set; }
 
 
         /// <summary>
         /// Reporte por pago - Total aceptados requeridos (3 dias)
         /// </summary>
+        [Display(Name = "Informe para el pago")]
         public int ReportForPaymentTotalAcceptedRequired { get; set; }
 
         /// <summary>
         /// Reporte por pago - Total requeridos (3 dias)
         /// </summary>
+        [Display(Name = "Informe para el pago")]
         public int ReportForPaymentTotalRequired { get; set; }
 
         /// <summary>
