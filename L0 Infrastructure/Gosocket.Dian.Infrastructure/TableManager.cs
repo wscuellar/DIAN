@@ -418,6 +418,15 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+        public T FindBySerieAndNumberAttorney<T>(string SerieAndNumber) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("SerieAndNumber", QueryComparisons.Equal, SerieAndNumber));
+
+            var entities = CloudTable.ExecuteQuery(query);
+
+            return entities.FirstOrDefault();
+        }
+
 
         public T FindByDocumentKey<T>(string partitionKey, string rowKey, string documentKey) where T : ITableEntity, new()
         {

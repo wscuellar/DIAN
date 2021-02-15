@@ -566,4 +566,27 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Software de un proveedor tecnológico")]
         SoftwareTechnologyProvider = 2
     }
+
+    public enum EventCustomization
+    {
+        [Description("Primera inscripción de la factura electrónica de venta como título valor para Negociación General")]
+        FirstGeneralRegistration = 361,
+        [Description("Primera inscripción de la factura electrónica de venta como título valor para Negociación Directa Previa")]
+        FirstPriorDirectRegistration = 362,
+        [Description("Inscripción posterior de la factura electrónica de venta como título valor para Negociación General")]
+        GeneralSubsequentRegistration = 363,
+        [Description("Inscripción posterior de la factura electrónica de venta como título valor para Negociación Directa Previa")]
+        PriorDirectSubsequentEnrollment = 364,
+        [Description("Cancelación del Endoso en Garantia")]
+        CancellationGuaranteeEndorsement = 401,
+        [Description("Cancelación del Endoso en Procuracion")]
+        CancellationEndorsementProcurement = 402,
+        [Description("Tacha de Endosos por Endoso en Retorno")]
+        EndorsementsReturn = 403,
+        [Description("Notificación de pago parcial")]
+        PartialPaymentNotification = 451,
+        [Description("Pago de la factura electrónica de venta como título valor")]
+        PaymentBillFTV = 452
+        
+    }
 }

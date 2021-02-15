@@ -158,10 +158,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             validEventTacita = false;
                     }
                     validateResponses.AddRange(responses);
-                    
-                    if(validEventTacita)
+
+                    if (validEventTacita)
+                    {
                         responses = await Instance.StartValidateSigningTimeAsync(signingTime);
-                    validateResponses.AddRange(responses);
+                        validateResponses.AddRange(responses);
+                    }
+                        
                 }
 
                 //Si es mandato registra en GlobalDocReferenceAttorney
