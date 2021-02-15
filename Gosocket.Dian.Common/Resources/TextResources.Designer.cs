@@ -61,7 +61,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Aceptación expresa de la Factura  Electrónica.
+        ///   Busca una cadena traducida similar a Aceptación expresa.
         /// </summary>
         public static string Accepted {
             get {
@@ -439,7 +439,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Constancia de recibo de mercancía.
+        ///   Busca una cadena traducida similar a Recibo del bien y/o prestación del servicio.
         /// </summary>
         public static string Receipt {
             get {
@@ -448,7 +448,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Acuse de Recibo de Factura Electrónica.
+        ///   Busca una cadena traducida similar a Acuse de recibo de Factura Electrónica de Venta.
         /// </summary>
         public static string Received {
             get {
