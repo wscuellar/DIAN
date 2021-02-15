@@ -1,7 +1,6 @@
 ﻿using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Functions.Cryptography.Common;
-using Gosocket.Dian.Functions.Utils;
+using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Services.Utils;
 using Microsoft.Azure.WebJobs;
@@ -78,10 +77,11 @@ namespace Gosocket.Dian.Functions.Events
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoPropiedad)
                     {
                         //Obtiene XML ApplicationResponse CUDE
+
                         var xmlBytesCude = await Utils.Utils.GetXmlFromStorageAsync(trackIdCude);
                         var xmlParserCude = new XmlParser(xmlBytesCude);
                         if (!xmlParserCude.Parser())
-                            throw new Exception(xmlParserCude.ParserError);
+                            throw new Exception(xmlParserCude.ParserError);                     
                         UpdateEndoso(xmlParserCude, documentMeta);
 
                     }
@@ -227,7 +227,7 @@ namespace Gosocket.Dian.Functions.Events
         public class RequestObject
         {
             [JsonProperty(PropertyName = "trackId")]
-            public string TrackId { get; set; }
+            public string TrackId { get; set; }       
         }
     }
 }

@@ -125,10 +125,11 @@ namespace Gosocket.Dian.Web.Models
                 new DocumentTypeModel() { Code = "04", Name = "Factura de contingencia electrónica DIAN" },
                 new DocumentTypeModel() { Code = "07", Name = "Nota de crédito electrónica" },
                 new DocumentTypeModel() { Code = "08", Name = "Nota de débito electrónica" },
-                new DocumentTypeModel() { Code = "09", Name = "Nomina electrónica" },
-                new DocumentTypeModel() { Code = "10", Name = "Documento de importación electrónico" },
-                new DocumentTypeModel() { Code = "11", Name = "Documento soporte electrónico" },
-                new DocumentTypeModel() { Code = "12", Name = "Documento equivalente POS electrónico" }
+                new DocumentTypeModel() { Code = "12", Name = "Documento equivalente POS electrónico" },
+                new DocumentTypeModel() { Code = "101", Name = "Documento importación" },
+               // new DocumentTypeModel() { Code = "102", Name = "Nomina Individual" },
+                //new DocumentTypeModel() { Code = "103", Name = "Nomina Individual de ajuste" },
+                new DocumentTypeModel() { Code = "05", Name = "Documento soporte electrónico" },//falto otro documento.               
             };
         }
     }

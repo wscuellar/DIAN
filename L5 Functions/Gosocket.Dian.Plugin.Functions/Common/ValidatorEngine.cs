@@ -87,6 +87,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 NitModel nitModel = new NitModel();
                 EventRadianModel eventRadian = new EventRadianModel();
                 bool validEventRadian = true;
+                bool validEventTacita = true;
                 var xmlBytes = await GetXmlFromStorageAsync(trackId);
                 var xmlParser = new XmlParser(xmlBytes);
                 if (!xmlParser.Parser())
@@ -150,9 +151,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses = await Instance.StartValidateParty(requestParty);
                     validateResponses.AddRange(responses);
                     responses = await Instance.StartValidateEmitionEventPrevAsync(eventPrev);
+                    foreach (var itemResponsesTacita in responses)
+                    {
+                        if (itemResponsesTacita.ErrorCode == ConfigurationManager.GetValue("ErrorCode_LGC14") 
+                            || itemResponsesTacita.ErrorCode == ConfigurationManager.GetValue("ErrorCode_LGC05"))
+                            validEventTacita = false;
+                    }
                     validateResponses.AddRange(responses);
-                    responses = await Instance.StartValidateSigningTimeAsync(signingTime);
-                    validateResponses.AddRange(responses);
+
+                    if (validEventTacita)
+                    {
+                        responses = await Instance.StartValidateSigningTimeAsync(signingTime);
+                        validateResponses.AddRange(responses);
+                    }
+                        
                 }
 
                 //Si es mandato registra en GlobalDocReferenceAttorney
@@ -712,6 +724,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return xmlBytes;
         }
+
+
         public async Task<byte[]> GetXmlPayrollDocumentAsync(string file)
         {
             var fileManager = new FileManager();

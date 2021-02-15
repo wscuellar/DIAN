@@ -113,9 +113,11 @@
     "ErrorCode_LGC13": "LGC13",
     "ErrorMessage_LGC13": "Solo se pueda transmitir el evento (033) después de haber transmitido el evento (030) de Acuse de recibo de la factura electrónica de venta",
     "ErrorCode_LGC14": "LGC14",
-    "ErrorMessage_LGC14": "Solo se pueda transmitir el evento (034) Aceptación Tácita de la factura, pasados 3 días hábiles, después de la transmisión del evento (032) recibo del bien o aceptación de la prestación del servicio"
-
-
+    "ErrorMessage_LGC14": "Solo se pueda transmitir el evento (034) Aceptación Tácita de la factura, pasados 3 días hábiles, después de la transmisión del evento (032) recibo del bien o aceptación de la prestación del servicio",
+    "ErrorCode_LGC05": "LGC05",
+    "ErrorMessage_LGC05": "No se puede generar una aceptación tácita sobre un documento que haya sido aceptada expresamente previamente.",
+    "ErrorCode_AAD05b": "AAD05b",
+    "ErrorMessage_AAD05b": "No se puede repetir el numero para el tipo de evento"
 
     // Test UAT INDRA
     //"Environment": "Test",
