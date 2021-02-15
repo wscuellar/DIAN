@@ -625,6 +625,7 @@ namespace Gosocket.Dian.Web.Controllers
             };
 
 
+
             model.Events = new List<EventsViewModel>();
             List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
             if (eventsByInvoice.Any())
