@@ -141,7 +141,7 @@ namespace Gosocket.Dian.Application
             arrayTasks.Add(hilo7);
             Task.WhenAll(arrayTasks).Wait();
 
-
+            int eventCount = events.Count;
               
                 events.Insert(0, new Event()
                 {
@@ -234,7 +234,7 @@ namespace Gosocket.Dian.Application
                 if (events.Count % 2 == 0)
                 {
                     templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
-                    templateLastPage = templateLastPage.Replace("{EventsTotal}", events.Count.ToString());
+                    templateLastPage = templateLastPage.Replace("{EventsTotal}", eventCount.ToString());
                     templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
                     templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
                     templateLastPage = templateLastPage.Append(footerTemplate);
@@ -245,7 +245,7 @@ namespace Gosocket.Dian.Application
                     page++;
                     headerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaHeader.html"));
                     templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
-                    templateLastPage = templateLastPage.Replace("{EventsTotal}", (events.Count -1).ToString());
+                    templateLastPage = templateLastPage.Replace("{EventsTotal}", eventCount.ToString());
                     templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
                     templateLastPage = templateLastPage.Replace("{QRCode}", ImgHtml);
                     templateLastPage = templateLastPage.Append(footerTemplate);
