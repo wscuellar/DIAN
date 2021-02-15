@@ -1984,3 +1984,10 @@ ul#list li a:hover {
     margin: auto;
     font-size: 14px;
 }
+
+.claseLabel {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: auto !important;
+}

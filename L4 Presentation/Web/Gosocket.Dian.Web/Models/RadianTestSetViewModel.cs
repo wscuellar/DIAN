@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using helper = Gosocket.Dian.Domain.Common;
 
 namespace Gosocket.Dian.Web.Models
 {
@@ -31,25 +32,25 @@ namespace Gosocket.Dian.Web.Models
         public int TotalDocumentAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Acuse de recibo de la FEV       ")]
+        [Display(Name = "Acuse de recibo de Factura Electrónica de Venta")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ReceiptNoticeTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Acuse de recibo de la FEV  ")]
+        [Display(Name = "Acuse de recibo de Factura Electrónica de Venta")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ReceiptNoticeTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Recibo del bien            ")]
+        [Display(Name = "Recibo del bien y/o prestación del servicio")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ReceiptServiceTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Recibo del bien            ")]
+        [Display(Name = "Recibo del bien y/o prestación del servicio")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ReceiptServiceTotalAcceptedRequired { get; set; }
@@ -79,25 +80,25 @@ namespace Gosocket.Dian.Web.Models
         public int AutomaticAcceptanceTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Rechazo de la FEV ")]
+        [Display(Name = "Rechazo de la factura electrónica")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int RejectInvoiceTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Rechazo de la FEV ")]
+        [Display(Name = "Rechazo de la factura electrónica")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int RejectInvoiceTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Solicitud disponibilización ")]
+        [Display(Name = "Inscripción de la factura electrónica de venta como título valor - RADIAN")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ApplicationAvailableTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Solicitud disponibilización ")]
+        [Display(Name = "Inscripción de la factura electrónica de venta como título valor - RADIAN")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ApplicationAvailableTotalAcceptedRequired { get; set; }
@@ -139,85 +140,85 @@ namespace Gosocket.Dian.Web.Models
         public int EndorsementProcurationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Anulación del endoso       ")]
+        [Display(Name = "Cancelación de endoso")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementCancellationTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Anulación del endoso       ")]
+        [Display(Name = "Cancelación de endoso")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndorsementCancellationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Avales                      ")]
+        [Display(Name = "Aval")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int GuaranteeTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Avales                      ")]
+        [Display(Name = "Aval")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int GuaranteeTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Mandato         ")]
+        [Display(Name = "Mandato")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ElectronicMandateTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Mandato        ")]
+        [Display(Name = "Mandato")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ElectronicMandateTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación del mandato         ")]
+        [Display(Name = "Terminación del mandato")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndMandateTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación del mandato        ")]
+        [Display(Name = "Terminación del mandato")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndMandateTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Notificación de pago        ")]
+        [Display(Name = "Pago de la factura electrónica de venta como título valor")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int PaymentNotificationTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Notificación pago           ")]
+        [Display(Name = "Pago de la factura electrónica de venta como título valor")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int PaymentNotificationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Limitación de circulación   ")]
+        [Display(Name = "Limitaciones a la circulación de la factura electrónica de venta como título")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int CirculationLimitationTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Limitación de circulación   ")]
+        [Display(Name = "Limitaciones a la circulación de la factura electrónica de venta como título")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int CirculationLimitationTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación de la limitación de circulación     ")]
+        [Display(Name = "Terminación de las limitaciones a la circulación de la factura electrónica de venta como título")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndCirculationLimitationTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
-        [Display(Name = "Terminación de la limitación de circulación     ")]
+        [Display(Name = "Terminación de las limitaciones a la circulación de la factura electrónica de venta como título")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int EndCirculationLimitationTotalAcceptedRequired { get; set; }
