@@ -503,6 +503,8 @@ namespace Gosocket.Dian.Web.Controllers
             DateTime date = DateNumberToDateTime(invoiceAndNotes.Item1.EmissionDateNumber);
             string partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, invoiceAndNotes.Item1.DocumentKey);
             GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(invoiceAndNotes.Item1.DocumentKey, partitionKey, date);
+            if (globalDataDocument.DocumentTypeId == "96")
+                return RedirectToAction("SearchDocument", "User");
 
             DocValidatorModel docModel = await ReturnDocValidatorModelByCufe(invoiceAndNotes.Item1.DocumentKey, globalDataDocument);
             listDocValidatorModels.Add(docModel);
