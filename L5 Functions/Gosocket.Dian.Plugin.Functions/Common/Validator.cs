@@ -4195,20 +4195,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.Add(item);
                 return responses;
             }
-
-            var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(individualPayroll.Identifier, individualPayroll.Identifier);
-            if (document != null)
-            {
-                //Actualiza Nomina individual con registro de nomina individual de ajustes
-                var arrayTasks = new List<Task>();
-                individualPayroll.DocumentReferencedKey = trackId;
-                arrayTasks.Add(documentMetaTableManager.InsertOrUpdateAsync(individualPayroll));
-
-                item.IsValid = true;
-                item.ErrorCode = "100";
-                item.ErrorMessage = "Evento ValidateReplacePredecesor referenciado correctamente";
-            }
-
+           
             item.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             responses.Add(item);
             return responses;
