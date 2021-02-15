@@ -1,19 +1,18 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
-@using Gosocket.Dian.Domain.Entity
-@using Gosocket.Dian.Domain.Common;
-@using Newtonsoft.Json
+@using help = Gosocket.Dian.Domain.Common;
+
 @{
     ViewBag.title = "Detalle de Set de Pruebas - Propios Medios";
     string status = "";
     switch (Model.RadianTestSetResult.Status)
     {
-        case (int)TestSetStatus.InProcess:
+        case (int)help.TestSetStatus.InProcess:
             status = "En Proceso";
             break;
-        case (int)TestSetStatus.Accepted:
+        case (int)help.TestSetStatus.Accepted:
             status = "Aceptado";
             break;
-        case (int)TestSetStatus.Rejected:
+        case (int)help.TestSetStatus.Rejected:
             status = "Rechazado";
             break;
 
@@ -30,7 +29,7 @@
             <a href="@Url.Action("GetSetTestResult", "RadianApproved",
                                          new {
                                              RadianContributorId = Model.Contributor.RadianContributorId,
-                                             Nit = Model.Nit, 
+                                             Nit = Model.Nit,
                                              ContributorId = Model.ContributorId,
                                              RadianState = Model.RadianState,
                                              RadianContributorTypeId = Model.RadianContributorTypeId,
@@ -94,7 +93,7 @@
                 }
             });
 
-            function showChart(data) {
+            function showChart(data) {debugger
                 var dataChart = data.data;
                 Highcharts.chart('setTestDetails', {
                     chart: {
@@ -107,23 +106,23 @@
                         alternateGridColor: '#EBEEEC',
                         categories: [
                             'Documentos',
-                            'Acuse de recibo',
-                            'Recibido del bien o prestación del S',
-                            'Aceptación expresa',
-                            'Aceptación tácita',
-                            'Rechazo de la  FEV',
-                            'Avales',
-                            'Mandato eléctronico',
-                            'Terminacion de mandato',
-                            'Solicitud de disponibilización',
-                            'Endoso en propiedad',
-                            'Anulación endoso',
-                            'Notificación pago parcial o total',
-                            'Terminación de la limitación de circulación',
-                            'Endoso en garantia',
-                            'Endoso en procuración',
-                            'Limitación de circulación',
-                            'Informe para el pago'
+                            '@help.EnumHelper.GetDescription(help.EventStatus.Received)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.Receipt)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.Accepted)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.AceptacionTacita)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.Rejected)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.Avales)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.Mandato)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.TerminacionMandato)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.SolicitudDisponibilizacion)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.EndosoPropiedad)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.InvoiceOfferedForNegotiation)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.NotificacionPagoTotalParcial)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.AnulacionLimitacionCirculacion)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.EndosoGarantia)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.EndosoProcuracion)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.NegotiatedInvoice)',
+                            '@help.EnumHelper.GetDescription(help.EventStatus.ValInfoPago)',
                         ]
                     },
                     yAxis: {

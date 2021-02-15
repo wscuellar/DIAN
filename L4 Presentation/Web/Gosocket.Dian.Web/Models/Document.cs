@@ -129,7 +129,7 @@ namespace Gosocket.Dian.Web.Models
                 new DocumentTypeModel() { Code = "101", Name = "Documento importación" },
                // new DocumentTypeModel() { Code = "102", Name = "Nomina Individual" },
                 //new DocumentTypeModel() { Code = "103", Name = "Nomina Individual de ajuste" },
-                new DocumentTypeModel() { Code = "05", Name = "Documento soporte electrónico" },//falto otro documento.               
+                new DocumentTypeModel() { Code = "05", Name = "Documento soporte electrónico" }
             };
         }
     }

@@ -217,19 +217,19 @@ namespace Gosocket.Dian.Domain.Common
     {
         [Description("None")]
         None = 000,
-        [Description("Acuse de recibo")]
+        [Description("Acuse de recibo de Factura Electrónica de Venta")]
         Received = 030,
         [Description("Rechazo de la factura electrónica")]
         Rejected = 031,
-        [Description("Constancia de recibo del bien o aceptación de la prestación del servicio")]
+        [Description("Recibo del bien y/o prestación del servicio")]
         Receipt = 032,
         [Description("Aceptación expresa")]
         Accepted = 033,
-        [Description("Manifestación aceptación tácita")]
+        [Description("Aceptación Tácita")]
         AceptacionTacita = 034,
-        [Description("Avales")]
+        [Description("Aval")]
         Avales = 035,
-        [Description("Solicitud de disponibilización")]
+        [Description("Inscripción de la factura electrónica de venta como título valor - RADIAN")]
         SolicitudDisponibilizacion = 036,
         [Description("Endoso en propiedad")]
         EndosoPropiedad = 037,
@@ -237,17 +237,17 @@ namespace Gosocket.Dian.Domain.Common
         EndosoGarantia = 038,
         [Description("Endoso en procuración")]
         EndosoProcuracion = 039,
-        [Description("Anulación de endoso")]
+        [Description("Cancelación de endoso")]
         InvoiceOfferedForNegotiation = 040,
-        [Description("Limitación de circulación")]
+        [Description("Limitaciones a la circulación de la factura electrónica de venta como título")]
         NegotiatedInvoice = 041,
-        [Description("Anulación de limitación de circulación")]
+        [Description("Terminación de las limitaciones a la circulación de la factura electrónica de venta como título")]
         AnulacionLimitacionCirculacion = 042,
         [Description("Mandato")]
         Mandato = 043,
         [Description("Terminación del mandato")]
         TerminacionMandato = 044,
-        [Description("Notificación del pago total o parcial")]
+        [Description("Pago de la factura electrónica de venta como título valor")]
         NotificacionPagoTotalParcial = 045,
         [Description("Informe para el pago")]
         ValInfoPago = 046
