@@ -55,8 +55,8 @@ namespace Gosocket.Dian.Application
                 List<Event> events = new List<Event>();
                 List <GlobalDocValidatorDocumentMeta> storageEvents = new List<GlobalDocValidatorDocumentMeta>();
                 List<GlobalDocReferenceAttorney> documents = new List<GlobalDocReferenceAttorney>();
-                string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
-                //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+                //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+                string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
 
 
                 StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
