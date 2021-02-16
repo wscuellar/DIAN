@@ -93,7 +93,7 @@
                 }
             });
 
-            function showChart(data) {debugger
+            function showChart(data) {
                 var dataChart = data.data;
                 Highcharts.chart('setTestDetails', {
                     chart: {
@@ -106,23 +106,23 @@
                         alternateGridColor: '#EBEEEC',
                         categories: [
                             'Documentos',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.Received)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.Receipt)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.Accepted)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.AceptacionTacita)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.Rejected)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.Avales)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.Mandato)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.TerminacionMandato)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.SolicitudDisponibilizacion)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.EndosoPropiedad)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.InvoiceOfferedForNegotiation)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.NotificacionPagoTotalParcial)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.AnulacionLimitacionCirculacion)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.EndosoGarantia)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.EndosoProcuracion)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.NegotiatedInvoice)',
-                            '@help.EnumHelper.GetDescription(help.EventStatus.ValInfoPago)',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.Received))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.Receipt))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.Accepted))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.AceptacionTacita))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.Rejected))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.Avales))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.Mandato))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.TerminacionMandato))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.SolicitudDisponibilizacion)))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.EndosoPropiedad))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.InvoiceOfferedForNegotiation))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.NotificacionPagoTotalParcial))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.AnulacionLimitacionCirculacion))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.EndosoGarantia))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.EndosoProcuracion))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.NegotiatedInvoice))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.ValInfoPago))'
                         ]
                     },
                     yAxis: {
