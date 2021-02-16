@@ -1147,7 +1147,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 //Valida exista previamnete un registro de endoso en propiedad
                 var listEndosoPropiedad = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad).ToList();
-                if(listEndosoPropiedad != null || listEndosoPropiedad.Count <= 0)
+                if(listEndosoPropiedad == null || listEndosoPropiedad.Count <= 0)
                 {                   
                     responses.Add(new ValidateListResponse
                     {
