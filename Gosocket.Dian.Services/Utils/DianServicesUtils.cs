@@ -812,7 +812,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (docTypeCode == "96")
             {
-                if (providerCode == "800197268")
+                if (string.IsNullOrWhiteSpace(providerCode) || providerCode == "800197268")
                 {
                     stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAB19b") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAB19b"));
                     errors.Add(stringBuilder.ToString());
@@ -820,7 +820,7 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
-                if (!UBLVersionID.Equals("UBL 2.1"))
+                if (string.IsNullOrWhiteSpace(UBLVersionID) || !UBLVersionID.Equals("UBL 2.1"))
                 {
                     stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAD01") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD01"));
                     errors.Add(stringBuilder.ToString());
