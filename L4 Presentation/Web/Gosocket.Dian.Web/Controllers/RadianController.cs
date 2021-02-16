@@ -162,10 +162,10 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult ViewDetails(int id)
         {
             RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
-            if (radianAdmin.Contributor.RadianState == "Cancelado")
-            {
-                return RedirectToAction("AdminRadianView");
-            }
+            //if (radianAdmin.Contributor.RadianState == "Cancelado")
+            //{
+            //    return RedirectToAction("AdminRadianView");
+            //}
             RadianContributorsViewModel model = new RadianContributorsViewModel
             {
                 Id = radianAdmin.Contributor.RadianContributorId,
@@ -273,10 +273,10 @@ namespace Gosocket.Dian.Web.Controllers
                 RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
                 RadianState stateProcess = approveState == "1" ? RadianState.Cancelado : RadianState.Test;
                 if (radianAdmin.Contributor.RadianState == RadianState.Test.GetDescription() && stateProcess == RadianState.Cancelado)
-                    return Json(new { message = TextResources.TestNotRemove, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                    return Json(new { message = TextResources.TestNotRemove, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
 
                 if (stateProcess == RadianState.Test && radianAdmin.Files.Any(n => n.Status != 2 && n.RadianContributorFileType.Mandatory))
-                    return Json(new { message = TextResources.AllSoftware, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                    return Json(new { message = TextResources.AllSoftware, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
 
                 if (radianAdmin.Contributor.RadianState == RadianState.Habilitado.GetDescription() && stateProcess == RadianState.Cancelado)
                 {
@@ -284,7 +284,7 @@ namespace Gosocket.Dian.Web.Controllers
                     if (counter > 0)
                     {
                         string message = string.Format(TextResources.WithCustomerList, counter);
-                        return Json(new { message, success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                        return Json(new { message, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
                     }
                 }
 
