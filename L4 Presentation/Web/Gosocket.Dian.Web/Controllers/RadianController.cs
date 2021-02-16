@@ -162,10 +162,6 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult ViewDetails(int id)
         {
             RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
-            //if (radianAdmin.Contributor.RadianState == "Cancelado")
-            //{
-            //    return RedirectToAction("AdminRadianView");
-            //}
             RadianContributorsViewModel model = new RadianContributorsViewModel
             {
                 Id = radianAdmin.Contributor.RadianContributorId,
@@ -176,8 +172,8 @@ namespace Gosocket.Dian.Web.Controllers
                 ContributorTypeName = radianAdmin.Type?.Name,
                 AcceptanceStatusId = radianAdmin.Contributor.AcceptanceStatusId,
                 AcceptanceStatusName = radianAdmin.Contributor.AcceptanceStatusName,
-                CreatedDate = radianAdmin.Contributor.CreatedDate,
-                UpdatedDate = radianAdmin.Contributor.Update,
+                CreatedDate = radianAdmin.Contributor.CreatedDate.AddHours(-5),
+                UpdatedDate = radianAdmin.Contributor.Update.AddHours(-5),
                 RadianState = radianAdmin.Contributor.RadianState,
                 RadianContributorFilesType = radianAdmin.FileTypes,
                 RadianContributorFiles = radianAdmin.Files.Count > 0 ? radianAdmin.Files.Select(f => new RadianContributorFileViewModel
