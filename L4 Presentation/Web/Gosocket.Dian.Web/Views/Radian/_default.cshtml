@@ -114,7 +114,7 @@
                                     <td class="text-left init-show">
                                         <div class="dis-flex">@Html.Raw(label)<span class=""> @f.ContributorFileStatus.Name</span></div>
                                     </td>
-                                    <td width="33%" class="text-center edit-state-td">@if(f.ContributorFileStatus.Id == 0 ){<i class="fa fa-pencil"></i>}<button type="button" class="btn btn-link edit-state" @(f.ContributorFileStatus.Id != 0 ? "disabled" : "")>Editar</button></td>
+                                    <td width="33%" class="text-center edit-state-td">@if(f.ContributorFileStatus.Id != 0 && Model.RadianState == "Registrado"){<i class="fa fa-pencil"></i>}<button type="button" class="btn btn-link edit-state" @(f.ContributorFileStatus.Id == 0 || Model.RadianState != "Registrado" ? "disabled" : "")>Editar</button></td>
                                 </tr>
                                 index++;
                             }
