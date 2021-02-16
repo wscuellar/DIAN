@@ -109,9 +109,13 @@
                             <td class="text-nowrap text-left">@monthName</td>
                         }
 
-                        @if (!p.Novedad == null && p.Novedad == true)
+                        @if (p.Novedad.HasValue && p.Novedad == true)
                         {
-                            <td class="text-left" BGCOLOR="#00FF00"></td>
+                            <td class="text-left">
+                                <div style="width: 52px;
+                                            height: 13px;
+                                            background-color: #348441"></div>
+                            </td>
                         }
                         else
                         {

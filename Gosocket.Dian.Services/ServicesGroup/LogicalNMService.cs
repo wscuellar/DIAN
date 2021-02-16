@@ -1029,8 +1029,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         var docGlobalPayrollHistoric = new GlobalDocPayrollHistoric(trackIdPred, trackId);
                         arrayTasks.Add(TableManagerGlobalDocPayrollHistoric.InsertOrUpdateAsync(docGlobalPayrollHistoric));
                         // se actualiza en la Meta el DocumentReferenceKey con el ID del último ajuste...
-                        documentMeta.DocumentReferencedKey = trackId;
-                        arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(documentMeta));
+                        var documentMetaAdjustment = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdPred, trackIdPred);
+                        documentMetaAdjustment.DocumentReferencedKey = trackId;
+                        arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(documentMetaAdjustment));
                     }
                 }
 

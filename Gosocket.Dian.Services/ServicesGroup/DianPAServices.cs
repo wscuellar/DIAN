@@ -707,7 +707,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                                     if (originalValidations != null && originalValidations.Count > 0)
                                     {
                                         originalEventsValidations.AddRange(originalValidations);
-                                    } 
+                                    }
                                 }
                             });
                         }

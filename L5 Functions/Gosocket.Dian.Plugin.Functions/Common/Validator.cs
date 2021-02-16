@@ -1442,9 +1442,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cufe, senderCode);
 
+                //No existe Mandato para el CUFE referenciado se valida si es Mandato Abierto ListID = 3
                 if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
-                {
-                    //No existe Mandato para el CUFE referenciado se valida si es Mandato Ilimitado
+                {                    
                     docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(issueAtorney, senderCode);
                     if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
                     {
@@ -1457,7 +1457,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC36"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
-                    }                        
+                    }
+                }
+                else
+                {
+                    docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(issueAtorney, senderCode);
+                    if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
+                    {
+                        validError = true;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC36"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC36"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                 }
 
                 //Valida existan permisos para firmar evento por mandatario
@@ -1559,6 +1575,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                     ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
+                                                break;
                                             }
 
                                             //Si mandatario tiene permisos/facultades y esta habilitado para emitir documentos
@@ -1577,6 +1594,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageMandato,
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
+                                            break;
                                         }
                                     }
                                 }
@@ -1595,6 +1613,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                     }
+
+                    if(validError)
+                        return responses;
                 }
 
                 if (validError)
@@ -1696,6 +1717,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();           
             List<AttorneyModel> attorney = new List<AttorneyModel>();
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
+            string providerCode = xmlParser.FieldValue("ProviderCode", true).ToString();
             string AttachmentBase64 = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(0)?.InnerText.ToString();
             string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0)?.InnerText.ToString();
@@ -1716,10 +1738,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
             string senderId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
+            string senderPowerOfAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
             string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']").Item(0)?.InnerText.ToString();
             string modoOperacion = string.Empty;
             string softwareId = xmlParser.Fields["SoftwareId"].ToString();
+
+            //Validacion senderParty igual a  senderParty / PowerOfAttorney ID
+            if(senderCode != senderPowerOfAttorney)
+            {
+                validate = false;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF32"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF32"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }          
+
             //Validacion descripcion Mandante
             switch (senderId)
             {
@@ -1833,8 +1871,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string actor = modoOperacion;
             //Valida se encuetre habilitado Modo Operacion RadianOperation
             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByRadianStatus<GlobalRadianOperations>(
-                issuerPartyCode, false, "Habilitado");            
-            if (globalRadianOperation == null)
+                issuerPartyCode, false, "Habilitado");
+
+            //Validacion habilitado Modo Operacion RadianOperation y providerID igual a  IssuerParty / PowerOfAttorney / ID          
+            if (globalRadianOperation == null || (issuerPartyCode != providerCode))
             {
                 validate = false;
                 responses.Add(new ValidateListResponse
@@ -2195,8 +2235,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // If dont found range return
             if (range == null)
             {
-                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAD05e", ErrorMessage = "Número de factura no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                return responses;
+                if(Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
+                {
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    
+                    return responses;
+                }
+                else
+                {
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAD05e", ErrorMessage = "Número de factura no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    return responses;
+                }
+               
             }
 
             // Check invoice authorization
@@ -4159,11 +4210,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(individualPayroll.Identifier, individualPayroll.Identifier);
             if (document != null)
             {
-                //Actualiza Nomina individual con registro de nomina individual de ajustes
-                var arrayTasks = new List<Task>();
-                individualPayroll.DocumentReferencedKey = trackId;
-                arrayTasks.Add(documentMetaTableManager.InsertOrUpdateAsync(individualPayroll));
-
                 item.IsValid = true;
                 item.ErrorCode = "100";
                 item.ErrorMessage = "Evento ValidateReplacePredecesor referenciado correctamente";

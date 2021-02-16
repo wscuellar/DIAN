@@ -117,7 +117,11 @@
     "ErrorCode_LGC05": "LGC05",
     "ErrorMessage_LGC05": "No se puede generar una aceptación tácita sobre un documento que haya sido aceptada expresamente previamente.",
     "ErrorCode_AAD05b": "AAD05b",
-    "ErrorMessage_AAD05b": "No se puede repetir el numero para el tipo de evento"
+    "ErrorMessage_AAD05b": "No se puede repetir el numero para el tipo de evento",
+    "ErrorCode_AAF32": "AAF32",
+    "ErrorMessage_AAF32": "No fue informado",
+    "ErrorCode_AAH62b": "AAH62b",
+    "ErrorMessage_AAH62b": "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE)."
 
     // Test UAT INDRA
     //"Environment": "Test",
