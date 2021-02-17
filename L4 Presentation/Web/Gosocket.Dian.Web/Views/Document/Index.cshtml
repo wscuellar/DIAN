@@ -204,12 +204,7 @@
           //  showPdfModal("#show-supportdocument", cude, '@Url.Action("PrintSupportDocument", "Document")', '#panel-form');
         }
 
-          $(".download-support-document").click(function () {
-                console.log("Entre");
-                var cufe = this.id;
-                var element = '#' +cufe;
-                showPdfModal(element, cufe, '@Url.Action("PrintSupportDocument", "Document")', '#panel-form1');
-            })
+
 
         $(document).ready(function () {
 
@@ -233,7 +228,12 @@
                 window.location.href = "/Document/DownloadZipFiles?trackId=" + cufe;
             })
 
-
+            $(".download-support-document").click(function () {
+                console.log("Entre");
+                var cufe = this.id;
+                var element = '#' +cufe;
+                showPdfModal(element, cufe, '@Url.Action("PrintSupportDocument", "Document")', '#panel-form1');
+            })
 
             $('.download-files').click('onClick', function () {
                 downloadFiles(this);
