@@ -1874,8 +1874,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             string actor = modoOperacion;
             //Valida se encuetre habilitado Modo Operacion RadianOperation
-            var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByRadianStatus<GlobalRadianOperations>(
-                issuerPartyCode, false, "Habilitado");
+            var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                issuerPartyCode, false, "Habilitado", softwareId);
 
             //Validacion habilitado Modo Operacion RadianOperation y providerID igual a  IssuerParty / PowerOfAttorney / ID          
             if (globalRadianOperation == null || (issuerPartyCode != providerCode))
@@ -2057,8 +2057,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "Error en tipo de modo de operación " + modoOperacion  + " no corresponde a la facultad/permiso asignado ResponseCode",
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL02"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
