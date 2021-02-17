@@ -3796,9 +3796,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        {
                            IsValid = false,
                            Mandatory = true,
-                           ErrorCode = "DC24g",
-                           ErrorMessage = "No se puede generar el evento Aval antes de la fecha de generación del evento " +
-                           "Primera inscripción de la factura electrónica de venta como título valor en el RADIAN",
+                           ErrorCode = ConfigurationManager.GetValue("ErrorCode_DC24g"),
+                           ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24g"),
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
                     }

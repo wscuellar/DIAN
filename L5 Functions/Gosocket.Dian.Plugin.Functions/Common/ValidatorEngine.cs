@@ -26,6 +26,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
+        static readonly TableManager documentValidatorTableManager = new TableManager("GlobalDocValidatorDocument");
 
         #endregion
 
@@ -304,35 +305,61 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||                
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||                
-                Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales ||
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                 )
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
-                    "0"+ (int)code).FirstOrDefault();                
-                if (documentMeta != null)
+                    "0"+ (int)code);                
+                if (documentMeta != null || documentMeta.Count > 0)
                 {
-                    data.TrackId = documentMeta.PartitionKey;
+                    foreach (var itemDocumentMeta in documentMeta)
+                    {
+                        var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
+                        if (documentValidator != null)
+                        {
+                            data.TrackId = itemDocumentMeta.PartitionKey;
+                            break;
+                        }                                                   
+                    }                   
                 }
+
                 // Validación de la Sección Signature - Fechas valida transmisión evento Solicitud Disponibilizacion
                 else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
                 {
                     code = EventStatus.AceptacionTacita; 
                     documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId, 
-                        "0" + (int)code).FirstOrDefault();
-                    if (documentMeta != null)
+                        "0" + (int)code);
+                    if (documentMeta != null || documentMeta.Count > 0)
                     {
-                        data.TrackId = documentMeta.PartitionKey;
-                    }                  
+                        foreach (var itemDocumentMeta in documentMeta)
+                        {
+                            var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
+                            if (documentValidator != null)
+                            {
+                                data.TrackId = itemDocumentMeta.PartitionKey;
+                                break;
+                            }                            
+                        }
+
+                    }                        
                 }               
             }           
-            else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice)                   
+            else if(Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice || Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)                   
             {
                 var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(),
-                    data.DocumentTypeId, "0" + (int)code, "361", "362").FirstOrDefault();
-                if (documentMeta != null)
+                    data.DocumentTypeId, "0" + (int)code, "361", "362");
+
+                if (documentMeta != null || documentMeta.Count > 0)
                 {
-                    data.TrackId = documentMeta.PartitionKey;
+                    foreach (var itemDocumentMeta in documentMeta)
+                    {
+                        var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
+                        if (documentValidator != null)
+                        {
+                            data.TrackId = itemDocumentMeta.PartitionKey;
+                            break;
+                        }
+                    }                  
                 }               
             }
             var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
