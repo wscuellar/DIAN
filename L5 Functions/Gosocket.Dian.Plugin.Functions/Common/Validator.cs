@@ -448,6 +448,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = "DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
 
+            //Valida DV del PowerOfAttorney - schemeName
+            string agentPartyPersonSchemeName = nitModel.AgentPartyPersonSchemeName;
+            if (agentPartyPersonSchemeName == "31")
+            {
+                string agentPartyPersonSchemeID = nitModel.AgentPartyPersonSchemeID;
+                if (string.IsNullOrEmpty(agentPartyPersonSchemeID) || agentPartyPersonSchemeID == "undefined") agentPartyPersonSchemeID = "11";
+                if (ValidateDigitCode(receiverCode, int.Parse(agentPartyPersonSchemeID)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            }
+
             var receiver2Code = nitModel.ReceiverCode2;
             if (receiverCode != receiver2Code)
             {
