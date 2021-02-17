@@ -676,6 +676,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var events = new List<GlobalDocValidatorDocumentMeta>();
                     var originalEvents = new List<GlobalDocValidatorDocumentMeta>();
                     var originalEventsValidations = new List<GlobalDocValidatorTracking>();
+                    var atLeastOneApproved = false;
 
                     Task firstLocalRun = Task.Run(() =>
                     {
@@ -697,6 +698,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                                 var approved = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(e?.Identifier, e?.Identifier);
                                 if (approved)
                                 {
+                                    atLeastOneApproved = true;
                                     // se consulta el evento por el código y así obtener su descripción.
                                     var docEvent = TableManagerGlobalDocEvent.FindGlobalEvent<GlobalDocEvent>(e.EventCode, e.CustomizationID, "96");
                                     e.EventCodeDescription = (docEvent != null) ? docEvent.Description : string.Empty;
@@ -728,6 +730,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                     response.XmlDocumentKey = trackId;
                     response.XmlFileName = documentMeta.FileName;
+
+                    if (!atLeastOneApproved)
+                    {
+                        response.StatusCode = "67";
+                        response.StatusDescription = "EL CUFE o Factura consultada no tiene a la fecha eventos asociados.";
+                        return response;
+                    }
 
                     if (documentMeta == null)
                     {
