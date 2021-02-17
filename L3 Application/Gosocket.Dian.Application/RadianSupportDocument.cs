@@ -58,7 +58,9 @@ namespace Gosocket.Dian.Application
 
             try
             {
-                ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+                //ConfigurationManager.GetValue("GetXpathDataValuesUrl")
+                string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+                ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
 
                 // Build QRCode
                 Bitmap qrCode = RadianPdfCreationService.GenerateQR($"{webPath}?documentkey={cude}");

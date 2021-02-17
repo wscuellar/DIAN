@@ -189,8 +189,10 @@ namespace Gosocket.Dian.Application
              {
 
                  List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(c.Id).ToList();
+                 testSet = testSet.Where(t => !t.Deleted).ToList();
                  foreach (var item in testSet)
                  {
+
                      string[] parts = item.RowKey.Split('|');
                      item.SoftwareId = parts[1];
                      item.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription(Enum.Parse(typeof(RadianOperationModeTestSet), parts[0]));

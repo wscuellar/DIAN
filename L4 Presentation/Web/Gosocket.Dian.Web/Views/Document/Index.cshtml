@@ -68,7 +68,7 @@
                 <!--Tabs Content-->
                 <div class="tab-content padding-0">
                     <div id="tab-current-country" class="tab-pane fade active in">
-                        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
+                        <div class="panel" id="panel-form1" data-target="#panel-form1" data-toggle="panel-overlay">
                             <div class="panel-body padding-top-20">
                                 <div class="pad-btm padding-bottom-0">
                                     <div class="row margin-horizontal-0">
@@ -201,8 +201,15 @@
         var endDate;
 
         function showModal(cude) {
-            showPdfModal("#show-supportdocument", cude, '@Url.Action("PrintSupportDocument", "Document")', '#panel-form');
+          //  showPdfModal("#show-supportdocument", cude, '@Url.Action("PrintSupportDocument", "Document")', '#panel-form');
         }
+
+          $(".download-support-document").click(function () {
+                console.log("Entre");
+                var cufe = this.id;
+                var element = '#' +cufe;
+                showPdfModal(element, cufe, '@Url.Action("PrintSupportDocument", "Document")', '#panel-form1');
+            })
 
         $(document).ready(function () {
 
@@ -225,6 +232,8 @@
                 var cufe = this.id;
                 window.location.href = "/Document/DownloadZipFiles?trackId=" + cufe;
             })
+
+
 
             $('.download-files').click('onClick', function () {
                 downloadFiles(this);
