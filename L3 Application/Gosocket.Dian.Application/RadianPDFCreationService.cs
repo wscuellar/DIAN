@@ -271,7 +271,7 @@ namespace Gosocket.Dian.Application
                 .From(htmlContent)
                 .WithTitle(documentName)
                 .WithGlobalSetting("orientation", "Portrait")
-                .WithObjectSetting("web.defaultEncoding", "utf-8")
+                //.WithObjectSetting("web.defaultEncoding", "utf-8")
                 .OfSize(PaperSize.A4)
                 .WithTitle(documentName)
                 .WithMargins(1.0.Centimeters())

@@ -486,6 +486,17 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [ExcludeFilter(typeof(Authorization))]
+        public async Task<JsonResult> PrintSupportDocument(string cufe)
+        {
+            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
+            byte[] pdfDocument = await _radianSupportDocument.GetGraphicRepresentation(cufe, webPath);
+            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
+            var json = Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
+            json.MaxJsonLength = 500000000;
+            return json;
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
