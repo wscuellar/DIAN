@@ -41,6 +41,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                                                     where p.RadianContributorTypeId != contributorTypeId
                                                     && p.RadianOperationModeId == 1
                                                     && o.OperationStatusId < 4
+                                                    && !o.Deleted
                                                     select p).ToList();
             return participants.Any();
 
