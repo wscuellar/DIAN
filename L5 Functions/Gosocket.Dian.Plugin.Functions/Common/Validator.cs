@@ -4304,25 +4304,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 var document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(identifier, identifier, documentMeta.PartitionKey);
                 if(document != null)
                 {
-                    var documentApproved = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(document.DocumentKey, document.DocumentKey);
-                    if (documentApproved != null)
+                    responses.Add(new ValidateListResponse
                     {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "90",
-                            ErrorMessage = "Documento procesado anteriormente",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });                     
-                    }
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "90",
+                        ErrorMessage = "Documento procesado anteriormente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
                 }
                 else
                 {
                     var meta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
                     if (meta != null)
                     {
-                        document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
+                        document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier, meta.PartitionKey);
                         if (document != null)
                         {
                             responses.Add(new ValidateListResponse
