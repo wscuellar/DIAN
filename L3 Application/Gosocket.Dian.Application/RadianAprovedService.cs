@@ -123,6 +123,15 @@ namespace Gosocket.Dian.Application
 
             RadianContributor participant = _radianContributorRepository.Get(t => t.Id == operationToDelete.RadianContributorId);
             _globalRadianOperationService.Delete(participant.Contributor.Code, operationToDelete.SoftwareId.ToString());
+
+            //-----------------marca como elimnado el set de prueba.
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == operationToDelete.RadianContributor.Id);
+            string key = operationToDelete.SoftwareType.ToString() + "|" + operationToDelete.SoftwareId.ToString();
+            RadianTestSetResult oper =  _radianTestSetResultService.GetTestSetResult(radianContributor.Contributor.Code, key);
+            oper.Deleted = true;
+            _radianTestSetResultService.InsertTestSetResult(oper);
+            //------------------
+
             return _radianContributorOperationRepository.Delete(operationToDelete.Id);
         }
 

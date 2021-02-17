@@ -446,6 +446,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = "DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
 
+            //Valida DV del PowerOfAttorney - schemeName
+            string agentPartyPersonSchemeName = nitModel.AgentPartyPersonSchemeName;
+            if (agentPartyPersonSchemeName == "31")
+            {
+                string agentPartyPersonSchemeID = nitModel.AgentPartyPersonSchemeID;
+                if (string.IsNullOrEmpty(agentPartyPersonSchemeID) || agentPartyPersonSchemeID == "undefined") agentPartyPersonSchemeID = "11";
+                if (ValidateDigitCode(receiverCode, int.Parse(agentPartyPersonSchemeID)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            }
+
             var receiver2Code = nitModel.ReceiverCode2;
             if (receiverCode != receiver2Code)
             {
@@ -3794,9 +3805,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        {
                            IsValid = false,
                            Mandatory = true,
-                           ErrorCode = "DC24g",
-                           ErrorMessage = "No se puede generar el evento Aval antes de la fecha de generación del evento " +
-                           "Primera inscripción de la factura electrónica de venta como título valor en el RADIAN",
+                           ErrorCode = ConfigurationManager.GetValue("ErrorCode_DC24g"),
+                           ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24g"),
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
                     }

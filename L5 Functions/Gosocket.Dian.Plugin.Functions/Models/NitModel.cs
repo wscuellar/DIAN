@@ -36,6 +36,8 @@
         public string ValorActualTituloValor { get; set; }
         public string ValorPendienteTituloValor { get; set; }
         public string SoftwareId { get; set; }
+        public string AgentPartyPersonSchemeID { get; set; }
+        public string AgentPartyPersonSchemeName { get; set; }
 
     }
 }
