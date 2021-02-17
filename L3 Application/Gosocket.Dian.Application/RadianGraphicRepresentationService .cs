@@ -1,4 +1,8 @@
-﻿namespace Gosocket.Dian.Application
+﻿using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace Gosocket.Dian.Application
 {
     #region Using
 
@@ -46,7 +50,7 @@
         public async Task<byte[]> GetPdfReport(string cude)
         {
             // Load Templates            
-            StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGráficaNew.html"));
+            StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNew.html"));
             
             // Load Document Data
             Domain.Entity.EventDataModel model = await GetEventDataModel(cude);
@@ -74,6 +78,7 @@
         }
 
         #endregion
+
 
         #region GetEventDataModel
 
@@ -272,7 +277,7 @@
 
         private StringBuilder DataTemplateMapping(StringBuilder template, DateTime expeditionDate, Domain.Entity.EventDataModel model)
         {
-            string sectionHtml = "<div class='text-section padding-top20'> Sección {SectionNumber}</ div > ";
+            //string sectionHtml = "<div class='text-section padding-top20'> Sección {SectionNumber}</ div > ";
 
             #region Mapping Event Data Section
             // Mapping Event Data Section
@@ -286,8 +291,8 @@
             template = template.Replace("{CUDE}", model.CUDE);
             template = template.Replace("{EmissionDate}", $"{model.EmissionDate:dd'/'MM'/'yyyy hh:mm:ss tt}");
             template = template.Replace("{RegistrationDate}", model.DateOfIssue);
-            template = template.Replace("{StartDate}", model.EventStartDate);
-            template = template.Replace("{FinishDate}", model.EventFinishDate);
+            template = template.Replace("{EventStartDate}", model.EventStartDate);
+            template = template.Replace("{EventFinishDate}", model.EventFinishDate);
             #endregion
 
             #region Mapping reference invoice data section
@@ -318,17 +323,17 @@
 
             if (!string.IsNullOrEmpty(model.ReceiverName) && !string.IsNullOrEmpty(model.ReceiverCode))
             {
-                StringBuilder templateSujeto = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGraficaSujeto.html"));
+                StringBuilder templateSujeto = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGraficaSujetoNew.html"));
 
                 StringBuilder subjects = new StringBuilder();
 
 
                 // Section 1
 
-                subjects.Append(sectionHtml);
+                //subjects.Append(sectionHtml);
                 subjects.Append(templateSujeto);
 
-                subjects = SubjectTemplateMapping(subjects, "1", "1",
+                subjects = SubjectTemplateMapping(subjects, "1", "Datos del emisor",
                     model.ReceiverName
                     , model.ReceiverType
                     , model.ReceiverDocumentType
@@ -336,14 +341,15 @@
                     , string.Empty
                     , string.Empty
                     , model.ReceiverEmail
-                    , model.ReceiverPhoneNumber);
+                    , model.ReceiverPhoneNumber
+                    , "emisor");
 
                 // Section 2
 
-                subjects.Append(sectionHtml);
+                //subjects.Append(sectionHtml);
                 subjects.Append(templateSujeto);
 
-                subjects = SubjectTemplateMapping(subjects, "2", "1",
+                subjects = SubjectTemplateMapping(subjects, "2", "Datos del receptor",
                     model.SenderName
                     , model.ReceiverType
                     , model.SenderDocumentType
@@ -351,7 +357,8 @@
                     , string.Empty
                     , string.Empty
                     , model.SenderEmail
-                    , model.SenderPhoneNumber);
+                    , model.SenderPhoneNumber
+                    , "receptor");
 
                 template = template.Replace("{SectionsData}", subjects.ToString());
             }
@@ -401,12 +408,13 @@
             string subjectAddress,
             string subjectCity,
             string subjectEmail,
-            string subjectPhoneNumber
+            string subjectPhoneNumber,
+            string sujeto
             )
         {
-
+            template = template.Replace("{sujeto}", sujeto);
             template = template.Replace("{SectionNumber}", sectionNumber);
-            template = template.Replace("{SubjectNumber}", subjectNumber);
+            template = template.Replace("{titleNameParticipant}", subjectNumber);
             template = template.Replace("{SubjectBusinessName}", subjectBusinessName);
             template = template.Replace("{SubjectType}", subjectType);
             template = template.Replace("{SubjectDocumentType}", subjectDocumentType);
@@ -488,8 +496,10 @@
                     dataValues.XpathsValues["ReceiverDocumentType"] : string.Empty;
             model.EventTotalAmount = dataValues.XpathsValues["EventTotalAmount"] != null ?
                     dataValues.XpathsValues["EventTotalAmount"] : string.Empty;
+
             model.EventStartDate = dataValues.XpathsValues["EventStartDate"] != null ?
                     dataValues.XpathsValues["EventStartDate"] : string.Empty;
+
             model.EventFinishDate = dataValues.XpathsValues["EventFinishDate"] != null ?
                     dataValues.XpathsValues["EventFinishDate"] : string.Empty;
 
@@ -527,5 +537,17 @@
         #endregion
 
         #endregion
+
+        //#region RemoveTrTag
+
+        //public StringBuilder RemoveTrTag(StringBuilder template, string id)
+        //{
+        //    string pattern = "<tr id =\""+id+"\".+?</tr>";
+        //    Regex r = new Regex(pattern, RegexOptions.Singleline);
+        //    string result = r.Replace(template.ToString(), "");
+        //    template.Replace(template.ToString(), result);
+        //    return template;
+        //}
+        //#endregion
     }
 }
