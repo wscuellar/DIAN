@@ -46,8 +46,8 @@
         public async Task<byte[]> GetPdfReport(string cude)
         {
             // Load Templates            
-            StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGráfica.html"));
-
+            StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGráficaNew.html"));
+            
             // Load Document Data
             Domain.Entity.EventDataModel model = await GetEventDataModel(cude);
 
@@ -112,16 +112,16 @@
             switch (model.EventStatus)
             {
                 case EventStatus.Received:
-                    model.EventTitle = "Acuse de Recibo de la FEV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Received);
                     break;
                 case EventStatus.Receipt:
-                    model.EventTitle = "Recibo del bien o servicio";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Receipt);
                     break;
                 case EventStatus.AceptacionTacita:
-                    model.EventTitle = "Aceptación Tácita de FEV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.AceptacionTacita);
                     break;
                 case EventStatus.Accepted:
-                    model.EventTitle = "Aceptación Expresa de FEV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Accepted);
                     break;
                 case EventStatus.SolicitudDisponibilizacion:
                     if (eventItem.CustomizationID.Equals("361") || eventItem.CustomizationID.Equals("362"))
@@ -131,44 +131,44 @@
                     break;
                 case EventStatus.EndosoGarantia:
                     model.Title = model.EventStatus.GetDescription();
-                    model.EventTitle = "Endoso En garantía de la FEV TV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.EndosoPropiedad:
                     model.Title = model.EventStatus.GetDescription();
-                    model.EventTitle = "Endoso En propiedad de la FEV TV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoPropiedad);
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.EndosoProcuracion:
                     model.Title = model.EventStatus.GetDescription();
-                    model.EventTitle = "Endoso En procuración de la FEV TV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoProcuracion);
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.InvoiceOfferedForNegotiation:
                     model.Title = model.EventStatus.GetDescription();
-                    model.EventTitle = "Cancelación del endoso electrónico de la FEV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.InvoiceOfferedForNegotiation);
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.Avales:
-                    model.EventTitle = "Aval de la FEV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Avales);
                     break;
                 case EventStatus.Mandato:
-                    model.EventTitle = "Mandato de la FEV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Mandato);
                     break;
                 case EventStatus.TerminacionMandato:
-                    model.EventTitle = "Terminación Mandato de la FEV TV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.TerminacionMandato);
                     break;
                 case EventStatus.ValInfoPago:
-                    model.EventTitle = "Informe para el pago de la FEV TV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.ValInfoPago);
                     break;
                 case EventStatus.NotificacionPagoTotalParcial:
-                    model.EventTitle = "Pago de la FEV TV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.NotificacionPagoTotalParcial);
                     break;
                 case EventStatus.AnulacionLimitacionCirculacion:
-                    model.EventTitle = "Terminación Limitación  para circulación de la FEV TV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.AnulacionLimitacionCirculacion);
                     break;
                 case EventStatus.NegotiatedInvoice:
-                    model.EventTitle = "Limitación  para circulación de la FEV TV";
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.NegotiatedInvoice);
                     break;
                 default:
                     model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);

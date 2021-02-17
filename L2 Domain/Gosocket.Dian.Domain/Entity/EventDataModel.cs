@@ -52,6 +52,8 @@
         public string EntityName { get; set; }
         public string CertificateNumber { get; set; }
         public string ValidationMessage { get; set; }
+        public string Note { get; set; }
+
         public EventStatus EventStatus { get; set; }
         public List<AssociatedValidationsModel> Validations { get; set; }
 
