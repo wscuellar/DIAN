@@ -1,6 +1,10 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianContributorsViewModel
 
-@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" }, { "readonly", "true" } };}
+@{
+    var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" }, { "readonly", "true" } };
+    var setDisabled = new Dictionary<string, object> { { "class", "form-control input-general" }, { "disabled", "disabled" } };
+    Dictionary<string, object> validation = Model.RadianState == "Cancelado" ? setDisabled : new Dictionary<string, object> { { "class", "form-control input-general" } };
+}
 <div class="row">
     <div class="col-sm-3 padding-xs-0">
         <div class="form-group">
@@ -110,7 +114,7 @@
                                     <td class="text-left init-show">
                                         <div class="dis-flex">@Html.Raw(label)<span class=""> @f.ContributorFileStatus.Name</span></div>
                                     </td>
-                                    <td width="33%" class="text-center edit-state-td">@if(f.ContributorFileStatus.Id != 0){<i class="fa fa-pencil edit-state"></i>}<button type="button" class="btn btn-link edit-state" @(f.ContributorFileStatus.Id == 0 ? "disabled" : "")>Editar</button></td>
+                                    <td width="33%" class="text-center edit-state-td">@if(f.ContributorFileStatus.Id != 0 && Model.RadianState == "Registrado"){<i class="fa fa-pencil"></i>}<button type="button" class="btn btn-link edit-state" @(f.ContributorFileStatus.Id == 0 || Model.RadianState != "Registrado" ? "disabled" : "")>Editar</button></td>
                                 </tr>
                                 index++;
                             }
@@ -126,7 +130,7 @@
         <div class="col-sm-3 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.RadianApprovalState, new { @class = "control-label" })
-                @Html.EnumDropDownListFor(m => m.RadianApprovalState, "Seleccióne el estado de la aprobación", new { @class = "form-control input-general" })
+                @Html.EnumDropDownListFor(m => m.RadianApprovalState, "Seleccióne el estado de la aprobación", validation )
             </div>
         </div>
     </div>

@@ -709,7 +709,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                                     if (originalValidations != null && originalValidations.Count > 0)
                                     {
                                         originalEventsValidations.AddRange(originalValidations);
-                                    } 
+                                    }
                                 }
                             });
                         }
@@ -877,9 +877,27 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Parser
             start = DateTime.UtcNow;
             var xmlBytes = contentFileList.First().XmlBytes;
-            var xmlParser = new XmlParser(xmlBytes);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
+            XmlParser xmlParser = new XmlParser();
+            try
+            {
+                xmlParser = new XmlParser(xmlBytes);
+                if (!xmlParser.Parser())
+                    throw new Exception(xmlParser.ParserError);
+            }
+            catch (Exception ex)
+            {
+                var failedList = new List<string> { $"Regla: ZB01, Rechazo: Fallo en el esquema XML del archivo" };
+                dianResponse.IsValid = false;
+                dianResponse.StatusCode = "99";
+                dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios. " + ex.Message;
+                dianResponse.StatusDescription = "Documento con errores en campos mandatorios.";
+                dianResponse.ErrorMessage.AddRange(failedList);
+                return dianResponse;
+            }
+
+            //var xmlParser = new XmlParser(xmlBytes);
+            //if (!xmlParser.Parser())
+            //    throw new Exception(xmlParser.ParserError);
 
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
             documentParsed.SigningTime = xmlParser.SigningTime;

@@ -2,9 +2,7 @@
 @using Newtonsoft.Json
 
 @{
-
     ViewBag.Title = "Detalle participante";
-
 }
 
 <div class="page-content margin-15">
@@ -24,7 +22,10 @@
                         </div>
                         <div class="panel-footer adm-radian-view text-right">
                             <button type="button" onclick="location.href='@Url.Action("AdminRadianView", "Radian")'" class="btn btn-default btn-radian-default">Volver</button>
-                            <button type="button" class="btn btn-success btn-radian-success button-change-state">Guardar cambios</button>
+                            @if (Model.RadianState != "Cancelado")
+                            {
+                                <button type="button" class="btn btn-success btn-radian-success button-change-state">Guardar cambios</button>
+                            }
                         </div>
                     </div>
                     @*}*@
@@ -112,7 +113,7 @@
                             showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
                             window.location.href = "/Radian/ViewDetails/" + id;
                         }
-                        if (!data.html && radianApproveState == "1") {
+                        if (data.success && radianApproveState == "1") {
                             showConfirmation(bootboxMessage.CANCEL_RESPONSE_CORRECT, AlertExec(operation), "cancel-confirmation", operation);
                         } else {
                             showConfirmation(messageSuccess, AlertExec(operation));

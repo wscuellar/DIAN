@@ -1672,6 +1672,10 @@ button.selectpicker {
     padding: 0px;
 }
 
+.edit-state {
+    cursor: pointer;
+}
+
 .actions {
     padding: 0 5px;
 }
