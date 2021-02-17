@@ -356,18 +356,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateIndividualPayroll(XmlParseNomina xmlParser, DocumentParsedNomina model)
         {
             DateTime startDate = DateTime.UtcNow;
-            List<ValidateListResponse> listResponses = new List<ValidateListResponse>();
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
-            responses = this.CheckIndividualPayrollDuplicity(model.CUNE);
-            
-            if(Convert.ToInt32(model.DocumentTypeId) == Convert.ToInt32(DocumentType.IndividualPayroll))
-            {
-                responses = this.CheckIndividualPayrollInSameMonth(model.EmpleadorNIT, xmlParser.globalDocPayrolls.NumeroDocumento, xmlParser.Novelty);              
+            responses.AddRange(this.CheckIndividualPayrollDuplicity(model.CUNE));
+
+            if (Convert.ToInt32(model.DocumentTypeId) == Convert.ToInt32(DocumentType.IndividualPayroll))
+            {                
+                responses.AddRange(this.CheckIndividualPayrollInSameMonth(model.EmpleadorNIT, xmlParser.globalDocPayrolls.NumeroDocumento, xmlParser.Novelty));
             }
 
-            listResponses.AddRange(responses);
-            return listResponses;
+            return responses;
         }
 
         #endregion
@@ -446,6 +444,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (ValidateDigitCode(receiverCode, int.Parse(receiverCodeDigit)))
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = "DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            }
+
+            //Valida DV del PowerOfAttorney - schemeName
+            string agentPartyPersonSchemeName = nitModel.AgentPartyPersonSchemeName;
+            if (agentPartyPersonSchemeName == "31")
+            {
+                string agentPartyPersonSchemeID = nitModel.AgentPartyPersonSchemeID;
+                if (string.IsNullOrEmpty(agentPartyPersonSchemeID) || agentPartyPersonSchemeID == "undefined") agentPartyPersonSchemeID = "11";
+                if (ValidateDigitCode(receiverCode, int.Parse(agentPartyPersonSchemeID)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
 
             var receiver2Code = nitModel.ReceiverCode2;
@@ -4303,6 +4312,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 var document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(identifier, identifier, documentMeta.PartitionKey);
                 if(document != null)
                 {
+                    responses.Clear();
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -4320,6 +4330,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier, meta.PartitionKey);
                         if (document != null)
                         {
+                            responses.Clear();
                             responses.Add(new ValidateListResponse
                             {
                                 IsValid = false,
@@ -4350,7 +4361,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-
             var response = new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "100", ErrorMessage = "Evento CheckIndividualPayrollInSameMonth referenciado correctamente" };
 
             // Solo se podrá transmitir para cada trabajador 1 documento NominaIndividual mensual durante cada mes del año. Para el mismo Empleador.
@@ -4364,6 +4374,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Novedad XML true
                 if (novelty)
                 {
+                    responses.Clear();
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -4377,17 +4388,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                     return responses; // no existe para el mes actual
-
             }
                           
             foreach (var doc in documents)
             {
-                var documentApproved = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(doc.Identifier, doc.Identifier);
+                var documentApproved = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(doc.Identifier, doc.Identifier, doc.PartitionKey);
                 if (documentApproved != null)
                 {
                     //Novedad XML False
                     if (!novelty)
                     {
+                        responses.Clear();
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
