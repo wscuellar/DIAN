@@ -568,10 +568,10 @@ namespace Gosocket.Dian.Web.Services
                 return new DianResponse
                 {
                     StatusCode = "500",
-                    StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.",
+                    StatusDescription = $"Ha ocurrido un error en la estrucutra del documento XML.",
                     XmlFileName = "SendEventUpdateStatus",
                     IsValid = false,
-                    StatusMessage = "Documento XML ApplicationResponse " + ex.Message
+                    StatusMessage = "Documento XML ApplicationResponse: " + ex.Message
                 };
             }
         }

@@ -1718,11 +1718,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<AttorneyModel> attorney = new List<AttorneyModel>();
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
             string providerCode = xmlParser.FieldValue("ProviderCode", true).ToString();
-            string AttachmentBase64 = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(0)?.InnerText.ToString();
+            //string AttachmentBase64 = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(0)?.InnerText.ToString();
+            XmlNodeList AttachmentBase64List = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']");
             string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0)?.InnerText.ToString();
             XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
+            XmlNodeList cufeListReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']");
+            //XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']");
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
+            string operacionMandato = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']/@schemeID").Item(0)?.InnerText.ToString();
             string serieAndNumber = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string senderName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='RegistrationName']").Item(0)?.InnerText.ToString();
             //string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
@@ -1870,8 +1874,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             string actor = modoOperacion;
             //Valida se encuetre habilitado Modo Operacion RadianOperation
-            var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByRadianStatus<GlobalRadianOperations>(
-                issuerPartyCode, false, "Habilitado");
+            var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                issuerPartyCode, false, "Habilitado", softwareId);
 
             //Validacion habilitado Modo Operacion RadianOperation y providerID igual a  IssuerParty / PowerOfAttorney / ID          
             if (globalRadianOperation == null || (issuerPartyCode != providerCode))
@@ -1901,11 +1905,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
             }
-         
+
             //Valida existe Contrato de mandatos entre las partes
-            if (AttachmentBase64 != null)
+            if (operacionMandato == "2")
             {
-                if (!IsBase64(AttachmentBase64))
+                if (AttachmentBase64List.Count < 2)
                 {
                     validate = false;
                     responses.Add(new ValidateListResponse
@@ -1917,8 +1921,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
+                else
+                {
+                    for (int i = 1; i <= AttachmentBase64List.Count && validate; i++)
+                    {
+                        string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString();
+                        if (!IsBase64(AttachmentBase64))
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH84"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH84"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                            break;
+                        }
+                    }
+                }               
             }
-
+                              
             //Valida Mandato si es Ilimitado o Limitado
             if (customizationID == "432" || customizationID == "434")
             {
@@ -1943,7 +1967,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
 
             }
-            if(cufeList.Count > attorneyLimit + 1)
+
+            if(cufeList.Count > attorneyLimit + 1 || cufeListReference.Count > attorneyLimit)
             {
                 validate = false;
                 responses.Add(new ValidateListResponse
@@ -1955,14 +1980,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
+          
             var facultitys = TableManagerGlobalAttorneyFacultity.FindAll<GlobalAttorneyFacultity>();
+            //Si existen mas de 2 documentResposne
+            int listReference = cufeListReference.Count == 1 ? cufeList.Count : cufeListReference.Count;
+
             //Grupo de información alcances para el mandato sobre los CUFE.
-            for (int i = 1; i < cufeList.Count && i < attorneyLimit + 1 && validate; i++)
+            for (int i = 1; i < listReference && i < attorneyLimit  && validate; i++)
             {
                 //Valida facultades madato 
                 AttorneyModel attorneyModel = new AttorneyModel();
-                string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
-                string[] tempCode = code.Split(';');
+                string[] tempCode = new string[0];
+
+                if (cufeList.Count > 2)
+                {
+                    string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
+                    if (!string.IsNullOrWhiteSpace(code))
+                    {
+                        tempCode = code.Split(';');
+                    }
+                }
+                else
+                {
+                    string code = cufeList.Item(1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(1)?.InnerText.ToString();
+                    if (!string.IsNullOrWhiteSpace(code))
+                    {
+                        tempCode = code.Split(';');
+                    }
+                }
+
+               
+                
                 bool codeExist = false;
                 foreach (string codeAttorney in tempCode)
                 {
@@ -2009,8 +2057,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "89",
-                            ErrorMessage = "Error en tipo de modo de operación " + modoOperacion  + " no corresponde a la facultad/permiso asignado ResponseCode",
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL02"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -2031,9 +2079,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Solo si existe información referenciada del CUFE
                 if (listID != "3")
                 {
-                    attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
-                    attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
-                    attorneyModel.idTypeDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
+                    if (cufeList.Count >= 2)
+                    {
+                        attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                        attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                        attorneyModel.idTypeDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
+                    }
+                    else
+                    {
+                        attorneyModel.cufe = cufeListReference.Item(i).SelectNodes("//*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                        attorneyModel.idDocumentReference = cufeListReference.Item(i-1).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i-1)?.InnerText.ToString();
+                        attorneyModel.idTypeDocumentReference = cufeListReference.Item(i).SelectNodes("//*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
+                    }
+                    
                     //Valida CUFE referenciado existe en sistema DIAN                
                     var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference, issuerPartyCode, issuerPartyName);                   
                     foreach (var itemCufe in resultValidateCufe)
@@ -2399,7 +2457,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string hash = "";
             if (softwareId == billerSoftwareId)
                 hash = $"{billerSoftwareId}{billerSoftwarePin}{number}".EncryptSHA384();
-            else
+            else if(!string.IsNullOrWhiteSpace(softwareId))
             {
                 var software = GetSoftwareInstanceCache(softwareId);
                 if (software == null)
@@ -4243,28 +4301,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta != null)
             {
                 var identifier = StringUtil.GenerateIdentifierSHA256($"{documentMeta.SenderCode}{documentMeta.DocumentTypeId}{documentMeta.SerieAndNumber}");
-                var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
+                var document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(identifier, identifier, documentMeta.PartitionKey);
                 if(document != null)
                 {
-                    var documentApproved = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(document.DocumentKey, document.DocumentKey);
-                    if (documentApproved != null)
+                    responses.Add(new ValidateListResponse
                     {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "90",
-                            ErrorMessage = "Documento procesado anteriormente",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });                     
-                    }
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "90",
+                        ErrorMessage = "Documento procesado anteriormente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
                 }
                 else
                 {
                     var meta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
                     if (meta != null)
                     {
-                        document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier);
+                        document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier, meta.PartitionKey);
                         if (document != null)
                         {
                             responses.Add(new ValidateListResponse
