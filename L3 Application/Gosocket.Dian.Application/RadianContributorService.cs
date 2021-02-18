@@ -146,7 +146,7 @@ namespace Gosocket.Dian.Application
 
         public RadianAdmin ListParticipantsFilter(AdminRadianFilter filter, int page, int size)
         {
-            string cancelState = RadianState.Cancelado.GetDescription();
+            string cancelState = filter.RadianState == null ? RadianState.Cancelado.GetDescription() : string.Empty;
             string stateDescriptionFilter = filter.RadianState == null ? string.Empty : filter.RadianState;
             DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
             DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
