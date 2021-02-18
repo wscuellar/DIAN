@@ -119,25 +119,25 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Endoso en garantía          ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
-        public int EndorsementWarrantyTotalRequired { get; set; }
+        public int EndorsementGuaranteeTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Endoso en garantía         ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
-        public int EndorsementWarrantyTotalAcceptedRequired { get; set; }
+        public int EndorsementGuaranteeTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Endoso en procuración         ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
-        public int EndorsementProcurationTotalRequired { get; set; }
+        public int EndorsementProcurementTotalRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Endoso en procuración        ")]
         [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
-        public int EndorsementProcurationTotalAcceptedRequired { get; set; }
+        public int EndorsementProcurementTotalAcceptedRequired { get; set; }
 
         [Required(ErrorMessage = "El campo es requerido")]
         [Display(Name = "Cancelación de endoso")]
