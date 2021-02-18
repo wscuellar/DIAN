@@ -45,8 +45,8 @@ namespace Gosocket.Dian.Functions.Documents
                 var xmlBytesToSign = Convert.FromBase64String(data.XmlBase64);
 
                 //File.WriteAllBytes(@"D:\ValidarDianXmls\1XmlBytesToSign.xml", xmlBytesToSign);
-
-                xmlBytes = signer.SignDocument(xmlBytesToSign, data.DocumentType, DateTime.UtcNow);
+                 
+                xmlBytes = signer.SignDocument(xmlBytesToSign, data.DocumentType, DateTime.UtcNow.AddHours(-5));
 
                 //File.WriteAllBytes(@"D:\ValidarDianXmls\1XmlSigned.xml", xmlBytes);
 

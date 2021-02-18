@@ -112,10 +112,8 @@ namespace Gosocket.Dian.Functions.Pdf
                 var documentSigningTime = htmlGDoc.GetSigningTime();
 
                 if (documentApplication != null)
-                {
-                    documentApplication = DateNormalized(documentApplication, "Documento validado por la DIAN");
-                    Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication);
-                    documentSigningTime = DateNormalized(documentSigningTime, "Documento generado el:");
+                { 
+                    Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication); 
                     Html_Content = Html_Content.Replace("#SigningTime", documentSigningTime);
                 }
                 else
