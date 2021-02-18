@@ -285,7 +285,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EventNumber}", $"{model.Number}");
             template = template.Replace("{EventType}", model.EventTitle);
             template = template.Replace("{OperationType}", model.RequestType);
-            template = template.Replace("{OperationDetails}", model.OperationDetails);
+            template = model.OperationDetails == "" ? RemoveTrTag(template, "OperationDetails") : template.Replace("{OperationDetails}", model.OperationDetails);
             template = template.Replace("{DiscountRate}", model.DiscountRate);
             template = template.Replace("{TotalEventAmount}", model.EndosoTotalAmount);
             template = template.Replace("{CUDE}", model.CUDE);
@@ -538,16 +538,16 @@ namespace Gosocket.Dian.Application
 
         #endregion
 
-        //#region RemoveTrTag
+        #region RemoveTrTag
 
-        //public StringBuilder RemoveTrTag(StringBuilder template, string id)
-        //{
-        //    string pattern = "<tr id =\""+id+"\".+?</tr>";
-        //    Regex r = new Regex(pattern, RegexOptions.Singleline);
-        //    string result = r.Replace(template.ToString(), "");
-        //    template.Replace(template.ToString(), result);
-        //    return template;
-        //}
-        //#endregion
+        public StringBuilder RemoveTrTag(StringBuilder template, string id)
+        {
+            string pattern = "<div id =\"OperationDetails\".+?</div>";
+            Regex r = new Regex(pattern, RegexOptions.Singleline);
+            string result = r.Replace(template.ToString(), "");
+            template.Replace(template.ToString(), result);
+            return template;
+        }
+        #endregion
     }
 }
