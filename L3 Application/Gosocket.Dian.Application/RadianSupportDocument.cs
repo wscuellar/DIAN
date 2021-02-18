@@ -5,6 +5,7 @@ namespace Gosocket.Dian.Application
     #region Using
 
     using Gosocket.Dian.Application.Cosmos;
+    using Gosocket.Dian.Domain.Common;
     using Gosocket.Dian.Domain.Domain;
     using Gosocket.Dian.Domain.Entity;
     using Gosocket.Dian.Infrastructure;
@@ -52,14 +53,15 @@ namespace Gosocket.Dian.Application
 
             // Load xml
             byte[] xmlBytes = GetXmlFromStorageAsync(cude);
+            var str = Encoding.Default.GetString(xmlBytes);
 
             // Load xpaths
             Dictionary<string, string> xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
             try
             {
-                string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
-                //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+                //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+                string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
                 ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
 
                 // Build QRCode
@@ -130,8 +132,6 @@ namespace Gosocket.Dian.Application
 
         #endregion
 
-
-
         #region CreateGetXpathDataValuesRequestObject
 
         private static Dictionary<string, string> CreateGetXpathDataValuesRequestObject(string xmlBase64, string fileName = null)
@@ -145,14 +145,19 @@ namespace Gosocket.Dian.Application
                 { "EmissionDate", "/*[local-name() = 'Invoice']/*[local-name() = 'IssueDate']" },
                 { "OperationType", "/*[local-name() = 'Invoice']/*[local-name() = 'CustomizationID'] " },
                 { "Prefix", "/*[local-name()='Invoice']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='DianExtensions']/*[local-name()='InvoiceControl']/*[local-name()='AuthorizedInvoices']/*[local-name()='Prefix']" },
+                { "PaymentWay","/*[local-name() = 'Invoice']/*[local-name() = 'PaymentMeans']/*[local-name() = 'ID']"},
+                { "PaymentMethod","/*[local-name() = 'Invoice']/*[local-name() = 'PaymentMeans']/*[local-name() = 'PaymentMeansCode']"},
+                { "PaymentDueDate","/*[local-name() = 'Invoice']/*[local-name() = 'PaymentMeans']/*[local-name() = 'PaymentDueDate']"},
                 // Seller Data
                 { "SellerNit", "//*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'CompanyID']" },
                 { "SellerBusinessName", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PartyLegalEntity']/*[local-name() = 'RegistrationName']"},
                 { "SellerDocumentType","//*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'CompanyID']/@schemeName"},
+                { "SellerDocumentNumber", "//*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'CompanyID']" },
                 { "SellerTaxpayerType","//*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'AdditionalAccountID']"},
+                { "SellerOrigin","//*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'AdditionalAccountID']/@schemeID"},
                 { "SellerResponsibilityType","//*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'TaxLevelCode']"},
                 { "SellerAddress","/*[local-name() = 'Invoice']/*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PhysicalLocation']/*[local-name() = 'Address']/*[local-name() = 'AddressLine']/*[local-name() = 'Line']"},
-                { "SellerState", "" },
+                { "SellerState", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PhysicalLocation']/*[local-name() = 'Address']/*[local-name() = 'CountrySubentity']" },
                 { "SellerMunicipality", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PhysicalLocation']/*[local-name() = 'Address']/*[local-name() = 'CityName']" },
                 { "SellerEmail", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'Contact']/*[local-name() = 'ElectronicMail']" },
                 { "SellerPhoneNumber", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'Contact']/*[local-name() = 'Telephone']" },
@@ -160,11 +165,13 @@ namespace Gosocket.Dian.Application
                 { "AcquirerNit", "//*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'CompanyID']" },
                 { "AcquirerBusinessName", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'RegistrationName']" },
                 { "AcquirerDocumentType", "//*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'CompanyID']/@schemeName" },
+                { "AcquirerDocumentNumber", "//*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'CompanyID']" },
                 { "AcquirerTradeName", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'RegistrationName']" },
                 { "AcquirerTaxpayerType", "//*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'AdditionalAccountID']" },
                 { "AcquirerMainEconomicActivity", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'IndustryClassificationCode']" },
                 { "AcquirerResponsibilityType", "//*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'TaxLevelCode']" },
                 { "AcquirerAddress", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'PhysicalLocation']/*[local-name() = 'Address']/*[local-name() = 'AddressLine']/*[local-name() = 'Line']" },
+                { "AcquirerState", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'PhysicalLocation']/*[local-name() = 'Address']/*[local-name() = 'CountrySubentity']" },
                 { "AcquirerMunicipality", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'PhysicalLocation']/*[local-name() = 'Address']/*[local-name() = 'CityName']" },
                 { "AcquirerEmail", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'Contact']/*[local-name() = 'ElectronicMail']" },
                 { "AcquirerPhoneNumber", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingCustomerParty']/*[local-name() = 'Party']/*[local-name() = 'Contact']/*[local-name() = 'Telephone']" },
@@ -223,64 +230,139 @@ namespace Gosocket.Dian.Application
 
         private StringBuilder TemplateGlobalMapping(StringBuilder template, ResponseXpathDataValue dataValues)
         {
+            // Document Data
             template = template.Replace( "{SupportDocumentNumber}", dataValues.XpathsValues["SupportDocumentNumber"]);
             template = template.Replace( "{Cude}", dataValues.XpathsValues["Cude"]);
             template = template.Replace( "{EmissionDate}", dataValues.XpathsValues["EmissionDate"]);
-            template = template.Replace( "{OperationType}", dataValues.XpathsValues["OperationType"]);
-            template = template.Replace( "{PaymentWay}", string.Empty);
-            template = template.Replace( "{ExpirationDate}", string.Empty);
-            template = template.Replace( "{PaymentMethod}", string.Empty);
+
+            if (!string.IsNullOrEmpty(dataValues.XpathsValues["OperationType"]) && dataValues.XpathsValues["OperationType"].Equals("10"))
+            {
+                template = template.Replace("{OperationType}", "Estándar");
+            }
+            else
+            {
+                template = template.Replace("{OperationType}", string.Empty);
+            }
+            
+            
+            if (!string.IsNullOrEmpty(dataValues.XpathsValues["PaymentWay"]))
+            {
+                template = template.Replace("{PaymentWay}", 
+                    dataValues.XpathsValues["PaymentWay"].Equals("1") ? "Contado" : "Credito" );
+            }
+            else
+            {
+                template = template.Replace("{PaymentWay}", string.Empty);
+            }
+
+            if (!string.IsNullOrEmpty(dataValues.XpathsValues["PaymentMethod"]))
+            {
+                string paymentMethod = dataValues.XpathsValues["PaymentWay"];
+                PaymentMethods enumPayment = (PaymentMethods)Enum.Parse(typeof(PaymentMethods), paymentMethod);
+                if (enumPayment == PaymentMethods.Bonos)
+                {
+                    template = template.Replace("{PaymentMethod}", EnumHelper.GetDescription(enumPayment));
+                }
+                else
+                {
+                    template = template.Replace("{PaymentMethod}", "Otro");
+                }
+            }
+            else
+            {
+                template = template.Replace("{PaymentMethod}", string.Empty);
+            }
+
+            template = template.Replace( "{ExpirationDate}", dataValues.XpathsValues["PaymentDueDate"]);
             template = template.Replace( "{Prefix}", dataValues.XpathsValues["Prefix"]);
+            
             // Seller Data
             template = template.Replace( "{SellerNit}", dataValues.XpathsValues["SellerNit"]);
             template = template.Replace( "{SellerBusinessName}", dataValues.XpathsValues["SellerBusinessName"]);
-            template = template.Replace( "{SellerDocumentType}", dataValues.XpathsValues["SellerDocumentType"]);
+            template = template.Replace("{SellerDocumentNumber}", dataValues.XpathsValues["SellerDocumentNumber"]);
+
+            if (!string.IsNullOrEmpty(dataValues.XpathsValues["SellerDocumentType"]))
+            {
+                string documentType = dataValues.XpathsValues["SellerDocumentType"];
+                FiscalDocumentType enumDocument = (FiscalDocumentType)Enum.Parse(typeof(FiscalDocumentType), documentType);
+                template = template.Replace("{SellerDocumentType}", EnumHelper.GetDescription(enumDocument));
+               
+            }
+            else
+            {
+                template = template.Replace("{SellerDocumentType}", string.Empty);
+            }
+
             template = template.Replace( "{SellerDocumentNumber}", string.Empty);
-            template = template.Replace( "{SellerOrigin}", string.Empty);
-            template = template.Replace( "{SellerTaxpayerType}", dataValues.XpathsValues["SellerTaxpayerType"]);
+
+            if (dataValues.XpathsValues["SellerOrigin"] != null)
+            {
+                template = template.Replace("{SellerOrigin}",
+                    dataValues.XpathsValues["SellerOrigin"].Equals("01") ? "Residente" : "No Residente");
+            }
+            else
+            {
+                template = template.Replace("{SellerOrigin}", string.Empty);
+            }
+
+            if (dataValues.XpathsValues["SellerTaxpayerType"] != null)
+            {
+                template = template.Replace("{SellerTaxpayerType}",
+                    dataValues.XpathsValues["SellerTaxpayerType"].Equals("1") ? "Persona Jurídica y asimiladas" : "Persona Natural y asimiladas");
+            }
+            else
+            {
+                template = template.Replace("{SellerTaxpayerType}", string.Empty);
+            }
+
+            
             template = template.Replace( "{SellerResponsibilityType}", dataValues.XpathsValues["SellerResponsibilityType"]);
             template = template.Replace( "{SellerAddress}", dataValues.XpathsValues["SellerAddress"]);
-            template = template.Replace( "{SellerState}", string.Empty );
+            template = template.Replace( "{SellerState}", dataValues.XpathsValues["SellerState"]);
             template = template.Replace( "{SellerMunicipality}", dataValues.XpathsValues["SellerMunicipality"]);
             template = template.Replace( "{SellerEmail}", dataValues.XpathsValues["SellerEmail"]);
             template = template.Replace( "{SellerPhoneNumber}", dataValues.XpathsValues["SellerPhoneNumber"]);
             // Acquirer Data
             template = template.Replace( "{AcquirerNit}", dataValues.XpathsValues["AcquirerNit"]);
             template = template.Replace( "{AcquirerBusinessName}", dataValues.XpathsValues["AcquirerBusinessName"]);
-            template = template.Replace( "{AcquirerDocumentType}", dataValues.XpathsValues["AcquirerDocumentType"]);
+            template = template.Replace("{AcquirerDocumentNumber}", dataValues.XpathsValues["AcquirerDocumentNumber"]);
+
+            if (!string.IsNullOrEmpty(dataValues.XpathsValues["AcquirerDocumentType"]))
+            {
+                string documentType = dataValues.XpathsValues["AcquirerDocumentType"];
+                FiscalDocumentType enumDocument = (FiscalDocumentType)Enum.Parse(typeof(FiscalDocumentType), documentType);
+                template = template.Replace("{AcquirerDocumentType}", EnumHelper.GetDescription(enumDocument));
+
+            }
+            else
+            {
+                template = template.Replace("{AcquirerDocumentType}", string.Empty);
+            }
+
             template = template.Replace(" {AcquirerDocumentNumber}", string.Empty);
             template = template.Replace( "{AcquirerTradeName}", dataValues.XpathsValues["AcquirerTradeName"]);
-            template = template.Replace( "{AcquirerTaxpayerType}", dataValues.XpathsValues["AcquirerTaxpayerType"]);
+
+
+            //template = template.Replace( "{AcquirerTaxpayerType}", dataValues.XpathsValues["AcquirerTaxpayerType"]);
+            if (dataValues.XpathsValues["AcquirerTaxpayerType"] != null)
+            {
+                template = template.Replace("{AcquirerTaxpayerType}",
+                    dataValues.XpathsValues["AcquirerTaxpayerType"].Equals("1") ? "Persona Jurídica y asimiladas" : "Persona Natural y asimiladas");
+            }
+            else
+            {
+                template = template.Replace("{AcquirerTaxpayerType}", string.Empty);
+            }
+
             template = template.Replace( "{AcquirerMainEconomicActivity}", dataValues.XpathsValues["AcquirerMainEconomicActivity"]);
             template = template.Replace( "{AcquirerResponsibilityType}", dataValues.XpathsValues["AcquirerResponsibilityType"]);
             template = template.Replace( "{AcquirerAddress}", dataValues.XpathsValues["AcquirerAddress"]);
-            template = template.Replace( "{AcquirerState}", string.Empty);
+            template = template.Replace( "{AcquirerState}", dataValues.XpathsValues["AcquirerState"]);
             template = template.Replace( "{AcquirerMunicipality}", dataValues.XpathsValues["AcquirerMunicipality"]);
             template = template.Replace( "{AcquirerEmail}", dataValues.XpathsValues["AcquirerEmail"]);
             template = template.Replace( "{AcquirerPhoneNumber}", dataValues.XpathsValues["AcquirerPhoneNumber"]);
 
             // Product Data drawing logic
-
-            //var productsIds = dataValues.XpathsValues["ProductNumber"].Split('|');
-            //StringBuilder products = new StringBuilder();
-
-            //for (int i = 0; i < productsIds.Length; i++)
-            //{
-            //    products.Append("<tr>");
-
-            //    products.Append($"<td>{dataValues.XpathsValues["ProductCode"].Split('|')[i]}</td>");
-            //    products.Append($"<td>{dataValues.XpathsValues["ProductDescription"].Split('|')[i]}</td>");
-            //    products.Append($"<td>{dataValues.XpathsValues["ProductUM"].Split('|')[i]}</td>");
-            //    products.Append($"<td>{dataValues.XpathsValues["ProductQuantity"].Split('|')[i]}</td>");
-            //    products.Append($"<td>{dataValues.XpathsValues["ProductUnitPrice"].Split('|')[i]}</td>");
-            //    products.Append($"<td>{dataValues.XpathsValues["ProductChargeIndicator"].Split('|')[i]}</td>");
-            //    products.Append($"<td>{dataValues.XpathsValues["ProductDiscount"].Split('|')[i]}</td>");
-            //    products.Append($"<td>{dataValues.XpathsValues["ProductSurcharge"].Split('|')[i]}</td>");
-            //    products.Append($"<td>{dataValues.XpathsValues["ProductIvaTax"].Split('|')[i]}</td>");
-            //    products.Append($"<td>{dataValues.XpathsValues["ProductSellValue"].Split('|')[i]}</td>");
-
-            //    products.Append("</tr>");
-            //}
 
             template = template.Replace( "{ProductCode}", "" );
             template = template.Replace( "{ProductDescription}", "" );

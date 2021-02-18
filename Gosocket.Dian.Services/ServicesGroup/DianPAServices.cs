@@ -695,8 +695,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                             events = events.OrderBy(x => x.SigningTimeStamp).ToList();
                             events.ForEach(e =>
                             {
-                                var approved = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(e?.Identifier, e?.Identifier);
-                                if (approved)
+                                var approved = TableManagerGlobalDocValidatorDocument.FindByDocumentKey<GlobalDocValidatorDocument>(e?.Identifier, e?.Identifier, e?.PartitionKey);
+                                if (approved != null)
                                 {
                                     atLeastOneApproved = true;
                                     // se consulta el evento por el código y así obtener su descripción.

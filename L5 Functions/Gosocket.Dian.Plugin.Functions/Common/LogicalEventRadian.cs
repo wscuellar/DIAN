@@ -17,7 +17,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Global properties
         static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         static readonly TableManager documentValidatorTableManager = new TableManager("GlobalDocValidatorDocument");
-        static readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+        static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
+        static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
         private readonly string successfulMessage = "Evento ValidateEmitionEventPrev referenciado correctamente";
         #endregion
 
@@ -256,7 +257,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
           
             //Valida exista mandato            
-            List<GlobalDocReferenceAttorney> listDocumentAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(eventPrev.TrackId).ToList();
+            List<GlobalDocReferenceAttorney> listDocumentAttorney = documentAttorneyTableManager.FindAll<GlobalDocReferenceAttorney>(eventPrev.TrackId).ToList();
             if (listDocumentAttorney == null || listDocumentAttorney.Count <= 0)
             {                
                 responses.Add(new ValidateListResponse
@@ -622,6 +623,95 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region ValidateExistPropertyEndorsement     
+        private List<ValidateListResponse> ValidateExistPropertyEndorsement(List<GlobalDocValidatorDocumentMeta> documentMetaList, XmlParser xmlParserCude, NitModel nitModel)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            string senderCode = string.Empty;
+            bool validFor = true;
+            string errorCode = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ? ConfigurationManager.GetValue("ErrorCode_LGC27") : ConfigurationManager.GetValue("ErrorCode_LGC30");
+            string messageCode = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ? ConfigurationManager.GetValue("ErrorMessage_LGC27") : ConfigurationManager.GetValue("ErrorMessage_LGC30");
+
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = successfulMessage,
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+
+            //Consulta existe endoso en propiedad
+            var documentMeta = documentMetaList.Where(x => Convert.ToInt32(x.EventCode) == (int)EventStatus.EndosoPropiedad).OrderByDescending(x => x.SigningTimeStamp).FirstOrDefault();
+            if (documentMeta != null)
+            {
+                var document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier, documentMeta.PartitionKey);
+                if (document != null)
+                {
+                    //Consulta legitimo tenedor
+                    GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(documentMeta.DocumentReferencedKey, true);
+                    //Existe mas de un legitimo tenedor requiere un mandatario
+                    string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
+                    if (endosatarios.Length == 1)
+                    {
+                        senderCode = documentHolderExchange.PartyLegalEntity;
+                    }
+                    else
+                    {
+                        //Valida exista mandatario representante para cada legitimo tenedor
+                        foreach (string endosatario in endosatarios)
+                        {
+                            GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(documentMeta.PartitionKey, endosatario, xmlParserCude.ProviderCode);
+                            if (documentAttorney == null)
+                            {
+                                validFor = false;                                
+                            }
+                        }
+
+                        if (validFor)
+                        {
+                            senderCode = xmlParserCude.ProviderCode;
+                        }
+                    }
+
+                    if (validFor)
+                    {
+                        //Valida existe disponibilizacion posterior
+                        var listDisponibilizacion = documentMetaList.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
+                        && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.GeneralSubsequentRegistration ||
+                                Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PriorDirectSubsequentEnrollment) && t.SenderCode == senderCode
+                            ).FirstOrDefault();
+                        if (listDisponibilizacion == null)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = errorCode,
+                                ErrorMessage = messageCode,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCode,
+                            ErrorMessage = messageCode,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }                   
+                }
+            }
+
+            return responses;
+        }
+        #endregion
+
         #region ValidateEndorsementProcurement
         public List<ValidateListResponse> ValidateEndorsementProcurement(RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
         {
@@ -640,18 +730,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-            senderCode = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => t.EventCode == "036").SenderCode;
+            //senderCode = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => t.EventCode == "036").SenderCode;
+            //Si el endoso esta en blanco o el senderCode es diferente a providerCode                
+            nitModel.SenderCode = (nitModel.listID == "2" || (nitModel.SenderCode != nitModel.ProviderCode)) ? nitModel.ProviderCode : nitModel.SenderCode;
+            senderCode = nitModel.listID == "1" ? xmlParserCude.Fields["SenderCode"].ToString() : nitModel.SenderCode;
+
+            //Valida existe endoso en propiedad cambio legitimo tenedor para disponibilizacion posterior
+            var responseExistPropertyEndorsement = ValidateExistPropertyEndorsement(documentMeta, xmlParserCude, nitModel);
+            if (responseExistPropertyEndorsement != null)
+            {
+                foreach (var item in responseExistPropertyEndorsement)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = item.IsValid,
+                        Mandatory = item.Mandatory,
+                        ErrorCode = item.ErrorCode,
+                        ErrorMessage = item.ErrorMessage,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && t.SenderCode == senderCode).ToList();
             if (listDisponibilizacion != null || listDisponibilizacion.Count > 0)
-            {
+            {             
                 bool validForItem = false;
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
-                {
+                {                  
                     var documentDisponibilizacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListDisponibilizacion.Identifier, itemListDisponibilizacion.Identifier, itemListDisponibilizacion.PartitionKey);
                     if (documentDisponibilizacion != null)
-                    {
+                    {                       
                         validForItem = false;
                         var newAmountTV = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).NewAmountTV;
                         var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode, newAmountTV);
@@ -769,7 +880,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-            senderCode = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => t.EventCode == "036").SenderCode;
+            //senderCode = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => t.EventCode == "036").SenderCode;
+
+            //senderCode = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => t.EventCode == "036").SenderCode;
+            //Si el endoso esta en blanco o el senderCode es diferente a providerCode                
+            nitModel.SenderCode = (nitModel.listID == "2" || (nitModel.SenderCode != nitModel.ProviderCode)) ? nitModel.ProviderCode : nitModel.SenderCode;
+            senderCode = nitModel.listID == "1" ? xmlParserCude.Fields["SenderCode"].ToString() : nitModel.SenderCode;
+
+            //Valida existe endoso en propiedad cambio legitimo tenedor para disponibilizacion posterior
+            var responseExistPropertyEndorsement = ValidateExistPropertyEndorsement(documentMeta, xmlParserCude, nitModel);
+            if (responseExistPropertyEndorsement != null)
+            {
+                foreach (var item in responseExistPropertyEndorsement)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = item.IsValid,
+                        Mandatory = item.Mandatory,
+                        ErrorCode = item.ErrorCode,
+                        ErrorMessage = item.ErrorMessage,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && t.SenderCode == senderCode).ToList();
