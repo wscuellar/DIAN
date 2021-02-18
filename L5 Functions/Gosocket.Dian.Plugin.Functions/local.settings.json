@@ -125,7 +125,10 @@
     "ErrorCode_AAH84": "AAH84",
     "ErrorMessage_AAH84": "Debe ser informado el contrato de mandato en base64",
     "ErrorCode_LGC61": "LGC61",
-    "ErrorMessage_LGC61": "Mandatario Sistema de Negociación no se encuentra Habilitado"
+    "ErrorMessage_LGC61": "Mandatario Sistema de Negociación no se encuentra Habilitado",
+    "ErrorCode_AAH71": "AAH71",
+    "ErrorMessage_AAH71": "El DV no está correctamente calculado"
+
 
 
 

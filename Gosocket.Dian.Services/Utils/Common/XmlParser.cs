@@ -45,6 +45,8 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string ValorOriginalTV { get; set; }
         public string ValorActualTituloValor { get; set; }
         public string ValorPendienteTituloValor { get; set; }
+        public string AgentPartyPersonSchemeID { get; set; }
+        public string AgentPartyPersonSchemeName { get; set; }
 
         public XmlParser()
         {
