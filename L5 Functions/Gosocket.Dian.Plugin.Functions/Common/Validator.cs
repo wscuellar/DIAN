@@ -4365,7 +4365,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             // Solo se podrá transmitir para cada trabajador 1 documento NominaIndividual mensual durante cada mes del año. Para el mismo Empleador.
             var documentsList = documentMetaTableManager.FindDocumentSenderCodeReceiverCode<GlobalDocValidatorDocumentMeta>(companyId, employeeId);
-            if (documentsList == null || documentsList.Count <= 0) return responses; // no exiten documentos
+            if (documentsList == null || documentsList.Count <= 0) // No exiten documentos...
+            {
+                //Novedad XML true
+                if (novelty)
+                {
+                    responses.Clear();
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "NIE199a",
+                        ErrorMessage = "Elemento Novedad con valor “true” no puede ser recibido por primera vez, " +
+                        "ya que no existe una Nómina Electrónica recibida para este trabajador reportada por este Emisor durante este mes.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    return responses;
+                }
+                else
+                    return responses; // no existe para el mes actual
+            }
 
             var currentDate = DateTime.Now.Date;
             var documents = documentsList.Where(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month).ToList();
