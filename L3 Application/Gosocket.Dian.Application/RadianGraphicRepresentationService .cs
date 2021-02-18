@@ -542,8 +542,7 @@ namespace Gosocket.Dian.Application
 
         public StringBuilder RemoveTrTag(StringBuilder template, string id)
         {
-            StringBuilder tempTemplate = new StringBuilder();
-            string pattern = "<div id =\""+id+"\".+?</div>";
+            string pattern = "<div id =\"OperationDetails\".+?</div>";
             Regex r = new Regex(pattern, RegexOptions.Singleline);
             string result = r.Replace(template.ToString(), "");
             template.Replace(template.ToString(), result);
