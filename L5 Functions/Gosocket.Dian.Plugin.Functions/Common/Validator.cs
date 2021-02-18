@@ -451,14 +451,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string agentPartyPersonSchemeID = nitModel.AgentPartyPersonSchemeID;
             long number1 = 0;
             bool valNumber = long.TryParse(agentPartyPersonSchemeID, out number1);
-            if (agentPartyPersonSchemeName == "31" && valNumber)
-            {               
-                if (string.IsNullOrEmpty(agentPartyPersonSchemeID) || agentPartyPersonSchemeID == "undefined") agentPartyPersonSchemeID = "11";
-                if (ValidateDigitCode(receiverCode, int.Parse(agentPartyPersonSchemeID)))
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            if (agentPartyPersonSchemeName == "31")
+            {
+                if (valNumber)
+                {
+                    if (string.IsNullOrEmpty(agentPartyPersonSchemeID) || agentPartyPersonSchemeID == "undefined") agentPartyPersonSchemeID = "11";
+                    if (ValidateDigitCode(receiverCode, int.Parse(agentPartyPersonSchemeID)))
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+                else { responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds }); }
             }
-            else { responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds }); }
+            
 
             var receiver2Code = nitModel.ReceiverCode2;
             if (receiverCode != receiver2Code)
