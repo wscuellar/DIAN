@@ -35,6 +35,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string ListID { get; set; }
         public string DocumentID { get; set; }
         public string NoteMandato { get; set; }
+        public string NoteMandato2 { get; set; }
         public string UBLVersionID { get; set; }
         public string ValorTotalEndoso { get; set; }
         public string PrecioPagarseFEV { get; set; }
@@ -98,6 +99,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";                 
                     var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
                     var valueNote = "//*[local-name()='Note']";
+                    var valueNote2 = "//*[local-name()='Note'][2]";
                     var providerID = "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='DianExtensions']/*[local-name()='SoftwareProvider']/*[local-name()='ProviderID']";
                     var originalAmountTV = "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='ConstanciadePagos']/*[local-name()='Value'][1]";
 
@@ -106,6 +108,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var nodePaymentDueDate = XmlDocument.SelectSingleNode(nodePaymentDueDateValuesXpath)?.InnerText;
                     var nodeTotalInvoice = XmlDocument.SelectSingleNode(valueTotalInvoice)?.InnerText;
                     var valueNoteMandato = XmlDocument.SelectSingleNode(valueNote)?.InnerText;
+                    var valueNoteMandato2 = XmlDocument.SelectSingleNode(valueNote2)?.InnerText;
                     var valueProviderID = XmlDocument.SelectSingleNode(providerID)?.InnerText;
                     ValorOriginalTV = XmlDocument.SelectSingleNode(originalAmountTV)?.InnerText;
 
@@ -117,7 +120,8 @@ namespace Gosocket.Dian.Services.Utils.Common
                     //Valor total factura
                     TotalInvoice = nodeTotalInvoice != null ? nodeTotalInvoice : "";
                     //Nota del mandato
-                    NoteMandato = valueNoteMandato != null ? valueNoteMandato : "" ;                 
+                    NoteMandato = valueNoteMandato != null ? valueNoteMandato : "" ;
+                    NoteMandato2 = valueNoteMandato2 != null ? valueNoteMandato2 : "";
                     //Provder
                     ProviderCode = valueProviderID != null ? valueProviderID: "";
                     //SigningTime

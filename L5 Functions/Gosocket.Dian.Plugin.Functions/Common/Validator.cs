@@ -1438,6 +1438,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string cufe = party.TrackId;
             string senderCode = nitModel.SenderCode;
             string noteMandato = xmlParserCude.NoteMandato;
+            string noteMandato2 = xmlParserCude.NoteMandato2;
             string softwareId = xmlParserCude.Fields["SoftwareId"].ToString();
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -1580,18 +1581,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         if ((attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0") && codeFacultity != "MR91")
                                         {
                                             //Valida exista note mandatario
-                                            if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                            if ( noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))                                              
                                             {
-                                                validError = true;
-                                                responses.Add(new ValidateListResponse
+                                                if ( noteMandato2 == null || !noteMandato2.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                                                 {
-                                                    IsValid = false,
-                                                    Mandatory = true,
-                                                    ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                                    ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                });
-                                                break;
+                                                    validError = true;
+                                                    responses.Add(new ValidateListResponse
+                                                    {
+                                                        IsValid = false,
+                                                        Mandatory = true,
+                                                        ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                                        ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                    });
+                                                    break;
+                                                }
+                                               
                                             }
 
                                             //Si mandatario tiene permisos/facultades y esta habilitado para emitir documentos
