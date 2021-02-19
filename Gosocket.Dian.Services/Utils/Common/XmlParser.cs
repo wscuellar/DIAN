@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Infrastructure;
+﻿using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,6 +48,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string ValorPendienteTituloValor { get; set; }
         public string AgentPartyPersonSchemeID { get; set; }
         public string AgentPartyPersonSchemeName { get; set; }
+        public GlobalDocPayroll globalDocPayrolls { get; set; }
 
         public XmlParser()
         {

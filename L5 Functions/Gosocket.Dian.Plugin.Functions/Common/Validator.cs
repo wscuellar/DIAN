@@ -2994,7 +2994,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string documentTypeIdRef, string issuerPartyCode = null, string issuerPartyName = null)
         {
             string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
-                ? "No corresponde a un tipo de documento valido"
+                ? ConfigurationManager.GetValue("ErrorMessage_AAH09_043")
                 : ConfigurationManager.GetValue("ErrorMessage_AAH09");
             string errorCodeReglaUUID = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
                 ? ConfigurationManager.GetValue("ErrorCode_AAL07")

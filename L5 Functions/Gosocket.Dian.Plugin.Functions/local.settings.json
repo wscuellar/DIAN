@@ -86,6 +86,7 @@
     "ErrorMessage_NIE024": "Se debe indicar el CUNE según la definición establecida.",
     "ErrorCode_AAH09": "AAH09",
     "ErrorMessage_AAH09_043": "No corresponde a un tipo de documento valido",
+    "ErrorMessage_AAH09": "El tipo de identificador no coincide con el informado en el documento electrónico.",
     "ErrorCode_DC24g": "DC24g",
     "ErrorMessage_DC24g": "No se puede generar el evento Aval antes de la fecha de generación del evento Primera inscripción de la factura electrónica de venta como título valor en el RADIAN",
     "ErrorCode_LGC35": "LGC35",
