@@ -60,12 +60,12 @@
         public string EventTotalValueEndoso { get; set; }
         public string EventTotalValueLimitation { get; set; }
         public string EventTotalValuePago { get; set; }
+        public string InvoiceNumber { get; set; }
 
 
-        
-    
-            
-            
+
+
+
 
 
 
