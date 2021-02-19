@@ -288,7 +288,7 @@ namespace Gosocket.Dian.Application
 
             string htmlEvent = "";
             htmlEvent += "<td>";
-            htmlEvent += "<div id='EventNumber' class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{EventNumber}</a></div> ";
+            htmlEvent += "<div id='EventNumber' class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{OperationDetails}</a></div> ";
 
             if (model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "043" || model.EventCode == "045")
             {
@@ -350,8 +350,8 @@ namespace Gosocket.Dian.Application
 
             string htmlInvoice = "";
             htmlInvoice += "<td>";
-            htmlInvoice += "<div id='InvoiceNumber' class='text-subtitle text-gray'> Número de Factura: <a class='text-data'>{InvoiceNumber}</a></div> ";
-            htmlInvoice += "<div id='CUFE' class='text-subtitle text-gray'> CUFE: <a class='text-data cufe'>{CUFE}</a></div>";
+            htmlInvoice += "<div class='text-subtitle text-gray'> Número de Factura: <a class='text-data'>{InvoiceNumber}</a></div> ";
+            htmlInvoice += "<div class='text-subtitle text-gray'> CUFE: <a class='text-data cufe'>{CUFE}</a></div>";
             htmlInvoice += "</td>";
             htmlInvoice += "<td>";
 
@@ -371,7 +371,7 @@ namespace Gosocket.Dian.Application
             if (model.EventCode == "040" || model.EventCode == "042" || model.EventCode == "044") {
                 string htmlReference = "";
                 htmlReference += "<td>";
-                htmlReference += "<div id='InvoiceNumber' class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{EventCode}</a></div>";
+                htmlReference += "<div class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{EventCode}</a></div>";
                 htmlReference += "<div id='CUDE' class='text-subtitle text-gray'>CUDE: <a class='text-data cude'>{CUDE}</a></div>";
                 htmlReference += "</td>";
                 htmlReference += "<td>";
@@ -422,7 +422,7 @@ namespace Gosocket.Dian.Application
 
             // Mapping reference invoice data section
 
-            template = template.Replace("{InvoiceNumber}", model.References[0].Number);
+            template = template.Replace("{InvoiceNumber}", model.InvoiceNumber);
             template = template.Replace("{TotalValue}", $"{model.References[0].TotalAmount}");
             template = template.Replace("{PaymentWay}", string.Empty);
             template = template.Replace("{PaymentMethod}", string.Empty);
@@ -601,7 +601,8 @@ namespace Gosocket.Dian.Application
                 { "EventTotalValueAval","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionAvalar']/*[local-name()='Value']" },
                 { "EventTotalValueEndoso","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value']" },
                 { "EventTotalValueLimitation","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionMedidaCautelar']/*[local-name()='Value']" },
-                { "EventTotalValuePago","//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']" }
+                { "EventTotalValuePago","//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']" },
+                { "InvoiceNumber","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']" }
             };
             return requestObj;
         }
@@ -659,11 +660,14 @@ namespace Gosocket.Dian.Application
             model.EventTotalValueEndoso = dataValues.XpathsValues["EventTotalValueEndoso"] != null ? dataValues.XpathsValues["EventTotalValueEndoso"] : string.Empty;
             model.EventTotalValueLimitation = dataValues.XpathsValues["EventTotalValueLimitation"] != null ? dataValues.XpathsValues["EventTotalValueLimitation"] : string.Empty;
             model.EventTotalValuePago = dataValues.XpathsValues["EventTotalValuePago"] != null ? dataValues.XpathsValues["EventTotalValuePago"] : string.Empty;
+            model.InvoiceNumber = dataValues.XpathsValues["InvoiceNumber"] != null ? dataValues.XpathsValues["InvoiceNumber"] : string.Empty;
 
             
-    
-            
-            
+
+
+
+
+
 
             if (dataValues.XpathsValues["GenerationDate"] != null)
             {
