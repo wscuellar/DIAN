@@ -83,6 +83,10 @@ namespace Gosocket.Dian.Application
             var tableManager = new TableManager("GlobalLogger");
             tableManager.InsertOrUpdate(logger);
         }
- 
+
+        public string GetSoftwareStatusName(int id)
+        {
+            return _othersDocsElecSoftwareRepository.GetSoftwareStatusName(id);
+        }
     }
 }

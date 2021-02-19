@@ -11,5 +11,7 @@ namespace Gosocket.Dian.Interfaces.Repositories
         PagedResult<OtherDocElecSoftware> List(Expression<Func<OtherDocElecSoftware, bool>> expression, int page, int pagesize);
         bool Delete(Guid id);
         Guid AddOrUpdate(OtherDocElecSoftware Software);
+
+        string GetSoftwareStatusName(int id);
     }
 }

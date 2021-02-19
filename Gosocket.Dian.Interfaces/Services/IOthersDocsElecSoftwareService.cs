@@ -13,5 +13,7 @@ namespace Gosocket.Dian.Interfaces.Services
         Guid DeleteSoftware(Guid id);
         void SetToProduction(OtherDocElecSoftware software);
         List<OtherDocElecSoftware> List(int id);
+
+        string GetSoftwareStatusName(int id);
     }
 }

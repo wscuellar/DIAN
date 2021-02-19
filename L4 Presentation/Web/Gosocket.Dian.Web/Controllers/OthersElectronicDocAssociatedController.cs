@@ -218,6 +218,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (testSet == null)
                 return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
+            ViewBag.TestSetId = testSet.TestSetId;
             OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
 
             string key = model.OperationModeId.ToString() + "|" + model.SoftwareId.ToString();
@@ -233,10 +234,11 @@ namespace Gosocket.Dian.Web.Controllers
                 Url = software.Url,
                 Status = software.Status,
                 OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId,
+                OtherDocElecSoftwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId),
                 ProviderId = software.ProviderId,
                 SoftwareId = software.SoftwareId,
             };
-
+            
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
             model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
             model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
@@ -252,7 +254,6 @@ namespace Gosocket.Dian.Web.Controllers
             if (model.Id == -1)
                 return RedirectToAction("Index", "OthersElectronicDocuments");
 
-
             if (model.Id == -2)
             {
                 ViewBag.ValidateRequest = false;
@@ -266,6 +267,14 @@ namespace Gosocket.Dian.Web.Controllers
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
             model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
             model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
+
+            GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
+            ViewBag.TestSetId = (testSet != null) ? testSet.TestSetId : string.Empty;
+
+            var softwareStatusName = string.Empty;
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
+            if(software != null) softwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId);
+            ViewBag.OtherDocElecSoftwareStatusName = softwareStatusName;
 
             return View(model);
         }

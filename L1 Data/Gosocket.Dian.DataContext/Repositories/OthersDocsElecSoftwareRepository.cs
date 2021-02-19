@@ -75,6 +75,12 @@ namespace Gosocket.Dian.DataContext.Repositories
             return true;
         }
 
-
+        public string GetSoftwareStatusName(int id)
+        {
+            var name = string.Empty;
+            var statusModel = this.sqlDBContext.OtherDocElecSoftwareStatus.FirstOrDefault(x => x.Id == id);
+            if (statusModel != null) name = statusModel.Name;
+            return name;
+        }
     }
 }

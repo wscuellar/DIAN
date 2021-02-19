@@ -16,6 +16,7 @@ namespace Gosocket.Dian.Web.Models
         public string Url { get; set; }
         public bool Status { get; set; }
         public int OtherDocElecSoftwareStatusId { get; set; }
+        public string OtherDocElecSoftwareStatusName { get; set; }
         public int ProviderId { get; set; }
 
         public Guid SoftwareId { get; set; }
