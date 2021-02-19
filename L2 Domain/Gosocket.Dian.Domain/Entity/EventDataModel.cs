@@ -30,6 +30,7 @@
 
         public string Title { get; set; }
         public string CUDE { get; set; }
+        public string CUFE { get; set; }
         public string Prefix { get; set; }
         public string Number { get; set; }
         public string DateOfIssue { get; set; }

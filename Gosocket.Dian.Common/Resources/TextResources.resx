@@ -316,4 +316,7 @@
   <data name="WrongPassword" xml:space="preserve">
     <value>Contraseña incorrecta</value>
   </data>
+  <data name="ReportQRCode" xml:space="preserve">
+    <value>/document/searchqr?documentkey={CUFE}</value>
+  </data>
 </root>
