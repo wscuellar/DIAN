@@ -2301,7 +2301,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (ConfigurationManager.GetValue("Environment") == "Prod" || ConfigurationManager.GetValue("Environment") == "Test")
             {
                 var documentType = documentMeta?.DocumentTypeId;
-                if (new string[] { "01", "02", "04" }.Contains(documentType)) documentType = "01";
+                if (new string[] { "01", "02", "04", "05" }.Contains(documentType)) documentType = "01";
                 var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
                 range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
             }
@@ -2323,12 +2323,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                
             }
-
+            string errorCode = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB05b" : "FAB05b";
+            string messaCode = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
+                ? "Número de la autorización de la numeración no corresponde a un número de autorización de este contribuyente vendedor para este Proveedor de Autorización"
+                : "Número de la resolución que autoriza la numeración no corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.";
             // Check invoice authorization
             if (range.ResolutionNumber == invoiceAuthorization)
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB05b", ErrorMessage = "Número de la resolución que autoriza la numeración corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse { 
+                    IsValid = true, 
+                    Mandatory = true, 
+                    ErrorCode = errorCode,
+                    ErrorMessage = "Número de la resolución que autoriza la numeración corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
-                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB05b", ErrorMessage = "Número de la resolución que autoriza la numeración no corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse { 
+                    IsValid = false,
+                    Mandatory = true, 
+                    ErrorCode = errorCode, 
+                    ErrorMessage = messaCode, 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
@@ -2343,35 +2355,98 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime.TryParse(numberRangeModel.StartDate, out DateTime _startDate);
             int.TryParse(_startDate.ToString("yyyyMMdd"), out int fromDateNumber);
             if (range.ValidDateNumberFrom == fromDateNumber)
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            {
+                if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            }
             else
-                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado no corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            {
+                if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado NO corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado no corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            }
+                
 
             //
             DateTime.TryParse(numberRangeModel.EndDate, out DateTime endDate);
             int.TryParse(endDate.ToString("yyyyMMdd"), out int toDateNumber);
+            string errorCodeRange = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB08b" : "FAB08b";
             if (range.ValidDateNumberTo == toDateNumber)
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB08b", ErrorMessage = "Fecha final del rango de numeración informado corresponde a la fecha final de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse {
+                    IsValid = true, 
+                    Mandatory = true, 
+                    ErrorCode = errorCodeRange, 
+                    ErrorMessage = "Fecha final del rango de numeración informado corresponde a la fecha final de los rangos vigente para el contribuyente.", 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
-                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB08b", ErrorMessage = "Fecha final del rango de numeración informado no corresponde a la fecha final de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse {
+                    IsValid = false, 
+                    Mandatory = true, 
+                    ErrorCode = errorCodeRange, 
+                    ErrorMessage = "Fecha final del rango de numeración informado no corresponde a la fecha final de los rangos vigente para el contribuyente.", 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
 
             if (string.IsNullOrEmpty(range.Serie)) range.Serie = "";
+            string errorCodeSerie = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB10b" : "FAB10b";
             if (range.Serie == numberRangeModel.Serie)
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAB10b", ErrorMessage = "El prefijo corresponde al prefijo autorizado en la resolución.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse { 
+                    IsValid = true, 
+                    Mandatory = false, 
+                    ErrorCode = errorCodeSerie, 
+                    ErrorMessage = "El prefijo corresponde al prefijo autorizado en la resolución.", 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
-                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAB10b", ErrorMessage = "El prefijo debe corresponder al prefijo autorizado en la resolución.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse { 
+                    IsValid = false, 
+                    Mandatory = false, 
+                    ErrorCode = errorCodeSerie, 
+                    ErrorMessage = "El prefijo no corresponde al prefijo de la autorización de numeración", 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             long.TryParse(numberRangeModel.StartNumber, out long fromNumber);
+            string errorCodeModel = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB11b" : "FAB11b";
+            string messageCodeModel = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice 
+                ? "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigentes para el contribuyente vendedor"
+                : "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.";
             if (range.FromNumber == fromNumber)
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB11b", ErrorMessage = "Valor inicial del rango de numeración informado corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse { 
+                    IsValid = true, 
+                    Mandatory = true, 
+                    ErrorCode = errorCodeModel, 
+                    ErrorMessage = "Valor inicial del rango de numeración informado corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.", 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
-                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB11b", ErrorMessage = "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse { 
+                    IsValid = false, 
+                    Mandatory = true, 
+                    ErrorCode = errorCodeModel, 
+                    ErrorMessage = messageCodeModel,
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
 
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
+            string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";
+            string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
+                ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente vendedor"
+                : "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.";
             if (range.ToNumber == endNumber)
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB12b", ErrorMessage = "Valor final del rango de numeración informado corresponde a un valor final de los rangos vigentes para el contribuyente emisor.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse { 
+                    IsValid = true, 
+                    Mandatory = true, 
+                    ErrorCode = errorCodeModel2,
+                    ErrorMessage = "Valor final del rango de numeración informado corresponde a un valor final de los rangos vigentes para el contribuyente emisor.", 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             else
-                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB12b", ErrorMessage = "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                responses.Add(new ValidateListResponse { 
+                    IsValid = false, 
+                    Mandatory = true, 
+                    ErrorCode = errorCodeModel2,
+                    ErrorMessage = messageCodeModel2,
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
 
             foreach (var r in responses)
@@ -2456,13 +2531,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 response.ErrorCode = "NIE020";
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                 response.ErrorCode = "NIAE020";
+            if ((Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice))
+                response.ErrorCode = "DSAB27b";
 
             if ( Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
-                ||Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
-            {
+                ||Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)            
                 response.ErrorMessage = "Se debe indicar el Software Security Code según la definición establecida.";
-            }
 
+            
             var number = (softwareModel != null) ? softwareModel.SerieAndNumber : nominaModel.SerieAndNumber;
             var softwareId = (softwareModel != null) ? softwareModel.SoftwareId : nominaModel.ProveedorSoftwareID;
             var SoftwareSecurityCode = (softwareModel != null) ? softwareModel.SoftwareSecurityCode : nominaModel.ProveedorSoftwareSC;
@@ -2490,12 +2566,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         response.ErrorCode = "NIE019";
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                         response.ErrorCode = "NIAE019";
+                    if ((Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice))
+                        response.ErrorCode = "DSAB24b";
 
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
-                         || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
-                    {
+                         || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)                    
                         response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Documento Soporte de Pago de Nómina Electrónica, debe corresponder a un software autorizado para este Emisor";
-                    }
+
+                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
+                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este OFE.";
+
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
                 }
@@ -2513,12 +2593,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         response.ErrorCode = "NIE019";
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                         response.ErrorCode = "NIAE019";
+                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
+                        response.ErrorCode = "DSAB24c";
 
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
-                        || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
-                    {
+                        || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)                    
                         response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Documento Soporte de Pago de Nómina Electrónica, debe corresponder a un software autorizado para este Emisor";
-                    }
+
+                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
+                        response.ErrorMessage = "Identificador del software informado se encuentra inactivo.";
 
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
