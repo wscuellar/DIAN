@@ -135,7 +135,11 @@ namespace Gosocket.Dian.Application
                         model.EventTitle = "Registro Circulación posterior  de la FEV TV";
                     break;
                 case EventStatus.EndosoGarantia:
-                    model.Title = model.EventStatus.GetDescription();
+                    if (model.CustomizationID.Equals("371"))
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.ConResponsabilidad);
+                    else
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.SinResponsabilidad);
+
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
                     model.RequestType = eventItem.EventCode;
                     break;
@@ -457,22 +461,6 @@ namespace Gosocket.Dian.Application
                 subjects.Append(templateSujeto);
 
                 subjects = SubjectTemplateMapping(subjects, "1", "Datos del emisor",
-                    model.ReceiverName
-                    , model.ReceiverType
-                    , model.ReceiverDocumentType
-                    , model.ReceiverCode
-                    , string.Empty
-                    , string.Empty
-                    , model.ReceiverEmail
-                    , model.ReceiverPhoneNumber
-                    , "emisor");
-
-                // Section 2
-
-                //subjects.Append(sectionHtml);
-                subjects.Append(templateSujeto);
-
-                subjects = SubjectTemplateMapping(subjects, "2", "Datos del receptor",
                     model.SenderName
                     , model.ReceiverType
                     , model.SenderDocumentType
@@ -481,6 +469,22 @@ namespace Gosocket.Dian.Application
                     , string.Empty
                     , model.SenderEmail
                     , model.SenderPhoneNumber
+                    , "emisor");
+
+                // Section 2
+
+                //subjects.Append(sectionHtml);
+                subjects.Append(templateSujeto);
+
+                subjects = SubjectTemplateMapping(subjects, "2", "Datos del receptor",
+                    model.ReceiverName
+                    , model.ReceiverType
+                    , model.ReceiverDocumentType
+                    , model.ReceiverCode
+                    , string.Empty
+                    , string.Empty
+                    , model.ReceiverEmail
+                    , model.ReceiverPhoneNumber
                     , "receptor");
 
                 template = template.Replace("{SectionsData}", subjects.ToString());
@@ -498,7 +502,8 @@ namespace Gosocket.Dian.Application
                 for (int i = 0; i < model.ValueTitleEvents[0].Events.Count; i++)
                 {
                     Event eventDoc = model.ValueTitleEvents[0].Events[i];
-                    templateTitleValue = DocumentTemplateMapping(templateTitleValue, eventDoc, (i + 1).ToString());
+                    if(eventDoc != null)
+                        templateTitleValue = DocumentTemplateMapping(templateTitleValue, eventDoc, (i + 1).ToString());
                 }
                 template = template.Replace("{TitleValue}", templateTitleValue.ToString());
             }
@@ -602,7 +607,8 @@ namespace Gosocket.Dian.Application
                 { "EventTotalValueEndoso","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value']" },
                 { "EventTotalValueLimitation","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionMedidaCautelar']/*[local-name()='Value']" },
                 { "EventTotalValuePago","//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']" },
-                { "InvoiceNumber","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']" }
+                { "InvoiceNumber","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']" },
+                { "CustomizationID","//*[local-name()='ApplicationResponse']/*[local-name()='CustomizationID']" }
             };
             return requestObj;
         }
@@ -661,6 +667,7 @@ namespace Gosocket.Dian.Application
             model.EventTotalValueLimitation = dataValues.XpathsValues["EventTotalValueLimitation"] != null ? dataValues.XpathsValues["EventTotalValueLimitation"] : string.Empty;
             model.EventTotalValuePago = dataValues.XpathsValues["EventTotalValuePago"] != null ? dataValues.XpathsValues["EventTotalValuePago"] : string.Empty;
             model.InvoiceNumber = dataValues.XpathsValues["InvoiceNumber"] != null ? dataValues.XpathsValues["InvoiceNumber"] : string.Empty;
+            model.CustomizationID = dataValues.XpathsValues["CustomizationID"] != null ? dataValues.XpathsValues["CustomizationID"] : string.Empty;
 
             
 

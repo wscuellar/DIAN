@@ -766,4 +766,13 @@ namespace Gosocket.Dian.Domain.Common
         ClearingEntreartners = 97
 
     }
+
+    public enum SubEventStatus
+    {
+        [Description("Endoso electrónico en propiedad con responsabilidad de la FEV")]
+        ConResponsabilidad = 371,
+        [Description("Endoso electrónico en propiedad sin responsabilidad de la FEV")]
+        SinResponsabilidad = 372
+
+    }
 }
