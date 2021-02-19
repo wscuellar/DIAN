@@ -1719,6 +1719,172 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region ValidateReferenceAttorney
+        private List<ValidateListResponse> ValidateCufeReferenceAttorney(XmlParser xmlParser)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            RequestObjectSigningTime dataSigningtime = new RequestObjectSigningTime();
+            NitModel nitModel = new NitModel();
+            bool validate = false;
+            bool validateReference = false;
+            bool validateSigningTime = false;
+            int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
+
+            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
+            XmlNodeList cufeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']");
+            XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']");            
+
+            //Valida cantidad de CUFEs referenciados
+            if (cufeListResponse.Count > attorneyLimit || cufeListResponseRefeerence.Count > attorneyLimit)
+            {
+                validate = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC58"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC58"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            else if(cufeListResponse.Count != cufeListResponseRefeerence.Count)
+            {
+                validate = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL04"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL04"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            else
+            {
+                //Compara ID seccion DocumentReference 1 /  DocumentReference 2
+                for (int i = 0; i < attorneyLimit; i++)
+                {
+                    var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                    var xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+
+                    if (!String.Equals(xmlID, xmlID2))
+                    {
+                        validate = true;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL05"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL05"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                    else
+                        validate = false;
+                }
+                
+                //Compara UUID seccion DocumentReference 1 /  DocumentReference 2
+                for (int i = 0; i < attorneyLimit; i++)
+                {
+                    var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    var xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+
+                    if (!String.Equals(xmlUUID, xmlUUID2))
+                    {
+                        validate = true;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL05"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL05"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                    else
+                        validate = false;
+                }
+            }
+
+            //Valida documentos referenciados
+            for (int i = 0; i < attorneyLimit; i++)
+            {
+                var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                var xmlDocumentTypeCode = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
+
+                //Valida CUFE referenciado existe en sistema DIAN                
+                var resultValidateCufe = ValidateDocumentReferencePrev(xmlUUID, xmlID, "043", xmlDocumentTypeCode);
+                foreach (var itemCufe in resultValidateCufe)
+                {
+                    if (!itemCufe.IsValid)
+                    {
+                        validateReference = true;
+                        validate = true;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = itemCufe.IsValid,
+                            Mandatory = true,
+                            ErrorCode = itemCufe.ErrorCode,
+                            ErrorMessage = itemCufe.ErrorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+                if (validateReference)
+                    break;
+            }
+
+            dataSigningtime.EventCode = "043";
+            dataSigningtime.SigningTime = xmlParser.SigningTime;
+            dataSigningtime.DocumentTypeId = "96";
+            dataSigningtime.CustomizationID = customizationID;
+            dataSigningtime.EndDate = "";
+
+            //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
+            for (int i = 0; i < attorneyLimit; i++)
+            {              
+                ValidatorEngine validatorEngine = new ValidatorEngine();
+                dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(dataSigningtime.TrackId);
+                var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
+                if (!xmlParserCufe.Parser())
+                    throw new Exception(xmlParserCufe.ParserError);
+
+
+                var resultValidateSignInTime = ValidateSigningTime(dataSigningtime, xmlParserCufe, nitModel);
+                foreach (var itemSingInTIme in resultValidateSignInTime)
+                {
+                    if (!itemSingInTIme.IsValid)
+                    {
+                        validateSigningTime = true;
+                        validate = true;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = itemSingInTIme.IsValid,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_DC24r"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24r"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+                if (validateSigningTime)
+                    break;
+            }
+
+            if (validate)
+                return responses;
+
+            return null;
+        }
+        #endregion
+
         #region Validate Reference Attorney
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
         {
@@ -1764,8 +1930,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string modoOperacion = string.Empty;
             string softwareId = xmlParser.Fields["SoftwareId"].ToString();
 
+            //Validaciones previas secciones DocumentResponse / DocumentReference 1 y 2
+            if (listID != "3")
+            {
+                var validateCufeReferenceAttorney = ValidateCufeReferenceAttorney(xmlParser);
+                if (validateCufeReferenceAttorney != null)
+                {
+                    validate = false;
+                    foreach (var item in validateCufeReferenceAttorney)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = item.IsValid,
+                            Mandatory = item.Mandatory,
+                            ErrorCode = item.ErrorCode,
+                            ErrorMessage = item.ErrorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                }
+            }               
+
             //Validacion senderParty igual a  senderParty / PowerOfAttorney ID
-            if(senderCode != senderPowerOfAttorney)
+            if (senderCode != senderPowerOfAttorney)
             {
                 validate = false;
                 responses.Add(new ValidateListResponse
@@ -1984,19 +2171,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             }
 
-            if(cufeList.Count > attorneyLimit + 1 || cufeListReference.Count > attorneyLimit)
-            {
-                validate = false;
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC58"),
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC58"),
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
-          
             var facultitys = TableManagerGlobalAttorneyFacultity.FindAll<GlobalAttorneyFacultity>();
             //Si existen mas de 2 documentResposne
             int listReference = cufeListReference.Count == 1 ? cufeList.Count : cufeListReference.Count;
@@ -2024,9 +2198,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         tempCode = code.Split(';');
                     }
                 }
-
-               
-                
+                              
                 bool codeExist = false;
                 foreach (string codeAttorney in tempCode)
                 {
@@ -2107,25 +2279,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         attorneyModel.idDocumentReference = cufeListReference.Item(i-1).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i-1)?.InnerText.ToString();
                         attorneyModel.idTypeDocumentReference = cufeListReference.Item(i).SelectNodes("//*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
                     }
-                    
-                    //Valida CUFE referenciado existe en sistema DIAN                
-                    var resultValidateCufe = ValidateDocumentReferencePrev(attorneyModel.cufe, attorneyModel.idDocumentReference, "043", attorneyModel.idTypeDocumentReference, issuerPartyCode, issuerPartyName);                   
-                    foreach (var itemCufe in resultValidateCufe)
-                    {                        
-                        if (!itemCufe.IsValid)
-                        {
-                            validate = false;                            
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = itemCufe.IsValid,
-                                Mandatory = true,
-                                ErrorCode = itemCufe.ErrorCode,
-                                ErrorMessage = itemCufe.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
-
+                                      
                     if (validate)
                     {
                         TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
@@ -2187,33 +2341,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 });
                             }
                         }                      
-                    }
-                    
-
-                    ValidatorEngine validatorEngine = new ValidatorEngine();
-                    dataSigningtime.TrackId = attorneyModel.cufe;
-                    var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(dataSigningtime.TrackId);
-                    var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
-                    if (!xmlParserCufe.Parser())
-                        throw new Exception(xmlParserCufe.ParserError);
-
-                    //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-                    var resultValidateSignInTime = ValidateSigningTime(dataSigningtime, xmlParserCufe, nitModel);
-                    foreach (var itemSingInTIme in resultValidateSignInTime)
-                    {
-                        if (!itemSingInTIme.IsValid)
-                        {
-                            validate = false;
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = itemSingInTIme.IsValid,
-                                Mandatory = true,
-                                ErrorCode = "DC24r",
-                                ErrorMessage = "No se puede generar el evento mandato antes de la fecha de generación del documento referenciado.",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
+                    }                                       
                 }
                 else
                 {
