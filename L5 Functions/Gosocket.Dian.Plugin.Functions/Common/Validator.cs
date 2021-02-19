@@ -2250,7 +2250,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-
                 }
                 if(!codeExist)
                 {
@@ -2278,8 +2277,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         attorneyModel.cufe = cufeListReference.Item(i).SelectNodes("//*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                         attorneyModel.idDocumentReference = cufeListReference.Item(i-1).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i-1)?.InnerText.ToString();
                         attorneyModel.idTypeDocumentReference = cufeListReference.Item(i).SelectNodes("//*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
-                    }
-                                      
+                    }                                      
                     if (validate)
                     {
                         TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
