@@ -53,6 +53,21 @@
         public string CertificateNumber { get; set; }
         public string ValidationMessage { get; set; }
         public string Note { get; set; }
+        public string SignedBy { get; set; }
+        public string EventCode { get; set; }
+
+        public string EventTotalValueAval { get; set; }
+        public string EventTotalValueEndoso { get; set; }
+        public string EventTotalValueLimitation { get; set; }
+        public string EventTotalValuePago { get; set; }
+
+
+        
+    
+            
+            
+
+
 
         public EventStatus EventStatus { get; set; }
         public List<AssociatedValidationsModel> Validations { get; set; }

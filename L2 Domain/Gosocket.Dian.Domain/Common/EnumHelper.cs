@@ -314,6 +314,24 @@ namespace Gosocket.Dian.Domain.Common
         NIUP = 10910105
     }
 
+    public enum FiscalDocumentType
+    {
+        [Description("Tarjeta de extranjería ")]
+        TE = 21,
+        [Description("Cédula de extranjería ")]
+        CE = 22,
+        [Description("Nit")]
+        Nit = 31,
+        [Description("Pasaporte")]
+        Pasaporte = 41,
+        [Description("Documento de identificación extranjero")]
+        DIE = 42,
+        [Description("PEP")]
+        PEP = 47,
+        [Description("Nit de otro país")]
+        NitOP = 50
+    }
+
     public enum OperationMode
     {
         [Description("Facturador gratuito")]
@@ -592,5 +610,160 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Pago de la factura electrónica de venta como título valor")]
         PaymentBillFTV = 452
         
+    }
+
+    public enum PaymentMethods
+    {
+        [Description("Efectivo")]
+        Efectivo = 10,
+        [Description("Tarjeta Débito")]
+        TarjetaDebito = 49,
+        [Description("Consignación bancaria")]
+        ConsignacionBancaria = 42,
+        [Description("Débito ACH")]
+        DebitoACH = 3,
+        [Description("Cheque certificado")]
+        ChequeCertificado = 25,
+        [Description("Cheque Local")]
+        ChequeLocal = 26,
+        [Description("Tarjeta Crédito")]
+        TarjetaCredito = 48,
+        [Description("Transferencia Débito Bancaria")]
+        TransferenciaDebitoBancaria = 47,
+        [Description("Nota cambiaria")]
+        NotaCambiaria = 44,
+        [Description("Cheque")]
+        Cheque = 20,
+        [Description("Cheque bancario de gerencia")]
+        ChequeBancarioDeGerencia = 23,
+        [Description("Bonos")]
+        Bonos = 71,
+        [Description("Nota cambiaria esperando aceptación")]
+        NotaCambiariaEsperandoAceptacion = 24,
+        [Description("Nota promisoria firmada por el banco")]
+        NotaPromisoriaFirmadaPorElBanco = 64,
+        [Description("Nota promisoria firmada por un banco avalada por otro banco")]
+        NotaPromisoriaFirmadaPorUnBancoAvaladaPorOtroBanco = 65,
+        [Description("Nota promisoria firmada")]
+        NotaPromisoriaFirmada = 66,
+        [Description("Nota promisoria firmada por un tercero avalada por un banco")]
+        NotaPromisoriaFirmadaPorUnTerceroAvaladaPorUnBanco = 67,
+        [Description("Crédito ACH")]
+        CreditoACH = 2,
+        [Description("Giro formato abierto")]
+        GiroFormatoAbierto = 95,
+        [Description("Crédito Ahorro")]
+        CreditoAhorro = 13,
+        [Description("Débito Ahorro")]
+        DebitoAhorro = 14,
+        [Description("Crédito Intercambio Corporativo")]
+        CreditoIntercambioCorporativoCTX = 39,
+        [Description("Reversión débito de demanda ACH")]
+        ReversionDebitoDeDemandaACH = 4,
+        [Description("Reversión crédito de demanda ACH")]
+        ReversionCreditoDeDemandaACH = 5,
+        [Description("Crédito de demanda ACH")]
+        CreditoDeDemandaACH = 6,
+        [Description("Débito de demanda ACH")]
+        DebitoDeDemandaACH = 7,
+        [Description("Clearing Nacional o Regional")]
+        ClearingNacionalORegional = 9,
+        [Description("Reversión Crédito Ahorro")]
+        ReversionCreditoAhorro = 11,
+        [Description("Reversión Débito Ahorro")]
+        ReversionDebitoAhorro = 12,
+        [Description("Desembolso (CCD) débito")]
+        DesembolsoCCDDebito = 18,
+        [Description("Crédito Pago negocio corporativo")]
+        CreditoPagoNegocioCorporativoCTP = 19,
+        [Description("Poyecto bancario")]
+        PoyectoPancario = 21,
+        [Description("Proyecto bancario certificado")]
+        ProyectoBancarioCertificado = 22,
+        [Description("Débito Pago Negocio Corporativo (CTP)")]
+        DebitoPagoNegocioCorporativoCTP = 27,
+        [Description("Crédito Negocio Intercambio Corporativo (CTX)")]
+        CreditoNegocioIntercambioCorporativoCTX = 28,
+        [Description("Débito Negocio Intercambio Corporativo (CTX)")]
+        DebitoNegocioIntercambioCorporativoCTX = 29,
+        [Description("Transferencia Crédito")]
+        TransferenciaCredito = 30,
+        [Description("Transferencia Débito")]
+        TransferenciaDebito = 31,
+        [Description("Desembolso Crédito plus (CCD+)")]
+        DesembolsoCreditoPlusCCD = 32,
+        [Description("Vales")]
+        Vales = 72,
+        [Description("Nota promisoria firmada por el acreedor")]
+        NotaPromisoriaFirmadaPorElAcreedor = 61,
+        [Description("Nota promisoria firmada por el acreedor, avalada por el banco")]
+        NotaPromisoriaFirmadaPorElAcreedorAvaladaPorElBanco = 62,
+        [Description("Nota promisoria firmada por el acreedor, avalada por un tercero")]
+        NotaPromisoriaFirmadaPorElAcreedorAvaladaPorUnTercero = 63,
+        [Description("Nota promisoria")]
+        NotaPromisoria = 60,
+        [Description("Método de pago solicitado no usado")]
+        MetodoDePagoSolicitadoNoUsado = 96,
+        [Description("Nota bancaria transferible")]
+        NotaBancariaTransferible = 91,
+        [Description("Cheque local transferible")]
+        ChequeLocalTransferible = 92,
+        [Description("Giro referenciado")]
+        GiroReferenciado = 93,
+        [Description("Giro urgente")]
+        GiroUrgente = 94,
+        [Description("Débito Intercambio Corporativo (CTX)")]
+        DebitoIntercambioCorporativoCTX = 40,
+        [Description("Desembolso Crédito plus (CCD+)")]
+        DesembolsoCreditoPlusCCDD = 41,
+        [Description("Desembolso Débito plus (CCD+)")]
+        DesembolsoDebitoPlusCCD = 43,
+        [Description("Transferencia Crédito Bancario")]
+        TransferenciaCrEditoBancario = 45,
+        [Description("Transferencia Débito Interbancario")]
+        TransferenciaDebitoInterbancario = 46,
+        [Description("Postgiro")]
+        Postgiro = 50,
+        [Description("Telex estándar bancario")]
+        TelexEstandarBancario = 51,
+        [Description("Pago comercial urgente")]
+        PagoComercialUrgente = 52,
+        [Description("Pago Tesorería Urgente")]
+        PagoTesoreriaUrgente = 53,
+        [Description("Bookentry Crédito")]
+        BookentryCredito = 15,
+        [Description("Bookentry Débito")]
+        BookentryDebito = 16,
+        [Description("Desembolso Crédito (CCD)")]
+        DesembolsoCreditoCCD = 17,
+        [Description("Retiro de nota por el por el acreedor")]
+        RetiroDeNotaPorElPorElAcreedor = 70,
+        [Description("Retiro de nota por el por el acreedor sobre un banco")]
+        RetiroDeNotaPorElPorElAcreedorSobreUnBanco = 74,
+        [Description("Retiro de nota por el acreedor, avalada por otro banco")]
+        RetiroDeNotaPorElAcreedorAvaladaPorOtroBanco = 75,
+        [Description("Retiro de nota por el acreedor, sobre un banco avalada por un tercero")]
+        RetiroDeNotaPorElAcreedorSobreUnBancoAvaladaPorUnTercero = 76,
+        [Description("Retiro de una nota por el acreedor sobre un tercero")]
+        RetiroDeUnaNotaPorElAcreedorSobreunTercero = 77,
+        [Description("Retiro de una nota por el acreedor sobre un tercero avalada por un banco")]
+        RetiroDeUnaNotaPorElAcreedorSobreUnTerceroAvaladaPorUnBanco = 78,
+        [Description("Desembolso Débito plus (CCD+)")]
+        DesembolsoDebitoPlusCCDD = 33,
+        [Description("Pago y depósito pre acordado (PPD)")]
+        PagoYDepositoPreAcordadoPPD = 34,
+        [Description("Desembolso Crédito (CCD)")]
+        DesembolsoCreditoCCDD = 35,
+        [Description("Desembolso Débito (CCD)")]
+        DesembolsoDebitoCCD = 36,
+        [Description("Instrumento no definido")]
+        InstrumentoNoDefinido = 1,
+        [Description("Pago Negocio Corporativo Ahorros Crédito (CTP)")]
+        PagoNegocioCorporativoAhorrosCreditoCTP = 37,
+        [Description("Pago Negocio Corporativo Ahorros Débito (CTP)")]
+        PagoNegocioCorporativoAhorrosDebitoCTP = 38,
+        [Description("Clearing entre partners")]
+        ClearingEntreartners = 97
+
     }
 }

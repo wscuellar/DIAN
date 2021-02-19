@@ -232,7 +232,7 @@
                 console.log("Entre");
                 var cufe = this.id;
                 var element = '#' +cufe;
-                showPdfModal(element, cufe, '@Url.Action("PrintSupportDocument", "Document")', '#panel-form1');
+                showPdfModalClick(cufe, '@Url.Action("PrintSupportDocument", "Document")', '#panel-form1');
             })
 
             $('.download-files').click('onClick', function () {

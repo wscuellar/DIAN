@@ -1,4 +1,16 @@
 ﻿function showPdfModal(element, cufe, url, panel) {
+    $(element).click(() => {
+        showLoading(panel, 'Cargando', 'Procesando datos, por favor espere.');
+        var data = { cufe }
+        var actionSuccess = (docBase) => {
+            hideLoading(panel);
+            downloadPDF(docBase, cufe);
+        }
+        ajaxFunction(url, "POST", data, () => { }, actionSuccess);
+    })
+}
+
+function showPdfModalClick(cufe, url, panel) {
     showLoading(panel, 'Cargando', 'Procesando datos, por favor espere.');
     var data = { cufe }
     var actionSuccess = (docBase) => {

@@ -127,7 +127,9 @@
     "ErrorCode_LGC61": "LGC61",
     "ErrorMessage_LGC61": "Mandatario Sistema de Negociación no se encuentra Habilitado",
     "ErrorCode_AAH71": "AAH71",
-    "ErrorMessage_AAH71": "El DV no está correctamente calculado"
+    "ErrorMessage_AAH71": "El DV no está correctamente calculado",
+    "ErrorCode_LGC30": "LGC30",
+    "ErrorMessage_LGC30": "No se puede registrar este evento si previamente no se ha registrado el evento Inscripción de la factura electrónica de venta como título valor"
 
 
 
