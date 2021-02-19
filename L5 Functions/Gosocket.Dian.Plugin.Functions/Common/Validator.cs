@@ -1762,8 +1762,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             else
             {
+
                 //Compara ID seccion DocumentReference 1 /  DocumentReference 2
-                for (int i = 0; i < attorneyLimit; i++)
+                for (int i = 0; i < cufeListResponse.Count; i++)
                 {
                     var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                     var xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
@@ -1786,7 +1787,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 
                 //Compara UUID seccion DocumentReference 1 /  DocumentReference 2
-                for (int i = 0; i < attorneyLimit; i++)
+                for (int i = 0; i < cufeListResponse.Count; i++)
                 {
                     var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                     var xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
@@ -1810,7 +1811,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //Valida documentos referenciados
-            for (int i = 0; i < attorneyLimit && !validate; i++)
+            for (int i = 0; i < cufeListResponse.Count && !validate; i++)
             {
                 var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
@@ -1846,7 +1847,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             dataSigningtime.EndDate = "";
 
             //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-            for (int i = 0; i < attorneyLimit && !validate; i++)
+            for (int i = 0; i < cufeListResponse.Count && !validate; i++)
             {              
                 ValidatorEngine validatorEngine = new ValidatorEngine();
                 dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
