@@ -2572,10 +2572,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
                          || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)                    
                         response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Documento Soporte de Pago de Nómina Electrónica, debe corresponder a un software autorizado para este Emisor";
-
-                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
-                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este OFE.";
-
+               
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
                 }
@@ -2598,10 +2595,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
                         || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)                    
-                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Documento Soporte de Pago de Nómina Electrónica, debe corresponder a un software autorizado para este Emisor";
-
-                    if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
-                        response.ErrorMessage = "Identificador del software informado se encuentra inactivo.";
+                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Documento Soporte de Pago de Nómina Electrónica, debe corresponder a un software autorizado para este Emisor";                 
 
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
