@@ -1810,7 +1810,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //Valida documentos referenciados
-            for (int i = 0; i < attorneyLimit; i++)
+            for (int i = 0; i < attorneyLimit && !validate; i++)
             {
                 var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
@@ -1846,7 +1846,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             dataSigningtime.EndDate = "";
 
             //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-            for (int i = 0; i < attorneyLimit; i++)
+            for (int i = 0; i < attorneyLimit && !validate; i++)
             {              
                 ValidatorEngine validatorEngine = new ValidatorEngine();
                 dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
