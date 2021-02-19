@@ -235,13 +235,11 @@ namespace Gosocket.Dian.Application
 
                 if (re1 > 0) //Update operations state
                 {
-                    var contriOpera = sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(c => c.OtherDocElecContributorId == contributorId);
-                    Guid softId;
-
+                    var contriOpera = sqlDBContext
+                                        .OtherDocElecContributorOperations
+                                        .FirstOrDefault(c => c.OtherDocElecContributorId == contributorId && c.Deleted == false);
                     if (contriOpera != null)
                     {
-                        softId = contriOpera.SoftwareId;
-
                         contriOpera.Deleted = true;
 
                         sqlDBContext.Entry(contriOpera).State = System.Data.Entity.EntityState.Modified;
@@ -250,7 +248,9 @@ namespace Gosocket.Dian.Application
 
                         if (re2 > 0) //Update operations SUCCESS
                         {
-                            var contriSoftware = sqlDBContext.OtherDocElecSoftwares.FirstOrDefault(c => c.OtherDocElecContributorId == contributorId && c.Id == softId);
+                            var contriSoftware = sqlDBContext
+                                                    .OtherDocElecSoftwares
+                                                    .FirstOrDefault(c => c.OtherDocElecContributorId == contributorId && c.Id == contriOpera.SoftwareId);
 
                             if (contriSoftware != null)
                             {
