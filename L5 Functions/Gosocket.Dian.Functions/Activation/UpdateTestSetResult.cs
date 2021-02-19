@@ -286,15 +286,15 @@ namespace Gosocket.Dian.Functions.Activation
                     GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
 
 
-                    SetLogger(null, "Step 19.c", radianTesSetResult.ReceiptServiceRejected.ToString(), "AR_007");
-                    SetLogger(null, "Step 19.d", radianTesSetResult.ReceiptServiceTotalRequired.ToString(), "AR_008");
-                    SetLogger(null, "Step 19.e", radianTesSetResult.ReceiptServiceTotalAcceptedRequired.ToString(), "AR_009");
+                    SetLogger(null, "Step 19.c", radianTesSetResult.ApplicationAvailableRejected.ToString(), "AR_007");
+                    SetLogger(null, "Step 19.d", radianTesSetResult.ApplicationAvailableTotalRequired.ToString(), "AR_008");
+                    SetLogger(null, "Step 19.e", radianTesSetResult.ApplicationAvailableTotalAcceptedRequired.ToString(), "AR_009");
                     // Determinamos si rechazamos el set de pruebas del cliente
                     if (radianTesSetResult.ReceiptNoticeRejected > (radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired)||
                         radianTesSetResult.ReceiptServiceRejected > (radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired) ||
                         radianTesSetResult.ExpressAcceptanceRejected > (radianTesSetResult.ExpressAcceptanceTotalRequired - radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired)||
-                        radianTesSetResult.AutomaticAcceptanceRejected > (radianTesSetResult.AutomaticAcceptanceTotalRequired - radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired))// ||
-                        //radianTesSetResult.ApplicationAvailableRejected > (radianTesSetResult.ApplicationAvailableTotalRequired - radianTesSetResult.ApplicationAvailableTotalAcceptedRequired) ||
+                        radianTesSetResult.AutomaticAcceptanceRejected > (radianTesSetResult.AutomaticAcceptanceTotalRequired - radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired) ||
+                        radianTesSetResult.ApplicationAvailableRejected > (radianTesSetResult.ApplicationAvailableTotalRequired - radianTesSetResult.ApplicationAvailableTotalAcceptedRequired))// ||
                         //radianTesSetResult.EndorsementPropertyRejected > (radianTesSetResult.EndorsementPropertyTotalRequired - radianTesSetResult.EndorsementPropertyTotalAcceptedRequired) ||
                         //radianTesSetResult.EndorsementProcurementRejected > (radianTesSetResult.EndorsementProcurationTotalRequired - radianTesSetResult.EndorsementProcurementTotalAcceptedRequired) ||
                         //radianTesSetResult.EndorsementGuaranteeRejected > (radianTesSetResult.EndorsementGuaranteeTotalRequired - radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired) ||
