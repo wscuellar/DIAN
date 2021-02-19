@@ -47,7 +47,7 @@ namespace Gosocket.Dian.Application
 
         #region GetPdfReport
 
-        public async Task<byte[]> GetPdfReport(string cude)
+        public async Task<byte[]> GetPdfReport(string cude, string urlBase)
         {
             // Load Templates            
             StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNew1.html"));
@@ -57,7 +57,9 @@ namespace Gosocket.Dian.Application
 
             // Set Variables
             DateTime expeditionDate = DateTime.Now;
-            Bitmap qrCode = RadianPdfCreationService.GenerateQR(TextResources.RadianReportQRCode.Replace("{CUFE}", model.CUDE));
+
+            string pathUrl = string.Concat(urlBase, TextResources.ReportQRCode.Replace("{CUFE}", model.CUFE));
+            Bitmap qrCode = RadianPdfCreationService.GenerateQR(pathUrl);
 
             string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
             string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
@@ -103,11 +105,13 @@ namespace Gosocket.Dian.Application
 
             model.EventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), eventItem.EventCode);
             model.CUDE = cude;
-
+            model.CUFE = eventItem.DocumentReferencedKey;
             Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
             xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
-            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+            //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+            string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
             
             model = MappingXpathValues(model, fieldValues);
 
