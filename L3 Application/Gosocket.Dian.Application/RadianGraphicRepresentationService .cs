@@ -289,7 +289,11 @@ namespace Gosocket.Dian.Application
             string htmlEvent = "";
             htmlEvent += "<td>";
             htmlEvent += "<div id='EventNumber' class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{EventNumber}</a></div> ";
-            htmlEvent += "<div id='OperationDetails' class='text-subtitle text-gray'> Detalles del evento: <a class='text-data'>{OperationDetails}</a></div>";
+
+            if (model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "043" || model.EventCode == "045")
+            {
+                htmlEvent += "<div id='OperationDetails' class='text-subtitle text-gray'> Detalles del evento: <a class='text-data'>{OperationDetails}</a></div>";
+            }
             if (isInEvent)
             {
                 htmlEvent += "<div class='text-subtitle text-gray'> Valor total del evento: <a class='text-data'>";
@@ -350,7 +354,8 @@ namespace Gosocket.Dian.Application
             htmlInvoice += "<div id='CUFE' class='text-subtitle text-gray'> CUFE: <a class='text-data cufe'>{CUFE}</a></div>";
             htmlInvoice += "</td>";
             htmlInvoice += "<td>";
-            htmlInvoice += "<div id='TotalValue' class='text-subtitle text-gray'>Valor Total de la Factura: <a class='text-data'>{TotalValue}</a></div>";
+
+            //htmlInvoice += "<div id='TotalValue' class='text-subtitle text-gray'>Valor Total de la Factura: <a class='text-data'>{TotalValue}</a></div>";
             
             if (model.EventCode == "036" || model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "045")
             {
@@ -425,7 +430,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{PaymentConditions}", string.Empty);
             template = template.Replace("{CUFE}", model.References[0].CUFE);
             template = template.Replace("{IssueDate}", $"{model.References[0].DateOfIssue:dd'/'MM'/'yyyy}");
-            template = template.Replace("{ExpirationDate}", string.Empty);
+            template = template.Replace("{ExpirationDate}", model.EventFinishDate);
             template = template.Replace("{InvoiceOperationType}", string.Empty);
 
             // Mapping reference event data section
