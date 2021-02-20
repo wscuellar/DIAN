@@ -49,6 +49,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private TableManager TableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
         private TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
         private TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
+        private TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -358,7 +359,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
-            responses.AddRange(this.CheckIndividualPayrollDuplicity(model.CUNE));
+            responses.AddRange(this.CheckIndividualPayrollDuplicity(model.EmpleadorNIT, model.SerieAndNumber));
 
             if (Convert.ToInt32(model.DocumentTypeId) == Convert.ToInt32(DocumentType.IndividualPayroll))
             {                
@@ -407,7 +408,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIAE034", ErrorMessage = "Debe ir el DV del Empleador", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
 
-                var otherElectricDocuments = TableManagerGlobalOtherDocElecOperation.FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.ProveedorNIT,
+                var otherElectricDocuments = TableManagerGlobalOtherDocElecOperation
+                    .FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.ProveedorNIT,
                     nominaModel.ProveedorSoftwareID, false, "Habilitado");
                 if(otherElectricDocuments != null && otherElectricDocuments.Count > 0)
                 {
@@ -4539,7 +4541,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region Individual Payroll
 
-        private List<ValidateListResponse> CheckIndividualPayrollDuplicity(string cune)
+        private List<ValidateListResponse> CheckIndividualPayrollDuplicity(string companyId, string serieAndNumber)
         {
             DateTime startDate = DateTime.UtcNow;
             
@@ -4554,43 +4556,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             });
 
             // Solo se podrá transmitir una única vez el número del documento para el trabajador.
-            var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
-            if (documentMeta != null)
+            var payroll = payrollTableManager.GlobalPayrollByRowKey_Number<GlobalDocPayroll>(companyId, serieAndNumber);
+            if (payroll != null)
             {
-                var identifier = StringUtil.GenerateIdentifierSHA256($"{documentMeta.SenderCode}{documentMeta.DocumentTypeId}{documentMeta.SerieAndNumber}");
-                var document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(identifier, identifier, documentMeta.PartitionKey);
-                if(document != null)
+                responses.Clear();
+                responses.Add(new ValidateListResponse
                 {
-                    responses.Clear();
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "90",
-                        ErrorMessage = "Documento procesado anteriormente",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-                else
-                {
-                    var meta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
-                    if (meta != null)
-                    {
-                        document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier, meta.PartitionKey);
-                        if (document != null)
-                        {
-                            responses.Clear();
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "90",
-                                ErrorMessage = "Documento procesado anteriormente",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
-                }
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "90",
+                    ErrorMessage = "Documento procesado anteriormente",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
 
             return responses;
