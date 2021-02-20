@@ -1354,18 +1354,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 //Valida que exista una Primera Disponibilizacion
+                bool validForItemDisponibiliza = false;
                 var listPrimeraDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion 
                 && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration) 
                 || Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration).ToList();
                 if(listPrimeraDisponibilizacion != null || listPrimeraDisponibilizacion.Count > 0)
                 {
-                    //Valida que exista una Primera Disponibilizacion aprobado
-                    bool validForItemDisponibiliza = false;
+                    //Valida que exista una Primera Disponibilizacion aprobado                    
                     foreach (var itemListPrimeraDisponibilizacion in listPrimeraDisponibilizacion)
                     {
                         var documentPrimeraDisponibilizacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListPrimeraDisponibilizacion.Identifier, itemListPrimeraDisponibilizacion.Identifier, itemListPrimeraDisponibilizacion.PartitionKey);
                         if (documentPrimeraDisponibilizacion != null)
                         {
+                            validForItemDisponibiliza = false;
                             //Valida existen Limitaciones activas
                             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
                             || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
@@ -1411,8 +1412,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC24"),
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC24"),
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC21"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1423,8 +1424,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC24"),
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC24"),
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC21"),
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }

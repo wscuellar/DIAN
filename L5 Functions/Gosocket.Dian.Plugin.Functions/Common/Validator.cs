@@ -864,6 +864,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
                 case (int)EventStatus.SolicitudDisponibilizacion:
 
+                    //Valida existe cambio legitimo tenedor factura
                     LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
                     HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(nitModel.DocumentKey);
                     string[] endosatarios = new string[0];
