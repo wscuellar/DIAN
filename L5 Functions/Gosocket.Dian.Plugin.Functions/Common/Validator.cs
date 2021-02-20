@@ -408,7 +408,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIAE034", ErrorMessage = "Debe ir el DV del Empleador", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
 
-                var otherElectricDocuments = TableManagerGlobalOtherDocElecOperation.FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.ProveedorNIT,
+                var otherElectricDocuments = TableManagerGlobalOtherDocElecOperation
+                    .FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.ProveedorNIT,
                     nominaModel.ProveedorSoftwareID, false, "Habilitado");
                 if(otherElectricDocuments != null && otherElectricDocuments.Count > 0)
                 {

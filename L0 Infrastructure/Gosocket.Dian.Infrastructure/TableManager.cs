@@ -1215,9 +1215,14 @@ namespace Gosocket.Dian.Infrastructure
                     partitionKey));
 
             prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
+                TableOperators.And,
                 TableQuery.GenerateFilterConditionForBool("Deleted",
                     QueryComparisons.Equal,
-                    deleted),
+                    deleted));
+
+            prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition("State",
                     QueryComparisons.Equal,
