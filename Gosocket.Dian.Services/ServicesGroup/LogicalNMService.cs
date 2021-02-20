@@ -870,11 +870,34 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE 2
 
             // Parser
+            //start = DateTime.UtcNow;
+            //var xmlBytes = contentFileList.First().XmlBytes;
+            //var xmlParser = new XmlParseNomina(xmlBytes);
+            //if (!xmlParser.Parser())
+            //    throw new Exception(xmlParser.ParserError);
+
+
+            // Parser
             start = DateTime.UtcNow;
             var xmlBytes = contentFileList.First().XmlBytes;
-            var xmlParser = new XmlParseNomina(xmlBytes);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
+            XmlParseNomina xmlParser = new XmlParseNomina();
+            try
+            {
+                xmlParser = new XmlParseNomina(xmlBytes);
+                if (!xmlParser.Parser())
+                    throw new Exception(xmlParser.ParserError);
+            }
+            catch (Exception ex)
+            {
+                var failedList = new List<string> { $"Regla: NIE901, El documento debe poseer Todos los Namespace correspondientes a su estructura." };
+                dianResponse.IsValid = false;
+                dianResponse.StatusCode = "99";
+                dianResponse.StatusMessage = "Rechazo: Fallo en el esquema XML del archivo. " + ex.Message;
+                dianResponse.StatusDescription = "Documento con errores en campos mandatorios.";
+                dianResponse.ErrorMessage.AddRange(failedList);
+                return dianResponse;
+            }
+
 
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsedNomina>();
             DocumentParsedNomina.SetValues(ref documentParsed);
@@ -1015,10 +1038,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 };
 
                 if (dianResponse.IsValid)
-                {
-                    if(!existDocument) arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
+                {                   
 
-                    var docGlobalPayroll = xmlParser.globalDocPayrolls;
+                    if (!existDocument) arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
+                    
+                    GlobalDocPayroll docGlobalPayroll = xmlParser.globalDocPayrolls;
                     docGlobalPayroll.Timestamp = DateTime.Now;
 
                     arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
