@@ -4424,7 +4424,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 response.errorCode = "AAF01";
                 response.errorMessage = "No fue informado el avalista";
                 response.errorCodeNoteA = "AAD11a";
-                response.errorMessageNoteA = "No fue informada la nota cuando el evento fue generado por un mandato. ";
+                response.errorMessageNoteA = "No se informo la nota cuando el evento fue generado por un mandato.";
             }
             else if (eventCode == "037")
             {
