@@ -63,7 +63,7 @@
         public string EventTotalValuePago { get; set; }
         public string InvoiceNumber { get; set; }
         public string CustomizationID { get; set; }
-
+        public string ResponseCodeListID { get; set; }
 
 
 

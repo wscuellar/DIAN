@@ -772,7 +772,51 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Endoso electrónico en propiedad con responsabilidad de la FEV")]
         ConResponsabilidad = 371,
         [Description("Endoso electrónico en propiedad sin responsabilidad de la FEV")]
-        SinResponsabilidad = 372
-
+        SinResponsabilidad = 372,
+        [Description("Mandato General de la FEV TV por documento General por tiempo limitado")]
+        MandatoGenerarlLimitado = 431,
+        [Description("Mandato General de la FEV TV por documento General por tiempo Ilimitado")]
+        MandatoGenerarlIlimitado = 432,
+        [Description("Mandato General de la FEV TV por documento Limitado por tiempo limitado")]
+        MandatoGenerarlTiempo = 433,
+        [Description("Mandato General de la FEV TV por documento Limitado por tiempo Ilimitado")]
+        MandatoGenerarlTiempoIlimitado = 434,
+        [Description("Inscripción en el RADIAN para primera circulación  de la FEV para Negociación General")]
+        PrimeraSolicitudDisponibilizacion = 361,
+        [Description("Inscripción en el RADIAN para primera circulación  de la FEV para Negociación Directa Previa")]
+        SolicitudDisponibilizacionDirecta = 362,
+        [Description("Inscripción en el RADIAN para circulación posterior de la FEV para Negociación General")]
+        SolicitudDisponibilizacionPosterior = 363,        
+        [Description("Inscripción en el RADIAN para circulación posterior de la FEV para Negociación Directa Previa")]
+        SolicitudDisponibilizacionPosteriorDirecta = 364,
+        [Description("Cancelación del Endoso en Garantia de la FEV")]
+        CancelacionEndoso = 401,
+        [Description("Cancelación del Endoso en Procuracion de la FEV")]
+        CancelacionEndosoProcuracion = 402,
+        [Description("Auto que decreta medida cautelar por embargo")]
+        MedidaCautelarEmbargo = 411,
+        [Description("Auto que decreta medida cautelar por mandamiento de pago")]
+        MedidaCautelarMandamiento = 412,        
+        [Description("Terminación de limitación por sentencia")]
+        TerminacionSentencia = 421,
+        [Description("Terminación de limitación por terminación anticipada")]
+        TerminacionAnticipada = 422,        
+        [Description("Terminación por Revocatoria del mandato de la FEV")]
+        TerminacionRevocatoria = 441,
+        [Description("Terminación por Renuncia del mandato de la FEV")]
+        TerminacionRenuncia = 442,
+        [Description("Pago Parcial de la FEV TV")]
+        PagoParcial = 451,
+        [Description("Pago Total de la FEV TV")]
+        PagoTotal = 452
     }
+
+    public enum EndodoSubEventStatus
+    {
+        [Description("Completo")]
+        Completo = 1,
+        [Description("En blanco")]
+        EnBlanco = 2
+    }
+
 }

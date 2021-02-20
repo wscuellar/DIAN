@@ -133,10 +133,14 @@ namespace Gosocket.Dian.Application
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.Accepted);
                     break;
                 case EventStatus.SolicitudDisponibilizacion:
-                    if (eventItem.CustomizationID.Equals("361") || eventItem.CustomizationID.Equals("362"))
-                        model.EventTitle = "Registro Primera circulación de la FEV TV";
-                    else
-                        model.EventTitle = "Registro Circulación posterior  de la FEV TV";
+                    if (model.CustomizationID.Equals("361"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.PrimeraSolicitudDisponibilizacion);
+                    if (model.CustomizationID.Equals("362"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionDirecta);
+                    if (model.CustomizationID.Equals("363"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosterior);
+                    if (model.CustomizationID.Equals("364"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosteriorDirecta);
                     break;
                 case EventStatus.EndosoGarantia:
                     if (model.CustomizationID.Equals("371"))
@@ -158,30 +162,50 @@ namespace Gosocket.Dian.Application
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.InvoiceOfferedForNegotiation:
+                    if (model.CustomizationID.Equals("401"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.CancelacionEndoso);
+                    if (model.CustomizationID.Equals("402"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.CancelacionEndosoProcuracion);
+                    
                     model.Title = model.EventStatus.GetDescription();
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.InvoiceOfferedForNegotiation);
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.Avales:
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.Avales);
                     break;
                 case EventStatus.Mandato:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Mandato);
+                    if(model.CustomizationID.Equals("431"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlLimitado);
+                    if (model.CustomizationID.Equals("432"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlLimitado);
+                    if (model.CustomizationID.Equals("433"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlTiempo);
+                    if (model.CustomizationID.Equals("434"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlTiempoIlimitado);
                     break;
                 case EventStatus.TerminacionMandato:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.TerminacionMandato);
+                    if (model.CustomizationID.Equals("441"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionRevocatoria);
+                    if (model.CustomizationID.Equals("442"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionRenuncia);
                     break;
                 case EventStatus.ValInfoPago:
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.ValInfoPago);
                     break;
                 case EventStatus.NotificacionPagoTotalParcial:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.NotificacionPagoTotalParcial);
+                    if (model.CustomizationID.Equals("451"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.PagoParcial);
+                    if (model.CustomizationID.Equals("452"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.PagoTotal);
                     break;
                 case EventStatus.AnulacionLimitacionCirculacion:
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.AnulacionLimitacionCirculacion);
                     break;
                 case EventStatus.NegotiatedInvoice:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.NegotiatedInvoice);
+                    if (model.CustomizationID.Equals("421"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionSentencia);
+                    if (model.CustomizationID.Equals("422"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionAnticipada); 
                     break;
                 default:
                     model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
@@ -211,8 +235,8 @@ namespace Gosocket.Dian.Application
                 });
             }
 
-            model.EntityName = referenceMeta.Serie;
-            model.CertificateNumber = referenceMeta.SerieAndNumber;
+            //model.EntityName = referenceMeta.Serie;
+            //model.CertificateNumber = referenceMeta.SerieAndNumber;
 
             Domain.Entity.GlobalDocValidatorDocument eventVerification =
                     globalDocValidatorDocumentTableManager.Find<Domain.Entity.GlobalDocValidatorDocument>(referenceMeta?.Identifier, referenceMeta?.Identifier);
@@ -300,7 +324,7 @@ namespace Gosocket.Dian.Application
 
             if (model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "043" || model.EventCode == "045")
             {
-                htmlEvent += "<div id='OperationDetails' class='text-subtitle text-gray'> Detalles del evento: <a class='text-data'>{OperationDetails}</a></div>";
+                htmlEvent += "<div class='text-subtitle text-gray'> Detalles del evento: <a class='text-data'>{ResponseCodeListID}</a></div>";
             }
             if (isInEvent)
             {
@@ -418,6 +442,8 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EventTotalValueEndoso}", model.EventTotalValueEndoso);
             template = template.Replace("{EventTotalValueLimitation}", model.EventTotalValueLimitation);
             template = template.Replace("{EventTotalValuePago}", model.EventTotalValuePago);
+            template = template.Replace("{ResponseCodeListID}", model.ResponseCodeListID == "1" ? EnumHelper.GetDescription(EndodoSubEventStatus.Completo) : EnumHelper.GetDescription(EndodoSubEventStatus.EnBlanco));
+
 
             if (!(model.EventCode == "036" || model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "040"))
             {
@@ -521,7 +547,7 @@ namespace Gosocket.Dian.Application
 
             // Mapping Final Data Section
 
-            template = template.Replace("{FinalData}", $"Nombre de la Entidad de Certificación Digital: {model.EntityName}  Número del certificado digital: {model.CertificateNumber} ");
+            template = template.Replace("{FinalData}", $"Nombre de la Entidad de Certificación Digital: {model.EntityName} <br> Número del certificado digital: {model.CertificateNumber} ");
 
             return template;
         }
@@ -544,6 +570,11 @@ namespace Gosocket.Dian.Application
             string sujeto
             )
         {
+            if (!string.IsNullOrEmpty(subjectNit))
+            {
+                string html = "Nit del {sujeto}: < a class='text-data'>{SubjectNit}</a>";
+                template = template.Replace("{nitData}", html);
+            }
             template = template.Replace("{sujeto}", sujeto);
             template = template.Replace("{SectionNumber}", sectionNumber);
             template = template.Replace("{titleNameParticipant}", subjectNumber);
@@ -607,12 +638,15 @@ namespace Gosocket.Dian.Application
                 { "Note","//*[local-name()='ApplicationResponse']/*[local-name()='Note']" },
                 { "SignedBy","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Signature']/*[local-name()='Object']/*[local-name()='QualifyingProperties']/*[local-name()='SignedProperties']/*[local-name()='SignedSignatureProperties']/*[local-name()='SignerRole']/*[local-name()='ClaimedRoles']/*[local-name()='ClaimedRole']" },
                 { "EventCode","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
-                { "EventTotalValueAval","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionAvalar']/*[local-name()='Value']" },
-                { "EventTotalValueEndoso","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value']" },
-                { "EventTotalValueLimitation","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionMedidaCautelar']/*[local-name()='Value']" },
+                { "EventTotalValueAval","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionAvalar']/*[local-name()='Value'])[1]" },
+                { "EventTotalValueEndoso","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value'])[1]" },
+                { "EventTotalValueLimitation","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionMedidaCautelar']/*[local-name()='Value'])[1]" },
                 { "EventTotalValuePago","//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']" },
                 { "InvoiceNumber","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']" },
-                { "CustomizationID","//*[local-name()='ApplicationResponse']/*[local-name()='CustomizationID']" }
+                { "CustomizationID","//*[local-name()='ApplicationResponse']/*[local-name()='CustomizationID']" },
+                { "ResponseCodeListID", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']/@listID" },
+                { "CertificateNumber", "(//*[local-name()='X509SerialNumber'])[1]" },
+                { "EntityName", "(//*[local-name()='X509IssuerName'])[1]" }
             };
             return requestObj;
         }
@@ -672,6 +706,9 @@ namespace Gosocket.Dian.Application
             model.EventTotalValuePago = dataValues.XpathsValues["EventTotalValuePago"] != null ? dataValues.XpathsValues["EventTotalValuePago"] : string.Empty;
             model.InvoiceNumber = dataValues.XpathsValues["InvoiceNumber"] != null ? dataValues.XpathsValues["InvoiceNumber"] : string.Empty;
             model.CustomizationID = dataValues.XpathsValues["CustomizationID"] != null ? dataValues.XpathsValues["CustomizationID"] : string.Empty;
+            model.ResponseCodeListID = dataValues.XpathsValues["ResponseCodeListID"] != null ? dataValues.XpathsValues["ResponseCodeListID"] : string.Empty;
+            model.EntityName = dataValues.XpathsValues["EntityName"] != null ? dataValues.XpathsValues["EntityName"] : string.Empty;
+            model.CertificateNumber = dataValues.XpathsValues["CertificateNumber"] != null ? dataValues.XpathsValues["CertificateNumber"] : string.Empty;
 
             
 
