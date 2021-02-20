@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager numberRangeTableManager = new TableManager("GlobalNumberRange");
         static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
         static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
-        static readonly TableManager typeListTableManager = new TableManager("GlobalTypeList");
+        static readonly TableManager typeListTableManager = new TableManager("GlobalTypeList");        
         private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
         private TableManager TableManagerGlobalAttorneyFacultity = new TableManager("GlobalAttorneyFacultity");
         private TableManager TableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
@@ -861,14 +861,47 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     return responses;
                 case (int)EventStatus.SolicitudDisponibilizacion:
+
+                    LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
+                    HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(nitModel.DocumentKey);
+                    string[] endosatarios = new string[0];
+                    bool validFor = true;
+                    bool validHolderExchang = false;
+                    if (responseHolderExchange != null)
+                    {
+                        validHolderExchang = true;
+                        endosatarios = responseHolderExchange.PartyLegalEntity.Split('|');
+                        if (endosatarios.Length == 1)
+                        {
+                            senderCode = responseHolderExchange.PartyLegalEntity;
+                        }
+                        else
+                        {
+                            //Valida exista mandatario representante para cada legitimo tenedor
+                            foreach (string endosatario in endosatarios)
+                            {
+                                GlobalDocReferenceAttorney documentAttorney = TableManagerGlobalDocReferenceAttorney.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(nitModel.DocumentKey, endosatario, xmlParserCude.ProviderCode);
+                                if (documentAttorney == null)
+                                {
+                                    validFor = false;
+                                }
+                            }
+
+                            if (validFor)
+                            {
+                                senderCode = xmlParserCude.ProviderCode;
+                            }
+                        }
+                    }
+
                     if (party.SenderParty != senderCode)
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = errorCodeMessage.errorCode,
-                            ErrorMessage = errorCodeMessage.errorMessage,
+                            ErrorCode = validHolderExchang ? errorCodeMessage.errorCodeB : errorCodeMessage.errorCode,
+                            ErrorMessage = validHolderExchang ? errorCodeMessage.errorMessageB : errorCodeMessage.errorMessage,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }

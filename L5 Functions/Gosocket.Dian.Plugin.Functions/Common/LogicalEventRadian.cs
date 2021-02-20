@@ -623,6 +623,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region RetrieveSenderHolderExchange
+        public HolderExchangeModel RetrieveSenderHolderExchange(string cufe)
+        {
+            HolderExchangeModel response = new HolderExchangeModel();
+
+            //Consulta legitimo tenedor
+            GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(cufe, true);
+            if (documentHolderExchange != null)
+            {
+                response.PartitionKey = documentHolderExchange.PartitionKey;
+                response.RowKey = documentHolderExchange.RowKey;
+                response.CorporateStockAmount = documentHolderExchange.CorporateStockAmount;
+                response.CorporateStockAmountSender = documentHolderExchange.CorporateStockAmountSender;
+                response.GlobalDocumentId = documentHolderExchange.GlobalDocumentId;
+                response.PartyLegalEntity = documentHolderExchange.PartyLegalEntity;
+                response.SenderCode = documentHolderExchange.SenderCode;
+            }
+            else
+                return null;  
+
+            return response;
+        }
+
+        #endregion
+
         #region ValidateExistPropertyEndorsement     
         private List<ValidateListResponse> ValidateExistPropertyEndorsement(List<GlobalDocValidatorDocumentMeta> documentMetaList, XmlParser xmlParserCude, NitModel nitModel)
         {
