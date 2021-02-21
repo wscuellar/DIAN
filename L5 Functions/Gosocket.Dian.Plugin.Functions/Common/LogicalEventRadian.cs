@@ -1319,8 +1319,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC23"),
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC23"),
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC20"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC20"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                             break;
@@ -1622,7 +1622,56 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-           
+
+            //Valida exista primer evento acuse de recibo
+            var listAcuse = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Received).ToList();
+            if (listAcuse == null || listAcuse.Count <= 0)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            else
+            {
+                bool validForItemAcuse = false;
+                foreach (var itemListAcuse in listAcuse)
+                {
+                    var documentAcuse = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListAcuse.Identifier, itemListAcuse.Identifier, itemListAcuse.PartitionKey);
+                    if (documentAcuse != null)
+                    {
+                        validForItemAcuse = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = successfulMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                    else
+                        validForItemAcuse = true;
+                }
+
+                if (validForItemAcuse)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
             //Valida exista Recibo del bien y/o prestación del servicio
             var listReceipt = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Receipt).ToList();
             if (listReceipt == null || listReceipt.Count <= 0)

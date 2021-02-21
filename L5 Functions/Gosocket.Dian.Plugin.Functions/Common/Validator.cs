@@ -1774,8 +1774,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
             XmlNodeList cufeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']");
-            XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']");            
-
+            XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']");
+            
             //Valida cantidad de CUFEs referenciados
             if (cufeListResponse.Count > attorneyLimit || cufeListResponseRefeerence.Count > attorneyLimit)
             {
@@ -1972,6 +1972,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string modoOperacion = string.Empty;
             string softwareId = xmlParser.Fields["SoftwareId"].ToString();
 
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento ValidateReferenceAttorney referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+
             //Validaciones previas secciones DocumentResponse / DocumentReference 1 y 2
             if (listID != "3")
             {
@@ -1980,7 +1989,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     validate = false;
                     foreach (var item in validateCufeReferenceAttorney)
-                    {
+                    {              
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = item.IsValid,
@@ -2199,19 +2208,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 startDateAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='StartDate']").Item(0)?.InnerText.ToString();
                 endDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='EndDate']").Item(0)?.InnerText.ToString();
             }
-            else
-            {
-                validate = false;
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAD02"),
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAD02"),
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-
-            }
+          
 
             var facultitys = TableManagerGlobalAttorneyFacultity.FindAll<GlobalAttorneyFacultity>();
             //Si existen mas de 2 documentResposne
@@ -3220,9 +3217,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string successfulMessage = "Evento ValidateEmitionEventPrev referenciado correctamente";
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document = null;
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            string errorRegla = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34)
-                ? ConfigurationManager.GetValue("ErrorCode_LGC01") : ConfigurationManager.GetValue("ErrorCode_LGC20");
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();            
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
             
             //Valida si el documento AR transmitido ya se encuentra aprobado            
@@ -3547,50 +3542,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = errorRegla,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC01"),
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
                     }                                                                           
-                }
-                // Valida que el primer evento transmitido sea un acuse
-                else if (eventPrev.EventCode == "031" || eventPrev.EventCode == "032" 
-                    || eventPrev.EventCode == "033" || eventPrev.EventCode == "034")
-                {
-                    string errorCode = string.Empty;
-                    string errorMeesage = string.Empty;                   
-
-                    if (eventPrev.EventCode == "031")
-                    {
-                        errorCode = ConfigurationManager.GetValue("ErrorCode_LGC03");
-                        errorMeesage = ConfigurationManager.GetValue("ErrorMessage_LGC03");
-                    }
-                    else if(eventPrev.EventCode == "032")
-                    {
-                        errorCode = ConfigurationManager.GetValue("ErrorCode_LGC09");
-                        errorMeesage = ConfigurationManager.GetValue("ErrorMessage_LGC09");
-                    }
-                    else if(eventPrev.EventCode == "033")
-                    {
-                        errorCode = ConfigurationManager.GetValue("ErrorCode_LGC13");
-                        errorMeesage = ConfigurationManager.GetValue("ErrorMessage_LGC13");
-                    }
-                    else
-                    {
-                        errorCode = ConfigurationManager.GetValue("ErrorCode_LGC14");
-                        errorMeesage = ConfigurationManager.GetValue("ErrorMessage_LGC14");
-                    }
-
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = errorCode,
-                        ErrorMessage = errorMeesage,
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
+                }               
                 else
                 {
                     responses.Add(new ValidateListResponse
