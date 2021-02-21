@@ -134,7 +134,9 @@
     "ErrorCode_LGC24": "LGC24",
     "ErrorMessage_LGC24": "No se puede registrar este evento si previamente no se ha registrado el evento Inscripción de la factura electrónica de venta como título valor",
     "ErrorCode_LGC21": "LGC21",
-    "ErrorMessage_LGC21": "La Factura Electrónica no cumple con los requisitos legales para ser considerada título valor y no podrá ser registrada."
+    "ErrorMessage_LGC21": "La Factura Electrónica no cumple con los requisitos legales para ser considerada título valor y no podrá ser registrada.",
+    "ErrorCode_LGC23": "LGC23",
+    "ErrorMessage_LGC23": "No puede registrar si previamente se registro primera inscripcion de la factura electrónica de venta"
 
 
 

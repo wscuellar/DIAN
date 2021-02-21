@@ -3229,13 +3229,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string errorRegla = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34)
                 ? ConfigurationManager.GetValue("ErrorCode_LGC01") : ConfigurationManager.GetValue("ErrorCode_LGC20");
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
+            
+            //Valida si el documento AR transmitido ya se encuentra aprobado            
+            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
 
             switch (Convert.ToInt32(eventPrev.EventCode))
             {
                 case (int)EventStatus.Rejected:
                     //Valida eventos previos Rechazo de la FEV
                     LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
-                    var eventRadianRejected = logicalEventRadianRejected.ValidateRejectedEventPrev(eventPrev);
+                    var eventRadianRejected = logicalEventRadianRejected.ValidateRejectedEventPrev(documentMeta);
                     if (eventRadianRejected != null || eventRadianRejected.Count > 0)
                     {
                         foreach (var itemEventRadianRejected in eventRadianRejected)
@@ -3254,7 +3257,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.Receipt:
                     //Valida eventos previos Constancia de recibo del Bien de la FEV
                     LogicalEventRadian logicalEventRadianReceipt = new LogicalEventRadian();
-                    var eventRadianReceipt = logicalEventRadianReceipt.ValidateReceiptEventPrev(eventPrev);
+                    var eventRadianReceipt = logicalEventRadianReceipt.ValidateReceiptEventPrev(documentMeta);
                     if (eventRadianReceipt != null || eventRadianReceipt.Count > 0)
                     {
                         foreach (var itemeventRadianReceipt in eventRadianReceipt)
@@ -3273,7 +3276,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.Accepted:
                     //Valida eventos previos Aceptacion expresa de la FEV
                     LogicalEventRadian logicalEventRadianAccepted = new LogicalEventRadian();
-                    var eventRadianAccepted = logicalEventRadianAccepted.ValidateAcceptedEventPrev(eventPrev);
+                    var eventRadianAccepted = logicalEventRadianAccepted.ValidateAcceptedEventPrev(documentMeta);
                     if (eventRadianAccepted != null || eventRadianAccepted.Count > 0)
                     {
                         foreach (var itemeventRadianAccepted in eventRadianAccepted)
@@ -3292,7 +3295,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.AceptacionTacita:
                     //Valida eventos previos Aceptacion Tacita de la FEV
                     LogicalEventRadian logicalEventRadianTacitAcceptance = new LogicalEventRadian();
-                    var eventRadianTacitAcceptance = logicalEventRadianTacitAcceptance.ValidateTacitAcceptanceEventPrev(eventPrev);
+                    var eventRadianTacitAcceptance = logicalEventRadianTacitAcceptance.ValidateTacitAcceptanceEventPrev(documentMeta);
                     if(eventRadianTacitAcceptance != null || eventRadianTacitAcceptance.Count > 0)
                     {
                         foreach (var itemEventRadianTacitAcceptance in eventRadianTacitAcceptance)
@@ -3311,7 +3314,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.Avales:
                     //Valida eventos previos Aval
                     LogicalEventRadian logicalEventRadianAval = new LogicalEventRadian();
-                    var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(eventPrev, xmlParserCufe, xmlParserCude);
+                    var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(documentMeta, xmlParserCufe, xmlParserCude);
                     if(eventRadianAval != null || eventRadianAval.Count > 0)
                     {
                         foreach (var itemEventRadianAval in eventRadianAval)
@@ -3330,7 +3333,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     //Valida eventos previos Solicitud Disponibilizacion
                     LogicalEventRadian logicalEventRadianDisponibilizacion = new LogicalEventRadian();
-                    var eventRadianDisponibilizacion = logicalEventRadianDisponibilizacion.ValidateAvailabilityRequestEventPrev(eventPrev, xmlParserCufe, xmlParserCude, nitModel);
+                    var eventRadianDisponibilizacion = logicalEventRadianDisponibilizacion.ValidateAvailabilityRequestEventPrev(documentMeta, xmlParserCufe, xmlParserCude, nitModel);
                     if (eventRadianDisponibilizacion != null || eventRadianDisponibilizacion.Count > 0)
                     {
                         foreach (var itemEventRadianDisponibilizacion in eventRadianDisponibilizacion)
@@ -3349,7 +3352,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.EndosoPropiedad:
                     //Valida eventos previos Endoso en Propiedad
                     LogicalEventRadian logicalEventRadianEndosoPropiedad = new LogicalEventRadian();
-                    var eventRadianEndosoPropiedad = logicalEventRadianEndosoPropiedad.ValidatePropertyEndorsement(eventPrev, xmlParserCufe, xmlParserCude, nitModel);
+                    var eventRadianEndosoPropiedad = logicalEventRadianEndosoPropiedad.ValidatePropertyEndorsement(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
                     if (eventRadianEndosoPropiedad != null || eventRadianEndosoPropiedad.Count > 0)
                     {
                         foreach (var itemEventRadianEndosoPropiedad in eventRadianEndosoPropiedad)
@@ -3368,7 +3371,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.EndosoGarantia:
                     //Valida eventos previos Endoso en Garantia
                     LogicalEventRadian logicalEventRadianEndosoGarantia = new LogicalEventRadian();
-                    var eventRadianEndosoGarantia = logicalEventRadianEndosoGarantia.ValidateEndorsementGatantia(eventPrev, xmlParserCufe, xmlParserCude, nitModel);
+                    var eventRadianEndosoGarantia = logicalEventRadianEndosoGarantia.ValidateEndorsementGatantia(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
                     if (eventRadianEndosoGarantia != null || eventRadianEndosoGarantia.Count > 0)
                     {
                         foreach (var itemEventRadianEndosoGarantia in eventRadianEndosoGarantia)
@@ -3387,7 +3390,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.EndosoProcuracion:
                     //Valida eventos previos Endoso en Procuracion
                     LogicalEventRadian logicalEventRadianEndosoProcuracion = new LogicalEventRadian();
-                    var eventRadianEndosoProcuracion = logicalEventRadianEndosoProcuracion.ValidateEndorsementProcurement(eventPrev, xmlParserCufe, xmlParserCude, nitModel);
+                    var eventRadianEndosoProcuracion = logicalEventRadianEndosoProcuracion.ValidateEndorsementProcurement(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
                     if(eventRadianEndosoProcuracion != null || eventRadianEndosoProcuracion.Count > 0)
                     {
                         foreach (var itemEventRadianEndosoProcuracion in eventRadianEndosoProcuracion)
@@ -3406,7 +3409,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
                     //Valida eventos previos Cancelacion Endosos
                     LogicalEventRadian logicalEventRadianCancelaEndoso = new LogicalEventRadian();
-                    var eventRadianCancelaEndoso = logicalEventRadianCancelaEndoso.ValidateEndorsementCancell(eventPrev, xmlParserCude);
+                    var eventRadianCancelaEndoso = logicalEventRadianCancelaEndoso.ValidateEndorsementCancell(documentMeta, eventPrev, xmlParserCude);
                     if(eventRadianCancelaEndoso != null || eventRadianCancelaEndoso.Count > 0)
                     {
                         foreach (var itemEventRadianCancelaEndoso in eventRadianCancelaEndoso)
@@ -3425,7 +3428,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.NegotiatedInvoice:
                     //Valida eventos previos Limitacion de Circulacion
                     LogicalEventRadian logicalEventRadianNegotiatedInvoice = new LogicalEventRadian();
-                    var eventRadianNegotiatedInvoice = logicalEventRadianNegotiatedInvoice.ValidateNegotiatedInvoice(eventPrev);
+                    var eventRadianNegotiatedInvoice = logicalEventRadianNegotiatedInvoice.ValidateNegotiatedInvoice(documentMeta);
                     if(eventRadianNegotiatedInvoice != null || eventRadianNegotiatedInvoice.Count > 0)
                     {
                         foreach (var itemEventRadianNegotiatedInvoice in eventRadianNegotiatedInvoice)
@@ -3444,7 +3447,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
                     //Valida eventos previos Anulacion de la Limitacion de Circulacion
                     LogicalEventRadian logicalEventRadianNegotiatedInvoiceCancell = new LogicalEventRadian();
-                    var eventRadianNegotiatedInvoiceCancell = logicalEventRadianNegotiatedInvoiceCancell.ValidateNegotiatedInvoiceCancell(eventPrev);
+                    var eventRadianNegotiatedInvoiceCancell = logicalEventRadianNegotiatedInvoiceCancell.ValidateNegotiatedInvoiceCancell(documentMeta);
                     if (eventRadianNegotiatedInvoiceCancell != null || eventRadianNegotiatedInvoiceCancell.Count > 0)
                     {
                         foreach (var itemEventRadianNegotiatedInvoiceCancell in eventRadianNegotiatedInvoiceCancell)
@@ -3493,7 +3496,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                     //Valida eventos previos Pago parcial o Total
                     LogicalEventRadian logicalEventRadianPartialPayment = new LogicalEventRadian();
-                    var eventRadianPartialPayment = logicalEventRadianPartialPayment.ValidatePartialPayment(eventPrev, xmlParserCude, nitModel);
+                    var eventRadianPartialPayment = logicalEventRadianPartialPayment.ValidatePartialPayment(documentMeta, eventPrev, xmlParserCude, nitModel);
                     if(eventRadianPartialPayment != null || eventRadianPartialPayment.Count > 0)
                     {
                         foreach (var itemEventRadianPartialPayment in eventRadianPartialPayment)
@@ -3512,7 +3515,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.ValInfoPago:
                     //Valida eventos previos Informacion Pago}
                     LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
-                    var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidatePaymetInfo(eventPrev);
+                    var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidatePaymetInfo(documentMeta);
                     if (eventRadianPaymentInfo != null || eventRadianPaymentInfo.Count > 0)
                     {
                         foreach (var itemEventRadianPaymentInfo in eventRadianPaymentInfo)
@@ -3530,9 +3533,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
 
             }
-
-            //Valida si el documento AR transmitido ya se encuentra aprobado            
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
           
             foreach (var documentIdentifier in documentMeta)
             {
@@ -3541,8 +3541,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (documentMeta.Count >= 2)
                 {
                     //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
-                    if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34)
-                        || (eventPrev.CustomizationID == "361" || eventPrev.CustomizationID == "362")
+                    if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34)                       
                         || (Convert.ToInt32(eventPrev.EventCode) == 42))
                     {
                         if (documentMeta.Any(t => t.EventCode == eventPrev.EventCode
@@ -3553,11 +3552,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = (eventPrev.CustomizationID == "361" || eventPrev.CustomizationID == "362")
-                                ? ConfigurationManager.GetValue("ErrorCode_LGC23") : errorRegla,
-                                ErrorMessage = (eventPrev.CustomizationID == "361" || eventPrev.CustomizationID == "362")
-                                ? ConfigurationManager.GetValue("ErrorMessage_LGC23")
-                                : ConfigurationManager.GetValue("ErrorMessage_LGC01"),
+                                ErrorCode = errorRegla,
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
