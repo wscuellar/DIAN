@@ -2390,42 +2390,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
             //Si no hay errores inserta registro
-            if (validate)
-            {
-                //Valida existe serie
-                GlobalDocReferenceAttorney serieReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindBySerieAndNumberAttorney<GlobalDocReferenceAttorney>(serieAndNumber);
-                if(serieReferenceAttorney == null)
-                {
-                    foreach (var attorneyDocument in attorney)
-                    {
-                        GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId, attorneyDocument.cufe)
-                        {
-                            Active = true,
-                            Actor = actor,
-                            EffectiveDate = effectiveDate,
-                            EndDate = endDate,
-                            FacultityCode = attorneyDocument.facultityCode,
-                            IssuerAttorney = issuerPartyCode,
-                            SenderCode = senderCode,
-                            StartDate = startDateAttorney,
-                            AttorneyType = customizationID,
-                            SerieAndNumber = serieAndNumber,
-                            SenderName = senderName,
-                            IssuerAttorneyName = name,
-                            ResponseCodeListID = listID
-                        };
-                        TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
-                    }
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = "Mandato referenciado correctamente",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }               
-            }
+            //if (validate)
+            //{                
+            //    foreach (var attorneyDocument in attorney)
+            //    {
+            //        GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId, attorneyDocument.cufe)
+            //        {
+            //            Active = true,
+            //            Actor = actor,
+            //            EffectiveDate = effectiveDate,
+            //            EndDate = endDate,
+            //            FacultityCode = attorneyDocument.facultityCode,
+            //            IssuerAttorney = issuerPartyCode,
+            //            SenderCode = senderCode,
+            //            StartDate = startDateAttorney,
+            //            AttorneyType = customizationID,
+            //            SerieAndNumber = serieAndNumber,
+            //            SenderName = senderName,
+            //            IssuerAttorneyName = name,
+            //            ResponseCodeListID = listID
+            //        };
+            //        TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
+            //    }
+            //    responses.Add(new ValidateListResponse
+            //    {
+            //        IsValid = true,
+            //        Mandatory = true,
+            //        ErrorCode = "100",
+            //        ErrorMessage = "Mandato referenciado correctamente",
+            //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            //    });                          
+            //}
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
