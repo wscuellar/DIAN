@@ -22,7 +22,8 @@ namespace Gosocket.Dian.Functions.Events
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
         private static readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
-        private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");       
+        private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
+        private static readonly TableManager TableManagerDocumentTracking = new TableManager("GlobalDocValidatorTracking");
 
         [FunctionName("RegistrateCompletedRadian")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -39,11 +40,27 @@ namespace Gosocket.Dian.Functions.Events
                 return new EventResponse { Code = "400", Message = "Please pass a trackId in the request body." };
 
             var trackIdCude = data.TrackId;
-            var response = new EventResponse { Code = ((int)EventValidationMessage.Success).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.Success) };
+            var response = new EventResponse {
+                Code = ((int)EventValidationMessage.Success).ToString(), 
+                Message = EnumHelper.GetEnumDescription(EventValidationMessage.Success),            
+            };
             try
             {
+                var validations = new List<GlobalDocValidatorTracking>();
                 GlobalDocValidatorDocumentMeta documentMeta = null;
+                byte[] xmlBytes = null;
+                validations = TableManagerDocumentTracking.FindByPartition<GlobalDocValidatorTracking>(trackIdCude);
                 documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                xmlBytes = XmlUtil.GenerateApplicationResponseBytes(trackIdCude, documentMeta, validations);
+
+                if (xmlBytes == null)
+                {
+                    response.Code = ((int)EventValidationMessage.Error).ToString();
+                    response.Message = "No se pudo generar application response.";
+                }
+                else                               
+                    response.XmlBytesBase64 = Convert.ToBase64String(xmlBytes);                    
+                
                 if (documentMeta != null)
                 {
                     //Registra Mandato
@@ -128,7 +145,7 @@ namespace Gosocket.Dian.Functions.Events
             string startDateAttorney = string.Empty;
             string endDate = string.Empty;
             List<AttorneyModel> attorney = new List<AttorneyModel>();
-            AttorneyModel attorneyModel = new AttorneyModel();
+           
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
             XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']");
 
@@ -172,6 +189,7 @@ namespace Gosocket.Dian.Functions.Events
             
             for (int i = 0; i < cufeListResponseRefeerence.Count; i++)
             {
+                AttorneyModel attorneyModel = new AttorneyModel();
                 string[] tempCode = new string[0];
                 attorneyModel.cufe = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                 string code = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
