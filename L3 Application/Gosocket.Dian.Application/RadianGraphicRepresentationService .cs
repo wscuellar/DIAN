@@ -47,7 +47,7 @@ namespace Gosocket.Dian.Application
 
         #region GetPdfReport
 
-        public async Task<byte[]> GetPdfReport(string cude)
+        public async Task<byte[]> GetPdfReport(string cude, string urlBase)
         {
             // Load Templates            
             StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNew1.html"));
@@ -57,7 +57,9 @@ namespace Gosocket.Dian.Application
 
             // Set Variables
             DateTime expeditionDate = DateTime.Now;
-            Bitmap qrCode = RadianPdfCreationService.GenerateQR(TextResources.RadianReportQRCode.Replace("{CUFE}", model.CUDE));
+
+            string pathUrl = string.Concat(urlBase, TextResources.ReportQRCode.Replace("{CUFE}", model.CUFE));
+            Bitmap qrCode = RadianPdfCreationService.GenerateQR(pathUrl);
 
             string ImgDataURI = IronPdf.Util.ImageToDataUri(qrCode);
             string ImgHtml = String.Format("<img class='qr-content' src='{0}'>", ImgDataURI);
@@ -103,11 +105,13 @@ namespace Gosocket.Dian.Application
 
             model.EventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), eventItem.EventCode);
             model.CUDE = cude;
-
+            model.CUFE = eventItem.DocumentReferencedKey;
             Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
             xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
-            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+            //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+            string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+            ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
             
             model = MappingXpathValues(model, fieldValues);
 
@@ -129,13 +133,21 @@ namespace Gosocket.Dian.Application
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.Accepted);
                     break;
                 case EventStatus.SolicitudDisponibilizacion:
-                    if (eventItem.CustomizationID.Equals("361") || eventItem.CustomizationID.Equals("362"))
-                        model.EventTitle = "Registro Primera circulación de la FEV TV";
-                    else
-                        model.EventTitle = "Registro Circulación posterior  de la FEV TV";
+                    if (model.CustomizationID.Equals("361"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.PrimeraSolicitudDisponibilizacion);
+                    if (model.CustomizationID.Equals("362"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionDirecta);
+                    if (model.CustomizationID.Equals("363"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosterior);
+                    if (model.CustomizationID.Equals("364"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosteriorDirecta);
                     break;
                 case EventStatus.EndosoGarantia:
-                    model.Title = model.EventStatus.GetDescription();
+                    if (model.CustomizationID.Equals("371"))
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.ConResponsabilidad);
+                    else
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.SinResponsabilidad);
+
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
                     model.RequestType = eventItem.EventCode;
                     break;
@@ -150,30 +162,50 @@ namespace Gosocket.Dian.Application
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.InvoiceOfferedForNegotiation:
+                    if (model.CustomizationID.Equals("401"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.CancelacionEndoso);
+                    if (model.CustomizationID.Equals("402"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.CancelacionEndosoProcuracion);
+                    
                     model.Title = model.EventStatus.GetDescription();
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.InvoiceOfferedForNegotiation);
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.Avales:
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.Avales);
                     break;
                 case EventStatus.Mandato:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Mandato);
+                    if(model.CustomizationID.Equals("431"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlLimitado);
+                    if (model.CustomizationID.Equals("432"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlLimitado);
+                    if (model.CustomizationID.Equals("433"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlTiempo);
+                    if (model.CustomizationID.Equals("434"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlTiempoIlimitado);
                     break;
                 case EventStatus.TerminacionMandato:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.TerminacionMandato);
+                    if (model.CustomizationID.Equals("441"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionRevocatoria);
+                    if (model.CustomizationID.Equals("442"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionRenuncia);
                     break;
                 case EventStatus.ValInfoPago:
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.ValInfoPago);
                     break;
                 case EventStatus.NotificacionPagoTotalParcial:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.NotificacionPagoTotalParcial);
+                    if (model.CustomizationID.Equals("451"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.PagoParcial);
+                    if (model.CustomizationID.Equals("452"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.PagoTotal);
                     break;
                 case EventStatus.AnulacionLimitacionCirculacion:
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.AnulacionLimitacionCirculacion);
                     break;
                 case EventStatus.NegotiatedInvoice:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.NegotiatedInvoice);
+                    if (model.CustomizationID.Equals("421"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionSentencia);
+                    if (model.CustomizationID.Equals("422"))
+                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionAnticipada); 
                     break;
                 default:
                     model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
@@ -203,8 +235,8 @@ namespace Gosocket.Dian.Application
                 });
             }
 
-            model.EntityName = referenceMeta.Serie;
-            model.CertificateNumber = referenceMeta.SerieAndNumber;
+            //model.EntityName = referenceMeta.Serie;
+            //model.CertificateNumber = referenceMeta.SerieAndNumber;
 
             Domain.Entity.GlobalDocValidatorDocument eventVerification =
                     globalDocValidatorDocumentTableManager.Find<Domain.Entity.GlobalDocValidatorDocument>(referenceMeta?.Identifier, referenceMeta?.Identifier);
@@ -292,7 +324,7 @@ namespace Gosocket.Dian.Application
 
             if (model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "043" || model.EventCode == "045")
             {
-                htmlEvent += "<div id='OperationDetails' class='text-subtitle text-gray'> Detalles del evento: <a class='text-data'>{OperationDetails}</a></div>";
+                htmlEvent += "<div class='text-subtitle text-gray'> Detalles del evento: <a class='text-data'>{ResponseCodeListID}</a></div>";
             }
             if (isInEvent)
             {
@@ -410,6 +442,8 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EventTotalValueEndoso}", model.EventTotalValueEndoso);
             template = template.Replace("{EventTotalValueLimitation}", model.EventTotalValueLimitation);
             template = template.Replace("{EventTotalValuePago}", model.EventTotalValuePago);
+            template = template.Replace("{ResponseCodeListID}", model.ResponseCodeListID == "1" ? EnumHelper.GetDescription(EndodoSubEventStatus.Completo) : EnumHelper.GetDescription(EndodoSubEventStatus.EnBlanco));
+
 
             if (!(model.EventCode == "036" || model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "040"))
             {
@@ -457,22 +491,6 @@ namespace Gosocket.Dian.Application
                 subjects.Append(templateSujeto);
 
                 subjects = SubjectTemplateMapping(subjects, "1", "Datos del emisor",
-                    model.ReceiverName
-                    , model.ReceiverType
-                    , model.ReceiverDocumentType
-                    , model.ReceiverCode
-                    , string.Empty
-                    , string.Empty
-                    , model.ReceiverEmail
-                    , model.ReceiverPhoneNumber
-                    , "emisor");
-
-                // Section 2
-
-                //subjects.Append(sectionHtml);
-                subjects.Append(templateSujeto);
-
-                subjects = SubjectTemplateMapping(subjects, "2", "Datos del receptor",
                     model.SenderName
                     , model.ReceiverType
                     , model.SenderDocumentType
@@ -481,6 +499,22 @@ namespace Gosocket.Dian.Application
                     , string.Empty
                     , model.SenderEmail
                     , model.SenderPhoneNumber
+                    , "emisor");
+
+                // Section 2
+
+                //subjects.Append(sectionHtml);
+                subjects.Append(templateSujeto);
+
+                subjects = SubjectTemplateMapping(subjects, "2", "Datos del receptor",
+                    model.ReceiverName
+                    , model.ReceiverType
+                    , model.ReceiverDocumentType
+                    , model.ReceiverCode
+                    , string.Empty
+                    , string.Empty
+                    , model.ReceiverEmail
+                    , model.ReceiverPhoneNumber
                     , "receptor");
 
                 template = template.Replace("{SectionsData}", subjects.ToString());
@@ -498,7 +532,8 @@ namespace Gosocket.Dian.Application
                 for (int i = 0; i < model.ValueTitleEvents[0].Events.Count; i++)
                 {
                     Event eventDoc = model.ValueTitleEvents[0].Events[i];
-                    templateTitleValue = DocumentTemplateMapping(templateTitleValue, eventDoc, (i + 1).ToString());
+                    if(eventDoc != null)
+                        templateTitleValue = DocumentTemplateMapping(templateTitleValue, eventDoc, (i + 1).ToString());
                 }
                 template = template.Replace("{TitleValue}", templateTitleValue.ToString());
             }
@@ -512,7 +547,7 @@ namespace Gosocket.Dian.Application
 
             // Mapping Final Data Section
 
-            template = template.Replace("{FinalData}", $"Nombre de la Entidad de Certificación Digital: {model.EntityName}  Número del certificado digital: {model.CertificateNumber} ");
+            template = template.Replace("{FinalData}", $"Nombre de la Entidad de Certificación Digital: {model.EntityName} <br> Número del certificado digital: {model.CertificateNumber} ");
 
             return template;
         }
@@ -535,6 +570,11 @@ namespace Gosocket.Dian.Application
             string sujeto
             )
         {
+            if (!string.IsNullOrEmpty(subjectNit))
+            {
+                string html = "Nit del {sujeto}: < a class='text-data'>{SubjectNit}</a>";
+                template = template.Replace("{nitData}", html);
+            }
             template = template.Replace("{sujeto}", sujeto);
             template = template.Replace("{SectionNumber}", sectionNumber);
             template = template.Replace("{titleNameParticipant}", subjectNumber);
@@ -598,11 +638,15 @@ namespace Gosocket.Dian.Application
                 { "Note","//*[local-name()='ApplicationResponse']/*[local-name()='Note']" },
                 { "SignedBy","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Signature']/*[local-name()='Object']/*[local-name()='QualifyingProperties']/*[local-name()='SignedProperties']/*[local-name()='SignedSignatureProperties']/*[local-name()='SignerRole']/*[local-name()='ClaimedRoles']/*[local-name()='ClaimedRole']" },
                 { "EventCode","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
-                { "EventTotalValueAval","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionAvalar']/*[local-name()='Value']" },
-                { "EventTotalValueEndoso","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value']" },
-                { "EventTotalValueLimitation","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionMedidaCautelar']/*[local-name()='Value']" },
+                { "EventTotalValueAval","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionAvalar']/*[local-name()='Value'])[1]" },
+                { "EventTotalValueEndoso","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value'])[1]" },
+                { "EventTotalValueLimitation","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionMedidaCautelar']/*[local-name()='Value'])[1]" },
                 { "EventTotalValuePago","//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']" },
-                { "InvoiceNumber","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']" }
+                { "InvoiceNumber","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']" },
+                { "CustomizationID","//*[local-name()='ApplicationResponse']/*[local-name()='CustomizationID']" },
+                { "ResponseCodeListID", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']/@listID" },
+                { "CertificateNumber", "(//*[local-name()='X509SerialNumber'])[1]" },
+                { "EntityName", "(//*[local-name()='X509IssuerName'])[1]" }
             };
             return requestObj;
         }
@@ -661,6 +705,10 @@ namespace Gosocket.Dian.Application
             model.EventTotalValueLimitation = dataValues.XpathsValues["EventTotalValueLimitation"] != null ? dataValues.XpathsValues["EventTotalValueLimitation"] : string.Empty;
             model.EventTotalValuePago = dataValues.XpathsValues["EventTotalValuePago"] != null ? dataValues.XpathsValues["EventTotalValuePago"] : string.Empty;
             model.InvoiceNumber = dataValues.XpathsValues["InvoiceNumber"] != null ? dataValues.XpathsValues["InvoiceNumber"] : string.Empty;
+            model.CustomizationID = dataValues.XpathsValues["CustomizationID"] != null ? dataValues.XpathsValues["CustomizationID"] : string.Empty;
+            model.ResponseCodeListID = dataValues.XpathsValues["ResponseCodeListID"] != null ? dataValues.XpathsValues["ResponseCodeListID"] : string.Empty;
+            model.EntityName = dataValues.XpathsValues["EntityName"] != null ? dataValues.XpathsValues["EntityName"] : string.Empty;
+            model.CertificateNumber = dataValues.XpathsValues["CertificateNumber"] != null ? dataValues.XpathsValues["CertificateNumber"] : string.Empty;
 
             
 
