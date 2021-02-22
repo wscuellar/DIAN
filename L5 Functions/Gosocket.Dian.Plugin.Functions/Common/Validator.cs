@@ -2188,7 +2188,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
-                    for (int i = 1; i <= AttachmentBase64List.Count && validate; i++)
+                    for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
                     {
                         string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString();
                         if (!IsBase64(AttachmentBase64))
