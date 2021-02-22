@@ -143,16 +143,16 @@ namespace Gosocket.Dian.Application
                         model.EventTitle = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosteriorDirecta);
                     break;
                 case EventStatus.EndosoGarantia:
+                    model.Title = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
+                    model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
+                    model.RequestType = eventItem.EventCode;
+                    break;
+                case EventStatus.EndosoPropiedad:
                     if (model.CustomizationID.Equals("371"))
                         model.Title = EnumHelper.GetDescription(SubEventStatus.ConResponsabilidad);
                     else
                         model.Title = EnumHelper.GetDescription(SubEventStatus.SinResponsabilidad);
 
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
-                    model.RequestType = eventItem.EventCode;
-                    break;
-                case EventStatus.EndosoPropiedad:
-                    model.Title = model.EventStatus.GetDescription();
                     model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoPropiedad);
                     model.RequestType = eventItem.EventCode;
                     break;
