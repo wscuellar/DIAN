@@ -2456,7 +2456,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (ConfigurationManager.GetValue("Environment") == "Prod" || ConfigurationManager.GetValue("Environment") == "Test")
             {
                 var documentType = documentMeta?.DocumentTypeId;
-                if (new string[] { "01", "02", "04", "09", "11" }.Contains(documentType)) documentType = "01";
+                if (new string[] { "01", "02", "04", "05", "09", "11" }.Contains(documentType)) documentType = "01";
                 var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
                 range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
             }
