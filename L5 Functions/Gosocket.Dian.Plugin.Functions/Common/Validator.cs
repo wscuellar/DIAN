@@ -1995,22 +1995,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                 }
-            }               
+            }
 
-            //Validacion senderParty igual a  senderParty / PowerOfAttorney ID
-            if (senderCode != senderPowerOfAttorney)
+            if (!string.IsNullOrWhiteSpace(senderPowerOfAttorney))
             {
-                validate = false;
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF32"),
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF32"),
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }          
+                long number1 = 0;
+                bool valNumber = long.TryParse(senderPowerOfAttorney, out number1);
 
+                //Validacion senderParty igual a  senderParty / PowerOfAttorney ID
+                if (valNumber && senderCode != senderPowerOfAttorney)
+                {
+                    validate = false;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF32"),
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF32"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+          
             //Validacion descripcion Mandante
             switch (senderId)
             {
