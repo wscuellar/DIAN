@@ -1215,9 +1215,14 @@ namespace Gosocket.Dian.Infrastructure
                     partitionKey));
 
             prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
+                TableOperators.And,
                 TableQuery.GenerateFilterConditionForBool("Deleted",
                     QueryComparisons.Equal,
-                    deleted),
+                    deleted));
+
+            prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition("State",
                     QueryComparisons.Equal,
@@ -1321,6 +1326,22 @@ namespace Gosocket.Dian.Infrastructure
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("Code", QueryComparisons.Equal, code));
             return CloudTable.ExecuteQuery(query).FirstOrDefault();
+        }
+
+        public T GlobalPayrollByRowKey_Number<T>(string rowkey, string number) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    rowkey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("Numero",
+                    QueryComparisons.Equal,
+                    number));
+
+            return CloudTable.ExecuteQuery(query.Where(prefixCondition)).FirstOrDefault();
         }
     }
 }

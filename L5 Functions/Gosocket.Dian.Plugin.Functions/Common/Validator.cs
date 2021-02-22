@@ -43,12 +43,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager numberRangeTableManager = new TableManager("GlobalNumberRange");
         static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
         static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
-        static readonly TableManager typeListTableManager = new TableManager("GlobalTypeList");
+        static readonly TableManager typeListTableManager = new TableManager("GlobalTypeList");        
         private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
         private TableManager TableManagerGlobalAttorneyFacultity = new TableManager("GlobalAttorneyFacultity");
         private TableManager TableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
         private TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
         private TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
+        private TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -358,7 +359,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
-            responses.AddRange(this.CheckIndividualPayrollDuplicity(model.CUNE));
+            responses.AddRange(this.CheckIndividualPayrollDuplicity(model.EmpleadorNIT, model.SerieAndNumber));
 
             if (Convert.ToInt32(model.DocumentTypeId) == Convert.ToInt32(DocumentType.IndividualPayroll))
             {                
@@ -407,7 +408,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIAE034", ErrorMessage = "Debe ir el DV del Empleador", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
 
-                var otherElectricDocuments = TableManagerGlobalOtherDocElecOperation.FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.ProveedorNIT,
+                var otherElectricDocuments = TableManagerGlobalOtherDocElecOperation
+                    .FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.ProveedorNIT,
                     nominaModel.ProveedorSoftwareID, false, "Habilitado");
                 if(otherElectricDocuments != null && otherElectricDocuments.Count > 0)
                 {
@@ -861,14 +863,48 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     return responses;
                 case (int)EventStatus.SolicitudDisponibilizacion:
+
+                    //Valida existe cambio legitimo tenedor factura
+                    LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
+                    HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(nitModel.DocumentKey);
+                    string[] endosatarios = new string[0];
+                    bool validFor = true;
+                    bool validHolderExchang = false;
+                    if (responseHolderExchange != null)
+                    {
+                        validHolderExchang = true;
+                        endosatarios = responseHolderExchange.PartyLegalEntity.Split('|');
+                        if (endosatarios.Length == 1)
+                        {
+                            senderCode = responseHolderExchange.PartyLegalEntity;
+                        }
+                        else
+                        {
+                            //Valida exista mandatario representante para cada legitimo tenedor
+                            foreach (string endosatario in endosatarios)
+                            {
+                                GlobalDocReferenceAttorney documentAttorney = TableManagerGlobalDocReferenceAttorney.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(nitModel.DocumentKey, endosatario, xmlParserCude.ProviderCode);
+                                if (documentAttorney == null)
+                                {
+                                    validFor = false;
+                                }
+                            }
+
+                            if (validFor)
+                            {
+                                senderCode = xmlParserCude.ProviderCode;
+                            }
+                        }
+                    }
+
                     if (party.SenderParty != senderCode)
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = errorCodeMessage.errorCode,
-                            ErrorMessage = errorCodeMessage.errorMessage,
+                            ErrorCode = validHolderExchang ? errorCodeMessage.errorCodeB : errorCodeMessage.errorCode,
+                            ErrorMessage = validHolderExchang ? errorCodeMessage.errorMessageB : errorCodeMessage.errorMessage,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1438,6 +1474,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string cufe = party.TrackId;
             string senderCode = nitModel.SenderCode;
             string noteMandato = xmlParserCude.NoteMandato;
+            string noteMandato2 = xmlParserCude.NoteMandato2;
             string softwareId = xmlParserCude.Fields["SoftwareId"].ToString();
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -1580,18 +1617,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         if ((attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0") && codeFacultity != "MR91")
                                         {
                                             //Valida exista note mandatario
-                                            if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                            if ( noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))                                              
                                             {
-                                                validError = true;
-                                                responses.Add(new ValidateListResponse
+                                                if ( noteMandato2 == null || !noteMandato2.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                                                 {
-                                                    IsValid = false,
-                                                    Mandatory = true,
-                                                    ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                                    ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                });
-                                                break;
+                                                    validError = true;
+                                                    responses.Add(new ValidateListResponse
+                                                    {
+                                                        IsValid = false,
+                                                        Mandatory = true,
+                                                        ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                                        ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                    });
+                                                    break;
+                                                }
+                                               
                                             }
 
                                             //Si mandatario tiene permisos/facultades y esta habilitado para emitir documentos
@@ -2994,7 +3035,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string documentTypeIdRef, string issuerPartyCode = null, string issuerPartyName = null)
         {
             string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
-                ? "No corresponde a un tipo de documento valido"
+                ? ConfigurationManager.GetValue("ErrorMessage_AAH09_043")
                 : ConfigurationManager.GetValue("ErrorMessage_AAH09");
             string errorCodeReglaUUID = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
                 ? ConfigurationManager.GetValue("ErrorCode_AAL07")
@@ -4418,7 +4459,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 response.errorCode = "AAF01";
                 response.errorMessage = "No fue informado el avalista";
                 response.errorCodeNoteA = "AAD11a";
-                response.errorMessageNoteA = "No fue informada la nota cuando el evento fue generado por un mandato. ";
+                response.errorMessageNoteA = "No se informo la nota cuando el evento fue generado por un mandato.";
             }
             else if (eventCode == "037")
             {
@@ -4501,7 +4542,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region Individual Payroll
 
-        private List<ValidateListResponse> CheckIndividualPayrollDuplicity(string cune)
+        private List<ValidateListResponse> CheckIndividualPayrollDuplicity(string companyId, string serieAndNumber)
         {
             DateTime startDate = DateTime.UtcNow;
             
@@ -4516,43 +4557,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             });
 
             // Solo se podrá transmitir una única vez el número del documento para el trabajador.
-            var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
-            if (documentMeta != null)
+            var payroll = payrollTableManager.GlobalPayrollByRowKey_Number<GlobalDocPayroll>(companyId, serieAndNumber);
+            if (payroll != null)
             {
-                var identifier = StringUtil.GenerateIdentifierSHA256($"{documentMeta.SenderCode}{documentMeta.DocumentTypeId}{documentMeta.SerieAndNumber}");
-                var document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(identifier, identifier, documentMeta.PartitionKey);
-                if(document != null)
+                responses.Clear();
+                responses.Add(new ValidateListResponse
                 {
-                    responses.Clear();
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "90",
-                        ErrorMessage = "Documento procesado anteriormente",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-                else
-                {
-                    var meta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
-                    if (meta != null)
-                    {
-                        document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(meta?.Identifier, meta?.Identifier, meta.PartitionKey);
-                        if (document != null)
-                        {
-                            responses.Clear();
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "90",
-                                ErrorMessage = "Documento procesado anteriormente",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
-                }
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "90",
+                    ErrorMessage = "Documento procesado anteriormente",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
 
             return responses;
