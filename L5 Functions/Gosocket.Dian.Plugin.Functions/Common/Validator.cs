@@ -1997,12 +1997,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
+            //Validacion senderParty igual a  senderParty / PowerOfAttorney ID
             if (!string.IsNullOrWhiteSpace(senderPowerOfAttorney))
             {
                 long number1 = 0;
                 bool valNumber = long.TryParse(senderPowerOfAttorney, out number1);
-
-                //Validacion senderParty igual a  senderParty / PowerOfAttorney ID
+              
                 if (valNumber && senderCode != senderPowerOfAttorney)
                 {
                     validate = false;
