@@ -157,7 +157,8 @@
                         Accion: 'SeleccionParticipante',
                         ElectronicDocument: electronicDocumentId,
                         complementoTexto: complementoTexto,
-                        ContributorIdType: ContributorIdType
+                        ContributorIdType: ContributorIdType,
+                        ContributorId: '@ViewBag.ContributorId'
                     };
 
                     CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
@@ -195,7 +196,8 @@
                     ElectronicDocumentId: electronicDocumentId,
                     complementoTexto: complementoTexto,
                     ContributorIdType: ContributorIdType,
-                    OperationModeId: OperationMode
+                    OperationModeId: OperationMode,
+                    ContributorId: '@ViewBag.ContributorId'
                 };
 
                 CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherDocs,
