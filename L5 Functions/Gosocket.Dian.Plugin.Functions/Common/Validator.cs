@@ -3541,8 +3541,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (documentMeta.Count >= 2)
                 {
                     //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
-                    if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34)                       
-                        || (Convert.ToInt32(eventPrev.EventCode) == 42))
+                    if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34))
                     {
                         if (documentMeta.Any(t => t.EventCode == eventPrev.EventCode
                         && document != null && t.Identifier == document?.PartitionKey && string.IsNullOrEmpty(t.TestSetId)
