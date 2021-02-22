@@ -229,7 +229,6 @@
             })
 
             $(".download-support-document").click(function () {
-                console.log("Entre");
                 var cufe = this.id;
                 var element = '#' +cufe;
                 showPdfModalClick(cufe, '@Url.Action("PrintSupportDocument", "Document")', '#panel-form1');

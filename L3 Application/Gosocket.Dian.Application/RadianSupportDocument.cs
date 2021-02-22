@@ -18,6 +18,7 @@ namespace Gosocket.Dian.Application
     using System.IO;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Web;
     using System.Xml;
     using System.Xml.Linq;
 
@@ -57,12 +58,19 @@ namespace Gosocket.Dian.Application
 
             // Load xpaths
             Dictionary<string, string> xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
-
+           
             try
             {
                 //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
                 string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
                 ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
+
+                Dictionary<string, string> newFieldValues = new Dictionary<string, string>();
+                foreach (KeyValuePair<string, string> element in fieldValues.XpathsValues)
+                {
+                    newFieldValues.Add(element.Key, getUtfEncode(element.Value));
+                }
+                fieldValues.XpathsValues = newFieldValues;
 
                 // Build QRCode
                 Bitmap qrCode = RadianPdfCreationService.GenerateQR($"{webPath}?documentkey={cude}");
@@ -109,7 +117,8 @@ namespace Gosocket.Dian.Application
 
             var fileManager = new FileManager();
             var container = $"global";
-            var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
+            //var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
+            var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/8bd6a4cf6b4e2ee29e608d38880669512256f9c1b054813467e41ce6330848852da3bf8b0310bf941aa7becea3e6740c.xml";
             var xmlBytes = fileManager.GetBytes(container, fileName);
 
             return xmlBytes;
@@ -150,7 +159,7 @@ namespace Gosocket.Dian.Application
                 { "PaymentDueDate","/*[local-name() = 'Invoice']/*[local-name() = 'PaymentMeans']/*[local-name() = 'PaymentDueDate']"},
                 // Seller Data
                 { "SellerNit", "//*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'CompanyID']" },
-                { "SellerBusinessName", "/*[local-name() = 'Invoice']/*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PartyLegalEntity']/*[local-name() = 'RegistrationName']"},
+                { "SellerBusinessName", "(//*[local-name() = 'Invoice']/*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PartyLegalEntity']/*[local-name() = 'RegistrationName'])[1]"},
                 { "SellerDocumentType","//*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'CompanyID']/@schemeName"},
                 { "SellerDocumentNumber", "//*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'Party']/*[local-name() = 'PartyTaxScheme']/*[local-name() = 'CompanyID']" },
                 { "SellerTaxpayerType","//*[local-name() = 'AccountingSupplierParty']/*[local-name() = 'AdditionalAccountID']"},
@@ -278,7 +287,9 @@ namespace Gosocket.Dian.Application
             
             // Seller Data
             template = template.Replace( "{SellerNit}", dataValues.XpathsValues["SellerNit"]);
-            template = template.Replace( "{SellerBusinessName}", dataValues.XpathsValues["SellerBusinessName"]);
+         
+            template = template.Replace("{SellerBusinessName}", dataValues.XpathsValues["SellerBusinessName"]);
+
             template = template.Replace("{SellerDocumentNumber}", dataValues.XpathsValues["SellerDocumentNumber"]);
 
             if (!string.IsNullOrEmpty(dataValues.XpathsValues["SellerDocumentType"]))
@@ -611,8 +622,18 @@ namespace Gosocket.Dian.Application
             template.Replace("{TotalRetentions}", retentions.ToString());
 
             return template;
-        } 
+        }
 
+        #endregion
+
+        #region
+        string getUtfEncode(string text)
+        {
+            byte[] utf8Bytes = Encoding.UTF8.GetBytes(text);
+            byte[] win1252Bytes = Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding("Windows-1252"), utf8Bytes);
+            string sConvertedString = Encoding.UTF8.GetString(win1252Bytes);
+            return sConvertedString;
+        }
         #endregion
 
     }
