@@ -2456,7 +2456,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (ConfigurationManager.GetValue("Environment") == "Prod" || ConfigurationManager.GetValue("Environment") == "Test")
             {
                 var documentType = documentMeta?.DocumentTypeId;
-                if (new string[] { "01", "02", "04", "05", "09", "11" }.Contains(documentType)) documentType = "01";
+                if (new string[] { "01", "02", "04", "05", "09", "11","101" }.Contains(documentType)) documentType = "01";
                 var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
                 range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
             }
@@ -2469,6 +2469,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     
+                    return responses;
+                }
+                else if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice)
+                {
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DIAD05d", ErrorMessage = "Número del documento soporte de importación no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DIAD05e", ErrorMessage = "Número del documento soporte de importación no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
                     return responses;
                 }
                 else
@@ -2563,10 +2570,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             long.TryParse(numberRangeModel.StartNumber, out long fromNumber);
-            string errorCodeModel = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB11b" : "FAB11b";
-            string messageCodeModel = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice 
-                ? "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigentes para el contribuyente vendedor"
+            string errorCodeModel = "DSAB11b";
+            errorCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice) ? "DIAD05b" : "FAB11b";
+
+            string messageCodeModel = "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigentes para el contribuyente vendedor";
+            messageCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice) 
+                ? "Número del documento soporte de importación es inferior al número inicial del rango de numeración autorizado" 
                 : "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.";
+                
             if (range.FromNumber == fromNumber)
                 responses.Add(new ValidateListResponse { 
                     IsValid = true, 
@@ -2584,10 +2595,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
 
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
-            string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";
-            string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
-                ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente vendedor"
+            string errorCodeModel2 = "DSAB12b";
+            errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice ? "DIAD05c" : "FAB12b";
+            string messageCodeModel2 = "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente vendedor";
+            messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice
+                ? "Número del documento soporte de importación es superior al número final del rango de numeración autorizado"
                 : "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.";
+
             if (range.ToNumber == endNumber)
                 responses.Add(new ValidateListResponse { 
                     IsValid = true, 
