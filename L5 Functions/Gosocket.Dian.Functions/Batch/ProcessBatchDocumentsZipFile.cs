@@ -294,43 +294,46 @@ namespace Gosocket.Dian.Functions.Batch
                         var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), request);
 
                         //Registra tablas de negocio AR
-                        if(validations.Count == 0)
+                        if (flagApplicationResponse)
                         {
-                            appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
-                        }
-                        else
-                        {
-                            //Validaciones reglas Validador Xpath
-                            var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
-                            var notifications = validations.Where(r => r.IsNotification).ToList();
-                           
-                            if (!errors.Any( ) && !notifications.Any()) { validateDocumentUrl = true; }
-
-                            if(errors.Any()) { validateDocumentUrl = false; }
-
-                            if (notifications.Any()) { validateDocumentUrl = !errors.Any(); }
-
-                            if (validateDocumentUrl)
+                            if (validations.Count == 0)
                             {
-                                try
+                                appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                            }
+                            else
+                            {
+                                //Validaciones reglas Validador Xpath
+                                var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
+                                var notifications = validations.Where(r => r.IsNotification).ToList();
+
+                                if (!errors.Any() && !notifications.Any()) { validateDocumentUrl = true; }
+
+                                if (errors.Any()) { validateDocumentUrl = false; }
+
+                                if (notifications.Any()) { validateDocumentUrl = !errors.Any(); }
+
+                                if (validateDocumentUrl)
                                 {
-                                    byte[] xmlBytesEvent = null;
-                                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedRadianUrl"), new { TrackId = trackId });
-                                    if (processRegistrateComplete.Code == "100")
+                                    try
                                     {
-                                        xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
-                                        appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = xmlBytesEvent, Success = true });
-                                    }                                        
-                                    else
+                                        byte[] xmlBytesEvent = null;
+                                        var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedRadianUrl"), new { TrackId = trackId });
+                                        if (processRegistrateComplete.Code == "100")
+                                        {
+                                            xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
+                                            appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = xmlBytesEvent, Success = true });
+                                        }
+                                        else
+                                            appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                                    }
+                                    catch (Exception ex)
+                                    {
                                         appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                                        log.Error($"Error al generar registro complemento de datos en RADIAN con trackId: {trackId} Message: {ex.Message}, StackTrace: {ex.StackTrace}");
+                                    }
                                 }
-                                catch(Exception ex)
-                                {
-                                    appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
-                                    log.Error($"Error al generar registro complemento de datos en RADIAN con trackId: {trackId} Message: {ex.Message}, StackTrace: {ex.StackTrace}");
-                                }                               
-                            }                         
-                        }
+                            }
+                        }                       
 
                         var batchFileResult = GetBatchFileResult(zipKey, trackId, validations);
                         if (batchFileResult != null)

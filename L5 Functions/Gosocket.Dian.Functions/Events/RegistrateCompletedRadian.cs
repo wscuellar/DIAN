@@ -191,8 +191,15 @@ namespace Gosocket.Dian.Functions.Events
             {
                 AttorneyModel attorneyModel = new AttorneyModel();
                 string[] tempCode = new string[0];
-                attorneyModel.cufe = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
-                string code = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
+
+                //Solo si existe información referenciada del CUFE
+                if (listID != "3")
+                    attorneyModel.cufe = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                else                
+                    attorneyModel.cufe = "01";
+
+
+                    string code = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
                 if (!string.IsNullOrWhiteSpace(code))
                 {
                     tempCode = code.Split(';');
