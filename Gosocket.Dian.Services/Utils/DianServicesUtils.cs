@@ -793,7 +793,7 @@ namespace Gosocket.Dian.Services.Utils
                     }
                 case "96":
                     {
-                        codeMessage = "Regla: AA";
+                        codeMessage = "AA";
                         txtRegla = "Regla: ";
                         txtRechazo = ", Rechazo: ";
                         break;
@@ -948,8 +948,8 @@ namespace Gosocket.Dian.Services.Utils
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
-                }                
-                            
+                }
+
             }
             else
             {
