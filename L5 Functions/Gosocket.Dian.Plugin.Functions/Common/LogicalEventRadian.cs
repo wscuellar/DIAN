@@ -1594,6 +1594,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                             }
                         }
+                        break;
                     }
                     else
                         validForItem = true;
@@ -1746,6 +1747,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                             }
                         }
+                        break;
                     }
                     else
                         validForItem = true;
@@ -1909,7 +1911,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 }
                             }
                         }
-
+                        break;
                     }
                     else
                         validForItem = true;
