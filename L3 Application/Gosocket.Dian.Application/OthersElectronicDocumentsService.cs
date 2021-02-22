@@ -85,7 +85,7 @@ namespace Gosocket.Dian.Application
             ContributorOperation.OperationStatusId = (int)(Contributor.State == OtherDocElecState.Habilitado.GetDescription() ? (int)OtherDocElecState.Test : (int)RadianState.Registrado);
             int operationId = _othersDocsElecContributorOperationRepository.Add(ContributorOperation);
             existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.Id == operationId);
-
+            // se asigna el nuevo set de pruebas...
             ApplyTestSet(ContributorOperation, testSet, Contributor, existingOperation, soft);
 
             return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
@@ -108,6 +108,8 @@ namespace Gosocket.Dian.Application
 
             if (entity.State == OtherDocElecState.Cancelado.GetDescription())
                 CancelParticipant(entity);
+
+            entity.Update = DateTime.Now;
 
             _othersDocsElecContributorRepository.AddOrUpdate(entity);
 

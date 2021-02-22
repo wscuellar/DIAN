@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Linq;
+using Gosocket.Dian.Functions.Models;
 
 namespace Gosocket.Dian.Functions.Events
 {
@@ -21,7 +22,8 @@ namespace Gosocket.Dian.Functions.Events
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
         private static readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
-        private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");       
+        private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
+        private static readonly TableManager TableManagerDocumentTracking = new TableManager("GlobalDocValidatorTracking");
 
         [FunctionName("RegistrateCompletedRadian")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -38,22 +40,38 @@ namespace Gosocket.Dian.Functions.Events
                 return new EventResponse { Code = "400", Message = "Please pass a trackId in the request body." };
 
             var trackIdCude = data.TrackId;
-            var response = new EventResponse { Code = ((int)EventValidationMessage.Success).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.Success) };
+            var response = new EventResponse {
+                Code = ((int)EventValidationMessage.Success).ToString(), 
+                Message = EnumHelper.GetEnumDescription(EventValidationMessage.Success),            
+            };
             try
             {
+                var validations = new List<GlobalDocValidatorTracking>();
                 GlobalDocValidatorDocumentMeta documentMeta = null;
+                byte[] xmlBytes = null;
+                validations = TableManagerDocumentTracking.FindByPartition<GlobalDocValidatorTracking>(trackIdCude);
                 documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
+                xmlBytes = XmlUtil.GenerateApplicationResponseBytes(trackIdCude, documentMeta, validations);
+
+                if (xmlBytes == null)
+                {
+                    response.Code = ((int)EventValidationMessage.Error).ToString();
+                    response.Message = "No se pudo generar application response.";
+                }
+                else                               
+                    response.XmlBytesBase64 = Convert.ToBase64String(xmlBytes);                    
+                
                 if (documentMeta != null)
                 {
-                    //Referecnia evento inicial para Anulacion Endoso y Terminacion de Limitacion circulacion
-                    if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation
-                        || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+                    //Registra Mandato
+                    if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato)
                     {
-                        documentMeta.CancelElectronicEvent = documentMeta.DocumentReferencedKey;
-
-                        //Obtiene informacion CUFE referenciado Endoso y Terminacion de Limitacion circulacion
-                        var documentMetaReferenced = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(documentMeta.DocumentReferencedKey, documentMeta.DocumentReferencedKey);
-                        documentMeta.DocumentReferencedKey = documentMetaReferenced.DocumentReferencedKey;
+                        //Obtiene XML ApplicationResponse CUDE
+                        var xmlBytesCude = await Utils.Utils.GetXmlFromStorageAsync(trackIdCude);
+                        var xmlParserCude = new XmlParser(xmlBytesCude);
+                        if (!xmlParserCude.Parser())
+                            throw new Exception(xmlParserCude.ParserError);
+                        InsertUpdateMandato(xmlParserCude, trackIdCude);
                     }
 
                     GlobalDocRegisterProviderAR documentRegisterAR = new GlobalDocRegisterProviderAR(trackIdCude, documentMeta.TechProviderCode)
@@ -77,13 +95,11 @@ namespace Gosocket.Dian.Functions.Events
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoPropiedad)
                     {
                         //Obtiene XML ApplicationResponse CUDE
-
                         var xmlBytesCude = await Utils.Utils.GetXmlFromStorageAsync(trackIdCude);
                         var xmlParserCude = new XmlParser(xmlBytesCude);
                         if (!xmlParserCude.Parser())
                             throw new Exception(xmlParserCude.ParserError);                     
                         UpdateEndoso(xmlParserCude, documentMeta);
-
                     }
 
                     //Actuliza estado en transaccion FETV
@@ -121,54 +137,175 @@ namespace Gosocket.Dian.Functions.Events
 
         }
 
+        #region InsertUpdateMandato
+        private static void InsertUpdateMandato(XmlParser xmlParser, string trackIdCude)
+        {
+            var arrayTasks = new List<Task>();
+            string modoOperacion = string.Empty;
+            string startDateAttorney = string.Empty;
+            string endDate = string.Empty;
+            List<AttorneyModel> attorney = new List<AttorneyModel>();
+           
+            string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
+            XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']");
+
+            string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
+            string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0)?.InnerText.ToString();
+            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
+            string serieAndNumber = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ID']").Item(0)?.InnerText.ToString();
+            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
+            string senderName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='RegistrationName']").Item(0)?.InnerText.ToString();
+            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
+            string firstName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FirstName']").Item(0)?.InnerText.ToString();
+            string familyName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FamilyName']").Item(0)?.InnerText.ToString();
+            string name = firstName + " " + familyName;
+
+            //Descripcion Mandatario 
+            switch (factorTemp)
+            {
+                case "M-SN-e":
+                    modoOperacion = "SNE";
+                    break;
+                case "M-Factor":
+                    modoOperacion = "F";
+                    break;
+                case "M-PT":
+                    modoOperacion = "PT";
+                    break;
+            }
+
+            //Valida Mandato si es Ilimitado o Limitado
+            if (customizationID == "432" || customizationID == "434")
+            {
+                startDateAttorney = string.Empty;
+                endDate = string.Empty;
+            }
+            else if (customizationID == "431" || customizationID == "433")
+            {
+                startDateAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='StartDate']").Item(0)?.InnerText.ToString();
+                endDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='EndDate']").Item(0)?.InnerText.ToString();
+            }
+
+            
+            for (int i = 0; i < cufeListResponseRefeerence.Count; i++)
+            {
+                AttorneyModel attorneyModel = new AttorneyModel();
+                string[] tempCode = new string[0];
+
+                //Solo si existe información referenciada del CUFE
+                if (listID != "3")
+                    attorneyModel.cufe = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                else                
+                    attorneyModel.cufe = "01";
+
+
+                    string code = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
+                if (!string.IsNullOrWhiteSpace(code))
+                {
+                    tempCode = code.Split(';');
+                }
+
+                foreach (string codeAttorney in tempCode)
+                {
+                    string[] tempCodeAttorney = codeAttorney.Split('-');                                        
+                    if (attorneyModel.facultityCode == null)
+                    {
+                        attorneyModel.facultityCode += tempCodeAttorney[0];
+                    }
+                    else
+                    {
+                        attorneyModel.facultityCode += (";" + tempCodeAttorney[0]);
+                    }
+                    
+                }
+                attorney.Add(attorneyModel);
+            }
+
+            foreach (var attorneyDocument in attorney)
+            {
+                GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackIdCude, attorneyDocument.cufe)
+                {
+                    Active = true,
+                    Actor = modoOperacion,
+                    EffectiveDate = effectiveDate,
+                    EndDate = endDate,
+                    FacultityCode = attorneyDocument.facultityCode,
+                    IssuerAttorney = issuerPartyCode,
+                    SenderCode = senderCode,
+                    StartDate = startDateAttorney,
+                    AttorneyType = customizationID,
+                    SerieAndNumber = serieAndNumber,
+                    SenderName = senderName,
+                    IssuerAttorneyName = name,
+                    ResponseCodeListID = listID
+                };
+                arrayTasks.Add(TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney));
+            }
+        }
+        #endregion
+
+
+        #region InsertGlobalDocRegisterProviderAR
         private static void InsertGlobalDocRegisterProviderAR(GlobalDocRegisterProviderAR documentRegisterAR)
         {
             var arrayTasks = new List<Task>();
             arrayTasks.Add(TableManagerGlobalDocRegisterProviderAR.InsertOrUpdateAsync(documentRegisterAR));
         }
+        #endregion
 
+        #region UpdateFinishAttorney
         private static void UpdateFinishAttorney(string trackId, string trackIdAttorney, string eventCode)
         {
             //validation if is an anulacion de mandato (Code 044)
             var arrayTasks = new List<Task>();
-           
-            List<GlobalDocReferenceAttorney> documentsAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(trackIdAttorney).ToList();
-            foreach (var documentAttorney in documentsAttorney)
-            {
-                documentAttorney.Active = false;
-                documentAttorney.DocReferencedEndAthorney = trackId;
-                arrayTasks.Add(TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(documentAttorney));
-            }            
-        }
 
+            List<GlobalDocReferenceAttorney> documentsAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(trackIdAttorney).ToList();
+            if (documentsAttorney != null || documentsAttorney.Count > 0)
+            {
+                foreach (var documentAttorney in documentsAttorney)
+                {
+                    documentAttorney.Active = false;
+                    documentAttorney.DocReferencedEndAthorney = trackId;
+                    arrayTasks.Add(TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(documentAttorney));
+                }
+            }
+        }
+        #endregion
+
+        #region UpdateIsInvoiceTV
         private static void UpdateIsInvoiceTV(string trackId)
         {
             //Actualiza factura electronica TV eventos fase 1 registrados
             var arrayTasks = new List<Task>();
-           
+
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             if (validatorDocumentMeta != null)
             {
                 validatorDocumentMeta.IsInvoiceTV = true;
                 arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
 
-            }            
+            }
         }
+        #endregion
 
+        #region UpdateInTransactions
         private static void UpdateInTransactions(string trackId)
         {
             //valida InTransaction Factura - eventos Endoso en propeidad, Garantia y procuración
             var arrayTasks = new List<Task>();
-           
+
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             if (validatorDocumentMeta != null)
             {
                 validatorDocumentMeta.InTransaction = false;
                 arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(validatorDocumentMeta));
             }
-            
-        }
 
+        }
+        #endregion
+
+
+        #region UpdateEndoso
         private static void UpdateEndoso(XmlParser xmlParser, GlobalDocValidatorDocumentMeta documentMeta)
         {
             //validation if is an Endoso en propiedad (Code 037)
@@ -176,14 +313,18 @@ namespace Gosocket.Dian.Functions.Events
             string sender = string.Empty;
             string senderList = string.Empty;
             string valueStockAmountSender = string.Empty;
-            string valueStockAmountSenderList = string.Empty;           
+            string valueStockAmountSenderList = string.Empty;
 
             List<GlobalDocHolderExchange> documentsHolderExchange = TableManagerGlobalDocHolderExchange.FindpartitionKey<GlobalDocHolderExchange>(documentMeta.DocumentReferencedKey.ToLower()).ToList();
-            foreach (var documentHolderExchange in documentsHolderExchange)
+            if (documentsHolderExchange != null || documentsHolderExchange.Count > 0)
             {
-                documentHolderExchange.Active = false;
-                arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(documentHolderExchange));
+                foreach (var documentHolderExchange in documentsHolderExchange)
+                {
+                    documentHolderExchange.Active = false;
+                    arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(documentHolderExchange));
+                }
             }
+
             //Lista de endosantes
             XmlNodeList valueListSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
             for (int i = 0; i < valueListSender.Count; i++)
@@ -221,8 +362,9 @@ namespace Gosocket.Dian.Functions.Events
                 };
                 arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(globalDocHolderExchange));
             }
-            
+
         }
+        #endregion
 
         public class RequestObject
         {

@@ -17,21 +17,21 @@ namespace Gosocket.Dian.Web.Models
         public int ProviderId { get; set; }
 
         [Required(ErrorMessage = "{0} es requerido")] 
-        [Display(Name = "Nombre de software")]
+        [Display(Name = "ID del Software")]
 
         public string SoftwareId { get; set; }
 
-        [Display(Name = "Nombre de software")] 
-        [Required(ErrorMessage = "{0} 1 es requerido")]
+        [Display(Name = "Nombre de Software")] 
+        [Required(ErrorMessage = "{0} es requerido")]
         //Es requerido cuando es softwarepropio
         public string SoftwareName { get; set; }
 
-        [Display(Name = "PIN del SW")]
-        [Required(ErrorMessage = "{0} 2 es requerido")]
+        [Display(Name = "PIN del Software")]
+        [Required(ErrorMessage = "{0} es requerido")]
         public string PinSW { get; set; }
         public int ModoOperacionId { get; set; }
 
-        [Required(ErrorMessage = "{0}es requerido")]
+        //[Required(ErrorMessage = "{0} es requerido")]
         [Display(Name= "Configuración modo de operación")]
         public string OperationMode { get; set; }
 
@@ -42,5 +42,11 @@ namespace Gosocket.Dian.Web.Models
         public int SoftwareType { get; set; }
 
         public List<OtherDocsElectListViewModel> ListTable { get; set; }
+
+        [Display(Name = "Seleccione el modo de operación")]
+        public string OperationModeSelectedId { get; set; }
+
+        [Display(Name = "Nombre empresa proveedora")]
+        public string ContributorName { get; set; }
     }
 }

@@ -7,5 +7,7 @@ namespace Gosocket.Dian.Interfaces
     {
         List<ElectronicDocument> GetElectronicDocuments();
         int InsertElectronicDocuments(ElectronicDocument electronicDocument);
+
+        string GetNameById(int id);
     }
 }

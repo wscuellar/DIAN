@@ -36,5 +36,9 @@ namespace Gosocket.Dian.Application
             return result;
         }
 
+        public string GetNameById(int id)
+        {
+            return new SqlDBContext().ElectronicDocuments.FirstOrDefault(x => x.Id == id).Name;
+        }
     }
 }

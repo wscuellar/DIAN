@@ -30,6 +30,7 @@
 
         public string Title { get; set; }
         public string CUDE { get; set; }
+        public string CUFE { get; set; }
         public string Prefix { get; set; }
         public string Number { get; set; }
         public string DateOfIssue { get; set; }
@@ -53,6 +54,21 @@
         public string CertificateNumber { get; set; }
         public string ValidationMessage { get; set; }
         public string Note { get; set; }
+        public string SignedBy { get; set; }
+        public string EventCode { get; set; }
+
+        public string EventTotalValueAval { get; set; }
+        public string EventTotalValueEndoso { get; set; }
+        public string EventTotalValueLimitation { get; set; }
+        public string EventTotalValuePago { get; set; }
+        public string InvoiceNumber { get; set; }
+        public string CustomizationID { get; set; }
+        public string ResponseCodeListID { get; set; }
+
+
+
+
+
 
         public EventStatus EventStatus { get; set; }
         public List<AssociatedValidationsModel> Validations { get; set; }

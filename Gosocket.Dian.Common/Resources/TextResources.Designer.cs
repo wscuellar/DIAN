@@ -475,6 +475,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a /document/searchqr?documentkey={CUFE}.
+        /// </summary>
+        public static string ReportQRCode {
+            get {
+                return ResourceManager.GetString("ReportQRCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El software es un campo obligatorio.
         /// </summary>
         public static string RequiredSoftware {

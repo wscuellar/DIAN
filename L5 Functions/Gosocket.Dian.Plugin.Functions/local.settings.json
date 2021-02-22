@@ -86,6 +86,7 @@
     "ErrorMessage_NIE024": "Se debe indicar el CUNE según la definición establecida.",
     "ErrorCode_AAH09": "AAH09",
     "ErrorMessage_AAH09_043": "No corresponde a un tipo de documento valido",
+    "ErrorMessage_AAH09": "El tipo de identificador no coincide con el informado en el documento electrónico.",
     "ErrorCode_DC24g": "DC24g",
     "ErrorMessage_DC24g": "No se puede generar el evento Aval antes de la fecha de generación del evento Primera inscripción de la factura electrónica de venta como título valor en el RADIAN",
     "ErrorCode_LGC35": "LGC35",
@@ -129,7 +130,14 @@
     "ErrorCode_AAH71": "AAH71",
     "ErrorMessage_AAH71": "El DV no está correctamente calculado",
     "ErrorCode_LGC30": "LGC30",
-    "ErrorMessage_LGC30": "No se puede registrar este evento si previamente no se ha registrado el evento Inscripción de la factura electrónica de venta como título valor"
+    "ErrorMessage_LGC30": "No se puede registrar este evento si previamente no se ha registrado el evento Inscripción de la factura electrónica de venta como título valor",
+    "ErrorCode_LGC24": "LGC24",
+    "ErrorMessage_LGC24": "No se puede registrar este evento si previamente no se ha registrado el evento Inscripción de la factura electrónica de venta como título valor",
+    "ErrorCode_LGC21": "LGC21",
+    "ErrorMessage_LGC21": "La Factura Electrónica no cumple con los requisitos legales para ser considerada título valor y no podrá ser registrada.",
+    "ErrorCode_LGC23": "LGC23",
+    "ErrorMessage_LGC23": "No puede registrar si previamente se registro primera inscripcion de la factura electrónica de venta"
+
 
 
 

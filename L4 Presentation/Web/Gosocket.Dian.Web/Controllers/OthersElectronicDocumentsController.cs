@@ -4,6 +4,7 @@ using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Common;
@@ -27,14 +28,17 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
         private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
         private readonly IContributorService _contributorService;
+        private readonly IElectronicDocumentService _electronicDocumentService;
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
-            IContributorService contributorService)
+            IContributorService contributorService,
+            IElectronicDocumentService electronicDocumentService)
         {
             _othersElectronicDocumentsService = othersElectronicDocumentsService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
             _contributorService = contributorService;
+            _electronicDocumentService = electronicDocumentService;
         }
 
         /// <summary>
@@ -57,17 +61,12 @@ namespace Gosocket.Dian.Web.Controllers
             List<ElectronicDocument> listED = new ElectronicDocumentService().GetElectronicDocuments();
             List<Domain.Sql.OtherDocElecOperationMode> listOM = _othersDocsElecContributorService.GetOperationModes();
             OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
-            List<ContributorViewModel> listContri = new List<ContributorViewModel>();// { new ContributorViewModel() { Id = 0, Name = "Seleccione..." } };
+            List<ContributorViewModel> listContri = new List<ContributorViewModel>();
 
-            ViewBag.ListSoftwares = new List<SoftwareViewModel>();// { new SoftwareViewModel() { Id = System.Guid.Empty, Name = "Seleccione..." } };
-
-            var listCont = _contributorService.GetContributors((int)Domain.Common.ContributorType.Provider.GetHashCode(), ContributorStatus.Enabled.GetHashCode()).ToList();
-
-            if (listCont != null)
-                listContri.AddRange(listCont.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
-
+            ViewBag.ListSoftwares = new List<SoftwareViewModel>();
             ViewBag.softwareActive = _othersDocsElecContributorService.ValidateSoftwareActive(User.ContributorId(), (int)dataentity.ContributorIdType, (int)dataentity.OperationModeId, (int)OtherDocElecSoftwaresStatus.InProcess);
-            ViewBag.ListTechnoProviders = listContri;
+            ViewBag.ContributorName = dataentity.ContributorIdType.GetDescription();
+            ViewBag.ElectronicDocumentName = _electronicDocumentService.GetNameById(dataentity.ElectronicDocumentId);
 
             var opeMode = listOM.FirstOrDefault(o => o.Id == (int)dataentity.OperationModeId);
             if (opeMode != null)
@@ -96,17 +95,35 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatedDate = t.CreatedDate,
             }).ToList();
 
-
             ViewBag.Title = $"Asociar modo de operación {model.OperationMode}";
 
-            if (model.OperationModeId == 2)
+            List<Domain.RadianOperationMode> operationModesList = new List<Domain.RadianOperationMode>();
+            if (model.OperationModeId == 1)
             {
+                operationModesList.Add(new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.OwnSoftware, Name = RadianOperationModeTestSet.OwnSoftware.GetDescription() });
+                // get contributor name...
+                var contributor = this._contributorService.GetContributorById(User.ContributorId(), model.ContributorIdType);
+                model.ContributorName = contributor?.Name;
+                model.SoftwareId = Guid.NewGuid().ToString();
+            }
+            else
+            {
+                operationModesList.Add(new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.SoftwareTechnologyProvider, Name = RadianOperationModeTestSet.SoftwareTechnologyProvider.GetDescription() });
+                var listCont = _contributorService.GetContributors((int)Domain.Common.ContributorType.Provider.GetHashCode(), ContributorStatus.Enabled.GetHashCode()).ToList();
+                if (listCont != null)
+                    listContri.AddRange(listCont.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
+                ViewBag.ListTechnoProviders = new SelectList(listContri, "Id", "Name");
+
                 model.SoftwareName = " ";
                 model.PinSW = " ";
             }
+
+            ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault().Id);
+
+            model.UrlEventReception = ConfigurationManager.GetValue("WebServiceUrl");
+
             return View(model);
         }
-
 
         [HttpPost]
         public ActionResult AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
@@ -118,12 +135,18 @@ namespace Gosocket.Dian.Web.Controllers
             testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocumentId);
             if (testSet == null)
                 return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
-
+            
             if (!ModelState.IsValid)
             {
                 IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
                 foreach (var item in allErrors) ModelState.AddModelError("", item.ErrorMessage);
                 return View("AddOrUpdate", new ValidacionOtherDocsElecViewModel { ContributorId = 1 });
+            }
+
+            int providerId = model.ProviderId;
+            if(model.OperationModeId != 2)
+            {
+                providerId = User.ContributorId();
             }
 
             var IdS = new Guid();
@@ -133,7 +156,8 @@ namespace Gosocket.Dian.Web.Controllers
                 Url = model.UrlEventReception,
                 Name = model.SoftwareName,
                 Pin = model.PinSW,
-                ProviderId = model.ProviderId,
+                //ProviderId = model.ProviderId,
+                ProviderId = providerId,
                 CreatedBy = User.UserName(),
                 Deleted = false,
                 Status = true,
@@ -144,28 +168,42 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareId = new Guid(model.SoftwareId),
                 OtherDocElecContributorId = model.OtherDocElecContributorId
             };
+            // Validar si esta tabla serían los Logs...?
             OtherDocElecContributorOperations contributorOperation = new OtherDocElecContributorOperations()
             {
                 OtherDocElecContributorId = model.OtherDocElecContributorId,
                 OperationStatusId = (int)OtherDocElecState.Test,
                 Deleted = false,
                 Timestamp = DateTime.Now,
-                SoftwareType = model.SoftwareType,
+                //SoftwareType = model.SoftwareType,
+                SoftwareType = model.OperationModeId,
                 SoftwareId = IdS
             };
-
+            
             ResponseMessage response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperation(contributorOperation, software, true, true);
-            if (response.Code != 500)
+            //if (response.Code != 500)
+            //{
+            //    _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Registrado.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
+            //}
+
+            if (response.Code == 500) // error...
             {
-                _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Registrado.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
+                return this.RedirectToAction("AddParticipants", new { electronicDocumentId = model.ElectronicDocumentId, message = response.Message });
+
+                //return View(new OthersElectronicDocumentsViewModel()
+                //{
+                //    ElectronicDocumentId = model.ElectronicDocumentId
+                //});
             }
+
+            _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Registrado.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
 
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = model.OtherDocElecContributorId });
         }
 
-
-        public ActionResult AddParticipants(int electronicDocumentId)
+        public ActionResult AddParticipants(int electronicDocumentId, string message)
         {
+            ViewBag.Message = message;
             ViewBag.UserCode = User.UserCode();
             ViewBag.electronicDocumentId = electronicDocumentId;
 
@@ -174,7 +212,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View();
         }
-
 
         [HttpPost]
         public JsonResult Add(ValidacionOtherDocsElecViewModel registrationData)
@@ -196,8 +233,6 @@ namespace Gosocket.Dian.Web.Controllers
             result.data = otherDocElecContributor.Id.ToString();
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-
-
 
         [HttpPost]
         public JsonResult Validation(ValidacionOtherDocsElecViewModel ValidacionOtherDocs)
@@ -295,15 +330,26 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new
                 {
                     url = soft.Url,
-                    SoftwareType = 1
+                    SoftwareType = 1,
+                    SoftwarePIN = soft.Pin
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            return Json(new
-            {
-                url = string.Empty,
-                SoftwareType = 1
-            }, JsonRequestBehavior.AllowGet);
+            return Json(null, JsonRequestBehavior.AllowGet);
+        }
+
+        
+        /// <summary>
+        /// Cancelar una asociación de la tabla OtherDocElecContributor, OtherDocElecContributorOperations y OtherDocElecSoftware
+        /// </summary>
+        /// <param name="id">Id de la tabla OtherDocElecContributor</param>
+        /// <param name="desciption">Descripción de por que se cancela</param>
+        /// <returns><see cref="ResponseMessage"/></returns>
+        [HttpPost]
+        public JsonResult CancelRegister(int id, string description)
+        {
+            ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
+            return Json(response, JsonRequestBehavior.AllowGet);
         }
     }
 }

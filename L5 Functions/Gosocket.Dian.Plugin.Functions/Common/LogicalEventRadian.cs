@@ -23,12 +23,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidatePaymetInfo
-        public List<ValidateListResponse> ValidatePaymetInfo(RequestObjectEventPrev eventPrev)
+        public List<ValidateListResponse> ValidatePaymetInfo(List<GlobalDocValidatorDocumentMeta> documentMeta)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-
+         
             //Debe existir solicitud de disponibilizacion
             var listDispnibiliza = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).ToList();
             if (listDispnibiliza != null || listDispnibiliza.Count > 0)
@@ -99,12 +98,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidatePartialPayment
-        public List<ValidateListResponse> ValidatePartialPayment(RequestObjectEventPrev eventPrev, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidatePartialPayment(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-
+         
             //Valida monto pago parcial o total
             var responseListPayment = ValidatePayment(xmlParserCude, nitModel);
             if (responseListPayment != null)
@@ -311,12 +309,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateNegotiatedInvoiceCancell
-        public List<ValidateListResponse> ValidateNegotiatedInvoiceCancell(RequestObjectEventPrev eventPrev)
+        public List<ValidateListResponse> ValidateNegotiatedInvoiceCancell(List<GlobalDocValidatorDocumentMeta> documentMeta)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-
+          
             //Validacion debe exisitir evento Limitacion de Circulacion 
             var listLimitacionCirculacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice).ToList();
             if (listLimitacionCirculacion == null || listLimitacionCirculacion.Count <= 0)
@@ -371,12 +368,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateNegotiatedInvoice
-        public List<ValidateListResponse> ValidateNegotiatedInvoice(RequestObjectEventPrev eventPrev)
+        public List<ValidateListResponse> ValidateNegotiatedInvoice(List<GlobalDocValidatorDocumentMeta> documentMeta)
         {
             DateTime startDate = DateTime.UtcNow;           
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-         
+          
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion 
             && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration || Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration)).ToList();
@@ -432,12 +428,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region VakidateEndorsementCancell
-        public List<ValidateListResponse> ValidateEndorsementCancell(RequestObjectEventPrev eventPrev, XmlParser xmlParserCude)
+        public List<ValidateListResponse> ValidateEndorsementCancell(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCude)
         {
             DateTime startDate = DateTime.UtcNow;          
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-
+         
             responses.Add(new ValidateListResponse
             {
                 IsValid = true,
@@ -623,6 +618,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region RetrieveSenderHolderExchange
+        public HolderExchangeModel RetrieveSenderHolderExchange(string cufe)
+        {
+            HolderExchangeModel response = new HolderExchangeModel();
+
+            //Consulta legitimo tenedor
+            GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(cufe, true);
+            if (documentHolderExchange != null)
+            {
+                response.PartitionKey = documentHolderExchange.PartitionKey;
+                response.RowKey = documentHolderExchange.RowKey;
+                response.CorporateStockAmount = documentHolderExchange.CorporateStockAmount;
+                response.CorporateStockAmountSender = documentHolderExchange.CorporateStockAmountSender;
+                response.GlobalDocumentId = documentHolderExchange.GlobalDocumentId;
+                response.PartyLegalEntity = documentHolderExchange.PartyLegalEntity;
+                response.SenderCode = documentHolderExchange.SenderCode;
+            }
+            else
+                return null;  
+
+            return response;
+        }
+        #endregion
+
         #region ValidateExistPropertyEndorsement     
         private List<ValidateListResponse> ValidateExistPropertyEndorsement(List<GlobalDocValidatorDocumentMeta> documentMetaList, XmlParser xmlParserCude, NitModel nitModel)
         {
@@ -713,14 +732,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndorsementProcurement
-        public List<ValidateListResponse> ValidateEndorsementProcurement(RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidateEndorsementProcurement(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             string senderCode = string.Empty;
             string eventCode = eventPrev.EventCode;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-
+           
             responses.Add(new ValidateListResponse
             {
                 IsValid = true,
@@ -863,14 +881,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndorsementGatantia
-        public List<ValidateListResponse> ValidateEndorsementGatantia(RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidateEndorsementGatantia(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             string senderCode = string.Empty;
             string eventCode = eventPrev.EventCode;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-
+            
             responses.Add(new ValidateListResponse
             {
                 IsValid = true,
@@ -1014,14 +1031,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidatePropertyEndorsement
-        public List<ValidateListResponse> ValidatePropertyEndorsement(RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidatePropertyEndorsement(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             string senderCode = string.Empty;
             string eventCode = eventPrev.EventCode;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-
+           
             responses.Add(new ValidateListResponse
             {
                 IsValid = true,
@@ -1146,12 +1162,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndorsementEventPrev
-        public List<ValidateListResponse> ValidateEndorsementEventPrev(RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude)
+        public List<ValidateListResponse> ValidateEndorsementEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta, XmlParser xmlParserCufe, XmlParser xmlParserCude)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-
+          
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).ToList();
             if(listDisponibilizacion != null || listDisponibilizacion.Count > 0)
@@ -1268,11 +1283,51 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateAvailabilityRequest
-        public List<ValidateListResponse> ValidateAvailabilityRequestEventPrev(RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidateAvailabilityRequestEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
+           
+            //Validacion de la Solicitud de Disponibilización Posterior 361 / 362
+            if (Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.FirstGeneralRegistration
+               || Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.FirstPriorDirectRegistration)
+            {
+                //Validacion Endosos aprobados
+                var listEndoso = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad 
+                    || (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia)
+                    || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion).ToList();
+                
+                if(listEndoso == null || listEndoso.Count <= 0)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = successfulMessage,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                else
+                {                  
+                    foreach (var itemListEndoso in listEndoso)
+                    {
+                        var documentDisponibilizacionPosterior = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListEndoso.Identifier, itemListEndoso.Identifier, itemListEndoso.PartitionKey);
+                        if(documentDisponibilizacionPosterior != null)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC20"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC20"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                            break;
+                        }                    
+                    }
+                }
+            }
 
             //Validacion de la Solicitud de Disponibilización Posterior 363 / 364
             if (Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.GeneralSubsequentRegistration 
@@ -1329,18 +1384,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 //Valida que exista una Primera Disponibilizacion
+                bool validForItemDisponibiliza = false;
                 var listPrimeraDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion 
                 && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration) 
                 || Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration).ToList();
                 if(listPrimeraDisponibilizacion != null || listPrimeraDisponibilizacion.Count > 0)
                 {
-                    //Valida que exista una Primera Disponibilizacion aprobado
-                    bool validForItemDisponibiliza = false;
+                    //Valida que exista una Primera Disponibilizacion aprobado                    
                     foreach (var itemListPrimeraDisponibilizacion in listPrimeraDisponibilizacion)
                     {
                         var documentPrimeraDisponibilizacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListPrimeraDisponibilizacion.Identifier, itemListPrimeraDisponibilizacion.Identifier, itemListPrimeraDisponibilizacion.PartitionKey);
                         if (documentPrimeraDisponibilizacion != null)
                         {
+                            validForItemDisponibiliza = false;
                             //Valida existen Limitaciones activas
                             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
                             || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
@@ -1386,8 +1442,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC24"),
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC24"),
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC21"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1398,8 +1454,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC24"),
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC24"),
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC21"),
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
@@ -1459,12 +1515,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateTacitAcceptance
-        public List<ValidateListResponse> ValidateTacitAcceptanceEventPrev(RequestObjectEventPrev eventPrev)
+        public List<ValidateListResponse> ValidateTacitAcceptanceEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-
+           
             //Debe existir Recibo del bien y/o prestación del servicio                              
             var listReciboBien = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Receipt).ToList();
             if (listReciboBien == null || listReciboBien.Count <= 0)
@@ -1563,11 +1618,59 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateAccepted
-        public List<ValidateListResponse> ValidateAcceptedEventPrev(RequestObjectEventPrev eventPrev)
+        public List<ValidateListResponse> ValidateAcceptedEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
+
+            //Valida exista primer evento acuse de recibo
+            var listAcuse = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Received).ToList();
+            if (listAcuse == null || listAcuse.Count <= 0)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            else
+            {
+                bool validForItemAcuse = false;
+                foreach (var itemListAcuse in listAcuse)
+                {
+                    var documentAcuse = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListAcuse.Identifier, itemListAcuse.Identifier, itemListAcuse.PartitionKey);
+                    if (documentAcuse != null)
+                    {
+                        validForItemAcuse = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = successfulMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                    else
+                        validForItemAcuse = true;
+                }
+
+                if (validForItemAcuse)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
 
             //Valida exista Recibo del bien y/o prestación del servicio
             var listReceipt = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Receipt).ToList();
@@ -1667,12 +1770,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateReceipt
-        public List<ValidateListResponse> ValidateReceiptEventPrev(RequestObjectEventPrev eventPrev)
+        public List<ValidateListResponse> ValidateReceiptEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-
+          
             //Debe existir Acuse de recibo de Factura Electrónica de Venta aprobado
             var listAcuse = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Received).ToList();
             if (listAcuse == null || listAcuse.Count <= 0)
@@ -1727,12 +1829,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateRejected
-        public List<ValidateListResponse> ValidateRejectedEventPrev(RequestObjectEventPrev eventPrev)
+        public List<ValidateListResponse> ValidateRejectedEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta)
         {
             DateTime startDate = DateTime.UtcNow;            
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
-            
+           
             //Valida exista Recibo del bien y/o prestación del servicio
             var listRecibo = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Receipt).ToList();
             if (listRecibo == null || listRecibo.Count <= 0)

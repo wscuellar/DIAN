@@ -18,7 +18,19 @@
     <div class="margin-horizontal-0">
         <div class="panel">
             <div class="panel-body padding-top-20">
-                <div class="row margin-horizontal-0">
+                <div class="row warning-wrapper">
+                    <div class="col-sm-1 icon-warning">
+                        <i class="fa fa-exclamation-circle"></i>
+                    </div>
+                    <div class="col-sm-11">
+                        <span class="warning-title">¡Importante!</span>
+                        <p>
+                            Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta <b>@(ViewBag.OtherDocElecSoftwareStatusName)</b>.<br>
+                            Usted debe proporcinar el identificador del set de pruebas (TestSetld) <b>@(ViewBag.TestSetId)</b> en el web service  para el envío de su set de pruebas.
+                        </p>
+                    </div>
+                </div>
+                <div class="row margin-horizontal-0 margin-top-20">
                     <p class="title-view" style="padding-top: 5px; font-size: 18px !important;">
                         Resumen documentos recibidos y aceptados para el Set de Pruebas
                     </p>
