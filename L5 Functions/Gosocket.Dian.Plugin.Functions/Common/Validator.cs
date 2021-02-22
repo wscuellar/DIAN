@@ -2016,68 +2016,78 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
             }
-          
-            //Validacion descripcion Mandante
-            switch (senderId)
-            {
-                case "Mandante-FE":
-                    if (descriptionSender != "Mandante Facturador Electrónico")
-                    {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                            ErrorMessage = "No fue informado el literal “Mandante Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    break;
-                case "Mandante-LT":
-                    if (descriptionSender != "Mandante Legitimo Tenedor")
-                    {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                            ErrorMessage = "No fue informado el literal “Mandante Legitimo Tenedor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    break;
-                case "Mandante-AV":
-                    if (descriptionSender != "Mandante Aval")
-                    {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                            ErrorMessage = "No fue informado el literal “Mandante Aval” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    break;
-                case "Mandante-AD":
-                    if (descriptionSender != "Mandante Adquirente/Deudor")
-                    {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                            ErrorMessage = "No fue informado el literal “Mandante Adquirente/Deudor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    break;
-            }
 
+            long numberDesc = 0;
+            bool valNumberDesc = long.TryParse(descriptionSender, out numberDesc);
+
+            if (!string.IsNullOrWhiteSpace(descriptionSender) && !valNumberDesc)
+            {               
+                //Validacion descripcion Mandante
+                switch (senderId)
+                {
+                    case "Mandante-FE":
+
+                        if (descriptionSender != "Mandante Facturador Electrónico")
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
+                                ErrorMessage = "No fue informado el literal “Mandante Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+
+                        break;
+                    case "Mandante-LT":
+                        if (descriptionSender != "Mandante Legitimo Tenedor")
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
+                                ErrorMessage = "No fue informado el literal “Mandante Legitimo Tenedor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        break;
+                    case "Mandante-AV":
+                        if (descriptionSender != "Mandante Aval")
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
+                                ErrorMessage = "No fue informado el literal “Mandante Aval” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        break;
+                    case "Mandante-AD":
+                        if (descriptionSender != "Mandante Adquirente/Deudor")
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
+                                ErrorMessage = "No fue informado el literal “Mandante Adquirente/Deudor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        break;
+                }
+
+            }
+         
             //Valida descripcion Mandatario 
             switch (factorTemp)
             {
