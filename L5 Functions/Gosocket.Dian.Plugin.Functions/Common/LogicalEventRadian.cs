@@ -1632,7 +1632,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC13"),
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC13"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -1666,7 +1666,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC13"),
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC13"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
