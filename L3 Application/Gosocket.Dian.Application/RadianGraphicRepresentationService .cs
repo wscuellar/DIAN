@@ -389,7 +389,7 @@ namespace Gosocket.Dian.Application
 
             //htmlInvoice += "<div id='TotalValue' class='text-subtitle text-gray'>Valor Total de la Factura: <a class='text-data'>{TotalValue}</a></div>";
             
-            if (model.EventCode == "036" || model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "045")
+            if (model.EventCode == "036" || model.CustomizationID == "372" || model.EventCode == "038" || model.EventCode == "045")
             {
                 htmlInvoice += "<div id='ExpirationDate' class='text-subtitle text-gray'>Fecha de Vencimiento: <a class='text-data'>{ExpirationDate}</a></div>";
             }
@@ -546,8 +546,8 @@ namespace Gosocket.Dian.Application
 
 
             // Mapping Final Data Section
-
-            template = template.Replace("{FinalData}", $"Nombre de la Entidad de Certificación Digital: {model.EntityName} <br> Número del certificado digital: {model.CertificateNumber} ");
+            Dictionary<string, string> EntityName = model.EntityName.Split(',').Select(x => x.Split('=')).ToDictionary(x => x[0], x => x[1]);
+            template = template.Replace("{FinalData}", $"Nombre de la Entidad de Certificación Digital: {EntityName["CN"]} <br> Número del certificado digital: {model.CertificateNumber} ");
 
             return template;
         }
