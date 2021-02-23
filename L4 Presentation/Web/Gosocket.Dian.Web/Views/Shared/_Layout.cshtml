@@ -374,7 +374,7 @@
                                             }
 
                                             <!--Rol Para Facturador Electronico y Proveedor Tecnologico-->
-                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                            @if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
                                             {
                                                 <li id="@Navigation.NavigationEnum.OthersEletronicDocuments">
                                                     <a href="@Url.Action("Index", "OthersElectronicDocuments")">Otros Documentos Electrónicos</a>

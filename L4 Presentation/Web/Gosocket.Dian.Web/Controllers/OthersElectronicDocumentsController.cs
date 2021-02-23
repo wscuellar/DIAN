@@ -204,6 +204,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult AddParticipants(int electronicDocumentId, string message)
         {
             ViewBag.Message = message;
+            ViewBag.ContributorId = User.ContributorId();
             ViewBag.UserCode = User.UserCode();
             ViewBag.electronicDocumentId = electronicDocumentId;
 
@@ -237,20 +238,35 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult Validation(ValidacionOtherDocsElecViewModel ValidacionOtherDocs)
         {
-            Contributor contributor = _contributorService.GetByCode(ValidacionOtherDocs.UserCode.ToString());
-            if (contributor == null || contributor.AcceptanceStatusId != 4)
-                return Json(new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType), JsonRequestBehavior.AllowGet);
+            // Código original...
+            //Contributor contributor = _contributorService.GetByCode(ValidacionOtherDocs.UserCode.ToString());
 
+            // IMPORTANTE: Pregunta que significa 'contributor.AcceptanceStatusId' = 4.
+            //if (contributor == null || contributor.AcceptanceStatusId != 4)
+            //    return Json(new ResponseMessage(TextResources.NonExistentParticipant, TextResources.alertType), JsonRequestBehavior.AllowGet);
 
             if (ValidacionOtherDocs.Accion == "SeleccionElectronicDocument")
                 return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelect_Confirm.Replace("@docume", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
 
             if (ValidacionOtherDocs.Accion == "SeleccionParticipante")
+            {
+                // El proveedor tecnólogico debe estar habilitado en el catalogo de validación previa...
+                if (ValidacionOtherDocs.ContributorIdType == Domain.Common.OtherDocElecContributorType.TechnologyProvider)
+                {
+                    Contributor contributor = _contributorService.Get(ValidacionOtherDocs.ContributorId);
+                    if(contributor.ContributorTypeId != (int)Domain.Common.ContributorType.Provider || !contributor.Status)
+                    {
+                        return Json(new ResponseMessage(TextResources.TechnologProviderDisabled, TextResources.alertType), JsonRequestBehavior.AllowGet);
+                    }
+                }
+
                 return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectParticipante_Confirm.Replace("@Participante", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+            }
 
             if (ValidacionOtherDocs.Accion == "SeleccionOperationMode")
             {
-                List<OtherDocElecContributor> Lista = _othersDocsElecContributorService.ValidateExistenciaContribuitor(contributor.Id, (int)ValidacionOtherDocs.OperationModeId, OtherDocElecState.Cancelado.GetDescription());
+                //List<OtherDocElecContributor> Lista = _othersDocsElecContributorService.ValidateExistenciaContribuitor(contributor.Id, (int)ValidacionOtherDocs.OperationModeId, OtherDocElecState.Cancelado.GetDescription());
+                List<OtherDocElecContributor> Lista = _othersDocsElecContributorService.ValidateExistenciaContribuitor(ValidacionOtherDocs.ContributorId, (int)ValidacionOtherDocs.OperationModeId, OtherDocElecState.Cancelado.GetDescription());
                 if (Lista.Any())
                 {
                     string ContributorId = null;
@@ -296,7 +312,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (ValidacionOtherDocs.Accion == "CancelRegister")
                 return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
-
 
             return Json(new ResponseMessage(TextResources.FailedValidation, TextResources.alertType), JsonRequestBehavior.AllowGet);
 

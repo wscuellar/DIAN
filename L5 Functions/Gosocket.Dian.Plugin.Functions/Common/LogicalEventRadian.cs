@@ -19,6 +19,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager documentValidatorTableManager = new TableManager("GlobalDocValidatorDocument");
         static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
+        
         private readonly string successfulMessage = "Evento ValidateEmitionEventPrev referenciado correctamente";
         #endregion
 
@@ -430,7 +431,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region VakidateEndorsementCancell
         public List<ValidateListResponse> ValidateEndorsementCancell(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCude)
         {
-            DateTime startDate = DateTime.UtcNow;          
+            DateTime startDate = DateTime.UtcNow;
+            string senderCode = string.Empty;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
          
             responses.Add(new ValidateListResponse
@@ -442,9 +444,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
+            //Obtiene legitimo tenedor               
+            LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
+            HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(documentMeta.FirstOrDefault().DocumentReferencedKey, xmlParserCude);
+            if (responseHolderExchange != null)
+                senderCode = !string.IsNullOrWhiteSpace(responseHolderExchange.PartyLegalEntity) ? responseHolderExchange.PartyLegalEntity : string.Empty;
+
+
             //Validación de la existencia de Endoso en Garantia / Cancelacion 401
             if (Convert.ToInt32(eventPrev.CustomizationID) == (int)EventCustomization.CancellationGuaranteeEndorsement)
-            {
+            {               
                 //Valida exista endoso en garantia
                 bool validForEndoso = false;
                 var endosoGarantia = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia) && t.CancelElectronicEvent == null).ToList();
@@ -592,23 +601,48 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 //Valida existe endoso en propiedad
-                var endosoPropiead = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad) && t.CancelElectronicEvent == null).ToList();
-                if (endosoPropiead != null || endosoPropiead.Count > 0)
+                var endosoPropiedad = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad)).OrderByDescending(x => x.SigningTimeStamp).ToList();
+                if (endosoPropiedad != null || endosoPropiedad.Count > 0)
                 {
-                    foreach (var itemEndosoPropiedad in endosoPropiead)
+                    foreach (var itemEndosoPropiedad in endosoPropiedad)
                     {
                         var documentPropiedad = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemEndosoPropiedad.Identifier, itemEndosoPropiedad.Identifier, itemEndosoPropiedad.PartitionKey);
                         if (documentPropiedad != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            bool validforDisponibiliza = false;
+                            //Valida existe disponibilizacion posterior 363 /364
+                            var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
+                            && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.GeneralSubsequentRegistration ||
+                                    Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PriorDirectSubsequentEnrollment)
+                                ).OrderByDescending(x => x.SigningTimeStamp).ToList();
+                            if (listDisponibilizacion != null || listDisponibilizacion.Count > 0)
                             {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC49"),
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC49"),
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                            break;
+                                foreach (var itemListDisponibilizacion in listDisponibilizacion)
+                                {                                    
+                                    var documentDisponibiliza = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListDisponibilizacion.Identifier, itemListDisponibilizacion.Identifier, itemListDisponibilizacion.PartitionKey);
+                                    if (documentDisponibiliza != null)
+                                    {
+                                        //Valida fecha endoso en propiedad es mayor a fecha disponibilizacion  
+                                        if(Convert.ToDateTime(itemEndosoPropiedad.SigningTimeStamp) > Convert.ToDateTime(itemListDisponibilizacion.SigningTimeStamp)
+                                            && itemEndosoPropiedad.SenderCode == senderCode)
+                                        {
+                                            validforDisponibiliza = true;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC49"),
+                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC49"),
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (validforDisponibiliza)
+                                break;
                         }
                     }
                 }
@@ -619,7 +653,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region RetrieveSenderHolderExchange
-        public HolderExchangeModel RetrieveSenderHolderExchange(string cufe)
+        public HolderExchangeModel RetrieveSenderHolderExchange(string cufe, XmlParser xmlParserCude)
         {
             HolderExchangeModel response = new HolderExchangeModel();
 
@@ -627,12 +661,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(cufe, true);
             if (documentHolderExchange != null)
             {
+                string[] endosatarios = new string[0];
+                bool validFor = true;               
+                endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
+                if (endosatarios.Length == 1)
+                {
+                    response.PartyLegalEntity = documentHolderExchange.PartyLegalEntity;
+                }
+                else
+                {
+                    //Valida exista mandatario representante para cada legitimo tenedor
+                    foreach (string endosatario in endosatarios)
+                    {
+                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(cufe, endosatario, xmlParserCude.ProviderCode);
+                        if (documentAttorney == null)
+                        {
+                            validFor = false;
+                            response.PartyLegalEntity = string.Empty;
+                        }
+                    }
+
+                    if (validFor)
+                        response.PartyLegalEntity = xmlParserCude.ProviderCode;                                         
+                }
+                
                 response.PartitionKey = documentHolderExchange.PartitionKey;
                 response.RowKey = documentHolderExchange.RowKey;
                 response.CorporateStockAmount = documentHolderExchange.CorporateStockAmount;
                 response.CorporateStockAmountSender = documentHolderExchange.CorporateStockAmountSender;
-                response.GlobalDocumentId = documentHolderExchange.GlobalDocumentId;
-                response.PartyLegalEntity = documentHolderExchange.PartyLegalEntity;
+                response.GlobalDocumentId = documentHolderExchange.GlobalDocumentId;                
                 response.SenderCode = documentHolderExchange.SenderCode;
             }
             else
