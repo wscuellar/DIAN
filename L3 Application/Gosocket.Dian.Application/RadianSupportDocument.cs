@@ -117,8 +117,8 @@ namespace Gosocket.Dian.Application
 
             var fileManager = new FileManager();
             var container = $"global";
-            //var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/8bd6a4cf6b4e2ee29e608d38880669512256f9c1b054813467e41ce6330848852da3bf8b0310bf941aa7becea3e6740c.xml";
+            var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
+            //var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/8bd6a4cf6b4e2ee29e608d38880669512256f9c1b054813467e41ce6330848852da3bf8b0310bf941aa7becea3e6740c.xml";
             var xmlBytes = fileManager.GetBytes(container, fileName);
 
             return xmlBytes;
