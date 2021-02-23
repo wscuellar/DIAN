@@ -25,6 +25,7 @@ namespace Gosocket.Dian.Functions.Events
         private static readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
         private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
         private static readonly TableManager TableManagerDocumentTracking = new TableManager("GlobalDocValidatorTracking");
+        private static readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         [FunctionName("RegistrateCompletedRadian")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -164,7 +165,8 @@ namespace Gosocket.Dian.Functions.Events
             //Registra certificado emisor a mandante
             if (listID == "3")
             {
-                
+                GlobalAuthorization globalAuthorization = new GlobalAuthorization(authCode, issuerPartyCode);
+                arrayTasks.Add(TableManagerGlobalAuthorization.InsertOrUpdateAsync(globalAuthorization));
             }
 
             //Descripcion Mandatario 
