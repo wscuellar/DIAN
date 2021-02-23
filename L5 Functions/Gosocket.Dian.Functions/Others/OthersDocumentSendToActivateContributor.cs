@@ -21,8 +21,8 @@ namespace Gosocket.Dian.Functions.Others
     class OthersDocumentSendToActivateContributor
     {
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
-        private static readonly ContributorService contributorService = new ContributorService();
-        private static readonly TableManager globalTestSetResultTableManager = new TableManager("RadianTestSetResult");
+        //private static readonly ContributorService contributorService = new ContributorService();
+        //private static readonly TableManager globalTestSetResultTableManager = new TableManager("RadianTestSetResult");
 
         [FunctionName("SendToActivateOtherDocumentOperation")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -33,11 +33,11 @@ namespace Gosocket.Dian.Functions.Others
 
             if (ConfigurationManager.GetValue("Environment") == "Hab")
             {
-                RadianContributor radianContributor = null;
-                Contributor contributor = null;
+                //RadianContributor radianContributor = null;
+                //Contributor contributor = null;
 
-                var sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnectionProd");
-                SetLogger(null, "Step STA-1", sqlConnectionStringProd);
+                //var sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnectionProd");
+                //SetLogger(null, "Step STA-1", sqlConnectionStringProd);
 
 
                 //try

@@ -440,6 +440,15 @@ namespace Gosocket.Dian.Functions.Activation
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
                     }
 
+                    ////Validacion Nomina
+                    //if (setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentTotalAcceptedRequired
+                    //    && setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
+                    //{
+                    //    setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
+                    //    setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
+                    //}
+
+   
                     SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina");
 
                     if (setResultOther.OthersDocumentsAccepted >= setResultOther.OthersDocumentsAcceptedRequired)

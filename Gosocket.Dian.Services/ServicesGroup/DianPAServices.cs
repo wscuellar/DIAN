@@ -969,27 +969,27 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Auth
             start = DateTime.UtcNow;
             //Si no es un endoso en blanco valida autorizacion
-            //if (listId != "2")
-            //{
-            //    string listIdMessage = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
+            if (listId != "2")
+            {
+                string listIdMessage = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
 
-            //    var authEntity = GetAuthorization(senderCode, authCode);
-            //    if (authEntity == null)
-            //    {
-            //        dianResponse.XmlFileName = Properties.Settings.Default.Param_ApplicationResponse;
-            //        dianResponse.StatusCode = Properties.Settings.Default.Code_89;
-            //        dianResponse.StatusDescription = listIdMessage;
-            //        var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-            //        if (globalEnd >= 10)
-            //        {
-            //            var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Auth };
-            //            TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
-            //        }
-            //        UpdateInTransactions(trackId, eventCode);
+                var authEntity = GetAuthorization(senderCode, authCode);
+                if (authEntity == null)
+                {
+                    dianResponse.XmlFileName = Properties.Settings.Default.Param_ApplicationResponse;
+                    dianResponse.StatusCode = Properties.Settings.Default.Code_89;
+                    dianResponse.StatusDescription = listIdMessage;
+                    var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
+                    if (globalEnd >= 10)
+                    {
+                        var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackIdCude) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Auth };
+                        TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                    }
+                    UpdateInTransactions(trackId, eventCode);
 
-            //        return dianResponse;
-            //    }
-            //}
+                    return dianResponse;
+                }
+            }
 
             var auth = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Auth3)
             {
@@ -1180,7 +1180,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd")
                     };
 
-                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedRadianUrl), new { TrackId = trackIdCude });
+                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedRadianUrl), new { TrackId = trackIdCude, AuthCode = authCode });
                     //var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>("http://localhost:7071/api/RegistrateCompletedRadian", new { TrackId = trackIdCude });
                     if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
                     {
