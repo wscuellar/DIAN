@@ -4538,11 +4538,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-            var response = new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "100", ErrorMessage = "Evento CheckIndividualPayrollInSameMonth referenciado correctamente" };
-
             // Solo se podrá transmitir para cada trabajador 1 documento NominaIndividual mensual durante cada mes del año. Para el mismo Empleador.
-            var documentsList = documentMetaTableManager.FindDocumentSenderCodeReceiverCode<GlobalDocValidatorDocumentMeta>(companyId, employeeId);
-            if (documentsList == null || documentsList.Count <= 0) // No exiten documentos...
+            var payrolls = payrollTableManager.GlobalPayrollByRowKey_DocumentNumber<GlobalDocPayroll>(companyId, employeeId);
+            if (payrolls == null || payrolls.Count <= 0) // No exiten nóminas para el empleado...
             {
                 //Novedad XML true
                 if (novelty)
@@ -4564,8 +4562,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             var currentDate = DateTime.Now.Date;
-            var documents = documentsList.Where(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month).ToList();
-            if (documents == null || documents.Count <= 0)
+            var payrollCurrentMonth = payrolls.FirstOrDefault(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month);
+            if (payrollCurrentMonth == null)
             {
                 //Novedad XML true
                 if (novelty)
@@ -4585,30 +4583,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 else
                     return responses; // no existe para el mes actual
             }
-                          
-            foreach (var doc in documents)
+
+            //Novedad XML False
+            if (payrollCurrentMonth != null && !novelty)
             {
-                var documentApproved = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(doc.Identifier, doc.Identifier, doc.PartitionKey);
-                if (documentApproved != null)
+                responses.Clear();
+                responses.Add(new ValidateListResponse
                 {
-                    //Novedad XML False
-                    if (!novelty)
-                    {
-                        responses.Clear();
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "NIE199",
-                            ErrorMessage = "Únicamente pueden ser aceptados documentos “NominaIndividual” del mismo trabajador" +
-                            " durante el Mes indicado en el documento que posean como 'True' este elemento.",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                        return responses;
-                    }
-                    else
-                        return responses;
-                }
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "NIE199",
+                    ErrorMessage = "Únicamente pueden ser aceptados documentos “NominaIndividual” del mismo trabajador" +
+                    " durante el Mes indicado en el documento que posean como 'True' este elemento.",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+                return responses;
             }
 
             return responses;
