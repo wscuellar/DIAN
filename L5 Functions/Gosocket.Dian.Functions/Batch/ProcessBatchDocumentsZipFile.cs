@@ -45,7 +45,7 @@ namespace Gosocket.Dian.Functions.Batch
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             var testSetId = string.Empty;
-            var habNomina = string.Empty;
+            var habOther = string.Empty;
             var zipKey = string.Empty;
             GlobalBatchFileStatus batchFileStatus = null;
             try
@@ -92,19 +92,19 @@ namespace Gosocket.Dian.Functions.Batch
 
                 Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);
 
-                var setResult = tableMaganerGlobalTestSetOthersDocuments.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocuments>(testSetId);
+                var setResultOther = tableMaganerGlobalTestSetOthersDocuments.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocuments>(testSetId);
 
                 SetLogger(null, "Step prueba nomina", " validando consulta " + flagApplicationResponse);
 
-                if (setResult != null)
+                if (setResultOther != null)
                 {
-                    habNomina = setResult.TestSetId;
+                    habOther = setResultOther.TestSetId;
                 }
 
-                SetLogger(null, "Step prueba nomina", " Trajo datos " + habNomina);
+                SetLogger(null, "Step prueba nomina", " Trajo datos " + habOther);
 
                 // Check big contributor
-                if (setResult == null && String.IsNullOrEmpty(testSetId))
+                if (setResultOther == null && String.IsNullOrEmpty(testSetId))
                 {
                     xpathRequest = requestObjects.FirstOrDefault();
                     xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
@@ -125,7 +125,7 @@ namespace Gosocket.Dian.Functions.Batch
                 var xmlBytes = contentFileList.First().XmlBytes;
                 XmlParseNomina xmlParser = new XmlParseNomina();
                          
-                if (setResult != null && string.IsNullOrEmpty(habNomina))
+                if (setResultOther != null && string.IsNullOrEmpty(habOther))
                 {
                     xmlParser = new XmlParseNomina(xmlBytes);
                     var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(Convert.ToString(xmlParser.globalDocPayrolls.NIT), Convert.ToString(xmlParser.globalDocPayrolls.NIT));
@@ -172,7 +172,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 SetLogger(null, "Step prueba nomina", " nits mayores a 1 paso ");
 
-                if (setResult == null)
+                if (setResultOther == null)
                 {
                     // Check xpaths
                     var xpathValuesValidationResult = ValidateXpathValues(multipleResponsesXpathDataValue, flagApplicationResponse);
@@ -188,7 +188,7 @@ namespace Gosocket.Dian.Functions.Batch
                 }
 
                 // Check permissions
-                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, habNomina, nitNomina, flagApplicationResponse);
+                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, habOther, nitNomina, flagApplicationResponse);
                 SetLogger(null, "Step prueba nomina", " Paso permisos " + result.Count.ToString());
                 if (result.Count > 0)
                 {
@@ -222,7 +222,7 @@ namespace Gosocket.Dian.Functions.Batch
                     var softwareId = "";
 
 
-                    if (setResult != null)
+                    if (setResultOther != null)
                     {
                         xmlBase64 = response.XpathsValues["XmlBase64"];
                         fileName = response.XpathsValues["FileName"];
@@ -284,7 +284,7 @@ namespace Gosocket.Dian.Functions.Batch
                     try
                     {
                         bool validateDocumentUrl = true;
-                        if (setResult != null)
+                        if (setResultOther != null)
                         {
                             eventNomina = true;
                             trackId = xmlParser.globalDocPayrolls.CUNE;
@@ -304,7 +304,7 @@ namespace Gosocket.Dian.Functions.Batch
                             {
                                 //Validaciones reglas Validador Xpath
                                 var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
-                                var notifications = validations.Where(r => r.IsNotification).ToList();
+                                var notifications = validations.Where(r => r.IsNotification).ToList();                             
 
                                 if (!errors.Any() && !notifications.Any()) { validateDocumentUrl = true; }
 
@@ -317,7 +317,7 @@ namespace Gosocket.Dian.Functions.Batch
                                     try
                                     {
                                         byte[] xmlBytesEvent = null;
-                                        var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedRadianUrl"), new { TrackId = trackId });
+                                        var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedRadianUrl"), new { TrackId = trackId, AuthCode = obj.AuthCode });
                                         if (processRegistrateComplete.Code == "100")
                                         {
                                             xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
@@ -419,6 +419,17 @@ namespace Gosocket.Dian.Functions.Batch
                 { "AppResDocumentKeyXpath","//*[local-name()='ApplicationResponse']/*[local-name()='UUID']"},
                 { "AppResDocumentReferenceKeyXpath","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']"},
                 { "AppResCustomizationIDXpath","//*[local-name()='ApplicationResponse']/*[local-name()='CustomizationID']"},
+
+                //Xpath Nomina Individual
+                { "NominaCUNE", "//*[local-name()='NominaIndividual']/*[local-name()='InformacionGeneral']/@CUNE"},
+                { "NominaReceiverCodeXpath","//*[local-name()='NominaIndividual']/*[local-name()='Trabajador']/@NumeroDocumento" },
+                { "NominaSenderCodeXpath","//*[local-name()='NominaIndividual']/*[local-name()='Empleador']/@NIT" },
+
+                //Xpath Nomina Individual de Ajustes
+                { "NominaAjusteCUNE", "//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='InformacionGeneral']/@CUNE"},
+                { "NominaAjusteCUNEPred", "//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='ReemplazandoPredecesor']/@CUNEPred"},
+                { "NominaAjusteReceiverCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Trabajador']/@NumeroDocumento" },
+                { "NominaAjusteSenderCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Empleador']/@NIT" },
 
             };
 

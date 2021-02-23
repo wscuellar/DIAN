@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Linq;
 using Gosocket.Dian.Functions.Models;
+using System.Security.Claims;
 
 namespace Gosocket.Dian.Functions.Events
 {
@@ -71,7 +72,7 @@ namespace Gosocket.Dian.Functions.Events
                         var xmlParserCude = new XmlParser(xmlBytesCude);
                         if (!xmlParserCude.Parser())
                             throw new Exception(xmlParserCude.ParserError);
-                        InsertUpdateMandato(xmlParserCude, trackIdCude);
+                        InsertUpdateMandato(xmlParserCude, trackIdCude, data.AuthCode);
                     }
 
                     GlobalDocRegisterProviderAR documentRegisterAR = new GlobalDocRegisterProviderAR(trackIdCude, documentMeta.TechProviderCode)
@@ -138,7 +139,7 @@ namespace Gosocket.Dian.Functions.Events
         }
 
         #region InsertUpdateMandato
-        private static void InsertUpdateMandato(XmlParser xmlParser, string trackIdCude)
+        private static void InsertUpdateMandato(XmlParser xmlParser, string trackIdCude, string authCode)
         {
             var arrayTasks = new List<Task>();
             string modoOperacion = string.Empty;
@@ -159,6 +160,12 @@ namespace Gosocket.Dian.Functions.Events
             string firstName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FirstName']").Item(0)?.InnerText.ToString();
             string familyName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FamilyName']").Item(0)?.InnerText.ToString();
             string name = firstName + " " + familyName;
+
+            //Registra certificado emisor a mandante
+            if (listID == "3")
+            {
+                
+            }
 
             //Descripcion Mandatario 
             switch (factorTemp)
@@ -369,7 +376,9 @@ namespace Gosocket.Dian.Functions.Events
         public class RequestObject
         {
             [JsonProperty(PropertyName = "trackId")]
-            public string TrackId { get; set; }       
+            public string TrackId { get; set; }
+            [JsonProperty(PropertyName = "authCode")]
+            public string AuthCode { get; set; }
         }
     }
 }
