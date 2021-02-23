@@ -154,6 +154,8 @@ namespace Gosocket.Dian.Functions.Pdf
 
         static string DateNormalized(string currentDate, string dataReplace)
         {
+            if (!currentDate.Contains(dataReplace))
+                return currentDate;
             string[] dateparts = currentDate.Replace(dataReplace, "").Trim().Split('/');
             string[] hours = dateparts[2].Split(':');
             string[] years = hours[0].Split(' ');
