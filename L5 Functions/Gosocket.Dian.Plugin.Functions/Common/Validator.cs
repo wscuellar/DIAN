@@ -860,36 +860,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.SolicitudDisponibilizacion:
 
                     //Valida existe cambio legitimo tenedor factura
-                    LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
-                    HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(nitModel.DocumentKey);
-                    string[] endosatarios = new string[0];
-                    bool validFor = true;
                     bool validHolderExchang = false;
+                    LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
+                    HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(nitModel.DocumentKey, xmlParserCude);                                                      
                     if (responseHolderExchange != null)
                     {
-                        validHolderExchang = true;
-                        endosatarios = responseHolderExchange.PartyLegalEntity.Split('|');
-                        if (endosatarios.Length == 1)
-                        {
-                            senderCode = responseHolderExchange.PartyLegalEntity;
-                        }
-                        else
-                        {
-                            //Valida exista mandatario representante para cada legitimo tenedor
-                            foreach (string endosatario in endosatarios)
-                            {
-                                GlobalDocReferenceAttorney documentAttorney = TableManagerGlobalDocReferenceAttorney.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(nitModel.DocumentKey, endosatario, xmlParserCude.ProviderCode);
-                                if (documentAttorney == null)
-                                {
-                                    validFor = false;
-                                }
-                            }
-
-                            if (validFor)
-                            {
-                                senderCode = xmlParserCude.ProviderCode;
-                            }
-                        }
+                        validHolderExchang = true;                       
+                        senderCode = !string.IsNullOrWhiteSpace(responseHolderExchange.PartyLegalEntity) ? responseHolderExchange.PartyLegalEntity : string.Empty;                       
                     }
 
                     if (party.SenderParty != senderCode)
@@ -2020,7 +1997,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             long numberDesc = 0;
             bool valNumberDesc = long.TryParse(descriptionSender, out numberDesc);
 
-            if (!string.IsNullOrWhiteSpace(descriptionSender) && !valNumberDesc)
+            if (!string.IsNullOrWhiteSpace(descriptionSender) || !valNumberDesc)
             {               
                 //Validacion descripcion Mandante
                 switch (senderId)
@@ -2472,7 +2449,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (ConfigurationManager.GetValue("Environment") == "Prod" || ConfigurationManager.GetValue("Environment") == "Test")
             {
                 var documentType = documentMeta?.DocumentTypeId;
-                if (new string[] { "01", "02", "04", "05", "09", "11","101" }.Contains(documentType)) documentType = "01";
+                if (new string[] { "01", "02", "04", "09", "11" }.Contains(documentType)) documentType = "01";
                 var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
                 range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
             }
