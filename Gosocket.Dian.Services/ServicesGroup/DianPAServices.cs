@@ -951,7 +951,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var issuerPartyCode = documentParsed.IssuerPartyCode;
             var issuerPartyName = documentParsed.IssuerPartyName;
             var endDate = documentParsed.ValidityPeriodEndDate;
-            bool validaMandatoListID = (Convert.ToInt32(eventCode) == 43 && listId == "3") ? false : true;
+            bool validaMandatoListID = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && listId == "3") ? false : true;
             var documentReferenceId = xmlParser.DocumentReferenceId;
 
             var zone3 = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone3)
