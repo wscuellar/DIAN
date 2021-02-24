@@ -121,30 +121,30 @@ namespace Gosocket.Dian.Application
             switch (model.EventStatus)
             {
                 case EventStatus.Received:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Received);
+                    model.Title = EnumHelper.GetDescription(EventStatus.Received);
                     break;
                 case EventStatus.Receipt:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Receipt);
+                    model.Title = EnumHelper.GetDescription(EventStatus.Receipt);
                     break;
                 case EventStatus.AceptacionTacita:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.AceptacionTacita);
+                    model.Title = EnumHelper.GetDescription(EventStatus.AceptacionTacita);
                     break;
                 case EventStatus.Accepted:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Accepted);
+                    model.Title = EnumHelper.GetDescription(EventStatus.Accepted);
                     break;
                 case EventStatus.SolicitudDisponibilizacion:
                     if (model.CustomizationID.Equals("361"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.PrimeraSolicitudDisponibilizacion);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.PrimeraSolicitudDisponibilizacion);
                     if (model.CustomizationID.Equals("362"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionDirecta);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionDirecta);
                     if (model.CustomizationID.Equals("363"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosterior);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosterior);
                     if (model.CustomizationID.Equals("364"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosteriorDirecta);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosteriorDirecta);
                     break;
                 case EventStatus.EndosoGarantia:
                     model.Title = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
+                    model.Title = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.EndosoPropiedad:
@@ -152,13 +152,10 @@ namespace Gosocket.Dian.Application
                         model.Title = EnumHelper.GetDescription(SubEventStatus.ConResponsabilidad);
                     else
                         model.Title = EnumHelper.GetDescription(SubEventStatus.SinResponsabilidad);
-
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoPropiedad);
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.EndosoProcuracion:
-                    model.Title = model.EventStatus.GetDescription();
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.EndosoProcuracion);
+                    model.Title = EnumHelper.GetDescription(EventStatus.EndosoProcuracion);
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.InvoiceOfferedForNegotiation:
@@ -172,41 +169,41 @@ namespace Gosocket.Dian.Application
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.Avales:
-                    model.EventTitle = "Aval de la FEV TV";
+                    model.Title = "Aval de la FEV TV";
                     break;
                 case EventStatus.Mandato:
                     if(model.CustomizationID.Equals("431"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlLimitado);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlLimitado);
                     if (model.CustomizationID.Equals("432"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlLimitado);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlLimitado);
                     if (model.CustomizationID.Equals("433"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlTiempo);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlTiempo);
                     if (model.CustomizationID.Equals("434"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlTiempoIlimitado);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlTiempoIlimitado);
                     break;
                 case EventStatus.TerminacionMandato:
                     if (model.CustomizationID.Equals("441"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionRevocatoria);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.TerminacionRevocatoria);
                     if (model.CustomizationID.Equals("442"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionRenuncia);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.TerminacionRenuncia);
                     break;
                 case EventStatus.ValInfoPago:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.ValInfoPago);
+                    model.Title = EnumHelper.GetDescription(EventStatus.ValInfoPago);
                     break;
                 case EventStatus.NotificacionPagoTotalParcial:
                     if (model.CustomizationID.Equals("451"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.PagoParcial);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.PagoParcial);
                     if (model.CustomizationID.Equals("452"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.PagoTotal);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.PagoTotal);
                     break;
                 case EventStatus.AnulacionLimitacionCirculacion:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.AnulacionLimitacionCirculacion);
+                    model.Title = EnumHelper.GetDescription(EventStatus.AnulacionLimitacionCirculacion);
                     break;
                 case EventStatus.NegotiatedInvoice:
                     if (model.CustomizationID.Equals("421"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionSentencia);
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.TerminacionSentencia);
                     if (model.CustomizationID.Equals("422"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.TerminacionAnticipada); 
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.TerminacionAnticipada); 
                     break;
                 default:
                     model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
@@ -458,7 +455,14 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EventTotalValueEndoso}", model.EventTotalValueEndoso);
             template = template.Replace("{EventTotalValueLimitation}", model.EventTotalValueLimitation);
             template = template.Replace("{EventTotalValuePago}", model.EventTotalValuePago);
-            template = template.Replace("{ResponseCodeListID}", model.ResponseCodeListID == "1" ? EnumHelper.GetDescription(EndodoSubEventStatus.Completo) : EnumHelper.GetDescription(EndodoSubEventStatus.EnBlanco));
+            if (model.EventCode == "045")
+            {
+                template = template.Replace("{ResponseCodeListID}", model.ResponseCodeListID == "1" ? "Sin limitación" : "Con limitación");
+            }
+            else
+            {
+                template = template.Replace("{ResponseCodeListID}", model.ResponseCodeListID == "1" ? EnumHelper.GetDescription(EndodoSubEventStatus.Completo) : EnumHelper.GetDescription(EndodoSubEventStatus.EnBlanco));
+            }
             template = template.Replace("{EventCode}", model.EventCodeReference);
             template = template.Replace("{CUDEReference}", model.CUDEReference);
             template = template.Replace("{DescriptionReference}", model.DescriptionReference);
