@@ -2012,7 +2012,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                                ErrorMessage = "No fue informado el literal “Mandante Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ErrorMessage = "No fue informado el literal “Mandante Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2028,7 +2028,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                                ErrorMessage = "No fue informado el literal “Mandante Legitimo Tenedor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ErrorMessage = "No fue informado el literal “Mandante Legitimo Tenedor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2042,7 +2042,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                                ErrorMessage = "No fue informado el literal “Mandante Aval” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ErrorMessage = "No fue informado el literal “Mandante Aval” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2056,7 +2056,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                                ErrorMessage = "No fue informado el literal “Mandante Adquirente/Deudor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ErrorMessage = "No fue informado el literal “Mandante Adquirente/Deudor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2374,38 +2374,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     attorney.Add(attorneyModel);
                 }
             }
-            //Si no hay errores inserta registro
-            //if (validate)
-            //{                
-            //    foreach (var attorneyDocument in attorney)
-            //    {
-            //        GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId, attorneyDocument.cufe)
-            //        {
-            //            Active = true,
-            //            Actor = actor,
-            //            EffectiveDate = effectiveDate,
-            //            EndDate = endDate,
-            //            FacultityCode = attorneyDocument.facultityCode,
-            //            IssuerAttorney = issuerPartyCode,
-            //            SenderCode = senderCode,
-            //            StartDate = startDateAttorney,
-            //            AttorneyType = customizationID,
-            //            SerieAndNumber = serieAndNumber,
-            //            SenderName = senderName,
-            //            IssuerAttorneyName = name,
-            //            ResponseCodeListID = listID
-            //        };
-            //        TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
-            //    }
-            //    responses.Add(new ValidateListResponse
-            //    {
-            //        IsValid = true,
-            //        Mandatory = true,
-            //        ErrorCode = "100",
-            //        ErrorMessage = "Mandato referenciado correctamente",
-            //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-            //    });                          
-            //}
+           
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;

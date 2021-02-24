@@ -812,7 +812,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (docTypeCode == "96")
             {
-                if (string.IsNullOrWhiteSpace(providerCode) || providerCode == "800197268")
+                if (providerCode == "800197268")
                 {
                     stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAB19b") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAB19b"));
                     errors.Add(stringBuilder.ToString());
@@ -877,35 +877,7 @@ namespace Gosocket.Dian.Services.Utils
                         }
                     }
 
-                    if ((Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) && string.IsNullOrEmpty(receiverCode) && flagEvento)
-                    {
-                        stringBuilder.AppendLine(txtRegla + $"{codeMessage}G04" + txtRechazo + "El ID de receptor del evento no es Válido");
-                        errors.Add(stringBuilder.ToString());
-                        stringBuilder.Clear();
-                        isValid = false;
-                    }
-                    else if ((Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(receiverCode) && flagEvento)
-                    {
-                        stringBuilder.AppendLine(txtRegla + $"{codeMessage}G04" + txtRechazo + "No fue informado el documento del endosatario");
-                        errors.Add(stringBuilder.ToString());
-                        stringBuilder.Clear();
-                        isValid = false;
-                    }
-                    else if ( (Convert.ToInt32(eventCode) == 45 || Convert.ToInt32(eventCode) == 46) && string.IsNullOrEmpty(receiverCode) && flagEvento)
-                    {
-                        stringBuilder.AppendLine(txtRegla + $"{codeMessage}G04" + txtRechazo + "No fue informado el número de identificación.");
-                        errors.Add(stringBuilder.ToString());
-                        stringBuilder.Clear();
-                        isValid = false;
-                    }
-                    else if (string.IsNullOrEmpty(receiverCode))
-                    {
-                        stringBuilder.AppendLine(txtRegla + $"{codeMessage}G04" + txtRechazo + "No fue informado el literal “800197268”");
-                        errors.Add(stringBuilder.ToString());
-                        stringBuilder.Clear();
-                        isValid = false;
-                    }
-
+                  
                     if (listID == "1" && (Convert.ToInt32(eventCode) >= 37 && Convert.ToInt32(eventCode) <= 40) && string.IsNullOrEmpty(senderCode) && flagEvento)
                     {
                         stringBuilder.AppendLine(txtRegla + $"{codeMessage}F04" + txtRechazo + "No fue informado el Nit.");
