@@ -519,6 +519,8 @@ namespace Gosocket.Dian.Application.Cosmos
                 e.DocumentTypeId == "05" ||
                 e.DocumentTypeId == "07" ||
                 e.DocumentTypeId == "08" ||
+                e.DocumentTypeId == "09" ||
+                e.DocumentTypeId == "11" ||
                 e.DocumentTypeId == "12" ||
                 e.DocumentTypeId == "101"
                 )).AsDocumentQuery();
@@ -607,6 +609,8 @@ namespace Gosocket.Dian.Application.Cosmos
                 g.DocumentTypeId == "05" ||
                 g.DocumentTypeId == "07" ||
                 g.DocumentTypeId == "08" ||
+                g.DocumentTypeId == "09" ||
+                g.DocumentTypeId == "11" ||
                 g.DocumentTypeId == "12" ||
                 g.DocumentTypeId == "101"
                 );
