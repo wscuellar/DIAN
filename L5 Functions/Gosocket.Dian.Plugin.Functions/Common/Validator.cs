@@ -363,7 +363,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             if (Convert.ToInt32(model.DocumentTypeId) == Convert.ToInt32(DocumentType.IndividualPayroll))
             {                
-                responses.AddRange(this.CheckIndividualPayrollInSameMonth(model.EmpleadorNIT, xmlParser.globalDocPayrolls.NumeroDocumento, xmlParser.Novelty));
+                responses.AddRange(this.CheckIndividualPayrollInSameMonth(model.EmpleadorNIT, 
+                                    xmlParser.globalDocPayrolls.NumeroDocumento, 
+                                    xmlParser.Novelty, 
+                                    xmlParser.globalDocPayrolls.FechaPagoInicio));
             }
 
             return responses;
@@ -4493,7 +4496,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return responses;
         }
 
-        private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty)
+        private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty, string startPaymentDate)
         {
             DateTime startDate = DateTime.UtcNow;
 
@@ -4530,8 +4533,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses; // no existe para el mes actual
             }
 
-            var currentDate = DateTime.Now.Date;
-            var payrollCurrentMonth = payrolls.FirstOrDefault(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month);
+            // Se valida contra la FechaPagoInicio...
+            var payrollCurrentMonth = payrolls.FirstOrDefault(x => x.FechaPagoInicio == startPaymentDate);
             if (payrollCurrentMonth == null)
             {
                 //Novedad XML true
@@ -4571,6 +4574,85 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return responses;
         }
+
+        //private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty)
+        //{
+        //    DateTime startDate = DateTime.UtcNow;
+
+        //    List<ValidateListResponse> responses = new List<ValidateListResponse>();
+        //    responses.Add(new ValidateListResponse
+        //    {
+        //        IsValid = true,
+        //        Mandatory = true,
+        //        ErrorCode = "100",
+        //        ErrorMessage = "Evento CheckIndividualPayrollInSameMonth referenciado correctamente",
+        //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+        //    });
+
+        //    // Solo se podrá transmitir para cada trabajador 1 documento NominaIndividual mensual durante cada mes del año. Para el mismo Empleador.
+        //    var payrolls = payrollTableManager.GlobalPayrollByRowKey_DocumentNumber<GlobalDocPayroll>(companyId, employeeId);
+        //    if (payrolls == null || payrolls.Count <= 0) // No exiten nóminas para el empleado...
+        //    {
+        //        //Novedad XML true
+        //        if (novelty)
+        //        {
+        //            responses.Clear();
+        //            responses.Add(new ValidateListResponse
+        //            {
+        //                IsValid = false,
+        //                Mandatory = true,
+        //                ErrorCode = "NIE199a",
+        //                ErrorMessage = "Elemento Novedad con valor “true” no puede ser recibido por primera vez, " +
+        //                "ya que no existe una Nómina Electrónica recibida para este trabajador reportada por este Emisor durante este mes.",
+        //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+        //            });
+        //            return responses;
+        //        }
+        //        else
+        //            return responses; // no existe para el mes actual
+        //    }
+
+        //    var currentDate = DateTime.Now.Date;
+        //    var payrollCurrentMonth = payrolls.FirstOrDefault(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month);
+        //    if (payrollCurrentMonth == null)
+        //    {
+        //        //Novedad XML true
+        //        if (novelty)
+        //        {
+        //            responses.Clear();
+        //            responses.Add(new ValidateListResponse
+        //            {
+        //                IsValid = false,
+        //                Mandatory = true,
+        //                ErrorCode = "NIE199a",
+        //                ErrorMessage = "Elemento Novedad con valor “true” no puede ser recibido por primera vez, " +
+        //                "ya que no existe una Nómina Electrónica recibida para este trabajador reportada por este Emisor durante este mes.",
+        //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+        //            });
+        //            return responses;
+        //        }
+        //        else
+        //            return responses; // no existe para el mes actual
+        //    }
+
+        //    //Novedad XML False
+        //    if (payrollCurrentMonth != null && !novelty)
+        //    {
+        //        responses.Clear();
+        //        responses.Add(new ValidateListResponse
+        //        {
+        //            IsValid = false,
+        //            Mandatory = true,
+        //            ErrorCode = "NIE199",
+        //            ErrorMessage = "Únicamente pueden ser aceptados documentos “NominaIndividual” del mismo trabajador" +
+        //            " durante el Mes indicado en el documento que posean como 'True' este elemento.",
+        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+        //        });
+        //        return responses;
+        //    }
+
+        //    return responses;
+        //}
 
         #endregion
 
