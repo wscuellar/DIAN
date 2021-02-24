@@ -766,6 +766,8 @@ namespace Gosocket.Dian.Services.Utils
             var UBLVersionID = documentParsed.UBLVersionID;
             var receiverCode = documentParsed.ReceiverCode;
             var providerCode = documentParsed.ProviderCode;
+            txtRegla = "Regla: ";
+            txtRechazo = ", Rechazo: ";
 
             switch (docTypeCode)
             {
@@ -793,9 +795,12 @@ namespace Gosocket.Dian.Services.Utils
                     }
                 case "96":
                     {
-                        codeMessage = "AA";
-                        txtRegla = "Regla: ";
-                        txtRechazo = ", Rechazo: ";
+                        codeMessage = "AA";                      
+                        break;
+                    }
+                case "05":
+                    {
+                        codeMessage = "DSA";
                         break;
                     }
                 default:
@@ -922,6 +927,16 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
+            }
+            else if ( docTypeCode == "05")
+            {
+                if (string.IsNullOrEmpty(senderCode))
+                {
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}J21" + txtRechazo + "NIT No informado.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
             }
             else
             {
