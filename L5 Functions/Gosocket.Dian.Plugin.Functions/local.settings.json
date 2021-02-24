@@ -136,8 +136,10 @@
     "ErrorCode_LGC21": "LGC21",
     "ErrorMessage_LGC21": "La Factura Electrónica no cumple con los requisitos legales para ser considerada título valor y no podrá ser registrada.",
     "ErrorCode_LGC23": "LGC23",
-    "ErrorMessage_LGC23": "No puede registrar si previamente se registro primera inscripcion de la factura electrónica de venta"
-
+    "ErrorMessage_LGC23": "No puede registrar si previamente se registro primera inscripcion de la factura electrónica de venta",
+    "ErrorCode_LGC22": "LGC22",
+    "ErrorMessage_LGC22": "No se puede registrar esté evento si previamente se registro uno de los siguientes eventos: Endoso en garantía, Endoso en procuración, Limitación de circulación.",
+    "ValidateEndosoTrusted": "false"
 
 
 

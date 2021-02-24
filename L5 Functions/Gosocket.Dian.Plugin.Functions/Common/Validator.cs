@@ -806,14 +806,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                     //Valida receptor documento AR coincida con DIAN
-                    if (party.ReceiverParty != "800197268")
+                    if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = Convert.ToInt16(party.ResponseCode) == 34 ? "AAG01e" : "AAG04",
-                            ErrorMessage = Convert.ToInt16(party.ResponseCode) == 34 ?  "No fue informado los datos de la DIAN" : "No fue informado el literal “800197268",
+                            ErrorMessage = Convert.ToInt16(party.ResponseCode) == 34 ? "No fue informado los datos de la DIAN" : "No fue informado el literal '800197268'",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1013,14 +1013,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.NegotiatedInvoice:
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
                     // Valida receptor documento AR coincida con DIAN
-                    if (party.ReceiverParty != "800197268")
+                    if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAG04",
-                            ErrorMessage = "No fue informado el literal “800197268",
+                            ErrorMessage = "No fue informado el literal '800197268'",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1064,14 +1064,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                         // Valida receptor documento AR coincida con DIAN
-                        if (party.ReceiverParty != "800197268")
+                        if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")                        
                         {
                             responses.Add(new ValidateListResponse
                             {
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "AAG04",
-                                ErrorMessage = "No fue informado el literal “800197268",
+                                ErrorMessage = "No fue informado el literal '800197268'",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -1102,14 +1102,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-                        else if (party.ReceiverParty != "800197268")
+                        else if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
                         {
                             responses.Add(new ValidateListResponse
                             {
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "AAG04",
-                                ErrorMessage = "No fue informado el literal “800197268",
+                                ErrorMessage = "No fue informado el literal '800197268'",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2012,7 +2012,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                                ErrorMessage = "No fue informado el literal “Mandante Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ErrorMessage = "No fue informado el literal “Mandante Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2028,7 +2028,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                                ErrorMessage = "No fue informado el literal “Mandante Legitimo Tenedor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ErrorMessage = "No fue informado el literal “Mandante Legitimo Tenedor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2042,7 +2042,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                                ErrorMessage = "No fue informado el literal “Mandante Aval” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ErrorMessage = "No fue informado el literal “Mandante Aval” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2056,7 +2056,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
-                                ErrorMessage = "No fue informado el literal “Mandante Adquirente/Deudor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandatario",
+                                ErrorMessage = "No fue informado el literal “Mandante Adquirente/Deudor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -2374,38 +2374,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     attorney.Add(attorneyModel);
                 }
             }
-            //Si no hay errores inserta registro
-            //if (validate)
-            //{                
-            //    foreach (var attorneyDocument in attorney)
-            //    {
-            //        GlobalDocReferenceAttorney docReferenceAttorney = new GlobalDocReferenceAttorney(trackId, attorneyDocument.cufe)
-            //        {
-            //            Active = true,
-            //            Actor = actor,
-            //            EffectiveDate = effectiveDate,
-            //            EndDate = endDate,
-            //            FacultityCode = attorneyDocument.facultityCode,
-            //            IssuerAttorney = issuerPartyCode,
-            //            SenderCode = senderCode,
-            //            StartDate = startDateAttorney,
-            //            AttorneyType = customizationID,
-            //            SerieAndNumber = serieAndNumber,
-            //            SenderName = senderName,
-            //            IssuerAttorneyName = name,
-            //            ResponseCodeListID = listID
-            //        };
-            //        TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney);
-            //    }
-            //    responses.Add(new ValidateListResponse
-            //    {
-            //        IsValid = true,
-            //        Mandatory = true,
-            //        ErrorCode = "100",
-            //        ErrorMessage = "Mandato referenciado correctamente",
-            //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-            //    });                          
-            //}
+           
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;

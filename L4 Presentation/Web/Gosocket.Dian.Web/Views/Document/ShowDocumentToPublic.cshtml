@@ -114,7 +114,12 @@
                 }, 200)
             })
 
-            $('#divViewMoreQueryList').hide();            
+            $('#divViewMoreQueryList').hide();
+
+              $(".download-support-document").click(function () {
+                  var cufe = this.id;
+                  showPdfModalClick(cufe, '@Url.Action("PrintSupportDocument", "Document")', '#html-gdoc');
+            })
         });
 
         $(function () {

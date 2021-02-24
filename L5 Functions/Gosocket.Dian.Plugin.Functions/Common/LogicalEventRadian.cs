@@ -1343,8 +1343,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateAvailabilityRequestEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
+            string senderCode = string.Empty;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-           
+
+            //Obtiene legitimo tenedor               
+            LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
+            HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(documentMeta.FirstOrDefault().DocumentReferencedKey, xmlParserCude);
+            if (responseHolderExchange != null)
+                senderCode = !string.IsNullOrWhiteSpace(responseHolderExchange.PartyLegalEntity) ? responseHolderExchange.PartyLegalEntity : string.Empty;
+            else
+                senderCode = xmlParserCude.Fields["SenderCode"].ToString();
+
             //Validacion de la Solicitud de Disponibilización Posterior 361 / 362
             if (Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.FirstGeneralRegistration
                || Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.FirstPriorDirectRegistration)
@@ -1443,6 +1452,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Valida que exista una Primera Disponibilizacion
                 bool validForItemDisponibiliza = false;
                 var listPrimeraDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion 
+                && t.SenderCode == senderCode
                 && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration) 
                 || Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration).ToList();
                 if(listPrimeraDisponibilizacion != null || listPrimeraDisponibilizacion.Count > 0)
@@ -2077,15 +2087,43 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida informacion Endoso en propiedad                       
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
             {
-                //Valida informacion Endoso                           
-                if (String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
+                //Valida informacion ValorTotalEndoso
+                if (String.IsNullOrEmpty(valueTotalEndoso))
                 {
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
                         Mandatory = ValidateEndosoTrusted,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
+                        ErrorCode = "AAI05",
+                        ErrorMessage = "El valor no es informado",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    return responses;
+                }
+
+                //Valida informacion Endoso  PrecioPagarseFEV                         
+                if (String.IsNullOrEmpty(valuePriceToPay))
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = ValidateEndosoTrusted,
+                        ErrorCode = "AAI07a",
+                        ErrorMessage = "El valor no es informado para el evento: Endoso en Propiedad",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    return responses;
+                }
+
+                //Valida informacion Endoso TasaDescuento                       
+                if (String.IsNullOrEmpty(valueDiscountRateEndoso))
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = ValidateEndosoTrusted,
+                        ErrorCode = "AAI09",
+                        ErrorMessage = "No fue informado la tasa de descuento para el evento: Endoso en Propiedad",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                     return responses;
