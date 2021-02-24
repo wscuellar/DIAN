@@ -1343,5 +1343,21 @@ namespace Gosocket.Dian.Infrastructure
 
             return CloudTable.ExecuteQuery(query.Where(prefixCondition)).FirstOrDefault();
         }
+
+        public List<T> GlobalPayrollByRowKey_DocumentNumber<T>(string rowkey, string documentNumber) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    rowkey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("NumeroDocumento",
+                    QueryComparisons.Equal,
+                    documentNumber));
+
+            return CloudTable.ExecuteQuery(query.Where(prefixCondition)).ToList();
+        }
     }
 }
