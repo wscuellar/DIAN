@@ -171,7 +171,7 @@
                                                             <td class="text-center">@item.PinSW</td>
                                                             <td class="text-center">  @item.Url  </td>
                                                             <td class="text-center" style="width:70px">
-                                                                <a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>
+                                                                @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
                                                                 <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Set de pruebas"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
                                                             </td>
                                                         </tr>

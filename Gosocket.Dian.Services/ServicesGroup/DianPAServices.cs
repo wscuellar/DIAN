@@ -706,6 +706,18 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         applicationResponseExist = XmlUtilEvents.ApplicationResponseExist(documentMeta);
                     });
 
+                    arrayTasks.Add(firstLocalRun);
+                    Task.WhenAll(arrayTasks).Wait();
+
+                    if(int.Parse(documentMeta.DocumentTypeId) != (int)DocumentType.Invoice)
+                    {
+                        response.StatusCode = "68";
+                        response.StatusDescription = "TrackId no corresponde a un CUFE.";
+                        return response;
+                    }
+
+                    arrayTasks.Clear();
+
                     Task secondLocalRun = Task.Run(() =>
                     {
                         // se consultan los eventos asociados al trackId.
@@ -740,7 +752,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
                     });
 
-                    arrayTasks.Add(firstLocalRun);
                     arrayTasks.Add(secondLocalRun);
                     arrayTasks.Add(thirdLocalRun);
                     Task.WhenAll(arrayTasks).Wait();
