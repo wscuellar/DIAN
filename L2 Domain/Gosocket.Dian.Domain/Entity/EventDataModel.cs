@@ -91,6 +91,9 @@
         public string EventDescription { get; set; }
         public string SenderBusinessName { get; set; }
         public string SenderDocumentType { get; set; }
+        public string CUDEReference { get; set; }
+        public string EventCodeReference { get; set; }
+        public string DescriptionReference { get; set; }
     }
 
     public class AssociatedValidationsModel
