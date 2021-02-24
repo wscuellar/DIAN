@@ -171,7 +171,7 @@ namespace Gosocket.Dian.Application
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.Avales:
-                    model.EventTitle = EnumHelper.GetDescription(EventStatus.Avales);
+                    model.EventTitle = "Aval de la FEV TV";
                     break;
                 case EventStatus.Mandato:
                     if(model.CustomizationID.Equals("431"))
@@ -369,7 +369,7 @@ namespace Gosocket.Dian.Application
                 htmlEvent += "<div id='EventFinishDate' class='text-subtitle text-gray'>Fecha de Terminación: <a class='text-data'>{EventFinishDate} </a></div>";
             }
            
-            if (model.EventCode == "038" || model.EventCode == "039")
+            if (model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039")
             {
                 htmlEvent += "<div id='EventStartDate' class='text-subtitle text-gray'>Fecha de Inicio: <a class='text-data'>{EventStartDate} </a></div>";
             }
@@ -445,7 +445,8 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{ResponseCodeListID}", model.ResponseCodeListID == "1" ? EnumHelper.GetDescription(EndodoSubEventStatus.Completo) : EnumHelper.GetDescription(EndodoSubEventStatus.EnBlanco));
 
 
-            if (!(model.EventCode == "036" || model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "040"))
+
+            if (!(model.EventCode == "036" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "040" || (model.CustomizationID == "372" && model.OperationDetails == "")))
             {
                 template = template.Replace("{classNotes}", "noShow");
             }
