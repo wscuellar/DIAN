@@ -219,8 +219,11 @@ namespace Gosocket.Dian.Application
             if(!string.IsNullOrEmpty(model.CUDEReference))
             {
                 GlobalDocValidatorDocumentMeta reference = _queryAssociatedEventsService.DocumentValidation(model.CUDEReference);
-                model.EventCodeReference = reference.EventCode;
-                model.DescriptionReference = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), reference.EventCode)));
+                if(reference != null &&  reference.EventCode != null)
+                {
+                    model.EventCodeReference = reference.EventCode;
+                    model.DescriptionReference = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), reference.EventCode)));
+                }
             }
 
 
