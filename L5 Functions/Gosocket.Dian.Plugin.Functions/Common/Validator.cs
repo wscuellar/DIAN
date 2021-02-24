@@ -806,14 +806,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                     //Valida receptor documento AR coincida con DIAN
-                    if (party.ReceiverParty != "800197268")
+                    if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = Convert.ToInt16(party.ResponseCode) == 34 ? "AAG01e" : "AAG04",
-                            ErrorMessage = Convert.ToInt16(party.ResponseCode) == 34 ?  "No fue informado los datos de la DIAN" : "No fue informado el literal “800197268",
+                            ErrorMessage = Convert.ToInt16(party.ResponseCode) == 34 ? "No fue informado los datos de la DIAN" : "No fue informado el literal '800197268'",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1013,14 +1013,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.NegotiatedInvoice:
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
                     // Valida receptor documento AR coincida con DIAN
-                    if (party.ReceiverParty != "800197268")
+                    if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAG04",
-                            ErrorMessage = "No fue informado el literal “800197268",
+                            ErrorMessage = "No fue informado el literal '800197268'",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1064,14 +1064,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                         // Valida receptor documento AR coincida con DIAN
-                        if (party.ReceiverParty != "800197268")
+                        if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")                        
                         {
                             responses.Add(new ValidateListResponse
                             {
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "AAG04",
-                                ErrorMessage = "No fue informado el literal “800197268",
+                                ErrorMessage = "No fue informado el literal '800197268'",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -1102,14 +1102,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-                        else if (party.ReceiverParty != "800197268")
+                        else if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
                         {
                             responses.Add(new ValidateListResponse
                             {
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "AAG04",
-                                ErrorMessage = "No fue informado el literal “800197268",
+                                ErrorMessage = "No fue informado el literal '800197268'",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
