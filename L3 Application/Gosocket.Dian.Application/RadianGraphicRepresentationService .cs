@@ -109,8 +109,8 @@ namespace Gosocket.Dian.Application
             Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
             xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
-            //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
-            string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+            string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+            //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
             ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
             
             model = MappingXpathValues(model, fieldValues);
@@ -546,7 +546,7 @@ namespace Gosocket.Dian.Application
 
 
             // Mapping Final Data Section
-            Dictionary<string, string> EntityName = model.EntityName.Split(',').Select(x => x.Split('=')).ToDictionary(x => x[0], x => x[1]);
+            Dictionary<string, string> EntityName = model.EntityName.Split(',').Select(x => x.Split('=')).ToDictionary(x => x[0].Trim(), x => x[1].Trim());
             template = template.Replace("{FinalData}", $"Nombre de la Entidad de Certificación Digital: {EntityName["CN"]} <br> Número del certificado digital: {model.CertificateNumber} ");
 
             return template;

@@ -98,7 +98,18 @@
                 </div>
                 <div class="col-md-5" style="padding-top: 7px; padding-left: 0">
                     <span class="cufe-text">
-                        CUFE: @Model.Document.DocumentKey<br>
+
+                        @if (Model.Document.DocumentTypeId == "05")
+                        {
+                        <span>CUDE:</span>
+                        }
+
+                        @if (Model.Document.DocumentTypeId != "05")
+                        {
+                        <span>CUFE:</span>
+                        }      
+                        @Model.Document.DocumentKey<br>
+
                     </span>
                 </div>
                 <div class="col-md-4" style="padding-top: 7px; padding-left: 0;">
@@ -111,9 +122,16 @@
                         }
                         Folio: @Model.Document.Number<br>
                         Fecha de emisión de la factura Electrónica: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br />
-                        @if (Model.Document.Status != 2)
+                        @if (Model.Document.Status != 2 && Model.Document.DocumentTypeId != "05")
                         {
                             <a href="@Url.Action("DownloadPDF", "Document", new { trackId = Model.Document.Id})" class="downloadPDFUrl" style="font-size:15px; text-decoration:underline;">
+                                <i class="fa fa-download"></i> Descargar PDF
+                            </a>
+                        }
+                        @if (Model.Document.DocumentTypeId == "05")
+                        {
+
+                            <a href="#" class="add-tooltip download-support-document" data-original-title="Documento soporte" data-id="@Model.Document.Id" id="@Model.Document.Id" style="font-size:15px; text-decoration:underline;">
                                 <i class="fa fa-download"></i> Descargar PDF
                             </a>
                         }
