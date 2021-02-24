@@ -25,7 +25,7 @@ namespace Gosocket.Dian.Application
     #endregion
 
     public class RadianSupportDocument : IRadianSupportDocument
-    {
+    {   
         #region Properties
 
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
