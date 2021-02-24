@@ -812,7 +812,7 @@ namespace Gosocket.Dian.Services.Utils
 
             if (docTypeCode == "96")
             {
-                if (string.IsNullOrWhiteSpace(providerCode) || providerCode == "800197268")
+                if (providerCode == "800197268")
                 {
                     stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAB19b") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAB19b"));
                     errors.Add(stringBuilder.ToString());

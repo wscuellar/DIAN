@@ -915,10 +915,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 return dianResponse;
             }
 
-            //var xmlParser = new XmlParser(xmlBytes);
-            //if (!xmlParser.Parser())
-            //    throw new Exception(xmlParser.ParserError);
-
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
             documentParsed.SigningTime = xmlParser.SigningTime;
             DocumentParsed.SetValues(ref documentParsed);

@@ -168,7 +168,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         
                 }
 
-                //Si es mandato registra en GlobalDocReferenceAttorney
+                //Si es mandato 
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato 
                     && validEventRadian)
                 {
