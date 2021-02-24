@@ -77,7 +77,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.ContributorIdType = (int)dataentity.ContributorIdType;
             model.OtherDocElecContributorId = (int)dataentity.ContributorId;
 
-            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.UserCode(), (int)dataentity.OperationModeId);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), (int)dataentity.OperationModeId);
 
             model.ListTable = List.Results.Select(t => new OtherDocsElectListViewModel()
             {
@@ -196,7 +196,7 @@ namespace Gosocket.Dian.Web.Controllers
                 //});
             }
 
-            _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Registrado.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
+            _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
 
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = model.OtherDocElecContributorId });
         }
@@ -223,7 +223,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (testSet == null)
                 return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
-            OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(registrationData.UserCode.ToString(),
+            OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(registrationData.ContributorId,
                                                 OtherDocElecState.Registrado,
                                                 (int)registrationData.ContributorIdType,
                                                 (int)registrationData.OperationModeId,
@@ -281,7 +281,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 
                         OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(
-                                                            ValidacionOtherDocs.UserCode.ToString(),
+                                                            User.ContributorId(),
                                                             OtherDocElecState.Registrado,
                                                             (int)ValidacionOtherDocs.ContributorIdType,
                                                             (int)ValidacionOtherDocs.OperationModeId,
@@ -295,7 +295,6 @@ namespace Gosocket.Dian.Web.Controllers
                         ContributorId = Lista.Where(x => x.ElectronicDocumentId == ValidacionOtherDocs.ElectronicDocumentId).FirstOrDefault().Id.ToString();
                     }
 
-
                     ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
                                             new
                                             {
@@ -304,9 +303,10 @@ namespace Gosocket.Dian.Web.Controllers
                                                 ContributorIdType = (int)ValidacionOtherDocs.ContributorIdType,
                                                 ContributorId
                                             });
-                    return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
 
+                    return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
                 }
+
                 return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
             }
 
@@ -314,7 +314,6 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectOperationMode_Confirm.Replace("@Participante", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
 
             return Json(new ResponseMessage(TextResources.FailedValidation, TextResources.alertType), JsonRequestBehavior.AllowGet);
-
         }
 
         [HttpPost]

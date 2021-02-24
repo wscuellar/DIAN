@@ -237,7 +237,6 @@
                         </section>
                         @*<h3><span class="name-state">En Pruebas</span></h3>
                         <section>
-                            @Html.Partial("_personalInfo")
                             <div class="panel-footer text-right">
                                 <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
                                 <button name="Submit" class="btn btn-radian-success submit-button">Enviar</button>
@@ -245,20 +244,21 @@
                         </section>*@
                         <h3><span class="name-state">Pruebas de aceptación</span></h3>
                         <section class="test-redirect">
-                            @*@Html.Partial("_personalInfo")*@
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="text-right">
-                                        <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
-                                        <button name="SubmitPrueba" class="btn btn-radian-success Set-Prueba">Set de pruebas</button>
+                            @if (Model.Step == 2)
+                            {
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="text-right">
+                                            <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
+                                            <button name="SubmitPrueba" class="btn btn-radian-success Set-Prueba">Set de pruebas</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
                         </section>
                         <h3></h3>
                         <section>
-                            @*@Html.Partial("_personalInfo")
-                            @Html.Partial("_finish")*@
+                            @Html.Partial("_finish")
                         </section>
                     </div>
                     @if (Model.Step == 3)
@@ -274,7 +274,7 @@
 
         </div>
 
-
+        @*Modal*@
         <div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -296,7 +296,6 @@
                 </div>
             </div>
         </div>
-
 
     </div>
 </div>

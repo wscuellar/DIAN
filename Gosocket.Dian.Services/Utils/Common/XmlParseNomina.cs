@@ -84,6 +84,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var tempDeduccionesTotal = xmlDocument.SelectSingleNode(nodeDeduccionTotal)?.InnerText;
                     var tempComprobanteTotal = xmlDocument.SelectSingleNode(nodeComprobanteTotal)?.InnerText;
 
+                    globalDocPayrolls.Novedad = this.Novelty;
                     globalDocPayrolls.DevengadosTotal = (!string.IsNullOrWhiteSpace(tempDevengadosTotal) ? double.Parse(tempDevengadosTotal) : 0);
                     globalDocPayrolls.DeduccionesTotal = (!string.IsNullOrWhiteSpace(tempDeduccionesTotal) ? double.Parse(tempDeduccionesTotal) : 0);
                     globalDocPayrolls.ComprobanteTotal = (!string.IsNullOrWhiteSpace(tempComprobanteTotal) ? double.Parse(tempComprobanteTotal) : 0);

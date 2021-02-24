@@ -17,13 +17,13 @@ namespace Gosocket.Dian.Interfaces.Services
 
         List<OtherDocElecOperationMode> GetOperationModes();
 
-        OtherDocElecContributor CreateContributor(string userCode, Domain.Common.OtherDocElecState State, int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy);
+        OtherDocElecContributor CreateContributor(int contributorId, Domain.Common.OtherDocElecState State, int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy);
 
         List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int OperationModeId, string state);
 
         bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware);
 
-        PagedResult<OtherDocsElectData> List(string userCode, int OperationModeId);
+        PagedResult<OtherDocsElectData> List(int contributorId, int OperationModeId);
 
         OtherDocsElectData GetCOntrinutorODE(int Id);
 

@@ -337,7 +337,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.ProviderId = entity.ProviderId;
             model.Provider = _contributorService.GetContributorById(model.ProviderId, entity.ContributorTypeId).Name;
 
-            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.UserCode(), 0);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), 0);
             model.ListTable = List.Results.Select(t => new OtherDocsElectListViewModel()
             {
                 Id = t.Id,
@@ -362,7 +362,7 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult SetupOperationModePost(OtherDocElecSetupOperationModeViewModel model)
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-
+            
             GlobalTestSetOthersDocuments testSet = null;
 
             testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
@@ -372,7 +372,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (_othersDocsElecContributorService.ValidateSoftwareActive(User.ContributorId(), (int)model.ContributorTypeId, (int)model.OperationModeId, (int)OtherDocElecSoftwaresStatus.InProcess))
                 return Json(new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
-            OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(User.UserCode(),
+            OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(User.ContributorId(),
                                               OtherDocElecState.Registrado,
                                               model.ContributorTypeId,
                                               model.OperationModeId,

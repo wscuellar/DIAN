@@ -60,11 +60,13 @@ namespace Gosocket.Dian.Application
             return collection;
         }
 
-        public OtherDocElecContributor CreateContributor(string userCode, OtherDocElecState State,
+        //public OtherDocElecContributor CreateContributor(string userCode, OtherDocElecState State,
+        //   int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy)
+        public OtherDocElecContributor CreateContributor(int contributorId, OtherDocElecState State,
            int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy)
         {
 
-            int contributorId = _contributorService.GetByCode(userCode).Id;
+            //int contributorId = _contributorService.GetByCode(userCode).Id;
             OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId
                                                                                      && t.OtherDocElecContributorTypeId == ContributorType
                                                                                      && t.OtherDocElecOperationModeId == OperationMode
@@ -136,12 +138,8 @@ namespace Gosocket.Dian.Application
         }
 
 
-        public PagedResult<OtherDocsElectData> List(string userCode, int OperationModeId)
+        public PagedResult<OtherDocsElectData> List(int contributorId, int OperationModeId)
         {
-            Contributor contributor = _contributorService.GetByCode(userCode);
-
-
-
             IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
                                                     join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
                                                     join oco in sqlDBContext.OtherDocElecContributorOperations on oc.Id equals oco.OtherDocElecContributorId
@@ -149,7 +147,7 @@ namespace Gosocket.Dian.Application
                                                     join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
                                                     join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
                                                     join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
-                                                    where oc.ContributorId == contributor.Id
+                                                    where oc.ContributorId == contributorId
                                                      && oc.State != "Cancelado"
                                                      && s.Deleted == false
                                                      && oco.Deleted == false
