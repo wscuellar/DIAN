@@ -789,10 +789,12 @@ namespace Gosocket.Dian.Domain.Common
         SolicitudDisponibilizacionPosterior = 363,        
         [Description("Inscripción en el RADIAN para circulación posterior de la FEV para Negociación Directa Previa")]
         SolicitudDisponibilizacionPosteriorDirecta = 364,
-        [Description("Cancelación del Endoso en Garantia de la FEV")]
+        [Description("Cancelación del Endoso en Garantia")]
         CancelacionEndoso = 401,
-        [Description("Cancelación del Endoso en Procuracion de la FEV")]
+        [Description("Cancelación del Endoso en Procuración")]
         CancelacionEndosoProcuracion = 402,
+        [Description("Tacha de endosos por endoso en retorno")]
+        TachaEndosoRetorno= 403,
         [Description("Auto que decreta medida cautelar por embargo")]
         MedidaCautelarEmbargo = 411,
         [Description("Auto que decreta medida cautelar por mandamiento de pago")]

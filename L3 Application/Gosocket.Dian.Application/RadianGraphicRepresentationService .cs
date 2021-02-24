@@ -162,12 +162,13 @@ namespace Gosocket.Dian.Application
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.InvoiceOfferedForNegotiation:
-                    if (model.CustomizationID.Equals("401"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.CancelacionEndoso);
-                    if (model.CustomizationID.Equals("402"))
-                        model.EventTitle = EnumHelper.GetDescription(SubEventStatus.CancelacionEndosoProcuracion);
-                    
                     model.Title = model.EventStatus.GetDescription();
+                    if (model.CustomizationID.Equals("401"))
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.CancelacionEndoso);
+                    if (model.CustomizationID.Equals("402"))
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.CancelacionEndosoProcuracion);
+                    if (model.CustomizationID.Equals("403"))
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.TachaEndosoRetorno);
                     model.RequestType = eventItem.EventCode;
                     break;
                 case EventStatus.Avales:
@@ -213,6 +214,15 @@ namespace Gosocket.Dian.Application
                     //model.RequestType = model.Title;
                     break;
             }
+
+
+            if(!string.IsNullOrEmpty(model.CUDEReference))
+            {
+                GlobalDocValidatorDocumentMeta reference = _queryAssociatedEventsService.DocumentValidation(model.CUDEReference);
+                model.EventCodeReference = reference.EventCode;
+                model.DescriptionReference = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), reference.EventCode)));
+            }
+
 
             // SetReferences
             GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
@@ -404,12 +414,15 @@ namespace Gosocket.Dian.Application
                 string htmlReference = "";
                 htmlReference += "<td>";
                 htmlReference += "<div class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{EventCode}</a></div>";
-                htmlReference += "<div id='CUDE' class='text-subtitle text-gray'>CUDE: <a class='text-data cude'>{CUDE}</a></div>";
+                htmlReference += "<div id='CUDE' class='text-subtitle text-gray'>CUDE: <a class='text-data cude'>{CUDEReference}</a></div>";
                 htmlReference += "</td>";
                 htmlReference += "<td>";
-                htmlReference += "<div id='OperationDetails' class='text-subtitle text-gray'>Detalle del Evento: <a class='text-data'>{OperationDetails}</a></div>";
+                htmlReference += "<div id='OperationDetails' class='text-subtitle text-gray'>Detalle del Evento: <a class='text-data'>{DescriptionReference}</a></div>";
                 htmlReference += "</td>";
                 template.Replace("{eventReference}", htmlReference);
+
+                // Mapping Event Data Section
+               
             }
             else
             {
@@ -443,7 +456,9 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EventTotalValueLimitation}", model.EventTotalValueLimitation);
             template = template.Replace("{EventTotalValuePago}", model.EventTotalValuePago);
             template = template.Replace("{ResponseCodeListID}", model.ResponseCodeListID == "1" ? EnumHelper.GetDescription(EndodoSubEventStatus.Completo) : EnumHelper.GetDescription(EndodoSubEventStatus.EnBlanco));
-
+            template = template.Replace("{EventCode}", model.EventCodeReference);
+            template = template.Replace("{CUDEReference}", model.CUDEReference);
+            template = template.Replace("{DescriptionReference}", model.DescriptionReference);
 
             if (!(model.EventCode == "036" || model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "040"))
             {
@@ -646,7 +661,8 @@ namespace Gosocket.Dian.Application
                 { "CustomizationID","//*[local-name()='ApplicationResponse']/*[local-name()='CustomizationID']" },
                 { "ResponseCodeListID", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']/@listID" },
                 { "CertificateNumber", "(//*[local-name()='X509SerialNumber'])[1]" },
-                { "EntityName", "(//*[local-name()='X509IssuerName'])[1]" }
+                { "EntityName", "(//*[local-name()='X509IssuerName'])[1]" },
+                { "CudeReference", "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']" }
             };
             return requestObj;
         }
@@ -710,7 +726,7 @@ namespace Gosocket.Dian.Application
             model.EntityName = dataValues.XpathsValues["EntityName"] != null ? dataValues.XpathsValues["EntityName"] : string.Empty;
             model.CertificateNumber = dataValues.XpathsValues["CertificateNumber"] != null ? dataValues.XpathsValues["CertificateNumber"] : string.Empty;
 
-            
+            model.CUDEReference = dataValues.XpathsValues["CudeReference"] != null ? dataValues.XpathsValues["CudeReference"] : string.Empty;
 
 
 
