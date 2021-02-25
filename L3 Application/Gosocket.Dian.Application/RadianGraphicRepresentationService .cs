@@ -334,11 +334,11 @@ namespace Gosocket.Dian.Application
 
             if (model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "043" || model.EventCode == "045")
             {
-                htmlEvent += "<div class='text-subtitle text-gray'> Detalles del evento: <a class='text-data'>{ResponseCodeListID}</a></div>";
+                htmlEvent += "<div class='text-subtitle text-gray'> Detalles del Evento: <a class='text-data'>{ResponseCodeListID}</a></div>";
             }
             if (isInEvent)
             {
-                htmlEvent += "<div class='text-subtitle text-gray'> Valor total del evento: <a class='text-data'>";
+                htmlEvent += "<div class='text-subtitle text-gray'> Valor total del Evento: <a class='text-data'>";
                 switch (model.EventCode)
                 {
                     case "035":
@@ -513,7 +513,7 @@ namespace Gosocket.Dian.Application
                 //subjects.Append(sectionHtml);
                 subjects.Append(templateSujeto);
 
-                subjects = SubjectTemplateMapping(subjects, "1", "Datos del emisor",
+                subjects = SubjectTemplateMapping(subjects, "1", "Datos del Emisor",
                     model.SenderName
                     , model.ReceiverType
                     , model.SenderDocumentType
@@ -529,7 +529,7 @@ namespace Gosocket.Dian.Application
                 //subjects.Append(sectionHtml);
                 subjects.Append(templateSujeto);
 
-                subjects = SubjectTemplateMapping(subjects, "2", "Datos del receptor",
+                subjects = SubjectTemplateMapping(subjects, "2", "Datos del Receptor",
                     model.ReceiverName
                     , model.ReceiverType
                     , model.ReceiverDocumentType
@@ -649,7 +649,7 @@ namespace Gosocket.Dian.Application
                 { "EventStartDate", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='StartDate']" },
                 { "EventFinishDate","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='EndDate']" },
                 { "RequestType", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
-                { "OperationDetails", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
+                { "OperationDetails", "(//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode'])[1]" },
                 { "DiscountRate", "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value'][3]" },
                 { "EndosoTotalAmount", "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value'][1]" },
                 { "GenerationDate", "//*[local-name()='ApplicationResponse']/*[local-name()='IssueDate']" },
