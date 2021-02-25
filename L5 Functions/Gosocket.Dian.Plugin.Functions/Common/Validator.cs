@@ -700,7 +700,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderCode = nitModel.SenderCode;
             var receiverCode = nitModel.ReceiverCode;
             string errorMessageParty = "Evento ValidateParty referenciado correctamente";
-
+          
             //Endoso en Blanco
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia ||
                Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion) && party.ListId == "2")
@@ -784,7 +784,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
 
                 case (int)EventStatus.AceptacionTacita:
-                case (int)EventStatus.Mandato:
+
                     if (party.SenderParty != senderCode && (Convert.ToInt32(eventCode) != (int)EventStatus.Mandato))
                     {
                         responses.Add(new ValidateListResponse
@@ -832,8 +832,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
-                    return responses;              
-                    
+                    return responses;
+
+                case (int)EventStatus.Mandato:
+
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageParty,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                    return responses;
+
                 case (int)EventStatus.Avales:
                    
                     //Valida receptor documento AR coincida con DIAN
@@ -3003,9 +3016,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
                 ? ConfigurationManager.GetValue("ErrorMessage_AAH09_043")
                 : ConfigurationManager.GetValue("ErrorMessage_AAH09");
-            string errorCodeReglaUUID = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
-                ? ConfigurationManager.GetValue("ErrorCode_AAL07")
-                : ConfigurationManager.GetValue("ErrorCode_AAH07");
+            string errorCodeReglaUUID = ConfigurationManager.GetValue("ErrorCode_AAH07");
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
