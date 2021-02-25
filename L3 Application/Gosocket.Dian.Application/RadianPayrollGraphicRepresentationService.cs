@@ -76,7 +76,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{Cune}", this.GetValueFormatToTemplate(model.CUNE));
             template = template.Replace("{PayrollNumber}", this.GetValueFormatToTemplate(model.Numero));
             template = template.Replace("{Country}", this.GetCountryName(model.Pais));
-            template = template.Replace("{GenerationPeriod}", this.GetValueFormatToTemplate(model.FechaGen)); //...
+            template = template.Replace("{GenerationPeriod}", this.GetValueFormatToTemplate((model.FechaGen.HasValue) ? model.FechaGen.Value.ToString("yyyy-MM-dd") : string.Empty)); //...
             template = template.Replace("{City}", this.GetMunicipalityName(model.MunicipioCiudad));
             template = template.Replace("{Departament}", this.GetDepartmentName(model.DepartamentoEstado));
 
@@ -103,13 +103,13 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{EmployeeMunicipality}", this.GetMunicipalityName(model.LugarTrabajoMunicipioCiudad));
             template = template.Replace("{EmployeeAddress}", this.GetValueFormatToTemplate(model.LugarTrabajoDireccion));
             template = template.Replace("{EmployeePayrollPeriod}", this.GetValueFormatToTemplate(model.PeriodoNomina));
-            template = template.Replace("{EmployeeEntryDate}", this.GetValueFormatToTemplate(model.FechaIngreso));
-            template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate(model.FechaPagoFin)); //...
-            template = template.Replace("{EmployeeAntique}", this.GetTotalTimeWorkedFormatted(DateTime.Parse(model.FechaIngreso), DateTime.Parse(model.FechaPagoFin)));
+            template = template.Replace("{EmployeeEntryDate}", this.GetValueFormatToTemplate((model.FechaIngreso.HasValue) ? model.FechaIngreso.Value.ToString("yyyy-MM-dd") : string.Empty));
+            template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate((model.FechaPagoFin.HasValue) ? model.FechaPagoFin.Value.ToString("yyyy-MM-dd") : string.Empty)); //...
+            template = template.Replace("{EmployeeAntique}", this.GetTotalTimeWorkedFormatted(model.FechaIngreso.Value, model.FechaPagoFin.Value));
             template = template.Replace("{EmployeeContractType}", this.GetValueFormatToTemplate(model.TipoContrato));
-            template = template.Replace("{EmployeeSettlementPeriod}", this.GetValueFormatToTemplate(model.FechaLiquidacion));
+            template = template.Replace("{EmployeeSettlementPeriod}", this.GetValueFormatToTemplate((model.FechaLiquidacion.HasValue) ? model.FechaLiquidacion.Value.ToString("yyyy-MM-dd") : string.Empty));
             template = template.Replace("{EmployeeTimeWorked}", this.GetValueFormatToTemplate(model.TiempoLaborado));
-            template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate(model.FechaPagoFin));
+            template = template.Replace("{EmployeePaymentDate}", this.GetValueFormatToTemplate((model.FechaPagoFin.HasValue) ? model.FechaPagoFin.Value.ToString("yyyy-MM-dd") : string.Empty));
             template = template.Replace("{EmployeeSalary}", model.Sueldo.ToString("C0"));
             template = template.Replace("{EmployeeIsComprehensiveSalary}", (model.SalarioIntegral) ? "Si" : "No");
 

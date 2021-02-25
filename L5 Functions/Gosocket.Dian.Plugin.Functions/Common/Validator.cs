@@ -366,7 +366,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.AddRange(this.CheckIndividualPayrollInSameMonth(model.EmpleadorNIT, 
                                     xmlParser.globalDocPayrolls.NumeroDocumento, 
                                     xmlParser.Novelty, 
-                                    xmlParser.globalDocPayrolls.FechaPagoInicio));
+                                    xmlParser.globalDocPayrolls.FechaPagoInicio.Value));
             }
 
             return responses;
@@ -700,7 +700,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderCode = nitModel.SenderCode;
             var receiverCode = nitModel.ReceiverCode;
             string errorMessageParty = "Evento ValidateParty referenciado correctamente";
-
+          
             //Endoso en Blanco
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia ||
                Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion) && party.ListId == "2")
@@ -784,7 +784,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
 
                 case (int)EventStatus.AceptacionTacita:
-                case (int)EventStatus.Mandato:
+
                     if (party.SenderParty != senderCode && (Convert.ToInt32(eventCode) != (int)EventStatus.Mandato))
                     {
                         responses.Add(new ValidateListResponse
@@ -832,8 +832,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
-                    return responses;              
-                    
+                    return responses;
+
+                case (int)EventStatus.Mandato:
+
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageParty,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                    return responses;
+
                 case (int)EventStatus.Avales:
                    
                     //Valida receptor documento AR coincida con DIAN
@@ -2421,9 +2434,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (ConfigurationManager.GetValue("Environment") == "Prod" || ConfigurationManager.GetValue("Environment") == "Test")
             {
                 var documentType = documentMeta?.DocumentTypeId;
-                if (new string[] { "01", "02", "04", "09", "11" }.Contains(documentType)) documentType = "01";
-                var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
-                range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
+                if(Convert.ToInt32(documentType) == (int)DocumentType.DocumentSupportInvoice)
+                {
+                    var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
+                    range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
+                }
+                else
+                {
+                    if (new string[] { "01", "02", "04", "09", "11" }.Contains(documentType)) documentType = "01";
+                    var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
+                    range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
+                }               
             }
 
             // If dont found range return
@@ -2435,14 +2456,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     
                     return responses;
-                }
-                else if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice)
-                {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DIAD05d", ErrorMessage = "Número del documento soporte de importación no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DIAD05e", ErrorMessage = "Número del documento soporte de importación no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
-                    return responses;
-                }
+                }               
                 else
                 {
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAD05e", ErrorMessage = "Número de factura no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -3003,9 +3017,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
                 ? ConfigurationManager.GetValue("ErrorMessage_AAH09_043")
                 : ConfigurationManager.GetValue("ErrorMessage_AAH09");
-            string errorCodeReglaUUID = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
-                ? ConfigurationManager.GetValue("ErrorCode_AAL07")
-                : ConfigurationManager.GetValue("ErrorCode_AAH07");
+            string errorCodeReglaUUID = ConfigurationManager.GetValue("ErrorCode_AAH07");
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
@@ -4496,7 +4508,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return responses;
         }
 
-        private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty, string startPaymentDate)
+        private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty, DateTime startPaymentDate)
         {
             DateTime startDate = DateTime.UtcNow;
 
@@ -4534,7 +4546,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             // Se valida contra la FechaPagoInicio...
-            var payrollCurrentMonth = payrolls.FirstOrDefault(x => x.FechaPagoInicio == startPaymentDate);
+            var payrollCurrentMonth = payrolls.FirstOrDefault(x => x.FechaPagoInicio.Value.Year == startPaymentDate.Year 
+                && x.FechaPagoInicio.Value.Month == startPaymentDate.Month);
             if (payrollCurrentMonth == null)
             {
                 //Novedad XML true
@@ -4574,85 +4587,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return responses;
         }
-
-        //private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty)
-        //{
-        //    DateTime startDate = DateTime.UtcNow;
-
-        //    List<ValidateListResponse> responses = new List<ValidateListResponse>();
-        //    responses.Add(new ValidateListResponse
-        //    {
-        //        IsValid = true,
-        //        Mandatory = true,
-        //        ErrorCode = "100",
-        //        ErrorMessage = "Evento CheckIndividualPayrollInSameMonth referenciado correctamente",
-        //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-        //    });
-
-        //    // Solo se podrá transmitir para cada trabajador 1 documento NominaIndividual mensual durante cada mes del año. Para el mismo Empleador.
-        //    var payrolls = payrollTableManager.GlobalPayrollByRowKey_DocumentNumber<GlobalDocPayroll>(companyId, employeeId);
-        //    if (payrolls == null || payrolls.Count <= 0) // No exiten nóminas para el empleado...
-        //    {
-        //        //Novedad XML true
-        //        if (novelty)
-        //        {
-        //            responses.Clear();
-        //            responses.Add(new ValidateListResponse
-        //            {
-        //                IsValid = false,
-        //                Mandatory = true,
-        //                ErrorCode = "NIE199a",
-        //                ErrorMessage = "Elemento Novedad con valor “true” no puede ser recibido por primera vez, " +
-        //                "ya que no existe una Nómina Electrónica recibida para este trabajador reportada por este Emisor durante este mes.",
-        //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-        //            });
-        //            return responses;
-        //        }
-        //        else
-        //            return responses; // no existe para el mes actual
-        //    }
-
-        //    var currentDate = DateTime.Now.Date;
-        //    var payrollCurrentMonth = payrolls.FirstOrDefault(x => x.Timestamp.Year == currentDate.Year && x.Timestamp.Month == currentDate.Month);
-        //    if (payrollCurrentMonth == null)
-        //    {
-        //        //Novedad XML true
-        //        if (novelty)
-        //        {
-        //            responses.Clear();
-        //            responses.Add(new ValidateListResponse
-        //            {
-        //                IsValid = false,
-        //                Mandatory = true,
-        //                ErrorCode = "NIE199a",
-        //                ErrorMessage = "Elemento Novedad con valor “true” no puede ser recibido por primera vez, " +
-        //                "ya que no existe una Nómina Electrónica recibida para este trabajador reportada por este Emisor durante este mes.",
-        //                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-        //            });
-        //            return responses;
-        //        }
-        //        else
-        //            return responses; // no existe para el mes actual
-        //    }
-
-        //    //Novedad XML False
-        //    if (payrollCurrentMonth != null && !novelty)
-        //    {
-        //        responses.Clear();
-        //        responses.Add(new ValidateListResponse
-        //        {
-        //            IsValid = false,
-        //            Mandatory = true,
-        //            ErrorCode = "NIE199",
-        //            ErrorMessage = "Únicamente pueden ser aceptados documentos “NominaIndividual” del mismo trabajador" +
-        //            " durante el Mes indicado en el documento que posean como 'True' este elemento.",
-        //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-        //        });
-        //        return responses;
-        //    }
-
-        //    return responses;
-        //}
 
         #endregion
 

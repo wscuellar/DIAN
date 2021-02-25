@@ -1266,9 +1266,12 @@ namespace Gosocket.Dian.Infrastructure
             if (monthStart.HasValue)
             {
                 var tempPrefixCondition = TableQuery.CombineFilters(
-                    TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThanOrEqual,
-                        monthStart.Value), TableOperators.And,
-                    TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.LessThanOrEqual, monthEnd.Value));
+                    TableQuery.GenerateFilterConditionForDate("FechaPagoInicio", QueryComparisons.GreaterThanOrEqual,
+                        monthStart.Value.Date), TableOperators.And,
+                    TableQuery.GenerateFilterConditionForDate("FechaPagoInicio", QueryComparisons.LessThanOrEqual, monthEnd.Value.Date));
+
+                // por alguna razón el tiempo lo inicia con 05:...
+                tempPrefixCondition = tempPrefixCondition.Replace("T05", "T00");
 
                 if (prefixCondition == null) prefixCondition = tempPrefixCondition;
                 else prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, tempPrefixCondition);

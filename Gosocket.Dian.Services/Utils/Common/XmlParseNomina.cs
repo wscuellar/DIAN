@@ -84,6 +84,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var tempDeduccionesTotal = xmlDocument.SelectSingleNode(nodeDeduccionTotal)?.InnerText;
                     var tempComprobanteTotal = xmlDocument.SelectSingleNode(nodeComprobanteTotal)?.InnerText;
 
+                    globalDocPayrolls.Novedad = this.Novelty;
                     globalDocPayrolls.DevengadosTotal = (!string.IsNullOrWhiteSpace(tempDevengadosTotal) ? double.Parse(tempDevengadosTotal) : 0);
                     globalDocPayrolls.DeduccionesTotal = (!string.IsNullOrWhiteSpace(tempDeduccionesTotal) ? double.Parse(tempDeduccionesTotal) : 0);
                     globalDocPayrolls.ComprobanteTotal = (!string.IsNullOrWhiteSpace(tempComprobanteTotal) ? double.Parse(tempComprobanteTotal) : 0);
@@ -92,12 +93,12 @@ namespace Gosocket.Dian.Services.Utils.Common
                     // Load xml document.
                     XmlNodeList xPersonas = xmlDocument.GetElementsByTagName("Periodo");
                     for (int i = 0; i < xPersonas.Count; i++) {
-                        globalDocPayrolls.FechaIngreso = xPersonas[i].Attributes["FechaIngreso"]?.InnerText;
-                        globalDocPayrolls.FechaPagoInicio = xPersonas[i].Attributes["FechaPagoInicio"]?.InnerText;
-                        globalDocPayrolls.FechaPagoFin = xPersonas[i].Attributes["FechaPagoFin"]?.InnerText;
+                        globalDocPayrolls.FechaIngreso = Convert.ToDateTime(xPersonas[i].Attributes["FechaIngreso"]?.InnerText);
+                        globalDocPayrolls.FechaPagoInicio = Convert.ToDateTime(xPersonas[i].Attributes["FechaPagoInicio"]?.InnerText);
+                        globalDocPayrolls.FechaPagoFin = Convert.ToDateTime(xPersonas[i].Attributes["FechaPagoFin"]?.InnerText);
                         globalDocPayrolls.TiempoLaborado = xPersonas[i].Attributes["TiempoLaborado"]?.InnerText;
-                        globalDocPayrolls.FechaLiquidacion = xPersonas[i].Attributes["FechaLiquidacion"]?.InnerText;
-                        globalDocPayrolls.FechaGen = xPersonas[i].Attributes["FechaGen"]?.InnerText;
+                        globalDocPayrolls.FechaLiquidacion = Convert.ToDateTime(xPersonas[i].Attributes["FechaLiquidacion"]?.InnerText);
+                        globalDocPayrolls.FechaGen = Convert.ToDateTime(xPersonas[i].Attributes["FechaGen"]?.InnerText);
                     }
                     XmlNodeList xNumeroSecuenciaXML = xmlDocument.GetElementsByTagName("NumeroSecuenciaXML");
                     for (int j = 0; j < xNumeroSecuenciaXML.Count; j++)
@@ -131,7 +132,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                         globalDocPayrolls.Ambiente = xInformacionGeneral[j].Attributes["Ambiente"]?.InnerText;
                         globalDocPayrolls.CUNE = xInformacionGeneral[j].Attributes["CUNE"]?.InnerText;
                         globalDocPayrolls.EncripCUNE = xInformacionGeneral[j].Attributes["EncripCUNE"]?.InnerText;
-                        globalDocPayrolls.Info_FechaGen = xInformacionGeneral[j].Attributes["FechaGen"]?.InnerText;
+                        globalDocPayrolls.Info_FechaGen = Convert.ToDateTime(xInformacionGeneral[j].Attributes["FechaGen"]?.InnerText);
                         globalDocPayrolls.HoraGen = xInformacionGeneral[j].Attributes["HoraGen"]?.InnerText;
                         globalDocPayrolls.TipoNomina = xInformacionGeneral[j].Attributes["TipoNomina"]?.InnerText;
                         globalDocPayrolls.PeriodoNomina = xInformacionGeneral[j].Attributes["PeriodoNomina"]?.InnerText;
@@ -264,8 +265,8 @@ namespace Gosocket.Dian.Services.Utils.Common
                     XmlNodeList xVacacionesComunes = xmlDocument.GetElementsByTagName("VacacionesComunes");
                     for (int j = 0; j < xVacacionesComunes.Count; j++)
                     {
-                        globalDocPayrolls.FechaInicio = xVacacionesComunes[j].Attributes["FechaInicio"]?.InnerText;
-                        globalDocPayrolls.FechaFin = xVacacionesComunes[j].Attributes["FechaFin"]?.InnerText;
+                        globalDocPayrolls.FechaInicio = Convert.ToDateTime(xVacacionesComunes[j].Attributes["FechaInicio"]?.InnerText);
+                        globalDocPayrolls.FechaFin = Convert.ToDateTime(xVacacionesComunes[j].Attributes["FechaFin"]?.InnerText);
                         globalDocPayrolls.Cantidad = xVacacionesComunes[j].Attributes["Cantidad"]?.InnerText;
                         globalDocPayrolls.Pago = xVacacionesComunes[j].Attributes["Pago"]?.InnerText;
                     }

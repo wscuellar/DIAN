@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -17,12 +18,12 @@ namespace Gosocket.Dian.Domain.Entity
         }
 
         //Periodo
-        public string FechaIngreso { get; set; }
-        public string FechaPagoInicio { get; set; }
-        public string FechaPagoFin { get; set; }
+        public DateTime? FechaIngreso { get; set; }
+        public DateTime? FechaPagoInicio { get; set; }
+        public DateTime? FechaPagoFin { get; set; }
         public string TiempoLaborado { get; set; }
-        public string FechaLiquidacion { get; set; }
-        public string FechaGen { get; set; }
+        public DateTime? FechaLiquidacion { get; set; }
+        public DateTime? FechaGen { get; set; }
 
         //NumeroSecuenciaXML
         public string CodigoTrabajador { get; set; }
@@ -49,7 +50,7 @@ namespace Gosocket.Dian.Domain.Entity
         public string Ambiente { get; set; }
         public string CUNE { get; set; }
         public string EncripCUNE { get; set; }
-        public string Info_FechaGen { get; set; }
+        public DateTime? Info_FechaGen { get; set; }
         public string HoraGen { get; set; }
         public string PeriodoNomina { get; set; }
         public string TRM { get; set; }
@@ -63,7 +64,7 @@ namespace Gosocket.Dian.Domain.Entity
         //ReemplazandoPredecesor
         public string NumeroPred { get; set; }
         public string CUNEPred { get; set; }
-        public System.DateTime? FechaGenPred { get; set; }
+        public DateTime? FechaGenPred { get; set; }
 
         //Empleador
         public string Emp_RazonSocial { get; set; }
@@ -115,8 +116,8 @@ namespace Gosocket.Dian.Domain.Entity
         public string HRNDF { get; set; }
 
         //VacacionesComunes
-        public string FechaInicio { get; set; }
-        public string FechaFin { get; set; }
+        public DateTime? FechaInicio { get; set; }
+        public DateTime? FechaFin { get; set; }
         public string Cantidad { get; set; }
         public string Pago { get; set; }
 

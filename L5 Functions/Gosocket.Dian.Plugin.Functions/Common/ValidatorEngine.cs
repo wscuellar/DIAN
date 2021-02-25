@@ -89,6 +89,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 EventRadianModel eventRadian = new EventRadianModel();
                 bool validEventRadian = true;
                 bool validEventTacita = true;
+                bool validEventReference = true;
                 var xmlBytes = await GetXmlFromStorageAsync(trackId);
                 var xmlParser = new XmlParser(xmlBytes);
                 if (!xmlParser.Parser())
@@ -130,8 +131,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses = await Instance.StartEventApproveCufe(eventApproveCufe);
                     validateResponses.AddRange(responses);
                 }
-                
-                if(Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
+
+                //Si es mandato 
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
+                    && validEventRadian)
+                {
+                    referenceAttorney.TrackId = trackId;
+                    responses = await Instance.StartValidateReferenceAttorney(referenceAttorney);
+                    foreach (var itemReferenceAttorney in responses)
+                    {
+                        if (itemReferenceAttorney.ErrorCode == ConfigurationManager.GetValue("ErrorCode_AAH07"))
+                            validEventReference = false;
+                    }
+                    validateResponses.AddRange(responses);
+                }
+
+                if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
                 {
                     EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
                     responses = await Instance.StartValidateDocumentReference(docReference);
@@ -144,7 +159,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 //Si Mandato contiene CUFEs Referenciados
-                if (validaMandatoListID && validEventRadian)
+                if (validaMandatoListID && validEventRadian && validEventReference)
                 {
                     EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
                     EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
@@ -168,14 +183,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         
                 }
 
-                //Si es mandato 
-                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato 
-                    && validEventRadian)
-                {
-                    referenceAttorney.TrackId = trackId;
-                    responses = await Instance.StartValidateReferenceAttorney(referenceAttorney);
-                    validateResponses.AddRange(responses);
-                }
+                ////Si es mandato 
+                //if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato 
+                //    && validEventRadian)
+                //{
+                //    referenceAttorney.TrackId = trackId;
+                //    responses = await Instance.StartValidateReferenceAttorney(referenceAttorney);
+                //    validateResponses.AddRange(responses);
+                //}
 
                 validator.UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
 
@@ -472,7 +487,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             cmObject.DocumentType = xmlParser.Fields["DocumentTypeId"].ToString();
             cmObject.Cune = xmlParser.globalDocPayrolls.CUNE;
             cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
-            cmObject.FecNIE = xmlParser.globalDocPayrolls.Info_FechaGen;
+            //cmObject.FecNIE = xmlParser.globalDocPayrolls.Info_FechaGen;
+            cmObject.FecNIE = xmlParser.globalDocPayrolls.Info_FechaGen.Value.ToString("yyyy-MM-dd");
             cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen;
             cmObject.ValDev = xmlParser.globalDocPayrolls.DevengadosTotal;
             cmObject.ValDesc = xmlParser.globalDocPayrolls.DeduccionesTotal;

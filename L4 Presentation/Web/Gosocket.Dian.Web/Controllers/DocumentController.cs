@@ -382,9 +382,9 @@ namespace Gosocket.Dian.Web.Controllers
                     Salario = payroll.Sueldo,
                     Devengado = payroll.DevengadosTotal,
                     Deducido = payroll.DeduccionesTotal,
-                    ValorTotal = payroll.DevengadosTotal + payroll.DeduccionesTotal,
-                    MesValidacion = documentMeta.Timestamp.Month.ToString(),
-                    Novedad = documentMeta.Novelty,
+                    ValorTotal = payroll.ComprobanteTotal,
+                    MesValidacion = (payroll.FechaPagoInicio.HasValue) ? payroll.FechaPagoInicio.Value.Month.ToString() : string.Empty,
+                    Novedad = payroll.Novedad,
                     NumeroAjuste = numAdjustment,
                     Resultado = document.ValidationStatusName,
                     Ciudad = payroll.MunicipioCiudad
