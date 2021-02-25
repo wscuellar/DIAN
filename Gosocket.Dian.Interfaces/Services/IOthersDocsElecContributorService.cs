@@ -23,7 +23,7 @@ namespace Gosocket.Dian.Interfaces.Services
 
         bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware);
 
-        PagedResult<OtherDocsElectData> List(int contributorId, int OperationModeId);
+        PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId);
 
         OtherDocsElectData GetCOntrinutorODE(int Id);
 
@@ -35,8 +35,8 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <returns></returns>
         ResponseMessage CancelRegister(int contributorId,string description);
 
-
         GlobalTestSetOthersDocuments GetTestResult(int OperatonModeId, int ElectronicDocumentId);
 
+        OtherDocElecContributor GetContributorSoftwareInProcess(int contributorId, int statusId);
     }
 }
