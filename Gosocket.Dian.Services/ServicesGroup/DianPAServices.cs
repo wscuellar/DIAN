@@ -976,7 +976,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Auth
             start = DateTime.UtcNow;
             //Si no es un endoso en blanco valida autorizacion
-            if (listId != "2")
+            if (listId != "2" && senderCode != "01")
             {
                 string listIdMessage = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
 

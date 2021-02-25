@@ -831,15 +831,7 @@ namespace Gosocket.Dian.Services.Utils
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
-                }
-
-                if (string.IsNullOrEmpty(documentID))
-                {                    
-                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAH06") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAH06"));
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                }               
+                }                    
 
                 if (string.IsNullOrEmpty(eventCode))
                 {
