@@ -547,12 +547,12 @@ namespace Gosocket.Dian.Functions.Activation
                                     softwareName = software.Name
                                 };
 
-                                string functionPath = ConfigurationManager.GetValue("OtherDocumentSendToActivateContributorUrl");
+                                string functionPath = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributor");
                                 SetLogger(null, "Funciton Path", functionPath, "63333334");
                                 SetLogger(requestObject, "Funciton Path", functionPath, "73333334");
 
 
-                                var activation = await ApiHelpers.ExecuteRequestAsync<OthersDocumentSendToActivateContributor>(functionPath, requestObject);
+                                var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
 
 
                                 SetLogger(activation, "Step 8", activation == null ? "Estoy vacio" : " functionPath " + functionPath, "21212121");

@@ -2456,14 +2456,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     
                     return responses;
-                }
-                else if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice)
-                {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DIAD05d", ErrorMessage = "Número del documento soporte de importación no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DIAD05e", ErrorMessage = "Número del documento soporte de importación no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
-                    return responses;
-                }
+                }               
                 else
                 {
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAD05e", ErrorMessage = "Número de factura no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
