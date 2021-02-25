@@ -154,6 +154,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+
+        #region ValidateInvoiceLine
+        public List<ValidateListResponse> ValidateInvoiceLine(XmlParser xmlParser)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+
+
+
+
+
+            return responses;
+        }
+
+        #endregion
+
+
         #region Cufe validation
         public ValidateListResponse ValidateCufe(CufeModel cufeModel, string trackId)
         {
@@ -2548,13 +2566,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = "El prefijo no corresponde al prefijo de la autorización de numeración", 
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
-            long.TryParse(numberRangeModel.StartNumber, out long fromNumber);
-            string errorCodeModel = "DSAB11b";
-            errorCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice) ? "DIAD05b" : "FAB11b";
-
-            string messageCodeModel = "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigentes para el contribuyente vendedor";
-            messageCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice) 
-                ? "Número del documento soporte de importación es inferior al número inicial del rango de numeración autorizado" 
+            long.TryParse(numberRangeModel.StartNumber, out long fromNumber);            
+            string errorCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice) ? "DSAB11b" : "FAB11b";
+          
+            string messageCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice) 
+                ? "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigentes para el contribuyente vendedor"
                 : "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.";
                 
             if (range.FromNumber == fromNumber)
@@ -2574,11 +2590,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
 
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
-            string errorCodeModel2 = "DSAB12b";
-            errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice ? "DIAD05c" : "FAB12b";
-            string messageCodeModel2 = "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente vendedor";
-            messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice
-                ? "Número del documento soporte de importación es superior al número final del rango de numeración autorizado"
+           
+            string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";           
+            string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
+                ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente vendedor"
                 : "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.";
 
             if (range.ToNumber == endNumber)

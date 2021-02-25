@@ -68,6 +68,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
+
+        public async Task<List<ValidateListResponse>> StartValidateInvoiceLineAsync(string trackId)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);          
+
+            // Validator instance
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateInvoiceLine(xmlParser));
+
+            return validateResponses;
+        }
+
+
         public async Task<List<ValidateListResponse>> StartValidationEventRadianAsync(string trackId)
         {
             var validator = new Validator();
