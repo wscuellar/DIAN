@@ -423,7 +423,7 @@ namespace Gosocket.Dian.Functions.Activation
                     setResultOther.TotalDocumentSent = allGlobalTestSetTracking.Count();
                     setResultOther.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
                     setResultOther.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
-                    //Nomina Ajuste
+                    //Nomina Individual y de Ajuste
                     setResultOther.TotalElectronicPayrollAjustmentSent = allGlobalTestSetTracking.Count();
                     setResultOther.ElectronicPayrollAjustmentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
                     setResultOther.ElectronicPayrollAjustmentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
@@ -432,33 +432,27 @@ namespace Gosocket.Dian.Functions.Activation
                     setResultOther.OthersDocumentsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
                     setResultOther.OthersDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
 
-                    //Validacion Nomina
+                    //Validacion Total Nomina aceptados
                     if (setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired
                         && setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
                     {
                         setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
-                    }
-
-                    ////Validacion Nomina
-                    //if (setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentTotalAcceptedRequired
-                    //    && setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
-                    //{
-                    //    setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
-                    //    setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
-                    //}
-
+                    }                 
    
                     SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina");
 
-                    if (setResultOther.OthersDocumentsAccepted >= setResultOther.OthersDocumentsAcceptedRequired)
+                    //Validacion Total otros documentos aceptados
+                    if (setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired
+                        && setResultOther.OthersDocumentsAccepted >= setResultOther.OthersDocumentsAcceptedRequired)
                     {
                         setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
                     }
 
                     SetLogger(null, "Step 4 - Validacion Other Document", "Paso Validacion de Other Document");
-
+                    
+                    //Validacion Total Nomina rechazados 
                     if (setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
                         && setResultOther.ElectronicPayrollAjustmentRejected >= (setResultOther.ElectronicPayrollAjustmentRequired - setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
                         && setResultOther.Status == (int)OtherDocElecSoftwaresStatus.InProcess)
@@ -469,7 +463,9 @@ namespace Gosocket.Dian.Functions.Activation
 
                     SetLogger(null, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject");
 
-                    if (setResultOther.OthersDocumentsAccepted >= (setResultOther.OthersDocumentsRequired - setResultOther.OthersDocumentsAcceptedRequired)
+                    //Validacion Total Otros Documentos rechazados 
+                    if (setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
+                        && setResultOther.OthersDocumentsRejected >= (setResultOther.OthersDocumentsRequired - setResultOther.OthersDocumentsAcceptedRequired)
                         && setResultOther.Status == (int)OtherDocElecSoftwaresStatus.InProcess)
                     {
                         setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Rejected;
@@ -484,19 +480,38 @@ namespace Gosocket.Dian.Functions.Activation
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (setResultOther.Status == (int)TestSetStatus.Accepted)
                     {
+
+                        // partition key are sender code.
+                        var contributor = contributorService.GetByCode(setResultOther.PartitionKey);
+                        if (contributor.AcceptanceStatusId == (int)ContributorStatus.Registered)
+                        {
+                            contributorService.SetToEnabled(contributor);
+                            var globalContributor = new GlobalContributor(contributor.Code, contributor.Code) { Code = contributor.Code, StatusId = contributor.AcceptanceStatusId, TypeId = contributor.ContributorTypeId };
+                            await contributorTableManager.InsertOrUpdateAsync(globalContributor);
+                        }
+
+                        var software = softwareService.Get(Guid.Parse(setResultOther.SoftwareId));
+                        if (software.AcceptanceStatusSoftwareId == (int)Domain.Common.OperationMode.Own
+                            && Convert.ToInt32(setResultOther.OperationModeName) != (int)Domain.Common.OperationMode.Free)
+                        {
+                            softwareService.SetToProduction(software);
+                            var softwareId = software.Id.ToString();
+                            var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
+                            await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
+                        }
+
                         SetLogger(null, "Step 6.1", "Fui aceptado", "11111111112");
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
                         {
-
                             try
                             {
                                 SetLogger(null, "Step 6.2", "Estoy en habilitacion", "11111111121");
 
-                                #region Proceso Radian Habilitacion
+                                #region Proceso Habilitacion
                                 //Traemos el contribuyente
-                                var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
+                                //var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
 
                                 //Habilitamos el participante en GlobalRadianOperations
                                 GlobalOtherDocElecOperation isPartipantActiveOtherDoc = globalOtherDocElecOperation.EnableParticipant(radianTesSetResult.PartitionKey, globalTestSetTracking.SoftwareId);
@@ -512,7 +527,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                                 //--GlobalSoftware 
                                 var softwareId = isPartipantActiveOtherDoc.RowKey;
-                                var software = softwareService.GetByRadian(Guid.Parse(softwareId));
+                                //var software = softwareService.GetByRadian(Guid.Parse(softwareId));
 
                                 #endregion
 
@@ -532,12 +547,12 @@ namespace Gosocket.Dian.Functions.Activation
                                     softwareName = software.Name
                                 };
 
-                                string functionPath = ConfigurationManager.GetValue("OtherDocumentSendToActivateContributorUrl");
+                                string functionPath = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributor");
                                 SetLogger(null, "Funciton Path", functionPath, "63333334");
                                 SetLogger(requestObject, "Funciton Path", functionPath, "73333334");
 
 
-                                var activation = await ApiHelpers.ExecuteRequestAsync<OthersDocumentSendToActivateContributor>(functionPath, requestObject);
+                                var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
 
 
                                 SetLogger(activation, "Step 8", activation == null ? "Estoy vacio" : " functionPath " + functionPath, "21212121");

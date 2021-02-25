@@ -2434,9 +2434,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (ConfigurationManager.GetValue("Environment") == "Prod" || ConfigurationManager.GetValue("Environment") == "Test")
             {
                 var documentType = documentMeta?.DocumentTypeId;
-                if (new string[] { "01", "02", "04", "09", "11" }.Contains(documentType)) documentType = "01";
-                var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
-                range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
+                if(Convert.ToInt32(documentType) == (int)DocumentType.DocumentSupportInvoice)
+                {
+                    var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
+                    range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
+                }
+                else
+                {
+                    if (new string[] { "01", "02", "04", "09", "11" }.Contains(documentType)) documentType = "01";
+                    var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
+                    range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
+                }               
             }
 
             // If dont found range return
@@ -2448,14 +2456,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     
                     return responses;
-                }
-                else if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.ImportDocumentInvoice)
-                {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DIAD05d", ErrorMessage = "Número del documento soporte de importación no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DIAD05e", ErrorMessage = "Número del documento soporte de importación no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
-                    return responses;
-                }
+                }               
                 else
                 {
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAD05e", ErrorMessage = "Número de factura no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
