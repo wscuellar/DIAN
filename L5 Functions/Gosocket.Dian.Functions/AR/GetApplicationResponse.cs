@@ -2,6 +2,7 @@ using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Functions.Utils;
 using Gosocket.Dian.Infrastructure;
+using Gosocket.Dian.Services.Utils.Helpers;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
@@ -103,9 +104,15 @@ namespace Gosocket.Dian.Functions.AR
                 if (applicationResponse != null) xmlBytes = applicationResponse;
                 else
                 {
+                    var requestObj = new { trackId };
+                    var response1 = Utils.Utils.DownloadXml(requestObj);
+                    Dictionary<string, string> newXpathRequest = CreateGetXpathValidation(response1.XmlBase64, "InvoiceValidation");
+                    string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+                    var tributaryValues = ApiHelpers.ExecuteRequest<Domain.Domain.ResponseXpathDataValue>(pathServiceData, newXpathRequest);
+
                     Stopwatch stopwatch4 = new Stopwatch();
                     stopwatch4.Start();
-                    xmlBytes = XmlUtil.GenerateApplicationResponseBytes(trackId, documentMetaEntity, validations);
+                    xmlBytes = XmlUtil.GenerateApplicationResponseBytes(trackId, documentMetaEntity, validations, tributaryValues.XpathsValues);
                     stopwatch4.Stop();
                     double ms4 = stopwatch4.ElapsedMilliseconds;
                     double seconds4 = ms4 / 1000;
@@ -143,6 +150,20 @@ namespace Gosocket.Dian.Functions.AR
 
             log.Info($"5. End function: {seconds0}");
             return req.CreateResponse(HttpStatusCode.OK, response);
+        }
+
+        private static Dictionary<string, string> CreateGetXpathValidation(string xmlBase64, string fileName)
+        {
+            var requestObj = new Dictionary<string, string>
+            {
+                { "XmlBase64", xmlBase64},
+                { "FileName", fileName},
+                { "SenderTributary", "//*[local-name()='AccountingSupplierParty']/*[local-name()='Party']/*[local-name()='PartyTaxScheme']/*[local-name()='TaxScheme']/*[local-name()='Name']" },
+                { "SenderTributaryId", "//*[local-name()='AccountingSupplierParty']/*[local-name()='Party']/*[local-name()='PartyTaxScheme']/*[local-name()='TaxScheme']/*[local-name()='ID']" },
+                { "ReceiverTributary", "//*[local-name()='AccountingCustomerParty']/*[local-name()='Party']/*[local-name()='PartyTaxScheme']/*[local-name()='TaxScheme']/*[local-name()='Name']" },
+                { "ReceiverTributaryId", "//*[local-name()='AccountingCustomerParty']/*[local-name()='Party']/*[local-name()='PartyTaxScheme']/*[local-name()='TaxScheme']/*[local-name()='ID']" }
+            };
+            return requestObj;
         }
 
         public class RequestObject

@@ -19,7 +19,7 @@ namespace Gosocket.Dian.TestProject.Functions.Commons
             var documentMeta = tableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             var validations = tableManagerDocumentTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
 
-            var xmlBytes = XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations);
+            var xmlBytes = XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations, null);
             Assert.IsTrue(xmlBytes != null);
         }
     }
