@@ -163,6 +163,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool existTaxRate = false;
             bool validFor = true;
+            bool validTax = true;
+            string xmlID = string.Empty;
+            string xmlPercent = string.Empty;            
 
             responses.Add(new ValidateListResponse
             {
@@ -173,43 +176,57 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-
+            XmlNodeList withholdingListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
             XmlNodeList taxCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
             XmlNodeList percentCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']");
 
-            if(taxCategoryListResponse.Count != percentCategoryListResponse.Count)
+            int[] arraywithholding = new int[withholdingListResponse.Count];
+            for (int i = 0; i < withholdingListResponse.Count; i++)
+            {
+                var xmlTaxSchemeID = withholdingListResponse.Item(i).SelectNodes("//*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                arraywithholding[i] = Convert.ToInt32(xmlTaxSchemeID);
+            }
+
+            bool pares = arraywithholding.Distinct().Count() == arraywithholding.Length;
+            if (!pares)
             {
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
-                    Mandatory = false,
-                    ErrorCode = "DSAX14",
-                    ErrorMessage = "Reporta una tarifa diferente para uno de los tributos enunciados en la tabla 11.3.9",
+                    Mandatory = true,
+                    ErrorCode = "DSAY01",
+                    ErrorMessage = "Existe más de un grupo con información de totales para un mismo tributo en una línea de el documento soporte",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
-
-                return responses;
             }
 
-            for (int i = 0; i < taxCategoryListResponse.Count; i++)
-            {
-                var xmlID = taxCategoryListResponse.Item(i).SelectNodes("//*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString();                
-                var xmlPercent = percentCategoryListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(i)?.InnerText.ToString();
 
-                existTaxRate = TableManagerGlobalTaxRate.Exist<GlobalTaxRate>(xmlID, xmlPercent);
-                if (!existTaxRate)
+            for (int i = 0; i < taxCategoryListResponse.Count; i++) 
+            {
+                xmlID = taxCategoryListResponse.Item(i).SelectNodes("//*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                if (new string[] { "22" }.Contains(xmlID)) validTax = false;
+
+                if (validTax)
                 {
-                    validFor = false;
-                    responses.Add(new ValidateListResponse
+                    xmlPercent = percentCategoryListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(i)?.InnerText.ToString();
+
+                    existTaxRate = TableManagerGlobalTaxRate.Exist<GlobalTaxRate>(xmlID, xmlPercent);
+                    if (!existTaxRate)
                     {
-                        IsValid = false,
-                        Mandatory = false,
-                        ErrorCode = "DSAX14",
-                        ErrorMessage = "Reporta una tarifa diferente para uno de los tributos enunciados en la tabla 11.3.9",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                    break;
-                }                             
+                        validFor = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = false,
+                            ErrorCode = "DSAX14",
+                            ErrorMessage = "Reporta una tarifa diferente para uno de los tributos enunciados en la tabla 11.3.9",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+                  
+                validTax = true;
             }
 
             return responses;
