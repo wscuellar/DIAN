@@ -227,20 +227,25 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // Auth
             start = DateTime.UtcNow;
-            var authEntity = GetAuthorization(senderCode, authCode);
-            if (authEntity == null)
+
+            if (senderCode != "01")
             {
-                dianResponse.XmlFileName = $"{fileName}";
-                dianResponse.StatusCode = "89";
-                dianResponse.StatusDescription = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
-                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-                if (globalEnd >= 10)
+                var authEntity = GetAuthorization(senderCode, authCode);
+                if (authEntity == null)
                 {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = globalEnd.ToString(), Action = "Auth" };
-                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                    dianResponse.XmlFileName = $"{fileName}";
+                    dianResponse.StatusCode = "89";
+                    dianResponse.StatusDescription = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
+                    var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
+                    if (globalEnd >= 10)
+                    {
+                        var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = globalEnd.ToString(), Action = "Auth" };
+                        TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                    }
+                    return dianResponse;
                 }
-                return dianResponse;
             }
+
             var auth = new GlobalLogger("", "3 Auth") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
             // Auth
 
