@@ -88,5 +88,16 @@ namespace Gosocket.Dian.Application
         {
             return _othersDocsElecSoftwareRepository.GetSoftwareStatusName(id);
         }
+
+        public List<OtherDocElecSoftware> GetSoftwaresByProviderTechnologicalServices(int contributorId, 
+            int electronicDocumentId, 
+            int contributorTypeId,
+            string state)
+        {
+            return _othersDocsElecSoftwareRepository.List(t => t.OtherDocElecContributor.ContributorId == contributorId &&
+                t.OtherDocElecContributor.ElectronicDocumentId == electronicDocumentId &&
+                t.OtherDocElecContributor.OtherDocElecContributorTypeId == contributorTypeId &&
+                t.OtherDocElecContributor.State == state, 0, 0).Results;
+        }
     }
 }

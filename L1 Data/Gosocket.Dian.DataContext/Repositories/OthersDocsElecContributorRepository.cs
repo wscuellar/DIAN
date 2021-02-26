@@ -1,8 +1,10 @@
 ﻿using Gosocket.Dian.DataContext.Middle;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
@@ -151,5 +153,15 @@ namespace Gosocket.Dian.DataContext.Repositories
             return query.Paginate(page, length, t => t.Id.ToString());
         }
 
+        public List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state)
+        {
+            return sqlDBContext.OtherDocElecContributors
+                .Include("Contributor")
+                .Where(x => x.ContributorId != contributorId &&
+                        x.ElectronicDocumentId == electronicDocumentId &&
+                        x.OtherDocElecContributorTypeId == contributorTypeId &&
+                        x.State == state)
+                .Select(x => x.Contributor).ToList();
+        }
     }
 }
