@@ -1,4 +1,4 @@
-﻿using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Plugin.Functions.Common;
 using Gosocket.Dian.Plugin.Functions.Models;
@@ -12,14 +12,14 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Gosocket.Dian.Plugin.Functions.ExtensionInvoiceLine
+namespace Gosocket.Dian.Plugin.Functions.Tax
 {
-    class ValidateInvoiceLine
+    public static class ValidateTaxCategory
     {
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
 
-        [FunctionName("ValidateInvoiceLine")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, TraceWriter log)
+        [FunctionName("ValidateTaxCategory")]
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");
 
@@ -39,13 +39,14 @@ namespace Gosocket.Dian.Plugin.Functions.ExtensionInvoiceLine
 
             try
             {
-                var validateResponses = await ValidatorEngine.Instance.StartValidateInvoiceLineAsync(trackId);
+
+                var validateResponses = await ValidatorEngine.Instance.StarValidateTaxCategoryAsync(trackId);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                var logger = new GlobalLogger($"INVOICELINEPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
+                var logger = new GlobalLogger($"TAXCATEGORYPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
@@ -54,8 +55,8 @@ namespace Gosocket.Dian.Plugin.Functions.ExtensionInvoiceLine
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "INVOICELINEPLGNS",
-                        ErrorMessage = $"No se pudo validar Extension InvoiceLine."
+                        ErrorCode = "TAXCATEGORYPLGNS",
+                        ErrorMessage = $"No se pudo validar Tarifa del tributo."
                     }
                 };
                 return req.CreateResponse(HttpStatusCode.InternalServerError, validateResponses);

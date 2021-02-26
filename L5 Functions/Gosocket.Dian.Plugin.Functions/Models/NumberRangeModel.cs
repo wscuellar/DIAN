@@ -1,4 +1,6 @@
-﻿namespace Gosocket.Dian.Plugin.Functions.Models
+﻿using System;
+
+namespace Gosocket.Dian.Plugin.Functions.Models
 {
     public class NumberRangeModel
     {
@@ -10,5 +12,6 @@
         public string StartNumber { get; set; }
         public string EndNumber { get; set; }
         public string SoftwareId { get; set; }
+        public string SigningTime { get; set; }
     }
 }

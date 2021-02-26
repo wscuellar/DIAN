@@ -27,7 +27,7 @@ namespace Gosocket.Dian.Functions.Utils
         private static readonly FileManager fileManager = new FileManager();
         private static readonly FirmaElectronica signer = new FirmaElectronica();
 
-        public static byte[] GenerateApplicationResponseBytes(string trackId, GlobalDocValidatorDocumentMeta documentMeta, List<GlobalDocValidatorTracking> validations)
+        public static byte[] GenerateApplicationResponseBytes(string trackId, GlobalDocValidatorDocumentMeta documentMeta, List<GlobalDocValidatorTracking> validations, Dictionary<string,string> tributaryValues)
         {
             var responseBytes = new byte[] { };
 
@@ -53,8 +53,8 @@ namespace Gosocket.Dian.Functions.Utils
                 priorityInvalid = true;
 
             XElement root = BuildRootNode(documentMeta);
-            root.Add(BuildSenderNode(documentMeta));
-            root.Add(BuildReceiverNode(documentMeta));
+            root.Add(BuildSenderNode(documentMeta, tributaryValues));
+            root.Add(BuildReceiverNode(documentMeta, tributaryValues));
 
             XElement docResponse = new XElement("DocumentResponse");
 
@@ -222,8 +222,15 @@ namespace Gosocket.Dian.Functions.Utils
                 new XElement(cbc + "IssueTime", $"{issueDate.AddHours(-5).ToString("HH:mm:ss")}-05:00"));
         }
 
-        public static XElement BuildSenderNode(GlobalDocValidatorDocumentMeta processResultEntity)
+        public static XElement BuildSenderNode(GlobalDocValidatorDocumentMeta processResultEntity, Dictionary<string,string> tributaryValues)
         {
+            string tributaryId = string.Empty;
+            string tributaryName = string.Empty;
+            if(tributaryValues.Any())
+            {
+                tributaryId = tributaryValues["SenderTributaryId"];
+                tributaryName = tributaryValues["SenderTributary"];
+            }
             return new XElement(cac + "SenderParty",
                     new XElement(cac + "PartyTaxScheme",
                         new XElement(cbc + "RegistrationName", "Unidad Especial Dirección de Impuestos y Aduanas Nacionales"),
@@ -231,12 +238,19 @@ namespace Gosocket.Dian.Functions.Utils
                             new XAttribute("schemeID", "4"),
                             new XAttribute("schemeName", $"{processResultEntity.SenderTypeCode}")),
                         new XElement(cac + "TaxScheme",
-                            new XElement(cbc + "ID", "01"),
-                            new XElement(cbc + "Name", "IVA"))));
+                            new XElement(cbc + "ID", string.IsNullOrEmpty(tributaryId) ?  "01" : tributaryId),
+                            new XElement(cbc + "Name", string.IsNullOrEmpty(tributaryName) ? "IVA" : tributaryName))));
         }
 
-        public static XElement BuildReceiverNode(GlobalDocValidatorDocumentMeta docMetadataEntity)
+        public static XElement BuildReceiverNode(GlobalDocValidatorDocumentMeta docMetadataEntity, Dictionary<string, string> tributaryValues)
         {
+            string tributaryId = string.Empty;
+            string tributaryName = string.Empty;
+            if (tributaryValues.Any())
+            {
+                tributaryId = tributaryValues["ReceiverTributaryId"];
+                tributaryName = tributaryValues["ReceiverTributary"];
+            }
             return new XElement(cac + "ReceiverParty",
                 new XElement(cac + "PartyTaxScheme",
                  new XElement(cbc + "RegistrationName", $"{docMetadataEntity.SenderName}"),
@@ -244,8 +258,8 @@ namespace Gosocket.Dian.Functions.Utils
                         new XAttribute("schemeID", $"{docMetadataEntity.SenderTypeCode}"),
                         new XAttribute("schemeName", $"{docMetadataEntity.SenderSchemeCode}")),
                     new XElement(cac + "TaxScheme",
-                        new XElement(cbc + "ID", "01"),
-                        new XElement(cbc + "Name", "IVA"))));
+                          new XElement(cbc + "ID", string.IsNullOrEmpty(tributaryId) ? "01" : tributaryId),
+                          new XElement(cbc + "Name", string.IsNullOrEmpty(tributaryName) ? "IVA" : tributaryName))));
         }
 
         public static XElement BuildDocumentResponseNode(int line, GlobalDocValidatorDocumentMeta processResultEntity, bool withObservations, bool withErrors)

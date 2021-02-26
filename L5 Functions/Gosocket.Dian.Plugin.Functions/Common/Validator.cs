@@ -49,6 +49,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private TableManager TableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
         private TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
         private TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
+        private TableManager TableManagerGlobalTaxRate = new TableManager("GlobalTaxRate");
         private TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
 
         readonly XmlDocument _xmlDocument;
@@ -155,16 +156,130 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
 
+        #region ValidateTaxCategory
+        public List<ValidateListResponse> ValidateTaxCategory(XmlParser xmlParser)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool existTaxRate = false;
+            bool validFor = true;
+
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento ValidateTaxCategory referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+
+
+            XmlNodeList taxCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
+            XmlNodeList percentCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']");
+
+            if(taxCategoryListResponse.Count != percentCategoryListResponse.Count)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = false,
+                    ErrorCode = "DSAX14",
+                    ErrorMessage = "Reporta una tarifa diferente para uno de los tributos enunciados en la tabla 11.3.9",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                return responses;
+            }
+
+            for (int i = 0; i < taxCategoryListResponse.Count; i++)
+            {
+                var xmlID = taxCategoryListResponse.Item(i).SelectNodes("//*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString();                
+                var xmlPercent = percentCategoryListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(i)?.InnerText.ToString();
+
+                existTaxRate = TableManagerGlobalTaxRate.Exist<GlobalTaxRate>(xmlID, xmlPercent);
+                if (!existTaxRate)
+                {
+                    validFor = false;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = false,
+                        ErrorCode = "DSAX14",
+                        ErrorMessage = "Reporta una tarifa diferente para uno de los tributos enunciados en la tabla 11.3.9",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    break;
+                }                             
+            }
+
+            return responses;
+        }
+        #endregion
+
         #region ValidateInvoiceLine
         public List<ValidateListResponse> ValidateInvoiceLine(XmlParser xmlParser)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validFor = true;
 
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento ValidateInvoiceLine referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
 
+           
+            XmlNodeList invoiceListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Lines']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
+            int[] arrayInvoiceLine = new int[invoiceListResponse.Count];
 
+            int tempID = 0;
+            for (int i = 0; i < invoiceListResponse.Count; i++)
+            {              
+                var xmlID = Convert.ToInt32(invoiceListResponse.Item(i).SelectNodes("//*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim());
+               
+                if (i == 0)
+                    tempID = xmlID;
+                else
+                {
+                    if(!int.Equals(xmlID,tempID+1))                     
+                    {
+                        validFor = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "DIBC05b",
+                            ErrorMessage = "Los números de línea de factura utilizados en los diferentes grupos no son consecutivos, empezando con “1”",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }   
+                    else
+                        tempID = Convert.ToInt32(xmlID);
+                }
 
+                arrayInvoiceLine[i] = Convert.ToInt32(xmlID);
+            }
 
+            if (validFor)
+            {
+                bool pares = arrayInvoiceLine.Distinct().Count() == arrayInvoiceLine.Length;
+                if (!pares)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DIBC05a",
+                        ErrorMessage = "Más de un grupo conteniendo el elemento /de:Invoice/de:InvoiceLine/cbc:ID con la misma información o no existe ningún valor",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }        
 
             return responses;
         }
@@ -2527,7 +2642,54 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 else
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado no corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
-                
+
+
+            //Valida fecha de emision posterior a la fecha de final de autorizacion 
+            if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
+            {
+                DateTime.TryParse(numberRangeModel.SigningTime, out DateTime startNumberEmision);
+                int.TryParse(startNumberEmision.ToString("yyyyMMdd"), out int dateStartNumberEmision);
+                if (dateStartNumberEmision > range.ValidDateNumberFrom)
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "DSAB07a",
+                        ErrorMessage = "Fecha emision referenciada correctamente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                else
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DSAB07a",
+                        ErrorMessage = "Fecha de emisión anterior a la fecha de inicio de la autorización de la numeración ",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+
+                DateTime.TryParse(numberRangeModel.SigningTime, out DateTime endNumberEmision);
+                int.TryParse(endNumberEmision.ToString("yyyyMMdd"), out int dateNumberEmision);
+                if (dateNumberEmision < range.ValidDateNumberTo)
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "DSAB08a",
+                        ErrorMessage = "Fecha emision referenciada correctamente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                else
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DSAB08a",
+                        ErrorMessage = "Fecha de emisión posterior a la fecha final de la autorización de numeración",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+            }
 
             //
             DateTime.TryParse(numberRangeModel.EndDate, out DateTime endDate);
@@ -2586,11 +2748,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     Mandatory = true, 
                     ErrorCode = errorCodeModel, 
                     ErrorMessage = messageCodeModel,
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });           
 
-
-            long.TryParse(numberRangeModel.EndNumber, out long endNumber);
-           
+            long.TryParse(numberRangeModel.EndNumber, out long endNumber);           
             string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";           
             string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
                 ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente vendedor"

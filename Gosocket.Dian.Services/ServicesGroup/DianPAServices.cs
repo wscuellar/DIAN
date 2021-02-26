@@ -205,7 +205,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse.ErrorMessage.AddRange(failedList);
                 return dianResponse;
             }
-          
+
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
             DocumentParsed.SetValues(ref documentParsed);
             var parser = new GlobalLogger("", "Parser") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
@@ -709,7 +709,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     arrayTasks.Add(firstLocalRun);
                     Task.WhenAll(arrayTasks).Wait();
 
-                    if(int.Parse(documentMeta.DocumentTypeId) != (int)DocumentType.Invoice)
+                    if (int.Parse(documentMeta.DocumentTypeId) != (int)DocumentType.Invoice)
                     {
                         response.StatusCode = "68";
                         response.StatusDescription = "TrackId no corresponde a un CUFE.";
@@ -1209,7 +1209,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.StatusDescription = processEventResponse.Message;
                         UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                         return dianResponse;
-                    }                   
+                    }
                 }
                 else
                 {
@@ -1458,15 +1458,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 return response;
             }
 
-            var number = StringUtil.TextAfter(serieAndNumber, serie).TrimStart('0');
+            var number = StringUtil.TextAfter(serieAndNumber, serie) == null ? string.Empty : StringUtil.TextAfter(serieAndNumber, serie).TrimStart('0');
             if (string.IsNullOrEmpty(number))
             {
-                var failedList = new List<string> { $"" };
                 response.IsValid = false;
                 response.StatusCode = "99";
-                response.StatusMessage = ".";
-                response.StatusDescription = ".";
-                response.ErrorMessage.AddRange(failedList);
+                response.StatusMessage = "Documento con errores en campos mandatorios.";
+                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                response.XmlDocumentKey = trackId;
                 return response;
             }
 
