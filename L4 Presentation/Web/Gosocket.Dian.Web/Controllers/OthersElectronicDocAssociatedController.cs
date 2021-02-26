@@ -337,7 +337,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.ProviderId = entity.ProviderId;
             model.Provider = _contributorService.GetContributorById(model.ProviderId, entity.ContributorTypeId).Name;
 
-            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), 0);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), model.ContributorTypeId, model.OperationModeId);
             model.ListTable = List.Results.Select(t => new OtherDocsElectListViewModel()
             {
                 Id = t.Id,

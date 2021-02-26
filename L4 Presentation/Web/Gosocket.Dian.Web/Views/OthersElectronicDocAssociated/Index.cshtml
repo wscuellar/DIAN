@@ -310,8 +310,7 @@
         $(document).ready(function () {
             //howLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
 
-            var index =  @Model.Step;//'@Model.State' == "En pruebas" ? 3 :
-            RenderStepsOtherDoc(1);
+            RenderStepsOtherDoc(@(@Model.Step - 1));
 
             $(".cancel-register").click(function () {
                 $("#txtCancelRegistro").val("");

@@ -61,23 +61,43 @@ namespace Gosocket.Dian.Web.Controllers
             List<ElectronicDocument> listED = new ElectronicDocumentService().GetElectronicDocuments();
             List<Domain.Sql.OtherDocElecOperationMode> listOM = _othersDocsElecContributorService.GetOperationModes();
             OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
-            List<ContributorViewModel> listContri = new List<ContributorViewModel>();
+            
+            var opeMode = listOM.FirstOrDefault(o => o.Id == (int)dataentity.OperationModeId);
+            if (opeMode != null) model.OperationMode = opeMode.Name;
 
-            ViewBag.ListSoftwares = new List<SoftwareViewModel>();
-            ViewBag.softwareActive = _othersDocsElecContributorService.ValidateSoftwareActive(User.ContributorId(), (int)dataentity.ContributorIdType, (int)dataentity.OperationModeId, (int)OtherDocElecSoftwaresStatus.InProcess);
+            // ViewBag's
+            ViewBag.Title = $"Asociar modo de operación {model.OperationMode}";
             ViewBag.ContributorName = dataentity.ContributorIdType.GetDescription();
             ViewBag.ElectronicDocumentName = _electronicDocumentService.GetNameById(dataentity.ElectronicDocumentId);
+            ViewBag.ListSoftwares = new List<SoftwareViewModel>();
 
-            var opeMode = listOM.FirstOrDefault(o => o.Id == (int)dataentity.OperationModeId);
-            if (opeMode != null)
-                model.OperationMode = opeMode.Name;
+            // Validación Software en proceso...
+            var softwareActive = false;
+            var softwareInProcess = _othersDocsElecContributorService.GetContributorSoftwareInProcess(User.ContributorId(), (int)OtherDocElecSoftwaresStatus.InProcess);
+            if(softwareInProcess != null)
+            {
+                if (softwareInProcess.OtherDocElecContributorTypeId == (int)dataentity.ContributorIdType 
+                    && softwareInProcess.OtherDocElecOperationModeId == (int)dataentity.OperationModeId)
+                {
+                    softwareActive = true;
+                }
+                else
+                {
+                    var msg = $"No se puede {ViewBag.Title}, ya que tiene uno en estado: \"En Proceso\"";
+                    return this.RedirectToAction("AddParticipants", new { electronicDocumentId = dataentity.ElectronicDocumentId, message = msg });
+                }
+            }
 
+            ViewBag.softwareActive = softwareActive;
+            
+            // Model
             model.ElectronicDocumentId = dataentity.ElectronicDocumentId;
             model.OperationModeId = (int)dataentity.OperationModeId;
             model.ContributorIdType = (int)dataentity.ContributorIdType;
             model.OtherDocElecContributorId = (int)dataentity.ContributorId;
+            model.UrlEventReception = ConfigurationManager.GetValue("WebServiceUrl");
 
-            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), (int)dataentity.OperationModeId);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), (int)dataentity.ContributorIdType, (int)dataentity.OperationModeId);
 
             model.ListTable = List.Results.Select(t => new OtherDocsElectListViewModel()
             {
@@ -95,8 +115,6 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatedDate = t.CreatedDate,
             }).ToList();
 
-            ViewBag.Title = $"Asociar modo de operación {model.OperationMode}";
-
             List<Domain.RadianOperationMode> operationModesList = new List<Domain.RadianOperationMode>();
             if (model.OperationModeId == 1)
             {
@@ -109,18 +127,17 @@ namespace Gosocket.Dian.Web.Controllers
             else
             {
                 operationModesList.Add(new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.SoftwareTechnologyProvider, Name = RadianOperationModeTestSet.SoftwareTechnologyProvider.GetDescription() });
-                var listCont = _contributorService.GetContributors((int)Domain.Common.ContributorType.Provider.GetHashCode(), ContributorStatus.Enabled.GetHashCode()).ToList();
-                if (listCont != null)
-                    listContri.AddRange(listCont.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
-                ViewBag.ListTechnoProviders = new SelectList(listContri, "Id", "Name");
+                var providersList = new List<ContributorViewModel>();
+                var contributorsList = _contributorService.GetContributors((int)Domain.Common.ContributorType.Provider.GetHashCode(), ContributorStatus.Enabled.GetHashCode()).ToList();
+                if (contributorsList != null)
+                    providersList.AddRange(contributorsList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
+                ViewBag.ListTechnoProviders = new SelectList(providersList, "Id", "Name");
 
                 model.SoftwareName = " ";
                 model.PinSW = " ";
             }
 
             ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault().Id);
-
-            model.UrlEventReception = ConfigurationManager.GetValue("WebServiceUrl");
 
             return View(model);
         }
@@ -130,9 +147,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
 
-            GlobalTestSetOthersDocuments testSet = null;
-
-            testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocumentId);
+            GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocumentId);
             if (testSet == null)
                 return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
             
@@ -144,10 +159,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             int providerId = model.ProviderId;
-            if(model.OperationModeId != 2)
-            {
-                providerId = User.ContributorId();
-            }
+            if(model.OperationModeId != 2) providerId = User.ContributorId();
 
             var IdS = new Guid();
             OtherDocElecSoftware software = new OtherDocElecSoftware()
@@ -181,19 +193,9 @@ namespace Gosocket.Dian.Web.Controllers
             };
             
             ResponseMessage response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperation(contributorOperation, software, true, true);
-            //if (response.Code != 500)
-            //{
-            //    _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Registrado.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
-            //}
-
             if (response.Code == 500) // error...
             {
                 return this.RedirectToAction("AddParticipants", new { electronicDocumentId = model.ElectronicDocumentId, message = response.Message });
-
-                //return View(new OthersElectronicDocumentsViewModel()
-                //{
-                //    ElectronicDocumentId = model.ElectronicDocumentId
-                //});
             }
 
             _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
