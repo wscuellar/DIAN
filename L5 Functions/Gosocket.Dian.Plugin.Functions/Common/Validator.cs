@@ -292,23 +292,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 int tempID = 0;
                 for (int i = 0; i < invoiceListResponse.Count; i++)
                 {
-                    var xmlID = Convert.ToInt32(invoiceListResponse.Item(i).SelectNodes("//*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim());
+                    var value = invoiceListResponse.Item(i).SelectNodes("//*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    // cuando no llega valor, se asume -1
+                    var xmlID = !string.IsNullOrWhiteSpace(value) ? Convert.ToInt32(value) : -1;
 
                     if (i == 0)
+                    {
                         tempID = xmlID;
+                        if (xmlID != 1) isErrorConsecutive = true;
+                    }
                     else
                     {
                         if (!int.Equals(xmlID, tempID + 1))
                             isErrorConsecutive = true;
                         else
-                            tempID = Convert.ToInt32(xmlID);
+                            tempID = xmlID;
                     }
 
-                    arrayInvoiceLine[i] = Convert.ToInt32(xmlID);
+                    arrayInvoiceLine[i] = xmlID;
                 }
 
                 if(isErrorConsecutive)
                 {
+                    responses.Clear();
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -320,8 +326,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 bool pares = arrayInvoiceLine.Distinct().Count() == arrayInvoiceLine.Length;
-                if (!pares)
+                if (!pares || arrayInvoiceLine.Contains(-1))
                 {
+                    if(!isErrorConsecutive) responses.Clear();
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
