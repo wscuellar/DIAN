@@ -253,37 +253,34 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string documentTypeId = xmlParser.Fields["DocumentTypeId"].ToString();
             if (Convert.ToInt32(documentTypeId) == (int)DocumentType.DocumentSupportInvoice)
             {
-                XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
+                XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
                 int[] arrayAllowanceCharge = new int[allowanceChargeListResponse.Count];
                 int tempID = 0;
                 for (int i = 0; i < allowanceChargeListResponse.Count; i++)
                 {
-                    var xmlID = allowanceChargeListResponse.Item(i).SelectNodes("//*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    var xmlID = Convert.ToInt32(allowanceChargeListResponse.Item(i).SelectNodes("//*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim());
 
-                    //if (i == 0)
-                    //    tempID = xmlID;
-                    //else
-                    //{
-                    //    if (!int.Equals(xmlID, tempID + 1))
-                    //    {
-                    //        validFor = false;
-                    //        responses.Add(new ValidateListResponse
-                    //        {
-                    //            IsValid = false,
-                    //            Mandatory = true,
-                    //            ErrorCode = "DSAQ02",
-                    //            ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
-                    //            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    //        });
-                    //        break;
-                    //    }
-                    //    else
-                    //        tempID = Convert.ToInt32(xmlID);
-                    //}
-
+                    if (i == 0)
+                        tempID = xmlID;
+                    else
+                    {
+                        if (!int.Equals(xmlID, tempID + 1))
+                        {
+                            validFor = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "DSAQ02",
+                                ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                            break;
+                        }
+                        else
+                            tempID = Convert.ToInt32(xmlID);
+                    }
                 }
-
-
             }
             else
             {
