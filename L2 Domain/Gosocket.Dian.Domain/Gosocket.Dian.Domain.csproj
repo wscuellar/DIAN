@@ -198,6 +198,7 @@
     <Compile Include="Entity\GlobalRejectedDocument.cs" />
     <Compile Include="Entity\GlobalSoftware.cs" />
     <Compile Include="Entity\GlobalTask.cs" />
+    <Compile Include="Entity\GlobalTaxRate.cs" />
     <Compile Include="Entity\GlobalTestSetOthersDocumentsResult.cs" />
     <Compile Include="Entity\GlobalTestSetOthersDocuments.cs" />
     <Compile Include="Entity\GlobalTestSetResult.cs" />
