@@ -935,16 +935,6 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
             }
-            else if (docTypeCode == "101")
-            {
-                if (string.IsNullOrEmpty(senderCode))
-                {
-                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}J01" + txtRechazo + "Grupo no informado.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                }
-            }
 
             else
             {
