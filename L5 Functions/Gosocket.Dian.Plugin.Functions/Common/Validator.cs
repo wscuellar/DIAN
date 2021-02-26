@@ -160,11 +160,65 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validFor = true;
 
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento ValidateInvoiceLine referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
 
+           
+            XmlNodeList invoiceListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Lines']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
+            int[] arrayInvoiceLine = new int[invoiceListResponse.Count];
 
+            int tempID = 0;
+            for (int i = 0; i < invoiceListResponse.Count; i++)
+            {              
+                var xmlID = Convert.ToInt32(invoiceListResponse.Item(i).SelectNodes("//*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim());
+               
+                if (i == 0)
+                    tempID = xmlID;
+                else
+                {
+                    if(!int.Equals(xmlID,tempID+1))                     
+                    {
+                        validFor = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "DIBC05b",
+                            ErrorMessage = "Los números de línea de factura utilizados en los diferentes grupos no son consecutivos, empezando con “1”",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }   
+                    else
+                        tempID = Convert.ToInt32(xmlID);
+                }
 
+                arrayInvoiceLine[i] = Convert.ToInt32(xmlID);
+            }
 
+            if (validFor)
+            {
+                bool pares = arrayInvoiceLine.Distinct().Count() == arrayInvoiceLine.Length;
+                if (!pares)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DIBC05a",
+                        ErrorMessage = "Más de un grupo conteniendo el elemento /de:Invoice/de:InvoiceLine/cbc:ID con la misma información o no existe ningún valor",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }        
 
             return responses;
         }
