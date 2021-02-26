@@ -2527,7 +2527,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 else
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado no corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
-                
+
+
+            //Valida fecha de emision posterior a la fecha de final de autorizacion 
+            if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
+            {               
+                DateTime.TryParse(numberRangeModel.SigningTime, out DateTime endNumberEmision);
+                int.TryParse(endNumberEmision.ToString("yyyyMMdd"), out int dateNumberEmision);
+                if (dateNumberEmision < range.ValidDateNumberTo)
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "DSAB08a",
+                        ErrorMessage = "Fecha emision referenciada correctamente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                else
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DSAB08a",
+                        ErrorMessage = "Fecha de emisión posterior a la fecha final de la autorización de numeración",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+            }
 
             //
             DateTime.TryParse(numberRangeModel.EndDate, out DateTime endDate);
@@ -2586,11 +2611,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     Mandatory = true, 
                     ErrorCode = errorCodeModel, 
                     ErrorMessage = messageCodeModel,
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });           
 
-
-            long.TryParse(numberRangeModel.EndNumber, out long endNumber);
-           
+            long.TryParse(numberRangeModel.EndNumber, out long endNumber);           
             string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";           
             string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
                 ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente vendedor"

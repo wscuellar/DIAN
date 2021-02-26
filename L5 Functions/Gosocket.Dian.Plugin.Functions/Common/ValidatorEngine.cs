@@ -640,6 +640,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 throw new Exception(xmlParser.ParserError);
 
             var numberRangeModel = xmlParser.Fields.ToObject<NumberRangeModel>();
+            numberRangeModel.SigningTime = xmlParser.SigningTime;
+
             // Validator instance
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateNumberingRange(numberRangeModel, trackId));
