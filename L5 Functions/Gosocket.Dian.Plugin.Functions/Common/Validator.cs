@@ -2020,8 +2020,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL05"),
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL05"),
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                         break;
@@ -2416,9 +2416,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Valida facultades madato 
                 AttorneyModel attorneyModel = new AttorneyModel();
                 string[] tempCode = new string[0];
+                string descriptionCode = string.Empty;
 
                 if (cufeList.Count > 2)
                 {
+                    descriptionCode = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='Description']").Item(i)?.InnerText.ToString();
                     string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
                     if (!string.IsNullOrWhiteSpace(code))
                     {
@@ -2427,6 +2429,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
+                    descriptionCode = cufeList.Item(1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='Description']").Item(1)?.InnerText.ToString();
                     string code = cufeList.Item(1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(1)?.InnerText.ToString();
                     if (!string.IsNullOrWhiteSpace(code))
                     {
@@ -2435,6 +2438,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                               
                 bool codeExist = false;
+                bool validDescriptionCode = false;
                 foreach (string codeAttorney in tempCode)
                 {
                     //Valida exitan codigos de facultades asignadas mandato
@@ -2452,6 +2456,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else
                         codeExist = true;
+
                     //Valida codigos facultades mandato General - Limitado
                     string[] tempCodeAttorney = codeAttorney.Split('-');
                     if (modoOperacion == tempCodeAttorney[1])
@@ -2471,7 +2476,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         else
                         {
                             attorneyModel.facultityCode += (";" + tempCodeAttorney[0]);
-                        }
+                        }                
                     }
                     else
                     {
@@ -2485,6 +2490,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+
+                    //Valida description code acorde al codigo ingresado de mandato general
+                    if (tempCodeAttorney[0] == "ALL17")
+                    {
+                        if (!descriptionCode.Equals("Mandato por documento General"))
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
+                    //Valida description code acorde al codigo ingresado de mandato general
+                    else if (tempCodeAttorney[0] == "MR91")
+                    {
+                        if (!descriptionCode.Equals("Mandato con Representación"))
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
                 }
                 if(!codeExist)
                 {
@@ -2497,6 +2537,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
+
+                    if (new string[] { "Mandato por documento General", "Mandato con Representación" }.Contains(descriptionCode)) validDescriptionCode = true;
+                    if (!validDescriptionCode)
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                 }
                 //Solo si existe información referenciada del CUFE
                 if (listID != "3")
@@ -2557,9 +2611,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         else
                         {
                             var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyModel.cufe, attorneyModel.cufe);
-                            if (companyId == documentMetaCUFE.SenderCode)
+                            if(documentMetaCUFE != null)
                             {
-                                attorney.Add(attorneyModel);
+                                if (companyId == documentMetaCUFE.SenderCode)
+                                {
+                                    attorney.Add(attorneyModel);
+                                }
+                                else
+                                {
+                                    validate = false;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
+                                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
                             }
                             else
                             {
@@ -2568,11 +2637,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     IsValid = false,
                                     Mandatory = true,
-                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
-                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
+                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07"),
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
-                            }
+                            }                                                     
                         }                      
                     }                                       
                 }
