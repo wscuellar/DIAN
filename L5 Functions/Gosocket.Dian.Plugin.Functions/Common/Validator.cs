@@ -155,31 +155,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
-
-        #region ValidateTaxCategory
-        public List<ValidateListResponse> ValidateTaxCategory(XmlParser xmlParser)
+        #region ValidateTaxWithHolding
+        public List<ValidateListResponse> ValidateTaxWithHolding(XmlParser xmlParser)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool existTaxRate = false;
-            bool validFor = true;
-            bool validTax = true;
-            string xmlID = string.Empty;
-            string xmlPercent = string.Empty;            
 
             responses.Add(new ValidateListResponse
             {
                 IsValid = true,
                 Mandatory = true,
                 ErrorCode = "100",
-                ErrorMessage = "Evento ValidateTaxCategory referenciado correctamente",
+                ErrorMessage = "Evento ValidateTaxWithHolding referenciado correctamente",
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
             XmlNodeList withholdingListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='InvoiceLine']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
-            XmlNodeList taxCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
-            XmlNodeList percentCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']");
-
+      
             int[] arraywithholding = new int[withholdingListResponse.Count];
             for (int i = 0; i < withholdingListResponse.Count; i++)
             {
@@ -200,7 +192,33 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
             }
 
+            return responses;
+        }
+        #endregion
 
+
+        #region ValidateTaxCategory
+        public List<ValidateListResponse> ValidateTaxCategory(XmlParser xmlParser)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool existTaxRate = false;
+            bool validTax = true;
+            string xmlID = string.Empty;
+            string xmlPercent = string.Empty;            
+
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento ValidateTaxCategory referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+            
+            XmlNodeList taxCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
+            XmlNodeList percentCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']");           
+            
             for (int i = 0; i < taxCategoryListResponse.Count; i++) 
             {
                 xmlID = taxCategoryListResponse.Item(i).SelectNodes("//*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
@@ -213,7 +231,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     existTaxRate = TableManagerGlobalTaxRate.Exist<GlobalTaxRate>(xmlID, xmlPercent);
                     if (!existTaxRate)
                     {
-                        validFor = false;
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
@@ -3077,62 +3094,85 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Get xpath values
             var xpathValues = GetXpathValues(dictionary);
 
-            //Sender tax level code validation
-            var isValid = true;
-            var senderTaxLevelCodes = xpathValues["SenderTaxLevelCodes"].Split(';');
-            foreach (var code in senderTaxLevelCodes)
-                if (!typeListvalues.Contains(code))
-                {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAJ26", ErrorMessage = "Responsabilidad informada por emisor no valida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    isValid = false;
-                    break;
-                }
-            if (isValid && senderTaxLevelCodes.Any())
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAJ26", ErrorMessage = "Responsabilidad informada por emisor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            //Tipo documento
+            var typeDocument = xpathValues["InvoiceTypeCode"];
 
-            //receiver tax level code validation
-            isValid = true;
-            var additionalAccountId = xpathValues["AdditionalAccountIds"];
-            var receiverTaxLevelCodes = xpathValues["ReceiverTaxLevelCodes"].Split(';');
-            foreach (var code in receiverTaxLevelCodes)
-                if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
-                {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAK26", ErrorMessage = "Responsabilidad informada para receptor no valida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    isValid = false;
-                    break;
-                }
-            if (isValid && receiverTaxLevelCodes.Any(r => !string.IsNullOrEmpty(r)))
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAK26", ErrorMessage = "Responsabilidad informada para receptor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            if(Convert.ToInt32(typeDocument) == (int)DocumentType.ImportDocumentInvoice)
+            {
+                //receiver tax level code validation
+                var isValid = true;
+                var senderTaxLevelCodes = xpathValues["ReceiverTaxLevelCodes"].Split(';');
+                foreach (var code in senderTaxLevelCodes)
+                    if (!typeListvalues.Contains(code))
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DIAK26", ErrorMessage = "Responsabilidad informada para el importador no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        isValid = false;
+                        break;
+                    }
+                if (isValid && senderTaxLevelCodes.Any())
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DIAK26", ErrorMessage = "Responsabilidad informada para el importador válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
-            //delivery tax level code validation
-            isValid = true;
-            var deliveryTaxLevelCodes = xpathValues["DeliveryTaxLevelCodes"].Split(';');
-            foreach (var code in deliveryTaxLevelCodes)
-                if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
-                {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAM37", ErrorMessage = "Responsabilidad informada para transportista no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    isValid = false;
-                    break;
-                }
-            if (isValid && deliveryTaxLevelCodes.Any(d => !string.IsNullOrEmpty(d)))
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAM37", ErrorMessage = "Responsabilidad informada para transportista válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            }
+            else
+            {
+                //Sender tax level code validation
+                var isValid = true;
+                var senderTaxLevelCodes = xpathValues["SenderTaxLevelCodes"].Split(';');
+                foreach (var code in senderTaxLevelCodes)
+                    if (!typeListvalues.Contains(code))
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAJ26", ErrorMessage = "Responsabilidad informada por emisor no valida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        isValid = false;
+                        break;
+                    }
+                if (isValid && senderTaxLevelCodes.Any())
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAJ26", ErrorMessage = "Responsabilidad informada por emisor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
-            isValid = true;
-            var sheldHolderTaxLevelCodeItems = xpathValues["SheldHolderTaxLevelCodes"].Split('|');
-            foreach (var item in sheldHolderTaxLevelCodeItems)
-                if (!string.IsNullOrEmpty(item))
-                {
-                    var sheldHolderTaxLevelCodes = item.Split(';');
-                    foreach (var code in sheldHolderTaxLevelCodes)
-                        if (!typeListvalues.Contains(code))
-                        {
-                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAJ62", ErrorMessage = "Responsabilidad informada por participantes no válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                            isValid = false;
-                            break;
-                        }
-                }
-            if (isValid && sheldHolderTaxLevelCodeItems.Any(s => !string.IsNullOrEmpty(s)))
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAJ62", ErrorMessage = "Responsabilidad informada por participantes válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                //receiver tax level code validation
+                isValid = true;
+                var additionalAccountId = xpathValues["AdditionalAccountIds"];
+                var receiverTaxLevelCodes = xpathValues["ReceiverTaxLevelCodes"].Split(';');
+                foreach (var code in receiverTaxLevelCodes)
+                    if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAK26", ErrorMessage = "Responsabilidad informada para receptor no valida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        isValid = false;
+                        break;
+                    }
+                if (isValid && receiverTaxLevelCodes.Any(r => !string.IsNullOrEmpty(r)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAK26", ErrorMessage = "Responsabilidad informada para receptor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                //delivery tax level code validation
+                isValid = true;
+                var deliveryTaxLevelCodes = xpathValues["DeliveryTaxLevelCodes"].Split(';');
+                foreach (var code in deliveryTaxLevelCodes)
+                    if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAM37", ErrorMessage = "Responsabilidad informada para transportista no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        isValid = false;
+                        break;
+                    }
+                if (isValid && deliveryTaxLevelCodes.Any(d => !string.IsNullOrEmpty(d)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAM37", ErrorMessage = "Responsabilidad informada para transportista válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                isValid = true;
+                var sheldHolderTaxLevelCodeItems = xpathValues["SheldHolderTaxLevelCodes"].Split('|');
+                foreach (var item in sheldHolderTaxLevelCodeItems)
+                    if (!string.IsNullOrEmpty(item))
+                    {
+                        var sheldHolderTaxLevelCodes = item.Split(';');
+                        foreach (var code in sheldHolderTaxLevelCodes)
+                            if (!typeListvalues.Contains(code))
+                            {
+                                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAJ62", ErrorMessage = "Responsabilidad informada por participantes no válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                                isValid = false;
+                                break;
+                            }
+                    }
+                if (isValid && sheldHolderTaxLevelCodeItems.Any(s => !string.IsNullOrEmpty(s)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAJ62", ErrorMessage = "Responsabilidad informada por participantes válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            }
+
 
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
