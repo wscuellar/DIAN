@@ -2390,12 +2390,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
-                else
+            }
+            
+            if(AttachmentBase64List.Count > 0)
+            {
+                for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
                 {
-                    for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
+                    string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString();
+                    if (!IsBase64(AttachmentBase64))
                     {
-                        string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString();
-                        if (!IsBase64(AttachmentBase64))
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH84"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH84"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                    else
+                    {
+                        string base64Decoded = string.Empty;
+                        byte[] data = Convert.FromBase64String(AttachmentBase64);
+                        var mimeType = GetMimeFromBytes(data);
+                        if (mimeType != pdfMimeType)
                         {
                             validate = false;
                             responses.Add(new ValidateListResponse
@@ -2408,28 +2428,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                             break;
                         }
-                        else
-                        {                                                   
-                            string base64Decoded = string.Empty;
-                            byte[] data = Convert.FromBase64String(AttachmentBase64);                            
-                            var mimeType = GetMimeFromBytes(data);
-                            if(mimeType != pdfMimeType)
-                            {
-                                validate = false;
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = false,
-                                    Mandatory = true,
-                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH84"),
-                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH84"),
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                                break;
-                            }
-                        }
                     }
-                }               
-            }
+                }
+            }                           
                               
             //Valida Mandato si es Ilimitado o Limitado
             if (customizationID == "432" || customizationID == "434")
