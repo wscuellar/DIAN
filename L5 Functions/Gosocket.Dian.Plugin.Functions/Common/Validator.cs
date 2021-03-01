@@ -1959,14 +1959,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
-        #region Base64_Decode
-        private string Base64_Decode(string base64String)
-        {
-            byte[] decbuff = Convert.FromBase64String(base64String);
-            return System.Text.Encoding.UTF8.GetString(decbuff);
-        }
-        #endregion
-
         #region ValidateReferenceAttorney
         private List<ValidateListResponse> ValidateCufeReferenceAttorney(XmlParser xmlParser)
         {
@@ -2419,8 +2411,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         else
                         {                                                   
                             string base64Decoded = string.Empty;
-                            byte[] data = Convert.FromBase64String(AttachmentBase64);
-                            base64Decoded = ASCIIEncoding.ASCII.GetString(data);
+                            byte[] data = Convert.FromBase64String(AttachmentBase64);                            
                             var mimeType = GetMimeFromBytes(data);
                             if(mimeType != pdfMimeType)
                             {
