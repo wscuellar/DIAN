@@ -177,7 +177,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             int[] arraywithholding = new int[withholdingListResponse.Count];
             for (int i = 0; i < withholdingListResponse.Count; i++)
             {
-                var xmlTaxSchemeID = withholdingListResponse.Item(i).SelectNodes("//*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                var xmlTaxSchemeID = withholdingListResponse.Item(i).SelectNodes("//*[local-name()='InvoiceLine']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
                 arraywithholding[i] = Convert.ToInt32(xmlTaxSchemeID);
             }
 

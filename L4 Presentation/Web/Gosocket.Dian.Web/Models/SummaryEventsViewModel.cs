@@ -100,15 +100,15 @@ namespace Gosocket.Dian.Web.Models
     {
         public ElectronicMandateViewModel(GlobalDocValidatorDocumentMeta eventItem, GlobalDocValidatorDocumentMeta invoice)
         {
-            ReceiverCode = eventItem.ReceiverCode;
-            ReceiverName = eventItem.ReceiverName;
+            TechProviderCode = eventItem.TechProviderCode;
+            TechProviderName = eventItem.ReceiverName;
             SenderCode = invoice.SenderCode;
             SenderName = invoice.SenderName;
         }
 
         public string ContractDate { get; internal set; }
-        public string ReceiverCode { get; internal set; }
-        public string ReceiverName { get; internal set; }
+        public string TechProviderCode { get; internal set; }
+        public string TechProviderName { get; internal set; }
         public string SenderCode { get; internal set; }
         public string SenderName { get; internal set; }
         public string MandateType { get; internal set; }
