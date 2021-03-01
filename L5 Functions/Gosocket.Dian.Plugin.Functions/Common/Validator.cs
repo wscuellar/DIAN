@@ -30,6 +30,7 @@ using Gosocket.Dian.Plugin.Functions.Event;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Gosocket.Dian.Services.Utils;
+using System.Runtime.InteropServices;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -51,6 +52,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
         private TableManager TableManagerGlobalTaxRate = new TableManager("GlobalTaxRate");
         private TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
+        private static readonly string pdfMimeType = "application/pdf";
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -155,6 +157,47 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region ValidateTaxWithHolding
+        public List<ValidateListResponse> ValidateTaxWithHolding(XmlParser xmlParser)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento ValidateTaxWithHolding referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+
+            XmlNodeList withholdingListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='InvoiceLine']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
+      
+            int[] arraywithholding = new int[withholdingListResponse.Count];
+            for (int i = 0; i < withholdingListResponse.Count; i++)
+            {
+                var xmlTaxSchemeID = withholdingListResponse.Item(i).SelectNodes("//*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                arraywithholding[i] = Convert.ToInt32(xmlTaxSchemeID);
+            }
+
+            bool pares = arraywithholding.Distinct().Count() == arraywithholding.Length;
+            if (!pares)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "DSAY01",
+                    ErrorMessage = "Existe más de un grupo con información de totales para un mismo tributo en una línea de el documento soporte",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            return responses;
+        }
+        #endregion
+
 
         #region ValidateTaxCategory
         public List<ValidateListResponse> ValidateTaxCategory(XmlParser xmlParser)
@@ -162,7 +205,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool existTaxRate = false;
-            bool validFor = true;
+            bool validTax = true;
+            string xmlID = string.Empty;
+            string xmlPercent = string.Empty;            
 
             responses.Add(new ValidateListResponse
             {
@@ -172,44 +217,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ErrorMessage = "Evento ValidateTaxCategory referenciado correctamente",
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
-
-
+            
             XmlNodeList taxCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
-            XmlNodeList percentCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']");
-
-            if(taxCategoryListResponse.Count != percentCategoryListResponse.Count)
+            XmlNodeList percentCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']");           
+            
+            for (int i = 0; i < taxCategoryListResponse.Count; i++) 
             {
-                responses.Add(new ValidateListResponse
+                xmlID = taxCategoryListResponse.Item(i).SelectNodes("//*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                if (new string[] { "22" }.Contains(xmlID)) validTax = false;
+
+                if (validTax)
                 {
-                    IsValid = false,
-                    Mandatory = false,
-                    ErrorCode = "DSAX14",
-                    ErrorMessage = "Reporta una tarifa diferente para uno de los tributos enunciados en la tabla 11.3.9",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
+                    xmlPercent = percentCategoryListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(i)?.InnerText.ToString();
 
-                return responses;
-            }
-
-            for (int i = 0; i < taxCategoryListResponse.Count; i++)
-            {
-                var xmlID = taxCategoryListResponse.Item(i).SelectNodes("//*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString();                
-                var xmlPercent = percentCategoryListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(i)?.InnerText.ToString();
-
-                existTaxRate = TableManagerGlobalTaxRate.Exist<GlobalTaxRate>(xmlID, xmlPercent);
-                if (!existTaxRate)
-                {
-                    validFor = false;
-                    responses.Add(new ValidateListResponse
+                    existTaxRate = TableManagerGlobalTaxRate.Exist<GlobalTaxRate>(xmlID, xmlPercent);
+                    if (!existTaxRate)
                     {
-                        IsValid = false,
-                        Mandatory = false,
-                        ErrorCode = "DSAX14",
-                        ErrorMessage = "Reporta una tarifa diferente para uno de los tributos enunciados en la tabla 11.3.9",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                    break;
-                }                             
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = false,
+                            ErrorCode = "DSAX14",
+                            ErrorMessage = "Reporta una tarifa diferente para uno de los tributos enunciados en la tabla 11.3.9",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+                  
+                validTax = true;
             }
 
             return responses;
@@ -232,44 +268,86 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-           
-            XmlNodeList invoiceListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Lines']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
-            int[] arrayInvoiceLine = new int[invoiceListResponse.Count];
-
-            int tempID = 0;
-            for (int i = 0; i < invoiceListResponse.Count; i++)
-            {              
-                var xmlID = Convert.ToInt32(invoiceListResponse.Item(i).SelectNodes("//*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim());
-               
-                if (i == 0)
-                    tempID = xmlID;
-                else
+            //Validacion Documento soporte
+            string documentTypeId = xmlParser.Fields["DocumentTypeId"].ToString();
+            if (Convert.ToInt32(documentTypeId) == (int)DocumentType.DocumentSupportInvoice)
+            {
+                XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
+                int[] arrayAllowanceCharge = new int[allowanceChargeListResponse.Count];
+                int tempID = 0;
+                for (int i = 0; i < allowanceChargeListResponse.Count; i++)
                 {
-                    if(!int.Equals(xmlID,tempID+1))                     
-                    {
-                        validFor = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "DIBC05b",
-                            ErrorMessage = "Los números de línea de factura utilizados en los diferentes grupos no son consecutivos, empezando con “1”",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                        break;
-                    }   
+                    var xmlID = Convert.ToInt32(allowanceChargeListResponse.Item(i).SelectNodes("//*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim());
+
+                    if (i == 0)
+                        tempID = xmlID;
                     else
-                        tempID = Convert.ToInt32(xmlID);
+                    {
+                        if (!int.Equals(xmlID, tempID + 1))
+                        {
+                            validFor = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "DSAQ02",
+                                ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                            break;
+                        }
+                        else
+                            tempID = Convert.ToInt32(xmlID);
+                    }
+                }
+            }
+            else
+            {
+                //Validacion documento de impotacion 
+                XmlNodeList invoiceListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Lines']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
+                int[] arrayInvoiceLine = new int[invoiceListResponse.Count];
+                var isErrorConsecutive = false;
+
+                int tempID = 0;
+                for (int i = 0; i < invoiceListResponse.Count; i++)
+                {
+                    var value = invoiceListResponse.Item(i).SelectNodes("//*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    // cuando no llega valor, se asume -1
+                    var xmlID = !string.IsNullOrWhiteSpace(value) ? Convert.ToInt32(value) : -1;
+
+                    if (i == 0)
+                    {
+                        tempID = xmlID;
+                        if (xmlID != 1) isErrorConsecutive = true;
+                    }
+                    else
+                    {
+                        if (!int.Equals(xmlID, tempID + 1))
+                            isErrorConsecutive = true;
+                        else
+                            tempID = xmlID;
+                    }
+
+                    arrayInvoiceLine[i] = xmlID;
                 }
 
-                arrayInvoiceLine[i] = Convert.ToInt32(xmlID);
-            }
-
-            if (validFor)
-            {
-                bool pares = arrayInvoiceLine.Distinct().Count() == arrayInvoiceLine.Length;
-                if (!pares)
+                if(isErrorConsecutive)
                 {
+                    responses.Clear();
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DIBC05b",
+                        ErrorMessage = "Los números de línea de factura utilizados en los diferentes grupos no son consecutivos, empezando con “1”",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+
+                bool pares = arrayInvoiceLine.Distinct().Count() == arrayInvoiceLine.Length;
+                if (!pares || arrayInvoiceLine.Contains(-1))
+                {
+                    if(!isErrorConsecutive) responses.Clear();
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -279,8 +357,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
-            }        
-
+            }
+           
             return responses;
         }
 
@@ -1874,7 +1952,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
         #region IsBase64
-        private bool IsBase64(String base64String)
+        private bool IsBase64(string base64String)
         {
             var rs = !string.IsNullOrEmpty(base64String) && !string.IsNullOrWhiteSpace(base64String) && base64String.Length != 0 && base64String.Length % 4 == 0 && !base64String.Contains(" ");
             return rs;
@@ -1961,8 +2039,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL05"),
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL05"),
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                         break;
@@ -2312,12 +2390,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
-                else
+            }
+            
+            if(AttachmentBase64List.Count > 0)
+            {
+                for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
                 {
-                    for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
+                    string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString();
+                    if (!IsBase64(AttachmentBase64))
                     {
-                        string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString();
-                        if (!IsBase64(AttachmentBase64))
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH84"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH84"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                    else
+                    {
+                        string base64Decoded = string.Empty;
+                        byte[] data = Convert.FromBase64String(AttachmentBase64);
+                        var mimeType = GetMimeFromBytes(data);
+                        if (mimeType != pdfMimeType)
                         {
                             validate = false;
                             responses.Add(new ValidateListResponse
@@ -2331,8 +2429,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             break;
                         }
                     }
-                }               
-            }
+                }
+            }                           
                               
             //Valida Mandato si es Ilimitado o Limitado
             if (customizationID == "432" || customizationID == "434")
@@ -2357,9 +2455,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Valida facultades madato 
                 AttorneyModel attorneyModel = new AttorneyModel();
                 string[] tempCode = new string[0];
+                string descriptionCode = string.Empty;
 
                 if (cufeList.Count > 2)
                 {
+                    descriptionCode = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='Description']").Item(i)?.InnerText.ToString();
                     string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
                     if (!string.IsNullOrWhiteSpace(code))
                     {
@@ -2368,6 +2468,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
+                    descriptionCode = cufeList.Item(1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='Description']").Item(1)?.InnerText.ToString();
                     string code = cufeList.Item(1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(1)?.InnerText.ToString();
                     if (!string.IsNullOrWhiteSpace(code))
                     {
@@ -2376,6 +2477,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                               
                 bool codeExist = false;
+                bool validDescriptionCode = false;
                 foreach (string codeAttorney in tempCode)
                 {
                     //Valida exitan codigos de facultades asignadas mandato
@@ -2393,6 +2495,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else
                         codeExist = true;
+
                     //Valida codigos facultades mandato General - Limitado
                     string[] tempCodeAttorney = codeAttorney.Split('-');
                     if (modoOperacion == tempCodeAttorney[1])
@@ -2415,7 +2518,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         else
                         {
                             attorneyModel.facultityCode += (";" + tempCodeAttorney[0]);
-                        }
+                        }                
                     }
                     else
                     {
@@ -2429,6 +2532,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+
+                    //Valida description code acorde al codigo ingresado de mandato general
+                    if (tempCodeAttorney[0] == "ALL17")
+                    {
+                        if (!descriptionCode.Equals("Mandato por documento General"))
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
+                    //Valida description code acorde al codigo ingresado de mandato general
+                    else if (tempCodeAttorney[0] == "MR91")
+                    {
+                        if (!descriptionCode.Equals("Mandato con Representación"))
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
                 }
                 if(!codeExist)
                 {
@@ -2441,6 +2579,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
+
+                    if (new string[] { "Mandato por documento General", "Mandato con Representación" }.Contains(descriptionCode)) validDescriptionCode = true;
+                    if (!validDescriptionCode)
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                 }
                 //Solo si existe información referenciada del CUFE
                 if (listID != "3")
@@ -2501,9 +2653,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         else
                         {
                             var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyModel.cufe, attorneyModel.cufe);
-                            if (companyId == documentMetaCUFE.SenderCode)
+                            if(documentMetaCUFE != null)
                             {
-                                attorney.Add(attorneyModel);
+                                if (companyId == documentMetaCUFE.SenderCode)
+                                {
+                                    attorney.Add(attorneyModel);
+                                }
+                                else
+                                {
+                                    validate = false;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
+                                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
                             }
                             else
                             {
@@ -2512,11 +2679,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     IsValid = false,
                                     Mandatory = true,
-                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
-                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
+                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07"),
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
-                            }
+                            }                                                     
                         }                      
                     }                                       
                 }
@@ -2532,6 +2699,55 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return responses;
         }
         #endregion
+
+        /// <summary>
+        /// Get mime type from data
+        /// </summary>
+        /// <param name="pBC"></param>
+        /// <param name="pwzUrl"></param>
+        /// <param name="pBuffer"></param>
+        /// <param name="cbSize"></param>
+        /// <param name="pwzMimeProposed"></param>
+        /// <param name="dwMimeFlags"></param>
+        /// <param name="ppwzMimeOut"></param>
+        /// <param name="dwReserved"></param>
+        /// <returns></returns>
+        [DllImport("urlmon.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = false)]
+        static extern int FindMimeFromData(IntPtr pBC,
+            [MarshalAs(UnmanagedType.LPWStr)] string pwzUrl,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.I1, SizeParamIndex=3)]
+            byte[] pBuffer,
+            int cbSize,
+            [MarshalAs(UnmanagedType.LPWStr)] string pwzMimeProposed,
+            int dwMimeFlags,
+            out IntPtr ppwzMimeOut,
+            int dwReserved);
+
+
+        /// <summary>
+        /// Get bytes mime type
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string GetMimeFromBytes(byte[] data)
+        {
+            try
+            {
+                string mime = string.Empty;
+                IntPtr suggestPtr = IntPtr.Zero, filePtr = IntPtr.Zero, outPtr = IntPtr.Zero;
+                int ret = FindMimeFromData(IntPtr.Zero, null, data, data.Length, null, 0, out outPtr, 0);
+                if (ret == 0 && outPtr != IntPtr.Zero)
+                {
+                    //todo: this leaks memory outPtr must be freed
+                    return Marshal.PtrToStringUni(outPtr);
+                }
+                return mime;
+            }
+            catch
+            {
+                return "";
+            }
+        }
 
         #region Number range validation
         public List<ValidateListResponse> ValidateNumberingRange(NumberRangeModel numberRangeModel, string trackId)
@@ -2952,62 +3168,85 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Get xpath values
             var xpathValues = GetXpathValues(dictionary);
 
-            //Sender tax level code validation
-            var isValid = true;
-            var senderTaxLevelCodes = xpathValues["SenderTaxLevelCodes"].Split(';');
-            foreach (var code in senderTaxLevelCodes)
-                if (!typeListvalues.Contains(code))
-                {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAJ26", ErrorMessage = "Responsabilidad informada por emisor no valida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    isValid = false;
-                    break;
-                }
-            if (isValid && senderTaxLevelCodes.Any())
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAJ26", ErrorMessage = "Responsabilidad informada por emisor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            //Tipo documento
+            var typeDocument = xpathValues["InvoiceTypeCode"];
 
-            //receiver tax level code validation
-            isValid = true;
-            var additionalAccountId = xpathValues["AdditionalAccountIds"];
-            var receiverTaxLevelCodes = xpathValues["ReceiverTaxLevelCodes"].Split(';');
-            foreach (var code in receiverTaxLevelCodes)
-                if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
-                {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAK26", ErrorMessage = "Responsabilidad informada para receptor no valida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    isValid = false;
-                    break;
-                }
-            if (isValid && receiverTaxLevelCodes.Any(r => !string.IsNullOrEmpty(r)))
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAK26", ErrorMessage = "Responsabilidad informada para receptor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            if(Convert.ToInt32(typeDocument) == (int)DocumentType.ImportDocumentInvoice)
+            {
+                //receiver tax level code validation
+                var isValid = true;
+                var senderTaxLevelCodes = xpathValues["ReceiverTaxLevelCodes"].Split(';');
+                foreach (var code in senderTaxLevelCodes)
+                    if (!typeListvalues.Contains(code))
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DIAK26", ErrorMessage = "Responsabilidad informada para el importador no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        isValid = false;
+                        break;
+                    }
+                if (isValid && senderTaxLevelCodes.Any())
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DIAK26", ErrorMessage = "Responsabilidad informada para el importador válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
-            //delivery tax level code validation
-            isValid = true;
-            var deliveryTaxLevelCodes = xpathValues["DeliveryTaxLevelCodes"].Split(';');
-            foreach (var code in deliveryTaxLevelCodes)
-                if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
-                {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAM37", ErrorMessage = "Responsabilidad informada para transportista no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    isValid = false;
-                    break;
-                }
-            if (isValid && deliveryTaxLevelCodes.Any(d => !string.IsNullOrEmpty(d)))
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAM37", ErrorMessage = "Responsabilidad informada para transportista válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            }
+            else
+            {
+                //Sender tax level code validation
+                var isValid = true;
+                var senderTaxLevelCodes = xpathValues["SenderTaxLevelCodes"].Split(';');
+                foreach (var code in senderTaxLevelCodes)
+                    if (!typeListvalues.Contains(code))
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAJ26", ErrorMessage = "Responsabilidad informada por emisor no valida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        isValid = false;
+                        break;
+                    }
+                if (isValid && senderTaxLevelCodes.Any())
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAJ26", ErrorMessage = "Responsabilidad informada por emisor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
-            isValid = true;
-            var sheldHolderTaxLevelCodeItems = xpathValues["SheldHolderTaxLevelCodes"].Split('|');
-            foreach (var item in sheldHolderTaxLevelCodeItems)
-                if (!string.IsNullOrEmpty(item))
-                {
-                    var sheldHolderTaxLevelCodes = item.Split(';');
-                    foreach (var code in sheldHolderTaxLevelCodes)
-                        if (!typeListvalues.Contains(code))
-                        {
-                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAJ62", ErrorMessage = "Responsabilidad informada por participantes no válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                            isValid = false;
-                            break;
-                        }
-                }
-            if (isValid && sheldHolderTaxLevelCodeItems.Any(s => !string.IsNullOrEmpty(s)))
-                responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAJ62", ErrorMessage = "Responsabilidad informada por participantes válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                //receiver tax level code validation
+                isValid = true;
+                var additionalAccountId = xpathValues["AdditionalAccountIds"];
+                var receiverTaxLevelCodes = xpathValues["ReceiverTaxLevelCodes"].Split(';');
+                foreach (var code in receiverTaxLevelCodes)
+                    if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAK26", ErrorMessage = "Responsabilidad informada para receptor no valida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        isValid = false;
+                        break;
+                    }
+                if (isValid && receiverTaxLevelCodes.Any(r => !string.IsNullOrEmpty(r)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAK26", ErrorMessage = "Responsabilidad informada para receptor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                //delivery tax level code validation
+                isValid = true;
+                var deliveryTaxLevelCodes = xpathValues["DeliveryTaxLevelCodes"].Split(';');
+                foreach (var code in deliveryTaxLevelCodes)
+                    if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAM37", ErrorMessage = "Responsabilidad informada para transportista no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        isValid = false;
+                        break;
+                    }
+                if (isValid && deliveryTaxLevelCodes.Any(d => !string.IsNullOrEmpty(d)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAM37", ErrorMessage = "Responsabilidad informada para transportista válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                isValid = true;
+                var sheldHolderTaxLevelCodeItems = xpathValues["SheldHolderTaxLevelCodes"].Split('|');
+                foreach (var item in sheldHolderTaxLevelCodeItems)
+                    if (!string.IsNullOrEmpty(item))
+                    {
+                        var sheldHolderTaxLevelCodes = item.Split(';');
+                        foreach (var code in sheldHolderTaxLevelCodes)
+                            if (!typeListvalues.Contains(code))
+                            {
+                                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "FAJ62", ErrorMessage = "Responsabilidad informada por participantes no válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                                isValid = false;
+                                break;
+                            }
+                    }
+                if (isValid && sheldHolderTaxLevelCodeItems.Any(s => !string.IsNullOrEmpty(s)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "FAJ62", ErrorMessage = "Responsabilidad informada por participantes válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            }
+
 
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;

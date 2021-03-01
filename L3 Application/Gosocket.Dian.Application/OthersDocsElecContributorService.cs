@@ -62,13 +62,11 @@ namespace Gosocket.Dian.Application
         public OtherDocElecContributor CreateContributor(int contributorId, OtherDocElecState State,
            int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy)
         {
-
-            //int contributorId = _contributorService.GetByCode(userCode).Id;
             OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId
                                                                                      && t.OtherDocElecContributorTypeId == ContributorType
                                                                                      && t.OtherDocElecOperationModeId == OperationMode
                                                                                      && t.ElectronicDocumentId == ElectronicDocumentId
-                                                                                     && t.State!="Aceptado");
+                                                                                     && t.State != "Aceptado");
 
             OtherDocElecContributor newContributor = new OtherDocElecContributor()
             {
@@ -82,10 +80,6 @@ namespace Gosocket.Dian.Application
                 CreatedDate = existing != null ? existing.CreatedDate : DateTime.Now
             };
             newContributor.Id = _othersDocsElecContributorRepository.AddOrUpdate(newContributor);
-
-            //Software ownSoftware = GetSoftwareOwn(contributorId);
-            //OtherDocElecSoftware odeSoftware = new OtherDocElecSoftware(ownSoftware, newContributor.Id, createdBy);
-            //newContributor.OtherDocElecSoftwares = new List<OtherDocElecSoftware>() { odeSoftware };
 
             return newContributor;
         }
@@ -119,12 +113,12 @@ namespace Gosocket.Dian.Application
             return softwareAccepted;
         }
 
-        public List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int OperationModeId, string state)
+        public List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int contributorTypeId, int OperationModeId, string state)
         {
-            return _othersDocsElecContributorRepository.List(t => t.ContributorId == ContributorId
-                                                                                      && t.OtherDocElecOperationModeId == OperationModeId
-                                                                                      && t.State != state).Results;
-
+            return _othersDocsElecContributorRepository.List(t => t.ContributorId == ContributorId && 
+                                                                  t.OtherDocElecContributorTypeId == contributorTypeId &&
+                                                                  t.OtherDocElecOperationModeId == OperationModeId && 
+                                                                  t.State != state).Results;
         }
 
         public bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware)
@@ -290,6 +284,11 @@ namespace Gosocket.Dian.Application
             return _othersDocsElecContributorRepository
                 .Get(x => x.ContributorId == contributorId && x.OtherDocElecSoftwares
                     .Any(y => y.OtherDocElecSoftwareStatusId == statusId));
+        }
+
+        public List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state)
+        {
+            return this._othersDocsElecContributorRepository.GetTechnologicalProviders(contributorId, electronicDocumentId, contributorTypeId, state);
         }
     }
 }

@@ -81,9 +81,10 @@ namespace Gosocket.Dian.Application
             OtherDocElecSoftware soft = _othersDocsElecSoftwareService.CreateSoftware(software);
             ContributorOperation.SoftwareId = soft.Id;
 
-
-            ContributorOperation.OperationStatusId = (int)(Contributor.State == OtherDocElecState.Habilitado.GetDescription() ? (int)OtherDocElecState.Test : (int)RadianState.Registrado);
+            // Esto considero no aplica, porque antes de establece el estado "En pruebas".
+            //ContributorOperation.OperationStatusId = (int)(Contributor.State == OtherDocElecState.Habilitado.GetDescription() ? (int)OtherDocElecState.Test : (int)RadianState.Registrado);
             int operationId = _othersDocsElecContributorOperationRepository.Add(ContributorOperation);
+
             existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.Id == operationId);
             // se asigna el nuevo set de pruebas...
             ApplyTestSet(ContributorOperation, testSet, Contributor, existingOperation, soft);
@@ -187,7 +188,8 @@ namespace Gosocket.Dian.Application
             operation.SoftwareId = ODEOperation.SoftwareId.ToString();
             operation.ElectronicDocumentId = ODEContributor.ElectronicDocumentId;
             operation.OtherDocElecContributorId = ODEContributor.Id;
-            operation.State = ODEContributor.State == OtherDocElecState.Habilitado.GetDescription() ? OtherDocElecState.Test.GetDescription() : OtherDocElecState.Registrado.GetDescription();
+            operation.State = OtherDocElecState.Test.GetDescription();
+            //operation.State = ODEContributor.State == OtherDocElecState.Habilitado.GetDescription() ? OtherDocElecState.Test.GetDescription() : OtherDocElecState.Registrado.GetDescription();
             //operation.SoftwareType = existingOperation.SoftwareType;
             operation.ContributorTypeId = ODEContributor.OtherDocElecContributorTypeId;
             operation.Deleted = false;

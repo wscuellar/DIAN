@@ -139,7 +139,13 @@
     "ErrorMessage_LGC23": "No puede registrar si previamente se registro primera inscripcion de la factura electrónica de venta",
     "ErrorCode_LGC22": "LGC22",
     "ErrorMessage_LGC22": "No se puede registrar esté evento si previamente se registro uno de los siguientes eventos: Endoso en garantía, Endoso en procuración, Limitación de circulación.",
-    "ValidateEndosoTrusted": "false"
+    "ValidateEndosoTrusted": "false",
+    "ErrorCode_AAL03": "AAL03",
+    "ErrorMessage_AAL03": "No fue informado la descripción",
+    "ErrorCode_AAL07": "AAL07",
+    "ErrorMessage_AAL07": "El CUFE referenciado no pertenece al emisor del mandato",
+    "ErrorCode_AAL05": "AAL05",
+    "ErrorMessage_AAL05": "El número de documento electrónico referenciado no coinciden con un documento valido"
 
 
 

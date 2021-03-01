@@ -85,6 +85,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
+        public async Task<List<ValidateListResponse>> StarValidateTaxWithHoldingAsync(string trackId)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            // Validator instance
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateTaxWithHolding(xmlParser));
+
+            return validateResponses;
+        }
+
         public async Task<List<ValidateListResponse>> StarValidateTaxCategoryAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
@@ -784,7 +800,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     { "AdditionalAccountIds", "//cac:AccountingCustomerParty/cbc:AdditionalAccountID" },
                     { "ReceiverTaxLevelCodes", "/sig:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode"},
                     { "DeliveryTaxLevelCodes", "/sig:Invoice/cac:Delivery/cac:DeliveryParty/cac:PartyTaxScheme/cbc:TaxLevelCode" },
-                    { "SheldHolderTaxLevelCodes", "/sig:Invoice/cac:Delivery/cac:DeliveryParty/cac:PartyTaxScheme/cbc:TaxLevelCode" }
+                    { "SheldHolderTaxLevelCodes", "/sig:Invoice/cac:Delivery/cac:DeliveryParty/cac:PartyTaxScheme/cbc:TaxLevelCode" },
+                    { "InvoiceTypeCode","/sig:Invoice/cbc:InvoiceTypeCode" }
             };
             return dictionary;
         }

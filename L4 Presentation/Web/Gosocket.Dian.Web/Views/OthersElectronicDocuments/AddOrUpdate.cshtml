@@ -243,16 +243,12 @@
 
             $('#ProviderId').change(function () {
                 if ('@ViewBag.softwareActive' == 'False') {
-                    console.log("botones", $(":button"));
+                    //console.log("botones", $(":button"));
                     $('#UrlEventReception').val('');
                     $('#SoftwareType').val('');
                     getSoftwares($('#ProviderId').val());
                 }
             });
-
-            //if ($('#ProviderId').val() != '' && $('#ProviderId').val() != "0") {
-            //    getSoftwares($('#ProviderId').val());
-            //}
 
             $('#SoftwareId').change(function (e) {
                 var $this = $(this);
@@ -330,14 +326,13 @@
             $.ajax({
                 url: "@Url.Action("GetSoftwaresByContributorId", "OthersElectronicDocuments")",
                 type: "POST",
-                data: { id: ProviderId },
+                data: { id: ProviderId, electronicDocumentId: @Model.ElectronicDocumentId },
                 datatype: "json",
                 success: function (result) {
 
                     if (result != null && result.res != null) {
 
                         $.each(result.res, function (index, value) {
-//                            console.log('<option value="' + value.Id + '">' + value.Name + '</option>');
                             $('#SoftwareId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
                             $('#ulSoftwareId').append('<li data-original-index="' + (index + 1) + '"><a tabindex="0" class=""' +
                                 ' data-normalized-text="' + value.Name + '"><span class="text">' + value.Name + '</span>' +
