@@ -3,6 +3,7 @@ using Gosocket.Dian.Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using Gosocket.Dian.Domain;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
@@ -14,19 +15,12 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <param name="userCode"></param>
         /// <returns></returns>
         NameValueCollection Summary(string userCode);
-
         List<OtherDocElecOperationMode> GetOperationModes();
-
         OtherDocElecContributor CreateContributor(int contributorId, Domain.Common.OtherDocElecState State, int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy);
-
-        List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int OperationModeId, string state);
-
+        List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int contributorTypeId, int OperationModeId, string state);
         bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware);
-
-        PagedResult<OtherDocsElectData> List(int contributorId, int OperationModeId);
-
+        PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId);
         OtherDocsElectData GetCOntrinutorODE(int Id);
-
         /// <summary>
         /// Cancelar un registro en la tabla OtherDocElecContributor
         /// </summary>
@@ -34,9 +28,8 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <param name="description">Motivo por el cual se hace la cancelación</param>
         /// <returns></returns>
         ResponseMessage CancelRegister(int contributorId,string description);
-
-
         GlobalTestSetOthersDocuments GetTestResult(int OperatonModeId, int ElectronicDocumentId);
-
+        OtherDocElecContributor GetContributorSoftwareInProcess(int contributorId, int statusId);
+        List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state);
     }
 }

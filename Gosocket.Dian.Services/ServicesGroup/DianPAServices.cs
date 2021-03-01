@@ -205,7 +205,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse.ErrorMessage.AddRange(failedList);
                 return dianResponse;
             }
-          
+
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
             DocumentParsed.SetValues(ref documentParsed);
             var parser = new GlobalLogger("", "Parser") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
@@ -227,20 +227,25 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // Auth
             start = DateTime.UtcNow;
-            var authEntity = GetAuthorization(senderCode, authCode);
-            if (authEntity == null)
+
+            if (senderCode != "01")
             {
-                dianResponse.XmlFileName = $"{fileName}";
-                dianResponse.StatusCode = "89";
-                dianResponse.StatusDescription = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
-                var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
-                if (globalEnd >= 10)
+                var authEntity = GetAuthorization(senderCode, authCode);
+                if (authEntity == null)
                 {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = globalEnd.ToString(), Action = "Auth" };
-                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                    dianResponse.XmlFileName = $"{fileName}";
+                    dianResponse.StatusCode = "89";
+                    dianResponse.StatusDescription = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
+                    var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
+                    if (globalEnd >= 10)
+                    {
+                        var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = globalEnd.ToString(), Action = "Auth" };
+                        TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                    }
+                    return dianResponse;
                 }
-                return dianResponse;
             }
+
             var auth = new GlobalLogger("", "3 Auth") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
             // Auth
 
@@ -709,7 +714,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     arrayTasks.Add(firstLocalRun);
                     Task.WhenAll(arrayTasks).Wait();
 
-                    if(int.Parse(documentMeta.DocumentTypeId) != (int)DocumentType.Invoice)
+                    if (int.Parse(documentMeta.DocumentTypeId) != (int)DocumentType.Invoice)
                     {
                         response.StatusCode = "68";
                         response.StatusDescription = "TrackId no corresponde a un CUFE.";
@@ -1209,7 +1214,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.StatusDescription = processEventResponse.Message;
                         UpdateInTransactions(documentParsed.DocumentKey.ToLower(), eventCode);
                         return dianResponse;
-                    }                   
+                    }
                 }
                 else
                 {
@@ -1458,15 +1463,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 return response;
             }
 
-            var number = StringUtil.TextAfter(serieAndNumber, serie).TrimStart('0');
+            var number = StringUtil.TextAfter(serieAndNumber, serie) == null ? string.Empty : StringUtil.TextAfter(serieAndNumber, serie).TrimStart('0');
             if (string.IsNullOrEmpty(number))
             {
-                var failedList = new List<string> { $"" };
                 response.IsValid = false;
                 response.StatusCode = "99";
-                response.StatusMessage = ".";
-                response.StatusDescription = ".";
-                response.ErrorMessage.AddRange(failedList);
+                response.StatusMessage = "Documento con errores en campos mandatorios.";
+                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                response.XmlDocumentKey = trackId;
                 return response;
             }
 

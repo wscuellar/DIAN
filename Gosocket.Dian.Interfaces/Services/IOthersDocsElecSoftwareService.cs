@@ -15,5 +15,10 @@ namespace Gosocket.Dian.Interfaces.Services
         List<OtherDocElecSoftware> List(int id);
 
         string GetSoftwareStatusName(int id);
+
+        List<OtherDocElecSoftware> GetSoftwaresByProviderTechnologicalServices(int contributorId,
+            int electronicDocumentId,
+            int contributorTypeId,
+            string state);
     }
 }

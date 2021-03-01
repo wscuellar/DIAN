@@ -803,6 +803,11 @@ namespace Gosocket.Dian.Services.Utils
                         codeMessage = "DSA";
                         break;
                     }
+                case "101":
+                    {
+                        codeMessage = "DIA";
+                        break;
+                    }
                 default:
                     {
                         codeMessage = "GEN";
@@ -930,6 +935,7 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
             }
+
             else
             {
                 if (string.IsNullOrEmpty(documentKey))

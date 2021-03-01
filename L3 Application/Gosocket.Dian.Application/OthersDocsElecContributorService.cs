@@ -32,7 +32,6 @@ namespace Gosocket.Dian.Application
                 sqlDBContext = new SqlDBContext();
         }
 
-
         public List<Gosocket.Dian.Domain.Sql.OtherDocElecOperationMode> GetOperationModes()
         {
             using (var context = new SqlDBContext())
@@ -60,18 +59,14 @@ namespace Gosocket.Dian.Application
             return collection;
         }
 
-        //public OtherDocElecContributor CreateContributor(string userCode, OtherDocElecState State,
-        //   int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy)
         public OtherDocElecContributor CreateContributor(int contributorId, OtherDocElecState State,
            int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy)
         {
-
-            //int contributorId = _contributorService.GetByCode(userCode).Id;
             OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId
                                                                                      && t.OtherDocElecContributorTypeId == ContributorType
                                                                                      && t.OtherDocElecOperationModeId == OperationMode
                                                                                      && t.ElectronicDocumentId == ElectronicDocumentId
-                                                                                     && t.State!="Aceptado");
+                                                                                     && t.State != "Aceptado");
 
             OtherDocElecContributor newContributor = new OtherDocElecContributor()
             {
@@ -85,10 +80,6 @@ namespace Gosocket.Dian.Application
                 CreatedDate = existing != null ? existing.CreatedDate : DateTime.Now
             };
             newContributor.Id = _othersDocsElecContributorRepository.AddOrUpdate(newContributor);
-
-            //Software ownSoftware = GetSoftwareOwn(contributorId);
-            //OtherDocElecSoftware odeSoftware = new OtherDocElecSoftware(ownSoftware, newContributor.Id, createdBy);
-            //newContributor.OtherDocElecSoftwares = new List<OtherDocElecSoftware>() { odeSoftware };
 
             return newContributor;
         }
@@ -104,7 +95,6 @@ namespace Gosocket.Dian.Application
                     join s in softwares on os.Id.ToString() equals s
                     select os).OrderByDescending(t => t.Timestamp).FirstOrDefault();
         }
-
 
         private List<string> ContributorSoftwareAcceptedList(int contributorId)
         {
@@ -123,22 +113,20 @@ namespace Gosocket.Dian.Application
             return softwareAccepted;
         }
 
-        public List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int OperationModeId, string state)
+        public List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int contributorTypeId, int OperationModeId, string state)
         {
-            return _othersDocsElecContributorRepository.List(t => t.ContributorId == ContributorId
-                                                                                      && t.OtherDocElecOperationModeId == OperationModeId
-                                                                                      && t.State != state).Results;
-
+            return _othersDocsElecContributorRepository.List(t => t.ContributorId == ContributorId && 
+                                                                  t.OtherDocElecContributorTypeId == contributorTypeId &&
+                                                                  t.OtherDocElecOperationModeId == OperationModeId && 
+                                                                  t.State != state).Results;
         }
 
         public bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware)
         {
             return _othersDocsElecContributorRepository.GetParticipantWithActiveProcess(ContributorId, ContributorTypeId, OperationModeId, stateSofware);
-
         }
 
-
-        public PagedResult<OtherDocsElectData> List(int contributorId, int OperationModeId)
+        public PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId)
         {
             IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
                                                     join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
@@ -148,10 +136,11 @@ namespace Gosocket.Dian.Application
                                                     join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
                                                     join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
                                                     where oc.ContributorId == contributorId
-                                                     && oc.State != "Cancelado"
-                                                     && s.Deleted == false
-                                                     && oco.Deleted == false
-
+                                                        && oc.OtherDocElecContributorTypeId == contributorTypeId
+                                                        && oc.OtherDocElecOperationModeId == operationModeId
+                                                        && oc.State != "Cancelado"
+                                                        && s.Deleted == false
+                                                        && oco.Deleted == false
                                                     select new OtherDocsElectData()
                                                     {
                                                         Id = oc.Id,
@@ -168,7 +157,6 @@ namespace Gosocket.Dian.Application
                                                         Url = s.Url,
                                                     }).Distinct();
             return query.Paginate(0, 100, t => t.Id.ToString());
-
         }
 
         public OtherDocsElectData GetCOntrinutorODE(int Id)
@@ -291,5 +279,16 @@ namespace Gosocket.Dian.Application
                 return null;
         }
 
+        public OtherDocElecContributor GetContributorSoftwareInProcess(int contributorId, int statusId)
+        {
+            return _othersDocsElecContributorRepository
+                .Get(x => x.ContributorId == contributorId && x.OtherDocElecSoftwares
+                    .Any(y => y.OtherDocElecSoftwareStatusId == statusId));
+        }
+
+        public List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state)
+        {
+            return this._othersDocsElecContributorRepository.GetTechnologicalProviders(contributorId, electronicDocumentId, contributorTypeId, state);
+        }
     }
 }
