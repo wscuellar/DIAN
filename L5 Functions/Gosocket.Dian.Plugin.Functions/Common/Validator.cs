@@ -641,6 +641,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var senderCode = nitModel.SenderCode;
             var senderCodeDigit = nitModel.SenderCodeDigit;
+            var senderSchemeCode = nitModel.SenderSchemeCode;
 
             var senderCodeProvider = nitModel.ProviderCode;
             var senderCodeProviderDigit = nitModel.ProviderCodeDigit;
@@ -720,21 +721,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId != "96")
             {
                 // Sender
-
-                string senderDvErrorCode = "FAJ24";
-                string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
-                if (documentMeta.DocumentTypeId == "05")
+                if(senderSchemeCode == "31")
                 {
-                    senderDvErrorCode = "DSAJ24b";
-                    senderDvrErrorDescription = "El DV del NIT no es correcto";
-                }
-                else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
-                else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
+                    string senderDvErrorCode = "FAJ24";
+                    string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
+                    if (documentMeta.DocumentTypeId == "05")
+                    {
+                        senderDvErrorCode = "DSAJ24b";
+                        senderDvrErrorDescription = "El DV del NIT no es correcto";
+                    }
+                    else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
+                    else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
 
-                if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
-                if (ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = senderDvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
+                    if (ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = senderDvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                }
 
 
                 // Sender2               
@@ -2501,12 +2505,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     string[] tempCodeAttorney = codeAttorney.Split('-');
                     if (modoOperacion == tempCodeAttorney[1])
                     {
-                        if ((customizationID == "431" || customizationID == "432") && tempCodeAttorney[0] == "ALL17")
+                        if ((customizationID == "431" || customizationID == "432"))
                         {
-                            codeExist = true;
+                            if(tempCode.Contains("ALL17")) codeExist = true;
+
+                            //if (new string[] { "ALL17", "MR91" }.Contains(tempCodeAttorney)) codeExist = true;
+
                         }
-                        else if ((customizationID == "433" || customizationID == "434") && tempCodeAttorney[0] == "MR91")
-                            codeExist = true;
+                        else if ((customizationID == "433" || customizationID == "434"))
+                        {
+                            if (tempCode.Contains("MR91")) codeExist = true;
+                            //if (new string[] { "ALL17", "MR91" }.Contains(tempCodeAttorney)) codeExist = true;
+                        }                           
                         else
                             codeExist = false;
 
