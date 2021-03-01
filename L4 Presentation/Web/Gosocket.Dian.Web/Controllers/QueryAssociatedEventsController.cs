@@ -1,6 +1,8 @@
 ﻿using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Models;
 using System;
@@ -14,10 +16,12 @@ namespace Gosocket.Dian.Web.Controllers
     public class QueryAssociatedEventsController : Controller
     {
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
+        private readonly IContributorService _contributorService;
 
-        public QueryAssociatedEventsController(IQueryAssociatedEventsService queryAssociatedEventsService)
+        public QueryAssociatedEventsController(IQueryAssociatedEventsService queryAssociatedEventsService, IContributorService contributorService)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
+            _contributorService = contributorService;
         }
 
         // GET: QueryAssociatedEvents
@@ -116,10 +120,11 @@ namespace Gosocket.Dian.Web.Controllers
 
         private void SetMandate(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem, GlobalDocValidatorDocumentMeta invoice)
         {
-            if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.Mandato)
+            if (model.EventStatus == EventStatus.Mandato)
             {
                 model.Mandate = new ElectronicMandateViewModel(eventItem, invoice);
-
+                Contributor contributor = _contributorService.GetByCode(model.ReceiverCode);
+                model.Mandate.TechProviderName = contributor.BusinessName;
                 List<GlobalDocReferenceAttorney> referenceAttorneys = _queryAssociatedEventsService.ReferenceAttorneys(eventItem.DocumentKey, eventItem.DocumentReferencedKey, eventItem.ReceiverCode, eventItem.SenderCode);
 
                 if (referenceAttorneys.Any())
