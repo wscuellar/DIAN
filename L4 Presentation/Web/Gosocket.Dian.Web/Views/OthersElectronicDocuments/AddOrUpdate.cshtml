@@ -243,7 +243,6 @@
 
             $('#ProviderId').change(function () {
                 if ('@ViewBag.softwareActive' == 'False') {
-                    //console.log("botones", $(":button"));
                     $('#UrlEventReception').val('');
                     $('#SoftwareType').val('');
                     getSoftwares($('#ProviderId').val());
