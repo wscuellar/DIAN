@@ -52,7 +52,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
             SetReferences(model, referenceMeta);
-            
+
             SetEventAssociated(model, eventItem);
 
             Response.Headers["InjectingPartialView"] = "true";
@@ -113,7 +113,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         private static void SetEndoso(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem, GlobalDocValidatorDocumentMeta invoice)
         {
-            if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia 
+            if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia
                 || model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
                 model.Endoso = new EndosoViewModel(eventItem, invoice);
         }
@@ -124,7 +124,8 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 model.Mandate = new ElectronicMandateViewModel(eventItem, invoice);
                 Contributor contributor = _contributorService.GetByCode(model.Mandate.TechProviderCode);
-                model.Mandate.TechProviderName = contributor.BusinessName;
+                if (contributor != null)
+                    model.Mandate.TechProviderName = contributor.BusinessName;
                 List<GlobalDocReferenceAttorney> referenceAttorneys = _queryAssociatedEventsService.ReferenceAttorneys(eventItem.DocumentKey, eventItem.DocumentReferencedKey, eventItem.ReceiverCode, eventItem.SenderCode);
 
                 if (referenceAttorneys.Any())
