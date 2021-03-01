@@ -2405,6 +2405,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             codeExist = true;
                         }
+                        else
+                            codeExist = false;
+
                         if (attorneyModel.facultityCode == null)
                         {
                             attorneyModel.facultityCode += tempCodeAttorney[0];
