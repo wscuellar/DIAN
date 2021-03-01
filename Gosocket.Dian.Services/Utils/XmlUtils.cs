@@ -240,7 +240,7 @@ namespace Gosocket.Dian.Services.Utils
                 new XElement(cac + "PartyTaxScheme",
                  new XElement(cbc + "RegistrationName", $"{docMetadataEntity.SenderName}"),
                     new XElement(cbc + "CompanyID", $"{docMetadataEntity.SenderCode}",
-                        new XAttribute("schemeID", $"{docMetadataEntity.SenderTypeCode}"),
+                        new XAttribute("schemeID", $"{GetDigitCode(docMetadataEntity.SenderCode)}"),
                         new XAttribute("schemeName", $"{docMetadataEntity.SenderSchemeCode}")),
                     new XElement(cac + "TaxScheme",
                         new XElement(cbc + "ID", "01"),
@@ -466,6 +466,32 @@ namespace Gosocket.Dian.Services.Utils
                     }
                 }
                 throw new CryptographicException($"No certificate found with thumbprint: {thumbprint}");
+            }
+        }
+
+        private static int GetDigitCode(string code)
+        {
+            try
+            {
+                int[] cousins = new int[] { 0, 3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71 };
+                int dv, actualCousin, _totalOperacion = 0, residue, totalDigits = code.Length;
+
+                for (int i = 0; i < totalDigits; i++)
+                {
+                    actualCousin = int.Parse(code.Substring(i, 1));
+                    _totalOperacion += actualCousin * cousins[totalDigits - i];
+                }
+                residue = _totalOperacion % 11;
+                if (residue > 1)
+                    dv = 11 - residue;
+                else
+                    dv = residue;
+
+                return dv;
+            }
+            catch (Exception)
+            {
+                return 0;
             }
         }
     }
