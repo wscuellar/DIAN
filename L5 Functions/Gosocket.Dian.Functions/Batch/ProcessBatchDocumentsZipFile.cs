@@ -104,7 +104,7 @@ namespace Gosocket.Dian.Functions.Batch
                 SetLogger(null, "Step prueba nomina", " Trajo datos " + TestSetHabOther, "BATCH-01");
 
                 // Check big contributor
-                if (setResultOther == null && String.IsNullOrEmpty(testSetId))
+                if (setResultOther == null && string.IsNullOrEmpty(testSetId))
                 {
                     xpathRequest = requestObjects.FirstOrDefault();
                     xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
@@ -128,16 +128,7 @@ namespace Gosocket.Dian.Functions.Batch
                 if (setResultOther != null && !string.IsNullOrEmpty(TestSetHabOther))
                 {
                     SetLogger(null, "Step prueba nomina", " Trajo datos setResultOther Y habOther ", "BATCH-01.1");
-
-                    xmlParser = new XmlParseNomina(xmlBytes);
-                    var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(Convert.ToString(xmlParser.globalDocPayrolls.NIT), Convert.ToString(xmlParser.globalDocPayrolls.NIT));
-                    if (bigContributorRequestAuthorization?.StatusCode != (int)BigContributorAuthorizationStatus.Authorized)
-                    {
-                        batchFileStatus.StatusCode = "2";
-                        batchFileStatus.StatusDescription = $"Empresa emisora con NIT {Convert.ToString(xmlParser.globalDocPayrolls.NIT)} no se encuentra autorizada para enviar documentos por los lotes.";
-                        await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
-                        return;
-                    }
+                    xmlParser = new XmlParseNomina(xmlBytes);                   
                 }
 
                 SetLogger(null, "Step prueba nomina", " Paso el segundo If ");

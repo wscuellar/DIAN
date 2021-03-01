@@ -3,6 +3,7 @@
     public class NitModel
     {
         public string SenderCode { get; set; }
+        public string SenderSchemeCode { get; set; }
         public string SenderName { get; set; }
         public string SenderCodeDigit { get; set; }
         public string ProviderCode { get; set; }

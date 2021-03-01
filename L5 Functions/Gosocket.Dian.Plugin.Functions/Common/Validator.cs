@@ -622,25 +622,33 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIAE034", ErrorMessage = "Debe ir el DV del Empleador", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
 
-                var otherElectricDocuments = TableManagerGlobalOtherDocElecOperation
+                //Valida emisor habilitado en Nomina GlobalOtherDocElecOperation
+                if (!documentMeta.SendTestSet)
+                {
+                    var otherElectricDocuments = TableManagerGlobalOtherDocElecOperation
                     .FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.ProveedorNIT,
                     nominaModel.ProveedorSoftwareID, false, "Habilitado");
-                if (otherElectricDocuments != null && otherElectricDocuments.Count > 0)
-                {
-                    // ElectronicDocumentId = 1. Es para Documentos 11 y 12 (Nómina Individual y Nómina Individual de Ajuste).
-                    var electricDocumentFound = otherElectricDocuments.FirstOrDefault(x => x.ElectronicDocumentId == 1);
-                    if (electricDocumentFound != null)
-                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                    if (otherElectricDocuments != null && otherElectricDocuments.Count > 0)
+                    {
+                        // ElectronicDocumentId = 1. Es para Documentos 11 y 12 (Nómina Individual y Nómina Individual de Ajuste).
+                        var electricDocumentFound = otherElectricDocuments.FirstOrDefault(x => x.ElectronicDocumentId == 1);
+                        if (electricDocumentFound != null)
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                    }
                     else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
                 }
-                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
 
                 return responses;
             }
 
             var senderCode = nitModel.SenderCode;
             var senderCodeDigit = nitModel.SenderCodeDigit;
+            var senderSchemeCode = nitModel.SenderSchemeCode;
 
             var senderCodeProvider = nitModel.ProviderCode;
             var senderCodeProviderDigit = nitModel.ProviderCodeDigit;
@@ -720,21 +728,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId != "96")
             {
                 // Sender
-
-                string senderDvErrorCode = "FAJ24";
-                string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
-                if (documentMeta.DocumentTypeId == "05")
+                if(senderSchemeCode == "31")
                 {
-                    senderDvErrorCode = "DSAJ24b";
-                    senderDvrErrorDescription = "El DV del NIT no es correcto";
-                }
-                else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
-                else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
+                    string senderDvErrorCode = "FAJ24";
+                    string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
+                    if (documentMeta.DocumentTypeId == "05")
+                    {
+                        senderDvErrorCode = "DSAJ24b";
+                        senderDvrErrorDescription = "El DV del NIT no es correcto";
+                    }
+                    else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
+                    else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
 
-                if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
-                if (ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = senderDvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
+                    if (ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = senderDvErrorCode, ErrorMessage = senderDvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                }
 
 
                 // Sender2               
@@ -1967,6 +1978,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             RequestObjectSigningTime dataSigningtime = new RequestObjectSigningTime();
             NitModel nitModel = new NitModel();
             bool validate = false;
+            bool validateID = false;
             bool validateReference = false;
             bool validateSigningTime = false;
             int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
@@ -2006,12 +2018,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Compara ID seccion DocumentReference 1 /  DocumentReference 2
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
-                    var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
-                    var xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                    var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                    var xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
 
                     if (!String.Equals(xmlID, xmlID2))
                     {
-                        validate = true;
+                        validateID = true;
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
@@ -2023,14 +2035,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         break;
                     }
                     else
-                        validate = false;
+                        validateID = false;
                 }
 
                 //Compara UUID seccion DocumentReference 1 /  DocumentReference 2
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
-                    var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
-                    var xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    var xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
 
                     if (!String.Equals(xmlUUID, xmlUUID2))
                     {
@@ -2051,7 +2063,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //Valida documentos referenciados
-            for (int i = 0; i < cufeListResponse.Count && !validate; i++)
+            for (int i = 0; i < cufeListResponse.Count && !validateID && !validate; i++)
             {
                 var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
@@ -2087,7 +2099,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             dataSigningtime.EndDate = "";
 
             //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-            for (int i = 0; i < cufeListResponse.Count && !validate; i++)
+            for (int i = 0; i < cufeListResponse.Count && !validateID && !validate; i++)
             {
                 ValidatorEngine validatorEngine = new ValidatorEngine();
                 dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
@@ -2119,7 +2131,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
             }
 
-            if (validate)
+            if (validate || validateID)
                 return responses;
 
             return null;
@@ -2396,7 +2408,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
                 {
-                    string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString();
+                    string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString().Trim();
+                  
                     if (!IsBase64(AttachmentBase64))
                     {
                         validate = false;
@@ -2428,7 +2441,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                             break;
                         }
-                    }
+                    }                                             
                 }
             }
 
@@ -2500,12 +2513,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     string[] tempCodeAttorney = codeAttorney.Split('-');
                     if (modoOperacion == tempCodeAttorney[1])
                     {
-                        if ((customizationID == "431" || customizationID == "432") && tempCodeAttorney[0] == "ALL17")
+                        if ((customizationID == "431" || customizationID == "432"))
                         {
-                            codeExist = true;
+                            if(tempCode.Contains("ALL17")) codeExist = true;
+
+                            //if (new string[] { "ALL17", "MR91" }.Contains(tempCodeAttorney)) codeExist = true;
+
                         }
-                        else if ((customizationID == "433" || customizationID == "434") && tempCodeAttorney[0] == "MR91")
-                            codeExist = true;
+                        else if ((customizationID == "433" || customizationID == "434"))
+                        {
+                            if (tempCode.Contains("MR91")) codeExist = true;
+                            //if (new string[] { "ALL17", "MR91" }.Contains(tempCodeAttorney)) codeExist = true;
+                        }                           
                         else
                             codeExist = false;
 
@@ -2551,7 +2570,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida description code acorde al codigo ingresado de mandato general
                     else if (tempCodeAttorney[0] == "MR91")
                     {
-                        if (!descriptionCode.Equals("Mandato con Representación"))
+                        if (!descriptionCode.Equals("Mandato por documento Limitado"))
                         {
                             validate = false;
                             responses.Add(new ValidateListResponse
