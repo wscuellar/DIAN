@@ -123,7 +123,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (model.EventStatus == EventStatus.Mandato)
             {
                 model.Mandate = new ElectronicMandateViewModel(eventItem, invoice);
-                Contributor contributor = _contributorService.GetByCode(model.ReceiverCode);
+                Contributor contributor = _contributorService.GetByCode(model.Mandate.TechProviderCode);
                 model.Mandate.TechProviderName = contributor.BusinessName;
                 List<GlobalDocReferenceAttorney> referenceAttorneys = _queryAssociatedEventsService.ReferenceAttorneys(eventItem.DocumentKey, eventItem.DocumentReferencedKey, eventItem.ReceiverCode, eventItem.SenderCode);
 
