@@ -149,7 +149,7 @@ namespace Gosocket.Dian.Application
                                                         ContributorType = oty.Name,
                                                         Software = s.Name,
                                                         PinSW = s.Pin,
-                                                        SoftwareId = s.Id.ToString(),
+                                                        SoftwareId = s.SoftwareId.ToString(),
                                                         StateSoftware = ocs.Name,
                                                         StateContributor = oc.State,
                                                         CreatedDate = oc.CreatedDate,

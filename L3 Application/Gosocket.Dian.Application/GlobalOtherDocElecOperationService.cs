@@ -20,7 +20,7 @@ namespace Gosocket.Dian.Application
         {
             GlobalSoftware soft = new GlobalSoftware(software.Id.ToString(), software.Id.ToString())
             {
-                Id = software.Id,
+                Id = software.SoftwareId,
                 Pin = software.Pin,
                 Timestamp = DateTime.Now,
                 StatusId = 1
