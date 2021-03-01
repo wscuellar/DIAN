@@ -1971,6 +1971,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             RequestObjectSigningTime dataSigningtime = new RequestObjectSigningTime();
             NitModel nitModel = new NitModel();
             bool validate = false;
+            bool validateID = false;
             bool validateReference = false;
             bool validateSigningTime = false;
             int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
@@ -2010,12 +2011,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Compara ID seccion DocumentReference 1 /  DocumentReference 2
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
-                    var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
-                    var xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                    var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                    var xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
 
                     if (!String.Equals(xmlID, xmlID2))
                     {
-                        validate = true;
+                        validateID = true;
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
@@ -2027,14 +2028,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         break;
                     }
                     else
-                        validate = false;
+                        validateID = false;
                 }
 
                 //Compara UUID seccion DocumentReference 1 /  DocumentReference 2
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
-                    var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
-                    var xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    var xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
 
                     if (!String.Equals(xmlUUID, xmlUUID2))
                     {
@@ -2055,7 +2056,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //Valida documentos referenciados
-            for (int i = 0; i < cufeListResponse.Count && !validate; i++)
+            for (int i = 0; i < cufeListResponse.Count && !validateID && !validate; i++)
             {
                 var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                 var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
@@ -2091,7 +2092,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             dataSigningtime.EndDate = "";
 
             //Valida La fecha debe ser mayor o igual al evento de la factura referenciada
-            for (int i = 0; i < cufeListResponse.Count && !validate; i++)
+            for (int i = 0; i < cufeListResponse.Count && !validateID && !validate; i++)
             {
                 ValidatorEngine validatorEngine = new ValidatorEngine();
                 dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
@@ -2123,7 +2124,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
             }
 
-            if (validate)
+            if (validate || validateID)
                 return responses;
 
             return null;
