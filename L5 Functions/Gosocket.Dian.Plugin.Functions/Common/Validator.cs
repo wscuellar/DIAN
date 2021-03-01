@@ -30,6 +30,7 @@ using Gosocket.Dian.Plugin.Functions.Event;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Gosocket.Dian.Services.Utils;
+using System.Runtime.InteropServices;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -51,6 +52,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
         private TableManager TableManagerGlobalTaxRate = new TableManager("GlobalTaxRate");
         private TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
+        private static readonly string pdfMimeType = "application/pdf";
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -1950,10 +1952,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
         #region IsBase64
-        private bool IsBase64(String base64String)
+        private bool IsBase64(string base64String)
         {
             var rs = !string.IsNullOrEmpty(base64String) && !string.IsNullOrWhiteSpace(base64String) && base64String.Length != 0 && base64String.Length % 4 == 0 && !base64String.Contains(" ");
             return rs;
+        }
+        #endregion
+
+        #region Base64_Decode
+        private string Base64_Decode(string base64String)
+        {
+            byte[] decbuff = Convert.FromBase64String(base64String);
+            return System.Text.Encoding.UTF8.GetString(decbuff);
         }
         #endregion
 
@@ -2406,6 +2416,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                             break;
                         }
+                        else
+                        {                                                   
+                            string base64Decoded = string.Empty;
+                            byte[] data = Convert.FromBase64String(AttachmentBase64);
+                            base64Decoded = ASCIIEncoding.ASCII.GetString(data);
+                            var mimeType = GetMimeFromBytes(data);
+                            if(mimeType != pdfMimeType)
+                            {
+                                validate = false;
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH84"),
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH84"),
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                                break;
+                            }
+                        }
                     }
                 }               
             }
@@ -2674,6 +2704,55 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return responses;
         }
         #endregion
+
+        /// <summary>
+        /// Get mime type from data
+        /// </summary>
+        /// <param name="pBC"></param>
+        /// <param name="pwzUrl"></param>
+        /// <param name="pBuffer"></param>
+        /// <param name="cbSize"></param>
+        /// <param name="pwzMimeProposed"></param>
+        /// <param name="dwMimeFlags"></param>
+        /// <param name="ppwzMimeOut"></param>
+        /// <param name="dwReserved"></param>
+        /// <returns></returns>
+        [DllImport("urlmon.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = false)]
+        static extern int FindMimeFromData(IntPtr pBC,
+            [MarshalAs(UnmanagedType.LPWStr)] string pwzUrl,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.I1, SizeParamIndex=3)]
+            byte[] pBuffer,
+            int cbSize,
+            [MarshalAs(UnmanagedType.LPWStr)] string pwzMimeProposed,
+            int dwMimeFlags,
+            out IntPtr ppwzMimeOut,
+            int dwReserved);
+
+
+        /// <summary>
+        /// Get bytes mime type
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string GetMimeFromBytes(byte[] data)
+        {
+            try
+            {
+                string mime = string.Empty;
+                IntPtr suggestPtr = IntPtr.Zero, filePtr = IntPtr.Zero, outPtr = IntPtr.Zero;
+                int ret = FindMimeFromData(IntPtr.Zero, null, data, data.Length, null, 0, out outPtr, 0);
+                if (ret == 0 && outPtr != IntPtr.Zero)
+                {
+                    //todo: this leaks memory outPtr must be freed
+                    return Marshal.PtrToStringUni(outPtr);
+                }
+                return mime;
+            }
+            catch
+            {
+                return "";
+            }
+        }
 
         #region Number range validation
         public List<ValidateListResponse> ValidateNumberingRange(NumberRangeModel numberRangeModel, string trackId)
