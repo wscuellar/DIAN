@@ -128,7 +128,7 @@
     <Setting Name="Param_RegistrateCompletedRadianUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">RegistrateCompletedRadianUrl</Value>
     </Setting>
-    <Setting Name="Param_RegistrateCompletedPayrollUrl" Type="System.String" Scope="User">
+    <Setting Name="Param_RegistrateCompletedPayrollUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">RegistrateCompletedPayrollUrl</Value>
     </Setting>
   </Settings>
