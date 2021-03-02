@@ -149,7 +149,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-
+            
             GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocumentId);
             if (testSet == null)
                 return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
@@ -164,7 +164,7 @@ namespace Gosocket.Dian.Web.Controllers
             int providerId = model.ProviderId;
             if(model.OperationModeId != 2) providerId = User.ContributorId();
 
-            var IdS = new Guid();
+            var IdS = Guid.NewGuid();
             OtherDocElecSoftware software = new OtherDocElecSoftware()
             {
                 Id = IdS,

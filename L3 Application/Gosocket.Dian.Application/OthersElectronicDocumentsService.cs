@@ -73,21 +73,17 @@ namespace Gosocket.Dian.Application
                     return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
             }
 
-
             OtherDocElecContributorOperations existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted);
             if (existingOperation != null)
                 return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
 
-            OtherDocElecSoftware soft = _othersDocsElecSoftwareService.CreateSoftware(software);
-            ContributorOperation.SoftwareId = soft.Id;
+            _othersDocsElecSoftwareService.CreateSoftware(software);
 
-            // Esto considero no aplica, porque antes de establece el estado "En pruebas".
-            //ContributorOperation.OperationStatusId = (int)(Contributor.State == OtherDocElecState.Habilitado.GetDescription() ? (int)OtherDocElecState.Test : (int)RadianState.Registrado);
             int operationId = _othersDocsElecContributorOperationRepository.Add(ContributorOperation);
 
             existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.Id == operationId);
             // se asigna el nuevo set de pruebas...
-            ApplyTestSet(ContributorOperation, testSet, Contributor, existingOperation, soft);
+            ApplyTestSet(ContributorOperation, testSet, Contributor, existingOperation, software);
 
             return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
         }
@@ -189,23 +185,21 @@ namespace Gosocket.Dian.Application
             operation.ElectronicDocumentId = ODEContributor.ElectronicDocumentId;
             operation.OtherDocElecContributorId = ODEContributor.Id;
             operation.State = OtherDocElecState.Test.GetDescription();
-            //operation.State = ODEContributor.State == OtherDocElecState.Habilitado.GetDescription() ? OtherDocElecState.Test.GetDescription() : OtherDocElecState.Registrado.GetDescription();
-            //operation.SoftwareType = existingOperation.SoftwareType;
             operation.ContributorTypeId = ODEContributor.OtherDocElecContributorTypeId;
             operation.Deleted = false;
 
             if (_globalOtherDocElecOperationService.Insert(operation, existingOperation.Software))
             {
-                string key = existingOperation.SoftwareType.ToString() + "|" + ODEOperation.SoftwareId;
+                string key = existingOperation.SoftwareType.ToString() + "|" + software.SoftwareId.ToString();
                 GlobalTestSetOthersDocumentsResult setResult = new GlobalTestSetOthersDocumentsResult(contributor.Code, key)
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = testSet.TestSetId,
                     OtherDocElecContributorId = ODEContributor.Id,
                     State = TestSetStatus.InProcess.GetDescription(),
                     Status = (int)TestSetStatus.InProcess,
                     StatusDescription = TestSetStatus.InProcess.GetDescription(),
                     ContributorTypeId = ODEContributor.OtherDocElecContributorTypeId.ToString(),
-                    OperationModeName = "TODORM:",
+                    OperationModeName = ((Domain.Common.OtherDocElecOperationMode)ODEContributor.OtherDocElecOperationModeId).GetDescription(),
                     ElectronicDocumentId = ODEContributor.ElectronicDocumentId,
                     SoftwareId = software.Id.ToString(),
                     ProviderId = software.ProviderId,
@@ -233,8 +227,8 @@ namespace Gosocket.Dian.Application
                     ElectronicPayrollAjustmentRejected = 0,
                     //EndElectronicPayrollAjustment
                 };
+                // insert...
                 _ = _testSetOthersDocumentsResultService.InsertTestSetResult(setResult);
-
             }
         }
         #endregion

@@ -761,8 +761,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     arrayTasks.Add(thirdLocalRun);
                     Task.WhenAll(arrayTasks).Wait();
 
-                    var applicationResponse = XmlUtilEvents.GetApplicationResponseIfExist(documentMeta);
-                    response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations) : null;
+                    response.XmlBase64Bytes = XmlUtilEvents.GenerateApplicationResponseBytes(trackId, documentMeta, validations, events, originalEvents, originalEventsValidations);
 
                     response.XmlDocumentKey = trackId;
                     response.XmlFileName = documentMeta.FileName;
@@ -1174,8 +1173,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 arrayTasks.Add(secondLocalRun);
                 Task.WhenAll(arrayTasks).Wait();
 
-                var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
-                dianResponse.XmlBase64Bytes = applicationResponse ?? XmlUtil.GenerateApplicationResponseBytes(trackIdCude, documentMeta, validations);
+                dianResponse.XmlBase64Bytes = XmlUtil.GenerateApplicationResponseBytes(trackIdCude, documentMeta, validations);
 
                 dianResponse.XmlDocumentKey = trackIdCude;
                 GlobalDocValidatorDocument validatorDocument = null;
