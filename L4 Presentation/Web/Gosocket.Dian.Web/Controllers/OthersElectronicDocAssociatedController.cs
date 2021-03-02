@@ -221,7 +221,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.TestSetId = testSet.TestSetId;
             OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
 
-            string key = model.OperationModeId.ToString() + "|" + model.SoftwareId.ToString();
+            string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
             model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
 
             model.GTestSetOthersDocumentsResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.OtherDocElecOperationMode), model.OperationModeId.ToString())));
